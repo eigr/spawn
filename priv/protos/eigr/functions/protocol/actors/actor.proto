@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package eigr.functions.protocol.actors;
+
+import "google/protobuf/any.proto";
+
+option java_package = "io.eigr.functions.protocol.actors";
+option go_package = "github.com/eigr/go-support/eigr/actors;actors";
+
+message ActorState {
+    google.protobuf.Any state = 1;
+}
+
+message Actor {
+    string name = 1;
+    ActorState actor_state = 2;
+}

@@ -7,7 +7,8 @@ defmodule Spawn.MixProject do
       version: "0.1.0",
       elixir: "~> 1.13",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      releases: releases()
     ]
   end
 
@@ -22,8 +23,27 @@ defmodule Spawn.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      # {:dep_from_hexpm, "~> 0.3.0"},
-      # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
+      {:bakeware, "~> 0.2"},
+      {:vapor, "~> 0.10"},
+      {:libcluster, "~> 3.3"},
+      {:horde, "~> 0.8"},
+      {:google_protos, "~> 0.2.0"},
+      {:protobuf, "~> 0.9.0", override: true},
+      {:grpc, github: "elixir-grpc/grpc", override: true}
+    ]
+  end
+
+  defp releases() do
+    [
+      spawn_proxy: [
+        include_executables_for: [:unix],
+        applications: [runtime_tools: :permanent],
+        steps: [
+          :assemble,
+          &Bakeware.assemble/1
+        ],
+        bakeware: [compression_level: 19]
+      ]
     ]
   end
 end
