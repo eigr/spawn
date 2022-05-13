@@ -13,6 +13,7 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
   @spec handle_continue(:load_state, Eigr.Functions.Protocol.Actors.Actor.t()) ::
           {:noreply, Eigr.Functions.Protocol.Actors.Actor.t()}
   def handle_continue(:load_state, %Actor{actor_state: %ActorState{} = actor_state} = state) do
+    current_state = StateManager.load(state.name)
     updated_state = actor_state
     {:noreply, %Actor{state | actor_state: updated_state}}
   end
