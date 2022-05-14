@@ -1,27 +1,141 @@
+defmodule Eigr.Functions.Protocol.ProxyInfo do
+  @moduledoc false
+  use Protobuf, syntax: :proto3
+
+  @type t :: %__MODULE__{
+          protocol_major_version: integer,
+          protocol_minor_version: integer,
+          proxy_name: String.t(),
+          proxy_version: String.t()
+        }
+  defstruct [:protocol_major_version, :protocol_minor_version, :proxy_name, :proxy_version]
+
+  def descriptor do
+    # credo:disable-for-next-line
+    Elixir.Google.Protobuf.DescriptorProto.decode(
+      <<10, 9, 80, 114, 111, 120, 121, 73, 110, 102, 111, 18, 52, 10, 22, 112, 114, 111, 116, 111,
+        99, 111, 108, 95, 109, 97, 106, 111, 114, 95, 118, 101, 114, 115, 105, 111, 110, 24, 1,
+        32, 1, 40, 5, 82, 20, 112, 114, 111, 116, 111, 99, 111, 108, 77, 97, 106, 111, 114, 86,
+        101, 114, 115, 105, 111, 110, 18, 52, 10, 22, 112, 114, 111, 116, 111, 99, 111, 108, 95,
+        109, 105, 110, 111, 114, 95, 118, 101, 114, 115, 105, 111, 110, 24, 2, 32, 1, 40, 5, 82,
+        20, 112, 114, 111, 116, 111, 99, 111, 108, 77, 105, 110, 111, 114, 86, 101, 114, 115, 105,
+        111, 110, 18, 29, 10, 10, 112, 114, 111, 120, 121, 95, 110, 97, 109, 101, 24, 3, 32, 1,
+        40, 9, 82, 9, 112, 114, 111, 120, 121, 78, 97, 109, 101, 18, 35, 10, 13, 112, 114, 111,
+        120, 121, 95, 118, 101, 114, 115, 105, 111, 110, 24, 4, 32, 1, 40, 9, 82, 12, 112, 114,
+        111, 120, 121, 86, 101, 114, 115, 105, 111, 110>>
+    )
+  end
+
+  field :protocol_major_version, 1, type: :int32
+  field :protocol_minor_version, 2, type: :int32
+  field :proxy_name, 3, type: :string
+  field :proxy_version, 4, type: :string
+end
+
+defmodule Eigr.Functions.Protocol.ServiceInfo do
+  @moduledoc false
+  use Protobuf, syntax: :proto3
+
+  @type t :: %__MODULE__{
+          service_name: String.t(),
+          service_version: String.t(),
+          service_runtime: String.t(),
+          support_library_name: String.t(),
+          support_library_version: String.t(),
+          protocol_major_version: integer,
+          protocol_minor_version: integer
+        }
+  defstruct [
+    :service_name,
+    :service_version,
+    :service_runtime,
+    :support_library_name,
+    :support_library_version,
+    :protocol_major_version,
+    :protocol_minor_version
+  ]
+
+  def descriptor do
+    # credo:disable-for-next-line
+    Elixir.Google.Protobuf.DescriptorProto.decode(
+      <<10, 11, 83, 101, 114, 118, 105, 99, 101, 73, 110, 102, 111, 18, 33, 10, 12, 115, 101, 114,
+        118, 105, 99, 101, 95, 110, 97, 109, 101, 24, 1, 32, 1, 40, 9, 82, 11, 115, 101, 114, 118,
+        105, 99, 101, 78, 97, 109, 101, 18, 39, 10, 15, 115, 101, 114, 118, 105, 99, 101, 95, 118,
+        101, 114, 115, 105, 111, 110, 24, 2, 32, 1, 40, 9, 82, 14, 115, 101, 114, 118, 105, 99,
+        101, 86, 101, 114, 115, 105, 111, 110, 18, 39, 10, 15, 115, 101, 114, 118, 105, 99, 101,
+        95, 114, 117, 110, 116, 105, 109, 101, 24, 3, 32, 1, 40, 9, 82, 14, 115, 101, 114, 118,
+        105, 99, 101, 82, 117, 110, 116, 105, 109, 101, 18, 48, 10, 20, 115, 117, 112, 112, 111,
+        114, 116, 95, 108, 105, 98, 114, 97, 114, 121, 95, 110, 97, 109, 101, 24, 4, 32, 1, 40, 9,
+        82, 18, 115, 117, 112, 112, 111, 114, 116, 76, 105, 98, 114, 97, 114, 121, 78, 97, 109,
+        101, 18, 54, 10, 23, 115, 117, 112, 112, 111, 114, 116, 95, 108, 105, 98, 114, 97, 114,
+        121, 95, 118, 101, 114, 115, 105, 111, 110, 24, 5, 32, 1, 40, 9, 82, 21, 115, 117, 112,
+        112, 111, 114, 116, 76, 105, 98, 114, 97, 114, 121, 86, 101, 114, 115, 105, 111, 110, 18,
+        52, 10, 22, 112, 114, 111, 116, 111, 99, 111, 108, 95, 109, 97, 106, 111, 114, 95, 118,
+        101, 114, 115, 105, 111, 110, 24, 6, 32, 1, 40, 5, 82, 20, 112, 114, 111, 116, 111, 99,
+        111, 108, 77, 97, 106, 111, 114, 86, 101, 114, 115, 105, 111, 110, 18, 52, 10, 22, 112,
+        114, 111, 116, 111, 99, 111, 108, 95, 109, 105, 110, 111, 114, 95, 118, 101, 114, 115,
+        105, 111, 110, 24, 7, 32, 1, 40, 5, 82, 20, 112, 114, 111, 116, 111, 99, 111, 108, 77,
+        105, 110, 111, 114, 86, 101, 114, 115, 105, 111, 110>>
+    )
+  end
+
+  field :service_name, 1, type: :string
+  field :service_version, 2, type: :string
+  field :service_runtime, 3, type: :string
+  field :support_library_name, 4, type: :string
+  field :support_library_version, 5, type: :string
+  field :protocol_major_version, 6, type: :int32
+  field :protocol_minor_version, 7, type: :int32
+end
+
 defmodule Eigr.Functions.Protocol.Init do
   @moduledoc false
   use Protobuf, syntax: :proto3
 
-  @type t :: %__MODULE__{}
-  defstruct []
+  @type t :: %__MODULE__{
+          proxy_info: Eigr.Functions.Protocol.ProxyInfo.t() | nil
+        }
+  defstruct [:proxy_info]
 
   def descriptor do
     # credo:disable-for-next-line
-    Elixir.Google.Protobuf.DescriptorProto.decode(<<10, 4, 73, 110, 105, 116>>)
+    Elixir.Google.Protobuf.DescriptorProto.decode(
+      <<10, 4, 73, 110, 105, 116, 18, 65, 10, 10, 112, 114, 111, 120, 121, 95, 105, 110, 102, 111,
+        24, 1, 32, 1, 40, 11, 50, 34, 46, 101, 105, 103, 114, 46, 102, 117, 110, 99, 116, 105,
+        111, 110, 115, 46, 112, 114, 111, 116, 111, 99, 111, 108, 46, 80, 114, 111, 120, 121, 73,
+        110, 102, 111, 82, 9, 112, 114, 111, 120, 121, 73, 110, 102, 111>>
+    )
   end
+
+  field :proxy_info, 1, type: Eigr.Functions.Protocol.ProxyInfo
 end
 
 defmodule Eigr.Functions.Protocol.InitResponse do
   @moduledoc false
   use Protobuf, syntax: :proto3
 
-  @type t :: %__MODULE__{}
-  defstruct []
+  @type t :: %__MODULE__{
+          service_info: Eigr.Functions.Protocol.ServiceInfo.t() | nil,
+          actors: [Eigr.Functions.Protocol.Actors.Actor.t()]
+        }
+  defstruct [:service_info, :actors]
 
   def descriptor do
     # credo:disable-for-next-line
-    Elixir.Google.Protobuf.DescriptorProto.decode("\n\fInitResponse")
+    Elixir.Google.Protobuf.DescriptorProto.decode(
+      <<10, 12, 73, 110, 105, 116, 82, 101, 115, 112, 111, 110, 115, 101, 18, 71, 10, 12, 115,
+        101, 114, 118, 105, 99, 101, 95, 105, 110, 102, 111, 24, 1, 32, 1, 40, 11, 50, 36, 46,
+        101, 105, 103, 114, 46, 102, 117, 110, 99, 116, 105, 111, 110, 115, 46, 112, 114, 111,
+        116, 111, 99, 111, 108, 46, 83, 101, 114, 118, 105, 99, 101, 73, 110, 102, 111, 82, 11,
+        115, 101, 114, 118, 105, 99, 101, 73, 110, 102, 111, 18, 61, 10, 6, 97, 99, 116, 111, 114,
+        115, 24, 2, 32, 3, 40, 11, 50, 37, 46, 101, 105, 103, 114, 46, 102, 117, 110, 99, 116,
+        105, 111, 110, 115, 46, 112, 114, 111, 116, 111, 99, 111, 108, 46, 97, 99, 116, 111, 114,
+        115, 46, 65, 99, 116, 111, 114, 82, 6, 97, 99, 116, 111, 114, 115>>
+    )
   end
+
+  field :service_info, 1, type: Eigr.Functions.Protocol.ServiceInfo
+  field :actors, 2, repeated: true, type: Eigr.Functions.Protocol.Actors.Actor
 end
 
 defmodule Eigr.Functions.Protocol.Create do

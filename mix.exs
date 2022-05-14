@@ -25,6 +25,13 @@ defmodule Spawn.MixProject do
     [
       {:bakeware, "~> 0.2"},
       {:vapor, "~> 0.10"},
+      {:observer_cli, "~> 1.7"},
+      {:plug_cowboy, "~> 2.5"},
+      {:poison, "~> 5.0"},
+      {:prometheus, "~> 4.8"},
+      {:prometheus_plugs, "~> 1.1"},
+      {:telemetry, "~> 1.0"},
+      {:jason, "~> 1.2"},
       {:libcluster, "~> 3.3"},
       {:horde, "~> 0.8"},
       {:google_protos, "~> 0.2.0"},
@@ -35,7 +42,7 @@ defmodule Spawn.MixProject do
 
   defp releases() do
     [
-      spawn_proxy: [
+      spawn: [
         include_executables_for: [:unix],
         applications: [runtime_tools: :permanent],
         steps: [
