@@ -51,8 +51,8 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
   def handle_info(:deactivate, %Actor{name: name} = state) do
     case Process.info(self(), :message_queue_len) do
       {:message_queue_len, 0} ->
-        Logger.debug("Deactivating actor #{name}")
-        {:stop, state}
+        Logger.debug("Deactivating actor #{name} for timeout")
+        {:stop, :normal, state}
 
       _ ->
         {:noreply, state}
@@ -62,26 +62,26 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
   @impl true
   def terminate(reason, %Actor{name: name, actor_state: %ActorState{} = actor_state} = _state) do
     StateManager.save(name, actor_state)
-    Logger.debug("Deactivating actor #{name} with reason #{reason}")
+    Logger.debug("Terminating actor #{name} with reason #{reason}")
   end
 
   def start_link(%Actor{name: name} = actor) do
     GenServer.start(__MODULE__, actor, name: via(name))
   end
 
-  defp get_snapshot_interval({:timeout, %TimeoutStrategy{timeout: nil}} = _timeout_strategy),
-    do: @default_timeout
+  defp get_snapshot_interval(%TimeoutStrategy{timeout: timeout} = _timeout_strategy)
+       when is_nil(timeout),
+       do: @default_timeout
 
-  defp get_snapshot_interval({:timeout, %TimeoutStrategy{timeout: timeout}} = _timeout_strategy),
+  defp get_snapshot_interval(%TimeoutStrategy{timeout: timeout} = _timeout_strategy),
     do: timeout
 
-  defp get_deactivate_interval({:timeout, %TimeoutStrategy{timeout: nil}} = _timeout_strategy),
-    do: @default_timeout
+  defp get_deactivate_interval(%TimeoutStrategy{timeout: timeout} = _timeout_strategy)
+       when is_nil(timeout),
+       do: @default_timeout
 
-  defp get_deactivate_interval(
-         {:timeout, %TimeoutStrategy{timeout: timeout}} = _timeout_strategy
-       ),
-       do: timeout
+  defp get_deactivate_interval(%TimeoutStrategy{timeout: timeout} = _timeout_strategy),
+    do: timeout
 
   defp via(name) do
     {:via, Horde.Registry, {Spawn.Actor.Registry, {__MODULE__, name}}}

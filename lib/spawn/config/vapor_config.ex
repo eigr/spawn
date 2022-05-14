@@ -30,7 +30,8 @@ defmodule Spawn.Config.Vapor do
       %Dotenv{},
       %Env{
         bindings: [
-          {:http_port, "HTTP_PORT", default: 4000, map: &String.to_integer/1, required: false},
+          {:http_port, "PROXY_HTTP_PORT",
+           default: 4000, map: &String.to_integer/1, required: false},
           {:proxy_cluster_strategy, "PROXY_CLUSTER_STRATEGY", default: "gossip", required: false},
           {:proxy_headless_service, "PROXY_HEADLESS_SERVICE",
            default: "proxy-headless-svc", required: false},
