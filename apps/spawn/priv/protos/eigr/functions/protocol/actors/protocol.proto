@@ -1,0 +1,97 @@
+syntax = "proto3";
+
+package eigr.functions.protocol;
+
+import "actor.proto";
+import "google/protobuf/any.proto";
+
+option java_package = "io.eigr.functions.protocol";
+option go_package = "github.com/eigr/go-support/eigr/protocol;protocol";
+
+message ProxyInfo {
+    int32 protocol_major_version = 1;
+    int32 protocol_minor_version = 2;
+    string proxy_name = 3;
+    string proxy_version = 4;
+}
+
+message ServiceInfo {
+
+    // The name of the actor system, eg, "my-actor-system".
+    string service_name = 1;
+
+    // The version of the service.
+    string service_version = 2;
+
+    // A description of the runtime for the service. Can be anything, but examples might be:
+    // - node v10.15.2
+    // - OpenJDK Runtime Environment 1.8.0_192-b12
+    string service_runtime = 3;
+
+    // If using a support library, the name of that library, eg "spawn-jvm"
+    string support_library_name = 4;
+
+    // The version of the support library being used.
+    string support_library_version = 5;
+
+    // Cloudstate protocol major version accepted by the support library.
+    int32 protocol_major_version = 6;
+
+    // Cloudstate protocol minor version accepted by the support library.
+    int32 protocol_minor_version = 7;
+}
+
+message Init {
+    ProxyInfo proxy_info = 1;
+}
+
+message InitResponse {
+    ServiceInfo service_info = 1;
+    repeated eigr.functions.protocol.actors.Actor actors = 2;
+}
+
+message Create {
+    eigr.functions.protocol.actors.Actor actor = 1;
+}
+
+message Call {
+    string command_name = 1;
+    google.protobuf.Any value = 2;
+    eigr.functions.protocol.actors.Actor actor = 3;
+}
+
+message CallResponse {
+    google.protobuf.Any value = 1;
+    eigr.functions.protocol.actors.Actor actor = 2;
+}
+
+message Cast {
+    string command_name = 1;
+    google.protobuf.Any value = 2;
+    eigr.functions.protocol.actors.Actor actor = 3;
+}
+
+message CastResponse {
+    eigr.functions.protocol.actors.Actor actor = 1;
+}
+
+message ActorProxyRequest {
+    oneof message {
+        Init init = 1;
+        Call call = 2;
+        Cast cast = 3;
+    }
+}
+
+message ActorProxyResponse {
+    oneof message {
+        InitResponse init_response = 1;
+        Create create_actor = 2;
+        CallResponse call_response = 3;
+        CastResponse cast_response = 4;
+    }
+}
+
+service ActorService {
+    rpc Spawn(stream ActorProxyRequest) returns (stream ActorProxyResponse);
+}
