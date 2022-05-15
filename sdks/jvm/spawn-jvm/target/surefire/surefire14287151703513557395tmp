@@ -1,0 +1,5 @@
+#surefire
+#Sun May 15 20:29:06 BRT 2022
+basedir=/home/sleipnir/workspaces/eigr/spawn/sdks/jvm/spawn-jvm
+user.dir=/home/sleipnir/workspaces/eigr/spawn/sdks/jvm/spawn-jvm
+localRepository=/home/sleipnir/.m2/repository

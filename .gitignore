@@ -1,4 +1,6 @@
 .vscode
+.idea
+sdks/jvm/spawn-jvm/.idea
 
 # The directory Mix will write compiled artifacts to.
 /_build/
