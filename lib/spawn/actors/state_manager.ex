@@ -10,6 +10,8 @@ defmodule Eigr.Functions.Protocol.Actors.StateManager do
 
   @spec save(String.t(), Eigr.Functions.Protocol.Actors.ActorState.t()) ::
           {:ok, Eigr.Functions.Protocol.Actors.ActorState.t()}
+  def save(_name, nil), do: {:ok, nil}
+
   def save(name, %ActorState{} = state) do
     Logger.debug("Saving state for actor #{name}")
 
