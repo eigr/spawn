@@ -32,6 +32,8 @@ defmodule Spawn.Config.Vapor do
         bindings: [
           {:http_port, "PROXY_HTTP_PORT",
            default: 4000, map: &String.to_integer/1, required: false},
+          {:grpc_port, "PROXY_GRPC_PORT",
+           default: 5000, map: &String.to_integer/1, required: false},
           {:proxy_cluster_strategy, "PROXY_CLUSTER_STRATEGY", default: "gossip", required: false},
           {:proxy_headless_service, "PROXY_HEADLESS_SERVICE",
            default: "proxy-headless-svc", required: false},
@@ -52,7 +54,7 @@ defmodule Spawn.Config.Vapor do
 
     Enum.each(config, fn {key, value} ->
       Logger.debug("Loading config: [#{key}]:[#{value}]")
-      Application.put_env(:toll_operator_proxy, key, value, persistent: true)
+      Application.put_env(:spawn, key, value, persistent: true)
     end)
 
     config

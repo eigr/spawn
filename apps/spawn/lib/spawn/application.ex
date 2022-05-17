@@ -24,13 +24,23 @@ defmodule Spawn.Application do
 
     children = [
       cluster_supervisor(config),
+      {Registry, keys: :unique, name: Spawn.NodeRegistry},
+      Spawn.Proxy.ConnectionManager.Supervisor,
       Spawn.Actor.Registry.child_spec(),
       Eigr.Functions.Protocol.Actors.ActorEntity.Supervisor,
-      http_server(config)
+      http_server(config),
+      grpc_server(config)
     ]
 
     opts = [strategy: :one_for_one, name: Spawn.Supervisor]
     Supervisor.start_link(children, opts)
+  end
+
+  defp grpc_server(config) do
+    %{
+      id: GRPC.Server.Supervisor,
+      start: {GRPC.Server.Supervisor, :start_link, [{Spawn.Proxy.Endpoint, config.grpc_port}]}
+    }
   end
 
   defp http_server(config) do

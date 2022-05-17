@@ -151,9 +151,9 @@ public class ActorServiceHandlerFactory {
         switch(method) {
           
           case "Spawn":
-            response = GrpcMarshalling.unmarshalStream(request.entity(), ActorProxyRequestSerializer, mat, reader)
+            response = GrpcMarshalling.unmarshalStream(request.entity(), ActorSystemRequestSerializer, mat, reader)
               .thenApply(e -> implementation.spawn(e))
-              .thenApply(e -> GrpcMarshalling.marshalStream(e, ActorProxyResponseSerializer, writer, system, eHandler));
+              .thenApply(e -> GrpcMarshalling.marshalStream(e, ActorSystemResponseSerializer, writer, system, eHandler));
             break;
           
           default:

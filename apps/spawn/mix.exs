@@ -40,7 +40,9 @@ defmodule Spawn.MixProject do
       {:horde, "~> 0.8"},
       {:google_protos, "~> 0.2.0"},
       {:protobuf, "~> 0.9.0", override: true},
-      {:grpc, github: "elixir-grpc/grpc", override: true}
+      {:grpc, github: "elixir-grpc/grpc", override: true},
+      {:cowlib, "~> 2.9", override: true},
+      {:phoenix_pubsub, "~> 2.1"}
     ]
   end
 

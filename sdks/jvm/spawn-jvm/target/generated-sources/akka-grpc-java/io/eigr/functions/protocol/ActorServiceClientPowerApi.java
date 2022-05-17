@@ -10,10 +10,10 @@ public abstract class ActorServiceClientPowerApi {
   
     /**
      * Lower level "lifted" version of the method, giving access to request metadata etc.
-     * prefer spawn(io.eigr.functions.protocol.Protocol.ActorProxyRequest) if possible.
+     * prefer spawn(io.eigr.functions.protocol.Protocol.ActorSystemRequest) if possible.
      */
     
-      public StreamResponseRequestBuilder<akka.stream.javadsl.Source<io.eigr.functions.protocol.Protocol.ActorProxyRequest, akka.NotUsed>, io.eigr.functions.protocol.Protocol.ActorProxyResponse> spawn()
+      public StreamResponseRequestBuilder<akka.stream.javadsl.Source<io.eigr.functions.protocol.Protocol.ActorSystemRequest, akka.NotUsed>, io.eigr.functions.protocol.Protocol.ActorSystemResponse> spawn()
     
     {
         throw new java.lang.UnsupportedOperationException();

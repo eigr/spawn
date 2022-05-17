@@ -11,7 +11,15 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
     TimeoutStrategy
   }
 
-  @default_timeout 90_000
+  alias Eigr.Functions.Protocol.Actors.ActorEntity.Supervisor, as: ActorEntitySupervisor
+
+  alias Eigr.Functions.Protocol.{
+    ActorInvocation,
+    InvocationRequest
+  }
+
+  @default_snapshot_timeout 60_000
+  @default_deactivate_timeout 90_000
 
   @impl true
   @spec init(Eigr.Functions.Protocol.Actors.Actor.t()) ::
@@ -25,10 +33,29 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
       ) do
     Logger.debug("Activating actor #{name}")
     Process.flag(:trap_exit, true)
-    snapshot(snapshot_strategy)
-    Process.send_after(self(), :deactivate, get_deactivate_interval(deactivate_strategy))
+    schedule_snapshot(snapshot_strategy)
+    schedule_deactivate(deactivate_strategy)
 
     {:ok, state, {:continue, :load_state}}
+  end
+
+  @impl true
+  def handle_call(:get_state, _from, %Actor{actor_state: %ActorState{} = actor_state} = state) do
+    {:reply, actor_state, state}
+  end
+
+  def handle_call(
+        {:invocation_request,
+         %InvocationRequest{
+           actor: %Actor{name: name} = actor,
+           command_name: command,
+           value: payload
+         } = invocation},
+        _from,
+        %Actor{actor_state: %ActorState{} = actor_state} = state
+      ) do
+    # TODO: Use ActorInvocation to pass request to real actor
+    {:reply, %{}, state}
   end
 
   @impl true
@@ -62,7 +89,7 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
           actor_state: nil
         } = state
       ) do
-    snapshot(snapshot_strategy)
+    schedule_snapshot(snapshot_strategy)
     {:noreply, state}
   end
 
@@ -76,7 +103,7 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
       ) do
     Logger.debug("Snapshotting actor #{name}")
     StateManager.save(name, actor_state)
-    snapshot(snapshot_strategy)
+    schedule_snapshot(snapshot_strategy)
     {:noreply, state}
   end
 
@@ -92,15 +119,6 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
     end
   end
 
-  def handle_info(
-        {:EXIT, _ref, {:shutdown, :process_redistribution}},
-        %Actor{name: name, actor_state: %ActorState{} = actor_state} = state
-      ) do
-    Logger.debug("Rebalancing actor #{name} from Node #{inspect(Node.self())}")
-    StateManager.save(name, actor_state)
-    {:noreply, state}
-  end
-
   @impl true
   def terminate(reason, %Actor{name: name, actor_state: %ActorState{} = actor_state} = _state) do
     StateManager.save(name, actor_state)
@@ -111,19 +129,52 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
     GenServer.start(__MODULE__, actor, name: via(name))
   end
 
-  defp snapshot(snapshot_strategy),
+  def get_state(name) do
+    # TODO: Remove this Workaround.
+    #       This can only be done on some erlang Node that a user function has originally declared this Actor.
+    case ActorEntitySupervisor.lookup_or_create_actor(
+           Actor.new(
+             name: name,
+             snapshot_strategy: %ActorSnapshotStrategy{
+               strategy: %TimeoutStrategy{timeout: @default_snapshot_timeout}
+             },
+             deactivate_strategy: %ActorDeactivateStrategy{
+               strategy: %TimeoutStrategy{timeout: @default_deactivate_timeout}
+             }
+           )
+         ) do
+      {:ok, _pid} ->
+        GenServer.call(via(name), :get_state, 20_000)
+
+      reason ->
+        {:error, reason}
+    end
+  end
+
+  def invoke_sync(name, request) do
+    GenServer.call(via(name), {:invocation_request, request}, 20_000)
+  end
+
+  def invoke_async(name, request) do
+    GenServer.call(via(name), {:invocation_request, request}, 20_000)
+  end
+
+  defp schedule_snapshot(snapshot_strategy),
     do: Process.send_after(self(), :snapshot, get_snapshot_interval(snapshot_strategy))
+
+  defp schedule_deactivate(deactivate_strategy),
+    do: Process.send_after(self(), :deactivate, get_deactivate_interval(deactivate_strategy))
 
   defp get_snapshot_interval(%TimeoutStrategy{timeout: timeout} = _timeout_strategy)
        when is_nil(timeout),
-       do: @default_timeout
+       do: @default_snapshot_timeout
 
   defp get_snapshot_interval(%TimeoutStrategy{timeout: timeout} = _timeout_strategy),
     do: timeout
 
   defp get_deactivate_interval(%TimeoutStrategy{timeout: timeout} = _timeout_strategy)
        when is_nil(timeout),
-       do: @default_timeout
+       do: @default_deactivate_timeout
 
   defp get_deactivate_interval(%TimeoutStrategy{timeout: timeout} = _timeout_strategy),
     do: timeout

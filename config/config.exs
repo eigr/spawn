@@ -21,10 +21,9 @@ config :logger, :console,
   format: "$date $time [$node]:[$metadata]:[$level]:$levelpad$message\n",
   metadata: [:pid]
 
-# hOOKS configuration
+config :grpc, start_server: true
+
+# App Configuration
 config :spawn,
-  http_port: System.get_env("HTTP_PORT", "9001") |> String.to_integer(),
-  broker_host: System.get_env("BROKER_HOST", "localhost"),
-  broker_port: System.get_env("BROKER_PORT", "61613") |> String.to_integer(),
-  broker_user: System.get_env("BROKER_USER", "admin"),
-  broker_pass: System.get_env("BROKER_PASS", "admin")
+  http_port: System.get_env("PROXY_HTTP_PORT", "9001") |> String.to_integer(),
+  grpc_port: System.get_env("PROXY_GRPC_PORT", "5001") |> String.to_integer()

@@ -11,16 +11,16 @@ import akka.grpc.javadsl.Metadata;
  */
 public interface ActorServicePowerApi {
   
-  akka.stream.javadsl.Source<io.eigr.functions.protocol.Protocol.ActorProxyResponse, akka.NotUsed> spawn(akka.stream.javadsl.Source<io.eigr.functions.protocol.Protocol.ActorProxyRequest, akka.NotUsed> in, Metadata metadata);
+  akka.stream.javadsl.Source<io.eigr.functions.protocol.Protocol.ActorSystemResponse, akka.NotUsed> spawn(akka.stream.javadsl.Source<io.eigr.functions.protocol.Protocol.ActorSystemRequest, akka.NotUsed> in, Metadata metadata);
   
 
   static String name = "eigr.functions.protocol.ActorService";
 
   public static class Serializers {
     
-      public static ProtobufSerializer<io.eigr.functions.protocol.Protocol.ActorProxyRequest> ActorProxyRequestSerializer = new GoogleProtobufSerializer<>(io.eigr.functions.protocol.Protocol.ActorProxyRequest.parser());
+      public static ProtobufSerializer<io.eigr.functions.protocol.Protocol.ActorSystemRequest> ActorSystemRequestSerializer = new GoogleProtobufSerializer<>(io.eigr.functions.protocol.Protocol.ActorSystemRequest.parser());
     
-      public static ProtobufSerializer<io.eigr.functions.protocol.Protocol.ActorProxyResponse> ActorProxyResponseSerializer = new GoogleProtobufSerializer<>(io.eigr.functions.protocol.Protocol.ActorProxyResponse.parser());
+      public static ProtobufSerializer<io.eigr.functions.protocol.Protocol.ActorSystemResponse> ActorSystemResponseSerializer = new GoogleProtobufSerializer<>(io.eigr.functions.protocol.Protocol.ActorSystemResponse.parser());
     
   }
 }

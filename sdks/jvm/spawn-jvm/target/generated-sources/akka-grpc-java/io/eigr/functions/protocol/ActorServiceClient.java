@@ -49,7 +49,7 @@ public abstract class ActorServiceClient extends ActorServiceClientPowerApi impl
   
     
       
-        private final StreamResponseRequestBuilder<akka.stream.javadsl.Source<io.eigr.functions.protocol.Protocol.ActorProxyRequest, akka.NotUsed>, io.eigr.functions.protocol.Protocol.ActorProxyResponse> spawnRequestBuilder(akka.grpc.internal.InternalChannel channel){
+        private final StreamResponseRequestBuilder<akka.stream.javadsl.Source<io.eigr.functions.protocol.Protocol.ActorSystemRequest, akka.NotUsed>, io.eigr.functions.protocol.Protocol.ActorSystemResponse> spawnRequestBuilder(akka.grpc.internal.InternalChannel channel){
           return new JavaBidirectionalStreamingRequestBuilder<>(
                                spawnDescriptor, channel, options, settings, ec);
         }
@@ -62,16 +62,16 @@ public abstract class ActorServiceClient extends ActorServiceClientPowerApi impl
         /**
          * For access to method metadata use the parameterless version of spawn
          */
-        public akka.stream.javadsl.Source<io.eigr.functions.protocol.Protocol.ActorProxyResponse, akka.NotUsed> spawn(akka.stream.javadsl.Source<io.eigr.functions.protocol.Protocol.ActorProxyRequest, akka.NotUsed> request) {
+        public akka.stream.javadsl.Source<io.eigr.functions.protocol.Protocol.ActorSystemResponse, akka.NotUsed> spawn(akka.stream.javadsl.Source<io.eigr.functions.protocol.Protocol.ActorSystemRequest, akka.NotUsed> request) {
           return spawn().invoke(request);
         }
 
         /**
          * Lower level "lifted" version of the method, giving access to request metadata etc.
-         * prefer spawn(io.eigr.functions.protocol.Protocol.ActorProxyRequest) if possible.
+         * prefer spawn(io.eigr.functions.protocol.Protocol.ActorSystemRequest) if possible.
          */
         
-          public StreamResponseRequestBuilder<akka.stream.javadsl.Source<io.eigr.functions.protocol.Protocol.ActorProxyRequest, akka.NotUsed>, io.eigr.functions.protocol.Protocol.ActorProxyResponse> spawn()
+          public StreamResponseRequestBuilder<akka.stream.javadsl.Source<io.eigr.functions.protocol.Protocol.ActorSystemRequest, akka.NotUsed>, io.eigr.functions.protocol.Protocol.ActorSystemResponse> spawn()
         
         {
           return spawnRequestBuilder(clientState.internalChannel());
@@ -79,8 +79,8 @@ public abstract class ActorServiceClient extends ActorServiceClientPowerApi impl
       
 
       
-        private static MethodDescriptor<io.eigr.functions.protocol.Protocol.ActorProxyRequest, io.eigr.functions.protocol.Protocol.ActorProxyResponse> spawnDescriptor =
-          MethodDescriptor.<io.eigr.functions.protocol.Protocol.ActorProxyRequest, io.eigr.functions.protocol.Protocol.ActorProxyResponse>newBuilder()
+        private static MethodDescriptor<io.eigr.functions.protocol.Protocol.ActorSystemRequest, io.eigr.functions.protocol.Protocol.ActorSystemResponse> spawnDescriptor =
+          MethodDescriptor.<io.eigr.functions.protocol.Protocol.ActorSystemRequest, io.eigr.functions.protocol.Protocol.ActorSystemResponse>newBuilder()
             .setType(
   
   
@@ -88,8 +88,8 @@ public abstract class ActorServiceClient extends ActorServiceClientPowerApi impl
   MethodDescriptor.MethodType.BIDI_STREAMING 
 )
             .setFullMethodName(MethodDescriptor.generateFullMethodName("eigr.functions.protocol.ActorService", "Spawn"))
-            .setRequestMarshaller(new ProtoMarshaller<io.eigr.functions.protocol.Protocol.ActorProxyRequest>(ActorProxyRequestSerializer))
-            .setResponseMarshaller(new ProtoMarshaller<io.eigr.functions.protocol.Protocol.ActorProxyResponse>(ActorProxyResponseSerializer))
+            .setRequestMarshaller(new ProtoMarshaller<io.eigr.functions.protocol.Protocol.ActorSystemRequest>(ActorSystemRequestSerializer))
+            .setResponseMarshaller(new ProtoMarshaller<io.eigr.functions.protocol.Protocol.ActorSystemResponse>(ActorSystemResponseSerializer))
             .setSampledToLocalTracing(true)
             .build();
         
