@@ -101,7 +101,7 @@ defmodule Spawn.Proxy.ActorService do
          pid <- Node.spawn(node, NodeManager, :try_reactivate, [system_name, actor]) do
       ActorEntity.invoke_sync(actor_name, request)
     else
-      :not_found ->
+      {:not_found, _} ->
         Logger.error("Actor #{actor_name} not found on ActorSystem #{system_name}")
         {:error, "Actor #{actor_name} not found on ActorSystem #{system_name}"}
 
@@ -129,7 +129,7 @@ defmodule Spawn.Proxy.ActorService do
          pid <- Node.spawn(node, NodeManager, :try_reactivate, [system_name, actor]) do
       ActorEntity.invoke_async(actor_name, request)
     else
-      :not_found ->
+      {:not_found, _} ->
         Logger.error("Actor #{actor_name} not found on ActorSystem #{system_name}")
         {:error, "Actor #{actor_name} not found on ActorSystem #{system_name}"}
 
