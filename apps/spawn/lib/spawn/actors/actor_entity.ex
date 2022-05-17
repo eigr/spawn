@@ -107,7 +107,14 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
     {:noreply, state}
   end
 
-  def handle_info(:deactivate, %Actor{name: name, %ActorDeactivateStrategy{strategy: deactivate_strategy}} = state) do
+  def handle_info(
+        :deactivate,
+        %Actor{
+          name: name,
+          deactivate_strategy:
+            %ActorDeactivateStrategy{strategy: deactivate_strategy} = _actor_deactivate_strategy
+        } = state
+      ) do
     case Process.info(self(), :message_queue_len) do
       {:message_queue_len, 0} ->
         Logger.debug("Deactivating actor #{name} for timeout")

@@ -9,7 +9,7 @@ defmodule Spawn.Registry.ActorRegistry.Supervisor do
   @impl true
   def init(_args) do
     children = [
-      {Phoenix.PubSub, name: :entity_channel},
+      {Phoenix.PubSub, name: :actor_channel},
       Spawn.Registry.ActorRegistry.child_spec(%{})
     ]
 

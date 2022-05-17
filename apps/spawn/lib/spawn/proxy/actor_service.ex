@@ -19,6 +19,8 @@ defmodule Spawn.Proxy.ActorService do
   alias Spawn.Proxy.NodeManager
   alias Spawn.Proxy.NodeManager.Supervisor, as: NodeManagerSupervisor
 
+  alias Spawn.Registry.ActorRegistry
+
   @spec spawn(ActorSystemRequest.t(), GRPC.Server.Stream.t()) :: ActorSystemResponse.t()
   def spawn(messages, stream) do
     messages
@@ -37,6 +39,8 @@ defmodule Spawn.Proxy.ActorService do
          stream
        ) do
     Logger.debug("Registration request received: #{inspect(registration)}")
+
+    ActorRegistry.register(actors)
 
     case NodeManagerSupervisor.create_connection_manager(%{
            actor_system: name,
@@ -92,13 +96,25 @@ defmodule Spawn.Proxy.ActorService do
          request,
          stream
        ) do
-    # TODO: invoke try_reactivate on some Node with actor registered
-    case NodeManager.try_reactivate(system_name, actor) do
-      {:ok, pid} ->
-        ActorEntity.invoke_sync(actor_name, request)
+    with {:ok, %{node: node, actor: registered_actor}} <-
+           ActorRegistry.lookup(system_name, actor_name),
+         pid <- Node.spawn(node, NodeManager, :try_reactivate, [system_name, actor]) do
+      ActorEntity.invoke_sync(actor_name, request)
+    else
+      :not_found ->
+        Logger.error("Actor #{actor_name} not found on ActorSystem #{system_name}")
+        {:error, "Actor #{actor_name} not found on ActorSystem #{system_name}"}
 
       {:error, reason} ->
+        Logger.error(
+          "Failed to invoke Actor #{actor_name} on ActorSystem #{system_name}: #{inspect(reason)}"
+        )
+
         {:error, reason}
+
+      _ ->
+        Logger.error("Failed to invoke Actor #{actor_name} on ActorSystem #{system_name}")
+        {:error, "Failed to invoke Actor #{actor_name} on ActorSystem #{system_name}"}
     end
   end
 
@@ -108,12 +124,25 @@ defmodule Spawn.Proxy.ActorService do
          request,
          stream
        ) do
-    case NodeManager.try_reactivate(system_name, actor) do
-      {:ok, pid} ->
-        ActorEntity.invoke_sync(actor_name, request)
+    with {:ok, %{node: node, actor: registered_actor}} <-
+           ActorRegistry.lookup(system_name, actor_name),
+         pid <- Node.spawn(node, NodeManager, :try_reactivate, [system_name, actor]) do
+      ActorEntity.invoke_async(actor_name, request)
+    else
+      :not_found ->
+        Logger.error("Actor #{actor_name} not found on ActorSystem #{system_name}")
+        {:error, "Actor #{actor_name} not found on ActorSystem #{system_name}"}
 
       {:error, reason} ->
+        Logger.error(
+          "Failed to invoke Actor #{actor_name} on ActorSystem #{system_name}: #{inspect(reason)}"
+        )
+
         {:error, reason}
+
+      _ ->
+        Logger.error("Failed to invoke Actor #{actor_name} on ActorSystem #{system_name}")
+        {:error, "Failed to invoke Actor #{actor_name} on ActorSystem #{system_name}"}
     end
   end
 end
