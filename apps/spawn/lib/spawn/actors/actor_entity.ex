@@ -107,14 +107,14 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
     {:noreply, state}
   end
 
-  @impl true
-  def handle_info(:deactivate, %Actor{name: name} = state) do
+  def handle_info(:deactivate, %Actor{name: name, %ActorDeactivateStrategy{strategy: deactivate_strategy}} = state) do
     case Process.info(self(), :message_queue_len) do
       {:message_queue_len, 0} ->
         Logger.debug("Deactivating actor #{name} for timeout")
         {:stop, :normal, state}
 
       _ ->
+        schedule_deactivate(deactivate_strategy)
         {:noreply, state}
     end
   end
@@ -130,25 +130,7 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
   end
 
   def get_state(name) do
-    # TODO: Remove this Workaround.
-    #       This can only be done on some erlang Node that a user function has originally declared this Actor.
-    case ActorEntitySupervisor.lookup_or_create_actor(
-           Actor.new(
-             name: name,
-             snapshot_strategy: %ActorSnapshotStrategy{
-               strategy: %TimeoutStrategy{timeout: @default_snapshot_timeout}
-             },
-             deactivate_strategy: %ActorDeactivateStrategy{
-               strategy: %TimeoutStrategy{timeout: @default_deactivate_timeout}
-             }
-           )
-         ) do
-      {:ok, _pid} ->
-        GenServer.call(via(name), :get_state, 20_000)
-
-      reason ->
-        {:error, reason}
-    end
+    GenServer.call(via(name), :get_state, 20_000)
   end
 
   def invoke_sync(name, request) do

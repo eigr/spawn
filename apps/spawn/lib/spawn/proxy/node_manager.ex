@@ -1,7 +1,8 @@
-defmodule Spawn.Proxy.ConnectionManager do
+defmodule Spawn.Proxy.NodeManager do
   use GenServer
   require Logger
 
+  alias Eigr.Functions.Protocol.Actors.{Actor, ActorEntity}
   alias Eigr.Functions.Protocol.ActorService.Stub, as: ActorServiceClient
 
   @spec init(any) :: {:ok, any}
@@ -24,12 +25,29 @@ defmodule Spawn.Proxy.ConnectionManager do
     {:stop, :normal, state}
   end
 
+  @impl true
   def handle_call(
         {:invoke_user_function, payload},
         _from,
         %{source_stream: %{payload: %{pid: connection_ref} = stream}} = state
       ) do
-    GRPC.Server.send_reply(stream, payload)
+    response = GRPC.Server.send_reply(stream, payload)
+    {:reply, response, state}
+  end
+
+  @impl true
+  def handle_call({:try_reactivate_actor, %Actor{name: name} = actor}, _from, state) do
+    Logger.debug("Trying reactivating Actor #{name}...")
+
+    case ActorEntity.lookup_or_create_actor(actor) do
+      {:ok, pid} ->
+        Logger.debug("Actor #{name} reactivated.")
+        {:reply, {:ok, pid}, state}
+
+      reason ->
+        Logger.error("Failed to reactivate actor #{name}: #{inspect(reason)}")
+        {:reply, {:error, reason}, state}
+    end
   end
 
   def start_link(
@@ -40,6 +58,10 @@ defmodule Spawn.Proxy.ConnectionManager do
 
   def invoke_user_function(actor_system, payload) do
     GenServer.call(via(actor_system), {:invoke_user_function, payload})
+  end
+
+  def try_reactivate(actor_system, actor) do
+    GenServer.call(via(actor_system), {:try_reactivate_actor, actor})
   end
 
   defp via(name) do

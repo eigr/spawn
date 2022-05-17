@@ -16,7 +16,8 @@ defmodule Spawn.Proxy.ActorService do
     ServiceInfo
   }
 
-  alias Spawn.Proxy.ConnectionManager.Supervisor, as: ConnManagerSupervisor
+  alias Spawn.Proxy.NodeManager
+  alias Spawn.Proxy.NodeManager.Supervisor, as: NodeManagerSupervisor
 
   @spec spawn(ActorSystemRequest.t(), GRPC.Server.Stream.t()) :: ActorSystemResponse.t()
   def spawn(messages, stream) do
@@ -37,7 +38,7 @@ defmodule Spawn.Proxy.ActorService do
        ) do
     Logger.debug("Registration request received: #{inspect(registration)}")
 
-    case ConnManagerSupervisor.create_connection_manager(%{
+    case NodeManagerSupervisor.create_connection_manager(%{
            actor_system: name,
            source_stream: stream
          }) do
@@ -51,12 +52,15 @@ defmodule Spawn.Proxy.ActorService do
 
   defp handle(
          {:invocation_request,
-          %InvocationRequest{actor: %Actor{name: name} = actor, async: invocation_type} = request} =
-           _message,
+          %InvocationRequest{
+            actor:
+              %Actor{name: actor_name, actor_system: %ActorSystem{name: system_name}} = actor,
+            async: invocation_type
+          } = request} = _message,
          stream
        ) do
     Logger.debug("Invocation request received: #{inspect(request)}")
-    invoke(invocation_type, name, request, stream)
+    invoke(invocation_type, actor, request, stream)
   end
 
   defp handle(
@@ -82,11 +86,34 @@ defmodule Spawn.Proxy.ActorService do
     end)
   end
 
-  defp invoke(false, name, request, stream) do
-    ActorEntity.invoke_sync(name, request)
+  defp invoke(
+         false,
+         %Actor{name: actor_name, actor_system: %ActorSystem{name: system_name}} = actor,
+         request,
+         stream
+       ) do
+    # TODO: invoke try_reactivate on some Node with actor registered
+    case NodeManager.try_reactivate(system_name, actor) do
+      {:ok, pid} ->
+        ActorEntity.invoke_sync(actor_name, request)
+
+      {:error, reason} ->
+        {:error, reason}
+    end
   end
 
-  defp invoke(true, name, request, stream) do
-    ActorEntity.invoke_async(name, request)
+  defp invoke(
+         true,
+         %Actor{name: actor_name, actor_system: %ActorSystem{name: system_name}} = actor,
+         request,
+         stream
+       ) do
+    case NodeManager.try_reactivate(system_name, actor) do
+      {:ok, pid} ->
+        ActorEntity.invoke_sync(actor_name, request)
+
+      {:error, reason} ->
+        {:error, reason}
+    end
   end
 end

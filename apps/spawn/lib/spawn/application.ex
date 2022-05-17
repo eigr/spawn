@@ -25,7 +25,7 @@ defmodule Spawn.Application do
     children = [
       cluster_supervisor(config),
       {Registry, keys: :unique, name: Spawn.NodeRegistry},
-      Spawn.Proxy.ConnectionManager.Supervisor,
+      Spawn.Proxy.NodeManager.Supervisor,
       Spawn.Actor.Registry.child_spec(),
       Eigr.Functions.Protocol.Actors.ActorEntity.Supervisor,
       http_server(config),

@@ -1,4 +1,4 @@
-defmodule Spawn.Proxy.ConnectionManager.Supervisor do
+defmodule Spawn.Proxy.NodeManager.Supervisor do
   use DynamicSupervisor
 
   def child_spec() do
@@ -27,8 +27,8 @@ defmodule Spawn.Proxy.ConnectionManager.Supervisor do
   """
   def create_connection_manager(state) do
     child_spec = %{
-      id: Spawn.Proxy.ConnectionManager,
-      start: {Spawn.Proxy.ConnectionManager, :start_link, [state]},
+      id: Spawn.Proxy.NodeManager,
+      start: {Spawn.Proxy.NodeManager, :start_link, [state]},
       restart: :transient
     }
 

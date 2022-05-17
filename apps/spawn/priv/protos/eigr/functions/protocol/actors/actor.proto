@@ -44,7 +44,7 @@ message ActorState {
 
 message Actor {
     string name = 1;
-    ActorSystem actorSystem = 2;
+    ActorSystem actor_system = 2;
     ActorState actor_state = 3;
     ActorSnapshotStrategy snapshot_strategy = 4;
     ActorDeactivateStrategy deactivate_strategy = 5;
