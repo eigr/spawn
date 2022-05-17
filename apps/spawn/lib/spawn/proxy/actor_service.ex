@@ -42,19 +42,7 @@ defmodule Spawn.Proxy.ActorService do
            source_stream: stream
          }) do
       {:ok, pid} ->
-        Enum.each(actors, fn {actor_name, actor} ->
-          Logger.debug(
-            "Registering #{actor_name}: #{inspect(actor)} on Node: #{inspect(Node.self())}"
-          )
-
-          case ActorEntitySupervisor.lookup_or_create_actor(actor) do
-            {:ok, pid} ->
-              Logger.debug("Registered Actor #{actor_name} with pid: #{pid}")
-
-            _ ->
-              Logger.debug("Failed to register Actor #{actor_name}")
-          end
-        end)
+        create_actors(actors)
 
       reason ->
         Logger.error("Failed to spawn actor system: #{inspect(reason)}")
@@ -76,6 +64,22 @@ defmodule Spawn.Proxy.ActorService do
          stream
        ) do
     Logger.debug("Actor invocation response received: #{inspect(actor_invocation_response)}")
+  end
+
+  defp create_actors(actors) do
+    Enum.each(actors, fn {actor_name, actor} ->
+      Logger.debug(
+        "Registering #{actor_name}: #{inspect(actor)} on Node: #{inspect(Node.self())}"
+      )
+
+      case ActorEntitySupervisor.lookup_or_create_actor(actor) do
+        {:ok, pid} ->
+          Logger.debug("Registered Actor #{actor_name} with pid: #{pid}")
+
+        _ ->
+          Logger.debug("Failed to register Actor #{actor_name}")
+      end
+    end)
   end
 
   defp invoke(false, name, request, stream) do
