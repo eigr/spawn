@@ -10,7 +10,7 @@ Spawn's technology stack on top of BEAM VM (Erlang's virtual machine) provides s
 Spawn is made up of the following components:
 
 * A semantic protocol based on Protocol Buffers
-* A Sidecar Proxy written in Elixir that implements this protocol.
+* A Sidecar Proxy written in Elixir that implements this protocol and persistent storage adapters.
 * Support libraries in different programming languages.
 
 ## The Actor Model
