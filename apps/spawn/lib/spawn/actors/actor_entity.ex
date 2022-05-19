@@ -31,7 +31,7 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
           deactivate_strategy: %ActorDeactivateStrategy{strategy: deactivate_strategy}
         } = state
       ) do
-    Logger.debug("Activating actor #{name}")
+    Logger.debug("Activating actor #{name} in Node #{inspect(Node.self())}")
     Process.flag(:trap_exit, true)
     schedule_snapshot(snapshot_strategy)
     schedule_deactivate(deactivate_strategy)
