@@ -45,15 +45,25 @@ defmodule Spawn.Config.Vapor do
            default: 8080, map: &String.to_integer/1, required: false},
           {:user_function_uds_enable, "PROXY_UDS_MODE", default: false, required: false},
           {:user_function_sock_addr, "PROXY_UDS_ADDRESS",
-           default: "/var/run/cloudstate.sock", required: false}
+           default: "/var/run/cloudstate.sock", required: false},
+          {:proxy_db_type, "PROXY_DATABASE_TYPE", default: "postgres", required: false},
+          {:proxy_db_name, "PROXY_DATABASE_NAME", default: "eigr-functions-db", required: false},
+          {:proxy_db_username, "PROXY_DATABASE_USERNAME", default: "admin", required: false},
+          {:proxy_db_secret, "PROXY_DATABASE_SECRET", default: "admin", required: false},
+          {:proxy_db_host, "PROXY_DATABASE_HOST", default: "localhost", required: false},
+          {:proxy_db_port, "PROXY_DATABASE_PORT",
+           default: 5432, map: &String.to_integer/1, required: false}
         ]
       }
     ]
 
     config = Vapor.load!(providers)
 
+    Logger.info("Loading configs")
+
     Enum.each(config, fn {key, value} ->
-      Logger.debug("Loading config: [#{key}]:[#{value}]")
+      value_str = if String.contains?(Atom.to_string(key), "secret"), do: "****", else: value
+      Logger.info("Loading config: [#{key}]:[#{value_str}]")
       Application.put_env(:spawn, key, value, persistent: true)
     end)
 

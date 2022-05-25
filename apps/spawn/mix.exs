@@ -19,7 +19,7 @@ defmodule Spawn.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger],
+      extra_applications: [:logger, :statestores],
       mod: {Spawn.Application, []}
     ]
   end
@@ -27,6 +27,8 @@ defmodule Spawn.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:statestores, "~> 0.1", in_umbrella: true},
+      {:decimal, "~> 1.9", override: true},
       {:bakeware, "~> 0.2"},
       {:vapor, "~> 0.10"},
       {:observer_cli, "~> 1.7"},

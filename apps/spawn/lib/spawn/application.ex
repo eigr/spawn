@@ -18,6 +18,7 @@ defmodule Spawn.Application do
   @spec start(any, any) :: {:error, any} | {:ok, pid}
   def start(_type, _args) do
     config = Config.load()
+
     Exporter.setup()
     PrometheusPipeline.setup()
     PrometheusInstrumenter.setup()

@@ -1,4 +1,4 @@
-defmodule Statestores.Adapters.Store.MySQL.Migrations.CreateEventsTable do
+defmodule Statestores.Adapters.MySQL.Migrations.CreateEventsTable do
   use Ecto.Migration
 
   def change do
@@ -9,6 +9,5 @@ defmodule Statestores.Adapters.Store.MySQL.Migrations.CreateEventsTable do
       add :data, :binary
       timestamps
     end
-
   end
 end

@@ -28,7 +28,7 @@ defmodule Statestores.MixProject do
     [
       {:ecto_sql, "~> 3.8"},
       {:postgrex, "~> 0.16"},
-      {:mariaex, "~> 0.9.1"}
+      {:myxql, "~> 0.6"}
     ]
   end
 end
