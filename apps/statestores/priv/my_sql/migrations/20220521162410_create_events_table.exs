@@ -7,7 +7,7 @@ defmodule Statestores.Adapters.MySQL.Migrations.CreateEventsTable do
       add :revision, :integer
       add :tags, :map
       add :data, :binary
-      timestamps
+      timestamps()
     end
   end
 end

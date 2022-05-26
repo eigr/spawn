@@ -6,6 +6,7 @@ defmodule Statestores.Application do
   @impl true
   def start(_type, _args) do
     type = String.to_existing_atom(System.get_env("PROXY_DATABASE_TYPE"))
+    Statestores.Migrator.migrate()
 
     children = get_supervisor_tree(type)
 
