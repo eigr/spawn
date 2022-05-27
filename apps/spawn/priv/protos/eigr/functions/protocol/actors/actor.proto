@@ -39,13 +39,14 @@ message TimeoutStrategy {
 }
 
 message ActorState {
-    google.protobuf.Any state = 1;
+    map<string, string> tags = 1;
+    google.protobuf.Any state = 2;
 }
 
 message Actor {
     string name = 1;
-    ActorSystem actor_system = 2;
-    ActorState actor_state = 3;
+    ActorSystem system = 2;
+    ActorState state = 3;
     ActorSnapshotStrategy snapshot_strategy = 4;
     ActorDeactivateStrategy deactivate_strategy = 5;
 }

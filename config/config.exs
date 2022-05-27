@@ -26,10 +26,11 @@ config :statestores, Statestores.Adapters.Store.Postgres,
 
 config :logger,
   backends: [:console],
-  truncate: 65536,
-  compile_time_purge_matching: [
-    [level_lower_than: :debug]
-  ]
+  truncate: 65536
+  #,
+  #compile_time_purge_matching: [
+  #  [level_lower_than: :debug]
+  #]
 
 # Our Console Backend-specific configuration
 config :logger, :console,

@@ -21,5 +21,4 @@ defmodule Statestores.Application do
   defp get_supervisor_tree(:postgres) do
     [Statestores.Adapters.Postgres]
   end
-
 end

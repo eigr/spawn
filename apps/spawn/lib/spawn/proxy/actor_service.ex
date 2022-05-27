@@ -57,8 +57,7 @@ defmodule Spawn.Proxy.ActorService do
   defp handle(
          {:invocation_request,
           %InvocationRequest{
-            actor:
-              %Actor{name: actor_name, actor_system: %ActorSystem{name: system_name}} = actor,
+            actor: %Actor{name: actor_name, system: %ActorSystem{name: system_name}} = actor,
             async: invocation_type
           } = request} = _message,
          stream
@@ -92,7 +91,7 @@ defmodule Spawn.Proxy.ActorService do
 
   defp invoke(
          false,
-         %Actor{name: actor_name, actor_system: %ActorSystem{name: system_name}} = actor,
+         %Actor{name: actor_name, system: %ActorSystem{name: system_name}} = actor,
          request,
          stream
        ) do
@@ -120,7 +119,7 @@ defmodule Spawn.Proxy.ActorService do
 
   defp invoke(
          true,
-         %Actor{name: actor_name, actor_system: %ActorSystem{name: system_name}} = actor,
+         %Actor{name: actor_name, system: %ActorSystem{name: system_name}} = actor,
          request,
          stream
        ) do

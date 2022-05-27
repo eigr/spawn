@@ -40,9 +40,44 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
   end
 
   @impl true
-  def handle_call(:get_state, _from, %Actor{actor_state: %ActorState{} = actor_state} = state) do
-    {:reply, actor_state, state}
+  @spec handle_continue(:load_state, Eigr.Functions.Protocol.Actors.Actor.t()) ::
+          {:noreply, Eigr.Functions.Protocol.Actors.Actor.t()}
+  def handle_continue(:load_state, %Actor{name: name, state: nil} = state) do
+    Logger.debug("Initial state is empty... Getting state from state manager.")
+
+    case StateManager.load(name) do
+      {:ok, current_state} ->
+        {:noreply, %Actor{state | state: current_state}}
+
+      {:not_found, %{}} ->
+        Logger.debug("Not found initial Actor State on statestore for Actor #{name}.")
+        {:noreply, state}
+    end
   end
+
+  def handle_continue(:load_state, %Actor{name: name, state: %ActorState{} = actor_state} = state) do
+    Logger.debug(
+      "Initial state is not empty... Trying to reconcile the state with state manager."
+    )
+
+    case StateManager.load(name) do
+      {:ok, current_state} ->
+        # TODO: Merge current with old ?
+        {:noreply, %Actor{state | state: current_state}}
+
+      {:not_found, %{}} ->
+        Logger.debug("Not found initial on statestore for Actor #{name}.")
+        {:noreply, state}
+    end
+  end
+
+  @impl true
+  def handle_call(
+        :get_state,
+        _from,
+        %Actor{name: name, state: %ActorState{} = actor_state} = state
+      ),
+      do: {:reply, state, state}
 
   def handle_call(
         {:invocation_request,
@@ -52,32 +87,10 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
            value: payload
          } = invocation},
         _from,
-        %Actor{actor_state: %ActorState{} = actor_state} = state
+        %Actor{state: %ActorState{} = actor_state} = state
       ) do
     # TODO: Use ActorInvocation to pass request to real actor
     {:reply, %{}, state}
-  end
-
-  @impl true
-  @spec handle_continue(:load_state, Eigr.Functions.Protocol.Actors.Actor.t()) ::
-          {:noreply, Eigr.Functions.Protocol.Actors.Actor.t()}
-  def handle_continue(:load_state, %Actor{actor_state: nil} = state) do
-    Logger.debug("Initial state is empty... Getting state from state manager.")
-
-    {:ok, current_state} = StateManager.load(state.name)
-    {:noreply, %Actor{state | actor_state: current_state}}
-  end
-
-  def handle_continue(:load_state, %Actor{actor_state: %ActorState{} = actor_state} = state) do
-    Logger.debug(
-      "Initial state is not empty... Trying to reconcile the state with state manager."
-    )
-
-    {:ok, _current_state} = StateManager.load(state.name)
-
-    # TODO: Check if the state is empty in the state manager. If so, then set state from initial state.
-    updated_state = actor_state
-    {:noreply, %Actor{state | actor_state: updated_state}}
   end
 
   @impl true
@@ -86,7 +99,7 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
         %Actor{
           name: _name,
           snapshot_strategy: %ActorSnapshotStrategy{strategy: snapshot_strategy},
-          actor_state: nil
+          state: nil
         } = state
       ) do
     schedule_snapshot(snapshot_strategy)
@@ -98,7 +111,7 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
         %Actor{
           name: name,
           snapshot_strategy: %ActorSnapshotStrategy{strategy: snapshot_strategy},
-          actor_state: %ActorState{} = actor_state
+          state: %ActorState{} = actor_state
         } = state
       ) do
     Logger.debug("Snapshotting actor #{name}")
@@ -127,7 +140,12 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
   end
 
   @impl true
-  def terminate(reason, %Actor{name: name, actor_state: %ActorState{} = actor_state} = _state) do
+  def terminate(reason, %Actor{name: name, state: actor_state} = _state)
+      when is_nil(actor_state) do
+    Logger.debug("Terminating actor #{name} with reason #{inspect(reason)}")
+  end
+
+  def terminate(reason, %Actor{name: name, state: %ActorState{} = actor_state} = _state) do
     StateManager.save(name, actor_state)
     Logger.debug("Terminating actor #{name} with reason #{inspect(reason)}")
   end

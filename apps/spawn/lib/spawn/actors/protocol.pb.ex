@@ -26,10 +26,10 @@ defmodule Eigr.Functions.Protocol.ProxyInfo do
     )
   end
 
-  field :protocol_major_version, 1, type: :int32
-  field :protocol_minor_version, 2, type: :int32
-  field :proxy_name, 3, type: :string
-  field :proxy_version, 4, type: :string
+  field(:protocol_major_version, 1, type: :int32)
+  field(:protocol_minor_version, 2, type: :int32)
+  field(:proxy_name, 3, type: :string)
+  field(:proxy_version, 4, type: :string)
 end
 
 defmodule Eigr.Functions.Protocol.ServiceInfo do
@@ -79,13 +79,13 @@ defmodule Eigr.Functions.Protocol.ServiceInfo do
     )
   end
 
-  field :service_name, 1, type: :string
-  field :service_version, 2, type: :string
-  field :service_runtime, 3, type: :string
-  field :support_library_name, 4, type: :string
-  field :support_library_version, 5, type: :string
-  field :protocol_major_version, 6, type: :int32
-  field :protocol_minor_version, 7, type: :int32
+  field(:service_name, 1, type: :string)
+  field(:service_version, 2, type: :string)
+  field(:service_runtime, 3, type: :string)
+  field(:support_library_name, 4, type: :string)
+  field(:support_library_version, 5, type: :string)
+  field(:protocol_major_version, 6, type: :int32)
+  field(:protocol_minor_version, 7, type: :int32)
 end
 
 defmodule Eigr.Functions.Protocol.RegistrationRequest do
@@ -113,8 +113,8 @@ defmodule Eigr.Functions.Protocol.RegistrationRequest do
     )
   end
 
-  field :service_info, 1, type: Eigr.Functions.Protocol.ServiceInfo
-  field :actor_system, 2, type: Eigr.Functions.Protocol.Actors.ActorSystem
+  field(:service_info, 1, type: Eigr.Functions.Protocol.ServiceInfo)
+  field(:actor_system, 2, type: Eigr.Functions.Protocol.Actors.ActorSystem)
 end
 
 defmodule Eigr.Functions.Protocol.RegistrationResponse do
@@ -137,7 +137,7 @@ defmodule Eigr.Functions.Protocol.RegistrationResponse do
     )
   end
 
-  field :proxy_info, 1, type: Eigr.Functions.Protocol.ProxyInfo
+  field(:proxy_info, 1, type: Eigr.Functions.Protocol.ProxyInfo)
 end
 
 defmodule Eigr.Functions.Protocol.InvocationRequest do
@@ -167,10 +167,10 @@ defmodule Eigr.Functions.Protocol.InvocationRequest do
     )
   end
 
-  field :actor, 1, type: Eigr.Functions.Protocol.Actors.Actor
-  field :command_name, 2, type: :string
-  field :value, 3, type: Google.Protobuf.Any
-  field :async, 4, type: :bool
+  field(:actor, 1, type: Eigr.Functions.Protocol.Actors.Actor)
+  field(:command_name, 2, type: :string)
+  field(:value, 3, type: Google.Protobuf.Any)
+  field(:async, 4, type: :bool)
 end
 
 defmodule Eigr.Functions.Protocol.InvocationResponse do
@@ -196,8 +196,8 @@ defmodule Eigr.Functions.Protocol.InvocationResponse do
     )
   end
 
-  field :value, 1, type: Google.Protobuf.Any
-  field :actor, 2, type: Eigr.Functions.Protocol.Actors.Actor
+  field(:value, 1, type: Google.Protobuf.Any)
+  field(:actor, 2, type: Eigr.Functions.Protocol.Actors.Actor)
 end
 
 defmodule Eigr.Functions.Protocol.ActorInvocation do
@@ -221,7 +221,7 @@ defmodule Eigr.Functions.Protocol.ActorInvocation do
     )
   end
 
-  field :invocation_request, 1, type: Eigr.Functions.Protocol.InvocationRequest
+  field(:invocation_request, 1, type: Eigr.Functions.Protocol.InvocationRequest)
 end
 
 defmodule Eigr.Functions.Protocol.ActorInvocationResponse do
@@ -249,8 +249,8 @@ defmodule Eigr.Functions.Protocol.ActorInvocationResponse do
     )
   end
 
-  field :invocation_response, 1, type: Eigr.Functions.Protocol.InvocationResponse
-  field :new_state, 2, type: Google.Protobuf.Any
+  field(:invocation_response, 1, type: Eigr.Functions.Protocol.InvocationResponse)
+  field(:new_state, 2, type: Google.Protobuf.Any)
 end
 
 defmodule Eigr.Functions.Protocol.ActorSystemRequest do
@@ -286,13 +286,14 @@ defmodule Eigr.Functions.Protocol.ActorSystemRequest do
     )
   end
 
-  oneof :message, 0
-  field :registration_request, 1, type: Eigr.Functions.Protocol.RegistrationRequest, oneof: 0
-  field :invocation_request, 2, type: Eigr.Functions.Protocol.InvocationRequest, oneof: 0
+  oneof(:message, 0)
+  field(:registration_request, 1, type: Eigr.Functions.Protocol.RegistrationRequest, oneof: 0)
+  field(:invocation_request, 2, type: Eigr.Functions.Protocol.InvocationRequest, oneof: 0)
 
-  field :actor_invocation_response, 3,
+  field(:actor_invocation_response, 3,
     type: Eigr.Functions.Protocol.ActorInvocationResponse,
     oneof: 0
+  )
 end
 
 defmodule Eigr.Functions.Protocol.ActorSystemResponse do
@@ -327,10 +328,10 @@ defmodule Eigr.Functions.Protocol.ActorSystemResponse do
     )
   end
 
-  oneof :message, 0
-  field :registration_response, 1, type: Eigr.Functions.Protocol.RegistrationResponse, oneof: 0
-  field :actor_invocation, 2, type: Eigr.Functions.Protocol.ActorInvocation, oneof: 0
-  field :invocation_response, 3, type: Eigr.Functions.Protocol.InvocationResponse, oneof: 0
+  oneof(:message, 0)
+  field(:registration_response, 1, type: Eigr.Functions.Protocol.RegistrationResponse, oneof: 0)
+  field(:actor_invocation, 2, type: Eigr.Functions.Protocol.ActorInvocation, oneof: 0)
+  field(:invocation_response, 3, type: Eigr.Functions.Protocol.InvocationResponse, oneof: 0)
 end
 
 defmodule Eigr.Functions.Protocol.ActorService.Service do
@@ -350,9 +351,11 @@ defmodule Eigr.Functions.Protocol.ActorService.Service do
     )
   end
 
-  rpc :Spawn,
-      stream(Eigr.Functions.Protocol.ActorSystemRequest),
-      stream(Eigr.Functions.Protocol.ActorSystemResponse)
+  rpc(
+    :Spawn,
+    stream(Eigr.Functions.Protocol.ActorSystemRequest),
+    stream(Eigr.Functions.Protocol.ActorSystemResponse)
+  )
 end
 
 defmodule Eigr.Functions.Protocol.ActorService.Stub do
