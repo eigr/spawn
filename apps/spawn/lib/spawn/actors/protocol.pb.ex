@@ -1,3 +1,49 @@
+defmodule Eigr.Functions.Protocol.Status do
+  @moduledoc false
+  use Protobuf, enum: true, syntax: :proto3
+
+  @type t :: integer | :UNKNOWN | :OK | :ACTOR_NOT_FOUND | :ERROR
+  def descriptor do
+    # credo:disable-for-next-line
+    Elixir.Google.Protobuf.EnumDescriptorProto.decode(
+      <<10, 6, 83, 116, 97, 116, 117, 115, 18, 11, 10, 7, 85, 78, 75, 78, 79, 87, 78, 16, 0, 18,
+        6, 10, 2, 79, 75, 16, 1, 18, 19, 10, 15, 65, 67, 84, 79, 82, 95, 78, 79, 84, 95, 70, 79,
+        85, 78, 68, 16, 2, 18, 9, 10, 5, 69, 82, 82, 79, 82, 16, 3>>
+    )
+  end
+
+  field(:UNKNOWN, 0)
+  field(:OK, 1)
+  field(:ACTOR_NOT_FOUND, 2)
+  field(:ERROR, 3)
+end
+
+defmodule Eigr.Functions.Protocol.InvocationStatus do
+  @moduledoc false
+  use Protobuf, syntax: :proto3
+
+  @type t :: %__MODULE__{
+          status: Eigr.Functions.Protocol.Status.t(),
+          message: String.t()
+        }
+  defstruct [:status, :message]
+
+  def descriptor do
+    # credo:disable-for-next-line
+    Elixir.Google.Protobuf.DescriptorProto.decode(
+      <<10, 16, 73, 110, 118, 111, 99, 97, 116, 105, 111, 110, 83, 116, 97, 116, 117, 115, 18, 55,
+        10, 6, 115, 116, 97, 116, 117, 115, 24, 1, 32, 1, 40, 14, 50, 31, 46, 101, 105, 103, 114,
+        46, 102, 117, 110, 99, 116, 105, 111, 110, 115, 46, 112, 114, 111, 116, 111, 99, 111, 108,
+        46, 83, 116, 97, 116, 117, 115, 82, 6, 115, 116, 97, 116, 117, 115, 18, 24, 10, 7, 109,
+        101, 115, 115, 97, 103, 101, 24, 2, 32, 1, 40, 9, 82, 7, 109, 101, 115, 115, 97, 103,
+        101>>
+    )
+  end
+
+  field(:status, 1, type: Eigr.Functions.Protocol.Status, enum: true)
+  field(:message, 2, type: :string)
+end
+
 defmodule Eigr.Functions.Protocol.ProxyInfo do
   @moduledoc false
   use Protobuf, syntax: :proto3
@@ -145,32 +191,38 @@ defmodule Eigr.Functions.Protocol.InvocationRequest do
   use Protobuf, syntax: :proto3
 
   @type t :: %__MODULE__{
-          actor: Eigr.Functions.Protocol.Actors.Actor.t() | nil,
+          from: Eigr.Functions.Protocol.Actors.Actor.t() | nil,
+          target: Eigr.Functions.Protocol.Actors.Actor.t() | nil,
           command_name: String.t(),
           value: Google.Protobuf.Any.t() | nil,
           async: boolean
         }
-  defstruct [:actor, :command_name, :value, :async]
+  defstruct [:from, :target, :command_name, :value, :async]
 
   def descriptor do
     # credo:disable-for-next-line
     Elixir.Google.Protobuf.DescriptorProto.decode(
       <<10, 17, 73, 110, 118, 111, 99, 97, 116, 105, 111, 110, 82, 101, 113, 117, 101, 115, 116,
-        18, 59, 10, 5, 97, 99, 116, 111, 114, 24, 1, 32, 1, 40, 11, 50, 37, 46, 101, 105, 103,
+        18, 57, 10, 4, 102, 114, 111, 109, 24, 1, 32, 1, 40, 11, 50, 37, 46, 101, 105, 103, 114,
+        46, 102, 117, 110, 99, 116, 105, 111, 110, 115, 46, 112, 114, 111, 116, 111, 99, 111, 108,
+        46, 97, 99, 116, 111, 114, 115, 46, 65, 99, 116, 111, 114, 82, 4, 102, 114, 111, 109, 18,
+        61, 10, 6, 116, 97, 114, 103, 101, 116, 24, 2, 32, 1, 40, 11, 50, 37, 46, 101, 105, 103,
         114, 46, 102, 117, 110, 99, 116, 105, 111, 110, 115, 46, 112, 114, 111, 116, 111, 99, 111,
-        108, 46, 97, 99, 116, 111, 114, 115, 46, 65, 99, 116, 111, 114, 82, 5, 97, 99, 116, 111,
-        114, 18, 33, 10, 12, 99, 111, 109, 109, 97, 110, 100, 95, 110, 97, 109, 101, 24, 2, 32, 1,
-        40, 9, 82, 11, 99, 111, 109, 109, 97, 110, 100, 78, 97, 109, 101, 18, 42, 10, 5, 118, 97,
-        108, 117, 101, 24, 3, 32, 1, 40, 11, 50, 20, 46, 103, 111, 111, 103, 108, 101, 46, 112,
-        114, 111, 116, 111, 98, 117, 102, 46, 65, 110, 121, 82, 5, 118, 97, 108, 117, 101, 18, 20,
-        10, 5, 97, 115, 121, 110, 99, 24, 4, 32, 1, 40, 8, 82, 5, 97, 115, 121, 110, 99>>
+        108, 46, 97, 99, 116, 111, 114, 115, 46, 65, 99, 116, 111, 114, 82, 6, 116, 97, 114, 103,
+        101, 116, 18, 33, 10, 12, 99, 111, 109, 109, 97, 110, 100, 95, 110, 97, 109, 101, 24, 3,
+        32, 1, 40, 9, 82, 11, 99, 111, 109, 109, 97, 110, 100, 78, 97, 109, 101, 18, 42, 10, 5,
+        118, 97, 108, 117, 101, 24, 4, 32, 1, 40, 11, 50, 20, 46, 103, 111, 111, 103, 108, 101,
+        46, 112, 114, 111, 116, 111, 98, 117, 102, 46, 65, 110, 121, 82, 5, 118, 97, 108, 117,
+        101, 18, 20, 10, 5, 97, 115, 121, 110, 99, 24, 5, 32, 1, 40, 8, 82, 5, 97, 115, 121, 110,
+        99>>
     )
   end
 
-  field(:actor, 1, type: Eigr.Functions.Protocol.Actors.Actor)
-  field(:command_name, 2, type: :string)
-  field(:value, 3, type: Google.Protobuf.Any)
-  field(:async, 4, type: :bool)
+  field(:from, 1, type: Eigr.Functions.Protocol.Actors.Actor)
+  field(:target, 2, type: Eigr.Functions.Protocol.Actors.Actor)
+  field(:command_name, 3, type: :string)
+  field(:value, 4, type: Google.Protobuf.Any)
+  field(:async, 5, type: :bool)
 end
 
 defmodule Eigr.Functions.Protocol.InvocationResponse do
@@ -178,26 +230,32 @@ defmodule Eigr.Functions.Protocol.InvocationResponse do
   use Protobuf, syntax: :proto3
 
   @type t :: %__MODULE__{
-          value: Google.Protobuf.Any.t() | nil,
-          actor: Eigr.Functions.Protocol.Actors.Actor.t() | nil
+          status: Eigr.Functions.Protocol.InvocationStatus.t() | nil,
+          from: Eigr.Functions.Protocol.Actors.Actor.t() | nil,
+          target: Eigr.Functions.Protocol.Actors.Actor.t() | nil
         }
-  defstruct [:value, :actor]
+  defstruct [:status, :from, :target]
 
   def descriptor do
     # credo:disable-for-next-line
     Elixir.Google.Protobuf.DescriptorProto.decode(
       <<10, 18, 73, 110, 118, 111, 99, 97, 116, 105, 111, 110, 82, 101, 115, 112, 111, 110, 115,
-        101, 18, 42, 10, 5, 118, 97, 108, 117, 101, 24, 1, 32, 1, 40, 11, 50, 20, 46, 103, 111,
-        111, 103, 108, 101, 46, 112, 114, 111, 116, 111, 98, 117, 102, 46, 65, 110, 121, 82, 5,
-        118, 97, 108, 117, 101, 18, 59, 10, 5, 97, 99, 116, 111, 114, 24, 2, 32, 1, 40, 11, 50,
-        37, 46, 101, 105, 103, 114, 46, 102, 117, 110, 99, 116, 105, 111, 110, 115, 46, 112, 114,
-        111, 116, 111, 99, 111, 108, 46, 97, 99, 116, 111, 114, 115, 46, 65, 99, 116, 111, 114,
-        82, 5, 97, 99, 116, 111, 114>>
+        101, 18, 65, 10, 6, 115, 116, 97, 116, 117, 115, 24, 1, 32, 1, 40, 11, 50, 41, 46, 101,
+        105, 103, 114, 46, 102, 117, 110, 99, 116, 105, 111, 110, 115, 46, 112, 114, 111, 116,
+        111, 99, 111, 108, 46, 73, 110, 118, 111, 99, 97, 116, 105, 111, 110, 83, 116, 97, 116,
+        117, 115, 82, 6, 115, 116, 97, 116, 117, 115, 18, 57, 10, 4, 102, 114, 111, 109, 24, 2,
+        32, 1, 40, 11, 50, 37, 46, 101, 105, 103, 114, 46, 102, 117, 110, 99, 116, 105, 111, 110,
+        115, 46, 112, 114, 111, 116, 111, 99, 111, 108, 46, 97, 99, 116, 111, 114, 115, 46, 65,
+        99, 116, 111, 114, 82, 4, 102, 114, 111, 109, 18, 61, 10, 6, 116, 97, 114, 103, 101, 116,
+        24, 3, 32, 1, 40, 11, 50, 37, 46, 101, 105, 103, 114, 46, 102, 117, 110, 99, 116, 105,
+        111, 110, 115, 46, 112, 114, 111, 116, 111, 99, 111, 108, 46, 97, 99, 116, 111, 114, 115,
+        46, 65, 99, 116, 111, 114, 82, 6, 116, 97, 114, 103, 101, 116>>
     )
   end
 
-  field(:value, 1, type: Google.Protobuf.Any)
-  field(:actor, 2, type: Eigr.Functions.Protocol.Actors.Actor)
+  field(:status, 1, type: Eigr.Functions.Protocol.InvocationStatus)
+  field(:from, 2, type: Eigr.Functions.Protocol.Actors.Actor)
+  field(:target, 3, type: Eigr.Functions.Protocol.Actors.Actor)
 end
 
 defmodule Eigr.Functions.Protocol.ActorInvocation do
@@ -230,9 +288,9 @@ defmodule Eigr.Functions.Protocol.ActorInvocationResponse do
 
   @type t :: %__MODULE__{
           invocation_response: Eigr.Functions.Protocol.InvocationResponse.t() | nil,
-          new_state: Google.Protobuf.Any.t() | nil
+          updated_state: Google.Protobuf.Any.t() | nil
         }
-  defstruct [:invocation_response, :new_state]
+  defstruct [:invocation_response, :updated_state]
 
   def descriptor do
     # credo:disable-for-next-line
@@ -243,14 +301,15 @@ defmodule Eigr.Functions.Protocol.ActorInvocationResponse do
         105, 103, 114, 46, 102, 117, 110, 99, 116, 105, 111, 110, 115, 46, 112, 114, 111, 116,
         111, 99, 111, 108, 46, 73, 110, 118, 111, 99, 97, 116, 105, 111, 110, 82, 101, 115, 112,
         111, 110, 115, 101, 82, 18, 105, 110, 118, 111, 99, 97, 116, 105, 111, 110, 82, 101, 115,
-        112, 111, 110, 115, 101, 18, 49, 10, 9, 110, 101, 119, 95, 115, 116, 97, 116, 101, 24, 2,
-        32, 1, 40, 11, 50, 20, 46, 103, 111, 111, 103, 108, 101, 46, 112, 114, 111, 116, 111, 98,
-        117, 102, 46, 65, 110, 121, 82, 8, 110, 101, 119, 83, 116, 97, 116, 101>>
+        112, 111, 110, 115, 101, 18, 57, 10, 13, 117, 112, 100, 97, 116, 101, 100, 95, 115, 116,
+        97, 116, 101, 24, 2, 32, 1, 40, 11, 50, 20, 46, 103, 111, 111, 103, 108, 101, 46, 112,
+        114, 111, 116, 111, 98, 117, 102, 46, 65, 110, 121, 82, 12, 117, 112, 100, 97, 116, 101,
+        100, 83, 116, 97, 116, 101>>
     )
   end
 
   field(:invocation_response, 1, type: Eigr.Functions.Protocol.InvocationResponse)
-  field(:new_state, 2, type: Google.Protobuf.Any)
+  field(:updated_state, 2, type: Google.Protobuf.Any)
 end
 
 defmodule Eigr.Functions.Protocol.ActorSystemRequest do

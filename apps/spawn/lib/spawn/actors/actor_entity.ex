@@ -4,9 +4,10 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
 
   alias Eigr.Functions.Protocol.Actors.{
     Actor,
-    ActorState,
     ActorDeactivateStrategy,
+    ActorState,
     ActorSnapshotStrategy,
+    ActorSystem,
     StateManager,
     TimeoutStrategy
   }
@@ -15,8 +16,11 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
 
   alias Eigr.Functions.Protocol.{
     ActorInvocation,
+    ActorInvocationResponse,
     InvocationRequest
   }
+
+  alias Spawn.Proxy.NodeManager
 
   @default_snapshot_timeout 60_000
   @default_deactivate_timeout 90_000
@@ -80,17 +84,32 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
       do: {:reply, state, state}
 
   def handle_call(
+        {:actor_invocation_response, %ActorInvocationResponse{} = invocation},
+        _from,
+        %Actor{
+          state: %ActorState{} = actor_state,
+          system: %ActorSystem{name: actor_system} = _system
+        } = state
+      ) do
+    {:reply, %{}, state}
+  end
+
+  def handle_cast(
         {:invocation_request,
          %InvocationRequest{
-           actor: %Actor{name: name} = actor,
+           from: %Actor{name: name} = from_actor,
+           target: %Actor{name: name} = target_actor,
            command_name: command,
            value: payload
          } = invocation},
-        _from,
-        %Actor{state: %ActorState{} = actor_state} = state
+        %Actor{
+          state: %ActorState{} = actor_state,
+          system: %ActorSystem{name: actor_system} = _system
+        } = state
       ) do
-    # TODO: Use ActorInvocation to pass request to real actor
-    {:reply, %{}, state}
+    payload = ActorInvocation.new(invocation_request: invocation)
+    NodeManager.invoke_user_function(actor_system, payload)
+    {:noreply, state}
   end
 
   @impl true
@@ -110,11 +129,15 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
         :snapshot,
         %Actor{
           name: name,
-          snapshot_strategy: %ActorSnapshotStrategy{strategy: %TimeoutStrategy{timeout: timeout} = snapshot_strategy},
+          snapshot_strategy: %ActorSnapshotStrategy{
+            strategy: %TimeoutStrategy{timeout: timeout} = snapshot_strategy
+          },
           state: %ActorState{} = actor_state
         } = state
       ) do
     Logger.debug("Snapshotting actor #{name}")
+
+    # Execute with timeout equals timeout strategy - 1 to avoid mailbox congestions
     StateManager.save_async(name, actor_state, timeout - 1)
     schedule_snapshot(snapshot_strategy)
     {:noreply, state}
@@ -163,12 +186,12 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
     GenServer.call(via(name), :get_state, 20_000)
   end
 
-  def invoke_sync(name, request) do
-    GenServer.call(via(name), {:invocation_request, request}, 20_000)
+  def invoke(name, request) do
+    GenServer.cast(via(name), {:invocation_request, request}, 20_000)
   end
 
   def invoke_async(name, request) do
-    GenServer.call(via(name), {:invocation_request, request}, 20_000)
+    GenServer.cast(via(name), {:invocation_request, :async, request}, 20_000)
   end
 
   defp schedule_snapshot(snapshot_strategy),

@@ -18,7 +18,8 @@ defmodule Eigr.Functions.Protocol.Actors.StateManager do
   end
 
   @spec save(String.t(), Eigr.Functions.Protocol.Actors.ActorState.t()) ::
-          {:ok, Eigr.Functions.Protocol.Actors.ActorState.t()} | {:error, any()}
+          {:ok, Eigr.Functions.Protocol.Actors.ActorState.t()}
+          | {:error, any(), Eigr.Functions.Protocol.Actors.ActorState.t()}
   def save(_name, nil), do: {:ok, nil}
 
   def save(_name, %ActorState{state: actor_state} = state)
@@ -28,28 +29,34 @@ defmodule Eigr.Functions.Protocol.Actors.StateManager do
   def save(name, %ActorState{tags: tags, state: actor_state} = state) do
     Logger.debug("Saving state for actor #{name}")
 
-    %Event{
-      actor: name,
-      revision: 0,
-      tags: tags,
-      data_type: actor_state.type_url,
-      data: actor_state.value
-    }
-    |> StateStoreManager.save()
-    |> case do
-      {:ok, event} ->
-        {:ok, actor_state}
+    try do
+      %Event{
+        actor: name,
+        revision: 0,
+        tags: tags,
+        data_type: actor_state.type_url,
+        data: actor_state.value
+      }
+      |> StateStoreManager.save()
+      |> case do
+        {:ok, event} ->
+          {:ok, actor_state}
 
-      {:error, changeset} ->
-        {:error, changeset}
+        {:error, changeset} ->
+          {:error, changeset, actor_state}
 
-      other ->
-        {:error, other}
+        other ->
+          {:error, other, actor_state}
+      end
+    catch
+      kind, error ->
+        {:error, error, actor_state}
     end
   end
 
   @spec save_async(String.t(), Eigr.Functions.Protocol.Actors.ActorState.t()) ::
-          {:ok, Eigr.Functions.Protocol.Actors.ActorState.t()} | {:error, any()}
+          {:ok, Eigr.Functions.Protocol.Actors.ActorState.t()}
+          | {:error, any(), Eigr.Functions.Protocol.Actors.ActorState.t()}
   def save_async(_name, nil, timeout \\ 5000), do: {:ok, %{}}
 
   def save_async(_name, %ActorState{state: actor_state} = state, timeout)
@@ -82,18 +89,18 @@ defmodule Eigr.Functions.Protocol.Actors.StateManager do
             {:ok, actor_state}
 
           {:error, changeset} ->
-            {:error, changeset}
+            {:error, changeset, actor_state}
 
           other ->
-            {:error, other}
+            {:error, other, actor_state}
         end
       else
-        {:error, :unsuccessfully}
+        {:error, :unsuccessfully, actor_state}
       end
     catch
       kind, error ->
         Task.shutdown(persist_data_task, :brutal_kill)
-        {:error, error}
+        {:error, error, actor_state}
     end
   end
 

@@ -8,6 +8,18 @@ import "google/protobuf/any.proto";
 option java_package = "io.eigr.functions.protocol";
 option go_package = "github.com/eigr/go-support/eigr/protocol;protocol";
 
+enum Status {
+    UNKNOWN = 0;
+    OK = 1;
+    ACTOR_NOT_FOUND = 2;
+    ERROR = 3;
+}
+
+message InvocationStatus {
+    Status status = 1;
+    string message = 2;
+}
+
 message ProxyInfo {
     int32 protocol_major_version = 1;
     int32 protocol_minor_version = 2;
@@ -51,27 +63,27 @@ message RegistrationResponse {
 }
 
 message InvocationRequest {
-    eigr.functions.protocol.actors.Actor actor = 1;
-    string command_name = 2;
-    google.protobuf.Any value = 3;
-    bool async = 4;
+    eigr.functions.protocol.actors.Actor from = 1;
+    eigr.functions.protocol.actors.Actor target = 2;
+    string command_name = 3;
+    google.protobuf.Any value = 4;
+    bool async = 5;
 }
 
 message InvocationResponse {
-    google.protobuf.Any value = 1;
-    eigr.functions.protocol.actors.Actor actor = 2;
+    InvocationStatus status = 1;
+    eigr.functions.protocol.actors.Actor from = 2;
+    eigr.functions.protocol.actors.Actor target = 3;
 }
 
 message ActorInvocation {
     InvocationRequest invocation_request = 1;
-
 }
 
 message ActorInvocationResponse {
     InvocationResponse invocation_response = 1;
-    google.protobuf.Any new_state = 2;
+    google.protobuf.Any updated_state = 2;
 }    
-
 
 message ActorSystemRequest {
     oneof message {

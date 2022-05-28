@@ -7,6 +7,7 @@ defmodule Spawn.Proxy.ActorService do
 
   alias Eigr.Functions.Protocol.{
     ActorInvocation,
+    ActorInvocationResponse,
     ActorSystemRequest,
     ActorSystemResponse,
     InvocationRequest,
@@ -57,17 +58,20 @@ defmodule Spawn.Proxy.ActorService do
   defp handle(
          {:invocation_request,
           %InvocationRequest{
-            actor: %Actor{name: actor_name, system: %ActorSystem{name: system_name}} = actor,
+            from: %Actor{name: name} = from_actor,
+            target:
+              %Actor{name: actor_name, system: %ActorSystem{name: system_name}} = target_actor,
             async: invocation_type
           } = request} = _message,
          stream
        ) do
     Logger.debug("Invocation request received: #{inspect(request)}")
-    invoke(invocation_type, actor, request, stream)
+    invoke(invocation_type, target_actor, request, stream)
   end
 
   defp handle(
-         {:actor_invocation_response, %ActorInvocation{} = actor_invocation_response} = _message,
+         {:actor_invocation_response, %ActorInvocationResponse{} = actor_invocation_response} =
+           _message,
          stream
        ) do
     Logger.debug("Actor invocation response received: #{inspect(actor_invocation_response)}")
@@ -89,6 +93,9 @@ defmodule Spawn.Proxy.ActorService do
     end)
   end
 
+  defp send_actor_invocation_response() do
+  end
+
   defp invoke(
          false,
          %Actor{name: actor_name, system: %ActorSystem{name: system_name}} = actor,
@@ -97,8 +104,8 @@ defmodule Spawn.Proxy.ActorService do
        ) do
     with {:ok, %{node: node, actor: registered_actor}} <-
            ActorRegistry.lookup(system_name, actor_name),
-         pid <- Node.spawn(node, NodeManager, :try_reactivate, [system_name, actor]) do
-      ActorEntity.invoke_sync(actor_name, request)
+         _pid <- Node.spawn(node, NodeManager, :try_reactivate, [system_name, actor]) do
+      ActorEntity.invoke(actor_name, request)
     else
       {:not_found, _} ->
         Logger.error("Actor #{actor_name} not found on ActorSystem #{system_name}")
