@@ -110,12 +110,12 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
         :snapshot,
         %Actor{
           name: name,
-          snapshot_strategy: %ActorSnapshotStrategy{strategy: snapshot_strategy},
+          snapshot_strategy: %ActorSnapshotStrategy{strategy: %TimeoutStrategy{timeout: timeout} = snapshot_strategy},
           state: %ActorState{} = actor_state
         } = state
       ) do
     Logger.debug("Snapshotting actor #{name}")
-    StateManager.save(name, actor_state)
+    StateManager.save_async(name, actor_state, timeout - 1)
     schedule_snapshot(snapshot_strategy)
     {:noreply, state}
   end
@@ -137,6 +137,11 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
         schedule_deactivate(deactivate_strategy)
         {:noreply, state}
     end
+  end
+
+  def handle_info(message, %Actor{name: name} = state) do
+    Logger.warn("No handled internal message for actor #{name}. Message: #{inspect(message)}")
+    {:noreply, state}
   end
 
   @impl true

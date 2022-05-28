@@ -25,11 +25,9 @@ defmodule Statestores.Adapters.MySQL do
         %Event{actor: actor, revision: revision, tags: tags, data_type: type, data: data} = event
       ) do
     map_event = ValueObjectSchema.to_map(event)
-    IO.inspect(map_event)
 
     %Event{}
     |> Event.changeset(map_event)
-    |> IO.inspect()
     |> insert!(on_conflict: [set: [revision: revision, tags: tags, data_type: type, data: data]])
     |> case do
       {:ok, event} ->
