@@ -12,8 +12,6 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
     TimeoutStrategy
   }
 
-  alias Eigr.Functions.Protocol.Actors.ActorEntity.Supervisor, as: ActorEntitySupervisor
-
   alias Eigr.Functions.Protocol.{
     ActorInvocation,
     ActorInvocationResponse,
@@ -24,6 +22,7 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
 
   @default_snapshot_timeout 60_000
   @default_deactivate_timeout 90_000
+  @timeout_factor [1, 3, 5, 7]
 
   @impl true
   @spec init(Eigr.Functions.Protocol.Actors.Actor.t()) ::
@@ -37,8 +36,8 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
       ) do
     Logger.debug("Activating actor #{name} in Node #{inspect(Node.self())}")
     Process.flag(:trap_exit, true)
-    schedule_snapshot(snapshot_strategy)
-    schedule_deactivate(deactivate_strategy)
+    schedule_snapshot(snapshot_strategy, get_timeout_factor(@timeout_factor))
+    schedule_deactivate(deactivate_strategy, get_timeout_factor(@timeout_factor))
 
     {:ok, state, {:continue, :load_state}}
   end
@@ -79,6 +78,14 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
   def handle_call(
         :get_state,
         _from,
+        %Actor{name: name, state: actor_state} = state
+      )
+      when is_nil(actor_state),
+      do: {:reply, nil, state}
+
+  def handle_call(
+        :get_state,
+        _from,
         %Actor{name: name, state: %ActorState{} = actor_state} = state
       ),
       do: {:reply, state, state}
@@ -94,6 +101,7 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
     {:reply, %{}, state}
   end
 
+  @impl true
   def handle_cast(
         {:invocation_request,
          %InvocationRequest{
@@ -187,32 +195,59 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
   end
 
   def invoke(name, request) do
-    GenServer.cast(via(name), {:invocation_request, request}, 20_000)
+    GenServer.cast(via(name), {:invocation_request, request})
   end
 
   def invoke_async(name, request) do
-    GenServer.cast(via(name), {:invocation_request, :async, request}, 20_000)
+    GenServer.cast(via(name), {:invocation_request, :async, request})
   end
 
-  defp schedule_snapshot(snapshot_strategy),
-    do: Process.send_after(self(), :snapshot, get_snapshot_interval(snapshot_strategy))
+  defp get_timeout_factor(factor_range) when is_number(factor_range),
+    do: Enum.random([factor_range])
 
-  defp schedule_deactivate(deactivate_strategy),
-    do: Process.send_after(self(), :deactivate, get_deactivate_interval(deactivate_strategy))
+  defp get_timeout_factor(factor_range) when is_list(factor_range), do: Enum.random(factor_range)
 
-  defp get_snapshot_interval(%TimeoutStrategy{timeout: timeout} = _timeout_strategy)
+  defp schedule_snapshot(snapshot_strategy, timeout_factor \\ 0),
+    do:
+      Process.send_after(
+        self(),
+        :snapshot,
+        get_snapshot_interval(snapshot_strategy, timeout_factor)
+      )
+
+  defp schedule_deactivate(deactivate_strategy, timeout_factor \\ 0),
+    do:
+      Process.send_after(
+        self(),
+        :deactivate,
+        get_deactivate_interval(deactivate_strategy, timeout_factor)
+      )
+
+  defp get_snapshot_interval(
+         %TimeoutStrategy{timeout: timeout} = _timeout_strategy,
+         timeout_factor \\ 0
+       )
        when is_nil(timeout),
-       do: @default_snapshot_timeout
+       do: @default_snapshot_timeout + timeout_factor
 
-  defp get_snapshot_interval(%TimeoutStrategy{timeout: timeout} = _timeout_strategy),
-    do: timeout
+  defp get_snapshot_interval(
+         %TimeoutStrategy{timeout: timeout} = _timeout_strategy,
+         timeout_factor
+       ),
+       do: timeout + timeout_factor
 
-  defp get_deactivate_interval(%TimeoutStrategy{timeout: timeout} = _timeout_strategy)
+  defp get_deactivate_interval(
+         %TimeoutStrategy{timeout: timeout} = _timeout_strategy,
+         timeout_factor \\ 0
+       )
        when is_nil(timeout),
-       do: @default_deactivate_timeout
+       do: @default_deactivate_timeout + timeout_factor
 
-  defp get_deactivate_interval(%TimeoutStrategy{timeout: timeout} = _timeout_strategy),
-    do: timeout
+  defp get_deactivate_interval(
+         %TimeoutStrategy{timeout: timeout} = _timeout_strategy,
+         timeout_factor
+       ),
+       do: timeout + timeout_factor
 
   defp via(name) do
     {:via, Horde.Registry, {Spawn.Actor.Registry, {__MODULE__, name}}}
