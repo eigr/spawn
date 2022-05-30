@@ -55,16 +55,11 @@ public class AppTest {
                 .build();
 
         HashMap<String, ActorOuterClass.Actor> actors = new HashMap<String, ActorOuterClass.Actor>();
-        actors.put("actor-test-01", makeActor("actor-test-01", actorSystem));
-        actors.put("actor-test-02", makeActor("actor-test-02", actorSystem));
-        actors.put("actor-test-03", makeActor("actor-test-03", actorSystem));
-        actors.put("actor-test-04", makeActor("actor-test-04", actorSystem));
-        actors.put("actor-test-05", makeActor("actor-test-05", actorSystem));
-        actors.put("actor-test-06", makeActor("actor-test-06", actorSystem));
-        actors.put("actor-test-07", makeActor("actor-test-07", actorSystem));
-        actors.put("actor-test-08", makeActor("actor-test-08", actorSystem));
-        actors.put("actor-test-09", makeActor("actor-test-09", actorSystem));
-        actors.put("actor-test-10", makeActor("actor-test-10", actorSystem));
+
+        for (int i = 0; i < 100; i++) {
+            String actorName = String.format("actor-test-0%s", i);
+            actors.put(actorName, makeActor(actorName, actorSystem));
+        }
 
         ActorOuterClass.Registry registry = ActorOuterClass.Registry.newBuilder()
                 .putAllActors(actors)
