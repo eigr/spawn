@@ -37,6 +37,8 @@ config :logger, :console,
   format: "$date $time [$node]:[$metadata]:[$level]:$levelpad$message\n",
   metadata: [:pid]
 
+config :protobuf, extensions: :enabled
+
 config :grpc, start_server: true
 
 # App Configuration

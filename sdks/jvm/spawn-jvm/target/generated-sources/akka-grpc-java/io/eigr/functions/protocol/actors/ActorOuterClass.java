@@ -3596,17 +3596,51 @@ public final class ActorOuterClass {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>.google.protobuf.Any state = 1;</code>
+     * <code>map&lt;string, string&gt; tags = 1;</code>
+     */
+    int getTagsCount();
+    /**
+     * <code>map&lt;string, string&gt; tags = 1;</code>
+     */
+    boolean containsTags(
+        java.lang.String key);
+    /**
+     * Use {@link #getTagsMap()} instead.
+     */
+    @java.lang.Deprecated
+    java.util.Map<java.lang.String, java.lang.String>
+    getTags();
+    /**
+     * <code>map&lt;string, string&gt; tags = 1;</code>
+     */
+    java.util.Map<java.lang.String, java.lang.String>
+    getTagsMap();
+    /**
+     * <code>map&lt;string, string&gt; tags = 1;</code>
+     */
+
+    java.lang.String getTagsOrDefault(
+        java.lang.String key,
+        java.lang.String defaultValue);
+    /**
+     * <code>map&lt;string, string&gt; tags = 1;</code>
+     */
+
+    java.lang.String getTagsOrThrow(
+        java.lang.String key);
+
+    /**
+     * <code>.google.protobuf.Any state = 2;</code>
      * @return Whether the state field is set.
      */
     boolean hasState();
     /**
-     * <code>.google.protobuf.Any state = 1;</code>
+     * <code>.google.protobuf.Any state = 2;</code>
      * @return The state.
      */
     com.google.protobuf.Any getState();
     /**
-     * <code>.google.protobuf.Any state = 1;</code>
+     * <code>.google.protobuf.Any state = 2;</code>
      */
     com.google.protobuf.AnyOrBuilder getStateOrBuilder();
   }
@@ -3645,6 +3679,7 @@ public final class ActorOuterClass {
       if (extensionRegistry == null) {
         throw new java.lang.NullPointerException();
       }
+      int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
       try {
@@ -3656,6 +3691,19 @@ public final class ActorOuterClass {
               done = true;
               break;
             case 10: {
+              if (!((mutable_bitField0_ & 0x00000001) != 0)) {
+                tags_ = com.google.protobuf.MapField.newMapField(
+                    TagsDefaultEntryHolder.defaultEntry);
+                mutable_bitField0_ |= 0x00000001;
+              }
+              com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
+              tags__ = input.readMessage(
+                  TagsDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
+              tags_.getMutableMap().put(
+                  tags__.getKey(), tags__.getValue());
+              break;
+            }
+            case 18: {
               com.google.protobuf.Any.Builder subBuilder = null;
               if (state_ != null) {
                 subBuilder = state_.toBuilder();
@@ -3692,6 +3740,18 @@ public final class ActorOuterClass {
       return io.eigr.functions.protocol.actors.ActorOuterClass.internal_static_eigr_functions_protocol_actors_ActorState_descriptor;
     }
 
+    @SuppressWarnings({"rawtypes"})
+    @java.lang.Override
+    protected com.google.protobuf.MapField internalGetMapField(
+        int number) {
+      switch (number) {
+        case 1:
+          return internalGetTags();
+        default:
+          throw new RuntimeException(
+              "Invalid map field number: " + number);
+      }
+    }
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
@@ -3700,24 +3760,100 @@ public final class ActorOuterClass {
               io.eigr.functions.protocol.actors.ActorOuterClass.ActorState.class, io.eigr.functions.protocol.actors.ActorOuterClass.ActorState.Builder.class);
     }
 
-    public static final int STATE_FIELD_NUMBER = 1;
+    public static final int TAGS_FIELD_NUMBER = 1;
+    private static final class TagsDefaultEntryHolder {
+      static final com.google.protobuf.MapEntry<
+          java.lang.String, java.lang.String> defaultEntry =
+              com.google.protobuf.MapEntry
+              .<java.lang.String, java.lang.String>newDefaultInstance(
+                  io.eigr.functions.protocol.actors.ActorOuterClass.internal_static_eigr_functions_protocol_actors_ActorState_TagsEntry_descriptor, 
+                  com.google.protobuf.WireFormat.FieldType.STRING,
+                  "",
+                  com.google.protobuf.WireFormat.FieldType.STRING,
+                  "");
+    }
+    private com.google.protobuf.MapField<
+        java.lang.String, java.lang.String> tags_;
+    private com.google.protobuf.MapField<java.lang.String, java.lang.String>
+    internalGetTags() {
+      if (tags_ == null) {
+        return com.google.protobuf.MapField.emptyMapField(
+            TagsDefaultEntryHolder.defaultEntry);
+      }
+      return tags_;
+    }
+
+    public int getTagsCount() {
+      return internalGetTags().getMap().size();
+    }
+    /**
+     * <code>map&lt;string, string&gt; tags = 1;</code>
+     */
+
+    public boolean containsTags(
+        java.lang.String key) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      return internalGetTags().getMap().containsKey(key);
+    }
+    /**
+     * Use {@link #getTagsMap()} instead.
+     */
+    @java.lang.Deprecated
+    public java.util.Map<java.lang.String, java.lang.String> getTags() {
+      return getTagsMap();
+    }
+    /**
+     * <code>map&lt;string, string&gt; tags = 1;</code>
+     */
+
+    public java.util.Map<java.lang.String, java.lang.String> getTagsMap() {
+      return internalGetTags().getMap();
+    }
+    /**
+     * <code>map&lt;string, string&gt; tags = 1;</code>
+     */
+
+    public java.lang.String getTagsOrDefault(
+        java.lang.String key,
+        java.lang.String defaultValue) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      java.util.Map<java.lang.String, java.lang.String> map =
+          internalGetTags().getMap();
+      return map.containsKey(key) ? map.get(key) : defaultValue;
+    }
+    /**
+     * <code>map&lt;string, string&gt; tags = 1;</code>
+     */
+
+    public java.lang.String getTagsOrThrow(
+        java.lang.String key) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      java.util.Map<java.lang.String, java.lang.String> map =
+          internalGetTags().getMap();
+      if (!map.containsKey(key)) {
+        throw new java.lang.IllegalArgumentException();
+      }
+      return map.get(key);
+    }
+
+    public static final int STATE_FIELD_NUMBER = 2;
     private com.google.protobuf.Any state_;
     /**
-     * <code>.google.protobuf.Any state = 1;</code>
+     * <code>.google.protobuf.Any state = 2;</code>
      * @return Whether the state field is set.
      */
     public boolean hasState() {
       return state_ != null;
     }
     /**
-     * <code>.google.protobuf.Any state = 1;</code>
+     * <code>.google.protobuf.Any state = 2;</code>
      * @return The state.
      */
     public com.google.protobuf.Any getState() {
       return state_ == null ? com.google.protobuf.Any.getDefaultInstance() : state_;
     }
     /**
-     * <code>.google.protobuf.Any state = 1;</code>
+     * <code>.google.protobuf.Any state = 2;</code>
      */
     public com.google.protobuf.AnyOrBuilder getStateOrBuilder() {
       return getState();
@@ -3737,8 +3873,14 @@ public final class ActorOuterClass {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
+      com.google.protobuf.GeneratedMessageV3
+        .serializeStringMapTo(
+          output,
+          internalGetTags(),
+          TagsDefaultEntryHolder.defaultEntry,
+          1);
       if (state_ != null) {
-        output.writeMessage(1, getState());
+        output.writeMessage(2, getState());
       }
       unknownFields.writeTo(output);
     }
@@ -3749,9 +3891,19 @@ public final class ActorOuterClass {
       if (size != -1) return size;
 
       size = 0;
+      for (java.util.Map.Entry<java.lang.String, java.lang.String> entry
+           : internalGetTags().getMap().entrySet()) {
+        com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
+        tags__ = TagsDefaultEntryHolder.defaultEntry.newBuilderForType()
+            .setKey(entry.getKey())
+            .setValue(entry.getValue())
+            .build();
+        size += com.google.protobuf.CodedOutputStream
+            .computeMessageSize(1, tags__);
+      }
       if (state_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(1, getState());
+          .computeMessageSize(2, getState());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -3768,6 +3920,8 @@ public final class ActorOuterClass {
       }
       io.eigr.functions.protocol.actors.ActorOuterClass.ActorState other = (io.eigr.functions.protocol.actors.ActorOuterClass.ActorState) obj;
 
+      if (!internalGetTags().equals(
+          other.internalGetTags())) return false;
       if (hasState() != other.hasState()) return false;
       if (hasState()) {
         if (!getState()
@@ -3784,6 +3938,10 @@ public final class ActorOuterClass {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
+      if (!internalGetTags().getMap().isEmpty()) {
+        hash = (37 * hash) + TAGS_FIELD_NUMBER;
+        hash = (53 * hash) + internalGetTags().hashCode();
+      }
       if (hasState()) {
         hash = (37 * hash) + STATE_FIELD_NUMBER;
         hash = (53 * hash) + getState().hashCode();
@@ -3895,6 +4053,28 @@ public final class ActorOuterClass {
         return io.eigr.functions.protocol.actors.ActorOuterClass.internal_static_eigr_functions_protocol_actors_ActorState_descriptor;
       }
 
+      @SuppressWarnings({"rawtypes"})
+      protected com.google.protobuf.MapField internalGetMapField(
+          int number) {
+        switch (number) {
+          case 1:
+            return internalGetTags();
+          default:
+            throw new RuntimeException(
+                "Invalid map field number: " + number);
+        }
+      }
+      @SuppressWarnings({"rawtypes"})
+      protected com.google.protobuf.MapField internalGetMutableMapField(
+          int number) {
+        switch (number) {
+          case 1:
+            return internalGetMutableTags();
+          default:
+            throw new RuntimeException(
+                "Invalid map field number: " + number);
+        }
+      }
       @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
@@ -3921,6 +4101,7 @@ public final class ActorOuterClass {
       @java.lang.Override
       public Builder clear() {
         super.clear();
+        internalGetMutableTags().clear();
         if (stateBuilder_ == null) {
           state_ = null;
         } else {
@@ -3953,6 +4134,9 @@ public final class ActorOuterClass {
       @java.lang.Override
       public io.eigr.functions.protocol.actors.ActorOuterClass.ActorState buildPartial() {
         io.eigr.functions.protocol.actors.ActorOuterClass.ActorState result = new io.eigr.functions.protocol.actors.ActorOuterClass.ActorState(this);
+        int from_bitField0_ = bitField0_;
+        result.tags_ = internalGetTags();
+        result.tags_.makeImmutable();
         if (stateBuilder_ == null) {
           result.state_ = state_;
         } else {
@@ -4006,6 +4190,8 @@ public final class ActorOuterClass {
 
       public Builder mergeFrom(io.eigr.functions.protocol.actors.ActorOuterClass.ActorState other) {
         if (other == io.eigr.functions.protocol.actors.ActorOuterClass.ActorState.getDefaultInstance()) return this;
+        internalGetMutableTags().mergeFrom(
+            other.internalGetTags());
         if (other.hasState()) {
           mergeState(other.getState());
         }
@@ -4037,19 +4223,143 @@ public final class ActorOuterClass {
         }
         return this;
       }
+      private int bitField0_;
+
+      private com.google.protobuf.MapField<
+          java.lang.String, java.lang.String> tags_;
+      private com.google.protobuf.MapField<java.lang.String, java.lang.String>
+      internalGetTags() {
+        if (tags_ == null) {
+          return com.google.protobuf.MapField.emptyMapField(
+              TagsDefaultEntryHolder.defaultEntry);
+        }
+        return tags_;
+      }
+      private com.google.protobuf.MapField<java.lang.String, java.lang.String>
+      internalGetMutableTags() {
+        onChanged();;
+        if (tags_ == null) {
+          tags_ = com.google.protobuf.MapField.newMapField(
+              TagsDefaultEntryHolder.defaultEntry);
+        }
+        if (!tags_.isMutable()) {
+          tags_ = tags_.copy();
+        }
+        return tags_;
+      }
+
+      public int getTagsCount() {
+        return internalGetTags().getMap().size();
+      }
+      /**
+       * <code>map&lt;string, string&gt; tags = 1;</code>
+       */
+
+      public boolean containsTags(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        return internalGetTags().getMap().containsKey(key);
+      }
+      /**
+       * Use {@link #getTagsMap()} instead.
+       */
+      @java.lang.Deprecated
+      public java.util.Map<java.lang.String, java.lang.String> getTags() {
+        return getTagsMap();
+      }
+      /**
+       * <code>map&lt;string, string&gt; tags = 1;</code>
+       */
+
+      public java.util.Map<java.lang.String, java.lang.String> getTagsMap() {
+        return internalGetTags().getMap();
+      }
+      /**
+       * <code>map&lt;string, string&gt; tags = 1;</code>
+       */
+
+      public java.lang.String getTagsOrDefault(
+          java.lang.String key,
+          java.lang.String defaultValue) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        java.util.Map<java.lang.String, java.lang.String> map =
+            internalGetTags().getMap();
+        return map.containsKey(key) ? map.get(key) : defaultValue;
+      }
+      /**
+       * <code>map&lt;string, string&gt; tags = 1;</code>
+       */
+
+      public java.lang.String getTagsOrThrow(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        java.util.Map<java.lang.String, java.lang.String> map =
+            internalGetTags().getMap();
+        if (!map.containsKey(key)) {
+          throw new java.lang.IllegalArgumentException();
+        }
+        return map.get(key);
+      }
+
+      public Builder clearTags() {
+        internalGetMutableTags().getMutableMap()
+            .clear();
+        return this;
+      }
+      /**
+       * <code>map&lt;string, string&gt; tags = 1;</code>
+       */
+
+      public Builder removeTags(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        internalGetMutableTags().getMutableMap()
+            .remove(key);
+        return this;
+      }
+      /**
+       * Use alternate mutation accessors instead.
+       */
+      @java.lang.Deprecated
+      public java.util.Map<java.lang.String, java.lang.String>
+      getMutableTags() {
+        return internalGetMutableTags().getMutableMap();
+      }
+      /**
+       * <code>map&lt;string, string&gt; tags = 1;</code>
+       */
+      public Builder putTags(
+          java.lang.String key,
+          java.lang.String value) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        if (value == null) { throw new java.lang.NullPointerException(); }
+        internalGetMutableTags().getMutableMap()
+            .put(key, value);
+        return this;
+      }
+      /**
+       * <code>map&lt;string, string&gt; tags = 1;</code>
+       */
+
+      public Builder putAllTags(
+          java.util.Map<java.lang.String, java.lang.String> values) {
+        internalGetMutableTags().getMutableMap()
+            .putAll(values);
+        return this;
+      }
 
       private com.google.protobuf.Any state_;
       private com.google.protobuf.SingleFieldBuilderV3<
           com.google.protobuf.Any, com.google.protobuf.Any.Builder, com.google.protobuf.AnyOrBuilder> stateBuilder_;
       /**
-       * <code>.google.protobuf.Any state = 1;</code>
+       * <code>.google.protobuf.Any state = 2;</code>
        * @return Whether the state field is set.
        */
       public boolean hasState() {
         return stateBuilder_ != null || state_ != null;
       }
       /**
-       * <code>.google.protobuf.Any state = 1;</code>
+       * <code>.google.protobuf.Any state = 2;</code>
        * @return The state.
        */
       public com.google.protobuf.Any getState() {
@@ -4060,7 +4370,7 @@ public final class ActorOuterClass {
         }
       }
       /**
-       * <code>.google.protobuf.Any state = 1;</code>
+       * <code>.google.protobuf.Any state = 2;</code>
        */
       public Builder setState(com.google.protobuf.Any value) {
         if (stateBuilder_ == null) {
@@ -4076,7 +4386,7 @@ public final class ActorOuterClass {
         return this;
       }
       /**
-       * <code>.google.protobuf.Any state = 1;</code>
+       * <code>.google.protobuf.Any state = 2;</code>
        */
       public Builder setState(
           com.google.protobuf.Any.Builder builderForValue) {
@@ -4090,7 +4400,7 @@ public final class ActorOuterClass {
         return this;
       }
       /**
-       * <code>.google.protobuf.Any state = 1;</code>
+       * <code>.google.protobuf.Any state = 2;</code>
        */
       public Builder mergeState(com.google.protobuf.Any value) {
         if (stateBuilder_ == null) {
@@ -4108,7 +4418,7 @@ public final class ActorOuterClass {
         return this;
       }
       /**
-       * <code>.google.protobuf.Any state = 1;</code>
+       * <code>.google.protobuf.Any state = 2;</code>
        */
       public Builder clearState() {
         if (stateBuilder_ == null) {
@@ -4122,7 +4432,7 @@ public final class ActorOuterClass {
         return this;
       }
       /**
-       * <code>.google.protobuf.Any state = 1;</code>
+       * <code>.google.protobuf.Any state = 2;</code>
        */
       public com.google.protobuf.Any.Builder getStateBuilder() {
         
@@ -4130,7 +4440,7 @@ public final class ActorOuterClass {
         return getStateFieldBuilder().getBuilder();
       }
       /**
-       * <code>.google.protobuf.Any state = 1;</code>
+       * <code>.google.protobuf.Any state = 2;</code>
        */
       public com.google.protobuf.AnyOrBuilder getStateOrBuilder() {
         if (stateBuilder_ != null) {
@@ -4141,7 +4451,7 @@ public final class ActorOuterClass {
         }
       }
       /**
-       * <code>.google.protobuf.Any state = 1;</code>
+       * <code>.google.protobuf.Any state = 2;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           com.google.protobuf.Any, com.google.protobuf.Any.Builder, com.google.protobuf.AnyOrBuilder> 
@@ -4226,34 +4536,34 @@ public final class ActorOuterClass {
         getNameBytes();
 
     /**
-     * <code>.eigr.functions.protocol.actors.ActorSystem actorSystem = 2;</code>
-     * @return Whether the actorSystem field is set.
+     * <code>.eigr.functions.protocol.actors.ActorSystem system = 2;</code>
+     * @return Whether the system field is set.
      */
-    boolean hasActorSystem();
+    boolean hasSystem();
     /**
-     * <code>.eigr.functions.protocol.actors.ActorSystem actorSystem = 2;</code>
-     * @return The actorSystem.
+     * <code>.eigr.functions.protocol.actors.ActorSystem system = 2;</code>
+     * @return The system.
      */
-    io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem getActorSystem();
+    io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem getSystem();
     /**
-     * <code>.eigr.functions.protocol.actors.ActorSystem actorSystem = 2;</code>
+     * <code>.eigr.functions.protocol.actors.ActorSystem system = 2;</code>
      */
-    io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystemOrBuilder getActorSystemOrBuilder();
+    io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystemOrBuilder getSystemOrBuilder();
 
     /**
-     * <code>.eigr.functions.protocol.actors.ActorState actor_state = 3;</code>
-     * @return Whether the actorState field is set.
+     * <code>.eigr.functions.protocol.actors.ActorState state = 3;</code>
+     * @return Whether the state field is set.
      */
-    boolean hasActorState();
+    boolean hasState();
     /**
-     * <code>.eigr.functions.protocol.actors.ActorState actor_state = 3;</code>
-     * @return The actorState.
+     * <code>.eigr.functions.protocol.actors.ActorState state = 3;</code>
+     * @return The state.
      */
-    io.eigr.functions.protocol.actors.ActorOuterClass.ActorState getActorState();
+    io.eigr.functions.protocol.actors.ActorOuterClass.ActorState getState();
     /**
-     * <code>.eigr.functions.protocol.actors.ActorState actor_state = 3;</code>
+     * <code>.eigr.functions.protocol.actors.ActorState state = 3;</code>
      */
-    io.eigr.functions.protocol.actors.ActorOuterClass.ActorStateOrBuilder getActorStateOrBuilder();
+    io.eigr.functions.protocol.actors.ActorOuterClass.ActorStateOrBuilder getStateOrBuilder();
 
     /**
      * <code>.eigr.functions.protocol.actors.ActorSnapshotStrategy snapshot_strategy = 4;</code>
@@ -4339,26 +4649,26 @@ public final class ActorOuterClass {
             }
             case 18: {
               io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.Builder subBuilder = null;
-              if (actorSystem_ != null) {
-                subBuilder = actorSystem_.toBuilder();
+              if (system_ != null) {
+                subBuilder = system_.toBuilder();
               }
-              actorSystem_ = input.readMessage(io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.parser(), extensionRegistry);
+              system_ = input.readMessage(io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.parser(), extensionRegistry);
               if (subBuilder != null) {
-                subBuilder.mergeFrom(actorSystem_);
-                actorSystem_ = subBuilder.buildPartial();
+                subBuilder.mergeFrom(system_);
+                system_ = subBuilder.buildPartial();
               }
 
               break;
             }
             case 26: {
               io.eigr.functions.protocol.actors.ActorOuterClass.ActorState.Builder subBuilder = null;
-              if (actorState_ != null) {
-                subBuilder = actorState_.toBuilder();
+              if (state_ != null) {
+                subBuilder = state_.toBuilder();
               }
-              actorState_ = input.readMessage(io.eigr.functions.protocol.actors.ActorOuterClass.ActorState.parser(), extensionRegistry);
+              state_ = input.readMessage(io.eigr.functions.protocol.actors.ActorOuterClass.ActorState.parser(), extensionRegistry);
               if (subBuilder != null) {
-                subBuilder.mergeFrom(actorState_);
-                actorState_ = subBuilder.buildPartial();
+                subBuilder.mergeFrom(state_);
+                state_ = subBuilder.buildPartial();
               }
 
               break;
@@ -4457,50 +4767,50 @@ public final class ActorOuterClass {
       }
     }
 
-    public static final int ACTORSYSTEM_FIELD_NUMBER = 2;
-    private io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem actorSystem_;
+    public static final int SYSTEM_FIELD_NUMBER = 2;
+    private io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem system_;
     /**
-     * <code>.eigr.functions.protocol.actors.ActorSystem actorSystem = 2;</code>
-     * @return Whether the actorSystem field is set.
+     * <code>.eigr.functions.protocol.actors.ActorSystem system = 2;</code>
+     * @return Whether the system field is set.
      */
-    public boolean hasActorSystem() {
-      return actorSystem_ != null;
+    public boolean hasSystem() {
+      return system_ != null;
     }
     /**
-     * <code>.eigr.functions.protocol.actors.ActorSystem actorSystem = 2;</code>
-     * @return The actorSystem.
+     * <code>.eigr.functions.protocol.actors.ActorSystem system = 2;</code>
+     * @return The system.
      */
-    public io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem getActorSystem() {
-      return actorSystem_ == null ? io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.getDefaultInstance() : actorSystem_;
+    public io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem getSystem() {
+      return system_ == null ? io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.getDefaultInstance() : system_;
     }
     /**
-     * <code>.eigr.functions.protocol.actors.ActorSystem actorSystem = 2;</code>
+     * <code>.eigr.functions.protocol.actors.ActorSystem system = 2;</code>
      */
-    public io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystemOrBuilder getActorSystemOrBuilder() {
-      return getActorSystem();
+    public io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystemOrBuilder getSystemOrBuilder() {
+      return getSystem();
     }
 
-    public static final int ACTOR_STATE_FIELD_NUMBER = 3;
-    private io.eigr.functions.protocol.actors.ActorOuterClass.ActorState actorState_;
+    public static final int STATE_FIELD_NUMBER = 3;
+    private io.eigr.functions.protocol.actors.ActorOuterClass.ActorState state_;
     /**
-     * <code>.eigr.functions.protocol.actors.ActorState actor_state = 3;</code>
-     * @return Whether the actorState field is set.
+     * <code>.eigr.functions.protocol.actors.ActorState state = 3;</code>
+     * @return Whether the state field is set.
      */
-    public boolean hasActorState() {
-      return actorState_ != null;
+    public boolean hasState() {
+      return state_ != null;
     }
     /**
-     * <code>.eigr.functions.protocol.actors.ActorState actor_state = 3;</code>
-     * @return The actorState.
+     * <code>.eigr.functions.protocol.actors.ActorState state = 3;</code>
+     * @return The state.
      */
-    public io.eigr.functions.protocol.actors.ActorOuterClass.ActorState getActorState() {
-      return actorState_ == null ? io.eigr.functions.protocol.actors.ActorOuterClass.ActorState.getDefaultInstance() : actorState_;
+    public io.eigr.functions.protocol.actors.ActorOuterClass.ActorState getState() {
+      return state_ == null ? io.eigr.functions.protocol.actors.ActorOuterClass.ActorState.getDefaultInstance() : state_;
     }
     /**
-     * <code>.eigr.functions.protocol.actors.ActorState actor_state = 3;</code>
+     * <code>.eigr.functions.protocol.actors.ActorState state = 3;</code>
      */
-    public io.eigr.functions.protocol.actors.ActorOuterClass.ActorStateOrBuilder getActorStateOrBuilder() {
-      return getActorState();
+    public io.eigr.functions.protocol.actors.ActorOuterClass.ActorStateOrBuilder getStateOrBuilder() {
+      return getState();
     }
 
     public static final int SNAPSHOT_STRATEGY_FIELD_NUMBER = 4;
@@ -4566,11 +4876,11 @@ public final class ActorOuterClass {
       if (!getNameBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 1, name_);
       }
-      if (actorSystem_ != null) {
-        output.writeMessage(2, getActorSystem());
+      if (system_ != null) {
+        output.writeMessage(2, getSystem());
       }
-      if (actorState_ != null) {
-        output.writeMessage(3, getActorState());
+      if (state_ != null) {
+        output.writeMessage(3, getState());
       }
       if (snapshotStrategy_ != null) {
         output.writeMessage(4, getSnapshotStrategy());
@@ -4590,13 +4900,13 @@ public final class ActorOuterClass {
       if (!getNameBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, name_);
       }
-      if (actorSystem_ != null) {
+      if (system_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(2, getActorSystem());
+          .computeMessageSize(2, getSystem());
       }
-      if (actorState_ != null) {
+      if (state_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(3, getActorState());
+          .computeMessageSize(3, getState());
       }
       if (snapshotStrategy_ != null) {
         size += com.google.protobuf.CodedOutputStream
@@ -4623,15 +4933,15 @@ public final class ActorOuterClass {
 
       if (!getName()
           .equals(other.getName())) return false;
-      if (hasActorSystem() != other.hasActorSystem()) return false;
-      if (hasActorSystem()) {
-        if (!getActorSystem()
-            .equals(other.getActorSystem())) return false;
+      if (hasSystem() != other.hasSystem()) return false;
+      if (hasSystem()) {
+        if (!getSystem()
+            .equals(other.getSystem())) return false;
       }
-      if (hasActorState() != other.hasActorState()) return false;
-      if (hasActorState()) {
-        if (!getActorState()
-            .equals(other.getActorState())) return false;
+      if (hasState() != other.hasState()) return false;
+      if (hasState()) {
+        if (!getState()
+            .equals(other.getState())) return false;
       }
       if (hasSnapshotStrategy() != other.hasSnapshotStrategy()) return false;
       if (hasSnapshotStrategy()) {
@@ -4656,13 +4966,13 @@ public final class ActorOuterClass {
       hash = (19 * hash) + getDescriptor().hashCode();
       hash = (37 * hash) + NAME_FIELD_NUMBER;
       hash = (53 * hash) + getName().hashCode();
-      if (hasActorSystem()) {
-        hash = (37 * hash) + ACTORSYSTEM_FIELD_NUMBER;
-        hash = (53 * hash) + getActorSystem().hashCode();
+      if (hasSystem()) {
+        hash = (37 * hash) + SYSTEM_FIELD_NUMBER;
+        hash = (53 * hash) + getSystem().hashCode();
       }
-      if (hasActorState()) {
-        hash = (37 * hash) + ACTOR_STATE_FIELD_NUMBER;
-        hash = (53 * hash) + getActorState().hashCode();
+      if (hasState()) {
+        hash = (37 * hash) + STATE_FIELD_NUMBER;
+        hash = (53 * hash) + getState().hashCode();
       }
       if (hasSnapshotStrategy()) {
         hash = (37 * hash) + SNAPSHOT_STRATEGY_FIELD_NUMBER;
@@ -4807,17 +5117,17 @@ public final class ActorOuterClass {
         super.clear();
         name_ = "";
 
-        if (actorSystemBuilder_ == null) {
-          actorSystem_ = null;
+        if (systemBuilder_ == null) {
+          system_ = null;
         } else {
-          actorSystem_ = null;
-          actorSystemBuilder_ = null;
+          system_ = null;
+          systemBuilder_ = null;
         }
-        if (actorStateBuilder_ == null) {
-          actorState_ = null;
+        if (stateBuilder_ == null) {
+          state_ = null;
         } else {
-          actorState_ = null;
-          actorStateBuilder_ = null;
+          state_ = null;
+          stateBuilder_ = null;
         }
         if (snapshotStrategyBuilder_ == null) {
           snapshotStrategy_ = null;
@@ -4858,15 +5168,15 @@ public final class ActorOuterClass {
       public io.eigr.functions.protocol.actors.ActorOuterClass.Actor buildPartial() {
         io.eigr.functions.protocol.actors.ActorOuterClass.Actor result = new io.eigr.functions.protocol.actors.ActorOuterClass.Actor(this);
         result.name_ = name_;
-        if (actorSystemBuilder_ == null) {
-          result.actorSystem_ = actorSystem_;
+        if (systemBuilder_ == null) {
+          result.system_ = system_;
         } else {
-          result.actorSystem_ = actorSystemBuilder_.build();
+          result.system_ = systemBuilder_.build();
         }
-        if (actorStateBuilder_ == null) {
-          result.actorState_ = actorState_;
+        if (stateBuilder_ == null) {
+          result.state_ = state_;
         } else {
-          result.actorState_ = actorStateBuilder_.build();
+          result.state_ = stateBuilder_.build();
         }
         if (snapshotStrategyBuilder_ == null) {
           result.snapshotStrategy_ = snapshotStrategy_;
@@ -4930,11 +5240,11 @@ public final class ActorOuterClass {
           name_ = other.name_;
           onChanged();
         }
-        if (other.hasActorSystem()) {
-          mergeActorSystem(other.getActorSystem());
+        if (other.hasSystem()) {
+          mergeSystem(other.getSystem());
         }
-        if (other.hasActorState()) {
-          mergeActorState(other.getActorState());
+        if (other.hasState()) {
+          mergeState(other.getState());
         }
         if (other.hasSnapshotStrategy()) {
           mergeSnapshotStrategy(other.getSnapshotStrategy());
@@ -5047,242 +5357,242 @@ public final class ActorOuterClass {
         return this;
       }
 
-      private io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem actorSystem_;
+      private io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem system_;
       private com.google.protobuf.SingleFieldBuilderV3<
-          io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem, io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.Builder, io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystemOrBuilder> actorSystemBuilder_;
+          io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem, io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.Builder, io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystemOrBuilder> systemBuilder_;
       /**
-       * <code>.eigr.functions.protocol.actors.ActorSystem actorSystem = 2;</code>
-       * @return Whether the actorSystem field is set.
+       * <code>.eigr.functions.protocol.actors.ActorSystem system = 2;</code>
+       * @return Whether the system field is set.
        */
-      public boolean hasActorSystem() {
-        return actorSystemBuilder_ != null || actorSystem_ != null;
+      public boolean hasSystem() {
+        return systemBuilder_ != null || system_ != null;
       }
       /**
-       * <code>.eigr.functions.protocol.actors.ActorSystem actorSystem = 2;</code>
-       * @return The actorSystem.
+       * <code>.eigr.functions.protocol.actors.ActorSystem system = 2;</code>
+       * @return The system.
        */
-      public io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem getActorSystem() {
-        if (actorSystemBuilder_ == null) {
-          return actorSystem_ == null ? io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.getDefaultInstance() : actorSystem_;
+      public io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem getSystem() {
+        if (systemBuilder_ == null) {
+          return system_ == null ? io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.getDefaultInstance() : system_;
         } else {
-          return actorSystemBuilder_.getMessage();
+          return systemBuilder_.getMessage();
         }
       }
       /**
-       * <code>.eigr.functions.protocol.actors.ActorSystem actorSystem = 2;</code>
+       * <code>.eigr.functions.protocol.actors.ActorSystem system = 2;</code>
        */
-      public Builder setActorSystem(io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem value) {
-        if (actorSystemBuilder_ == null) {
+      public Builder setSystem(io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem value) {
+        if (systemBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
-          actorSystem_ = value;
+          system_ = value;
           onChanged();
         } else {
-          actorSystemBuilder_.setMessage(value);
+          systemBuilder_.setMessage(value);
         }
 
         return this;
       }
       /**
-       * <code>.eigr.functions.protocol.actors.ActorSystem actorSystem = 2;</code>
+       * <code>.eigr.functions.protocol.actors.ActorSystem system = 2;</code>
        */
-      public Builder setActorSystem(
+      public Builder setSystem(
           io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.Builder builderForValue) {
-        if (actorSystemBuilder_ == null) {
-          actorSystem_ = builderForValue.build();
+        if (systemBuilder_ == null) {
+          system_ = builderForValue.build();
           onChanged();
         } else {
-          actorSystemBuilder_.setMessage(builderForValue.build());
+          systemBuilder_.setMessage(builderForValue.build());
         }
 
         return this;
       }
       /**
-       * <code>.eigr.functions.protocol.actors.ActorSystem actorSystem = 2;</code>
+       * <code>.eigr.functions.protocol.actors.ActorSystem system = 2;</code>
        */
-      public Builder mergeActorSystem(io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem value) {
-        if (actorSystemBuilder_ == null) {
-          if (actorSystem_ != null) {
-            actorSystem_ =
-              io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.newBuilder(actorSystem_).mergeFrom(value).buildPartial();
+      public Builder mergeSystem(io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem value) {
+        if (systemBuilder_ == null) {
+          if (system_ != null) {
+            system_ =
+              io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.newBuilder(system_).mergeFrom(value).buildPartial();
           } else {
-            actorSystem_ = value;
+            system_ = value;
           }
           onChanged();
         } else {
-          actorSystemBuilder_.mergeFrom(value);
+          systemBuilder_.mergeFrom(value);
         }
 
         return this;
       }
       /**
-       * <code>.eigr.functions.protocol.actors.ActorSystem actorSystem = 2;</code>
+       * <code>.eigr.functions.protocol.actors.ActorSystem system = 2;</code>
        */
-      public Builder clearActorSystem() {
-        if (actorSystemBuilder_ == null) {
-          actorSystem_ = null;
+      public Builder clearSystem() {
+        if (systemBuilder_ == null) {
+          system_ = null;
           onChanged();
         } else {
-          actorSystem_ = null;
-          actorSystemBuilder_ = null;
+          system_ = null;
+          systemBuilder_ = null;
         }
 
         return this;
       }
       /**
-       * <code>.eigr.functions.protocol.actors.ActorSystem actorSystem = 2;</code>
+       * <code>.eigr.functions.protocol.actors.ActorSystem system = 2;</code>
        */
-      public io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.Builder getActorSystemBuilder() {
+      public io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.Builder getSystemBuilder() {
         
         onChanged();
-        return getActorSystemFieldBuilder().getBuilder();
+        return getSystemFieldBuilder().getBuilder();
       }
       /**
-       * <code>.eigr.functions.protocol.actors.ActorSystem actorSystem = 2;</code>
+       * <code>.eigr.functions.protocol.actors.ActorSystem system = 2;</code>
        */
-      public io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystemOrBuilder getActorSystemOrBuilder() {
-        if (actorSystemBuilder_ != null) {
-          return actorSystemBuilder_.getMessageOrBuilder();
+      public io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystemOrBuilder getSystemOrBuilder() {
+        if (systemBuilder_ != null) {
+          return systemBuilder_.getMessageOrBuilder();
         } else {
-          return actorSystem_ == null ?
-              io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.getDefaultInstance() : actorSystem_;
+          return system_ == null ?
+              io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.getDefaultInstance() : system_;
         }
       }
       /**
-       * <code>.eigr.functions.protocol.actors.ActorSystem actorSystem = 2;</code>
+       * <code>.eigr.functions.protocol.actors.ActorSystem system = 2;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem, io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.Builder, io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystemOrBuilder> 
-          getActorSystemFieldBuilder() {
-        if (actorSystemBuilder_ == null) {
-          actorSystemBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+          getSystemFieldBuilder() {
+        if (systemBuilder_ == null) {
+          systemBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
               io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem, io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.Builder, io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystemOrBuilder>(
-                  getActorSystem(),
+                  getSystem(),
                   getParentForChildren(),
                   isClean());
-          actorSystem_ = null;
+          system_ = null;
         }
-        return actorSystemBuilder_;
+        return systemBuilder_;
       }
 
-      private io.eigr.functions.protocol.actors.ActorOuterClass.ActorState actorState_;
+      private io.eigr.functions.protocol.actors.ActorOuterClass.ActorState state_;
       private com.google.protobuf.SingleFieldBuilderV3<
-          io.eigr.functions.protocol.actors.ActorOuterClass.ActorState, io.eigr.functions.protocol.actors.ActorOuterClass.ActorState.Builder, io.eigr.functions.protocol.actors.ActorOuterClass.ActorStateOrBuilder> actorStateBuilder_;
+          io.eigr.functions.protocol.actors.ActorOuterClass.ActorState, io.eigr.functions.protocol.actors.ActorOuterClass.ActorState.Builder, io.eigr.functions.protocol.actors.ActorOuterClass.ActorStateOrBuilder> stateBuilder_;
       /**
-       * <code>.eigr.functions.protocol.actors.ActorState actor_state = 3;</code>
-       * @return Whether the actorState field is set.
+       * <code>.eigr.functions.protocol.actors.ActorState state = 3;</code>
+       * @return Whether the state field is set.
        */
-      public boolean hasActorState() {
-        return actorStateBuilder_ != null || actorState_ != null;
+      public boolean hasState() {
+        return stateBuilder_ != null || state_ != null;
       }
       /**
-       * <code>.eigr.functions.protocol.actors.ActorState actor_state = 3;</code>
-       * @return The actorState.
+       * <code>.eigr.functions.protocol.actors.ActorState state = 3;</code>
+       * @return The state.
        */
-      public io.eigr.functions.protocol.actors.ActorOuterClass.ActorState getActorState() {
-        if (actorStateBuilder_ == null) {
-          return actorState_ == null ? io.eigr.functions.protocol.actors.ActorOuterClass.ActorState.getDefaultInstance() : actorState_;
+      public io.eigr.functions.protocol.actors.ActorOuterClass.ActorState getState() {
+        if (stateBuilder_ == null) {
+          return state_ == null ? io.eigr.functions.protocol.actors.ActorOuterClass.ActorState.getDefaultInstance() : state_;
         } else {
-          return actorStateBuilder_.getMessage();
+          return stateBuilder_.getMessage();
         }
       }
       /**
-       * <code>.eigr.functions.protocol.actors.ActorState actor_state = 3;</code>
+       * <code>.eigr.functions.protocol.actors.ActorState state = 3;</code>
        */
-      public Builder setActorState(io.eigr.functions.protocol.actors.ActorOuterClass.ActorState value) {
-        if (actorStateBuilder_ == null) {
+      public Builder setState(io.eigr.functions.protocol.actors.ActorOuterClass.ActorState value) {
+        if (stateBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
-          actorState_ = value;
+          state_ = value;
           onChanged();
         } else {
-          actorStateBuilder_.setMessage(value);
+          stateBuilder_.setMessage(value);
         }
 
         return this;
       }
       /**
-       * <code>.eigr.functions.protocol.actors.ActorState actor_state = 3;</code>
+       * <code>.eigr.functions.protocol.actors.ActorState state = 3;</code>
        */
-      public Builder setActorState(
+      public Builder setState(
           io.eigr.functions.protocol.actors.ActorOuterClass.ActorState.Builder builderForValue) {
-        if (actorStateBuilder_ == null) {
-          actorState_ = builderForValue.build();
+        if (stateBuilder_ == null) {
+          state_ = builderForValue.build();
           onChanged();
         } else {
-          actorStateBuilder_.setMessage(builderForValue.build());
+          stateBuilder_.setMessage(builderForValue.build());
         }
 
         return this;
       }
       /**
-       * <code>.eigr.functions.protocol.actors.ActorState actor_state = 3;</code>
+       * <code>.eigr.functions.protocol.actors.ActorState state = 3;</code>
        */
-      public Builder mergeActorState(io.eigr.functions.protocol.actors.ActorOuterClass.ActorState value) {
-        if (actorStateBuilder_ == null) {
-          if (actorState_ != null) {
-            actorState_ =
-              io.eigr.functions.protocol.actors.ActorOuterClass.ActorState.newBuilder(actorState_).mergeFrom(value).buildPartial();
+      public Builder mergeState(io.eigr.functions.protocol.actors.ActorOuterClass.ActorState value) {
+        if (stateBuilder_ == null) {
+          if (state_ != null) {
+            state_ =
+              io.eigr.functions.protocol.actors.ActorOuterClass.ActorState.newBuilder(state_).mergeFrom(value).buildPartial();
           } else {
-            actorState_ = value;
+            state_ = value;
           }
           onChanged();
         } else {
-          actorStateBuilder_.mergeFrom(value);
+          stateBuilder_.mergeFrom(value);
         }
 
         return this;
       }
       /**
-       * <code>.eigr.functions.protocol.actors.ActorState actor_state = 3;</code>
+       * <code>.eigr.functions.protocol.actors.ActorState state = 3;</code>
        */
-      public Builder clearActorState() {
-        if (actorStateBuilder_ == null) {
-          actorState_ = null;
+      public Builder clearState() {
+        if (stateBuilder_ == null) {
+          state_ = null;
           onChanged();
         } else {
-          actorState_ = null;
-          actorStateBuilder_ = null;
+          state_ = null;
+          stateBuilder_ = null;
         }
 
         return this;
       }
       /**
-       * <code>.eigr.functions.protocol.actors.ActorState actor_state = 3;</code>
+       * <code>.eigr.functions.protocol.actors.ActorState state = 3;</code>
        */
-      public io.eigr.functions.protocol.actors.ActorOuterClass.ActorState.Builder getActorStateBuilder() {
+      public io.eigr.functions.protocol.actors.ActorOuterClass.ActorState.Builder getStateBuilder() {
         
         onChanged();
-        return getActorStateFieldBuilder().getBuilder();
+        return getStateFieldBuilder().getBuilder();
       }
       /**
-       * <code>.eigr.functions.protocol.actors.ActorState actor_state = 3;</code>
+       * <code>.eigr.functions.protocol.actors.ActorState state = 3;</code>
        */
-      public io.eigr.functions.protocol.actors.ActorOuterClass.ActorStateOrBuilder getActorStateOrBuilder() {
-        if (actorStateBuilder_ != null) {
-          return actorStateBuilder_.getMessageOrBuilder();
+      public io.eigr.functions.protocol.actors.ActorOuterClass.ActorStateOrBuilder getStateOrBuilder() {
+        if (stateBuilder_ != null) {
+          return stateBuilder_.getMessageOrBuilder();
         } else {
-          return actorState_ == null ?
-              io.eigr.functions.protocol.actors.ActorOuterClass.ActorState.getDefaultInstance() : actorState_;
+          return state_ == null ?
+              io.eigr.functions.protocol.actors.ActorOuterClass.ActorState.getDefaultInstance() : state_;
         }
       }
       /**
-       * <code>.eigr.functions.protocol.actors.ActorState actor_state = 3;</code>
+       * <code>.eigr.functions.protocol.actors.ActorState state = 3;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           io.eigr.functions.protocol.actors.ActorOuterClass.ActorState, io.eigr.functions.protocol.actors.ActorOuterClass.ActorState.Builder, io.eigr.functions.protocol.actors.ActorOuterClass.ActorStateOrBuilder> 
-          getActorStateFieldBuilder() {
-        if (actorStateBuilder_ == null) {
-          actorStateBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+          getStateFieldBuilder() {
+        if (stateBuilder_ == null) {
+          stateBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
               io.eigr.functions.protocol.actors.ActorOuterClass.ActorState, io.eigr.functions.protocol.actors.ActorOuterClass.ActorState.Builder, io.eigr.functions.protocol.actors.ActorOuterClass.ActorStateOrBuilder>(
-                  getActorState(),
+                  getState(),
                   getParentForChildren(),
                   isClean());
-          actorState_ = null;
+          state_ = null;
         }
-        return actorStateBuilder_;
+        return stateBuilder_;
       }
 
       private io.eigr.functions.protocol.actors.ActorOuterClass.ActorSnapshotStrategy snapshotStrategy_;
@@ -5611,6 +5921,11 @@ public final class ActorOuterClass {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_eigr_functions_protocol_actors_ActorState_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_eigr_functions_protocol_actors_ActorState_TagsEntry_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_eigr_functions_protocol_actors_ActorState_TagsEntry_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_eigr_functions_protocol_actors_Actor_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -5639,18 +5954,21 @@ public final class ActorOuterClass {
       "ivateStrategy\022B\n\007timeout\030\001 \001(\0132/.eigr.fu" +
       "nctions.protocol.actors.TimeoutStrategyH" +
       "\000B\n\n\010strategy\"\"\n\017TimeoutStrategy\022\017\n\007time" +
-      "out\030\001 \001(\003\"1\n\nActorState\022#\n\005state\030\001 \001(\0132\024" +
-      ".google.protobuf.Any\"\300\002\n\005Actor\022\014\n\004name\030\001" +
-      " \001(\t\022@\n\013actorSystem\030\002 \001(\0132+.eigr.functio" +
-      "ns.protocol.actors.ActorSystem\022?\n\013actor_" +
-      "state\030\003 \001(\0132*.eigr.functions.protocol.ac" +
-      "tors.ActorState\022P\n\021snapshot_strategy\030\004 \001" +
-      "(\01325.eigr.functions.protocol.actors.Acto" +
-      "rSnapshotStrategy\022T\n\023deactivate_strategy" +
-      "\030\005 \001(\01327.eigr.functions.protocol.actors." +
-      "ActorDeactivateStrategyBR\n!io.eigr.funct" +
-      "ions.protocol.actorsZ-github.com/eigr/go" +
-      "-support/eigr/actors;actorsb\006proto3"
+      "out\030\001 \001(\003\"\242\001\n\nActorState\022B\n\004tags\030\001 \003(\01324" +
+      ".eigr.functions.protocol.actors.ActorSta" +
+      "te.TagsEntry\022#\n\005state\030\002 \001(\0132\024.google.pro" +
+      "tobuf.Any\032+\n\tTagsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005v" +
+      "alue\030\002 \001(\t:\0028\001\"\265\002\n\005Actor\022\014\n\004name\030\001 \001(\t\022;" +
+      "\n\006system\030\002 \001(\0132+.eigr.functions.protocol" +
+      ".actors.ActorSystem\0229\n\005state\030\003 \001(\0132*.eig" +
+      "r.functions.protocol.actors.ActorState\022P" +
+      "\n\021snapshot_strategy\030\004 \001(\01325.eigr.functio" +
+      "ns.protocol.actors.ActorSnapshotStrategy" +
+      "\022T\n\023deactivate_strategy\030\005 \001(\01327.eigr.fun" +
+      "ctions.protocol.actors.ActorDeactivateSt" +
+      "rategyBR\n!io.eigr.functions.protocol.act" +
+      "orsZ-github.com/eigr/go-support/eigr/act" +
+      "ors;actorsb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -5698,13 +6016,19 @@ public final class ActorOuterClass {
     internal_static_eigr_functions_protocol_actors_ActorState_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_eigr_functions_protocol_actors_ActorState_descriptor,
-        new java.lang.String[] { "State", });
+        new java.lang.String[] { "Tags", "State", });
+    internal_static_eigr_functions_protocol_actors_ActorState_TagsEntry_descriptor =
+      internal_static_eigr_functions_protocol_actors_ActorState_descriptor.getNestedTypes().get(0);
+    internal_static_eigr_functions_protocol_actors_ActorState_TagsEntry_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_eigr_functions_protocol_actors_ActorState_TagsEntry_descriptor,
+        new java.lang.String[] { "Key", "Value", });
     internal_static_eigr_functions_protocol_actors_Actor_descriptor =
       getDescriptor().getMessageTypes().get(6);
     internal_static_eigr_functions_protocol_actors_Actor_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_eigr_functions_protocol_actors_Actor_descriptor,
-        new java.lang.String[] { "Name", "ActorSystem", "ActorState", "SnapshotStrategy", "DeactivateStrategy", });
+        new java.lang.String[] { "Name", "System", "State", "SnapshotStrategy", "DeactivateStrategy", });
     com.google.protobuf.AnyProto.getDescriptor();
   }
 

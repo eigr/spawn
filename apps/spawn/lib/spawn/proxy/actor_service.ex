@@ -12,6 +12,7 @@ defmodule Spawn.Proxy.ActorService do
     ActorSystemResponse,
     InvocationRequest,
     InvocationResponse,
+    ProxyInfo,
     RegistrationRequest,
     RegistrationResponse,
     ServiceInfo
@@ -50,6 +51,11 @@ defmodule Spawn.Proxy.ActorService do
       {:ok, pid} ->
         create_actors(actors)
 
+        GRPC.Server.send_reply(
+          stream,
+          RegistrationResponse.new(proxy_info: ProxyInfo.new())
+        )
+
       reason ->
         Logger.error("Failed to spawn actor system: #{inspect(reason)}")
     end
@@ -58,15 +64,13 @@ defmodule Spawn.Proxy.ActorService do
   defp handle(
          {:invocation_request,
           %InvocationRequest{
-            from: %Actor{name: name} = from_actor,
-            target:
-              %Actor{name: actor_name, system: %ActorSystem{name: system_name}} = target_actor,
+            actor: %Actor{name: actor, system: %ActorSystem{name: system_name}} = target_actor,
             async: invocation_type
           } = request} = _message,
          stream
        ) do
     Logger.debug("Invocation request received: #{inspect(request)}")
-    invoke(invocation_type, target_actor, request, stream)
+    invoke(invocation_type, actor, request, stream)
   end
 
   defp handle(
@@ -85,7 +89,7 @@ defmodule Spawn.Proxy.ActorService do
 
       case ActorEntitySupervisor.lookup_or_create_actor(actor) do
         {:ok, pid} ->
-          Logger.debug("Registered Actor #{actor_name} with pid: #{pid}")
+          Logger.debug("Registered Actor #{actor_name} with pid: #{inspect(pid)}")
 
         _ ->
           Logger.debug("Failed to register Actor #{actor_name}")

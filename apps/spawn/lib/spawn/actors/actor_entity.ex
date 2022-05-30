@@ -22,7 +22,7 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
 
   @default_snapshot_timeout 60_000
   @default_deactivate_timeout 90_000
-  @timeout_factor [1, 3, 5, 7]
+  @timeout_factor [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 200, 300, 500, 1000, 2000, 3000]
 
   @impl true
   @spec init(Eigr.Functions.Protocol.Actors.Actor.t()) ::
@@ -105,8 +105,7 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
   def handle_cast(
         {:invocation_request,
          %InvocationRequest{
-           from: %Actor{name: name} = from_actor,
-           target: %Actor{name: name} = target_actor,
+           actor: %Actor{name: name} = actor,
            command_name: command,
            value: payload
          } = invocation},
@@ -125,7 +124,9 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
         :snapshot,
         %Actor{
           name: _name,
-          snapshot_strategy: %ActorSnapshotStrategy{strategy: snapshot_strategy},
+          snapshot_strategy: %ActorSnapshotStrategy{
+            strategy: {:timeout, %TimeoutStrategy{timeout: timeout}} = snapshot_strategy
+          },
           state: nil
         } = state
       ) do
@@ -138,7 +139,7 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
         %Actor{
           name: name,
           snapshot_strategy: %ActorSnapshotStrategy{
-            strategy: %TimeoutStrategy{timeout: timeout} = snapshot_strategy
+            strategy: {:timeout, %TimeoutStrategy{timeout: timeout}} = snapshot_strategy
           },
           state: %ActorState{} = actor_state
         } = state
@@ -224,27 +225,27 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
       )
 
   defp get_snapshot_interval(
-         %TimeoutStrategy{timeout: timeout} = _timeout_strategy,
+         {:timeout, %TimeoutStrategy{timeout: timeout}} = _timeout_strategy,
          timeout_factor \\ 0
        )
        when is_nil(timeout),
        do: @default_snapshot_timeout + timeout_factor
 
   defp get_snapshot_interval(
-         %TimeoutStrategy{timeout: timeout} = _timeout_strategy,
+         {:timeout, %TimeoutStrategy{timeout: timeout}} = _timeout_strategy,
          timeout_factor
        ),
        do: timeout + timeout_factor
 
   defp get_deactivate_interval(
-         %TimeoutStrategy{timeout: timeout} = _timeout_strategy,
+         {:timeout, %TimeoutStrategy{timeout: timeout}} = _timeout_strategy,
          timeout_factor \\ 0
        )
        when is_nil(timeout),
        do: @default_deactivate_timeout + timeout_factor
 
   defp get_deactivate_interval(
-         %TimeoutStrategy{timeout: timeout} = _timeout_strategy,
+         {:timeout, %TimeoutStrategy{timeout: timeout}} = _timeout_strategy,
          timeout_factor
        ),
        do: timeout + timeout_factor

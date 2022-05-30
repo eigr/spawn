@@ -14,6 +14,20 @@ defmodule Spawn.Application do
 
   @cowboy_options [compress: true]
 
+  @grpc_opts [
+    idle_timeout: :infinity,
+    initial_connection_window_size: 2_147_483_647,
+    initial_stream_window_size: 2_147_483_647,
+    max_connection_window_size: 2_147_483_647,
+    max_connection_buffer_size: 1024 * 1024 * 1024,
+    max_stream_window_size: 2_147_483_647,
+    max_stream_buffer_size: 1024 * 1024 * 1024,
+    max_frame_size_received: 16_777_215,
+    max_frame_size_sent: :infinity,
+    max_received_frame_rate: {999_000_000, 100},
+    max_reset_stream_rate: {999_000_000, 100}
+  ]
+
   @impl true
   @spec start(any, any) :: {:error, any} | {:ok, pid}
   def start(_type, _args) do
@@ -41,7 +55,9 @@ defmodule Spawn.Application do
   defp grpc_server(config) do
     %{
       id: GRPC.Server.Supervisor,
-      start: {GRPC.Server.Supervisor, :start_link, [{Spawn.Proxy.Endpoint, config.grpc_port}]}
+      start:
+        {GRPC.Server.Supervisor, :start_link,
+         [{Spawn.Proxy.Endpoint, config.grpc_port, @grpc_opts}]}
     }
   end
 
