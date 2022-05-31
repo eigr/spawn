@@ -1,5 +1,8 @@
 defmodule Spawn.Proxy.ActorService do
-  use GRPC.Server, service: Eigr.Functions.Protocol.ActorService.Service
+  use GRPC.Server,
+    service: Eigr.Functions.Protocol.ActorService.Service,
+    compressors: [GRPC.Compressor.Gzip]
+
   require Logger
 
   alias Eigr.Functions.Protocol.Actors.{Actor, ActorEntity, ActorSystem, Registry}

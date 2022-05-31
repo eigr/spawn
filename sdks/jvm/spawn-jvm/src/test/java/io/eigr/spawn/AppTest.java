@@ -56,7 +56,7 @@ public class AppTest {
 
         HashMap<String, ActorOuterClass.Actor> actors = new HashMap<String, ActorOuterClass.Actor>();
 
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 1; i++) {
             String actorName = String.format("actor-test-0%s", i);
             actors.put(actorName, makeActor(actorName, actorSystem));
         }
