@@ -52,7 +52,11 @@ defmodule Spawn.Proxy.NodeManager do
   end
 
   @impl true
-  def handle_call({:try_reactivate_actor, {%ActorSystem{} = system, %Actor{name: name} = actor}}, _from, state) do
+  def handle_call(
+        {:try_reactivate_actor, {%ActorSystem{} = system, %Actor{name: name} = actor}},
+        _from,
+        state
+      ) do
     Logger.debug("Trying reactivating Actor #{name}...")
 
     case ActorEntitySupervisor.lookup_or_create_actor(system, actor) do

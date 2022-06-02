@@ -2,8 +2,20 @@ defmodule Eigr.Functions.Protocol.Actors.StateManager do
   require Logger
 
   alias Eigr.Functions.Protocol.Actors.ActorState
+  alias Google.Protobuf.Any
   alias Statestores.Schemas.Event
   alias Statestores.Manager.StateManager, as: StateStoreManager
+
+  def is_new?(old_hash, new_state) do
+    with bytes_from_state <- Any.encode(new_state),
+         hash <- :crypto.hash(:sha256, bytes_from_state) do
+      r = old_hash != hash
+      r
+    else
+      _ ->
+        false
+    end
+  end
 
   @spec load(String.t()) :: {:ok, any}
   def load(name) do
@@ -30,23 +42,26 @@ defmodule Eigr.Functions.Protocol.Actors.StateManager do
     Logger.debug("Saving state for actor #{name}")
 
     try do
-      %Event{
-        actor: name,
-        revision: 0,
-        tags: tags,
-        data_type: actor_state.type_url,
-        data: actor_state.value
-      }
-      |> StateStoreManager.save()
-      |> case do
-        {:ok, event} ->
-          {:ok, actor_state}
+      with bytes_from_state <- Any.encode(actor_state),
+           hash <- :crypto.hash(:sha256, bytes_from_state) do
+        %Event{
+          actor: name,
+          revision: 0,
+          tags: tags,
+          data_type: actor_state.type_url,
+          data: actor_state.value
+        }
+        |> StateStoreManager.save()
+        |> case do
+          {:ok, event} ->
+            {:ok, actor_state, hash}
 
-        {:error, changeset} ->
-          {:error, changeset, actor_state}
+          {:error, changeset} ->
+            {:error, changeset, actor_state, hash}
 
-        other ->
-          {:error, other, actor_state}
+          other ->
+            {:error, other, actor_state}
+        end
       end
     catch
       kind, error ->
@@ -83,19 +98,22 @@ defmodule Eigr.Functions.Protocol.Actors.StateManager do
     try do
       res = Task.await(persist_data_task, timeout)
 
-      if inserted_successfully?(parent, persist_data_task.pid) do
-        case res do
-          {:ok, _event} ->
-            {:ok, actor_state}
+      with bytes_from_state <- Any.encode(actor_state),
+           hash <- :crypto.hash(:sha256, bytes_from_state) do
+        if inserted_successfully?(parent, persist_data_task.pid) do
+          case res do
+            {:ok, _event} ->
+              {:ok, actor_state, hash}
 
-          {:error, changeset} ->
-            {:error, changeset, actor_state}
+            {:error, changeset} ->
+              {:error, changeset, actor_state, hash}
 
-          other ->
-            {:error, other, actor_state}
+            other ->
+              {:error, other, actor_state}
+          end
+        else
+          {:error, :unsuccessfully, hash}
         end
-      else
-        {:error, :unsuccessfully, actor_state}
       end
     catch
       kind, error ->

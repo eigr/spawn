@@ -20,16 +20,21 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
 
   alias Spawn.Proxy.NodeManager
 
+  @min_snapshot_threshold 500
   @default_snapshot_timeout 60_000
   @default_deactivate_timeout 90_000
-  @timeout_factor [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 200, 300, 500, 1000, 2000, 3000]
+  @timeout_factor_range [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 200, 300, 500, 1000, 2000, 3000]
 
   defmodule EntityState do
-    defstruct system: nil, actor: nil
+    defstruct system: nil, actor: nil, state_hash: nil
 
-    @type t(system, actor) :: %EntityState{system: system, actor: actor}
+    @type t(system, actor, state_hash) :: %EntityState{
+            system: system,
+            actor: actor,
+            state_hash: state_hash
+          }
 
-    @type t :: %EntityState{system: ActorSystem.t(), actor: Actor.t()}
+    @type t :: %EntityState{system: ActorSystem.t(), actor: Actor.t(), state_hash: binary()}
   end
 
   @impl true
@@ -46,9 +51,12 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
       ) do
     Logger.debug("Activating actor #{name} in Node #{inspect(Node.self())}")
     Process.flag(:trap_exit, true)
-    schedule_snapshot(snapshot_strategy, get_timeout_factor(@timeout_factor))
-    schedule_deactivate(deactivate_strategy, get_timeout_factor(@timeout_factor))
 
+    schedule_deactivate(deactivate_strategy, get_timeout_factor(@timeout_factor_range))
+
+    # Write soon in the first time
+    schedule_snapshot_advance(@min_snapshot_threshold + get_timeout_factor(@timeout_factor_range))
+    #schedule_snapshot(snapshot_strategy, get_timeout_factor(@timeout_factor_range))
     {:ok, state, {:continue, :load_state}}
   end
 
@@ -148,13 +156,14 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
         %EntityState{
           actor:
             %Actor{
-              state: nil,
+              state: actor_state,
               snapshot_strategy: %ActorSnapshotStrategy{
                 strategy: {:timeout, %TimeoutStrategy{timeout: timeout}} = snapshot_strategy
               }
             } = _actor
         } = state
-      ) do
+      )
+      when is_nil(actor_state) or actor_state == %{} do
     schedule_snapshot(snapshot_strategy)
     {:noreply, state}
   end
@@ -162,6 +171,7 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
   def handle_info(
         :snapshot,
         %EntityState{
+          state_hash: old_hash,
           actor:
             %Actor{
               name: name,
@@ -172,12 +182,31 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
             } = _actor
         } = state
       ) do
-    Logger.debug("Snapshotting actor #{name}")
+    res =
+      # Persist State only when necessary
+      if StateManager.is_new?(old_hash, actor_state.state) do
+        Logger.debug("Snapshotting actor #{name}")
 
-    # Execute with timeout equals timeout strategy - 1 to avoid mailbox congestions
-    StateManager.save_async(name, actor_state, timeout - 1)
+        # Execute with timeout equals timeout strategy - 1 to avoid mailbox congestions
+        case StateManager.save_async(name, actor_state, timeout - 1) do
+          {:ok, _, hash} ->
+            {:noreply, %{state | state_hash: hash}}
+
+          {:error, _, _, hash} ->
+            {:noreply, %{state | state_hash: hash}}
+
+          {:error, :unsuccessfully, hash} ->
+            {:noreply, %{state | state_hash: hash}}
+
+          _ ->
+            {:noreply, state}
+        end
+      else
+        {:noreply, state}
+      end
+
     schedule_snapshot(snapshot_strategy)
-    {:noreply, state}
+    res
   end
 
   def handle_info(
@@ -259,6 +288,14 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
     do: Enum.random([factor_range])
 
   defp get_timeout_factor(factor_range) when is_list(factor_range), do: Enum.random(factor_range)
+
+  defp schedule_snapshot_advance(timeout),
+    do:
+      Process.send_after(
+        self(),
+        :snapshot,
+        timeout
+      )
 
   defp schedule_snapshot(snapshot_strategy, timeout_factor \\ 0),
     do:

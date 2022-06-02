@@ -26,8 +26,8 @@ defmodule Spawn.Proxy.ActorService do
 
   alias Spawn.Registry.ActorRegistry
 
-  @activate_actors_min_demand 1
-  @activate_actors_max_demand 2
+  @activate_actors_min_demand 0
+  @activate_actors_max_demand 4
 
   @spec spawn(ActorSystemRequest.t(), GRPC.Server.Stream.t()) :: ActorSystemResponse.t()
   def spawn(messages, stream) do
