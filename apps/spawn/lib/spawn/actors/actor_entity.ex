@@ -56,7 +56,6 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
 
     # Write soon in the first time
     schedule_snapshot_advance(@min_snapshot_threshold + get_timeout_factor(@timeout_factor_range))
-    #schedule_snapshot(snapshot_strategy, get_timeout_factor(@timeout_factor_range))
     {:ok, state, {:continue, :load_state}}
   end
 
