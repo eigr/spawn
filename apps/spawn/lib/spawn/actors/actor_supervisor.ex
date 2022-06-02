@@ -1,7 +1,8 @@
 defmodule Eigr.Functions.Protocol.Actors.ActorEntity.Supervisor do
   use DynamicSupervisor
 
-  alias Eigr.Functions.Protocol.Actors.Actor
+  alias Eigr.Functions.Protocol.Actors.{Actor, ActorSystem}
+  alias Eigr.Functions.Protocol.Actors.ActorEntity.EntityState
 
   def child_spec() do
     %{
@@ -27,11 +28,13 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity.Supervisor do
   @doc """
   Adds a Actor to the dynamic supervisor.
   """
-  @spec lookup_or_create_actor(Eigr.Functions.Protocol.Actors.Actor.t()) :: {:ok, any}
-  def lookup_or_create_actor(%Actor{} = actor) do
+  @spec lookup_or_create_actor(ActorSystem.t(), Actor.t()) :: {:ok, any}
+  def lookup_or_create_actor(actor_system, %Actor{} = actor) do
+    entity_state = %EntityState{system: actor_system, actor: actor}
+
     child_spec = %{
       id: Eigr.Functions.Protocol.Actors.ActorEntity,
-      start: {Eigr.Functions.Protocol.Actors.ActorEntity, :start_link, [actor]},
+      start: {Eigr.Functions.Protocol.Actors.ActorEntity, :start_link, [entity_state]},
       restart: :transient
     }
 

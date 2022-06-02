@@ -28,8 +28,9 @@ defmodule Spawn.MixProject do
   defp deps do
     [
       {:statestores, "~> 0.1", in_umbrella: true},
-      {:decimal, "~> 1.9", override: true},
       {:bakeware, "~> 0.2"},
+      {:decimal, "~> 1.9", override: true},
+      {:flow, "~> 1.2"},
       {:vapor, "~> 0.10"},
       {:observer_cli, "~> 1.7"},
       {:plug_cowboy, "~> 2.5"},
@@ -40,8 +41,8 @@ defmodule Spawn.MixProject do
       {:jason, "~> 1.2"},
       {:libcluster, "~> 3.3"},
       {:horde, "~> 0.8"},
-      {:google_protos, "~> 0.2.0"},
-      {:protobuf, "~> 0.9.0", override: true},
+      {:google_protos, "~> 0.2"},
+      {:protobuf, "~> 0.9", override: true},
       {:grpc, github: "elixir-grpc/grpc", override: true},
       {:cowlib, "~> 2.9", override: true},
       {:phoenix_pubsub, "~> 2.1"}

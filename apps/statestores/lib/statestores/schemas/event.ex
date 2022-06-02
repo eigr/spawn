@@ -20,7 +20,7 @@ defmodule Statestores.Schemas.Event do
 
     field(:data_type, :string)
 
-    field(:data, :binary)
+    field(:data, Statestores.Types.Binary)
 
     timestamps()
   end

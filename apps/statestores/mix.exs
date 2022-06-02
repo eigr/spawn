@@ -26,9 +26,10 @@ defmodule Statestores.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:cloak_ecto, "~> 1.2"},
       {:ecto_sql, "~> 3.8"},
-      {:postgrex, "~> 0.16"},
-      {:myxql, "~> 0.6"}
+      {:myxql, "~> 0.6"},
+      {:postgrex, "~> 0.16"}
     ]
   end
 end

@@ -24,14 +24,24 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
   @default_deactivate_timeout 90_000
   @timeout_factor [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 200, 300, 500, 1000, 2000, 3000]
 
+  defmodule EntityState do
+    defstruct system: nil, actor: nil
+
+    @type t(system, actor) :: %EntityState{system: system, actor: actor}
+
+    @type t :: %EntityState{system: ActorSystem.t(), actor: Actor.t()}
+  end
+
   @impl true
-  @spec init(Eigr.Functions.Protocol.Actors.Actor.t()) ::
-          {:ok, Eigr.Functions.Protocol.Actors.Actor.t(), {:continue, :load_state}}
+  @spec init(EntityState.t()) ::
+          {:ok, EntityState.t(), {:continue, :load_state}}
   def init(
-        %Actor{
-          name: name,
-          snapshot_strategy: %ActorSnapshotStrategy{strategy: snapshot_strategy},
-          deactivate_strategy: %ActorDeactivateStrategy{strategy: deactivate_strategy}
+        %EntityState{
+          actor: %Actor{
+            name: name,
+            snapshot_strategy: %ActorSnapshotStrategy{strategy: snapshot_strategy},
+            deactivate_strategy: %ActorDeactivateStrategy{strategy: deactivate_strategy}
+          }
         } = state
       ) do
     Logger.debug("Activating actor #{name} in Node #{inspect(Node.self())}")
@@ -43,14 +53,18 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
   end
 
   @impl true
-  @spec handle_continue(:load_state, Eigr.Functions.Protocol.Actors.Actor.t()) ::
-          {:noreply, Eigr.Functions.Protocol.Actors.Actor.t()}
-  def handle_continue(:load_state, %Actor{name: name, state: nil} = state) do
+  @spec handle_continue(:load_state, EntityState.t()) :: {:noreply, EntityState.t()}
+  def handle_continue(
+        :load_state,
+        %EntityState{
+          actor: %Actor{name: name, state: nil} = actor
+        } = state
+      ) do
     Logger.debug("Initial state is empty... Getting state from state manager.")
 
     case StateManager.load(name) do
       {:ok, current_state} ->
-        {:noreply, %Actor{state | state: current_state}}
+        {:noreply, %EntityState{state | actor: %Actor{actor | state: current_state}}}
 
       {:not_found, %{}} ->
         Logger.debug("Not found initial Actor State on statestore for Actor #{name}.")
@@ -58,7 +72,12 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
     end
   end
 
-  def handle_continue(:load_state, %Actor{name: name, state: %ActorState{} = actor_state} = state) do
+  def handle_continue(
+        :load_state,
+        %EntityState{
+          actor: %Actor{name: name, state: %ActorState{} = actor_state} = actor
+        } = state
+      ) do
     Logger.debug(
       "Initial state is not empty... Trying to reconcile the state with state manager."
     )
@@ -66,10 +85,10 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
     case StateManager.load(name) do
       {:ok, current_state} ->
         # TODO: Merge current with old ?
-        {:noreply, %Actor{state | state: current_state}}
+        {:noreply, %EntityState{state | actor: %Actor{actor | state: current_state}}}
 
       {:not_found, %{}} ->
-        Logger.debug("Not found initial on statestore for Actor #{name}.")
+        Logger.debug("Not found initial state on statestore for Actor #{name}.")
         {:noreply, state}
     end
   end
@@ -78,7 +97,9 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
   def handle_call(
         :get_state,
         _from,
-        %Actor{name: name, state: actor_state} = state
+        %EntityState{
+          actor: %Actor{name: name, state: actor_state} = actor
+        } = state
       )
       when is_nil(actor_state),
       do: {:reply, nil, state}
@@ -86,16 +107,18 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
   def handle_call(
         :get_state,
         _from,
-        %Actor{name: name, state: %ActorState{} = actor_state} = state
+        %EntityState{
+          actor: %Actor{name: name, state: %ActorState{} = actor_state} = actor
+        } = state
       ),
       do: {:reply, state, state}
 
   def handle_call(
         {:actor_invocation_response, %ActorInvocationResponse{} = invocation},
         _from,
-        %Actor{
-          state: %ActorState{} = actor_state,
-          system: %ActorSystem{name: actor_system} = _system
+        %EntityState{
+          system: %ActorSystem{name: actor_system} = _system,
+          actor: %Actor{name: name, state: %ActorState{} = actor_state} = _actor
         } = state
       ) do
     {:reply, %{}, state}
@@ -109,9 +132,9 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
            command_name: command,
            value: payload
          } = invocation},
-        %Actor{
-          state: %ActorState{} = actor_state,
-          system: %ActorSystem{name: actor_system} = _system
+        %EntityState{
+          system: %ActorSystem{name: actor_system} = _system,
+          actor: %Actor{name: name, state: %ActorState{} = actor_state} = _actor
         } = state
       ) do
     payload = ActorInvocation.new(invocation_request: invocation)
@@ -122,12 +145,14 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
   @impl true
   def handle_info(
         :snapshot,
-        %Actor{
-          name: _name,
-          snapshot_strategy: %ActorSnapshotStrategy{
-            strategy: {:timeout, %TimeoutStrategy{timeout: timeout}} = snapshot_strategy
-          },
-          state: nil
+        %EntityState{
+          actor:
+            %Actor{
+              state: nil,
+              snapshot_strategy: %ActorSnapshotStrategy{
+                strategy: {:timeout, %TimeoutStrategy{timeout: timeout}} = snapshot_strategy
+              }
+            } = _actor
         } = state
       ) do
     schedule_snapshot(snapshot_strategy)
@@ -136,12 +161,15 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
 
   def handle_info(
         :snapshot,
-        %Actor{
-          name: name,
-          snapshot_strategy: %ActorSnapshotStrategy{
-            strategy: {:timeout, %TimeoutStrategy{timeout: timeout}} = snapshot_strategy
-          },
-          state: %ActorState{} = actor_state
+        %EntityState{
+          actor:
+            %Actor{
+              name: name,
+              state: %ActorState{} = actor_state,
+              snapshot_strategy: %ActorSnapshotStrategy{
+                strategy: {:timeout, %TimeoutStrategy{timeout: timeout}} = snapshot_strategy
+              }
+            } = _actor
         } = state
       ) do
     Logger.debug("Snapshotting actor #{name}")
@@ -154,10 +182,14 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
 
   def handle_info(
         :deactivate,
-        %Actor{
-          name: name,
-          deactivate_strategy:
-            %ActorDeactivateStrategy{strategy: deactivate_strategy} = _actor_deactivate_strategy
+        %EntityState{
+          actor:
+            %Actor{
+              name: name,
+              deactivate_strategy:
+                %ActorDeactivateStrategy{strategy: deactivate_strategy} =
+                  _actor_deactivate_strategy
+            } = _actor
         } = state
       ) do
     case Process.info(self(), :message_queue_len) do
@@ -171,24 +203,44 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
     end
   end
 
-  def handle_info(message, %Actor{name: name} = state) do
+  def handle_info(
+        message,
+        %EntityState{
+          actor: %Actor{name: name, state: actor_state}
+        } = state
+      )
+      when is_nil(actor_state) do
     Logger.warn("No handled internal message for actor #{name}. Message: #{inspect(message)}")
     {:noreply, state}
   end
 
+  def handle_info(
+        message,
+        %EntityState{
+          actor: %Actor{name: name, state: %ActorState{} = actor_state}
+        } = state
+      ) do
+    Logger.warn("No handled internal message for actor #{name}. Message: #{inspect(message)}")
+    StateManager.save(name, actor_state)
+    {:noreply, state}
+  end
+
   @impl true
-  def terminate(reason, %Actor{name: name, state: actor_state} = _state)
+  def terminate(reason, %EntityState{actor: %Actor{name: name, state: actor_state}} = _state)
       when is_nil(actor_state) do
     Logger.debug("Terminating actor #{name} with reason #{inspect(reason)}")
   end
 
-  def terminate(reason, %Actor{name: name, state: %ActorState{} = actor_state} = _state) do
+  def terminate(
+        reason,
+        %EntityState{actor: %Actor{name: name, state: %ActorState{} = actor_state}} = _state
+      ) do
     StateManager.save(name, actor_state)
     Logger.debug("Terminating actor #{name} with reason #{inspect(reason)}")
   end
 
-  def start_link(%Actor{name: name} = actor) do
-    GenServer.start(__MODULE__, actor, name: via(name))
+  def start_link(%EntityState{actor: %Actor{name: name}} = state) do
+    GenServer.start(__MODULE__, state, name: via(name))
   end
 
   def get_state(name) do

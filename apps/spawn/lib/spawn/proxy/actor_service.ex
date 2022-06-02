@@ -26,6 +26,9 @@ defmodule Spawn.Proxy.ActorService do
 
   alias Spawn.Registry.ActorRegistry
 
+  @activate_actors_min_demand 1
+  @activate_actors_max_demand 2
+
   @spec spawn(ActorSystemRequest.t(), GRPC.Server.Stream.t()) :: ActorSystemResponse.t()
   def spawn(messages, stream) do
     messages
@@ -52,7 +55,7 @@ defmodule Spawn.Proxy.ActorService do
            source_stream: stream
          }) do
       {:ok, pid} ->
-        create_actors(actors)
+        create_actors(actor_system, actors)
 
         GRPC.Server.send_reply(
           stream,
@@ -84,20 +87,35 @@ defmodule Spawn.Proxy.ActorService do
     Logger.debug("Actor invocation response received: #{inspect(actor_invocation_response)}")
   end
 
-  defp create_actors(actors) do
-    Enum.each(actors, fn {actor_name, actor} ->
-      Logger.debug(
-        "Registering #{actor_name}: #{inspect(actor)} on Node: #{inspect(Node.self())}"
+  defp create_actors(actor_system, actors) do
+    actors
+    |> Flow.from_enumerable(
+      min_demand: @activate_actors_min_demand,
+      max_demand: @activate_actors_max_demand
+    )
+    |> Flow.map(fn {actor_name, actor} ->
+      Logger.debug("Registering #{actor_name} #{inspect(actor)} on Node: #{inspect(Node.self())}")
+
+      {time, result} = :timer.tc(&lookup_actor/3, [actor_system, actor_name, actor])
+
+      Logger.info(
+        "Registered and Activated the #{actor_name} on Node #{inspect(Node.self())} in #{inspect(time)}ms"
       )
 
-      case ActorEntitySupervisor.lookup_or_create_actor(actor) do
-        {:ok, pid} ->
-          Logger.debug("Registered Actor #{actor_name} with pid: #{inspect(pid)}")
-
-        _ ->
-          Logger.debug("Failed to register Actor #{actor_name}")
-      end
+      result
     end)
+    |> Flow.run()
+  end
+
+  defp lookup_actor(actor_system, actor_name, actor) do
+    case ActorEntitySupervisor.lookup_or_create_actor(actor_system, actor) do
+      {:ok, pid} ->
+        {:ok, pid}
+
+      error ->
+        Logger.debug("Failed to register Actor #{actor_name}")
+        {:error, error}
+    end
   end
 
   defp send_actor_invocation_response() do

@@ -15,10 +15,10 @@ defmodule Statestores.Application do
   end
 
   defp get_supervisor_tree(:mysql) do
-    [Statestores.Adapters.MySQL]
+    [Statestores.Vault, Statestores.Adapters.MySQL]
   end
 
   defp get_supervisor_tree(:postgres) do
-    [Statestores.Adapters.Postgres]
+    [Statestores.Vault, Statestores.Adapters.Postgres]
   end
 end
