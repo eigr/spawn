@@ -70,13 +70,14 @@ defmodule Spawn.Proxy.ActorService do
   defp handle(
          {:invocation_request,
           %InvocationRequest{
-            actor: %Actor{name: actor, system: %ActorSystem{name: system_name}} = target_actor,
+            actor: %Actor{} = actor,
+            system: %ActorSystem{} = system,
             async: invocation_type
           } = request} = _message,
          stream
        ) do
     Logger.debug("Invocation request received: #{inspect(request)}")
-    invoke(invocation_type, actor, request, stream)
+    invoke(invocation_type, system, actor, request, stream)
   end
 
   defp handle(
@@ -123,13 +124,14 @@ defmodule Spawn.Proxy.ActorService do
 
   defp invoke(
          false,
-         %Actor{name: actor_name, system: %ActorSystem{name: system_name}} = actor,
+         %ActorSystem{name: system_name} = system,
+         %Actor{name: actor_name} = actor,
          request,
          stream
        ) do
     with {:ok, %{node: node, actor: registered_actor}} <-
            ActorRegistry.lookup(system_name, actor_name),
-         _pid <- Node.spawn(node, NodeManager, :try_reactivate, [system_name, actor]) do
+         _pid <- Node.spawn(node, NodeManager, :try_reactivate_actor, [system, actor]) do
       ActorEntity.invoke(actor_name, request)
     else
       {:not_found, _} ->
@@ -151,13 +153,14 @@ defmodule Spawn.Proxy.ActorService do
 
   defp invoke(
          true,
-         %Actor{name: actor_name, system: %ActorSystem{name: system_name}} = actor,
+         %ActorSystem{name: system_name} = system,
+         %Actor{name: actor_name} = actor,
          request,
          stream
        ) do
     with {:ok, %{node: node, actor: registered_actor}} <-
            ActorRegistry.lookup(system_name, actor_name),
-         pid <- Node.spawn(node, NodeManager, :try_reactivate, [system_name, actor]) do
+         pid <- Node.spawn(node, NodeManager, :try_reactivate_actor, [system, actor]) do
       ActorEntity.invoke_async(actor_name, request)
     else
       {:not_found, _} ->

@@ -67,15 +67,17 @@ message RegistrationResponse {
 }
 
 message InvocationRequest {
-    eigr.functions.protocol.actors.Actor actor = 1;
-    string command_name = 2;
-    google.protobuf.Any value = 3;
-    bool async = 4;
+    eigr.functions.protocol.actors.ActorSystem system =1;
+    eigr.functions.protocol.actors.Actor actor = 2;
+    string command_name = 3;
+    google.protobuf.Any value = 4;
+    bool async = 5;
 }
 
 message InvocationResponse {
     InvocationStatus status = 1;
-    eigr.functions.protocol.actors.Actor actor = 2;
+    eigr.functions.protocol.actors.ActorSystem system =2;
+    eigr.functions.protocol.actors.Actor actor = 3;
 }
 
 message ActorInvocation {

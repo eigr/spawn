@@ -4536,62 +4536,47 @@ public final class ActorOuterClass {
         getNameBytes();
 
     /**
-     * <code>.eigr.functions.protocol.actors.ActorSystem system = 2;</code>
-     * @return Whether the system field is set.
-     */
-    boolean hasSystem();
-    /**
-     * <code>.eigr.functions.protocol.actors.ActorSystem system = 2;</code>
-     * @return The system.
-     */
-    io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem getSystem();
-    /**
-     * <code>.eigr.functions.protocol.actors.ActorSystem system = 2;</code>
-     */
-    io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystemOrBuilder getSystemOrBuilder();
-
-    /**
-     * <code>.eigr.functions.protocol.actors.ActorState state = 3;</code>
+     * <code>.eigr.functions.protocol.actors.ActorState state = 2;</code>
      * @return Whether the state field is set.
      */
     boolean hasState();
     /**
-     * <code>.eigr.functions.protocol.actors.ActorState state = 3;</code>
+     * <code>.eigr.functions.protocol.actors.ActorState state = 2;</code>
      * @return The state.
      */
     io.eigr.functions.protocol.actors.ActorOuterClass.ActorState getState();
     /**
-     * <code>.eigr.functions.protocol.actors.ActorState state = 3;</code>
+     * <code>.eigr.functions.protocol.actors.ActorState state = 2;</code>
      */
     io.eigr.functions.protocol.actors.ActorOuterClass.ActorStateOrBuilder getStateOrBuilder();
 
     /**
-     * <code>.eigr.functions.protocol.actors.ActorSnapshotStrategy snapshot_strategy = 4;</code>
+     * <code>.eigr.functions.protocol.actors.ActorSnapshotStrategy snapshot_strategy = 3;</code>
      * @return Whether the snapshotStrategy field is set.
      */
     boolean hasSnapshotStrategy();
     /**
-     * <code>.eigr.functions.protocol.actors.ActorSnapshotStrategy snapshot_strategy = 4;</code>
+     * <code>.eigr.functions.protocol.actors.ActorSnapshotStrategy snapshot_strategy = 3;</code>
      * @return The snapshotStrategy.
      */
     io.eigr.functions.protocol.actors.ActorOuterClass.ActorSnapshotStrategy getSnapshotStrategy();
     /**
-     * <code>.eigr.functions.protocol.actors.ActorSnapshotStrategy snapshot_strategy = 4;</code>
+     * <code>.eigr.functions.protocol.actors.ActorSnapshotStrategy snapshot_strategy = 3;</code>
      */
     io.eigr.functions.protocol.actors.ActorOuterClass.ActorSnapshotStrategyOrBuilder getSnapshotStrategyOrBuilder();
 
     /**
-     * <code>.eigr.functions.protocol.actors.ActorDeactivateStrategy deactivate_strategy = 5;</code>
+     * <code>.eigr.functions.protocol.actors.ActorDeactivateStrategy deactivate_strategy = 4;</code>
      * @return Whether the deactivateStrategy field is set.
      */
     boolean hasDeactivateStrategy();
     /**
-     * <code>.eigr.functions.protocol.actors.ActorDeactivateStrategy deactivate_strategy = 5;</code>
+     * <code>.eigr.functions.protocol.actors.ActorDeactivateStrategy deactivate_strategy = 4;</code>
      * @return The deactivateStrategy.
      */
     io.eigr.functions.protocol.actors.ActorOuterClass.ActorDeactivateStrategy getDeactivateStrategy();
     /**
-     * <code>.eigr.functions.protocol.actors.ActorDeactivateStrategy deactivate_strategy = 5;</code>
+     * <code>.eigr.functions.protocol.actors.ActorDeactivateStrategy deactivate_strategy = 4;</code>
      */
     io.eigr.functions.protocol.actors.ActorOuterClass.ActorDeactivateStrategyOrBuilder getDeactivateStrategyOrBuilder();
   }
@@ -4648,19 +4633,6 @@ public final class ActorOuterClass {
               break;
             }
             case 18: {
-              io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.Builder subBuilder = null;
-              if (system_ != null) {
-                subBuilder = system_.toBuilder();
-              }
-              system_ = input.readMessage(io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.parser(), extensionRegistry);
-              if (subBuilder != null) {
-                subBuilder.mergeFrom(system_);
-                system_ = subBuilder.buildPartial();
-              }
-
-              break;
-            }
-            case 26: {
               io.eigr.functions.protocol.actors.ActorOuterClass.ActorState.Builder subBuilder = null;
               if (state_ != null) {
                 subBuilder = state_.toBuilder();
@@ -4673,7 +4645,7 @@ public final class ActorOuterClass {
 
               break;
             }
-            case 34: {
+            case 26: {
               io.eigr.functions.protocol.actors.ActorOuterClass.ActorSnapshotStrategy.Builder subBuilder = null;
               if (snapshotStrategy_ != null) {
                 subBuilder = snapshotStrategy_.toBuilder();
@@ -4686,7 +4658,7 @@ public final class ActorOuterClass {
 
               break;
             }
-            case 42: {
+            case 34: {
               io.eigr.functions.protocol.actors.ActorOuterClass.ActorDeactivateStrategy.Builder subBuilder = null;
               if (deactivateStrategy_ != null) {
                 subBuilder = deactivateStrategy_.toBuilder();
@@ -4767,93 +4739,70 @@ public final class ActorOuterClass {
       }
     }
 
-    public static final int SYSTEM_FIELD_NUMBER = 2;
-    private io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem system_;
-    /**
-     * <code>.eigr.functions.protocol.actors.ActorSystem system = 2;</code>
-     * @return Whether the system field is set.
-     */
-    public boolean hasSystem() {
-      return system_ != null;
-    }
-    /**
-     * <code>.eigr.functions.protocol.actors.ActorSystem system = 2;</code>
-     * @return The system.
-     */
-    public io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem getSystem() {
-      return system_ == null ? io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.getDefaultInstance() : system_;
-    }
-    /**
-     * <code>.eigr.functions.protocol.actors.ActorSystem system = 2;</code>
-     */
-    public io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystemOrBuilder getSystemOrBuilder() {
-      return getSystem();
-    }
-
-    public static final int STATE_FIELD_NUMBER = 3;
+    public static final int STATE_FIELD_NUMBER = 2;
     private io.eigr.functions.protocol.actors.ActorOuterClass.ActorState state_;
     /**
-     * <code>.eigr.functions.protocol.actors.ActorState state = 3;</code>
+     * <code>.eigr.functions.protocol.actors.ActorState state = 2;</code>
      * @return Whether the state field is set.
      */
     public boolean hasState() {
       return state_ != null;
     }
     /**
-     * <code>.eigr.functions.protocol.actors.ActorState state = 3;</code>
+     * <code>.eigr.functions.protocol.actors.ActorState state = 2;</code>
      * @return The state.
      */
     public io.eigr.functions.protocol.actors.ActorOuterClass.ActorState getState() {
       return state_ == null ? io.eigr.functions.protocol.actors.ActorOuterClass.ActorState.getDefaultInstance() : state_;
     }
     /**
-     * <code>.eigr.functions.protocol.actors.ActorState state = 3;</code>
+     * <code>.eigr.functions.protocol.actors.ActorState state = 2;</code>
      */
     public io.eigr.functions.protocol.actors.ActorOuterClass.ActorStateOrBuilder getStateOrBuilder() {
       return getState();
     }
 
-    public static final int SNAPSHOT_STRATEGY_FIELD_NUMBER = 4;
+    public static final int SNAPSHOT_STRATEGY_FIELD_NUMBER = 3;
     private io.eigr.functions.protocol.actors.ActorOuterClass.ActorSnapshotStrategy snapshotStrategy_;
     /**
-     * <code>.eigr.functions.protocol.actors.ActorSnapshotStrategy snapshot_strategy = 4;</code>
+     * <code>.eigr.functions.protocol.actors.ActorSnapshotStrategy snapshot_strategy = 3;</code>
      * @return Whether the snapshotStrategy field is set.
      */
     public boolean hasSnapshotStrategy() {
       return snapshotStrategy_ != null;
     }
     /**
-     * <code>.eigr.functions.protocol.actors.ActorSnapshotStrategy snapshot_strategy = 4;</code>
+     * <code>.eigr.functions.protocol.actors.ActorSnapshotStrategy snapshot_strategy = 3;</code>
      * @return The snapshotStrategy.
      */
     public io.eigr.functions.protocol.actors.ActorOuterClass.ActorSnapshotStrategy getSnapshotStrategy() {
       return snapshotStrategy_ == null ? io.eigr.functions.protocol.actors.ActorOuterClass.ActorSnapshotStrategy.getDefaultInstance() : snapshotStrategy_;
     }
     /**
-     * <code>.eigr.functions.protocol.actors.ActorSnapshotStrategy snapshot_strategy = 4;</code>
+     * <code>.eigr.functions.protocol.actors.ActorSnapshotStrategy snapshot_strategy = 3;</code>
      */
     public io.eigr.functions.protocol.actors.ActorOuterClass.ActorSnapshotStrategyOrBuilder getSnapshotStrategyOrBuilder() {
       return getSnapshotStrategy();
     }
 
-    public static final int DEACTIVATE_STRATEGY_FIELD_NUMBER = 5;
+    public static final int DEACTIVATE_STRATEGY_FIELD_NUMBER = 4;
     private io.eigr.functions.protocol.actors.ActorOuterClass.ActorDeactivateStrategy deactivateStrategy_;
     /**
-     * <code>.eigr.functions.protocol.actors.ActorDeactivateStrategy deactivate_strategy = 5;</code>
+     * <code>.eigr.functions.protocol.actors.ActorDeactivateStrategy deactivate_strategy = 4;</code>
      * @return Whether the deactivateStrategy field is set.
      */
     public boolean hasDeactivateStrategy() {
       return deactivateStrategy_ != null;
     }
     /**
-     * <code>.eigr.functions.protocol.actors.ActorDeactivateStrategy deactivate_strategy = 5;</code>
+     * <code>.eigr.functions.protocol.actors.ActorDeactivateStrategy deactivate_strategy = 4;</code>
      * @return The deactivateStrategy.
      */
     public io.eigr.functions.protocol.actors.ActorOuterClass.ActorDeactivateStrategy getDeactivateStrategy() {
       return deactivateStrategy_ == null ? io.eigr.functions.protocol.actors.ActorOuterClass.ActorDeactivateStrategy.getDefaultInstance() : deactivateStrategy_;
     }
     /**
-     * <code>.eigr.functions.protocol.actors.ActorDeactivateStrategy deactivate_strategy = 5;</code>
+     * <code>.eigr.functions.protocol.actors.ActorDeactivateStrategy deactivate_strategy = 4;</code>
      */
     public io.eigr.functions.protocol.actors.ActorOuterClass.ActorDeactivateStrategyOrBuilder getDeactivateStrategyOrBuilder() {
       return getDeactivateStrategy();
@@ -4876,17 +4825,14 @@ public final class ActorOuterClass {
       if (!getNameBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 1, name_);
       }
-      if (system_ != null) {
-        output.writeMessage(2, getSystem());
-      }
       if (state_ != null) {
-        output.writeMessage(3, getState());
+        output.writeMessage(2, getState());
       }
       if (snapshotStrategy_ != null) {
-        output.writeMessage(4, getSnapshotStrategy());
+        output.writeMessage(3, getSnapshotStrategy());
       }
       if (deactivateStrategy_ != null) {
-        output.writeMessage(5, getDeactivateStrategy());
+        output.writeMessage(4, getDeactivateStrategy());
       }
       unknownFields.writeTo(output);
     }
@@ -4900,21 +4846,17 @@ public final class ActorOuterClass {
       if (!getNameBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, name_);
       }
-      if (system_ != null) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(2, getSystem());
-      }
       if (state_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(3, getState());
+          .computeMessageSize(2, getState());
       }
       if (snapshotStrategy_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(4, getSnapshotStrategy());
+          .computeMessageSize(3, getSnapshotStrategy());
       }
       if (deactivateStrategy_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(5, getDeactivateStrategy());
+          .computeMessageSize(4, getDeactivateStrategy());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -4933,11 +4875,6 @@ public final class ActorOuterClass {
 
       if (!getName()
           .equals(other.getName())) return false;
-      if (hasSystem() != other.hasSystem()) return false;
-      if (hasSystem()) {
-        if (!getSystem()
-            .equals(other.getSystem())) return false;
-      }
       if (hasState() != other.hasState()) return false;
       if (hasState()) {
         if (!getState()
@@ -4966,10 +4903,6 @@ public final class ActorOuterClass {
       hash = (19 * hash) + getDescriptor().hashCode();
       hash = (37 * hash) + NAME_FIELD_NUMBER;
       hash = (53 * hash) + getName().hashCode();
-      if (hasSystem()) {
-        hash = (37 * hash) + SYSTEM_FIELD_NUMBER;
-        hash = (53 * hash) + getSystem().hashCode();
-      }
       if (hasState()) {
         hash = (37 * hash) + STATE_FIELD_NUMBER;
         hash = (53 * hash) + getState().hashCode();
@@ -5117,12 +5050,6 @@ public final class ActorOuterClass {
         super.clear();
         name_ = "";
 
-        if (systemBuilder_ == null) {
-          system_ = null;
-        } else {
-          system_ = null;
-          systemBuilder_ = null;
-        }
         if (stateBuilder_ == null) {
           state_ = null;
         } else {
@@ -5168,11 +5095,6 @@ public final class ActorOuterClass {
       public io.eigr.functions.protocol.actors.ActorOuterClass.Actor buildPartial() {
         io.eigr.functions.protocol.actors.ActorOuterClass.Actor result = new io.eigr.functions.protocol.actors.ActorOuterClass.Actor(this);
         result.name_ = name_;
-        if (systemBuilder_ == null) {
-          result.system_ = system_;
-        } else {
-          result.system_ = systemBuilder_.build();
-        }
         if (stateBuilder_ == null) {
           result.state_ = state_;
         } else {
@@ -5239,9 +5161,6 @@ public final class ActorOuterClass {
         if (!other.getName().isEmpty()) {
           name_ = other.name_;
           onChanged();
-        }
-        if (other.hasSystem()) {
-          mergeSystem(other.getSystem());
         }
         if (other.hasState()) {
           mergeState(other.getState());
@@ -5357,137 +5276,18 @@ public final class ActorOuterClass {
         return this;
       }
 
-      private io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem system_;
-      private com.google.protobuf.SingleFieldBuilderV3<
-          io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem, io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.Builder, io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystemOrBuilder> systemBuilder_;
-      /**
-       * <code>.eigr.functions.protocol.actors.ActorSystem system = 2;</code>
-       * @return Whether the system field is set.
-       */
-      public boolean hasSystem() {
-        return systemBuilder_ != null || system_ != null;
-      }
-      /**
-       * <code>.eigr.functions.protocol.actors.ActorSystem system = 2;</code>
-       * @return The system.
-       */
-      public io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem getSystem() {
-        if (systemBuilder_ == null) {
-          return system_ == null ? io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.getDefaultInstance() : system_;
-        } else {
-          return systemBuilder_.getMessage();
-        }
-      }
-      /**
-       * <code>.eigr.functions.protocol.actors.ActorSystem system = 2;</code>
-       */
-      public Builder setSystem(io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem value) {
-        if (systemBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          system_ = value;
-          onChanged();
-        } else {
-          systemBuilder_.setMessage(value);
-        }
-
-        return this;
-      }
-      /**
-       * <code>.eigr.functions.protocol.actors.ActorSystem system = 2;</code>
-       */
-      public Builder setSystem(
-          io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.Builder builderForValue) {
-        if (systemBuilder_ == null) {
-          system_ = builderForValue.build();
-          onChanged();
-        } else {
-          systemBuilder_.setMessage(builderForValue.build());
-        }
-
-        return this;
-      }
-      /**
-       * <code>.eigr.functions.protocol.actors.ActorSystem system = 2;</code>
-       */
-      public Builder mergeSystem(io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem value) {
-        if (systemBuilder_ == null) {
-          if (system_ != null) {
-            system_ =
-              io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.newBuilder(system_).mergeFrom(value).buildPartial();
-          } else {
-            system_ = value;
-          }
-          onChanged();
-        } else {
-          systemBuilder_.mergeFrom(value);
-        }
-
-        return this;
-      }
-      /**
-       * <code>.eigr.functions.protocol.actors.ActorSystem system = 2;</code>
-       */
-      public Builder clearSystem() {
-        if (systemBuilder_ == null) {
-          system_ = null;
-          onChanged();
-        } else {
-          system_ = null;
-          systemBuilder_ = null;
-        }
-
-        return this;
-      }
-      /**
-       * <code>.eigr.functions.protocol.actors.ActorSystem system = 2;</code>
-       */
-      public io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.Builder getSystemBuilder() {
-        
-        onChanged();
-        return getSystemFieldBuilder().getBuilder();
-      }
-      /**
-       * <code>.eigr.functions.protocol.actors.ActorSystem system = 2;</code>
-       */
-      public io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystemOrBuilder getSystemOrBuilder() {
-        if (systemBuilder_ != null) {
-          return systemBuilder_.getMessageOrBuilder();
-        } else {
-          return system_ == null ?
-              io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.getDefaultInstance() : system_;
-        }
-      }
-      /**
-       * <code>.eigr.functions.protocol.actors.ActorSystem system = 2;</code>
-       */
-      private com.google.protobuf.SingleFieldBuilderV3<
-          io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem, io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.Builder, io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystemOrBuilder> 
-          getSystemFieldBuilder() {
-        if (systemBuilder_ == null) {
-          systemBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-              io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem, io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.Builder, io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystemOrBuilder>(
-                  getSystem(),
-                  getParentForChildren(),
-                  isClean());
-          system_ = null;
-        }
-        return systemBuilder_;
-      }
-
       private io.eigr.functions.protocol.actors.ActorOuterClass.ActorState state_;
       private com.google.protobuf.SingleFieldBuilderV3<
           io.eigr.functions.protocol.actors.ActorOuterClass.ActorState, io.eigr.functions.protocol.actors.ActorOuterClass.ActorState.Builder, io.eigr.functions.protocol.actors.ActorOuterClass.ActorStateOrBuilder> stateBuilder_;
       /**
-       * <code>.eigr.functions.protocol.actors.ActorState state = 3;</code>
+       * <code>.eigr.functions.protocol.actors.ActorState state = 2;</code>
        * @return Whether the state field is set.
        */
       public boolean hasState() {
         return stateBuilder_ != null || state_ != null;
       }
       /**
-       * <code>.eigr.functions.protocol.actors.ActorState state = 3;</code>
+       * <code>.eigr.functions.protocol.actors.ActorState state = 2;</code>
        * @return The state.
        */
       public io.eigr.functions.protocol.actors.ActorOuterClass.ActorState getState() {
@@ -5498,7 +5298,7 @@ public final class ActorOuterClass {
         }
       }
       /**
-       * <code>.eigr.functions.protocol.actors.ActorState state = 3;</code>
+       * <code>.eigr.functions.protocol.actors.ActorState state = 2;</code>
        */
       public Builder setState(io.eigr.functions.protocol.actors.ActorOuterClass.ActorState value) {
         if (stateBuilder_ == null) {
@@ -5514,7 +5314,7 @@ public final class ActorOuterClass {
         return this;
       }
       /**
-       * <code>.eigr.functions.protocol.actors.ActorState state = 3;</code>
+       * <code>.eigr.functions.protocol.actors.ActorState state = 2;</code>
        */
       public Builder setState(
           io.eigr.functions.protocol.actors.ActorOuterClass.ActorState.Builder builderForValue) {
@@ -5528,7 +5328,7 @@ public final class ActorOuterClass {
         return this;
       }
       /**
-       * <code>.eigr.functions.protocol.actors.ActorState state = 3;</code>
+       * <code>.eigr.functions.protocol.actors.ActorState state = 2;</code>
        */
       public Builder mergeState(io.eigr.functions.protocol.actors.ActorOuterClass.ActorState value) {
         if (stateBuilder_ == null) {
@@ -5546,7 +5346,7 @@ public final class ActorOuterClass {
         return this;
       }
       /**
-       * <code>.eigr.functions.protocol.actors.ActorState state = 3;</code>
+       * <code>.eigr.functions.protocol.actors.ActorState state = 2;</code>
        */
       public Builder clearState() {
         if (stateBuilder_ == null) {
@@ -5560,7 +5360,7 @@ public final class ActorOuterClass {
         return this;
       }
       /**
-       * <code>.eigr.functions.protocol.actors.ActorState state = 3;</code>
+       * <code>.eigr.functions.protocol.actors.ActorState state = 2;</code>
        */
       public io.eigr.functions.protocol.actors.ActorOuterClass.ActorState.Builder getStateBuilder() {
         
@@ -5568,7 +5368,7 @@ public final class ActorOuterClass {
         return getStateFieldBuilder().getBuilder();
       }
       /**
-       * <code>.eigr.functions.protocol.actors.ActorState state = 3;</code>
+       * <code>.eigr.functions.protocol.actors.ActorState state = 2;</code>
        */
       public io.eigr.functions.protocol.actors.ActorOuterClass.ActorStateOrBuilder getStateOrBuilder() {
         if (stateBuilder_ != null) {
@@ -5579,7 +5379,7 @@ public final class ActorOuterClass {
         }
       }
       /**
-       * <code>.eigr.functions.protocol.actors.ActorState state = 3;</code>
+       * <code>.eigr.functions.protocol.actors.ActorState state = 2;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           io.eigr.functions.protocol.actors.ActorOuterClass.ActorState, io.eigr.functions.protocol.actors.ActorOuterClass.ActorState.Builder, io.eigr.functions.protocol.actors.ActorOuterClass.ActorStateOrBuilder> 
@@ -5599,14 +5399,14 @@ public final class ActorOuterClass {
       private com.google.protobuf.SingleFieldBuilderV3<
           io.eigr.functions.protocol.actors.ActorOuterClass.ActorSnapshotStrategy, io.eigr.functions.protocol.actors.ActorOuterClass.ActorSnapshotStrategy.Builder, io.eigr.functions.protocol.actors.ActorOuterClass.ActorSnapshotStrategyOrBuilder> snapshotStrategyBuilder_;
       /**
-       * <code>.eigr.functions.protocol.actors.ActorSnapshotStrategy snapshot_strategy = 4;</code>
+       * <code>.eigr.functions.protocol.actors.ActorSnapshotStrategy snapshot_strategy = 3;</code>
        * @return Whether the snapshotStrategy field is set.
        */
       public boolean hasSnapshotStrategy() {
         return snapshotStrategyBuilder_ != null || snapshotStrategy_ != null;
       }
       /**
-       * <code>.eigr.functions.protocol.actors.ActorSnapshotStrategy snapshot_strategy = 4;</code>
+       * <code>.eigr.functions.protocol.actors.ActorSnapshotStrategy snapshot_strategy = 3;</code>
        * @return The snapshotStrategy.
        */
       public io.eigr.functions.protocol.actors.ActorOuterClass.ActorSnapshotStrategy getSnapshotStrategy() {
@@ -5617,7 +5417,7 @@ public final class ActorOuterClass {
         }
       }
       /**
-       * <code>.eigr.functions.protocol.actors.ActorSnapshotStrategy snapshot_strategy = 4;</code>
+       * <code>.eigr.functions.protocol.actors.ActorSnapshotStrategy snapshot_strategy = 3;</code>
        */
       public Builder setSnapshotStrategy(io.eigr.functions.protocol.actors.ActorOuterClass.ActorSnapshotStrategy value) {
         if (snapshotStrategyBuilder_ == null) {
@@ -5633,7 +5433,7 @@ public final class ActorOuterClass {
         return this;
       }
       /**
-       * <code>.eigr.functions.protocol.actors.ActorSnapshotStrategy snapshot_strategy = 4;</code>
+       * <code>.eigr.functions.protocol.actors.ActorSnapshotStrategy snapshot_strategy = 3;</code>
        */
       public Builder setSnapshotStrategy(
           io.eigr.functions.protocol.actors.ActorOuterClass.ActorSnapshotStrategy.Builder builderForValue) {
@@ -5647,7 +5447,7 @@ public final class ActorOuterClass {
         return this;
       }
       /**
-       * <code>.eigr.functions.protocol.actors.ActorSnapshotStrategy snapshot_strategy = 4;</code>
+       * <code>.eigr.functions.protocol.actors.ActorSnapshotStrategy snapshot_strategy = 3;</code>
        */
       public Builder mergeSnapshotStrategy(io.eigr.functions.protocol.actors.ActorOuterClass.ActorSnapshotStrategy value) {
         if (snapshotStrategyBuilder_ == null) {
@@ -5665,7 +5465,7 @@ public final class ActorOuterClass {
         return this;
       }
       /**
-       * <code>.eigr.functions.protocol.actors.ActorSnapshotStrategy snapshot_strategy = 4;</code>
+       * <code>.eigr.functions.protocol.actors.ActorSnapshotStrategy snapshot_strategy = 3;</code>
        */
       public Builder clearSnapshotStrategy() {
         if (snapshotStrategyBuilder_ == null) {
@@ -5679,7 +5479,7 @@ public final class ActorOuterClass {
         return this;
       }
       /**
-       * <code>.eigr.functions.protocol.actors.ActorSnapshotStrategy snapshot_strategy = 4;</code>
+       * <code>.eigr.functions.protocol.actors.ActorSnapshotStrategy snapshot_strategy = 3;</code>
        */
       public io.eigr.functions.protocol.actors.ActorOuterClass.ActorSnapshotStrategy.Builder getSnapshotStrategyBuilder() {
         
@@ -5687,7 +5487,7 @@ public final class ActorOuterClass {
         return getSnapshotStrategyFieldBuilder().getBuilder();
       }
       /**
-       * <code>.eigr.functions.protocol.actors.ActorSnapshotStrategy snapshot_strategy = 4;</code>
+       * <code>.eigr.functions.protocol.actors.ActorSnapshotStrategy snapshot_strategy = 3;</code>
        */
       public io.eigr.functions.protocol.actors.ActorOuterClass.ActorSnapshotStrategyOrBuilder getSnapshotStrategyOrBuilder() {
         if (snapshotStrategyBuilder_ != null) {
@@ -5698,7 +5498,7 @@ public final class ActorOuterClass {
         }
       }
       /**
-       * <code>.eigr.functions.protocol.actors.ActorSnapshotStrategy snapshot_strategy = 4;</code>
+       * <code>.eigr.functions.protocol.actors.ActorSnapshotStrategy snapshot_strategy = 3;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           io.eigr.functions.protocol.actors.ActorOuterClass.ActorSnapshotStrategy, io.eigr.functions.protocol.actors.ActorOuterClass.ActorSnapshotStrategy.Builder, io.eigr.functions.protocol.actors.ActorOuterClass.ActorSnapshotStrategyOrBuilder> 
@@ -5718,14 +5518,14 @@ public final class ActorOuterClass {
       private com.google.protobuf.SingleFieldBuilderV3<
           io.eigr.functions.protocol.actors.ActorOuterClass.ActorDeactivateStrategy, io.eigr.functions.protocol.actors.ActorOuterClass.ActorDeactivateStrategy.Builder, io.eigr.functions.protocol.actors.ActorOuterClass.ActorDeactivateStrategyOrBuilder> deactivateStrategyBuilder_;
       /**
-       * <code>.eigr.functions.protocol.actors.ActorDeactivateStrategy deactivate_strategy = 5;</code>
+       * <code>.eigr.functions.protocol.actors.ActorDeactivateStrategy deactivate_strategy = 4;</code>
        * @return Whether the deactivateStrategy field is set.
        */
       public boolean hasDeactivateStrategy() {
         return deactivateStrategyBuilder_ != null || deactivateStrategy_ != null;
       }
       /**
-       * <code>.eigr.functions.protocol.actors.ActorDeactivateStrategy deactivate_strategy = 5;</code>
+       * <code>.eigr.functions.protocol.actors.ActorDeactivateStrategy deactivate_strategy = 4;</code>
        * @return The deactivateStrategy.
        */
       public io.eigr.functions.protocol.actors.ActorOuterClass.ActorDeactivateStrategy getDeactivateStrategy() {
@@ -5736,7 +5536,7 @@ public final class ActorOuterClass {
         }
       }
       /**
-       * <code>.eigr.functions.protocol.actors.ActorDeactivateStrategy deactivate_strategy = 5;</code>
+       * <code>.eigr.functions.protocol.actors.ActorDeactivateStrategy deactivate_strategy = 4;</code>
        */
       public Builder setDeactivateStrategy(io.eigr.functions.protocol.actors.ActorOuterClass.ActorDeactivateStrategy value) {
         if (deactivateStrategyBuilder_ == null) {
@@ -5752,7 +5552,7 @@ public final class ActorOuterClass {
         return this;
       }
       /**
-       * <code>.eigr.functions.protocol.actors.ActorDeactivateStrategy deactivate_strategy = 5;</code>
+       * <code>.eigr.functions.protocol.actors.ActorDeactivateStrategy deactivate_strategy = 4;</code>
        */
       public Builder setDeactivateStrategy(
           io.eigr.functions.protocol.actors.ActorOuterClass.ActorDeactivateStrategy.Builder builderForValue) {
@@ -5766,7 +5566,7 @@ public final class ActorOuterClass {
         return this;
       }
       /**
-       * <code>.eigr.functions.protocol.actors.ActorDeactivateStrategy deactivate_strategy = 5;</code>
+       * <code>.eigr.functions.protocol.actors.ActorDeactivateStrategy deactivate_strategy = 4;</code>
        */
       public Builder mergeDeactivateStrategy(io.eigr.functions.protocol.actors.ActorOuterClass.ActorDeactivateStrategy value) {
         if (deactivateStrategyBuilder_ == null) {
@@ -5784,7 +5584,7 @@ public final class ActorOuterClass {
         return this;
       }
       /**
-       * <code>.eigr.functions.protocol.actors.ActorDeactivateStrategy deactivate_strategy = 5;</code>
+       * <code>.eigr.functions.protocol.actors.ActorDeactivateStrategy deactivate_strategy = 4;</code>
        */
       public Builder clearDeactivateStrategy() {
         if (deactivateStrategyBuilder_ == null) {
@@ -5798,7 +5598,7 @@ public final class ActorOuterClass {
         return this;
       }
       /**
-       * <code>.eigr.functions.protocol.actors.ActorDeactivateStrategy deactivate_strategy = 5;</code>
+       * <code>.eigr.functions.protocol.actors.ActorDeactivateStrategy deactivate_strategy = 4;</code>
        */
       public io.eigr.functions.protocol.actors.ActorOuterClass.ActorDeactivateStrategy.Builder getDeactivateStrategyBuilder() {
         
@@ -5806,7 +5606,7 @@ public final class ActorOuterClass {
         return getDeactivateStrategyFieldBuilder().getBuilder();
       }
       /**
-       * <code>.eigr.functions.protocol.actors.ActorDeactivateStrategy deactivate_strategy = 5;</code>
+       * <code>.eigr.functions.protocol.actors.ActorDeactivateStrategy deactivate_strategy = 4;</code>
        */
       public io.eigr.functions.protocol.actors.ActorOuterClass.ActorDeactivateStrategyOrBuilder getDeactivateStrategyOrBuilder() {
         if (deactivateStrategyBuilder_ != null) {
@@ -5817,7 +5617,7 @@ public final class ActorOuterClass {
         }
       }
       /**
-       * <code>.eigr.functions.protocol.actors.ActorDeactivateStrategy deactivate_strategy = 5;</code>
+       * <code>.eigr.functions.protocol.actors.ActorDeactivateStrategy deactivate_strategy = 4;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           io.eigr.functions.protocol.actors.ActorOuterClass.ActorDeactivateStrategy, io.eigr.functions.protocol.actors.ActorOuterClass.ActorDeactivateStrategy.Builder, io.eigr.functions.protocol.actors.ActorOuterClass.ActorDeactivateStrategyOrBuilder> 
@@ -5958,17 +5758,15 @@ public final class ActorOuterClass {
       ".eigr.functions.protocol.actors.ActorSta" +
       "te.TagsEntry\022#\n\005state\030\002 \001(\0132\024.google.pro" +
       "tobuf.Any\032+\n\tTagsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005v" +
-      "alue\030\002 \001(\t:\0028\001\"\265\002\n\005Actor\022\014\n\004name\030\001 \001(\t\022;" +
-      "\n\006system\030\002 \001(\0132+.eigr.functions.protocol" +
-      ".actors.ActorSystem\0229\n\005state\030\003 \001(\0132*.eig" +
-      "r.functions.protocol.actors.ActorState\022P" +
-      "\n\021snapshot_strategy\030\004 \001(\01325.eigr.functio" +
-      "ns.protocol.actors.ActorSnapshotStrategy" +
-      "\022T\n\023deactivate_strategy\030\005 \001(\01327.eigr.fun" +
-      "ctions.protocol.actors.ActorDeactivateSt" +
-      "rategyBR\n!io.eigr.functions.protocol.act" +
-      "orsZ-github.com/eigr/go-support/eigr/act" +
-      "ors;actorsb\006proto3"
+      "alue\030\002 \001(\t:\0028\001\"\370\001\n\005Actor\022\014\n\004name\030\001 \001(\t\0229" +
+      "\n\005state\030\002 \001(\0132*.eigr.functions.protocol." +
+      "actors.ActorState\022P\n\021snapshot_strategy\030\003" +
+      " \001(\01325.eigr.functions.protocol.actors.Ac" +
+      "torSnapshotStrategy\022T\n\023deactivate_strate" +
+      "gy\030\004 \001(\01327.eigr.functions.protocol.actor" +
+      "s.ActorDeactivateStrategyBR\n!io.eigr.fun" +
+      "ctions.protocol.actorsZ-github.com/eigr/" +
+      "go-support/eigr/actors;actorsb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -6028,7 +5826,7 @@ public final class ActorOuterClass {
     internal_static_eigr_functions_protocol_actors_Actor_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_eigr_functions_protocol_actors_Actor_descriptor,
-        new java.lang.String[] { "Name", "System", "State", "SnapshotStrategy", "DeactivateStrategy", });
+        new java.lang.String[] { "Name", "State", "SnapshotStrategy", "DeactivateStrategy", });
     com.google.protobuf.AnyProto.getDescriptor();
   }
 

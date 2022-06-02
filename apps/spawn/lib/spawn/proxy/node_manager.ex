@@ -2,7 +2,7 @@ defmodule Spawn.Proxy.NodeManager do
   use GenServer
   require Logger
 
-  alias Eigr.Functions.Protocol.Actors.Actor
+  alias Eigr.Functions.Protocol.Actors.{Actor, ActorSystem}
   alias Eigr.Functions.Protocol.Actors.Actor.ActorEntity.Supervisor, as: ActorEntitySupervisor
   alias Eigr.Functions.Protocol.ActorService.Stub, as: ActorServiceClient
 
@@ -52,10 +52,10 @@ defmodule Spawn.Proxy.NodeManager do
   end
 
   @impl true
-  def handle_call({:try_reactivate_actor, %Actor{name: name} = actor}, _from, state) do
+  def handle_call({:try_reactivate_actor, {%ActorSystem{} = system, %Actor{name: name} = actor}}, _from, state) do
     Logger.debug("Trying reactivating Actor #{name}...")
 
-    case ActorEntitySupervisor.lookup_or_create_actor(actor) do
+    case ActorEntitySupervisor.lookup_or_create_actor(system, actor) do
       {:ok, pid} ->
         Logger.debug("Actor #{name} reactivated.")
         {:reply, {:ok, pid}, state}
@@ -83,8 +83,8 @@ defmodule Spawn.Proxy.NodeManager do
     GenServer.call(via(actor_system), {:invoke_user_function, payload})
   end
 
-  def try_reactivate(actor_system, actor) do
-    GenServer.call(via(actor_system), {:try_reactivate_actor, actor})
+  def try_reactivate(%ActorSystem{name: system_name} = system, actor) do
+    GenServer.call(via(system_name), {:try_reactivate_actor, {system, actor}})
   end
 
   defp via(name) do

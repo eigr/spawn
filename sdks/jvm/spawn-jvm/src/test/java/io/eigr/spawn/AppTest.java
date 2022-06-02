@@ -50,22 +50,23 @@ public class AppTest {
                 })
                 .runWith(Sink.asPublisher(AsPublisher.WITH_FANOUT), system);
 
-        ActorOuterClass.ActorSystem actorSystem = ActorOuterClass.ActorSystem.newBuilder()
-                .setName("test-system")
-                .build();
+
 
         HashMap<String, ActorOuterClass.Actor> actors = new HashMap<String, ActorOuterClass.Actor>();
 
         for (int i = 0; i < 1; i++) {
             String actorName = String.format("actor-test-0%s", i);
-            actors.put(actorName, makeActor(actorName, actorSystem));
+            actors.put(actorName, makeActor(actorName));
         }
 
         ActorOuterClass.Registry registry = ActorOuterClass.Registry.newBuilder()
                 .putAllActors(actors)
                 .build();
 
-        actorSystem = actorSystem.toBuilder().setRegistry(registry).build();
+        ActorOuterClass.ActorSystem actorSystem = ActorOuterClass.ActorSystem.newBuilder()
+                .setName("test-system")
+                .setRegistry(registry)
+                .build();
 
         Protocol.ServiceInfo si = Protocol.ServiceInfo.newBuilder()
                 .setServiceName("jvm-sdk")
@@ -91,7 +92,7 @@ public class AppTest {
         assertTrue(true);
     }
 
-    private ActorOuterClass.Actor makeActor(String name, ActorOuterClass.ActorSystem actorSystem) {
+    private ActorOuterClass.Actor makeActor(String name) {
         Any stateValue = Any.newBuilder()
                 .setTypeUrl("type.googleapis.com/string")
                 .setValue(ByteString.copyFrom(String.format("test-%s", name).getBytes(StandardCharsets.UTF_8)))
@@ -111,7 +112,6 @@ public class AppTest {
 
         return ActorOuterClass.Actor.newBuilder()
                 .setName(name)
-                .setSystem(actorSystem)
                 .setState(initialState)
                 .setSnapshotStrategy(snapshotStrategy)
                 .setDeactivateStrategy(deactivateStrategy)
