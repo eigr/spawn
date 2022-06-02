@@ -32,3 +32,11 @@ TODO
 ## SDKs
 
 TODO
+
+## Development
+
+Run:
+
+```shell
+PROXY_DATABASE_TYPE=mysql SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= iex --name spawn_a2@127.0.0.1 -S mix
+```
