@@ -50,4 +50,6 @@ jobs:
           mix deps.clean --all
           mix deps.get
       - name: Run tests
+        with:
+          path: apps/spawn
         run: elixir --name test@127.0.0.1 -S mix test
