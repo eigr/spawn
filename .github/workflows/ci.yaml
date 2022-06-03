@@ -28,7 +28,6 @@ jobs:
         with:
           elixir-version: ${{matrix.elixir}} # Define the elixir version [required]
           otp-version: ${{matrix.otp}} # Define the OTP version [required]
-          experimental-otp: true
 
       - uses: actions/cache@v1
         id: deps-cache
