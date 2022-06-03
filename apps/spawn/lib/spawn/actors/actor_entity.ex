@@ -64,9 +64,10 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
   def handle_continue(
         :load_state,
         %EntityState{
-          actor: %Actor{name: name, state: nil} = actor
+          actor: %Actor{name: name, state: actor_state} = actor
         } = state
-      ) do
+      )
+      when is_nil(actor_state) do
     Logger.debug("Initial state is empty... Getting state from state manager.")
 
     case StateManager.load(name) do
@@ -181,8 +182,8 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
             } = _actor
         } = state
       ) do
+    # Persist State only when necessary
     res =
-      # Persist State only when necessary
       if StateManager.is_new?(old_hash, actor_state.state) do
         Logger.debug("Snapshotting actor #{name}")
 

@@ -33,9 +33,9 @@ defmodule Spawn.Application do
   def start(_type, _args) do
     config = Config.load()
 
-    Exporter.setup()
-    PrometheusPipeline.setup()
-    PrometheusInstrumenter.setup()
+    #Exporter.setup()
+    #PrometheusPipeline.setup()
+    #PrometheusInstrumenter.setup()
 
     children = [
       cluster_supervisor(config),

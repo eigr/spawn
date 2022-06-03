@@ -20,7 +20,7 @@ defmodule Eigr.Functions.Protocol.Actors.StateManager do
   @spec load(String.t()) :: {:ok, any}
   def load(name) do
     case StateStoreManager.load(name) do
-      %Event{actor: name, revision: rev, tags: tags, data_type: type, data: data} = event ->
+      %Event{revision: _rev, tags: tags, data_type: type, data: data} = event ->
         {:ok,
          ActorState.new(tags: tags, state: Google.Protobuf.Any.new(type_url: type, value: data))}
 
