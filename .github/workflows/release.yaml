@@ -63,7 +63,7 @@ jobs:
       - name: Run tests
         run: |
           cd apps/spawn 
-          MIX_ENV=test PROXY_DATABASE_TYPE=mysql PROXY_DATABASE_NAME=posgres PROXY_DATABASE_USERNAME=postgres PROXY_DATABASE_SECRET=postgres SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
+          MIX_ENV=test PROXY_DATABASE_TYPE=postgres PROXY_DATABASE_NAME=posgres PROXY_DATABASE_USERNAME=postgres PROXY_DATABASE_SECRET=postgres SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
 
   build-and-push-image:
     runs-on: ubuntu-latest
