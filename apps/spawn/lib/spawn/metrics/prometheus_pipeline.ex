@@ -1,3 +1,3 @@
 defmodule Spawn.Metrics.PrometheusPipeline do
-  use Prometheus.PlugPipelineInstrumenter
+  #use Prometheus.PlugPipelineInstrumenter
 end

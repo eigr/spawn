@@ -1,3 +1,3 @@
 defmodule Spawn.Metrics.Exporter do
-  use Prometheus.PlugExporter
+  #use Prometheus.PlugExporter
 end
