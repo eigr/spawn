@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         otp: [23, 24, 25]
-        elixir: [1.11, 1.12, 1.13]
+        elixir: [1.12, 1.13]
     env:
       MIX_ENV: test
 
