@@ -45,4 +45,4 @@ jobs:
           mix deps.clean --all
           mix deps.get
       - name: Run tests
-        run: cd apps/spawn && elixir --name test@127.0.0.1 -S mix test
+        run: cd apps/spawn && MIX_ENV=test SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name test@127.0.0.1 -S mix test

@@ -7,6 +7,12 @@ defmodule Statestores.Adapters.MySQL do
 
   def init(_type, config) do
     config =
+      case System.get_env("MIX_ENV") do
+        "test" -> Keyword.put(config, :pool, Ecto.Adapters.SQL.Sandbox)
+        _ -> config
+      end
+
+    config =
       Keyword.put(config, :database, System.get_env("PROXY_DATABASE_NAME", "eigr-functions-db"))
 
     config = Keyword.put(config, :username, System.get_env("PROXY_DATABASE_USERNAME", "admin"))

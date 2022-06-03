@@ -6,7 +6,7 @@ defmodule Statestores.Util do
   end
 
   def load_repo() do
-    type = String.to_existing_atom(System.get_env("PROXY_DATABASE_TYPE"))
+    type = String.to_existing_atom(System.get_env("PROXY_DATABASE_TYPE", "mysql"))
     load_repo(type)
   end
 
