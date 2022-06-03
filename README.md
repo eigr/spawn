@@ -43,6 +43,8 @@ The sidecar allows components to access services from any location or using any 
 
 For more information about the Sidecar Pattern, see the following links:
 
+https://www.techtarget.com/searchapparchitecture/tip/The-role-of-sidecars-in-microservices-architecture
+
 https://docs.microsoft.com/en-us/azure/architecture/patterns/sidecar
 
 https://www.youtube.com/watch?v=j7JKkbAiWuI
