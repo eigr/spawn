@@ -53,7 +53,7 @@ https://medium.com/nerd-for-tech/microservice-design-pattern-sidecar-sidekick-pa
 
 ## Spawn Architecture
 
-Spawn takes the distribution, fault tolerance, and high concurrent capability of the Actor Model in its most famous implementation, which is the BEM Erlang VM implementation, and adds to that the flexibility and dynamism that the sidecar pattern offers to the build. cross-platform and multi-language microservice-oriented architectures.
+Spawn takes the distribution, fault tolerance, and high concurrent capability of the Actor Model in its most famous implementation, which is the BEM Erlang VM implementation, and adds to that the flexibility and dynamism that the sidecar pattern offers to the build cross-platform and multi-language microservice-oriented architectures.
 
 To achieve these goals, the Spawn architecture is composed of the following components:
 
