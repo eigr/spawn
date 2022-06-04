@@ -18,6 +18,7 @@ import org.junit.Test;
 import reactor.core.publisher.EmitterProcessor;
 import scala.concurrent.duration.Duration;
 
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 
@@ -54,9 +55,9 @@ public class AppTest {
 
         HashMap<String, ActorOuterClass.Actor> actors = new HashMap<String, ActorOuterClass.Actor>();
 
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 2; i++) {
             String actorName = String.format("actor-test-0%s", i);
-            actors.put(actorName, makeActor(actorName));
+            actors.put(actorName, makeActor(actorName, i));
         }
 
         ActorOuterClass.Registry registry = ActorOuterClass.Registry.newBuilder()
@@ -88,14 +89,40 @@ public class AppTest {
         System.out.println("Send registration request...");
         publisherStream.onNext(registrationActorSystemMessage);
 
+        byte[] byteState = BigInteger.valueOf(1).toByteArray();
+
+        Any stateValue = Any.newBuilder()
+                .setTypeUrl("type.googleapis.com/integer")
+                .setValue(ByteString.copyFrom(byteState))
+                .build();
+
+        Protocol.InvocationRequest invocation = Protocol.InvocationRequest.newBuilder()
+                .setAsync(false)
+                .setSystem(actorSystem)
+                .setActor(makeActor("actor-test-01", 1))
+                .setCommandName("someFunction")
+                .setValue(stateValue)
+                .build();
+
+        Protocol.ActorSystemRequest invocationRequest = Protocol.ActorSystemRequest.newBuilder()
+                .setInvocationRequest(invocation)
+                .build();
+
+        System.out.println("Sending Invocation request to Actor...");
+        publisherStream.onNext(invocationRequest);
+
         Thread.sleep(10000L);
         assertTrue(true);
     }
 
-    private ActorOuterClass.Actor makeActor(String name) {
+    private ActorOuterClass.Actor makeActor(String name, Integer state) {
+
+        byte[] byteState = BigInteger.valueOf(state).toByteArray();
+
         Any stateValue = Any.newBuilder()
-                .setTypeUrl("type.googleapis.com/string")
-                .setValue(ByteString.copyFrom(String.format("test-%s", name).getBytes(StandardCharsets.UTF_8)))
+                .setTypeUrl("type.googleapis.com/integer")
+                .setValue(ByteString.copyFrom(byteState))
+                //.setValue( ByteString.copyFrom(String.format("test-%s", name).getBytes(StandardCharsets.UTF_8)))
                 .build();
 
         ActorOuterClass.ActorState initialState = ActorOuterClass.ActorState.newBuilder()

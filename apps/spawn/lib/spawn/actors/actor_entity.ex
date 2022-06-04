@@ -23,7 +23,7 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
   @min_snapshot_threshold 500
   @default_snapshot_timeout 60_000
   @default_deactivate_timeout 90_000
-  @timeout_factor_range [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 200, 300, 500, 1000, 2000, 3000]
+  @timeout_factor_range [200, 300, 500, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000]
 
   defmodule EntityState do
     defstruct system: nil, actor: nil, state_hash: nil

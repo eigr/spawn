@@ -3,13 +3,14 @@ defmodule Spawn.Proxy.NodeManager do
   require Logger
 
   alias Eigr.Functions.Protocol.Actors.{Actor, ActorSystem}
-  alias Eigr.Functions.Protocol.Actors.Actor.ActorEntity.Supervisor, as: ActorEntitySupervisor
+  alias Eigr.Functions.Protocol.Actors.ActorEntity.Supervisor, as: ActorEntitySupervisor
   alias Eigr.Functions.Protocol.ActorService.Stub, as: ActorServiceClient
 
   alias Eigr.Functions.Protocol.{ProxyInfo, RegistrationResponse}
 
   @spec init(any) :: {:ok, any}
-  def init(%{source_stream: %{payload: %{pid: connection_ref}} = _stream} = state) do
+  def init(%{source_stream: %{payload: %{pid: connection_ref}} = stream} = state) do
+    IO.inspect(stream, label: "Source Stream")
     Logger.debug("Monitoring connection #{inspect(connection_ref)} with UserFunction.")
     Process.monitor(connection_ref)
     Process.flag(:trap_exit, true)
@@ -42,18 +43,19 @@ defmodule Spawn.Proxy.NodeManager do
   end
 
   @impl true
-  def handle_call(
+  def handle_cast(
         {:invoke_user_function, payload},
-        _from,
-        %{source_stream: %{payload: %{pid: connection_ref} = stream}} = state
+        %{source_stream: stream} = state
       ) do
-    response = GRPC.Server.send_reply(stream, payload)
-    {:reply, response, state}
+        Logger.debug("Calling User Function with Payload: #{inspect(payload)}")
+    GRPC.Server.send_reply(stream, payload)
+
+    {:noreply, state}
   end
 
   @impl true
   def handle_call(
-        {:try_reactivate_actor, {%ActorSystem{} = system, %Actor{name: name} = actor}},
+        {:try_reactivate, {%ActorSystem{} = system, %Actor{name: name} = actor}},
         _from,
         state
       ) do
@@ -84,11 +86,11 @@ defmodule Spawn.Proxy.NodeManager do
   end
 
   def invoke_user_function(actor_system, payload) do
-    GenServer.call(via(actor_system), {:invoke_user_function, payload})
+    GenServer.cast(via(actor_system), {:invoke_user_function, payload})
   end
 
-  def try_reactivate(%ActorSystem{name: system_name} = system, actor) do
-    GenServer.call(via(system_name), {:try_reactivate_actor, {system, actor}})
+  def try_reactivate_actor(%ActorSystem{name: system_name} = system, actor) do
+    GenServer.call(via(system_name), {:try_reactivate, {system, actor}})
   end
 
   defp via(name) do

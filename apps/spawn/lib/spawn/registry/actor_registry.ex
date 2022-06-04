@@ -71,8 +71,9 @@ defmodule Spawn.Registry.ActorRegistry do
     nodes =
       state
       |> Enum.reduce([], fn {key, value}, acc ->
-        Enum.map(value, fn actor ->
-          if actor.actor_system.name == system_name and actor.name == actor_name do
+        Enum.map(value, fn {actor_key, actor} ->
+          #if actor.actor_system.name == system_name and actor.name == actor_name do
+          if actor_key == actor_name do
             [%{node: key, actor: actor}] ++ acc
           else
             [] ++ acc

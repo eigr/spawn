@@ -77,6 +77,7 @@ defmodule Spawn.Proxy.ActorService do
          stream
        ) do
     Logger.debug("Invocation request received: #{inspect(request)}")
+
     invoke(invocation_type, system, actor, request, stream)
   end
 

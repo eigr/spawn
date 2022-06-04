@@ -5196,49 +5196,64 @@ public final class Protocol {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>.eigr.functions.protocol.actors.Actor actor = 1;</code>
+     * <code>.eigr.functions.protocol.actors.ActorSystem system = 1;</code>
+     * @return Whether the system field is set.
+     */
+    boolean hasSystem();
+    /**
+     * <code>.eigr.functions.protocol.actors.ActorSystem system = 1;</code>
+     * @return The system.
+     */
+    io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem getSystem();
+    /**
+     * <code>.eigr.functions.protocol.actors.ActorSystem system = 1;</code>
+     */
+    io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystemOrBuilder getSystemOrBuilder();
+
+    /**
+     * <code>.eigr.functions.protocol.actors.Actor actor = 2;</code>
      * @return Whether the actor field is set.
      */
     boolean hasActor();
     /**
-     * <code>.eigr.functions.protocol.actors.Actor actor = 1;</code>
+     * <code>.eigr.functions.protocol.actors.Actor actor = 2;</code>
      * @return The actor.
      */
     io.eigr.functions.protocol.actors.ActorOuterClass.Actor getActor();
     /**
-     * <code>.eigr.functions.protocol.actors.Actor actor = 1;</code>
+     * <code>.eigr.functions.protocol.actors.Actor actor = 2;</code>
      */
     io.eigr.functions.protocol.actors.ActorOuterClass.ActorOrBuilder getActorOrBuilder();
 
     /**
-     * <code>string command_name = 2;</code>
+     * <code>string command_name = 3;</code>
      * @return The commandName.
      */
     java.lang.String getCommandName();
     /**
-     * <code>string command_name = 2;</code>
+     * <code>string command_name = 3;</code>
      * @return The bytes for commandName.
      */
     com.google.protobuf.ByteString
         getCommandNameBytes();
 
     /**
-     * <code>.google.protobuf.Any value = 3;</code>
+     * <code>.google.protobuf.Any value = 4;</code>
      * @return Whether the value field is set.
      */
     boolean hasValue();
     /**
-     * <code>.google.protobuf.Any value = 3;</code>
+     * <code>.google.protobuf.Any value = 4;</code>
      * @return The value.
      */
     com.google.protobuf.Any getValue();
     /**
-     * <code>.google.protobuf.Any value = 3;</code>
+     * <code>.google.protobuf.Any value = 4;</code>
      */
     com.google.protobuf.AnyOrBuilder getValueOrBuilder();
 
     /**
-     * <code>bool async = 4;</code>
+     * <code>bool async = 5;</code>
      * @return The async.
      */
     boolean getAsync();
@@ -5290,6 +5305,19 @@ public final class Protocol {
               done = true;
               break;
             case 10: {
+              io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.Builder subBuilder = null;
+              if (system_ != null) {
+                subBuilder = system_.toBuilder();
+              }
+              system_ = input.readMessage(io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(system_);
+                system_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            case 18: {
               io.eigr.functions.protocol.actors.ActorOuterClass.Actor.Builder subBuilder = null;
               if (actor_ != null) {
                 subBuilder = actor_.toBuilder();
@@ -5302,13 +5330,13 @@ public final class Protocol {
 
               break;
             }
-            case 18: {
+            case 26: {
               java.lang.String s = input.readStringRequireUtf8();
 
               commandName_ = s;
               break;
             }
-            case 26: {
+            case 34: {
               com.google.protobuf.Any.Builder subBuilder = null;
               if (value_ != null) {
                 subBuilder = value_.toBuilder();
@@ -5321,7 +5349,7 @@ public final class Protocol {
 
               break;
             }
-            case 32: {
+            case 40: {
 
               async_ = input.readBool();
               break;
@@ -5358,33 +5386,56 @@ public final class Protocol {
               io.eigr.functions.protocol.Protocol.InvocationRequest.class, io.eigr.functions.protocol.Protocol.InvocationRequest.Builder.class);
     }
 
-    public static final int ACTOR_FIELD_NUMBER = 1;
+    public static final int SYSTEM_FIELD_NUMBER = 1;
+    private io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem system_;
+    /**
+     * <code>.eigr.functions.protocol.actors.ActorSystem system = 1;</code>
+     * @return Whether the system field is set.
+     */
+    public boolean hasSystem() {
+      return system_ != null;
+    }
+    /**
+     * <code>.eigr.functions.protocol.actors.ActorSystem system = 1;</code>
+     * @return The system.
+     */
+    public io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem getSystem() {
+      return system_ == null ? io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.getDefaultInstance() : system_;
+    }
+    /**
+     * <code>.eigr.functions.protocol.actors.ActorSystem system = 1;</code>
+     */
+    public io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystemOrBuilder getSystemOrBuilder() {
+      return getSystem();
+    }
+
+    public static final int ACTOR_FIELD_NUMBER = 2;
     private io.eigr.functions.protocol.actors.ActorOuterClass.Actor actor_;
     /**
-     * <code>.eigr.functions.protocol.actors.Actor actor = 1;</code>
+     * <code>.eigr.functions.protocol.actors.Actor actor = 2;</code>
      * @return Whether the actor field is set.
      */
     public boolean hasActor() {
       return actor_ != null;
     }
     /**
-     * <code>.eigr.functions.protocol.actors.Actor actor = 1;</code>
+     * <code>.eigr.functions.protocol.actors.Actor actor = 2;</code>
      * @return The actor.
      */
     public io.eigr.functions.protocol.actors.ActorOuterClass.Actor getActor() {
       return actor_ == null ? io.eigr.functions.protocol.actors.ActorOuterClass.Actor.getDefaultInstance() : actor_;
     }
     /**
-     * <code>.eigr.functions.protocol.actors.Actor actor = 1;</code>
+     * <code>.eigr.functions.protocol.actors.Actor actor = 2;</code>
      */
     public io.eigr.functions.protocol.actors.ActorOuterClass.ActorOrBuilder getActorOrBuilder() {
       return getActor();
     }
 
-    public static final int COMMAND_NAME_FIELD_NUMBER = 2;
+    public static final int COMMAND_NAME_FIELD_NUMBER = 3;
     private volatile java.lang.Object commandName_;
     /**
-     * <code>string command_name = 2;</code>
+     * <code>string command_name = 3;</code>
      * @return The commandName.
      */
     public java.lang.String getCommandName() {
@@ -5400,7 +5451,7 @@ public final class Protocol {
       }
     }
     /**
-     * <code>string command_name = 2;</code>
+     * <code>string command_name = 3;</code>
      * @return The bytes for commandName.
      */
     public com.google.protobuf.ByteString
@@ -5417,33 +5468,33 @@ public final class Protocol {
       }
     }
 
-    public static final int VALUE_FIELD_NUMBER = 3;
+    public static final int VALUE_FIELD_NUMBER = 4;
     private com.google.protobuf.Any value_;
     /**
-     * <code>.google.protobuf.Any value = 3;</code>
+     * <code>.google.protobuf.Any value = 4;</code>
      * @return Whether the value field is set.
      */
     public boolean hasValue() {
       return value_ != null;
     }
     /**
-     * <code>.google.protobuf.Any value = 3;</code>
+     * <code>.google.protobuf.Any value = 4;</code>
      * @return The value.
      */
     public com.google.protobuf.Any getValue() {
       return value_ == null ? com.google.protobuf.Any.getDefaultInstance() : value_;
     }
     /**
-     * <code>.google.protobuf.Any value = 3;</code>
+     * <code>.google.protobuf.Any value = 4;</code>
      */
     public com.google.protobuf.AnyOrBuilder getValueOrBuilder() {
       return getValue();
     }
 
-    public static final int ASYNC_FIELD_NUMBER = 4;
+    public static final int ASYNC_FIELD_NUMBER = 5;
     private boolean async_;
     /**
-     * <code>bool async = 4;</code>
+     * <code>bool async = 5;</code>
      * @return The async.
      */
     public boolean getAsync() {
@@ -5464,17 +5515,20 @@ public final class Protocol {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
+      if (system_ != null) {
+        output.writeMessage(1, getSystem());
+      }
       if (actor_ != null) {
-        output.writeMessage(1, getActor());
+        output.writeMessage(2, getActor());
       }
       if (!getCommandNameBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, commandName_);
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, commandName_);
       }
       if (value_ != null) {
-        output.writeMessage(3, getValue());
+        output.writeMessage(4, getValue());
       }
       if (async_ != false) {
-        output.writeBool(4, async_);
+        output.writeBool(5, async_);
       }
       unknownFields.writeTo(output);
     }
@@ -5485,20 +5539,24 @@ public final class Protocol {
       if (size != -1) return size;
 
       size = 0;
+      if (system_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(1, getSystem());
+      }
       if (actor_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(1, getActor());
+          .computeMessageSize(2, getActor());
       }
       if (!getCommandNameBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, commandName_);
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, commandName_);
       }
       if (value_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(3, getValue());
+          .computeMessageSize(4, getValue());
       }
       if (async_ != false) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(4, async_);
+          .computeBoolSize(5, async_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -5515,6 +5573,11 @@ public final class Protocol {
       }
       io.eigr.functions.protocol.Protocol.InvocationRequest other = (io.eigr.functions.protocol.Protocol.InvocationRequest) obj;
 
+      if (hasSystem() != other.hasSystem()) return false;
+      if (hasSystem()) {
+        if (!getSystem()
+            .equals(other.getSystem())) return false;
+      }
       if (hasActor() != other.hasActor()) return false;
       if (hasActor()) {
         if (!getActor()
@@ -5540,6 +5603,10 @@ public final class Protocol {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasSystem()) {
+        hash = (37 * hash) + SYSTEM_FIELD_NUMBER;
+        hash = (53 * hash) + getSystem().hashCode();
+      }
       if (hasActor()) {
         hash = (37 * hash) + ACTOR_FIELD_NUMBER;
         hash = (53 * hash) + getActor().hashCode();
@@ -5686,6 +5753,12 @@ public final class Protocol {
       @java.lang.Override
       public Builder clear() {
         super.clear();
+        if (systemBuilder_ == null) {
+          system_ = null;
+        } else {
+          system_ = null;
+          systemBuilder_ = null;
+        }
         if (actorBuilder_ == null) {
           actor_ = null;
         } else {
@@ -5728,6 +5801,11 @@ public final class Protocol {
       @java.lang.Override
       public io.eigr.functions.protocol.Protocol.InvocationRequest buildPartial() {
         io.eigr.functions.protocol.Protocol.InvocationRequest result = new io.eigr.functions.protocol.Protocol.InvocationRequest(this);
+        if (systemBuilder_ == null) {
+          result.system_ = system_;
+        } else {
+          result.system_ = systemBuilder_.build();
+        }
         if (actorBuilder_ == null) {
           result.actor_ = actor_;
         } else {
@@ -5788,6 +5866,9 @@ public final class Protocol {
 
       public Builder mergeFrom(io.eigr.functions.protocol.Protocol.InvocationRequest other) {
         if (other == io.eigr.functions.protocol.Protocol.InvocationRequest.getDefaultInstance()) return this;
+        if (other.hasSystem()) {
+          mergeSystem(other.getSystem());
+        }
         if (other.hasActor()) {
           mergeActor(other.getActor());
         }
@@ -5830,18 +5911,137 @@ public final class Protocol {
         return this;
       }
 
+      private io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem system_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem, io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.Builder, io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystemOrBuilder> systemBuilder_;
+      /**
+       * <code>.eigr.functions.protocol.actors.ActorSystem system = 1;</code>
+       * @return Whether the system field is set.
+       */
+      public boolean hasSystem() {
+        return systemBuilder_ != null || system_ != null;
+      }
+      /**
+       * <code>.eigr.functions.protocol.actors.ActorSystem system = 1;</code>
+       * @return The system.
+       */
+      public io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem getSystem() {
+        if (systemBuilder_ == null) {
+          return system_ == null ? io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.getDefaultInstance() : system_;
+        } else {
+          return systemBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>.eigr.functions.protocol.actors.ActorSystem system = 1;</code>
+       */
+      public Builder setSystem(io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem value) {
+        if (systemBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          system_ = value;
+          onChanged();
+        } else {
+          systemBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.eigr.functions.protocol.actors.ActorSystem system = 1;</code>
+       */
+      public Builder setSystem(
+          io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.Builder builderForValue) {
+        if (systemBuilder_ == null) {
+          system_ = builderForValue.build();
+          onChanged();
+        } else {
+          systemBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <code>.eigr.functions.protocol.actors.ActorSystem system = 1;</code>
+       */
+      public Builder mergeSystem(io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem value) {
+        if (systemBuilder_ == null) {
+          if (system_ != null) {
+            system_ =
+              io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.newBuilder(system_).mergeFrom(value).buildPartial();
+          } else {
+            system_ = value;
+          }
+          onChanged();
+        } else {
+          systemBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.eigr.functions.protocol.actors.ActorSystem system = 1;</code>
+       */
+      public Builder clearSystem() {
+        if (systemBuilder_ == null) {
+          system_ = null;
+          onChanged();
+        } else {
+          system_ = null;
+          systemBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <code>.eigr.functions.protocol.actors.ActorSystem system = 1;</code>
+       */
+      public io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.Builder getSystemBuilder() {
+        
+        onChanged();
+        return getSystemFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.eigr.functions.protocol.actors.ActorSystem system = 1;</code>
+       */
+      public io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystemOrBuilder getSystemOrBuilder() {
+        if (systemBuilder_ != null) {
+          return systemBuilder_.getMessageOrBuilder();
+        } else {
+          return system_ == null ?
+              io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.getDefaultInstance() : system_;
+        }
+      }
+      /**
+       * <code>.eigr.functions.protocol.actors.ActorSystem system = 1;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem, io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.Builder, io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystemOrBuilder> 
+          getSystemFieldBuilder() {
+        if (systemBuilder_ == null) {
+          systemBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem, io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.Builder, io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystemOrBuilder>(
+                  getSystem(),
+                  getParentForChildren(),
+                  isClean());
+          system_ = null;
+        }
+        return systemBuilder_;
+      }
+
       private io.eigr.functions.protocol.actors.ActorOuterClass.Actor actor_;
       private com.google.protobuf.SingleFieldBuilderV3<
           io.eigr.functions.protocol.actors.ActorOuterClass.Actor, io.eigr.functions.protocol.actors.ActorOuterClass.Actor.Builder, io.eigr.functions.protocol.actors.ActorOuterClass.ActorOrBuilder> actorBuilder_;
       /**
-       * <code>.eigr.functions.protocol.actors.Actor actor = 1;</code>
+       * <code>.eigr.functions.protocol.actors.Actor actor = 2;</code>
        * @return Whether the actor field is set.
        */
       public boolean hasActor() {
         return actorBuilder_ != null || actor_ != null;
       }
       /**
-       * <code>.eigr.functions.protocol.actors.Actor actor = 1;</code>
+       * <code>.eigr.functions.protocol.actors.Actor actor = 2;</code>
        * @return The actor.
        */
       public io.eigr.functions.protocol.actors.ActorOuterClass.Actor getActor() {
@@ -5852,7 +6052,7 @@ public final class Protocol {
         }
       }
       /**
-       * <code>.eigr.functions.protocol.actors.Actor actor = 1;</code>
+       * <code>.eigr.functions.protocol.actors.Actor actor = 2;</code>
        */
       public Builder setActor(io.eigr.functions.protocol.actors.ActorOuterClass.Actor value) {
         if (actorBuilder_ == null) {
@@ -5868,7 +6068,7 @@ public final class Protocol {
         return this;
       }
       /**
-       * <code>.eigr.functions.protocol.actors.Actor actor = 1;</code>
+       * <code>.eigr.functions.protocol.actors.Actor actor = 2;</code>
        */
       public Builder setActor(
           io.eigr.functions.protocol.actors.ActorOuterClass.Actor.Builder builderForValue) {
@@ -5882,7 +6082,7 @@ public final class Protocol {
         return this;
       }
       /**
-       * <code>.eigr.functions.protocol.actors.Actor actor = 1;</code>
+       * <code>.eigr.functions.protocol.actors.Actor actor = 2;</code>
        */
       public Builder mergeActor(io.eigr.functions.protocol.actors.ActorOuterClass.Actor value) {
         if (actorBuilder_ == null) {
@@ -5900,7 +6100,7 @@ public final class Protocol {
         return this;
       }
       /**
-       * <code>.eigr.functions.protocol.actors.Actor actor = 1;</code>
+       * <code>.eigr.functions.protocol.actors.Actor actor = 2;</code>
        */
       public Builder clearActor() {
         if (actorBuilder_ == null) {
@@ -5914,7 +6114,7 @@ public final class Protocol {
         return this;
       }
       /**
-       * <code>.eigr.functions.protocol.actors.Actor actor = 1;</code>
+       * <code>.eigr.functions.protocol.actors.Actor actor = 2;</code>
        */
       public io.eigr.functions.protocol.actors.ActorOuterClass.Actor.Builder getActorBuilder() {
         
@@ -5922,7 +6122,7 @@ public final class Protocol {
         return getActorFieldBuilder().getBuilder();
       }
       /**
-       * <code>.eigr.functions.protocol.actors.Actor actor = 1;</code>
+       * <code>.eigr.functions.protocol.actors.Actor actor = 2;</code>
        */
       public io.eigr.functions.protocol.actors.ActorOuterClass.ActorOrBuilder getActorOrBuilder() {
         if (actorBuilder_ != null) {
@@ -5933,7 +6133,7 @@ public final class Protocol {
         }
       }
       /**
-       * <code>.eigr.functions.protocol.actors.Actor actor = 1;</code>
+       * <code>.eigr.functions.protocol.actors.Actor actor = 2;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           io.eigr.functions.protocol.actors.ActorOuterClass.Actor, io.eigr.functions.protocol.actors.ActorOuterClass.Actor.Builder, io.eigr.functions.protocol.actors.ActorOuterClass.ActorOrBuilder> 
@@ -5951,7 +6151,7 @@ public final class Protocol {
 
       private java.lang.Object commandName_ = "";
       /**
-       * <code>string command_name = 2;</code>
+       * <code>string command_name = 3;</code>
        * @return The commandName.
        */
       public java.lang.String getCommandName() {
@@ -5967,7 +6167,7 @@ public final class Protocol {
         }
       }
       /**
-       * <code>string command_name = 2;</code>
+       * <code>string command_name = 3;</code>
        * @return The bytes for commandName.
        */
       public com.google.protobuf.ByteString
@@ -5984,7 +6184,7 @@ public final class Protocol {
         }
       }
       /**
-       * <code>string command_name = 2;</code>
+       * <code>string command_name = 3;</code>
        * @param value The commandName to set.
        * @return This builder for chaining.
        */
@@ -5999,7 +6199,7 @@ public final class Protocol {
         return this;
       }
       /**
-       * <code>string command_name = 2;</code>
+       * <code>string command_name = 3;</code>
        * @return This builder for chaining.
        */
       public Builder clearCommandName() {
@@ -6009,7 +6209,7 @@ public final class Protocol {
         return this;
       }
       /**
-       * <code>string command_name = 2;</code>
+       * <code>string command_name = 3;</code>
        * @param value The bytes for commandName to set.
        * @return This builder for chaining.
        */
@@ -6029,14 +6229,14 @@ public final class Protocol {
       private com.google.protobuf.SingleFieldBuilderV3<
           com.google.protobuf.Any, com.google.protobuf.Any.Builder, com.google.protobuf.AnyOrBuilder> valueBuilder_;
       /**
-       * <code>.google.protobuf.Any value = 3;</code>
+       * <code>.google.protobuf.Any value = 4;</code>
        * @return Whether the value field is set.
        */
       public boolean hasValue() {
         return valueBuilder_ != null || value_ != null;
       }
       /**
-       * <code>.google.protobuf.Any value = 3;</code>
+       * <code>.google.protobuf.Any value = 4;</code>
        * @return The value.
        */
       public com.google.protobuf.Any getValue() {
@@ -6047,7 +6247,7 @@ public final class Protocol {
         }
       }
       /**
-       * <code>.google.protobuf.Any value = 3;</code>
+       * <code>.google.protobuf.Any value = 4;</code>
        */
       public Builder setValue(com.google.protobuf.Any value) {
         if (valueBuilder_ == null) {
@@ -6063,7 +6263,7 @@ public final class Protocol {
         return this;
       }
       /**
-       * <code>.google.protobuf.Any value = 3;</code>
+       * <code>.google.protobuf.Any value = 4;</code>
        */
       public Builder setValue(
           com.google.protobuf.Any.Builder builderForValue) {
@@ -6077,7 +6277,7 @@ public final class Protocol {
         return this;
       }
       /**
-       * <code>.google.protobuf.Any value = 3;</code>
+       * <code>.google.protobuf.Any value = 4;</code>
        */
       public Builder mergeValue(com.google.protobuf.Any value) {
         if (valueBuilder_ == null) {
@@ -6095,7 +6295,7 @@ public final class Protocol {
         return this;
       }
       /**
-       * <code>.google.protobuf.Any value = 3;</code>
+       * <code>.google.protobuf.Any value = 4;</code>
        */
       public Builder clearValue() {
         if (valueBuilder_ == null) {
@@ -6109,7 +6309,7 @@ public final class Protocol {
         return this;
       }
       /**
-       * <code>.google.protobuf.Any value = 3;</code>
+       * <code>.google.protobuf.Any value = 4;</code>
        */
       public com.google.protobuf.Any.Builder getValueBuilder() {
         
@@ -6117,7 +6317,7 @@ public final class Protocol {
         return getValueFieldBuilder().getBuilder();
       }
       /**
-       * <code>.google.protobuf.Any value = 3;</code>
+       * <code>.google.protobuf.Any value = 4;</code>
        */
       public com.google.protobuf.AnyOrBuilder getValueOrBuilder() {
         if (valueBuilder_ != null) {
@@ -6128,7 +6328,7 @@ public final class Protocol {
         }
       }
       /**
-       * <code>.google.protobuf.Any value = 3;</code>
+       * <code>.google.protobuf.Any value = 4;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           com.google.protobuf.Any, com.google.protobuf.Any.Builder, com.google.protobuf.AnyOrBuilder> 
@@ -6146,14 +6346,14 @@ public final class Protocol {
 
       private boolean async_ ;
       /**
-       * <code>bool async = 4;</code>
+       * <code>bool async = 5;</code>
        * @return The async.
        */
       public boolean getAsync() {
         return async_;
       }
       /**
-       * <code>bool async = 4;</code>
+       * <code>bool async = 5;</code>
        * @param value The async to set.
        * @return This builder for chaining.
        */
@@ -6164,7 +6364,7 @@ public final class Protocol {
         return this;
       }
       /**
-       * <code>bool async = 4;</code>
+       * <code>bool async = 5;</code>
        * @return This builder for chaining.
        */
       public Builder clearAsync() {
@@ -6246,17 +6446,32 @@ public final class Protocol {
     io.eigr.functions.protocol.Protocol.InvocationStatusOrBuilder getStatusOrBuilder();
 
     /**
-     * <code>.eigr.functions.protocol.actors.Actor actor = 2;</code>
+     * <code>.eigr.functions.protocol.actors.ActorSystem system = 2;</code>
+     * @return Whether the system field is set.
+     */
+    boolean hasSystem();
+    /**
+     * <code>.eigr.functions.protocol.actors.ActorSystem system = 2;</code>
+     * @return The system.
+     */
+    io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem getSystem();
+    /**
+     * <code>.eigr.functions.protocol.actors.ActorSystem system = 2;</code>
+     */
+    io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystemOrBuilder getSystemOrBuilder();
+
+    /**
+     * <code>.eigr.functions.protocol.actors.Actor actor = 3;</code>
      * @return Whether the actor field is set.
      */
     boolean hasActor();
     /**
-     * <code>.eigr.functions.protocol.actors.Actor actor = 2;</code>
+     * <code>.eigr.functions.protocol.actors.Actor actor = 3;</code>
      * @return The actor.
      */
     io.eigr.functions.protocol.actors.ActorOuterClass.Actor getActor();
     /**
-     * <code>.eigr.functions.protocol.actors.Actor actor = 2;</code>
+     * <code>.eigr.functions.protocol.actors.Actor actor = 3;</code>
      */
     io.eigr.functions.protocol.actors.ActorOuterClass.ActorOrBuilder getActorOrBuilder();
   }
@@ -6319,6 +6534,19 @@ public final class Protocol {
               break;
             }
             case 18: {
+              io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.Builder subBuilder = null;
+              if (system_ != null) {
+                subBuilder = system_.toBuilder();
+              }
+              system_ = input.readMessage(io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(system_);
+                system_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            case 26: {
               io.eigr.functions.protocol.actors.ActorOuterClass.Actor.Builder subBuilder = null;
               if (actor_ != null) {
                 subBuilder = actor_.toBuilder();
@@ -6386,24 +6614,47 @@ public final class Protocol {
       return getStatus();
     }
 
-    public static final int ACTOR_FIELD_NUMBER = 2;
+    public static final int SYSTEM_FIELD_NUMBER = 2;
+    private io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem system_;
+    /**
+     * <code>.eigr.functions.protocol.actors.ActorSystem system = 2;</code>
+     * @return Whether the system field is set.
+     */
+    public boolean hasSystem() {
+      return system_ != null;
+    }
+    /**
+     * <code>.eigr.functions.protocol.actors.ActorSystem system = 2;</code>
+     * @return The system.
+     */
+    public io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem getSystem() {
+      return system_ == null ? io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.getDefaultInstance() : system_;
+    }
+    /**
+     * <code>.eigr.functions.protocol.actors.ActorSystem system = 2;</code>
+     */
+    public io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystemOrBuilder getSystemOrBuilder() {
+      return getSystem();
+    }
+
+    public static final int ACTOR_FIELD_NUMBER = 3;
     private io.eigr.functions.protocol.actors.ActorOuterClass.Actor actor_;
     /**
-     * <code>.eigr.functions.protocol.actors.Actor actor = 2;</code>
+     * <code>.eigr.functions.protocol.actors.Actor actor = 3;</code>
      * @return Whether the actor field is set.
      */
     public boolean hasActor() {
       return actor_ != null;
     }
     /**
-     * <code>.eigr.functions.protocol.actors.Actor actor = 2;</code>
+     * <code>.eigr.functions.protocol.actors.Actor actor = 3;</code>
      * @return The actor.
      */
     public io.eigr.functions.protocol.actors.ActorOuterClass.Actor getActor() {
       return actor_ == null ? io.eigr.functions.protocol.actors.ActorOuterClass.Actor.getDefaultInstance() : actor_;
     }
     /**
-     * <code>.eigr.functions.protocol.actors.Actor actor = 2;</code>
+     * <code>.eigr.functions.protocol.actors.Actor actor = 3;</code>
      */
     public io.eigr.functions.protocol.actors.ActorOuterClass.ActorOrBuilder getActorOrBuilder() {
       return getActor();
@@ -6426,8 +6677,11 @@ public final class Protocol {
       if (status_ != null) {
         output.writeMessage(1, getStatus());
       }
+      if (system_ != null) {
+        output.writeMessage(2, getSystem());
+      }
       if (actor_ != null) {
-        output.writeMessage(2, getActor());
+        output.writeMessage(3, getActor());
       }
       unknownFields.writeTo(output);
     }
@@ -6442,9 +6696,13 @@ public final class Protocol {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(1, getStatus());
       }
+      if (system_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(2, getSystem());
+      }
       if (actor_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(2, getActor());
+          .computeMessageSize(3, getActor());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -6466,6 +6724,11 @@ public final class Protocol {
         if (!getStatus()
             .equals(other.getStatus())) return false;
       }
+      if (hasSystem() != other.hasSystem()) return false;
+      if (hasSystem()) {
+        if (!getSystem()
+            .equals(other.getSystem())) return false;
+      }
       if (hasActor() != other.hasActor()) return false;
       if (hasActor()) {
         if (!getActor()
@@ -6485,6 +6748,10 @@ public final class Protocol {
       if (hasStatus()) {
         hash = (37 * hash) + STATUS_FIELD_NUMBER;
         hash = (53 * hash) + getStatus().hashCode();
+      }
+      if (hasSystem()) {
+        hash = (37 * hash) + SYSTEM_FIELD_NUMBER;
+        hash = (53 * hash) + getSystem().hashCode();
       }
       if (hasActor()) {
         hash = (37 * hash) + ACTOR_FIELD_NUMBER;
@@ -6629,6 +6896,12 @@ public final class Protocol {
           status_ = null;
           statusBuilder_ = null;
         }
+        if (systemBuilder_ == null) {
+          system_ = null;
+        } else {
+          system_ = null;
+          systemBuilder_ = null;
+        }
         if (actorBuilder_ == null) {
           actor_ = null;
         } else {
@@ -6665,6 +6938,11 @@ public final class Protocol {
           result.status_ = status_;
         } else {
           result.status_ = statusBuilder_.build();
+        }
+        if (systemBuilder_ == null) {
+          result.system_ = system_;
+        } else {
+          result.system_ = systemBuilder_.build();
         }
         if (actorBuilder_ == null) {
           result.actor_ = actor_;
@@ -6721,6 +6999,9 @@ public final class Protocol {
         if (other == io.eigr.functions.protocol.Protocol.InvocationResponse.getDefaultInstance()) return this;
         if (other.hasStatus()) {
           mergeStatus(other.getStatus());
+        }
+        if (other.hasSystem()) {
+          mergeSystem(other.getSystem());
         }
         if (other.hasActor()) {
           mergeActor(other.getActor());
@@ -6873,18 +7154,137 @@ public final class Protocol {
         return statusBuilder_;
       }
 
+      private io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem system_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem, io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.Builder, io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystemOrBuilder> systemBuilder_;
+      /**
+       * <code>.eigr.functions.protocol.actors.ActorSystem system = 2;</code>
+       * @return Whether the system field is set.
+       */
+      public boolean hasSystem() {
+        return systemBuilder_ != null || system_ != null;
+      }
+      /**
+       * <code>.eigr.functions.protocol.actors.ActorSystem system = 2;</code>
+       * @return The system.
+       */
+      public io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem getSystem() {
+        if (systemBuilder_ == null) {
+          return system_ == null ? io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.getDefaultInstance() : system_;
+        } else {
+          return systemBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>.eigr.functions.protocol.actors.ActorSystem system = 2;</code>
+       */
+      public Builder setSystem(io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem value) {
+        if (systemBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          system_ = value;
+          onChanged();
+        } else {
+          systemBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.eigr.functions.protocol.actors.ActorSystem system = 2;</code>
+       */
+      public Builder setSystem(
+          io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.Builder builderForValue) {
+        if (systemBuilder_ == null) {
+          system_ = builderForValue.build();
+          onChanged();
+        } else {
+          systemBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <code>.eigr.functions.protocol.actors.ActorSystem system = 2;</code>
+       */
+      public Builder mergeSystem(io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem value) {
+        if (systemBuilder_ == null) {
+          if (system_ != null) {
+            system_ =
+              io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.newBuilder(system_).mergeFrom(value).buildPartial();
+          } else {
+            system_ = value;
+          }
+          onChanged();
+        } else {
+          systemBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.eigr.functions.protocol.actors.ActorSystem system = 2;</code>
+       */
+      public Builder clearSystem() {
+        if (systemBuilder_ == null) {
+          system_ = null;
+          onChanged();
+        } else {
+          system_ = null;
+          systemBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <code>.eigr.functions.protocol.actors.ActorSystem system = 2;</code>
+       */
+      public io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.Builder getSystemBuilder() {
+        
+        onChanged();
+        return getSystemFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.eigr.functions.protocol.actors.ActorSystem system = 2;</code>
+       */
+      public io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystemOrBuilder getSystemOrBuilder() {
+        if (systemBuilder_ != null) {
+          return systemBuilder_.getMessageOrBuilder();
+        } else {
+          return system_ == null ?
+              io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.getDefaultInstance() : system_;
+        }
+      }
+      /**
+       * <code>.eigr.functions.protocol.actors.ActorSystem system = 2;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem, io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.Builder, io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystemOrBuilder> 
+          getSystemFieldBuilder() {
+        if (systemBuilder_ == null) {
+          systemBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem, io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.Builder, io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystemOrBuilder>(
+                  getSystem(),
+                  getParentForChildren(),
+                  isClean());
+          system_ = null;
+        }
+        return systemBuilder_;
+      }
+
       private io.eigr.functions.protocol.actors.ActorOuterClass.Actor actor_;
       private com.google.protobuf.SingleFieldBuilderV3<
           io.eigr.functions.protocol.actors.ActorOuterClass.Actor, io.eigr.functions.protocol.actors.ActorOuterClass.Actor.Builder, io.eigr.functions.protocol.actors.ActorOuterClass.ActorOrBuilder> actorBuilder_;
       /**
-       * <code>.eigr.functions.protocol.actors.Actor actor = 2;</code>
+       * <code>.eigr.functions.protocol.actors.Actor actor = 3;</code>
        * @return Whether the actor field is set.
        */
       public boolean hasActor() {
         return actorBuilder_ != null || actor_ != null;
       }
       /**
-       * <code>.eigr.functions.protocol.actors.Actor actor = 2;</code>
+       * <code>.eigr.functions.protocol.actors.Actor actor = 3;</code>
        * @return The actor.
        */
       public io.eigr.functions.protocol.actors.ActorOuterClass.Actor getActor() {
@@ -6895,7 +7295,7 @@ public final class Protocol {
         }
       }
       /**
-       * <code>.eigr.functions.protocol.actors.Actor actor = 2;</code>
+       * <code>.eigr.functions.protocol.actors.Actor actor = 3;</code>
        */
       public Builder setActor(io.eigr.functions.protocol.actors.ActorOuterClass.Actor value) {
         if (actorBuilder_ == null) {
@@ -6911,7 +7311,7 @@ public final class Protocol {
         return this;
       }
       /**
-       * <code>.eigr.functions.protocol.actors.Actor actor = 2;</code>
+       * <code>.eigr.functions.protocol.actors.Actor actor = 3;</code>
        */
       public Builder setActor(
           io.eigr.functions.protocol.actors.ActorOuterClass.Actor.Builder builderForValue) {
@@ -6925,7 +7325,7 @@ public final class Protocol {
         return this;
       }
       /**
-       * <code>.eigr.functions.protocol.actors.Actor actor = 2;</code>
+       * <code>.eigr.functions.protocol.actors.Actor actor = 3;</code>
        */
       public Builder mergeActor(io.eigr.functions.protocol.actors.ActorOuterClass.Actor value) {
         if (actorBuilder_ == null) {
@@ -6943,7 +7343,7 @@ public final class Protocol {
         return this;
       }
       /**
-       * <code>.eigr.functions.protocol.actors.Actor actor = 2;</code>
+       * <code>.eigr.functions.protocol.actors.Actor actor = 3;</code>
        */
       public Builder clearActor() {
         if (actorBuilder_ == null) {
@@ -6957,7 +7357,7 @@ public final class Protocol {
         return this;
       }
       /**
-       * <code>.eigr.functions.protocol.actors.Actor actor = 2;</code>
+       * <code>.eigr.functions.protocol.actors.Actor actor = 3;</code>
        */
       public io.eigr.functions.protocol.actors.ActorOuterClass.Actor.Builder getActorBuilder() {
         
@@ -6965,7 +7365,7 @@ public final class Protocol {
         return getActorFieldBuilder().getBuilder();
       }
       /**
-       * <code>.eigr.functions.protocol.actors.Actor actor = 2;</code>
+       * <code>.eigr.functions.protocol.actors.Actor actor = 3;</code>
        */
       public io.eigr.functions.protocol.actors.ActorOuterClass.ActorOrBuilder getActorOrBuilder() {
         if (actorBuilder_ != null) {
@@ -6976,7 +7376,7 @@ public final class Protocol {
         }
       }
       /**
-       * <code>.eigr.functions.protocol.actors.Actor actor = 2;</code>
+       * <code>.eigr.functions.protocol.actors.Actor actor = 3;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           io.eigr.functions.protocol.actors.ActorOuterClass.Actor, io.eigr.functions.protocol.actors.ActorOuterClass.Actor.Builder, io.eigr.functions.protocol.actors.ActorOuterClass.ActorOrBuilder> 
@@ -11285,42 +11685,45 @@ public final class Protocol {
       "stem\030\002 \001(\0132+.eigr.functions.protocol.act" +
       "ors.ActorSystem\"N\n\024RegistrationResponse\022" +
       "6\n\nproxy_info\030\001 \001(\0132\".eigr.functions.pro" +
-      "tocol.ProxyInfo\"\223\001\n\021InvocationRequest\0224\n" +
-      "\005actor\030\001 \001(\0132%.eigr.functions.protocol.a" +
-      "ctors.Actor\022\024\n\014command_name\030\002 \001(\t\022#\n\005val" +
-      "ue\030\003 \001(\0132\024.google.protobuf.Any\022\r\n\005async\030" +
-      "\004 \001(\010\"\205\001\n\022InvocationResponse\0229\n\006status\030\001" +
-      " \001(\0132).eigr.functions.protocol.Invocatio" +
-      "nStatus\0224\n\005actor\030\002 \001(\0132%.eigr.functions." +
-      "protocol.actors.Actor\"\206\001\n\017ActorInvocatio" +
-      "n\022+\n\004node\030\001 \001(\0132\035.eigr.functions.protoco" +
-      "l.Node\022F\n\022invocation_request\030\002 \001(\0132*.eig" +
-      "r.functions.protocol.InvocationRequest\"\275" +
-      "\001\n\027ActorInvocationResponse\022+\n\004node\030\001 \001(\013" +
-      "2\035.eigr.functions.protocol.Node\022+\n\rupdat" +
-      "ed_state\030\002 \001(\0132\024.google.protobuf.Any\022H\n\023" +
-      "invocation_response\030\003 \001(\0132+.eigr.functio" +
-      "ns.protocol.InvocationResponse\"\216\002\n\022Actor" +
-      "SystemRequest\022L\n\024registration_request\030\001 " +
-      "\001(\0132,.eigr.functions.protocol.Registrati" +
-      "onRequestH\000\022H\n\022invocation_request\030\002 \001(\0132" +
-      "*.eigr.functions.protocol.InvocationRequ" +
-      "estH\000\022U\n\031actor_invocation_response\030\003 \001(\013" +
-      "20.eigr.functions.protocol.ActorInvocati" +
-      "onResponseH\000B\t\n\007message\"\202\002\n\023ActorSystemR" +
-      "esponse\022N\n\025registration_response\030\001 \001(\0132-" +
-      ".eigr.functions.protocol.RegistrationRes" +
-      "ponseH\000\022D\n\020actor_invocation\030\002 \001(\0132(.eigr" +
-      ".functions.protocol.ActorInvocationH\000\022J\n" +
-      "\023invocation_response\030\003 \001(\0132+.eigr.functi" +
-      "ons.protocol.InvocationResponseH\000B\t\n\007mes" +
-      "sage*=\n\006Status\022\013\n\007UNKNOWN\020\000\022\006\n\002OK\020\001\022\023\n\017A" +
-      "CTOR_NOT_FOUND\020\002\022\t\n\005ERROR\020\0032v\n\014ActorServ" +
-      "ice\022f\n\005Spawn\022+.eigr.functions.protocol.A" +
-      "ctorSystemRequest\032,.eigr.functions.proto" +
-      "col.ActorSystemResponse(\0010\001BO\n\032io.eigr.f" +
-      "unctions.protocolZ1github.com/eigr/go-su" +
-      "pport/eigr/protocol;protocolb\006proto3"
+      "tocol.ProxyInfo\"\320\001\n\021InvocationRequest\022;\n" +
+      "\006system\030\001 \001(\0132+.eigr.functions.protocol." +
+      "actors.ActorSystem\0224\n\005actor\030\002 \001(\0132%.eigr" +
+      ".functions.protocol.actors.Actor\022\024\n\014comm" +
+      "and_name\030\003 \001(\t\022#\n\005value\030\004 \001(\0132\024.google.p" +
+      "rotobuf.Any\022\r\n\005async\030\005 \001(\010\"\302\001\n\022Invocatio" +
+      "nResponse\0229\n\006status\030\001 \001(\0132).eigr.functio" +
+      "ns.protocol.InvocationStatus\022;\n\006system\030\002" +
+      " \001(\0132+.eigr.functions.protocol.actors.Ac" +
+      "torSystem\0224\n\005actor\030\003 \001(\0132%.eigr.function" +
+      "s.protocol.actors.Actor\"\206\001\n\017ActorInvocat" +
+      "ion\022+\n\004node\030\001 \001(\0132\035.eigr.functions.proto" +
+      "col.Node\022F\n\022invocation_request\030\002 \001(\0132*.e" +
+      "igr.functions.protocol.InvocationRequest" +
+      "\"\275\001\n\027ActorInvocationResponse\022+\n\004node\030\001 \001" +
+      "(\0132\035.eigr.functions.protocol.Node\022+\n\rupd" +
+      "ated_state\030\002 \001(\0132\024.google.protobuf.Any\022H" +
+      "\n\023invocation_response\030\003 \001(\0132+.eigr.funct" +
+      "ions.protocol.InvocationResponse\"\216\002\n\022Act" +
+      "orSystemRequest\022L\n\024registration_request\030" +
+      "\001 \001(\0132,.eigr.functions.protocol.Registra" +
+      "tionRequestH\000\022H\n\022invocation_request\030\002 \001(" +
+      "\0132*.eigr.functions.protocol.InvocationRe" +
+      "questH\000\022U\n\031actor_invocation_response\030\003 \001" +
+      "(\01320.eigr.functions.protocol.ActorInvoca" +
+      "tionResponseH\000B\t\n\007message\"\202\002\n\023ActorSyste" +
+      "mResponse\022N\n\025registration_response\030\001 \001(\013" +
+      "2-.eigr.functions.protocol.RegistrationR" +
+      "esponseH\000\022D\n\020actor_invocation\030\002 \001(\0132(.ei" +
+      "gr.functions.protocol.ActorInvocationH\000\022" +
+      "J\n\023invocation_response\030\003 \001(\0132+.eigr.func" +
+      "tions.protocol.InvocationResponseH\000B\t\n\007m" +
+      "essage*=\n\006Status\022\013\n\007UNKNOWN\020\000\022\006\n\002OK\020\001\022\023\n" +
+      "\017ACTOR_NOT_FOUND\020\002\022\t\n\005ERROR\020\0032v\n\014ActorSe" +
+      "rvice\022f\n\005Spawn\022+.eigr.functions.protocol" +
+      ".ActorSystemRequest\032,.eigr.functions.pro" +
+      "tocol.ActorSystemResponse(\0010\001BO\n\032io.eigr" +
+      ".functions.protocolZ1github.com/eigr/go-" +
+      "support/eigr/protocol;protocolb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -11369,13 +11772,13 @@ public final class Protocol {
     internal_static_eigr_functions_protocol_InvocationRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_eigr_functions_protocol_InvocationRequest_descriptor,
-        new java.lang.String[] { "Actor", "CommandName", "Value", "Async", });
+        new java.lang.String[] { "System", "Actor", "CommandName", "Value", "Async", });
     internal_static_eigr_functions_protocol_InvocationResponse_descriptor =
       getDescriptor().getMessageTypes().get(7);
     internal_static_eigr_functions_protocol_InvocationResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_eigr_functions_protocol_InvocationResponse_descriptor,
-        new java.lang.String[] { "Status", "Actor", });
+        new java.lang.String[] { "Status", "System", "Actor", });
     internal_static_eigr_functions_protocol_ActorInvocation_descriptor =
       getDescriptor().getMessageTypes().get(8);
     internal_static_eigr_functions_protocol_ActorInvocation_fieldAccessorTable = new
