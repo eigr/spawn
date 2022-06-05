@@ -119,7 +119,7 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
           actor: %Actor{name: name, state: %ActorState{} = actor_state} = actor
         } = state
       ),
-      do: {:reply, state, state}
+      do: {:reply, actor_state, state}
 
   def handle_call(
         {:actor_invocation_response, %ActorInvocationResponse{} = invocation},
@@ -141,8 +141,7 @@ defmodule Eigr.Functions.Protocol.Actors.ActorEntity do
            value: payload
          } = invocation},
         %EntityState{
-          system: %ActorSystem{name: actor_system} = _system,
-          actor: %Actor{name: name, state: %ActorState{} = actor_state} = _actor
+          system: %ActorSystem{name: actor_system} = _system
         } = state
       ) do
     payload = ActorInvocation.new(invocation_request: invocation)

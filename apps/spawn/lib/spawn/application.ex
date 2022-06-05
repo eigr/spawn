@@ -44,7 +44,7 @@ defmodule Spawn.Application do
       Spawn.Proxy.NodeManager.Supervisor,
       Spawn.Actor.Registry.child_spec(),
       Eigr.Functions.Protocol.Actors.ActorEntity.Supervisor,
-      #http_server(config),
+      http_server(config),
       grpc_server(config)
     ]
 
