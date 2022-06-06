@@ -106,3 +106,12 @@ message ActorSystemResponse {
         InvocationResponse invocation_response = 3;
     }
 }
+
+service SpawnProxyService {
+    rpc Register(ActorSystemRequest) returns (ActorSystemResponse);
+    rpc Invoke(InvocationRequest) returns (InvocationResponse);
+}
+
+service SpawnUserService {
+    rpc Action(ActorInvocation) returns (ActorInvocationResponse);
+}

@@ -31,8 +31,7 @@ defmodule Proxy.MixProject do
       {:bandit, "~> 0.5"},
       {:observer_cli, "~> 1.7"},
       {:prometheus, "~> 4.8"},
-      {:prometheus_plugs, "~> 1.1"},
-      {:protobuf, "~> 0.10", override: true}
+      {:prometheus_plugs, "~> 1.1"}
     ]
   end
 end
