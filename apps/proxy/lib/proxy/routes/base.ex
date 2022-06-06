@@ -6,7 +6,7 @@ defmodule Proxy.Routes.Base do
       plug(Plug.Logger)
 
       plug(:match)
-      plug(Plug.Parsers, parsers: [:json], json_decoder: Jason)
+      plug(Plug.Parsers, parsers: [:json, :urlencoded, :multipart], json_decoder: Jason)
       plug(:dispatch)
 
       def send!(conn, code, data, content_type)

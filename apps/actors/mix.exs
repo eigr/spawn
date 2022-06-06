@@ -29,7 +29,7 @@ defmodule Actors.MixProject do
   defp deps do
     [
       {:statestores, "~> 0.1", in_umbrella: true},
-      {:google_protos, "~> 0.2"},
+      # {:google_protos, "~> 0.2"},
       {:protobuf, "~> 0.10", override: true},
       {:cowlib, "~> 2.9", override: true},
       {:decimal, "~> 2.0", override: true},
