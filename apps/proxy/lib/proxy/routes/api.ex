@@ -27,8 +27,6 @@ defmodule Proxy.Routes.API do
     %{"_proto" => body} = conn.body_params
     decoded_payload = Actor.decode(body)
 
-    IO.inspect(decoded_payload, label: "Actor =====>")
-
     send!(conn, 200, Actor.encode(decoded_payload), @content_type)
   end
 end
