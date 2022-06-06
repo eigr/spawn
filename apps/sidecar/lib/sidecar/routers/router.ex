@@ -1,10 +1,10 @@
 defmodule Sidecar.Routers.Router do
   use Plug.Router
 
+  plug(Plug.Logger)
+
   plug(Sidecar.Metrics.Exporter)
   plug(Sidecar.Metrics.PrometheusPipeline)
-
-  plug(Plug.Logger)
 
   plug(:match)
   plug(:dispatch)
