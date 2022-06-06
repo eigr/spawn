@@ -12,8 +12,6 @@ defmodule Spawn.Application do
     PrometheusPipeline
   }
 
-  @cowboy_options [compress: true]
-
   @grpc_opts [
     idle_timeout: :infinity,
     initial_connection_window_size: 2_147_483_647,
@@ -33,19 +31,19 @@ defmodule Spawn.Application do
   def start(_type, _args) do
     config = Config.load()
 
-    #Exporter.setup()
-    #PrometheusPipeline.setup()
-    #PrometheusInstrumenter.setup()
+    Exporter.setup()
+    PrometheusPipeline.setup()
+    # PrometheusInstrumenter.setup()
 
     children = [
+      http_server(config),
       cluster_supervisor(config),
       {Registry, keys: :unique, name: Spawn.NodeRegistry},
       Spawn.Registry.ActorRegistry.Supervisor,
       Spawn.Proxy.NodeManager.Supervisor,
       Spawn.Actor.Registry.child_spec(),
-      Eigr.Functions.Protocol.Actors.ActorEntity.Supervisor,
-      http_server(config),
-      grpc_server(config)
+      Eigr.Functions.Protocol.Actors.ActorEntity.Supervisor
+      # grpc_server(config)
     ]
 
     opts = [strategy: :one_for_one, name: Spawn.Supervisor]
@@ -63,9 +61,9 @@ defmodule Spawn.Application do
 
   defp http_server(config) do
     port = get_http_port(config)
-    options = @cowboy_options ++ [port: port]
+    options = [port: port]
 
-    {Plug.Cowboy, plug: Spawn.HTTP.Router, scheme: :http, options: options}
+    {Bandit, plug: Spawn.HTTP.Router, scheme: :http, options: options}
   end
 
   defp get_http_port(config), do: config.http_port

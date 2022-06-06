@@ -54,6 +54,12 @@ config :protobuf, extensions: :enabled
 
 config :grpc, start_server: true
 
+config :prometheus, Spawn.Metrics.Exporter, # (you should replace this with the name of your plug)
+    path: "/metrics",
+    format: :text, ## or :protobuf, or :text
+    registry: :default,
+    auth: false
+
 # App Configuration
 config :spawn,
   http_port: System.get_env("PROXY_HTTP_PORT", "9001") |> String.to_integer(),

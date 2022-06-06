@@ -19,7 +19,12 @@ defmodule Spawn.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger, :statestores],
+      extra_applications: [
+        :logger,
+        :statestores,
+        :prometheus,
+        :prometheus_plugs
+      ],
       mod: {Spawn.Application, []}
     ]
   end
@@ -28,6 +33,9 @@ defmodule Spawn.MixProject do
   defp deps do
     [
       {:statestores, "~> 0.1", in_umbrella: true},
+      {:bandit, "~> 0.5"},
+      {:prometheus, "~> 4.8"},
+      {:prometheus_plugs, "~> 1.1"},
       {:google_protos, "~> 0.2"},
       {:protobuf, "~> 0.9", override: true},
       {:grpc, "0.5.0-beta.1"},
@@ -37,11 +45,9 @@ defmodule Spawn.MixProject do
       {:flow, "~> 1.2"},
       {:vapor, "~> 0.10"},
       {:observer_cli, "~> 1.7"},
-      {:plug_cowboy, "~> 2.5"},
       {:poison, "~> 5.0"},
-      #{:prometheus, "~> 4.8"},
-      #{:prometheus_plugs, "~> 1.1"},
-      #{:telemetry, "~> 1.0"},
+
+      # {:telemetry, "~> 1.0"},
       {:jason, "~> 1.2"},
       {:libcluster, "~> 3.3"},
       {:horde, "~> 0.8"},

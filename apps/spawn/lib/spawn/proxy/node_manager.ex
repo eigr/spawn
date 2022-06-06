@@ -47,7 +47,7 @@ defmodule Spawn.Proxy.NodeManager do
         {:invoke_user_function, payload},
         %{source_stream: stream} = state
       ) do
-        Logger.debug("Calling User Function with Payload: #{inspect(payload)}")
+    Logger.debug("Calling User Function with Payload: #{inspect(payload)}")
     GRPC.Server.send_reply(stream, payload)
 
     {:noreply, state}
