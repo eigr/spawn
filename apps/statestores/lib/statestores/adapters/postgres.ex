@@ -3,7 +3,7 @@ defmodule Statestores.Adapters.Postgres do
     otp_app: :statestores,
     adapter: Ecto.Adapters.Postgres
 
-  alias Statestores.Schemas.Event
+  alias Statestores.Schemas.{Event, ValueObjectSchema}
 
   def init(_type, config) do
     config =

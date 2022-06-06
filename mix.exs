@@ -6,7 +6,8 @@ defmodule Spawn.MixProject do
       apps_path: "apps",
       version: "0.1.0",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      releases: releases()
     ]
   end
 
@@ -17,5 +18,19 @@ defmodule Spawn.MixProject do
   # Run "mix help deps" for examples and options.
   defp deps do
     []
+  end
+
+  defp releases() do
+    [
+      proxy: [
+        include_executables_for: [:unix],
+        applications: [sidecar: :permanent],
+        steps: [
+          :assemble,
+          &Bakeware.assemble/1
+        ],
+        bakeware: [compression_level: 19]
+      ]
+    ]
   end
 end

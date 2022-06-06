@@ -89,7 +89,7 @@ message ActorInvocationResponse {
     Node node = 1;
     google.protobuf.Any updated_state = 2;
     InvocationResponse invocation_response = 3;
-}    
+}
 
 message ActorSystemRequest {
     oneof message {

@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: io.eigr.spawn.AppTest
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 11.864 sec
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 11.86 sec

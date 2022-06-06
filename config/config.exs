@@ -9,9 +9,9 @@
 # move said applications out of the umbrella.
 import Config
 
-#config :statestores, Statestores.Vault,
-#json_library: Jason,
-#ciphers: [
+# config :statestores, Statestores.Vault,
+# json_library: Jason,
+# ciphers: [
 #  default:
 #    {Cloak.Ciphers.AES.GCM,
 #     tag: "AES.GCM.V1",
@@ -40,10 +40,11 @@ config :statestores, Statestores.Adapters.Store.Postgres,
 config :logger,
   backends: [:console],
   truncate: 65536
-  #,
-  #compile_time_purge_matching: [
-  #  [level_lower_than: :debug]
-  #]
+
+# ,
+# compile_time_purge_matching: [
+#  [level_lower_than: :debug]
+# ]
 
 # Our Console Backend-specific configuration
 config :logger, :console,
@@ -54,13 +55,15 @@ config :protobuf, extensions: :enabled
 
 config :grpc, start_server: true
 
-config :prometheus, Spawn.Metrics.Exporter, # (you should replace this with the name of your plug)
-    path: "/metrics",
-    format: :text, ## or :protobuf, or :text
-    registry: :default,
-    auth: false
+# (you should replace this with the name of your plug)
+config :prometheus, Actors.Metrics.Exporter,
+  path: "/metrics",
+  ## or :protobuf, or :text
+  format: :auto,
+  registry: :default,
+  auth: false
 
 # App Configuration
-config :spawn,
+config :proxy,
   http_port: System.get_env("PROXY_HTTP_PORT", "9001") |> String.to_integer(),
   grpc_port: System.get_env("PROXY_GRPC_PORT", "5001") |> String.to_integer()
