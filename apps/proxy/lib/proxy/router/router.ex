@@ -7,7 +7,7 @@ defmodule Proxy.Router do
   plug(Proxy.Metrics.PrometheusPipeline)
 
   plug(:match)
-  plug(Plug.Parsers, parsers: [:json, :urlencoded, :multipart], json_decoder: Jason)
+  plug(Plug.Parsers, parsers: [:json, :urlencoded, :multipart, Proxy.Parser], json_decoder: Jason)
   plug(:dispatch)
 
   forward("/api/v1", to: Proxy.Routes.API)

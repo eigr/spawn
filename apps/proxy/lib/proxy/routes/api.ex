@@ -24,7 +24,10 @@ defmodule Proxy.Routes.API do
       "ActorSystem #{inspect(name)} Received Actor invocation request for Actor #{inspect(actor_name)} #{inspect(conn.body_params)}"
     )
 
-    decoded_payload = Actor.decode(conn.body_params)
+    %{"_proto" => body} = conn.body_params
+    decoded_payload = Actor.decode(body)
+
+    IO.inspect(decoded_payload, label: "Actor =====>")
 
     send!(conn, 200, Actor.encode(decoded_payload), @content_type)
   end
