@@ -19,8 +19,6 @@ defmodule Actors.Actor.Entity do
     InvocationRequest
   }
 
-  alias Actors.Node.NodeManager
-
   @min_snapshot_threshold 500
   @default_snapshot_timeout 60_000
   @default_deactivate_timeout 90_000
@@ -122,32 +120,43 @@ defmodule Actors.Actor.Entity do
       ),
       do: {:reply, actor_state, state}
 
-  def handle_call(
-        {:actor_invocation_response, %ActorInvocationResponse{} = invocation},
-        _from,
-        %EntityState{
-          system: %ActorSystem{name: actor_system} = _system,
-          actor: %Actor{name: name, state: %ActorState{} = actor_state} = _actor
-        } = state
-      ) do
-    {:reply, %{}, state}
-  end
-
   @impl true
-  def handle_cast(
+  def handle_call(
         {:invocation_request,
          %InvocationRequest{
            actor: %Actor{name: name} = actor,
            command_name: command,
            value: payload
          } = invocation},
+        _from,
         %EntityState{
           system: %ActorSystem{name: actor_system} = _system
         } = state
       ) do
     payload = ActorInvocation.new(invocation_request: invocation)
-    NodeManager.invoke_user_function(actor_system, payload)
-    {:noreply, state}
+
+    request =
+      Finch.build(
+        :post,
+        "http://0.0.0.0:8090/api/v1/actors/actions",
+        ["Content-Type": "application/octet-stream"],
+        ActorInvocation.encode(payload)
+      )
+
+    resp =
+      request
+      |> Finch.request(request, SpawnHTTPClient)
+      |> case do
+        {:ok, %Finch.Response{body: response_body} = response} ->
+          Logger.debug("User Function Actor Invocation Response: #{inspect(response)}")
+          {:ok, response_body}
+
+        {:error, reason} ->
+          Logger.error("User Function Actor Invocation Error: #{inspect(reason)}")
+          {:error, reason}
+      end
+
+    {:reply, resp, state}
   end
 
   @impl true
@@ -277,7 +286,7 @@ defmodule Actors.Actor.Entity do
   end
 
   def invoke(name, request) do
-    GenServer.cast(via(name), {:invocation_request, request})
+    GenServer.call(via(name), {:invocation_request, request})
   end
 
   def invoke_async(name, request) do

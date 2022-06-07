@@ -7,8 +7,6 @@ defmodule Actors do
   alias Actors.Actor.Entity, as: ActorEntity
   alias Actors.Actor.Entity.Supervisor, as: ActorEntitySupervisor
 
-  alias Actors.Node.NodeManager
-
   alias Actors.Registry.ActorRegistry
 
   alias Eigr.Functions.Protocol.Actors.{Actor, ActorSystem, Registry}
@@ -53,15 +51,28 @@ defmodule Actors do
   end
 
   def invoke(
+        %InvocationRequest{
+          actor: %Actor{} = actor,
+          system: %ActorSystem{} = system,
+          async: type
+        } = request
+      ) do
+    invoke(type, system, actor, request)
+  end
+
+  def invoke(
         false,
         %ActorSystem{name: system_name} = system,
         %Actor{name: actor_name} = actor,
         request
       ) do
+    IO.inspect(request, label: "Requestsssssssssss")
+
     with {:ok, %{node: node, actor: _registered_actor}} <-
            ActorRegistry.lookup(system_name, actor_name),
-         _pid <- Node.spawn(node, NodeManager, :try_reactivate_actor, [system, actor]) do
-      ActorEntity.invoke(actor_name, request)
+         _pid <- Node.spawn(node, __MODULE__, :try_reactivate_actor, [system, actor]),
+         {:ok, response_body} <- ActorEntity.invoke(actor_name, request) do
+      {:ok, response_body}
     else
       {:not_found, _} ->
         Logger.error("Actor #{actor_name} not found on ActorSystem #{system_name}")
@@ -88,7 +99,7 @@ defmodule Actors do
       ) do
     with {:ok, %{node: node, actor: _registered_actor}} <-
            ActorRegistry.lookup(system_name, actor_name),
-         _pid <- Node.spawn(node, NodeManager, :try_reactivate_actor, [system, actor]) do
+         _pid <- Node.spawn(node, __MODULE__, :try_reactivate_actor, [system, actor]) do
       ActorEntity.invoke_async(actor_name, request)
     else
       {:not_found, _} ->
@@ -105,6 +116,18 @@ defmodule Actors do
       _ ->
         Logger.error("Failed to invoke Actor #{actor_name} on ActorSystem #{system_name}")
         {:error, "Failed to invoke Actor #{actor_name} on ActorSystem #{system_name}"}
+    end
+  end
+
+  def try_reactivate_actor(%ActorSystem{} = system, %Actor{name: name} = actor) do
+    case ActorEntitySupervisor.lookup_or_create_actor(system, actor) do
+      {:ok, pid} ->
+        Logger.debug("Actor #{name} reactivated. PID: #{inspect(pid)}")
+        {:ok, pid}
+
+      reason ->
+        Logger.error("Failed to reactivate actor #{name}: #{inspect(reason)}")
+        {:error, reason}
     end
   end
 

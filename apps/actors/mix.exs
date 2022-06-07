@@ -29,15 +29,13 @@ defmodule Actors.MixProject do
   defp deps do
     [
       {:statestores, "~> 0.1", in_umbrella: true},
-      # {:google_protos, "~> 0.2"},
       {:protobuf, "~> 0.10", override: true},
       {:cowlib, "~> 2.9", override: true},
       {:decimal, "~> 2.0", override: true},
+      {:finch, "~> 0.12"},
       {:flow, "~> 1.2"},
       {:vapor, "~> 0.10"},
       {:poison, "~> 5.0"},
-
-      # {:telemetry, "~> 1.0"},
       {:jason, "~> 1.2"},
       {:libcluster, "~> 3.3"},
       {:horde, "~> 0.8"},

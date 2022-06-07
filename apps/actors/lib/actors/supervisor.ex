@@ -20,8 +20,12 @@ defmodule Actors.Supervisor do
     children = [
       cluster_supervisor(config),
       {Registry, keys: :unique, name: Actors.NodeRegistry},
+      {Finch,
+       name: SpawnHTTPClient,
+       pools: %{
+         :default => [size: 32, count: 8]
+       }},
       Actors.Registry.ActorRegistry.Supervisor,
-      Actors.Node.NodeManager.Supervisor,
       Actors.Actor.Registry.child_spec(),
       Actors.Actor.Entity.Supervisor
     ]

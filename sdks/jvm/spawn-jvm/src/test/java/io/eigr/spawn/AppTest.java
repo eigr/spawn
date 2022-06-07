@@ -1,45 +1,43 @@
 package io.eigr.spawn;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.assertTrue;
-
-import akka.NotUsed;
-import akka.actor.typed.ActorSystem;
-import akka.actor.typed.javadsl.Behaviors;
-import akka.grpc.GrpcClientSettings;
-import akka.stream.javadsl.AsPublisher;
-import akka.stream.javadsl.Sink;
-import akka.stream.javadsl.Source;
 import com.google.protobuf.Any;
 import com.google.protobuf.ByteString;
-import io.eigr.functions.protocol.ActorServiceClient;
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
 import io.eigr.functions.protocol.Protocol;
 import io.eigr.functions.protocol.actors.ActorOuterClass;
 import okhttp3.*;
+import org.junit.Rule;
 import org.junit.Test;
-import reactor.core.publisher.EmitterProcessor;
-import scala.concurrent.duration.Duration;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Unit test for simple App.
  */
 public class AppTest {
 
-    private OkHttpClient client = new OkHttpClient();
+    private final OkHttpClient client = new OkHttpClient();
+
+    @Rule
+    public HttpServerRule httpServer = new HttpServerRule();
+
     /**
      * Rigorous Test :-)
      */
     @Test
-    public void shouldAnswerWithTrue() throws IOException {
+    public void shouldAnswerWithTrue() throws IOException, InterruptedException {
+        httpServer.registerHandler("/api/v1/actors/actions", new SpawnUserFunctionHttpHandler());
 
-        HashMap<String, ActorOuterClass.Actor> actors = new HashMap<String, ActorOuterClass.Actor>();
-
+        HashMap<String, ActorOuterClass.Actor> actors = new HashMap<>();
         for (int i = 0; i < 2; i++) {
             String actorName = String.format("actor-test-0%s", i);
             actors.put(actorName, makeActor(actorName, i));
@@ -78,32 +76,47 @@ public class AppTest {
         System.out.println("Send registration request...");
 
         Call call = client.newCall(request);
-        Response response = call.execute();
+        Response invocationResponse;
+        try (Response response = call.execute()) {
 
-        assertThat(response.code(), equalTo(200));
-        Protocol.RegistrationResponse registrationResponse = Protocol.RegistrationResponse.parseFrom(response.body().bytes());
-        System.out.println("Registration response: " + registrationResponse);
+            assertThat(response.code(), equalTo(200));
+            assert response.body() != null;
+            Protocol.RegistrationResponse registrationResponse = Protocol.RegistrationResponse.parseFrom(response.body().bytes());
+            System.out.println("Registration response: " + registrationResponse);
 
-        /*
-        byte[] byteState = BigInteger.valueOf(1).toByteArray();
+            // Send Invocation to Actor
+            byte[] byteState = BigInteger.valueOf(1).toByteArray();
 
-        Any stateValue = Any.newBuilder()
-                .setTypeUrl("type.googleapis.com/integer")
-                .setValue(ByteString.copyFrom(byteState))
-                .build();
+            Any stateValue = Any.newBuilder()
+                    .setTypeUrl("type.googleapis.com/integer")
+                    .setValue(ByteString.copyFrom(byteState))
+                    .build();
 
-        Protocol.InvocationRequest invocation = Protocol.InvocationRequest.newBuilder()
-                .setAsync(false)
-                .setSystem(actorSystem)
-                .setActor(makeActor("actor-test-01", 1))
-                .setCommandName("someFunction")
-                .setValue(stateValue)
-                .build();
+            Protocol.InvocationRequest invocationRequest = Protocol.InvocationRequest.newBuilder()
+                    .setAsync(false)
+                    .setSystem(actorSystem)
+                    .setActor(makeActor("actor-test-01", 1))
+                    .setCommandName("someFunction")
+                    .setValue(stateValue)
+                    .build();
 
-        Protocol.ActorSystemRequest invocationRequest = Protocol.ActorSystemRequest.newBuilder()
-                .setInvocationRequest(invocation)
-                .build();
-        */
+            RequestBody invocationBody = RequestBody.create(
+                    invocationRequest.toByteArray(), MediaType.parse("application/octet-stream"));
+
+            Request httpInvocationRequest = new Request.Builder()
+                    .url("http://localhost:9001/api/v1/system/test-system/actors/actor-test-01/invoke")
+                    .post(invocationBody)
+                    .build();
+
+            Thread.sleep(10000);
+
+            System.out.println("Send Invocation request...");
+            Call invocationCall = client.newCall(httpInvocationRequest);
+            invocationResponse = invocationCall.execute();
+            System.out.println("Invocation response: " + invocationResponse);
+            assertThat(response.code(), equalTo(200));
+        }
+
         assertTrue(true);
     }
 
@@ -135,5 +148,64 @@ public class AppTest {
                 .setSnapshotStrategy(snapshotStrategy)
                 .setDeactivateStrategy(deactivateStrategy)
                 .build();
+    }
+
+    private static class SpawnUserFunctionHttpHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange httpExchange) throws IOException {
+            InputStream requestStream = httpExchange.getRequestBody();
+            byte[] actorInvocationArray = new byte[requestStream.available()];
+            requestStream.read(actorInvocationArray);
+
+            Protocol.ActorInvocation actorInvocationRequest =  Protocol.ActorInvocation.parseFrom(actorInvocationArray);
+            System.out.println("Received ActorInvocation: " + actorInvocationRequest);
+            handleResponse(httpExchange, actorInvocationRequest);
+        }
+
+        private void handleResponse(HttpExchange httpExchange, Protocol.ActorInvocation actorInvocationRequest) throws IOException {
+            OutputStream outputStream = httpExchange.getResponseBody();
+
+            ActorOuterClass.Actor Actor = actorInvocationRequest.getInvocationRequest().getActor();
+            String commandName = actorInvocationRequest.getInvocationRequest().getCommandName();
+            Any value = actorInvocationRequest.getInvocationRequest().getValue();
+            String typeUrl = value.getTypeUrl();
+            ByteString reqValue = value.getValue();
+
+            System.out.printf("Actor %s received Action invocation for command %s%n", Actor.getName(), commandName);
+
+            Any updatedState = null;
+            long resultValue;
+
+            if (typeUrl.equalsIgnoreCase("type.googleapis.com/integer")) {
+                long r = Long.parseLong(reqValue.toString());
+                resultValue = r + 1L;
+
+                byte[] byteState = BigInteger.valueOf(resultValue).toByteArray();
+
+                updatedState = Any.newBuilder()
+                        .setTypeUrl("type.googleapis.com/integer")
+                        .setValue(ByteString.copyFrom(byteState))
+                        .build();
+
+            } else if (typeUrl.equalsIgnoreCase("type.googleapis.com/string")) {
+                updatedState = Any.newBuilder()
+                        .setTypeUrl("type.googleapis.com/integer")
+                        .setValue(ByteString.copyFrom(reqValue.toByteArray()))
+                        .build();
+            }
+
+            Protocol.ActorInvocationResponse response = Protocol.ActorInvocationResponse.newBuilder()
+                    .setUpdatedState(updatedState)
+                    .getDefaultInstanceForType();
+
+            byte[] responseBytes = response.toByteArray();
+
+            httpExchange.sendResponseHeaders(200, responseBytes.length);
+
+            outputStream.write(responseBytes);
+            outputStream.flush();
+            outputStream.close();
+        }
+
     }
 }
