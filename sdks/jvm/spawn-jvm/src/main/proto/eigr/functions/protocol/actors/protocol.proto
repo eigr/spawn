@@ -15,11 +15,7 @@ enum Status {
     ERROR = 3;
 }
 
-message Node {
-    string id = 1;
-}
-
-message InvocationStatus {
+message RequestStatus {
     Status status = 1;
     string message = 2;
 }
@@ -63,7 +59,8 @@ message RegistrationRequest {
 }
 
 message RegistrationResponse {
-    ProxyInfo proxy_info = 1;
+    RequestStatus staus = 1;
+    ProxyInfo proxy_info = 2;
 }
 
 message InvocationRequest {
@@ -75,18 +72,16 @@ message InvocationRequest {
 }
 
 message InvocationResponse {
-    InvocationStatus status = 1;
+    RequestStatus status = 1;
     eigr.functions.protocol.actors.ActorSystem system =2;
     eigr.functions.protocol.actors.Actor actor = 3;
 }
 
 message ActorInvocation {
-    Node node = 1;
     InvocationRequest invocation_request = 2;
 }
 
 message ActorInvocationResponse {
-    Node node = 1;
     google.protobuf.Any updated_state = 2;
     InvocationResponse invocation_response = 3;
 }
@@ -105,8 +100,4 @@ message ActorSystemResponse {
         ActorInvocation actor_invocation = 2;
         InvocationResponse invocation_response = 3;
     }
-}
-
-service ActorService {
-    rpc Spawn(stream ActorSystemRequest) returns (stream ActorSystemResponse);
 }

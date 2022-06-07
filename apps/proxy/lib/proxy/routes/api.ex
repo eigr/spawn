@@ -3,8 +3,7 @@ defmodule Proxy.Routes.API do
   require Logger
 
   alias Eigr.Functions.Protocol.Actors.Actor
-  alias Eigr.Functions.Protocol.RegistrationRequest
-  alias Eigr.Functions.Protocol.RegistrationResponse
+  alias Eigr.Functions.Protocol.{RegistrationRequest, RegistrationResponse, RequestStatus, Status}
 
   @content_type "application/octet-stream"
 
@@ -14,6 +13,11 @@ defmodule Proxy.Routes.API do
 
     with {:ok, response} <- Actors.register(registration_payload) do
       send!(conn, 200, RegistrationResponse.encode(response), @content_type)
+    else
+      _ ->
+        status = RequestStatus.new(status: :ERROR, message: "Error on create Actors")
+        response = RegistrationResponse.new(status: status)
+        send!(conn, 500, RegistrationResponse.encode(response), @content_type)
     end
   end
 

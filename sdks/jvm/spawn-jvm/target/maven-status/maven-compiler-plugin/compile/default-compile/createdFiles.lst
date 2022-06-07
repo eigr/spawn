@@ -6,7 +6,6 @@ io/eigr/functions/protocol/Protocol$RegistrationRequest.class
 io/eigr/functions/protocol/actors/ActorOuterClass$RegistryOrBuilder.class
 io/eigr/spawn/Spawn.class
 io/eigr/functions/protocol/Protocol$RegistrationResponseOrBuilder.class
-io/eigr/functions/protocol/Protocol$Node$Builder.class
 io/eigr/functions/protocol/actors/ActorOuterClass$ActorSystem.class
 io/eigr/functions/protocol/Protocol$ServiceInfo.class
 io/eigr/functions/protocol/actors/ActorOuterClass$Registry.class
@@ -27,10 +26,10 @@ io/eigr/functions/protocol/actors/ActorOuterClass$ActorSnapshotStrategy$Strategy
 io/eigr/functions/protocol/ActorServiceClientPowerApi.class
 io/eigr/functions/protocol/Protocol$InvocationResponse$1.class
 io/eigr/functions/protocol/ActorServicePowerApiHandlerFactory.class
-io/eigr/functions/protocol/Protocol$InvocationStatusOrBuilder.class
 io/eigr/functions/protocol/Protocol$RegistrationRequestOrBuilder.class
 io/eigr/spawn/server/ActorServiceHandler.class
 io/eigr/functions/protocol/actors/ActorOuterClass$ActorSnapshotStrategy.class
+io/eigr/functions/protocol/Protocol$RequestStatus$Builder.class
 com/google/protobuf/Any$Builder.class
 io/eigr/functions/protocol/Protocol$ActorInvocationResponse.class
 io/eigr/functions/protocol/Protocol$ActorInvocationResponseOrBuilder.class
@@ -43,8 +42,6 @@ io/eigr/functions/protocol/ActorService.class
 io/eigr/functions/protocol/Protocol$ActorSystemResponse.class
 io/eigr/functions/protocol/Protocol$InvocationRequestOrBuilder.class
 io/eigr/functions/protocol/Protocol$1.class
-io/eigr/functions/protocol/Protocol$NodeOrBuilder.class
-io/eigr/functions/protocol/Protocol$InvocationStatus$Builder.class
 io/eigr/functions/protocol/actors/ActorOuterClass$ActorState$TagsDefaultEntryHolder.class
 io/eigr/functions/protocol/ActorService$Serializers.class
 io/eigr/functions/protocol/Protocol$ActorSystemRequestOrBuilder.class
@@ -59,12 +56,13 @@ com/google/protobuf/AnyProto.class
 com/google/protobuf/AnyOrBuilder.class
 io/eigr/functions/protocol/actors/ActorOuterClass$ActorState.class
 io/eigr/functions/protocol/Protocol$Status.class
+io/eigr/functions/protocol/Protocol$RequestStatus.class
 io/eigr/functions/protocol/Protocol$ProxyInfoOrBuilder.class
 io/eigr/functions/protocol/actors/ActorOuterClass$ActorStateOrBuilder.class
 io/eigr/functions/protocol/actors/ActorOuterClass$ActorState$1.class
 io/eigr/functions/protocol/Protocol$InvocationRequest$Builder.class
+io/eigr/functions/protocol/Protocol$RequestStatus$1.class
 io/eigr/functions/protocol/Protocol$InvocationRequest.class
-io/eigr/functions/protocol/Protocol$Node$1.class
 io/eigr/functions/protocol/Protocol$ActorSystemRequest$1.class
 io/eigr/functions/protocol/Protocol$ActorSystemResponse$MessageCase.class
 io/eigr/functions/protocol/Protocol.class
@@ -74,7 +72,6 @@ io/eigr/functions/protocol/actors/ActorOuterClass$ActorSystem$1.class
 io/eigr/functions/protocol/Protocol$ActorInvocation$1.class
 io/eigr/functions/protocol/Protocol$ActorInvocationResponse$Builder.class
 io/eigr/functions/protocol/actors/ActorOuterClass$ActorDeactivateStrategy$StrategyCase.class
-io/eigr/functions/protocol/Protocol$Node.class
 io/eigr/functions/protocol/Protocol$ServiceInfo$1.class
 io/eigr/functions/protocol/Protocol$ProxyInfo$1.class
 com/google/protobuf/Any.class
@@ -93,8 +90,8 @@ io/eigr/functions/protocol/Protocol$ActorSystemRequest$Builder.class
 io/eigr/functions/protocol/actors/ActorOuterClass$Actor.class
 io/eigr/functions/protocol/actors/ActorOuterClass$Registry$Builder.class
 io/eigr/functions/protocol/ActorServicePowerApi$Serializers.class
-io/eigr/functions/protocol/Protocol$InvocationStatus$1.class
 io/eigr/functions/protocol/Protocol$ActorSystemResponse$1.class
+io/eigr/functions/protocol/Protocol$RequestStatusOrBuilder.class
 io/eigr/functions/protocol/actors/ActorOuterClass$Actor$Builder.class
 io/eigr/functions/protocol/Protocol$RegistrationResponse$Builder.class
 io/eigr/functions/protocol/actors/ActorOuterClass$ActorOrBuilder.class
@@ -102,4 +99,3 @@ io/eigr/functions/protocol/actors/ActorOuterClass$Registry$1.class
 io/eigr/functions/protocol/Protocol$RegistrationRequest$1.class
 io/eigr/functions/protocol/Protocol$ActorSystemResponseOrBuilder.class
 io/eigr/functions/protocol/Protocol$ProxyInfo.class
-io/eigr/functions/protocol/Protocol$InvocationStatus.class

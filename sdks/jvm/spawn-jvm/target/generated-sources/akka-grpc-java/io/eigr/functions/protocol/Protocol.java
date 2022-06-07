@@ -136,574 +136,8 @@ public final class Protocol {
     // @@protoc_insertion_point(enum_scope:eigr.functions.protocol.Status)
   }
 
-  public interface NodeOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:eigr.functions.protocol.Node)
-      com.google.protobuf.MessageOrBuilder {
-
-    /**
-     * <code>string id = 1;</code>
-     * @return The id.
-     */
-    java.lang.String getId();
-    /**
-     * <code>string id = 1;</code>
-     * @return The bytes for id.
-     */
-    com.google.protobuf.ByteString
-        getIdBytes();
-  }
-  /**
-   * Protobuf type {@code eigr.functions.protocol.Node}
-   */
-  public  static final class Node extends
-      com.google.protobuf.GeneratedMessageV3 implements
-      // @@protoc_insertion_point(message_implements:eigr.functions.protocol.Node)
-      NodeOrBuilder {
-  private static final long serialVersionUID = 0L;
-    // Use Node.newBuilder() to construct.
-    private Node(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
-      super(builder);
-    }
-    private Node() {
-      id_ = "";
-    }
-
-    @java.lang.Override
-    @SuppressWarnings({"unused"})
-    protected java.lang.Object newInstance(
-        UnusedPrivateParameter unused) {
-      return new Node();
-    }
-
-    @java.lang.Override
-    public final com.google.protobuf.UnknownFieldSet
-    getUnknownFields() {
-      return this.unknownFields;
-    }
-    private Node(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      this();
-      if (extensionRegistry == null) {
-        throw new java.lang.NullPointerException();
-      }
-      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
-      try {
-        boolean done = false;
-        while (!done) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              done = true;
-              break;
-            case 10: {
-              java.lang.String s = input.readStringRequireUtf8();
-
-              id_ = s;
-              break;
-            }
-            default: {
-              if (!parseUnknownField(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
-          }
-        }
-      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
-      } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e).setUnfinishedMessage(this);
-      } finally {
-        this.unknownFields = unknownFields.build();
-        makeExtensionsImmutable();
-      }
-    }
-    public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
-      return io.eigr.functions.protocol.Protocol.internal_static_eigr_functions_protocol_Node_descriptor;
-    }
-
-    @java.lang.Override
-    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-        internalGetFieldAccessorTable() {
-      return io.eigr.functions.protocol.Protocol.internal_static_eigr_functions_protocol_Node_fieldAccessorTable
-          .ensureFieldAccessorsInitialized(
-              io.eigr.functions.protocol.Protocol.Node.class, io.eigr.functions.protocol.Protocol.Node.Builder.class);
-    }
-
-    public static final int ID_FIELD_NUMBER = 1;
-    private volatile java.lang.Object id_;
-    /**
-     * <code>string id = 1;</code>
-     * @return The id.
-     */
-    public java.lang.String getId() {
-      java.lang.Object ref = id_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        id_ = s;
-        return s;
-      }
-    }
-    /**
-     * <code>string id = 1;</code>
-     * @return The bytes for id.
-     */
-    public com.google.protobuf.ByteString
-        getIdBytes() {
-      java.lang.Object ref = id_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        id_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-
-    private byte memoizedIsInitialized = -1;
-    @java.lang.Override
-    public final boolean isInitialized() {
-      byte isInitialized = memoizedIsInitialized;
-      if (isInitialized == 1) return true;
-      if (isInitialized == 0) return false;
-
-      memoizedIsInitialized = 1;
-      return true;
-    }
-
-    @java.lang.Override
-    public void writeTo(com.google.protobuf.CodedOutputStream output)
-                        throws java.io.IOException {
-      if (!getIdBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, id_);
-      }
-      unknownFields.writeTo(output);
-    }
-
-    @java.lang.Override
-    public int getSerializedSize() {
-      int size = memoizedSize;
-      if (size != -1) return size;
-
-      size = 0;
-      if (!getIdBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, id_);
-      }
-      size += unknownFields.getSerializedSize();
-      memoizedSize = size;
-      return size;
-    }
-
-    @java.lang.Override
-    public boolean equals(final java.lang.Object obj) {
-      if (obj == this) {
-       return true;
-      }
-      if (!(obj instanceof io.eigr.functions.protocol.Protocol.Node)) {
-        return super.equals(obj);
-      }
-      io.eigr.functions.protocol.Protocol.Node other = (io.eigr.functions.protocol.Protocol.Node) obj;
-
-      if (!getId()
-          .equals(other.getId())) return false;
-      if (!unknownFields.equals(other.unknownFields)) return false;
-      return true;
-    }
-
-    @java.lang.Override
-    public int hashCode() {
-      if (memoizedHashCode != 0) {
-        return memoizedHashCode;
-      }
-      int hash = 41;
-      hash = (19 * hash) + getDescriptor().hashCode();
-      hash = (37 * hash) + ID_FIELD_NUMBER;
-      hash = (53 * hash) + getId().hashCode();
-      hash = (29 * hash) + unknownFields.hashCode();
-      memoizedHashCode = hash;
-      return hash;
-    }
-
-    public static io.eigr.functions.protocol.Protocol.Node parseFrom(
-        java.nio.ByteBuffer data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static io.eigr.functions.protocol.Protocol.Node parseFrom(
-        java.nio.ByteBuffer data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static io.eigr.functions.protocol.Protocol.Node parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static io.eigr.functions.protocol.Protocol.Node parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static io.eigr.functions.protocol.Protocol.Node parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static io.eigr.functions.protocol.Protocol.Node parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static io.eigr.functions.protocol.Protocol.Node parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input);
-    }
-    public static io.eigr.functions.protocol.Protocol.Node parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input, extensionRegistry);
-    }
-    public static io.eigr.functions.protocol.Protocol.Node parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseDelimitedWithIOException(PARSER, input);
-    }
-    public static io.eigr.functions.protocol.Protocol.Node parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
-    }
-    public static io.eigr.functions.protocol.Protocol.Node parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input);
-    }
-    public static io.eigr.functions.protocol.Protocol.Node parseFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input, extensionRegistry);
-    }
-
-    @java.lang.Override
-    public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder() {
-      return DEFAULT_INSTANCE.toBuilder();
-    }
-    public static Builder newBuilder(io.eigr.functions.protocol.Protocol.Node prototype) {
-      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
-    }
-    @java.lang.Override
-    public Builder toBuilder() {
-      return this == DEFAULT_INSTANCE
-          ? new Builder() : new Builder().mergeFrom(this);
-    }
-
-    @java.lang.Override
-    protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
-    }
-    /**
-     * Protobuf type {@code eigr.functions.protocol.Node}
-     */
-    public static final class Builder extends
-        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:eigr.functions.protocol.Node)
-        io.eigr.functions.protocol.Protocol.NodeOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
-        return io.eigr.functions.protocol.Protocol.internal_static_eigr_functions_protocol_Node_descriptor;
-      }
-
-      @java.lang.Override
-      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-          internalGetFieldAccessorTable() {
-        return io.eigr.functions.protocol.Protocol.internal_static_eigr_functions_protocol_Node_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                io.eigr.functions.protocol.Protocol.Node.class, io.eigr.functions.protocol.Protocol.Node.Builder.class);
-      }
-
-      // Construct using io.eigr.functions.protocol.Protocol.Node.newBuilder()
-      private Builder() {
-        maybeForceBuilderInitialization();
-      }
-
-      private Builder(
-          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-        super(parent);
-        maybeForceBuilderInitialization();
-      }
-      private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessageV3
-                .alwaysUseFieldBuilders) {
-        }
-      }
-      @java.lang.Override
-      public Builder clear() {
-        super.clear();
-        id_ = "";
-
-        return this;
-      }
-
-      @java.lang.Override
-      public com.google.protobuf.Descriptors.Descriptor
-          getDescriptorForType() {
-        return io.eigr.functions.protocol.Protocol.internal_static_eigr_functions_protocol_Node_descriptor;
-      }
-
-      @java.lang.Override
-      public io.eigr.functions.protocol.Protocol.Node getDefaultInstanceForType() {
-        return io.eigr.functions.protocol.Protocol.Node.getDefaultInstance();
-      }
-
-      @java.lang.Override
-      public io.eigr.functions.protocol.Protocol.Node build() {
-        io.eigr.functions.protocol.Protocol.Node result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(result);
-        }
-        return result;
-      }
-
-      @java.lang.Override
-      public io.eigr.functions.protocol.Protocol.Node buildPartial() {
-        io.eigr.functions.protocol.Protocol.Node result = new io.eigr.functions.protocol.Protocol.Node(this);
-        result.id_ = id_;
-        onBuilt();
-        return result;
-      }
-
-      @java.lang.Override
-      public Builder clone() {
-        return super.clone();
-      }
-      @java.lang.Override
-      public Builder setField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
-        return super.setField(field, value);
-      }
-      @java.lang.Override
-      public Builder clearField(
-          com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return super.clearField(field);
-      }
-      @java.lang.Override
-      public Builder clearOneof(
-          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return super.clearOneof(oneof);
-      }
-      @java.lang.Override
-      public Builder setRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, java.lang.Object value) {
-        return super.setRepeatedField(field, index, value);
-      }
-      @java.lang.Override
-      public Builder addRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
-        return super.addRepeatedField(field, value);
-      }
-      @java.lang.Override
-      public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof io.eigr.functions.protocol.Protocol.Node) {
-          return mergeFrom((io.eigr.functions.protocol.Protocol.Node)other);
-        } else {
-          super.mergeFrom(other);
-          return this;
-        }
-      }
-
-      public Builder mergeFrom(io.eigr.functions.protocol.Protocol.Node other) {
-        if (other == io.eigr.functions.protocol.Protocol.Node.getDefaultInstance()) return this;
-        if (!other.getId().isEmpty()) {
-          id_ = other.id_;
-          onChanged();
-        }
-        this.mergeUnknownFields(other.unknownFields);
-        onChanged();
-        return this;
-      }
-
-      @java.lang.Override
-      public final boolean isInitialized() {
-        return true;
-      }
-
-      @java.lang.Override
-      public Builder mergeFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-        io.eigr.functions.protocol.Protocol.Node parsedMessage = null;
-        try {
-          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
-        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (io.eigr.functions.protocol.Protocol.Node) e.getUnfinishedMessage();
-          throw e.unwrapIOException();
-        } finally {
-          if (parsedMessage != null) {
-            mergeFrom(parsedMessage);
-          }
-        }
-        return this;
-      }
-
-      private java.lang.Object id_ = "";
-      /**
-       * <code>string id = 1;</code>
-       * @return The id.
-       */
-      public java.lang.String getId() {
-        java.lang.Object ref = id_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          id_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
-      }
-      /**
-       * <code>string id = 1;</code>
-       * @return The bytes for id.
-       */
-      public com.google.protobuf.ByteString
-          getIdBytes() {
-        java.lang.Object ref = id_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          id_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>string id = 1;</code>
-       * @param value The id to set.
-       * @return This builder for chaining.
-       */
-      public Builder setId(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  
-        id_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string id = 1;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearId() {
-        
-        id_ = getDefaultInstance().getId();
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string id = 1;</code>
-       * @param value The bytes for id to set.
-       * @return This builder for chaining.
-       */
-      public Builder setIdBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-        
-        id_ = value;
-        onChanged();
-        return this;
-      }
-      @java.lang.Override
-      public final Builder setUnknownFields(
-          final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFields(unknownFields);
-      }
-
-      @java.lang.Override
-      public final Builder mergeUnknownFields(
-          final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.mergeUnknownFields(unknownFields);
-      }
-
-
-      // @@protoc_insertion_point(builder_scope:eigr.functions.protocol.Node)
-    }
-
-    // @@protoc_insertion_point(class_scope:eigr.functions.protocol.Node)
-    private static final io.eigr.functions.protocol.Protocol.Node DEFAULT_INSTANCE;
-    static {
-      DEFAULT_INSTANCE = new io.eigr.functions.protocol.Protocol.Node();
-    }
-
-    public static io.eigr.functions.protocol.Protocol.Node getDefaultInstance() {
-      return DEFAULT_INSTANCE;
-    }
-
-    private static final com.google.protobuf.Parser<Node>
-        PARSER = new com.google.protobuf.AbstractParser<Node>() {
-      @java.lang.Override
-      public Node parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new Node(input, extensionRegistry);
-      }
-    };
-
-    public static com.google.protobuf.Parser<Node> parser() {
-      return PARSER;
-    }
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<Node> getParserForType() {
-      return PARSER;
-    }
-
-    @java.lang.Override
-    public io.eigr.functions.protocol.Protocol.Node getDefaultInstanceForType() {
-      return DEFAULT_INSTANCE;
-    }
-
-  }
-
-  public interface InvocationStatusOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:eigr.functions.protocol.InvocationStatus)
+  public interface RequestStatusOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:eigr.functions.protocol.RequestStatus)
       com.google.protobuf.MessageOrBuilder {
 
     /**
@@ -730,18 +164,18 @@ public final class Protocol {
         getMessageBytes();
   }
   /**
-   * Protobuf type {@code eigr.functions.protocol.InvocationStatus}
+   * Protobuf type {@code eigr.functions.protocol.RequestStatus}
    */
-  public  static final class InvocationStatus extends
+  public  static final class RequestStatus extends
       com.google.protobuf.GeneratedMessageV3 implements
-      // @@protoc_insertion_point(message_implements:eigr.functions.protocol.InvocationStatus)
-      InvocationStatusOrBuilder {
+      // @@protoc_insertion_point(message_implements:eigr.functions.protocol.RequestStatus)
+      RequestStatusOrBuilder {
   private static final long serialVersionUID = 0L;
-    // Use InvocationStatus.newBuilder() to construct.
-    private InvocationStatus(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+    // Use RequestStatus.newBuilder() to construct.
+    private RequestStatus(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
     }
-    private InvocationStatus() {
+    private RequestStatus() {
       status_ = 0;
       message_ = "";
     }
@@ -750,7 +184,7 @@ public final class Protocol {
     @SuppressWarnings({"unused"})
     protected java.lang.Object newInstance(
         UnusedPrivateParameter unused) {
-      return new InvocationStatus();
+      return new RequestStatus();
     }
 
     @java.lang.Override
@@ -758,7 +192,7 @@ public final class Protocol {
     getUnknownFields() {
       return this.unknownFields;
     }
-    private InvocationStatus(
+    private RequestStatus(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -809,15 +243,15 @@ public final class Protocol {
     }
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return io.eigr.functions.protocol.Protocol.internal_static_eigr_functions_protocol_InvocationStatus_descriptor;
+      return io.eigr.functions.protocol.Protocol.internal_static_eigr_functions_protocol_RequestStatus_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return io.eigr.functions.protocol.Protocol.internal_static_eigr_functions_protocol_InvocationStatus_fieldAccessorTable
+      return io.eigr.functions.protocol.Protocol.internal_static_eigr_functions_protocol_RequestStatus_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              io.eigr.functions.protocol.Protocol.InvocationStatus.class, io.eigr.functions.protocol.Protocol.InvocationStatus.Builder.class);
+              io.eigr.functions.protocol.Protocol.RequestStatus.class, io.eigr.functions.protocol.Protocol.RequestStatus.Builder.class);
     }
 
     public static final int STATUS_FIELD_NUMBER = 1;
@@ -921,10 +355,10 @@ public final class Protocol {
       if (obj == this) {
        return true;
       }
-      if (!(obj instanceof io.eigr.functions.protocol.Protocol.InvocationStatus)) {
+      if (!(obj instanceof io.eigr.functions.protocol.Protocol.RequestStatus)) {
         return super.equals(obj);
       }
-      io.eigr.functions.protocol.Protocol.InvocationStatus other = (io.eigr.functions.protocol.Protocol.InvocationStatus) obj;
+      io.eigr.functions.protocol.Protocol.RequestStatus other = (io.eigr.functions.protocol.Protocol.RequestStatus) obj;
 
       if (status_ != other.status_) return false;
       if (!getMessage()
@@ -949,69 +383,69 @@ public final class Protocol {
       return hash;
     }
 
-    public static io.eigr.functions.protocol.Protocol.InvocationStatus parseFrom(
+    public static io.eigr.functions.protocol.Protocol.RequestStatus parseFrom(
         java.nio.ByteBuffer data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static io.eigr.functions.protocol.Protocol.InvocationStatus parseFrom(
+    public static io.eigr.functions.protocol.Protocol.RequestStatus parseFrom(
         java.nio.ByteBuffer data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static io.eigr.functions.protocol.Protocol.InvocationStatus parseFrom(
+    public static io.eigr.functions.protocol.Protocol.RequestStatus parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static io.eigr.functions.protocol.Protocol.InvocationStatus parseFrom(
+    public static io.eigr.functions.protocol.Protocol.RequestStatus parseFrom(
         com.google.protobuf.ByteString data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static io.eigr.functions.protocol.Protocol.InvocationStatus parseFrom(byte[] data)
+    public static io.eigr.functions.protocol.Protocol.RequestStatus parseFrom(byte[] data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static io.eigr.functions.protocol.Protocol.InvocationStatus parseFrom(
+    public static io.eigr.functions.protocol.Protocol.RequestStatus parseFrom(
         byte[] data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static io.eigr.functions.protocol.Protocol.InvocationStatus parseFrom(java.io.InputStream input)
+    public static io.eigr.functions.protocol.Protocol.RequestStatus parseFrom(java.io.InputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseWithIOException(PARSER, input);
     }
-    public static io.eigr.functions.protocol.Protocol.InvocationStatus parseFrom(
+    public static io.eigr.functions.protocol.Protocol.RequestStatus parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
-    public static io.eigr.functions.protocol.Protocol.InvocationStatus parseDelimitedFrom(java.io.InputStream input)
+    public static io.eigr.functions.protocol.Protocol.RequestStatus parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseDelimitedWithIOException(PARSER, input);
     }
-    public static io.eigr.functions.protocol.Protocol.InvocationStatus parseDelimitedFrom(
+    public static io.eigr.functions.protocol.Protocol.RequestStatus parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
-    public static io.eigr.functions.protocol.Protocol.InvocationStatus parseFrom(
+    public static io.eigr.functions.protocol.Protocol.RequestStatus parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseWithIOException(PARSER, input);
     }
-    public static io.eigr.functions.protocol.Protocol.InvocationStatus parseFrom(
+    public static io.eigr.functions.protocol.Protocol.RequestStatus parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -1024,7 +458,7 @@ public final class Protocol {
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
     }
-    public static Builder newBuilder(io.eigr.functions.protocol.Protocol.InvocationStatus prototype) {
+    public static Builder newBuilder(io.eigr.functions.protocol.Protocol.RequestStatus prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
     @java.lang.Override
@@ -1040,26 +474,26 @@ public final class Protocol {
       return builder;
     }
     /**
-     * Protobuf type {@code eigr.functions.protocol.InvocationStatus}
+     * Protobuf type {@code eigr.functions.protocol.RequestStatus}
      */
     public static final class Builder extends
         com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:eigr.functions.protocol.InvocationStatus)
-        io.eigr.functions.protocol.Protocol.InvocationStatusOrBuilder {
+        // @@protoc_insertion_point(builder_implements:eigr.functions.protocol.RequestStatus)
+        io.eigr.functions.protocol.Protocol.RequestStatusOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
-        return io.eigr.functions.protocol.Protocol.internal_static_eigr_functions_protocol_InvocationStatus_descriptor;
+        return io.eigr.functions.protocol.Protocol.internal_static_eigr_functions_protocol_RequestStatus_descriptor;
       }
 
       @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
-        return io.eigr.functions.protocol.Protocol.internal_static_eigr_functions_protocol_InvocationStatus_fieldAccessorTable
+        return io.eigr.functions.protocol.Protocol.internal_static_eigr_functions_protocol_RequestStatus_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
-                io.eigr.functions.protocol.Protocol.InvocationStatus.class, io.eigr.functions.protocol.Protocol.InvocationStatus.Builder.class);
+                io.eigr.functions.protocol.Protocol.RequestStatus.class, io.eigr.functions.protocol.Protocol.RequestStatus.Builder.class);
       }
 
-      // Construct using io.eigr.functions.protocol.Protocol.InvocationStatus.newBuilder()
+      // Construct using io.eigr.functions.protocol.Protocol.RequestStatus.newBuilder()
       private Builder() {
         maybeForceBuilderInitialization();
       }
@@ -1087,17 +521,17 @@ public final class Protocol {
       @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
-        return io.eigr.functions.protocol.Protocol.internal_static_eigr_functions_protocol_InvocationStatus_descriptor;
+        return io.eigr.functions.protocol.Protocol.internal_static_eigr_functions_protocol_RequestStatus_descriptor;
       }
 
       @java.lang.Override
-      public io.eigr.functions.protocol.Protocol.InvocationStatus getDefaultInstanceForType() {
-        return io.eigr.functions.protocol.Protocol.InvocationStatus.getDefaultInstance();
+      public io.eigr.functions.protocol.Protocol.RequestStatus getDefaultInstanceForType() {
+        return io.eigr.functions.protocol.Protocol.RequestStatus.getDefaultInstance();
       }
 
       @java.lang.Override
-      public io.eigr.functions.protocol.Protocol.InvocationStatus build() {
-        io.eigr.functions.protocol.Protocol.InvocationStatus result = buildPartial();
+      public io.eigr.functions.protocol.Protocol.RequestStatus build() {
+        io.eigr.functions.protocol.Protocol.RequestStatus result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(result);
         }
@@ -1105,8 +539,8 @@ public final class Protocol {
       }
 
       @java.lang.Override
-      public io.eigr.functions.protocol.Protocol.InvocationStatus buildPartial() {
-        io.eigr.functions.protocol.Protocol.InvocationStatus result = new io.eigr.functions.protocol.Protocol.InvocationStatus(this);
+      public io.eigr.functions.protocol.Protocol.RequestStatus buildPartial() {
+        io.eigr.functions.protocol.Protocol.RequestStatus result = new io.eigr.functions.protocol.Protocol.RequestStatus(this);
         result.status_ = status_;
         result.message_ = message_;
         onBuilt();
@@ -1147,16 +581,16 @@ public final class Protocol {
       }
       @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof io.eigr.functions.protocol.Protocol.InvocationStatus) {
-          return mergeFrom((io.eigr.functions.protocol.Protocol.InvocationStatus)other);
+        if (other instanceof io.eigr.functions.protocol.Protocol.RequestStatus) {
+          return mergeFrom((io.eigr.functions.protocol.Protocol.RequestStatus)other);
         } else {
           super.mergeFrom(other);
           return this;
         }
       }
 
-      public Builder mergeFrom(io.eigr.functions.protocol.Protocol.InvocationStatus other) {
-        if (other == io.eigr.functions.protocol.Protocol.InvocationStatus.getDefaultInstance()) return this;
+      public Builder mergeFrom(io.eigr.functions.protocol.Protocol.RequestStatus other) {
+        if (other == io.eigr.functions.protocol.Protocol.RequestStatus.getDefaultInstance()) return this;
         if (other.status_ != 0) {
           setStatusValue(other.getStatusValue());
         }
@@ -1179,11 +613,11 @@ public final class Protocol {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        io.eigr.functions.protocol.Protocol.InvocationStatus parsedMessage = null;
+        io.eigr.functions.protocol.Protocol.RequestStatus parsedMessage = null;
         try {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (io.eigr.functions.protocol.Protocol.InvocationStatus) e.getUnfinishedMessage();
+          parsedMessage = (io.eigr.functions.protocol.Protocol.RequestStatus) e.getUnfinishedMessage();
           throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
@@ -1333,41 +767,41 @@ public final class Protocol {
       }
 
 
-      // @@protoc_insertion_point(builder_scope:eigr.functions.protocol.InvocationStatus)
+      // @@protoc_insertion_point(builder_scope:eigr.functions.protocol.RequestStatus)
     }
 
-    // @@protoc_insertion_point(class_scope:eigr.functions.protocol.InvocationStatus)
-    private static final io.eigr.functions.protocol.Protocol.InvocationStatus DEFAULT_INSTANCE;
+    // @@protoc_insertion_point(class_scope:eigr.functions.protocol.RequestStatus)
+    private static final io.eigr.functions.protocol.Protocol.RequestStatus DEFAULT_INSTANCE;
     static {
-      DEFAULT_INSTANCE = new io.eigr.functions.protocol.Protocol.InvocationStatus();
+      DEFAULT_INSTANCE = new io.eigr.functions.protocol.Protocol.RequestStatus();
     }
 
-    public static io.eigr.functions.protocol.Protocol.InvocationStatus getDefaultInstance() {
+    public static io.eigr.functions.protocol.Protocol.RequestStatus getDefaultInstance() {
       return DEFAULT_INSTANCE;
     }
 
-    private static final com.google.protobuf.Parser<InvocationStatus>
-        PARSER = new com.google.protobuf.AbstractParser<InvocationStatus>() {
+    private static final com.google.protobuf.Parser<RequestStatus>
+        PARSER = new com.google.protobuf.AbstractParser<RequestStatus>() {
       @java.lang.Override
-      public InvocationStatus parsePartialFrom(
+      public RequestStatus parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        return new InvocationStatus(input, extensionRegistry);
+        return new RequestStatus(input, extensionRegistry);
       }
     };
 
-    public static com.google.protobuf.Parser<InvocationStatus> parser() {
+    public static com.google.protobuf.Parser<RequestStatus> parser() {
       return PARSER;
     }
 
     @java.lang.Override
-    public com.google.protobuf.Parser<InvocationStatus> getParserForType() {
+    public com.google.protobuf.Parser<RequestStatus> getParserForType() {
       return PARSER;
     }
 
     @java.lang.Override
-    public io.eigr.functions.protocol.Protocol.InvocationStatus getDefaultInstanceForType() {
+    public io.eigr.functions.protocol.Protocol.RequestStatus getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
 
@@ -4578,17 +4012,32 @@ public final class Protocol {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>.eigr.functions.protocol.ProxyInfo proxy_info = 1;</code>
+     * <code>.eigr.functions.protocol.RequestStatus staus = 1;</code>
+     * @return Whether the staus field is set.
+     */
+    boolean hasStaus();
+    /**
+     * <code>.eigr.functions.protocol.RequestStatus staus = 1;</code>
+     * @return The staus.
+     */
+    io.eigr.functions.protocol.Protocol.RequestStatus getStaus();
+    /**
+     * <code>.eigr.functions.protocol.RequestStatus staus = 1;</code>
+     */
+    io.eigr.functions.protocol.Protocol.RequestStatusOrBuilder getStausOrBuilder();
+
+    /**
+     * <code>.eigr.functions.protocol.ProxyInfo proxy_info = 2;</code>
      * @return Whether the proxyInfo field is set.
      */
     boolean hasProxyInfo();
     /**
-     * <code>.eigr.functions.protocol.ProxyInfo proxy_info = 1;</code>
+     * <code>.eigr.functions.protocol.ProxyInfo proxy_info = 2;</code>
      * @return The proxyInfo.
      */
     io.eigr.functions.protocol.Protocol.ProxyInfo getProxyInfo();
     /**
-     * <code>.eigr.functions.protocol.ProxyInfo proxy_info = 1;</code>
+     * <code>.eigr.functions.protocol.ProxyInfo proxy_info = 2;</code>
      */
     io.eigr.functions.protocol.Protocol.ProxyInfoOrBuilder getProxyInfoOrBuilder();
   }
@@ -4638,6 +4087,19 @@ public final class Protocol {
               done = true;
               break;
             case 10: {
+              io.eigr.functions.protocol.Protocol.RequestStatus.Builder subBuilder = null;
+              if (staus_ != null) {
+                subBuilder = staus_.toBuilder();
+              }
+              staus_ = input.readMessage(io.eigr.functions.protocol.Protocol.RequestStatus.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(staus_);
+                staus_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            case 18: {
               io.eigr.functions.protocol.Protocol.ProxyInfo.Builder subBuilder = null;
               if (proxyInfo_ != null) {
                 subBuilder = proxyInfo_.toBuilder();
@@ -4682,24 +4144,47 @@ public final class Protocol {
               io.eigr.functions.protocol.Protocol.RegistrationResponse.class, io.eigr.functions.protocol.Protocol.RegistrationResponse.Builder.class);
     }
 
-    public static final int PROXY_INFO_FIELD_NUMBER = 1;
+    public static final int STAUS_FIELD_NUMBER = 1;
+    private io.eigr.functions.protocol.Protocol.RequestStatus staus_;
+    /**
+     * <code>.eigr.functions.protocol.RequestStatus staus = 1;</code>
+     * @return Whether the staus field is set.
+     */
+    public boolean hasStaus() {
+      return staus_ != null;
+    }
+    /**
+     * <code>.eigr.functions.protocol.RequestStatus staus = 1;</code>
+     * @return The staus.
+     */
+    public io.eigr.functions.protocol.Protocol.RequestStatus getStaus() {
+      return staus_ == null ? io.eigr.functions.protocol.Protocol.RequestStatus.getDefaultInstance() : staus_;
+    }
+    /**
+     * <code>.eigr.functions.protocol.RequestStatus staus = 1;</code>
+     */
+    public io.eigr.functions.protocol.Protocol.RequestStatusOrBuilder getStausOrBuilder() {
+      return getStaus();
+    }
+
+    public static final int PROXY_INFO_FIELD_NUMBER = 2;
     private io.eigr.functions.protocol.Protocol.ProxyInfo proxyInfo_;
     /**
-     * <code>.eigr.functions.protocol.ProxyInfo proxy_info = 1;</code>
+     * <code>.eigr.functions.protocol.ProxyInfo proxy_info = 2;</code>
      * @return Whether the proxyInfo field is set.
      */
     public boolean hasProxyInfo() {
       return proxyInfo_ != null;
     }
     /**
-     * <code>.eigr.functions.protocol.ProxyInfo proxy_info = 1;</code>
+     * <code>.eigr.functions.protocol.ProxyInfo proxy_info = 2;</code>
      * @return The proxyInfo.
      */
     public io.eigr.functions.protocol.Protocol.ProxyInfo getProxyInfo() {
       return proxyInfo_ == null ? io.eigr.functions.protocol.Protocol.ProxyInfo.getDefaultInstance() : proxyInfo_;
     }
     /**
-     * <code>.eigr.functions.protocol.ProxyInfo proxy_info = 1;</code>
+     * <code>.eigr.functions.protocol.ProxyInfo proxy_info = 2;</code>
      */
     public io.eigr.functions.protocol.Protocol.ProxyInfoOrBuilder getProxyInfoOrBuilder() {
       return getProxyInfo();
@@ -4719,8 +4204,11 @@ public final class Protocol {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
+      if (staus_ != null) {
+        output.writeMessage(1, getStaus());
+      }
       if (proxyInfo_ != null) {
-        output.writeMessage(1, getProxyInfo());
+        output.writeMessage(2, getProxyInfo());
       }
       unknownFields.writeTo(output);
     }
@@ -4731,9 +4219,13 @@ public final class Protocol {
       if (size != -1) return size;
 
       size = 0;
+      if (staus_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(1, getStaus());
+      }
       if (proxyInfo_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(1, getProxyInfo());
+          .computeMessageSize(2, getProxyInfo());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -4750,6 +4242,11 @@ public final class Protocol {
       }
       io.eigr.functions.protocol.Protocol.RegistrationResponse other = (io.eigr.functions.protocol.Protocol.RegistrationResponse) obj;
 
+      if (hasStaus() != other.hasStaus()) return false;
+      if (hasStaus()) {
+        if (!getStaus()
+            .equals(other.getStaus())) return false;
+      }
       if (hasProxyInfo() != other.hasProxyInfo()) return false;
       if (hasProxyInfo()) {
         if (!getProxyInfo()
@@ -4766,6 +4263,10 @@ public final class Protocol {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasStaus()) {
+        hash = (37 * hash) + STAUS_FIELD_NUMBER;
+        hash = (53 * hash) + getStaus().hashCode();
+      }
       if (hasProxyInfo()) {
         hash = (37 * hash) + PROXY_INFO_FIELD_NUMBER;
         hash = (53 * hash) + getProxyInfo().hashCode();
@@ -4903,6 +4404,12 @@ public final class Protocol {
       @java.lang.Override
       public Builder clear() {
         super.clear();
+        if (stausBuilder_ == null) {
+          staus_ = null;
+        } else {
+          staus_ = null;
+          stausBuilder_ = null;
+        }
         if (proxyInfoBuilder_ == null) {
           proxyInfo_ = null;
         } else {
@@ -4935,6 +4442,11 @@ public final class Protocol {
       @java.lang.Override
       public io.eigr.functions.protocol.Protocol.RegistrationResponse buildPartial() {
         io.eigr.functions.protocol.Protocol.RegistrationResponse result = new io.eigr.functions.protocol.Protocol.RegistrationResponse(this);
+        if (stausBuilder_ == null) {
+          result.staus_ = staus_;
+        } else {
+          result.staus_ = stausBuilder_.build();
+        }
         if (proxyInfoBuilder_ == null) {
           result.proxyInfo_ = proxyInfo_;
         } else {
@@ -4988,6 +4500,9 @@ public final class Protocol {
 
       public Builder mergeFrom(io.eigr.functions.protocol.Protocol.RegistrationResponse other) {
         if (other == io.eigr.functions.protocol.Protocol.RegistrationResponse.getDefaultInstance()) return this;
+        if (other.hasStaus()) {
+          mergeStaus(other.getStaus());
+        }
         if (other.hasProxyInfo()) {
           mergeProxyInfo(other.getProxyInfo());
         }
@@ -5020,18 +4535,137 @@ public final class Protocol {
         return this;
       }
 
+      private io.eigr.functions.protocol.Protocol.RequestStatus staus_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          io.eigr.functions.protocol.Protocol.RequestStatus, io.eigr.functions.protocol.Protocol.RequestStatus.Builder, io.eigr.functions.protocol.Protocol.RequestStatusOrBuilder> stausBuilder_;
+      /**
+       * <code>.eigr.functions.protocol.RequestStatus staus = 1;</code>
+       * @return Whether the staus field is set.
+       */
+      public boolean hasStaus() {
+        return stausBuilder_ != null || staus_ != null;
+      }
+      /**
+       * <code>.eigr.functions.protocol.RequestStatus staus = 1;</code>
+       * @return The staus.
+       */
+      public io.eigr.functions.protocol.Protocol.RequestStatus getStaus() {
+        if (stausBuilder_ == null) {
+          return staus_ == null ? io.eigr.functions.protocol.Protocol.RequestStatus.getDefaultInstance() : staus_;
+        } else {
+          return stausBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>.eigr.functions.protocol.RequestStatus staus = 1;</code>
+       */
+      public Builder setStaus(io.eigr.functions.protocol.Protocol.RequestStatus value) {
+        if (stausBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          staus_ = value;
+          onChanged();
+        } else {
+          stausBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.eigr.functions.protocol.RequestStatus staus = 1;</code>
+       */
+      public Builder setStaus(
+          io.eigr.functions.protocol.Protocol.RequestStatus.Builder builderForValue) {
+        if (stausBuilder_ == null) {
+          staus_ = builderForValue.build();
+          onChanged();
+        } else {
+          stausBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <code>.eigr.functions.protocol.RequestStatus staus = 1;</code>
+       */
+      public Builder mergeStaus(io.eigr.functions.protocol.Protocol.RequestStatus value) {
+        if (stausBuilder_ == null) {
+          if (staus_ != null) {
+            staus_ =
+              io.eigr.functions.protocol.Protocol.RequestStatus.newBuilder(staus_).mergeFrom(value).buildPartial();
+          } else {
+            staus_ = value;
+          }
+          onChanged();
+        } else {
+          stausBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.eigr.functions.protocol.RequestStatus staus = 1;</code>
+       */
+      public Builder clearStaus() {
+        if (stausBuilder_ == null) {
+          staus_ = null;
+          onChanged();
+        } else {
+          staus_ = null;
+          stausBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <code>.eigr.functions.protocol.RequestStatus staus = 1;</code>
+       */
+      public io.eigr.functions.protocol.Protocol.RequestStatus.Builder getStausBuilder() {
+        
+        onChanged();
+        return getStausFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.eigr.functions.protocol.RequestStatus staus = 1;</code>
+       */
+      public io.eigr.functions.protocol.Protocol.RequestStatusOrBuilder getStausOrBuilder() {
+        if (stausBuilder_ != null) {
+          return stausBuilder_.getMessageOrBuilder();
+        } else {
+          return staus_ == null ?
+              io.eigr.functions.protocol.Protocol.RequestStatus.getDefaultInstance() : staus_;
+        }
+      }
+      /**
+       * <code>.eigr.functions.protocol.RequestStatus staus = 1;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          io.eigr.functions.protocol.Protocol.RequestStatus, io.eigr.functions.protocol.Protocol.RequestStatus.Builder, io.eigr.functions.protocol.Protocol.RequestStatusOrBuilder> 
+          getStausFieldBuilder() {
+        if (stausBuilder_ == null) {
+          stausBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              io.eigr.functions.protocol.Protocol.RequestStatus, io.eigr.functions.protocol.Protocol.RequestStatus.Builder, io.eigr.functions.protocol.Protocol.RequestStatusOrBuilder>(
+                  getStaus(),
+                  getParentForChildren(),
+                  isClean());
+          staus_ = null;
+        }
+        return stausBuilder_;
+      }
+
       private io.eigr.functions.protocol.Protocol.ProxyInfo proxyInfo_;
       private com.google.protobuf.SingleFieldBuilderV3<
           io.eigr.functions.protocol.Protocol.ProxyInfo, io.eigr.functions.protocol.Protocol.ProxyInfo.Builder, io.eigr.functions.protocol.Protocol.ProxyInfoOrBuilder> proxyInfoBuilder_;
       /**
-       * <code>.eigr.functions.protocol.ProxyInfo proxy_info = 1;</code>
+       * <code>.eigr.functions.protocol.ProxyInfo proxy_info = 2;</code>
        * @return Whether the proxyInfo field is set.
        */
       public boolean hasProxyInfo() {
         return proxyInfoBuilder_ != null || proxyInfo_ != null;
       }
       /**
-       * <code>.eigr.functions.protocol.ProxyInfo proxy_info = 1;</code>
+       * <code>.eigr.functions.protocol.ProxyInfo proxy_info = 2;</code>
        * @return The proxyInfo.
        */
       public io.eigr.functions.protocol.Protocol.ProxyInfo getProxyInfo() {
@@ -5042,7 +4676,7 @@ public final class Protocol {
         }
       }
       /**
-       * <code>.eigr.functions.protocol.ProxyInfo proxy_info = 1;</code>
+       * <code>.eigr.functions.protocol.ProxyInfo proxy_info = 2;</code>
        */
       public Builder setProxyInfo(io.eigr.functions.protocol.Protocol.ProxyInfo value) {
         if (proxyInfoBuilder_ == null) {
@@ -5058,7 +4692,7 @@ public final class Protocol {
         return this;
       }
       /**
-       * <code>.eigr.functions.protocol.ProxyInfo proxy_info = 1;</code>
+       * <code>.eigr.functions.protocol.ProxyInfo proxy_info = 2;</code>
        */
       public Builder setProxyInfo(
           io.eigr.functions.protocol.Protocol.ProxyInfo.Builder builderForValue) {
@@ -5072,7 +4706,7 @@ public final class Protocol {
         return this;
       }
       /**
-       * <code>.eigr.functions.protocol.ProxyInfo proxy_info = 1;</code>
+       * <code>.eigr.functions.protocol.ProxyInfo proxy_info = 2;</code>
        */
       public Builder mergeProxyInfo(io.eigr.functions.protocol.Protocol.ProxyInfo value) {
         if (proxyInfoBuilder_ == null) {
@@ -5090,7 +4724,7 @@ public final class Protocol {
         return this;
       }
       /**
-       * <code>.eigr.functions.protocol.ProxyInfo proxy_info = 1;</code>
+       * <code>.eigr.functions.protocol.ProxyInfo proxy_info = 2;</code>
        */
       public Builder clearProxyInfo() {
         if (proxyInfoBuilder_ == null) {
@@ -5104,7 +4738,7 @@ public final class Protocol {
         return this;
       }
       /**
-       * <code>.eigr.functions.protocol.ProxyInfo proxy_info = 1;</code>
+       * <code>.eigr.functions.protocol.ProxyInfo proxy_info = 2;</code>
        */
       public io.eigr.functions.protocol.Protocol.ProxyInfo.Builder getProxyInfoBuilder() {
         
@@ -5112,7 +4746,7 @@ public final class Protocol {
         return getProxyInfoFieldBuilder().getBuilder();
       }
       /**
-       * <code>.eigr.functions.protocol.ProxyInfo proxy_info = 1;</code>
+       * <code>.eigr.functions.protocol.ProxyInfo proxy_info = 2;</code>
        */
       public io.eigr.functions.protocol.Protocol.ProxyInfoOrBuilder getProxyInfoOrBuilder() {
         if (proxyInfoBuilder_ != null) {
@@ -5123,7 +4757,7 @@ public final class Protocol {
         }
       }
       /**
-       * <code>.eigr.functions.protocol.ProxyInfo proxy_info = 1;</code>
+       * <code>.eigr.functions.protocol.ProxyInfo proxy_info = 2;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           io.eigr.functions.protocol.Protocol.ProxyInfo, io.eigr.functions.protocol.Protocol.ProxyInfo.Builder, io.eigr.functions.protocol.Protocol.ProxyInfoOrBuilder> 
@@ -6431,19 +6065,19 @@ public final class Protocol {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>.eigr.functions.protocol.InvocationStatus status = 1;</code>
+     * <code>.eigr.functions.protocol.RequestStatus status = 1;</code>
      * @return Whether the status field is set.
      */
     boolean hasStatus();
     /**
-     * <code>.eigr.functions.protocol.InvocationStatus status = 1;</code>
+     * <code>.eigr.functions.protocol.RequestStatus status = 1;</code>
      * @return The status.
      */
-    io.eigr.functions.protocol.Protocol.InvocationStatus getStatus();
+    io.eigr.functions.protocol.Protocol.RequestStatus getStatus();
     /**
-     * <code>.eigr.functions.protocol.InvocationStatus status = 1;</code>
+     * <code>.eigr.functions.protocol.RequestStatus status = 1;</code>
      */
-    io.eigr.functions.protocol.Protocol.InvocationStatusOrBuilder getStatusOrBuilder();
+    io.eigr.functions.protocol.Protocol.RequestStatusOrBuilder getStatusOrBuilder();
 
     /**
      * <code>.eigr.functions.protocol.actors.ActorSystem system = 2;</code>
@@ -6521,11 +6155,11 @@ public final class Protocol {
               done = true;
               break;
             case 10: {
-              io.eigr.functions.protocol.Protocol.InvocationStatus.Builder subBuilder = null;
+              io.eigr.functions.protocol.Protocol.RequestStatus.Builder subBuilder = null;
               if (status_ != null) {
                 subBuilder = status_.toBuilder();
               }
-              status_ = input.readMessage(io.eigr.functions.protocol.Protocol.InvocationStatus.parser(), extensionRegistry);
+              status_ = input.readMessage(io.eigr.functions.protocol.Protocol.RequestStatus.parser(), extensionRegistry);
               if (subBuilder != null) {
                 subBuilder.mergeFrom(status_);
                 status_ = subBuilder.buildPartial();
@@ -6592,25 +6226,25 @@ public final class Protocol {
     }
 
     public static final int STATUS_FIELD_NUMBER = 1;
-    private io.eigr.functions.protocol.Protocol.InvocationStatus status_;
+    private io.eigr.functions.protocol.Protocol.RequestStatus status_;
     /**
-     * <code>.eigr.functions.protocol.InvocationStatus status = 1;</code>
+     * <code>.eigr.functions.protocol.RequestStatus status = 1;</code>
      * @return Whether the status field is set.
      */
     public boolean hasStatus() {
       return status_ != null;
     }
     /**
-     * <code>.eigr.functions.protocol.InvocationStatus status = 1;</code>
+     * <code>.eigr.functions.protocol.RequestStatus status = 1;</code>
      * @return The status.
      */
-    public io.eigr.functions.protocol.Protocol.InvocationStatus getStatus() {
-      return status_ == null ? io.eigr.functions.protocol.Protocol.InvocationStatus.getDefaultInstance() : status_;
+    public io.eigr.functions.protocol.Protocol.RequestStatus getStatus() {
+      return status_ == null ? io.eigr.functions.protocol.Protocol.RequestStatus.getDefaultInstance() : status_;
     }
     /**
-     * <code>.eigr.functions.protocol.InvocationStatus status = 1;</code>
+     * <code>.eigr.functions.protocol.RequestStatus status = 1;</code>
      */
-    public io.eigr.functions.protocol.Protocol.InvocationStatusOrBuilder getStatusOrBuilder() {
+    public io.eigr.functions.protocol.Protocol.RequestStatusOrBuilder getStatusOrBuilder() {
       return getStatus();
     }
 
@@ -7035,31 +6669,31 @@ public final class Protocol {
         return this;
       }
 
-      private io.eigr.functions.protocol.Protocol.InvocationStatus status_;
+      private io.eigr.functions.protocol.Protocol.RequestStatus status_;
       private com.google.protobuf.SingleFieldBuilderV3<
-          io.eigr.functions.protocol.Protocol.InvocationStatus, io.eigr.functions.protocol.Protocol.InvocationStatus.Builder, io.eigr.functions.protocol.Protocol.InvocationStatusOrBuilder> statusBuilder_;
+          io.eigr.functions.protocol.Protocol.RequestStatus, io.eigr.functions.protocol.Protocol.RequestStatus.Builder, io.eigr.functions.protocol.Protocol.RequestStatusOrBuilder> statusBuilder_;
       /**
-       * <code>.eigr.functions.protocol.InvocationStatus status = 1;</code>
+       * <code>.eigr.functions.protocol.RequestStatus status = 1;</code>
        * @return Whether the status field is set.
        */
       public boolean hasStatus() {
         return statusBuilder_ != null || status_ != null;
       }
       /**
-       * <code>.eigr.functions.protocol.InvocationStatus status = 1;</code>
+       * <code>.eigr.functions.protocol.RequestStatus status = 1;</code>
        * @return The status.
        */
-      public io.eigr.functions.protocol.Protocol.InvocationStatus getStatus() {
+      public io.eigr.functions.protocol.Protocol.RequestStatus getStatus() {
         if (statusBuilder_ == null) {
-          return status_ == null ? io.eigr.functions.protocol.Protocol.InvocationStatus.getDefaultInstance() : status_;
+          return status_ == null ? io.eigr.functions.protocol.Protocol.RequestStatus.getDefaultInstance() : status_;
         } else {
           return statusBuilder_.getMessage();
         }
       }
       /**
-       * <code>.eigr.functions.protocol.InvocationStatus status = 1;</code>
+       * <code>.eigr.functions.protocol.RequestStatus status = 1;</code>
        */
-      public Builder setStatus(io.eigr.functions.protocol.Protocol.InvocationStatus value) {
+      public Builder setStatus(io.eigr.functions.protocol.Protocol.RequestStatus value) {
         if (statusBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
@@ -7073,10 +6707,10 @@ public final class Protocol {
         return this;
       }
       /**
-       * <code>.eigr.functions.protocol.InvocationStatus status = 1;</code>
+       * <code>.eigr.functions.protocol.RequestStatus status = 1;</code>
        */
       public Builder setStatus(
-          io.eigr.functions.protocol.Protocol.InvocationStatus.Builder builderForValue) {
+          io.eigr.functions.protocol.Protocol.RequestStatus.Builder builderForValue) {
         if (statusBuilder_ == null) {
           status_ = builderForValue.build();
           onChanged();
@@ -7087,13 +6721,13 @@ public final class Protocol {
         return this;
       }
       /**
-       * <code>.eigr.functions.protocol.InvocationStatus status = 1;</code>
+       * <code>.eigr.functions.protocol.RequestStatus status = 1;</code>
        */
-      public Builder mergeStatus(io.eigr.functions.protocol.Protocol.InvocationStatus value) {
+      public Builder mergeStatus(io.eigr.functions.protocol.Protocol.RequestStatus value) {
         if (statusBuilder_ == null) {
           if (status_ != null) {
             status_ =
-              io.eigr.functions.protocol.Protocol.InvocationStatus.newBuilder(status_).mergeFrom(value).buildPartial();
+              io.eigr.functions.protocol.Protocol.RequestStatus.newBuilder(status_).mergeFrom(value).buildPartial();
           } else {
             status_ = value;
           }
@@ -7105,7 +6739,7 @@ public final class Protocol {
         return this;
       }
       /**
-       * <code>.eigr.functions.protocol.InvocationStatus status = 1;</code>
+       * <code>.eigr.functions.protocol.RequestStatus status = 1;</code>
        */
       public Builder clearStatus() {
         if (statusBuilder_ == null) {
@@ -7119,33 +6753,33 @@ public final class Protocol {
         return this;
       }
       /**
-       * <code>.eigr.functions.protocol.InvocationStatus status = 1;</code>
+       * <code>.eigr.functions.protocol.RequestStatus status = 1;</code>
        */
-      public io.eigr.functions.protocol.Protocol.InvocationStatus.Builder getStatusBuilder() {
+      public io.eigr.functions.protocol.Protocol.RequestStatus.Builder getStatusBuilder() {
         
         onChanged();
         return getStatusFieldBuilder().getBuilder();
       }
       /**
-       * <code>.eigr.functions.protocol.InvocationStatus status = 1;</code>
+       * <code>.eigr.functions.protocol.RequestStatus status = 1;</code>
        */
-      public io.eigr.functions.protocol.Protocol.InvocationStatusOrBuilder getStatusOrBuilder() {
+      public io.eigr.functions.protocol.Protocol.RequestStatusOrBuilder getStatusOrBuilder() {
         if (statusBuilder_ != null) {
           return statusBuilder_.getMessageOrBuilder();
         } else {
           return status_ == null ?
-              io.eigr.functions.protocol.Protocol.InvocationStatus.getDefaultInstance() : status_;
+              io.eigr.functions.protocol.Protocol.RequestStatus.getDefaultInstance() : status_;
         }
       }
       /**
-       * <code>.eigr.functions.protocol.InvocationStatus status = 1;</code>
+       * <code>.eigr.functions.protocol.RequestStatus status = 1;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          io.eigr.functions.protocol.Protocol.InvocationStatus, io.eigr.functions.protocol.Protocol.InvocationStatus.Builder, io.eigr.functions.protocol.Protocol.InvocationStatusOrBuilder> 
+          io.eigr.functions.protocol.Protocol.RequestStatus, io.eigr.functions.protocol.Protocol.RequestStatus.Builder, io.eigr.functions.protocol.Protocol.RequestStatusOrBuilder> 
           getStatusFieldBuilder() {
         if (statusBuilder_ == null) {
           statusBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-              io.eigr.functions.protocol.Protocol.InvocationStatus, io.eigr.functions.protocol.Protocol.InvocationStatus.Builder, io.eigr.functions.protocol.Protocol.InvocationStatusOrBuilder>(
+              io.eigr.functions.protocol.Protocol.RequestStatus, io.eigr.functions.protocol.Protocol.RequestStatus.Builder, io.eigr.functions.protocol.Protocol.RequestStatusOrBuilder>(
                   getStatus(),
                   getParentForChildren(),
                   isClean());
@@ -7449,21 +7083,6 @@ public final class Protocol {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>.eigr.functions.protocol.Node node = 1;</code>
-     * @return Whether the node field is set.
-     */
-    boolean hasNode();
-    /**
-     * <code>.eigr.functions.protocol.Node node = 1;</code>
-     * @return The node.
-     */
-    io.eigr.functions.protocol.Protocol.Node getNode();
-    /**
-     * <code>.eigr.functions.protocol.Node node = 1;</code>
-     */
-    io.eigr.functions.protocol.Protocol.NodeOrBuilder getNodeOrBuilder();
-
-    /**
      * <code>.eigr.functions.protocol.InvocationRequest invocation_request = 2;</code>
      * @return Whether the invocationRequest field is set.
      */
@@ -7523,19 +7142,6 @@ public final class Protocol {
             case 0:
               done = true;
               break;
-            case 10: {
-              io.eigr.functions.protocol.Protocol.Node.Builder subBuilder = null;
-              if (node_ != null) {
-                subBuilder = node_.toBuilder();
-              }
-              node_ = input.readMessage(io.eigr.functions.protocol.Protocol.Node.parser(), extensionRegistry);
-              if (subBuilder != null) {
-                subBuilder.mergeFrom(node_);
-                node_ = subBuilder.buildPartial();
-              }
-
-              break;
-            }
             case 18: {
               io.eigr.functions.protocol.Protocol.InvocationRequest.Builder subBuilder = null;
               if (invocationRequest_ != null) {
@@ -7581,29 +7187,6 @@ public final class Protocol {
               io.eigr.functions.protocol.Protocol.ActorInvocation.class, io.eigr.functions.protocol.Protocol.ActorInvocation.Builder.class);
     }
 
-    public static final int NODE_FIELD_NUMBER = 1;
-    private io.eigr.functions.protocol.Protocol.Node node_;
-    /**
-     * <code>.eigr.functions.protocol.Node node = 1;</code>
-     * @return Whether the node field is set.
-     */
-    public boolean hasNode() {
-      return node_ != null;
-    }
-    /**
-     * <code>.eigr.functions.protocol.Node node = 1;</code>
-     * @return The node.
-     */
-    public io.eigr.functions.protocol.Protocol.Node getNode() {
-      return node_ == null ? io.eigr.functions.protocol.Protocol.Node.getDefaultInstance() : node_;
-    }
-    /**
-     * <code>.eigr.functions.protocol.Node node = 1;</code>
-     */
-    public io.eigr.functions.protocol.Protocol.NodeOrBuilder getNodeOrBuilder() {
-      return getNode();
-    }
-
     public static final int INVOCATION_REQUEST_FIELD_NUMBER = 2;
     private io.eigr.functions.protocol.Protocol.InvocationRequest invocationRequest_;
     /**
@@ -7641,9 +7224,6 @@ public final class Protocol {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (node_ != null) {
-        output.writeMessage(1, getNode());
-      }
       if (invocationRequest_ != null) {
         output.writeMessage(2, getInvocationRequest());
       }
@@ -7656,10 +7236,6 @@ public final class Protocol {
       if (size != -1) return size;
 
       size = 0;
-      if (node_ != null) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(1, getNode());
-      }
       if (invocationRequest_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(2, getInvocationRequest());
@@ -7679,11 +7255,6 @@ public final class Protocol {
       }
       io.eigr.functions.protocol.Protocol.ActorInvocation other = (io.eigr.functions.protocol.Protocol.ActorInvocation) obj;
 
-      if (hasNode() != other.hasNode()) return false;
-      if (hasNode()) {
-        if (!getNode()
-            .equals(other.getNode())) return false;
-      }
       if (hasInvocationRequest() != other.hasInvocationRequest()) return false;
       if (hasInvocationRequest()) {
         if (!getInvocationRequest()
@@ -7700,10 +7271,6 @@ public final class Protocol {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
-      if (hasNode()) {
-        hash = (37 * hash) + NODE_FIELD_NUMBER;
-        hash = (53 * hash) + getNode().hashCode();
-      }
       if (hasInvocationRequest()) {
         hash = (37 * hash) + INVOCATION_REQUEST_FIELD_NUMBER;
         hash = (53 * hash) + getInvocationRequest().hashCode();
@@ -7841,12 +7408,6 @@ public final class Protocol {
       @java.lang.Override
       public Builder clear() {
         super.clear();
-        if (nodeBuilder_ == null) {
-          node_ = null;
-        } else {
-          node_ = null;
-          nodeBuilder_ = null;
-        }
         if (invocationRequestBuilder_ == null) {
           invocationRequest_ = null;
         } else {
@@ -7879,11 +7440,6 @@ public final class Protocol {
       @java.lang.Override
       public io.eigr.functions.protocol.Protocol.ActorInvocation buildPartial() {
         io.eigr.functions.protocol.Protocol.ActorInvocation result = new io.eigr.functions.protocol.Protocol.ActorInvocation(this);
-        if (nodeBuilder_ == null) {
-          result.node_ = node_;
-        } else {
-          result.node_ = nodeBuilder_.build();
-        }
         if (invocationRequestBuilder_ == null) {
           result.invocationRequest_ = invocationRequest_;
         } else {
@@ -7937,9 +7493,6 @@ public final class Protocol {
 
       public Builder mergeFrom(io.eigr.functions.protocol.Protocol.ActorInvocation other) {
         if (other == io.eigr.functions.protocol.Protocol.ActorInvocation.getDefaultInstance()) return this;
-        if (other.hasNode()) {
-          mergeNode(other.getNode());
-        }
         if (other.hasInvocationRequest()) {
           mergeInvocationRequest(other.getInvocationRequest());
         }
@@ -7970,125 +7523,6 @@ public final class Protocol {
           }
         }
         return this;
-      }
-
-      private io.eigr.functions.protocol.Protocol.Node node_;
-      private com.google.protobuf.SingleFieldBuilderV3<
-          io.eigr.functions.protocol.Protocol.Node, io.eigr.functions.protocol.Protocol.Node.Builder, io.eigr.functions.protocol.Protocol.NodeOrBuilder> nodeBuilder_;
-      /**
-       * <code>.eigr.functions.protocol.Node node = 1;</code>
-       * @return Whether the node field is set.
-       */
-      public boolean hasNode() {
-        return nodeBuilder_ != null || node_ != null;
-      }
-      /**
-       * <code>.eigr.functions.protocol.Node node = 1;</code>
-       * @return The node.
-       */
-      public io.eigr.functions.protocol.Protocol.Node getNode() {
-        if (nodeBuilder_ == null) {
-          return node_ == null ? io.eigr.functions.protocol.Protocol.Node.getDefaultInstance() : node_;
-        } else {
-          return nodeBuilder_.getMessage();
-        }
-      }
-      /**
-       * <code>.eigr.functions.protocol.Node node = 1;</code>
-       */
-      public Builder setNode(io.eigr.functions.protocol.Protocol.Node value) {
-        if (nodeBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          node_ = value;
-          onChanged();
-        } else {
-          nodeBuilder_.setMessage(value);
-        }
-
-        return this;
-      }
-      /**
-       * <code>.eigr.functions.protocol.Node node = 1;</code>
-       */
-      public Builder setNode(
-          io.eigr.functions.protocol.Protocol.Node.Builder builderForValue) {
-        if (nodeBuilder_ == null) {
-          node_ = builderForValue.build();
-          onChanged();
-        } else {
-          nodeBuilder_.setMessage(builderForValue.build());
-        }
-
-        return this;
-      }
-      /**
-       * <code>.eigr.functions.protocol.Node node = 1;</code>
-       */
-      public Builder mergeNode(io.eigr.functions.protocol.Protocol.Node value) {
-        if (nodeBuilder_ == null) {
-          if (node_ != null) {
-            node_ =
-              io.eigr.functions.protocol.Protocol.Node.newBuilder(node_).mergeFrom(value).buildPartial();
-          } else {
-            node_ = value;
-          }
-          onChanged();
-        } else {
-          nodeBuilder_.mergeFrom(value);
-        }
-
-        return this;
-      }
-      /**
-       * <code>.eigr.functions.protocol.Node node = 1;</code>
-       */
-      public Builder clearNode() {
-        if (nodeBuilder_ == null) {
-          node_ = null;
-          onChanged();
-        } else {
-          node_ = null;
-          nodeBuilder_ = null;
-        }
-
-        return this;
-      }
-      /**
-       * <code>.eigr.functions.protocol.Node node = 1;</code>
-       */
-      public io.eigr.functions.protocol.Protocol.Node.Builder getNodeBuilder() {
-        
-        onChanged();
-        return getNodeFieldBuilder().getBuilder();
-      }
-      /**
-       * <code>.eigr.functions.protocol.Node node = 1;</code>
-       */
-      public io.eigr.functions.protocol.Protocol.NodeOrBuilder getNodeOrBuilder() {
-        if (nodeBuilder_ != null) {
-          return nodeBuilder_.getMessageOrBuilder();
-        } else {
-          return node_ == null ?
-              io.eigr.functions.protocol.Protocol.Node.getDefaultInstance() : node_;
-        }
-      }
-      /**
-       * <code>.eigr.functions.protocol.Node node = 1;</code>
-       */
-      private com.google.protobuf.SingleFieldBuilderV3<
-          io.eigr.functions.protocol.Protocol.Node, io.eigr.functions.protocol.Protocol.Node.Builder, io.eigr.functions.protocol.Protocol.NodeOrBuilder> 
-          getNodeFieldBuilder() {
-        if (nodeBuilder_ == null) {
-          nodeBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-              io.eigr.functions.protocol.Protocol.Node, io.eigr.functions.protocol.Protocol.Node.Builder, io.eigr.functions.protocol.Protocol.NodeOrBuilder>(
-                  getNode(),
-                  getParentForChildren(),
-                  isClean());
-          node_ = null;
-        }
-        return nodeBuilder_;
       }
 
       private io.eigr.functions.protocol.Protocol.InvocationRequest invocationRequest_;
@@ -8267,21 +7701,6 @@ public final class Protocol {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>.eigr.functions.protocol.Node node = 1;</code>
-     * @return Whether the node field is set.
-     */
-    boolean hasNode();
-    /**
-     * <code>.eigr.functions.protocol.Node node = 1;</code>
-     * @return The node.
-     */
-    io.eigr.functions.protocol.Protocol.Node getNode();
-    /**
-     * <code>.eigr.functions.protocol.Node node = 1;</code>
-     */
-    io.eigr.functions.protocol.Protocol.NodeOrBuilder getNodeOrBuilder();
-
-    /**
      * <code>.google.protobuf.Any updated_state = 2;</code>
      * @return Whether the updatedState field is set.
      */
@@ -8356,19 +7775,6 @@ public final class Protocol {
             case 0:
               done = true;
               break;
-            case 10: {
-              io.eigr.functions.protocol.Protocol.Node.Builder subBuilder = null;
-              if (node_ != null) {
-                subBuilder = node_.toBuilder();
-              }
-              node_ = input.readMessage(io.eigr.functions.protocol.Protocol.Node.parser(), extensionRegistry);
-              if (subBuilder != null) {
-                subBuilder.mergeFrom(node_);
-                node_ = subBuilder.buildPartial();
-              }
-
-              break;
-            }
             case 18: {
               com.google.protobuf.Any.Builder subBuilder = null;
               if (updatedState_ != null) {
@@ -8425,29 +7831,6 @@ public final class Protocol {
       return io.eigr.functions.protocol.Protocol.internal_static_eigr_functions_protocol_ActorInvocationResponse_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               io.eigr.functions.protocol.Protocol.ActorInvocationResponse.class, io.eigr.functions.protocol.Protocol.ActorInvocationResponse.Builder.class);
-    }
-
-    public static final int NODE_FIELD_NUMBER = 1;
-    private io.eigr.functions.protocol.Protocol.Node node_;
-    /**
-     * <code>.eigr.functions.protocol.Node node = 1;</code>
-     * @return Whether the node field is set.
-     */
-    public boolean hasNode() {
-      return node_ != null;
-    }
-    /**
-     * <code>.eigr.functions.protocol.Node node = 1;</code>
-     * @return The node.
-     */
-    public io.eigr.functions.protocol.Protocol.Node getNode() {
-      return node_ == null ? io.eigr.functions.protocol.Protocol.Node.getDefaultInstance() : node_;
-    }
-    /**
-     * <code>.eigr.functions.protocol.Node node = 1;</code>
-     */
-    public io.eigr.functions.protocol.Protocol.NodeOrBuilder getNodeOrBuilder() {
-      return getNode();
     }
 
     public static final int UPDATED_STATE_FIELD_NUMBER = 2;
@@ -8510,9 +7893,6 @@ public final class Protocol {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (node_ != null) {
-        output.writeMessage(1, getNode());
-      }
       if (updatedState_ != null) {
         output.writeMessage(2, getUpdatedState());
       }
@@ -8528,10 +7908,6 @@ public final class Protocol {
       if (size != -1) return size;
 
       size = 0;
-      if (node_ != null) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(1, getNode());
-      }
       if (updatedState_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(2, getUpdatedState());
@@ -8555,11 +7931,6 @@ public final class Protocol {
       }
       io.eigr.functions.protocol.Protocol.ActorInvocationResponse other = (io.eigr.functions.protocol.Protocol.ActorInvocationResponse) obj;
 
-      if (hasNode() != other.hasNode()) return false;
-      if (hasNode()) {
-        if (!getNode()
-            .equals(other.getNode())) return false;
-      }
       if (hasUpdatedState() != other.hasUpdatedState()) return false;
       if (hasUpdatedState()) {
         if (!getUpdatedState()
@@ -8581,10 +7952,6 @@ public final class Protocol {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
-      if (hasNode()) {
-        hash = (37 * hash) + NODE_FIELD_NUMBER;
-        hash = (53 * hash) + getNode().hashCode();
-      }
       if (hasUpdatedState()) {
         hash = (37 * hash) + UPDATED_STATE_FIELD_NUMBER;
         hash = (53 * hash) + getUpdatedState().hashCode();
@@ -8726,12 +8093,6 @@ public final class Protocol {
       @java.lang.Override
       public Builder clear() {
         super.clear();
-        if (nodeBuilder_ == null) {
-          node_ = null;
-        } else {
-          node_ = null;
-          nodeBuilder_ = null;
-        }
         if (updatedStateBuilder_ == null) {
           updatedState_ = null;
         } else {
@@ -8770,11 +8131,6 @@ public final class Protocol {
       @java.lang.Override
       public io.eigr.functions.protocol.Protocol.ActorInvocationResponse buildPartial() {
         io.eigr.functions.protocol.Protocol.ActorInvocationResponse result = new io.eigr.functions.protocol.Protocol.ActorInvocationResponse(this);
-        if (nodeBuilder_ == null) {
-          result.node_ = node_;
-        } else {
-          result.node_ = nodeBuilder_.build();
-        }
         if (updatedStateBuilder_ == null) {
           result.updatedState_ = updatedState_;
         } else {
@@ -8833,9 +8189,6 @@ public final class Protocol {
 
       public Builder mergeFrom(io.eigr.functions.protocol.Protocol.ActorInvocationResponse other) {
         if (other == io.eigr.functions.protocol.Protocol.ActorInvocationResponse.getDefaultInstance()) return this;
-        if (other.hasNode()) {
-          mergeNode(other.getNode());
-        }
         if (other.hasUpdatedState()) {
           mergeUpdatedState(other.getUpdatedState());
         }
@@ -8869,125 +8222,6 @@ public final class Protocol {
           }
         }
         return this;
-      }
-
-      private io.eigr.functions.protocol.Protocol.Node node_;
-      private com.google.protobuf.SingleFieldBuilderV3<
-          io.eigr.functions.protocol.Protocol.Node, io.eigr.functions.protocol.Protocol.Node.Builder, io.eigr.functions.protocol.Protocol.NodeOrBuilder> nodeBuilder_;
-      /**
-       * <code>.eigr.functions.protocol.Node node = 1;</code>
-       * @return Whether the node field is set.
-       */
-      public boolean hasNode() {
-        return nodeBuilder_ != null || node_ != null;
-      }
-      /**
-       * <code>.eigr.functions.protocol.Node node = 1;</code>
-       * @return The node.
-       */
-      public io.eigr.functions.protocol.Protocol.Node getNode() {
-        if (nodeBuilder_ == null) {
-          return node_ == null ? io.eigr.functions.protocol.Protocol.Node.getDefaultInstance() : node_;
-        } else {
-          return nodeBuilder_.getMessage();
-        }
-      }
-      /**
-       * <code>.eigr.functions.protocol.Node node = 1;</code>
-       */
-      public Builder setNode(io.eigr.functions.protocol.Protocol.Node value) {
-        if (nodeBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          node_ = value;
-          onChanged();
-        } else {
-          nodeBuilder_.setMessage(value);
-        }
-
-        return this;
-      }
-      /**
-       * <code>.eigr.functions.protocol.Node node = 1;</code>
-       */
-      public Builder setNode(
-          io.eigr.functions.protocol.Protocol.Node.Builder builderForValue) {
-        if (nodeBuilder_ == null) {
-          node_ = builderForValue.build();
-          onChanged();
-        } else {
-          nodeBuilder_.setMessage(builderForValue.build());
-        }
-
-        return this;
-      }
-      /**
-       * <code>.eigr.functions.protocol.Node node = 1;</code>
-       */
-      public Builder mergeNode(io.eigr.functions.protocol.Protocol.Node value) {
-        if (nodeBuilder_ == null) {
-          if (node_ != null) {
-            node_ =
-              io.eigr.functions.protocol.Protocol.Node.newBuilder(node_).mergeFrom(value).buildPartial();
-          } else {
-            node_ = value;
-          }
-          onChanged();
-        } else {
-          nodeBuilder_.mergeFrom(value);
-        }
-
-        return this;
-      }
-      /**
-       * <code>.eigr.functions.protocol.Node node = 1;</code>
-       */
-      public Builder clearNode() {
-        if (nodeBuilder_ == null) {
-          node_ = null;
-          onChanged();
-        } else {
-          node_ = null;
-          nodeBuilder_ = null;
-        }
-
-        return this;
-      }
-      /**
-       * <code>.eigr.functions.protocol.Node node = 1;</code>
-       */
-      public io.eigr.functions.protocol.Protocol.Node.Builder getNodeBuilder() {
-        
-        onChanged();
-        return getNodeFieldBuilder().getBuilder();
-      }
-      /**
-       * <code>.eigr.functions.protocol.Node node = 1;</code>
-       */
-      public io.eigr.functions.protocol.Protocol.NodeOrBuilder getNodeOrBuilder() {
-        if (nodeBuilder_ != null) {
-          return nodeBuilder_.getMessageOrBuilder();
-        } else {
-          return node_ == null ?
-              io.eigr.functions.protocol.Protocol.Node.getDefaultInstance() : node_;
-        }
-      }
-      /**
-       * <code>.eigr.functions.protocol.Node node = 1;</code>
-       */
-      private com.google.protobuf.SingleFieldBuilderV3<
-          io.eigr.functions.protocol.Protocol.Node, io.eigr.functions.protocol.Protocol.Node.Builder, io.eigr.functions.protocol.Protocol.NodeOrBuilder> 
-          getNodeFieldBuilder() {
-        if (nodeBuilder_ == null) {
-          nodeBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-              io.eigr.functions.protocol.Protocol.Node, io.eigr.functions.protocol.Protocol.Node.Builder, io.eigr.functions.protocol.Protocol.NodeOrBuilder>(
-                  getNode(),
-                  getParentForChildren(),
-                  isClean());
-          node_ = null;
-        }
-        return nodeBuilder_;
       }
 
       private com.google.protobuf.Any updatedState_;
@@ -11597,15 +10831,10 @@ public final class Protocol {
   }
 
   private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_eigr_functions_protocol_Node_descriptor;
+    internal_static_eigr_functions_protocol_RequestStatus_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_eigr_functions_protocol_Node_fieldAccessorTable;
-  private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_eigr_functions_protocol_InvocationStatus_descriptor;
-  private static final 
-    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_eigr_functions_protocol_InvocationStatus_fieldAccessorTable;
+      internal_static_eigr_functions_protocol_RequestStatus_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_eigr_functions_protocol_ProxyInfo_descriptor;
   private static final 
@@ -11668,62 +10897,58 @@ public final class Protocol {
       "\n-eigr/functions/protocol/actors/protoco" +
       "l.proto\022\027eigr.functions.protocol\032*eigr/f" +
       "unctions/protocol/actors/actor.proto\032\031go" +
-      "ogle/protobuf/any.proto\"\022\n\004Node\022\n\n\002id\030\001 " +
-      "\001(\t\"T\n\020InvocationStatus\022/\n\006status\030\001 \001(\0162" +
-      "\037.eigr.functions.protocol.Status\022\017\n\007mess" +
-      "age\030\002 \001(\t\"v\n\tProxyInfo\022\036\n\026protocol_major" +
-      "_version\030\001 \001(\005\022\036\n\026protocol_minor_version" +
-      "\030\002 \001(\005\022\022\n\nproxy_name\030\003 \001(\t\022\025\n\rproxy_vers" +
-      "ion\030\004 \001(\t\"\324\001\n\013ServiceInfo\022\024\n\014service_nam" +
-      "e\030\001 \001(\t\022\027\n\017service_version\030\002 \001(\t\022\027\n\017serv" +
-      "ice_runtime\030\003 \001(\t\022\034\n\024support_library_nam" +
-      "e\030\004 \001(\t\022\037\n\027support_library_version\030\005 \001(\t" +
-      "\022\036\n\026protocol_major_version\030\006 \001(\005\022\036\n\026prot" +
-      "ocol_minor_version\030\007 \001(\005\"\224\001\n\023Registratio" +
-      "nRequest\022:\n\014service_info\030\001 \001(\0132$.eigr.fu" +
-      "nctions.protocol.ServiceInfo\022A\n\014actor_sy" +
-      "stem\030\002 \001(\0132+.eigr.functions.protocol.act" +
-      "ors.ActorSystem\"N\n\024RegistrationResponse\022" +
-      "6\n\nproxy_info\030\001 \001(\0132\".eigr.functions.pro" +
-      "tocol.ProxyInfo\"\320\001\n\021InvocationRequest\022;\n" +
-      "\006system\030\001 \001(\0132+.eigr.functions.protocol." +
-      "actors.ActorSystem\0224\n\005actor\030\002 \001(\0132%.eigr" +
-      ".functions.protocol.actors.Actor\022\024\n\014comm" +
-      "and_name\030\003 \001(\t\022#\n\005value\030\004 \001(\0132\024.google.p" +
-      "rotobuf.Any\022\r\n\005async\030\005 \001(\010\"\302\001\n\022Invocatio" +
-      "nResponse\0229\n\006status\030\001 \001(\0132).eigr.functio" +
-      "ns.protocol.InvocationStatus\022;\n\006system\030\002" +
-      " \001(\0132+.eigr.functions.protocol.actors.Ac" +
-      "torSystem\0224\n\005actor\030\003 \001(\0132%.eigr.function" +
-      "s.protocol.actors.Actor\"\206\001\n\017ActorInvocat" +
-      "ion\022+\n\004node\030\001 \001(\0132\035.eigr.functions.proto" +
-      "col.Node\022F\n\022invocation_request\030\002 \001(\0132*.e" +
-      "igr.functions.protocol.InvocationRequest" +
-      "\"\275\001\n\027ActorInvocationResponse\022+\n\004node\030\001 \001" +
-      "(\0132\035.eigr.functions.protocol.Node\022+\n\rupd" +
-      "ated_state\030\002 \001(\0132\024.google.protobuf.Any\022H" +
-      "\n\023invocation_response\030\003 \001(\0132+.eigr.funct" +
-      "ions.protocol.InvocationResponse\"\216\002\n\022Act" +
-      "orSystemRequest\022L\n\024registration_request\030" +
-      "\001 \001(\0132,.eigr.functions.protocol.Registra" +
-      "tionRequestH\000\022H\n\022invocation_request\030\002 \001(" +
-      "\0132*.eigr.functions.protocol.InvocationRe" +
-      "questH\000\022U\n\031actor_invocation_response\030\003 \001" +
-      "(\01320.eigr.functions.protocol.ActorInvoca" +
-      "tionResponseH\000B\t\n\007message\"\202\002\n\023ActorSyste" +
-      "mResponse\022N\n\025registration_response\030\001 \001(\013" +
-      "2-.eigr.functions.protocol.RegistrationR" +
-      "esponseH\000\022D\n\020actor_invocation\030\002 \001(\0132(.ei" +
-      "gr.functions.protocol.ActorInvocationH\000\022" +
-      "J\n\023invocation_response\030\003 \001(\0132+.eigr.func" +
-      "tions.protocol.InvocationResponseH\000B\t\n\007m" +
-      "essage*=\n\006Status\022\013\n\007UNKNOWN\020\000\022\006\n\002OK\020\001\022\023\n" +
-      "\017ACTOR_NOT_FOUND\020\002\022\t\n\005ERROR\020\0032v\n\014ActorSe" +
-      "rvice\022f\n\005Spawn\022+.eigr.functions.protocol" +
-      ".ActorSystemRequest\032,.eigr.functions.pro" +
-      "tocol.ActorSystemResponse(\0010\001BO\n\032io.eigr" +
-      ".functions.protocolZ1github.com/eigr/go-" +
-      "support/eigr/protocol;protocolb\006proto3"
+      "ogle/protobuf/any.proto\"Q\n\rRequestStatus" +
+      "\022/\n\006status\030\001 \001(\0162\037.eigr.functions.protoc" +
+      "ol.Status\022\017\n\007message\030\002 \001(\t\"v\n\tProxyInfo\022" +
+      "\036\n\026protocol_major_version\030\001 \001(\005\022\036\n\026proto" +
+      "col_minor_version\030\002 \001(\005\022\022\n\nproxy_name\030\003 " +
+      "\001(\t\022\025\n\rproxy_version\030\004 \001(\t\"\324\001\n\013ServiceIn" +
+      "fo\022\024\n\014service_name\030\001 \001(\t\022\027\n\017service_vers" +
+      "ion\030\002 \001(\t\022\027\n\017service_runtime\030\003 \001(\t\022\034\n\024su" +
+      "pport_library_name\030\004 \001(\t\022\037\n\027support_libr" +
+      "ary_version\030\005 \001(\t\022\036\n\026protocol_major_vers" +
+      "ion\030\006 \001(\005\022\036\n\026protocol_minor_version\030\007 \001(" +
+      "\005\"\224\001\n\023RegistrationRequest\022:\n\014service_inf" +
+      "o\030\001 \001(\0132$.eigr.functions.protocol.Servic" +
+      "eInfo\022A\n\014actor_system\030\002 \001(\0132+.eigr.funct" +
+      "ions.protocol.actors.ActorSystem\"\205\001\n\024Reg" +
+      "istrationResponse\0225\n\005staus\030\001 \001(\0132&.eigr." +
+      "functions.protocol.RequestStatus\0226\n\nprox" +
+      "y_info\030\002 \001(\0132\".eigr.functions.protocol.P" +
+      "roxyInfo\"\320\001\n\021InvocationRequest\022;\n\006system" +
+      "\030\001 \001(\0132+.eigr.functions.protocol.actors." +
+      "ActorSystem\0224\n\005actor\030\002 \001(\0132%.eigr.functi" +
+      "ons.protocol.actors.Actor\022\024\n\014command_nam" +
+      "e\030\003 \001(\t\022#\n\005value\030\004 \001(\0132\024.google.protobuf" +
+      ".Any\022\r\n\005async\030\005 \001(\010\"\277\001\n\022InvocationRespon" +
+      "se\0226\n\006status\030\001 \001(\0132&.eigr.functions.prot" +
+      "ocol.RequestStatus\022;\n\006system\030\002 \001(\0132+.eig" +
+      "r.functions.protocol.actors.ActorSystem\022" +
+      "4\n\005actor\030\003 \001(\0132%.eigr.functions.protocol" +
+      ".actors.Actor\"Y\n\017ActorInvocation\022F\n\022invo" +
+      "cation_request\030\002 \001(\0132*.eigr.functions.pr" +
+      "otocol.InvocationRequest\"\220\001\n\027ActorInvoca" +
+      "tionResponse\022+\n\rupdated_state\030\002 \001(\0132\024.go" +
+      "ogle.protobuf.Any\022H\n\023invocation_response" +
+      "\030\003 \001(\0132+.eigr.functions.protocol.Invocat" +
+      "ionResponse\"\216\002\n\022ActorSystemRequest\022L\n\024re" +
+      "gistration_request\030\001 \001(\0132,.eigr.function" +
+      "s.protocol.RegistrationRequestH\000\022H\n\022invo" +
+      "cation_request\030\002 \001(\0132*.eigr.functions.pr" +
+      "otocol.InvocationRequestH\000\022U\n\031actor_invo" +
+      "cation_response\030\003 \001(\01320.eigr.functions.p" +
+      "rotocol.ActorInvocationResponseH\000B\t\n\007mes" +
+      "sage\"\202\002\n\023ActorSystemResponse\022N\n\025registra" +
+      "tion_response\030\001 \001(\0132-.eigr.functions.pro" +
+      "tocol.RegistrationResponseH\000\022D\n\020actor_in" +
+      "vocation\030\002 \001(\0132(.eigr.functions.protocol" +
+      ".ActorInvocationH\000\022J\n\023invocation_respons" +
+      "e\030\003 \001(\0132+.eigr.functions.protocol.Invoca" +
+      "tionResponseH\000B\t\n\007message*=\n\006Status\022\013\n\007U" +
+      "NKNOWN\020\000\022\006\n\002OK\020\001\022\023\n\017ACTOR_NOT_FOUND\020\002\022\t\n" +
+      "\005ERROR\020\003BO\n\032io.eigr.functions.protocolZ1" +
+      "github.com/eigr/go-support/eigr/protocol" +
+      ";protocolb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -11731,74 +10956,68 @@ public final class Protocol {
           io.eigr.functions.protocol.actors.ActorOuterClass.getDescriptor(),
           com.google.protobuf.AnyProto.getDescriptor(),
         });
-    internal_static_eigr_functions_protocol_Node_descriptor =
+    internal_static_eigr_functions_protocol_RequestStatus_descriptor =
       getDescriptor().getMessageTypes().get(0);
-    internal_static_eigr_functions_protocol_Node_fieldAccessorTable = new
+    internal_static_eigr_functions_protocol_RequestStatus_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_eigr_functions_protocol_Node_descriptor,
-        new java.lang.String[] { "Id", });
-    internal_static_eigr_functions_protocol_InvocationStatus_descriptor =
-      getDescriptor().getMessageTypes().get(1);
-    internal_static_eigr_functions_protocol_InvocationStatus_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_eigr_functions_protocol_InvocationStatus_descriptor,
+        internal_static_eigr_functions_protocol_RequestStatus_descriptor,
         new java.lang.String[] { "Status", "Message", });
     internal_static_eigr_functions_protocol_ProxyInfo_descriptor =
-      getDescriptor().getMessageTypes().get(2);
+      getDescriptor().getMessageTypes().get(1);
     internal_static_eigr_functions_protocol_ProxyInfo_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_eigr_functions_protocol_ProxyInfo_descriptor,
         new java.lang.String[] { "ProtocolMajorVersion", "ProtocolMinorVersion", "ProxyName", "ProxyVersion", });
     internal_static_eigr_functions_protocol_ServiceInfo_descriptor =
-      getDescriptor().getMessageTypes().get(3);
+      getDescriptor().getMessageTypes().get(2);
     internal_static_eigr_functions_protocol_ServiceInfo_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_eigr_functions_protocol_ServiceInfo_descriptor,
         new java.lang.String[] { "ServiceName", "ServiceVersion", "ServiceRuntime", "SupportLibraryName", "SupportLibraryVersion", "ProtocolMajorVersion", "ProtocolMinorVersion", });
     internal_static_eigr_functions_protocol_RegistrationRequest_descriptor =
-      getDescriptor().getMessageTypes().get(4);
+      getDescriptor().getMessageTypes().get(3);
     internal_static_eigr_functions_protocol_RegistrationRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_eigr_functions_protocol_RegistrationRequest_descriptor,
         new java.lang.String[] { "ServiceInfo", "ActorSystem", });
     internal_static_eigr_functions_protocol_RegistrationResponse_descriptor =
-      getDescriptor().getMessageTypes().get(5);
+      getDescriptor().getMessageTypes().get(4);
     internal_static_eigr_functions_protocol_RegistrationResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_eigr_functions_protocol_RegistrationResponse_descriptor,
-        new java.lang.String[] { "ProxyInfo", });
+        new java.lang.String[] { "Staus", "ProxyInfo", });
     internal_static_eigr_functions_protocol_InvocationRequest_descriptor =
-      getDescriptor().getMessageTypes().get(6);
+      getDescriptor().getMessageTypes().get(5);
     internal_static_eigr_functions_protocol_InvocationRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_eigr_functions_protocol_InvocationRequest_descriptor,
         new java.lang.String[] { "System", "Actor", "CommandName", "Value", "Async", });
     internal_static_eigr_functions_protocol_InvocationResponse_descriptor =
-      getDescriptor().getMessageTypes().get(7);
+      getDescriptor().getMessageTypes().get(6);
     internal_static_eigr_functions_protocol_InvocationResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_eigr_functions_protocol_InvocationResponse_descriptor,
         new java.lang.String[] { "Status", "System", "Actor", });
     internal_static_eigr_functions_protocol_ActorInvocation_descriptor =
-      getDescriptor().getMessageTypes().get(8);
+      getDescriptor().getMessageTypes().get(7);
     internal_static_eigr_functions_protocol_ActorInvocation_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_eigr_functions_protocol_ActorInvocation_descriptor,
-        new java.lang.String[] { "Node", "InvocationRequest", });
+        new java.lang.String[] { "InvocationRequest", });
     internal_static_eigr_functions_protocol_ActorInvocationResponse_descriptor =
-      getDescriptor().getMessageTypes().get(9);
+      getDescriptor().getMessageTypes().get(8);
     internal_static_eigr_functions_protocol_ActorInvocationResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_eigr_functions_protocol_ActorInvocationResponse_descriptor,
-        new java.lang.String[] { "Node", "UpdatedState", "InvocationResponse", });
+        new java.lang.String[] { "UpdatedState", "InvocationResponse", });
     internal_static_eigr_functions_protocol_ActorSystemRequest_descriptor =
-      getDescriptor().getMessageTypes().get(10);
+      getDescriptor().getMessageTypes().get(9);
     internal_static_eigr_functions_protocol_ActorSystemRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_eigr_functions_protocol_ActorSystemRequest_descriptor,
         new java.lang.String[] { "RegistrationRequest", "InvocationRequest", "ActorInvocationResponse", "Message", });
     internal_static_eigr_functions_protocol_ActorSystemResponse_descriptor =
-      getDescriptor().getMessageTypes().get(11);
+      getDescriptor().getMessageTypes().get(10);
     internal_static_eigr_functions_protocol_ActorSystemResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_eigr_functions_protocol_ActorSystemResponse_descriptor,
