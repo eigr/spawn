@@ -3,12 +3,18 @@ defmodule Proxy.Routes.API do
   require Logger
 
   alias Eigr.Functions.Protocol.Actors.Actor
+  alias Eigr.Functions.Protocol.RegistrationRequest
+  alias Eigr.Functions.Protocol.RegistrationResponse
 
   @content_type "application/octet-stream"
 
   post "/system" do
-    Logger.debug("ActorSystem Received registration request #{inspect(conn.body_params)}")
-    send!(conn, 200, Actor.encode(Actor.new(name: "Joe")), @content_type)
+    Logger.debug("ActorSystem Received registration request")
+    registration_payload = get_body(conn.body_params, RegistrationRequest)
+
+    with {:ok, response} <- Actors.register(registration_payload) do
+      send!(conn, 200, RegistrationResponse.encode(response), @content_type)
+    end
   end
 
   post "/system/:name/actors/invoke" do
@@ -24,9 +30,12 @@ defmodule Proxy.Routes.API do
       "ActorSystem #{inspect(name)} Received Actor invocation request for Actor #{inspect(actor_name)} #{inspect(conn.body_params)}"
     )
 
-    %{"_proto" => body} = conn.body_params
+    body = get_body(conn.body_params, Actor)
     decoded_payload = Actor.decode(body)
 
     send!(conn, 200, Actor.encode(decoded_payload), @content_type)
   end
+
+  defp get_body(%{"_proto" => body}, type \\ nil), do: type.decode(body)
+  defp get_body(body, _type), do: body
 end

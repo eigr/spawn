@@ -8,7 +8,7 @@ defmodule Proxy.Routes.Base do
       plug(:match)
 
       plug(Plug.Parsers,
-        parsers: [:json, Proxy.Parser],
+        parsers: [:json, Proxy.Parsers.Protobuf],
         json_decoder: Jason
       )
 

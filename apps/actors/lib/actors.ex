@@ -1,4 +1,4 @@
-defmodule SpawnProxy do
+defmodule Actors do
   @moduledoc """
   Documentation for `Spawn`.
   """
@@ -29,6 +29,21 @@ defmodule SpawnProxy do
 
   @activate_actors_min_demand 0
   @activate_actors_max_demand 4
+
+  def register(
+        %RegistrationRequest{
+          service_info: %ServiceInfo{} = service_info,
+          actor_system:
+            %ActorSystem{name: name, registry: %Registry{actors: actors} = registry} =
+              actor_system
+        } = registration
+      ) do
+    Logger.debug("Registration request received: #{inspect(registration)}")
+    ActorRegistry.register(actors)
+    create_actors(actor_system, actors)
+
+    {:ok, RegistrationResponse.new(proxy_info: ProxyInfo.new())}
+  end
 
   defp create_actors(actor_system, actors) do
     actors
