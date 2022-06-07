@@ -31,11 +31,10 @@ defmodule Proxy.Routes.API do
     )
 
     body = get_body(conn.body_params, Actor)
-    decoded_payload = Actor.decode(body)
 
-    send!(conn, 200, Actor.encode(decoded_payload), @content_type)
+    send!(conn, 200, Actor.encode(body), @content_type)
   end
 
-  defp get_body(%{"_proto" => body}, type \\ nil), do: type.decode(body)
+  defp get_body(%{"_proto" => body}, type), do: type.decode(body)
   defp get_body(body, _type), do: body
 end
