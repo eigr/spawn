@@ -133,28 +133,37 @@ defmodule Actors.Actor.Entity do
           system: %ActorSystem{name: actor_system} = _system
         } = state
       ) do
-    payload = ActorInvocation.new(invocation_request: invocation)
-
-    request =
-      Finch.build(
-        :post,
-        "http://0.0.0.0:8090/api/v1/actors/actions",
-        ["Content-Type": "application/octet-stream"],
-        ActorInvocation.encode(payload)
-      )
+    payload =
+      ActorInvocation.new(invocation_request: invocation)
+      |> ActorInvocation.encode()
 
     resp =
-      request
-      |> Finch.request(request, SpawnHTTPClient)
-      |> case do
-        {:ok, %Finch.Response{body: response_body} = response} ->
-          Logger.debug("User Function Actor Invocation Response: #{inspect(response)}")
-          {:ok, response_body}
+      case Actors.Node.Client.invoke_host_actor(payload) do
+        {:ok, %Tesla.Env{body: ""}} ->
+          Logger.error("User Function Actor Invocation Body nil")
+          {:error, :no_content}
+
+        {:ok, %Tesla.Env{body: nil}} ->
+          Logger.error("User Function Actor Invocation Body nil")
+          {:error, :no_content}
+
+        {:ok, %Tesla.Env{body: body}} ->
+          IO.inspect(body, label: "Bodyyyyy")
+          ActorInvocationResponse.decode(body)
+
+        {:error, timeout} ->
+          Logger.error("User Function Actor Invocation Timeout Error")
+          {:error, timeout}
 
         {:error, reason} ->
-          Logger.error("User Function Actor Invocation Error: #{inspect(reason)}")
+          Logger.error("User Function Actor Invocation Unknown Error: #{inspect(reason)}")
           {:error, reason}
+
+        _ ->
+          Logger.error("User Function Actor Invocation Unknown Error")
       end
+
+    IO.inspect(resp, label: "Actors.Node.Client.invoke_host_actor(payload) ::: ")
 
     {:reply, resp, state}
   end
@@ -286,7 +295,7 @@ defmodule Actors.Actor.Entity do
   end
 
   def invoke(name, request) do
-    GenServer.call(via(name), {:invocation_request, request})
+    GenServer.call(via(name), {:invocation_request, request}, 30_000)
   end
 
   def invoke_async(name, request) do

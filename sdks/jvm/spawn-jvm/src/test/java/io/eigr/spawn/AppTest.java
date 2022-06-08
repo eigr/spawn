@@ -6,9 +6,12 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import io.eigr.functions.protocol.Protocol;
 import io.eigr.functions.protocol.actors.ActorOuterClass;
+import io.eigr.spawn.example.Example;
 import okhttp3.*;
-import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,22 +23,17 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertTrue;
 
-/**
- * Unit test for simple App.
- */
+@SpringBootTest
+@RunWith(SpringJUnit4ClassRunner.class)
 public class AppTest {
 
     private final OkHttpClient client = new OkHttpClient();
-
-    @Rule
-    public HttpServerRule httpServer = new HttpServerRule();
 
     /**
      * Rigorous Test :-)
      */
     @Test
     public void shouldAnswerWithTrue() throws IOException, InterruptedException {
-        httpServer.registerHandler("/api/v1/actors/actions", new SpawnUserFunctionHttpHandler());
 
         HashMap<String, ActorOuterClass.Actor> actors = new HashMap<>();
         for (int i = 0; i < 2; i++) {
@@ -85,12 +83,11 @@ public class AppTest {
             System.out.println("Registration response: " + registrationResponse);
 
             // Send Invocation to Actor
-            byte[] byteState = BigInteger.valueOf(1).toByteArray();
-
-            Any stateValue = Any.newBuilder()
-                    .setTypeUrl("type.googleapis.com/integer")
-                    .setValue(ByteString.copyFrom(byteState))
+            Example.MyBussinessMessage valueMessage = Example.MyBussinessMessage.newBuilder()
+                    .setValue(10)
                     .build();
+
+            Any stateValue = Any.pack(valueMessage);
 
             Protocol.InvocationRequest invocationRequest = Protocol.InvocationRequest.newBuilder()
                     .setAsync(false)
@@ -117,18 +114,18 @@ public class AppTest {
             assertThat(response.code(), equalTo(200));
         }
 
+        Thread.sleep(10000);
+
         assertTrue(true);
     }
 
     private ActorOuterClass.Actor makeActor(String name, Integer state) {
 
-        byte[] byteState = BigInteger.valueOf(state).toByteArray();
-
-        Any stateValue = Any.newBuilder()
-                .setTypeUrl("type.googleapis.com/integer")
-                .setValue(ByteString.copyFrom(byteState))
-                //.setValue( ByteString.copyFrom(String.format("test-%s", name).getBytes(StandardCharsets.UTF_8)))
+        Example.MyBussinessMessage valueMessage = Example.MyBussinessMessage.newBuilder()
+                .setValue(state)
                 .build();
+
+        Any stateValue = Any.pack(valueMessage);
 
         ActorOuterClass.ActorState initialState = ActorOuterClass.ActorState.newBuilder()
                 .setState(stateValue)
@@ -153,11 +150,13 @@ public class AppTest {
     private static class SpawnUserFunctionHttpHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange httpExchange) throws IOException {
+            System.out.printf("HTTP Exchange -> %s\n", httpExchange);
             InputStream requestStream = httpExchange.getRequestBody();
+            System.out.println(requestStream);
             byte[] actorInvocationArray = new byte[requestStream.available()];
             requestStream.read(actorInvocationArray);
 
-            Protocol.ActorInvocation actorInvocationRequest =  Protocol.ActorInvocation.parseFrom(actorInvocationArray);
+            Protocol.ActorInvocation actorInvocationRequest = Protocol.ActorInvocation.parseFrom(actorInvocationArray);
             System.out.println("Received ActorInvocation: " + actorInvocationRequest);
             handleResponse(httpExchange, actorInvocationRequest);
         }
@@ -165,13 +164,14 @@ public class AppTest {
         private void handleResponse(HttpExchange httpExchange, Protocol.ActorInvocation actorInvocationRequest) throws IOException {
             OutputStream outputStream = httpExchange.getResponseBody();
 
-            ActorOuterClass.Actor Actor = actorInvocationRequest.getInvocationRequest().getActor();
+            ActorOuterClass.Actor actor = actorInvocationRequest.getInvocationRequest().getActor();
+            ActorOuterClass.ActorSystem system = actorInvocationRequest.getInvocationRequest().getSystem();
             String commandName = actorInvocationRequest.getInvocationRequest().getCommandName();
             Any value = actorInvocationRequest.getInvocationRequest().getValue();
             String typeUrl = value.getTypeUrl();
             ByteString reqValue = value.getValue();
 
-            System.out.printf("Actor %s received Action invocation for command %s%n", Actor.getName(), commandName);
+            System.out.printf("Actor %s received Action invocation for command %s%n", actor.getName(), commandName);
 
             Any updatedState = null;
             long resultValue;
@@ -196,6 +196,15 @@ public class AppTest {
 
             Protocol.ActorInvocationResponse response = Protocol.ActorInvocationResponse.newBuilder()
                     .setUpdatedState(updatedState)
+                    .setInvocationResponse(
+                            Protocol.InvocationResponse.newBuilder()
+                                    .setActor(actor)
+                                    .setSystem(system)
+                                    .setStatus(
+                                            Protocol.RequestStatus.newBuilder()
+                                                    .setStatus(Protocol.Status.OK)
+                                                    .build())
+                            .build())
                     .getDefaultInstanceForType();
 
             byte[] responseBytes = response.toByteArray();

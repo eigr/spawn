@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 Test set: io.eigr.spawn.AppTest
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 10.606 sec <<< FAILURE!
-shouldAnswerWithTrue(io.eigr.spawn.AppTest)  Time elapsed: 10.517 sec  <<< ERROR!
+Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 13.565 sec <<< FAILURE!
+shouldAnswerWithTrue(io.eigr.spawn.AppTest)  Time elapsed: 10.902 sec  <<< ERROR!
 java.net.ConnectException: Failed to connect to localhost/0:0:0:0:0:0:0:1:9001
 	at okhttp3.internal.connection.RealConnection.connectSocket(RealConnection.kt:297)
 	at okhttp3.internal.connection.RealConnection.connect(RealConnection.kt:207)
@@ -20,7 +20,7 @@ java.net.ConnectException: Failed to connect to localhost/0:0:0:0:0:0:0:1:9001
 	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
 	at okhttp3.internal.connection.RealCall.getResponseWithInterceptorChain$okhttp(RealCall.kt:201)
 	at okhttp3.internal.connection.RealCall.execute(RealCall.kt:154)
-	at io.eigr.spawn.AppTest.shouldAnswerWithTrue(AppTest.java:115)
+	at io.eigr.spawn.AppTest.shouldAnswerWithTrue(AppTest.java:112)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
@@ -29,19 +29,24 @@ java.net.ConnectException: Failed to connect to localhost/0:0:0:0:0:0:0:1:9001
 	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
 	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:56)
 	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
-	at org.junit.rules.ExternalResource$1.evaluate(ExternalResource.java:54)
-	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
-	at org.junit.runners.BlockJUnit4ClassRunner$1.evaluate(BlockJUnit4ClassRunner.java:100)
+	at org.springframework.test.context.junit4.statements.RunBeforeTestExecutionCallbacks.evaluate(RunBeforeTestExecutionCallbacks.java:74)
+	at org.springframework.test.context.junit4.statements.RunAfterTestExecutionCallbacks.evaluate(RunAfterTestExecutionCallbacks.java:84)
+	at org.springframework.test.context.junit4.statements.RunBeforeTestMethodCallbacks.evaluate(RunBeforeTestMethodCallbacks.java:75)
+	at org.springframework.test.context.junit4.statements.RunAfterTestMethodCallbacks.evaluate(RunAfterTestMethodCallbacks.java:86)
+	at org.springframework.test.context.junit4.statements.SpringRepeat.evaluate(SpringRepeat.java:84)
 	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:366)
-	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:103)
-	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:63)
+	at org.springframework.test.context.junit4.SpringJUnit4ClassRunner.runChild(SpringJUnit4ClassRunner.java:251)
+	at org.springframework.test.context.junit4.SpringJUnit4ClassRunner.runChild(SpringJUnit4ClassRunner.java:97)
 	at org.junit.runners.ParentRunner$4.run(ParentRunner.java:331)
 	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:79)
 	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:329)
 	at org.junit.runners.ParentRunner.access$100(ParentRunner.java:66)
 	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:293)
+	at org.springframework.test.context.junit4.statements.RunBeforeTestClassCallbacks.evaluate(RunBeforeTestClassCallbacks.java:61)
+	at org.springframework.test.context.junit4.statements.RunAfterTestClassCallbacks.evaluate(RunAfterTestClassCallbacks.java:70)
 	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
 	at org.junit.runners.ParentRunner.run(ParentRunner.java:413)
+	at org.springframework.test.context.junit4.SpringJUnit4ClassRunner.run(SpringJUnit4ClassRunner.java:190)
 	at org.apache.maven.surefire.junit4.JUnit4TestSet.execute(JUnit4TestSet.java:104)
 	at org.apache.maven.surefire.junit4.JUnit4Provider.executeTestSet(JUnit4Provider.java:147)
 	at org.apache.maven.surefire.junit4.JUnit4Provider.invoke(JUnit4Provider.java:98)
@@ -60,24 +65,24 @@ java.net.ConnectException: Failed to connect to localhost/0:0:0:0:0:0:0:1:9001
 		at okhttp3.internal.http.CallServerInterceptor.intercept(CallServerInterceptor.kt:79)
 		at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
 		at okhttp3.internal.connection.ConnectInterceptor.intercept(ConnectInterceptor.kt:34)
-		... 43 more
+		... 48 more
 	Caused by: java.io.EOFException: \n not found: limit=0 content=…
 		at okio.RealBufferedSource.readUtf8LineStrict(RealBufferedSource.kt:332)
 		at okhttp3.internal.http1.HeadersReader.readLine(HeadersReader.kt:29)
 		at okhttp3.internal.http1.Http1ExchangeCodec.readResponseHeaders(Http1ExchangeCodec.kt:178)
-		... 47 more
+		... 52 more
 	Suppressed: java.io.IOException: unexpected end of stream on http://localhost:9001/...
 		at okhttp3.internal.http1.Http1ExchangeCodec.readResponseHeaders(Http1ExchangeCodec.kt:202)
 		at okhttp3.internal.connection.Exchange.readResponseHeaders(Exchange.kt:106)
 		at okhttp3.internal.http.CallServerInterceptor.intercept(CallServerInterceptor.kt:79)
 		at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
 		at okhttp3.internal.connection.ConnectInterceptor.intercept(ConnectInterceptor.kt:34)
-		... 43 more
+		... 48 more
 	Caused by: java.io.EOFException: \n not found: limit=0 content=…
 		at okio.RealBufferedSource.readUtf8LineStrict(RealBufferedSource.kt:332)
 		at okhttp3.internal.http1.HeadersReader.readLine(HeadersReader.kt:29)
 		at okhttp3.internal.http1.Http1ExchangeCodec.readResponseHeaders(Http1ExchangeCodec.kt:178)
-		... 47 more
+		... 52 more
 Caused by: java.net.ConnectException: Connection refused (Connection refused)
 	at java.base/java.net.PlainSocketImpl.socketConnect(Native Method)
 	at java.base/java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:412)
@@ -87,5 +92,5 @@ Caused by: java.net.ConnectException: Connection refused (Connection refused)
 	at java.base/java.net.Socket.connect(Socket.java:609)
 	at okhttp3.internal.platform.Platform.connectSocket(Platform.kt:128)
 	at okhttp3.internal.connection.RealConnection.connectSocket(RealConnection.kt:295)
-	... 49 more
+	... 54 more
 

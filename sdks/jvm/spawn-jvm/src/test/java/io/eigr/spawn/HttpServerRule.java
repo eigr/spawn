@@ -17,7 +17,7 @@ public class HttpServerRule  extends ExternalResource {
         server = HttpServer.create(new InetSocketAddress("0.0.0.0", PORT), 0);
         server.setExecutor(null);
         server.start();
-        System.out.println("Server started on port 8080");
+        System.out.printf("Server started on port %s", PORT);
     }
 
     @Override
@@ -31,7 +31,7 @@ public class HttpServerRule  extends ExternalResource {
         if (!path.startsWith("/")) {
             path = "/" + path;
         }
-        String host = "http://localhost:" + PORT;
+        String host = "http://0.0.0.0:" + PORT;
         return host + path;
     }
 
