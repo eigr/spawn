@@ -28,8 +28,8 @@ defmodule Actors.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:protos, "~> 0.1", in_umbrella: true},
       {:statestores, "~> 0.1", in_umbrella: true},
-      {:protobuf, "~> 0.10", override: true},
       {:cowlib, "~> 2.9", override: true},
       {:decimal, "~> 2.0", override: true},
       {:finch, "~> 0.12"},

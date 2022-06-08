@@ -65,5 +65,4 @@ config :prometheus, Actors.Metrics.Exporter,
 
 # App Configuration
 config :proxy,
-  http_port: System.get_env("PROXY_HTTP_PORT", "9001") |> String.to_integer(),
-  grpc_port: System.get_env("PROXY_GRPC_PORT", "5001") |> String.to_integer()
+  http_port: System.get_env("PROXY_HTTP_PORT", "9001") |> String.to_integer()

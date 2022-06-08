@@ -1,9 +1,3 @@
-.vscode
-.idea
-.elixir_ls
-sdks/jvm/spawn-jvm/.idea
-sdks/jvm/spawn-jvm/target
-
 # The directory Mix will write compiled artifacts to.
 /_build/
 
@@ -24,6 +18,9 @@ erl_crash.dump
 
 # Also ignore archive artifacts (built via "mix archive.build").
 *.ez
+
+# Ignore package tarball (built via "mix hex.build").
+protos-*.tar
 
 # Temporary files, for example, from tests.
 /tmp/

@@ -32,8 +32,6 @@ defmodule Actors.Config.Vapor do
         bindings: [
           {:http_port, "PROXY_HTTP_PORT",
            default: 4000, map: &String.to_integer/1, required: false},
-          {:grpc_port, "PROXY_GRPC_PORT",
-           default: 5000, map: &String.to_integer/1, required: false},
           {:proxy_cluster_strategy, "PROXY_CLUSTER_STRATEGY", default: "gossip", required: false},
           {:proxy_headless_service, "PROXY_HEADLESS_SERVICE",
            default: "proxy-headless-svc", required: false},

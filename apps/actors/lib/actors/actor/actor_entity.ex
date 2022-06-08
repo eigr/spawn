@@ -148,7 +148,15 @@ defmodule Actors.Actor.Entity do
           {:error, :no_content}
 
         {:ok, %Tesla.Env{body: body}} ->
-          {:ok, ActorInvocationResponse.decode(body)}
+          with %ActorInvocationResponse{updated_state: _updated_state} = resp <-
+                 ActorInvocationResponse.decode(body) do
+            # TODO temporary
+            {:ok, resp}
+          else
+            error ->
+              Logger.error("Error on parse response #{inspect(error)}")
+              {:error, :invalid_content}
+          end
 
         {:error, timeout} ->
           Logger.error("User Function Actor Invocation Timeout Error")
