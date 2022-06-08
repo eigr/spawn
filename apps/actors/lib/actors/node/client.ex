@@ -16,8 +16,6 @@ defmodule Actors.Node.Client do
   plug(Tesla.Middleware.Logger)
 
   def invoke_host_actor(req) do
-    ret = post(@actor_invoke_uri, req)
-    IO.inspect(ret, label: "Ret")
-    ret
+    post(@actor_invoke_uri, req)
   end
 end

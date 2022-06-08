@@ -140,16 +140,15 @@ defmodule Actors.Actor.Entity do
     resp =
       case Actors.Node.Client.invoke_host_actor(payload) do
         {:ok, %Tesla.Env{body: ""}} ->
-          Logger.error("User Function Actor Invocation Body nil")
+          Logger.error("User Function Actor response Invocation body is empty")
           {:error, :no_content}
 
         {:ok, %Tesla.Env{body: nil}} ->
-          Logger.error("User Function Actor Invocation Body nil")
+          Logger.error("User Function Actor response Invocation body is nil")
           {:error, :no_content}
 
         {:ok, %Tesla.Env{body: body}} ->
-          IO.inspect(body, label: "Bodyyyyy")
-          ActorInvocationResponse.decode(body)
+          {:ok, ActorInvocationResponse.decode(body)}
 
         {:error, timeout} ->
           Logger.error("User Function Actor Invocation Timeout Error")

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuite tests="1" failures="0" name="io.eigr.spawn.AppTest" time="13.566" errors="1" skipped="0">
+<testsuite tests="1" failures="0" name="io.eigr.spawn.AppTest" time="23.753" errors="0" skipped="0">
   <properties>
     <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
     <property name="java.vm.version" value="11.0.15+10-Ubuntu-0ubuntu0.21.10.1"/>
@@ -11,7 +11,7 @@
     <property name="sun.os.patch.level" value="unknown"/>
     <property name="user.country" value="US"/>
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
-    <property name="PID" value="458775"/>
+    <property name="PID" value="1999166"/>
     <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
     <property name="user.dir" value="/home/sleipnir/workspaces/eigr/spawn/sdks/jvm/spawn-jvm"/>
     <property name="java.vm.compressedOopsMode" value="Zero based"/>
@@ -20,7 +20,7 @@
     <property name="basedir" value="/home/sleipnir/workspaces/eigr/spawn/sdks/jvm/spawn-jvm"/>
     <property name="os.arch" value="amd64"/>
     <property name="CONSOLE_LOG_CHARSET" value="UTF-8"/>
-    <property name="surefire.real.class.path" value="/home/sleipnir/workspaces/eigr/spawn/sdks/jvm/spawn-jvm/target/surefire/surefirebooter15011050986793437127.jar"/>
+    <property name="surefire.real.class.path" value="/home/sleipnir/workspaces/eigr/spawn/sdks/jvm/spawn-jvm/target/surefire/surefirebooter9222279518251077546.jar"/>
     <property name="java.io.tmpdir" value="/tmp"/>
     <property name="line.separator" value="
 "/>
@@ -45,7 +45,7 @@
     <property name="java.class.path" value="/home/sleipnir/workspaces/eigr/spawn/sdks/jvm/spawn-jvm/target/test-classes:/home/sleipnir/workspaces/eigr/spawn/sdks/jvm/spawn-jvm/target/classes:/home/sleipnir/.m2/repository/org/projectlombok/lombok/1.18.24/lombok-1.18.24.jar:/home/sleipnir/.m2/repository/org/springframework/boot/spring-boot-starter-webflux/2.7.0/spring-boot-starter-webflux-2.7.0.jar:/home/sleipnir/.m2/repository/org/springframework/boot/spring-boot-starter/2.7.0/spring-boot-starter-2.7.0.jar:/home/sleipnir/.m2/repository/org/springframework/boot/spring-boot/2.7.0/spring-boot-2.7.0.jar:/home/sleipnir/.m2/repository/org/springframework/spring-context/5.3.20/spring-context-5.3.20.jar:/home/sleipnir/.m2/repository/org/springframework/spring-aop/5.3.20/spring-aop-5.3.20.jar:/home/sleipnir/.m2/repository/org/springframework/spring-expression/5.3.20/spring-expression-5.3.20.jar:/home/sleipnir/.m2/repository/org/springframework/boot/spring-boot-autoconfigure/2.7.0/spring-boot-autoconfigure-2.7.0.jar:/home/sleipnir/.m2/repository/org/springframework/boot/spring-boot-starter-logging/2.7.0/spring-boot-starter-logging-2.7.0.jar:/home/sleipnir/.m2/repository/org/apache/logging/log4j/log4j-to-slf4j/2.17.2/log4j-to-slf4j-2.17.2.jar:/home/sleipnir/.m2/repository/org/apache/logging/log4j/log4j-api/2.17.2/log4j-api-2.17.2.jar:/home/sleipnir/.m2/repository/org/slf4j/jul-to-slf4j/1.7.36/jul-to-slf4j-1.7.36.jar:/home/sleipnir/.m2/repository/jakarta/annotation/jakarta.annotation-api/1.3.5/jakarta.annotation-api-1.3.5.jar:/home/sleipnir/.m2/repository/org/yaml/snakeyaml/1.30/snakeyaml-1.30.jar:/home/sleipnir/.m2/repository/org/springframework/boot/spring-boot-starter-json/2.7.0/spring-boot-starter-json-2.7.0.jar:/home/sleipnir/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.13.3/jackson-databind-2.13.3.jar:/home/sleipnir/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.13.3/jackson-annotations-2.13.3.jar:/home/sleipnir/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.13.3/jackson-core-2.13.3.jar:/home/sleipnir/.m2/repository/com/fasterxml/jackson/datatype/jackson-datatype-jdk8/2.13.3/jackson-datatype-jdk8-2.13.3.jar:/home/sleipnir/.m2/repository/com/fasterxml/jackson/datatype/jackson-datatype-jsr310/2.13.3/jackson-datatype-jsr310-2.13.3.jar:/home/sleipnir/.m2/repository/com/fasterxml/jackson/module/jackson-module-parameter-names/2.13.3/jackson-module-parameter-names-2.13.3.jar:/home/sleipnir/.m2/repository/org/springframework/spring-web/5.3.20/spring-web-5.3.20.jar:/home/sleipnir/.m2/repository/org/springframework/spring-beans/5.3.20/spring-beans-5.3.20.jar:/home/sleipnir/.m2/repository/org/springframework/spring-webflux/5.3.20/spring-webflux-5.3.20.jar:/home/sleipnir/.m2/repository/org/springframework/boot/spring-boot-starter-reactor-netty/2.7.0/spring-boot-starter-reactor-netty-2.7.0.jar:/home/sleipnir/.m2/repository/io/projectreactor/netty/reactor-netty-http/1.0.19/reactor-netty-http-1.0.19.jar:/home/sleipnir/.m2/repository/io/netty/netty-codec-http/4.1.77.Final/netty-codec-http-4.1.77.Final.jar:/home/sleipnir/.m2/repository/io/netty/netty-common/4.1.77.Final/netty-common-4.1.77.Final.jar:/home/sleipnir/.m2/repository/io/netty/netty-buffer/4.1.77.Final/netty-buffer-4.1.77.Final.jar:/home/sleipnir/.m2/repository/io/netty/netty-transport/4.1.77.Final/netty-transport-4.1.77.Final.jar:/home/sleipnir/.m2/repository/io/netty/netty-codec/4.1.77.Final/netty-codec-4.1.77.Final.jar:/home/sleipnir/.m2/repository/io/netty/netty-handler/4.1.77.Final/netty-handler-4.1.77.Final.jar:/home/sleipnir/.m2/repository/io/netty/netty-codec-http2/4.1.77.Final/netty-codec-http2-4.1.77.Final.jar:/home/sleipnir/.m2/repository/io/netty/netty-resolver-dns/4.1.77.Final/netty-resolver-dns-4.1.77.Final.jar:/home/sleipnir/.m2/repository/io/netty/netty-resolver/4.1.77.Final/netty-resolver-4.1.77.Final.jar:/home/sleipnir/.m2/repository/io/netty/netty-codec-dns/4.1.77.Final/netty-codec-dns-4.1.77.Final.jar:/home/sleipnir/.m2/repository/io/netty/netty-resolver-dns-native-macos/4.1.77.Final/netty-resolver-dns-native-macos-4.1.77.Final-osx-x86_64.jar:/home/sleipnir/.m2/repository/io/netty/netty-resolver-dns-classes-macos/4.1.77.Final/netty-resolver-dns-classes-macos-4.1.77.Final.jar:/home/sleipnir/.m2/repository/io/netty/netty-transport-native-epoll/4.1.77.Final/netty-transport-native-epoll-4.1.77.Final-linux-x86_64.jar:/home/sleipnir/.m2/repository/io/netty/netty-transport-native-unix-common/4.1.77.Final/netty-transport-native-unix-common-4.1.77.Final.jar:/home/sleipnir/.m2/repository/io/netty/netty-transport-classes-epoll/4.1.77.Final/netty-transport-classes-epoll-4.1.77.Final.jar:/home/sleipnir/.m2/repository/io/projectreactor/netty/reactor-netty-core/1.0.19/reactor-netty-core-1.0.19.jar:/home/sleipnir/.m2/repository/io/netty/netty-handler-proxy/4.1.77.Final/netty-handler-proxy-4.1.77.Final.jar:/home/sleipnir/.m2/repository/io/netty/netty-codec-socks/4.1.77.Final/netty-codec-socks-4.1.77.Final.jar:/home/sleipnir/.m2/repository/com/squareup/okhttp3/okhttp/4.9.3/okhttp-4.9.3.jar:/home/sleipnir/.m2/repository/com/squareup/okio/okio/2.8.0/okio-2.8.0.jar:/home/sleipnir/.m2/repository/org/jetbrains/kotlin/kotlin-stdlib-common/1.6.21/kotlin-stdlib-common-1.6.21.jar:/home/sleipnir/.m2/repository/org/jetbrains/kotlin/kotlin-stdlib/1.6.21/kotlin-stdlib-1.6.21.jar:/home/sleipnir/.m2/repository/org/jetbrains/annotations/13.0/annotations-13.0.jar:/home/sleipnir/.m2/repository/com/lightbend/akka/grpc/akka-grpc-runtime_2.12/2.1.1/akka-grpc-runtime_2.12-2.1.1.jar:/home/sleipnir/.m2/repository/org/scala-lang/scala-library/2.12.14/scala-library-2.12.14.jar:/home/sleipnir/.m2/repository/com/thesamet/scalapb/scalapb-runtime_2.12/0.11.6/scalapb-runtime_2.12-0.11.6.jar:/home/sleipnir/.m2/repository/com/thesamet/scalapb/lenses_2.12/0.11.6/lenses_2.12-0.11.6.jar:/home/sleipnir/.m2/repository/com/google/protobuf/protobuf-java/3.15.8/protobuf-java-3.15.8.jar:/home/sleipnir/.m2/repository/io/grpc/grpc-core/1.41.0/grpc-core-1.41.0.jar:/home/sleipnir/.m2/repository/io/grpc/grpc-api/1.41.0/grpc-api-1.41.0.jar:/home/sleipnir/.m2/repository/io/grpc/grpc-context/1.41.0/grpc-context-1.41.0.jar:/home/sleipnir/.m2/repository/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2.jar:/home/sleipnir/.m2/repository/com/google/code/gson/gson/2.9.0/gson-2.9.0.jar:/home/sleipnir/.m2/repository/com/google/android/annotations/4.1.1.4/annotations-4.1.1.4.jar:/home/sleipnir/.m2/repository/org/codehaus/mojo/animal-sniffer-annotations/1.19/animal-sniffer-annotations-1.19.jar:/home/sleipnir/.m2/repository/com/google/errorprone/error_prone_annotations/2.9.0/error_prone_annotations-2.9.0.jar:/home/sleipnir/.m2/repository/com/google/guava/guava/30.1-android/guava-30.1-android.jar:/home/sleipnir/.m2/repository/com/google/guava/failureaccess/1.0.1/failureaccess-1.0.1.jar:/home/sleipnir/.m2/repository/com/google/guava/listenablefuture/9999.0-empty-to-avoid-conflict-with-guava/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar:/home/sleipnir/.m2/repository/org/checkerframework/checker-compat-qual/2.5.5/checker-compat-qual-2.5.5.jar:/home/sleipnir/.m2/repository/com/google/j2objc/j2objc-annotations/1.3/j2objc-annotations-1.3.jar:/home/sleipnir/.m2/repository/io/perfmark/perfmark-api/0.23.0/perfmark-api-0.23.0.jar:/home/sleipnir/.m2/repository/io/grpc/grpc-netty-shaded/1.41.0/grpc-netty-shaded-1.41.0.jar:/home/sleipnir/.m2/repository/com/typesafe/akka/akka-http-core_2.12/10.2.7/akka-http-core_2.12-10.2.7.jar:/home/sleipnir/.m2/repository/com/typesafe/akka/akka-parsing_2.12/10.2.7/akka-parsing_2.12-10.2.7.jar:/home/sleipnir/.m2/repository/com/typesafe/akka/akka-http_2.12/10.2.7/akka-http_2.12-10.2.7.jar:/home/sleipnir/.m2/repository/org/scala-lang/modules/scala-collection-compat_2.12/2.5.0/scala-collection-compat_2.12-2.5.0.jar:/home/sleipnir/.m2/repository/com/lightbend/akka/akka-stream-alpakka-amqp_2.12/3.0.4/akka-stream-alpakka-amqp_2.12-3.0.4.jar:/home/sleipnir/.m2/repository/com/rabbitmq/amqp-client/5.14.2/amqp-client-5.14.2.jar:/home/sleipnir/.m2/repository/com/typesafe/akka/akka-stream_2.12/2.6.14/akka-stream_2.12-2.6.14.jar:/home/sleipnir/.m2/repository/com/typesafe/akka/akka-actor_2.12/2.6.14/akka-actor_2.12-2.6.14.jar:/home/sleipnir/.m2/repository/com/typesafe/config/1.4.0/config-1.4.0.jar:/home/sleipnir/.m2/repository/org/scala-lang/modules/scala-java8-compat_2.12/0.8.0/scala-java8-compat_2.12-0.8.0.jar:/home/sleipnir/.m2/repository/com/typesafe/akka/akka-protobuf-v3_2.12/2.6.14/akka-protobuf-v3_2.12-2.6.14.jar:/home/sleipnir/.m2/repository/org/reactivestreams/reactive-streams/1.0.3/reactive-streams-1.0.3.jar:/home/sleipnir/.m2/repository/com/typesafe/ssl-config-core_2.12/0.4.2/ssl-config-core_2.12-0.4.2.jar:/home/sleipnir/.m2/repository/org/scala-lang/modules/scala-parser-combinators_2.12/1.1.2/scala-parser-combinators_2.12-1.1.2.jar:/home/sleipnir/.m2/repository/com/typesafe/akka/akka-discovery_2.12/2.6.14/akka-discovery_2.12-2.6.14.jar:/home/sleipnir/.m2/repository/ch/qos/logback/logback-classic/1.2.3/logback-classic-1.2.3.jar:/home/sleipnir/.m2/repository/ch/qos/logback/logback-core/1.2.11/logback-core-1.2.11.jar:/home/sleipnir/.m2/repository/org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36.jar:/home/sleipnir/.m2/repository/com/typesafe/akka/akka-actor-testkit-typed_2.12/2.6.14/akka-actor-testkit-typed_2.12-2.6.14.jar:/home/sleipnir/.m2/repository/com/typesafe/akka/akka-actor-typed_2.12/2.6.14/akka-actor-typed_2.12-2.6.14.jar:/home/sleipnir/.m2/repository/com/typesafe/akka/akka-slf4j_2.12/2.6.14/akka-slf4j_2.12-2.6.14.jar:/home/sleipnir/.m2/repository/com/typesafe/akka/akka-testkit_2.12/2.6.14/akka-testkit_2.12-2.6.14.jar:/home/sleipnir/.m2/repository/com/typesafe/akka/akka-stream-testkit_2.12/2.6.14/akka-stream-testkit_2.12-2.6.14.jar:/home/sleipnir/.m2/repository/io/projectreactor/reactor-core/3.4.18/reactor-core-3.4.18.jar:/home/sleipnir/.m2/repository/org/springframework/boot/spring-boot-starter-test/2.7.0/spring-boot-starter-test-2.7.0.jar:/home/sleipnir/.m2/repository/org/springframework/boot/spring-boot-test/2.7.0/spring-boot-test-2.7.0.jar:/home/sleipnir/.m2/repository/org/springframework/boot/spring-boot-test-autoconfigure/2.7.0/spring-boot-test-autoconfigure-2.7.0.jar:/home/sleipnir/.m2/repository/com/jayway/jsonpath/json-path/2.7.0/json-path-2.7.0.jar:/home/sleipnir/.m2/repository/net/minidev/json-smart/2.4.8/json-smart-2.4.8.jar:/home/sleipnir/.m2/repository/net/minidev/accessors-smart/2.4.8/accessors-smart-2.4.8.jar:/home/sleipnir/.m2/repository/org/ow2/asm/asm/9.1/asm-9.1.jar:/home/sleipnir/.m2/repository/jakarta/xml/bind/jakarta.xml.bind-api/2.3.3/jakarta.xml.bind-api-2.3.3.jar:/home/sleipnir/.m2/repository/jakarta/activation/jakarta.activation-api/1.2.2/jakarta.activation-api-1.2.2.jar:/home/sleipnir/.m2/repository/org/assertj/assertj-core/3.22.0/assertj-core-3.22.0.jar:/home/sleipnir/.m2/repository/org/hamcrest/hamcrest/2.2/hamcrest-2.2.jar:/home/sleipnir/.m2/repository/org/junit/jupiter/junit-jupiter/5.8.2/junit-jupiter-5.8.2.jar:/home/sleipnir/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.8.2/junit-jupiter-api-5.8.2.jar:/home/sleipnir/.m2/repository/org/opentest4j/opentest4j/1.2.0/opentest4j-1.2.0.jar:/home/sleipnir/.m2/repository/org/junit/platform/junit-platform-commons/1.8.2/junit-platform-commons-1.8.2.jar:/home/sleipnir/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/home/sleipnir/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.8.2/junit-jupiter-params-5.8.2.jar:/home/sleipnir/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.8.2/junit-jupiter-engine-5.8.2.jar:/home/sleipnir/.m2/repository/org/junit/platform/junit-platform-engine/1.8.2/junit-platform-engine-1.8.2.jar:/home/sleipnir/.m2/repository/org/mockito/mockito-core/4.5.1/mockito-core-4.5.1.jar:/home/sleipnir/.m2/repository/net/bytebuddy/byte-buddy/1.12.10/byte-buddy-1.12.10.jar:/home/sleipnir/.m2/repository/net/bytebuddy/byte-buddy-agent/1.12.10/byte-buddy-agent-1.12.10.jar:/home/sleipnir/.m2/repository/org/objenesis/objenesis/3.2/objenesis-3.2.jar:/home/sleipnir/.m2/repository/org/mockito/mockito-junit-jupiter/4.5.1/mockito-junit-jupiter-4.5.1.jar:/home/sleipnir/.m2/repository/org/skyscreamer/jsonassert/1.5.0/jsonassert-1.5.0.jar:/home/sleipnir/.m2/repository/com/vaadin/external/google/android-json/0.0.20131108.vaadin1/android-json-0.0.20131108.vaadin1.jar:/home/sleipnir/.m2/repository/org/springframework/spring-core/5.3.20/spring-core-5.3.20.jar:/home/sleipnir/.m2/repository/org/springframework/spring-jcl/5.3.20/spring-jcl-5.3.20.jar:/home/sleipnir/.m2/repository/org/springframework/spring-test/5.3.20/spring-test-5.3.20.jar:/home/sleipnir/.m2/repository/org/xmlunit/xmlunit-core/2.9.0/xmlunit-core-2.9.0.jar:/home/sleipnir/.m2/repository/io/projectreactor/reactor-test/3.4.18/reactor-test-3.4.18.jar:/home/sleipnir/.m2/repository/junit/junit/4.13.1/junit-4.13.1.jar:/home/sleipnir/.m2/repository/org/hamcrest/hamcrest-core/2.2/hamcrest-core-2.2.jar:"/>
     <property name="java.vm.specification.version" value="11"/>
     <property name="sun.arch.data.model" value="64"/>
-    <property name="sun.java.command" value="/home/sleipnir/workspaces/eigr/spawn/sdks/jvm/spawn-jvm/target/surefire/surefirebooter15011050986793437127.jar /home/sleipnir/workspaces/eigr/spawn/sdks/jvm/spawn-jvm/target/surefire/surefire10564569342699448794tmp /home/sleipnir/workspaces/eigr/spawn/sdks/jvm/spawn-jvm/target/surefire/surefire4501956405117062274tmp"/>
+    <property name="sun.java.command" value="/home/sleipnir/workspaces/eigr/spawn/sdks/jvm/spawn-jvm/target/surefire/surefirebooter9222279518251077546.jar /home/sleipnir/workspaces/eigr/spawn/sdks/jvm/spawn-jvm/target/surefire/surefire9935673762903826114tmp /home/sleipnir/workspaces/eigr/spawn/sdks/jvm/spawn-jvm/target/surefire/surefire4798599690236348587tmp"/>
     <property name="java.home" value="/usr/lib/jvm/java-11-openjdk-amd64"/>
     <property name="user.language" value="en"/>
     <property name="java.specification.vendor" value="Oracle Corporation"/>
@@ -63,156 +63,5 @@
     <property name="sun.desktop" value="gnome"/>
     <property name="sun.cpu.isalist" value=""/>
   </properties>
-  <testcase classname="io.eigr.spawn.AppTest" name="shouldAnswerWithTrue" time="10.903">
-    <error message="Failed to connect to localhost/0:0:0:0:0:0:0:1:9001" type="java.net.ConnectException">java.net.ConnectException: Failed to connect to localhost/0:0:0:0:0:0:0:1:9001
-	at okhttp3.internal.connection.RealConnection.connectSocket(RealConnection.kt:297)
-	at okhttp3.internal.connection.RealConnection.connect(RealConnection.kt:207)
-	at okhttp3.internal.connection.ExchangeFinder.findConnection(ExchangeFinder.kt:226)
-	at okhttp3.internal.connection.ExchangeFinder.findHealthyConnection(ExchangeFinder.kt:106)
-	at okhttp3.internal.connection.ExchangeFinder.find(ExchangeFinder.kt:74)
-	at okhttp3.internal.connection.RealCall.initExchange$okhttp(RealCall.kt:255)
-	at okhttp3.internal.connection.ConnectInterceptor.intercept(ConnectInterceptor.kt:32)
-	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
-	at okhttp3.internal.cache.CacheInterceptor.intercept(CacheInterceptor.kt:95)
-	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
-	at okhttp3.internal.http.BridgeInterceptor.intercept(BridgeInterceptor.kt:83)
-	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
-	at okhttp3.internal.http.RetryAndFollowUpInterceptor.intercept(RetryAndFollowUpInterceptor.kt:76)
-	at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
-	at okhttp3.internal.connection.RealCall.getResponseWithInterceptorChain$okhttp(RealCall.kt:201)
-	at okhttp3.internal.connection.RealCall.execute(RealCall.kt:154)
-	at io.eigr.spawn.AppTest.shouldAnswerWithTrue(AppTest.java:112)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
-	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
-	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:59)
-	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
-	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:56)
-	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
-	at org.springframework.test.context.junit4.statements.RunBeforeTestExecutionCallbacks.evaluate(RunBeforeTestExecutionCallbacks.java:74)
-	at org.springframework.test.context.junit4.statements.RunAfterTestExecutionCallbacks.evaluate(RunAfterTestExecutionCallbacks.java:84)
-	at org.springframework.test.context.junit4.statements.RunBeforeTestMethodCallbacks.evaluate(RunBeforeTestMethodCallbacks.java:75)
-	at org.springframework.test.context.junit4.statements.RunAfterTestMethodCallbacks.evaluate(RunAfterTestMethodCallbacks.java:86)
-	at org.springframework.test.context.junit4.statements.SpringRepeat.evaluate(SpringRepeat.java:84)
-	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:366)
-	at org.springframework.test.context.junit4.SpringJUnit4ClassRunner.runChild(SpringJUnit4ClassRunner.java:251)
-	at org.springframework.test.context.junit4.SpringJUnit4ClassRunner.runChild(SpringJUnit4ClassRunner.java:97)
-	at org.junit.runners.ParentRunner$4.run(ParentRunner.java:331)
-	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:79)
-	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:329)
-	at org.junit.runners.ParentRunner.access$100(ParentRunner.java:66)
-	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:293)
-	at org.springframework.test.context.junit4.statements.RunBeforeTestClassCallbacks.evaluate(RunBeforeTestClassCallbacks.java:61)
-	at org.springframework.test.context.junit4.statements.RunAfterTestClassCallbacks.evaluate(RunAfterTestClassCallbacks.java:70)
-	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
-	at org.junit.runners.ParentRunner.run(ParentRunner.java:413)
-	at org.springframework.test.context.junit4.SpringJUnit4ClassRunner.run(SpringJUnit4ClassRunner.java:190)
-	at org.apache.maven.surefire.junit4.JUnit4TestSet.execute(JUnit4TestSet.java:104)
-	at org.apache.maven.surefire.junit4.JUnit4Provider.executeTestSet(JUnit4Provider.java:147)
-	at org.apache.maven.surefire.junit4.JUnit4Provider.invoke(JUnit4Provider.java:98)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
-	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
-	at org.apache.maven.surefire.booter.ProviderFactory$ClassLoaderProxy.invoke(ProviderFactory.java:101)
-	at com.sun.proxy.$Proxy0.invoke(Unknown Source)
-	at org.apache.maven.surefire.booter.SurefireStarter.invokeProvider(SurefireStarter.java:139)
-	at org.apache.maven.surefire.booter.SurefireStarter.runSuitesInProcess(SurefireStarter.java:82)
-	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:81)
-	Suppressed: java.io.IOException: unexpected end of stream on http://localhost:9001/...
-		at okhttp3.internal.http1.Http1ExchangeCodec.readResponseHeaders(Http1ExchangeCodec.kt:202)
-		at okhttp3.internal.connection.Exchange.readResponseHeaders(Exchange.kt:106)
-		at okhttp3.internal.http.CallServerInterceptor.intercept(CallServerInterceptor.kt:79)
-		at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
-		at okhttp3.internal.connection.ConnectInterceptor.intercept(ConnectInterceptor.kt:34)
-		... 48 more
-	Caused by: java.io.EOFException: \n not found: limit=0 content=…
-		at okio.RealBufferedSource.readUtf8LineStrict(RealBufferedSource.kt:332)
-		at okhttp3.internal.http1.HeadersReader.readLine(HeadersReader.kt:29)
-		at okhttp3.internal.http1.Http1ExchangeCodec.readResponseHeaders(Http1ExchangeCodec.kt:178)
-		... 52 more
-	Suppressed: java.io.IOException: unexpected end of stream on http://localhost:9001/...
-		at okhttp3.internal.http1.Http1ExchangeCodec.readResponseHeaders(Http1ExchangeCodec.kt:202)
-		at okhttp3.internal.connection.Exchange.readResponseHeaders(Exchange.kt:106)
-		at okhttp3.internal.http.CallServerInterceptor.intercept(CallServerInterceptor.kt:79)
-		at okhttp3.internal.http.RealInterceptorChain.proceed(RealInterceptorChain.kt:109)
-		at okhttp3.internal.connection.ConnectInterceptor.intercept(ConnectInterceptor.kt:34)
-		... 48 more
-	Caused by: java.io.EOFException: \n not found: limit=0 content=…
-		at okio.RealBufferedSource.readUtf8LineStrict(RealBufferedSource.kt:332)
-		at okhttp3.internal.http1.HeadersReader.readLine(HeadersReader.kt:29)
-		at okhttp3.internal.http1.Http1ExchangeCodec.readResponseHeaders(Http1ExchangeCodec.kt:178)
-		... 52 more
-Caused by: java.net.ConnectException: Connection refused (Connection refused)
-	at java.base/java.net.PlainSocketImpl.socketConnect(Native Method)
-	at java.base/java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:412)
-	at java.base/java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:255)
-	at java.base/java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:237)
-	at java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392)
-	at java.base/java.net.Socket.connect(Socket.java:609)
-	at okhttp3.internal.platform.Platform.connectSocket(Platform.kt:128)
-	at okhttp3.internal.connection.RealConnection.connectSocket(RealConnection.kt:295)
-	... 54 more
-</error>
-    <system-out>@HL
-@HL-------------------------------------------------------
-@HL T E S T S
-@HL-------------------------------------------------------
-@SLRunning io.eigr.spawn.AppTest
-21:18:25.194 [main] DEBUG org.springframework.test.context.junit4.SpringJUnit4ClassRunner - SpringJUnit4ClassRunner constructor called with [class io.eigr.spawn.AppTest]
-21:18:25.203 [main] DEBUG org.springframework.test.context.BootstrapUtils - Instantiating CacheAwareContextLoaderDelegate from class [org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate]
-21:18:25.209 [main] DEBUG org.springframework.test.context.BootstrapUtils - Instantiating BootstrapContext using constructor [public org.springframework.test.context.support.DefaultBootstrapContext(java.lang.Class,org.springframework.test.context.CacheAwareContextLoaderDelegate)]
-21:18:25.261 [main] DEBUG org.springframework.test.context.BootstrapUtils - Instantiating TestContextBootstrapper for test class [io.eigr.spawn.AppTest] from class [org.springframework.boot.test.context.SpringBootTestContextBootstrapper]
-21:18:25.276 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper - Neither @ContextConfiguration nor @ContextHierarchy found for test class [io.eigr.spawn.AppTest], using SpringBootContextLoader
-21:18:25.282 [main] DEBUG org.springframework.test.context.support.AbstractContextLoader - Did not detect default resource location for test class [io.eigr.spawn.AppTest]: class path resource [io/eigr/spawn/AppTest-context.xml] does not exist
-21:18:25.283 [main] DEBUG org.springframework.test.context.support.AbstractContextLoader - Did not detect default resource location for test class [io.eigr.spawn.AppTest]: class path resource [io/eigr/spawn/AppTestContext.groovy] does not exist
-21:18:25.283 [main] INFO org.springframework.test.context.support.AbstractContextLoader - Could not detect default resource locations for test class [io.eigr.spawn.AppTest]: no resource found for suffixes {-context.xml, Context.groovy}.
-21:18:25.285 [main] DEBUG org.springframework.test.context.support.AnnotationConfigContextLoaderUtils - Ignoring class [io.eigr.spawn.AppTest$SpawnUserFunctionHttpHandler]; it must be static, non-private, non-final, and annotated with @Configuration to be considered a default configuration class.
-21:18:25.285 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils - Could not detect default configuration classes for test class [io.eigr.spawn.AppTest]: AppTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-21:18:25.341 [main] DEBUG org.springframework.test.context.support.ActiveProfilesUtils - Could not find an &apos;annotation declaring class&apos; for annotation type [org.springframework.test.context.ActiveProfiles] and class [io.eigr.spawn.AppTest]
-21:18:25.401 [main] DEBUG org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider - Identified candidate component class: file [/home/sleipnir/workspaces/eigr/spawn/sdks/jvm/spawn-jvm/target/classes/io/eigr/spawn/Spawn.class]
-21:18:25.402 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper - Found @SpringBootConfiguration io.eigr.spawn.Spawn for test class io.eigr.spawn.AppTest
-21:18:25.485 [main] DEBUG org.springframework.boot.test.context.SpringBootTestContextBootstrapper - @TestExecutionListeners is not present for class [io.eigr.spawn.AppTest]: using defaults.
-21:18:25.485 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper - Loaded default TestExecutionListener class names from location [META-INF/spring.factories]: [org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener, org.springframework.boot.test.mock.mockito.ResetMocksTestExecutionListener, org.springframework.boot.test.autoconfigure.restdocs.RestDocsTestExecutionListener, org.springframework.boot.test.autoconfigure.web.client.MockRestServiceServerResetTestExecutionListener, org.springframework.boot.test.autoconfigure.web.servlet.MockMvcPrintOnlyOnFailureTestExecutionListener, org.springframework.boot.test.autoconfigure.web.servlet.WebDriverTestExecutionListener, org.springframework.boot.test.autoconfigure.webservices.client.MockWebServiceServerTestExecutionListener, org.springframework.test.context.web.ServletTestExecutionListener, org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener, org.springframework.test.context.event.ApplicationEventsTestExecutionListener, org.springframework.test.context.support.DependencyInjectionTestExecutionListener, org.springframework.test.context.support.DirtiesContextTestExecutionListener, org.springframework.test.context.transaction.TransactionalTestExecutionListener, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener, org.springframework.test.context.event.EventPublishingTestExecutionListener]
-21:18:25.492 [main] DEBUG org.springframework.boot.test.context.SpringBootTestContextBootstrapper - Skipping candidate TestExecutionListener [org.springframework.test.context.web.ServletTestExecutionListener] due to a missing dependency. Specify custom listener classes or make the default listener classes and their required dependencies available. Offending class: [javax/servlet/ServletContext]
-21:18:25.494 [main] DEBUG org.springframework.boot.test.context.SpringBootTestContextBootstrapper - Skipping candidate TestExecutionListener [org.springframework.test.context.transaction.TransactionalTestExecutionListener] due to a missing dependency. Specify custom listener classes or make the default listener classes and their required dependencies available. Offending class: [org/springframework/transaction/interceptor/TransactionAttributeSource]
-21:18:25.494 [main] DEBUG org.springframework.boot.test.context.SpringBootTestContextBootstrapper - Skipping candidate TestExecutionListener [org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener] due to a missing dependency. Specify custom listener classes or make the default listener classes and their required dependencies available. Offending class: [org/springframework/transaction/interceptor/TransactionAttribute]
-21:18:25.495 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper - Using TestExecutionListeners: [org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener@606e4010, org.springframework.test.context.event.ApplicationEventsTestExecutionListener@8458f04, org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener@48075da3, org.springframework.boot.test.autoconfigure.SpringBootDependencyInjectionTestExecutionListener@68c9133c, org.springframework.test.context.support.DirtiesContextTestExecutionListener@7a35b0f5, org.springframework.test.context.event.EventPublishingTestExecutionListener@5e2c3d18, org.springframework.boot.test.mock.mockito.ResetMocksTestExecutionListener@2cb4893b, org.springframework.boot.test.autoconfigure.restdocs.RestDocsTestExecutionListener@cc43f62, org.springframework.boot.test.autoconfigure.web.client.MockRestServiceServerResetTestExecutionListener@5b218417, org.springframework.boot.test.autoconfigure.web.servlet.MockMvcPrintOnlyOnFailureTestExecutionListener@645aa696, org.springframework.boot.test.autoconfigure.web.servlet.WebDriverTestExecutionListener@6caf0677, org.springframework.boot.test.autoconfigure.webservices.client.MockWebServiceServerTestExecutionListener@413d1baf]
-21:18:25.496 [main] DEBUG org.springframework.test.annotation.ProfileValueUtils - Retrieved @ProfileValueSourceConfiguration [null] for test class [io.eigr.spawn.AppTest]
-21:18:25.498 [main] DEBUG org.springframework.test.annotation.ProfileValueUtils - Retrieved ProfileValueSource type [class org.springframework.test.annotation.SystemProfileValueSource] for class [io.eigr.spawn.AppTest]
-21:18:25.500 [main] DEBUG org.springframework.test.annotation.ProfileValueUtils - Retrieved @ProfileValueSourceConfiguration [null] for test class [io.eigr.spawn.AppTest]
-21:18:25.500 [main] DEBUG org.springframework.test.annotation.ProfileValueUtils - Retrieved ProfileValueSource type [class org.springframework.test.annotation.SystemProfileValueSource] for class [io.eigr.spawn.AppTest]
-21:18:25.501 [main] DEBUG org.springframework.test.annotation.ProfileValueUtils - Retrieved @ProfileValueSourceConfiguration [null] for test class [io.eigr.spawn.AppTest]
-21:18:25.501 [main] DEBUG org.springframework.test.annotation.ProfileValueUtils - Retrieved ProfileValueSource type [class org.springframework.test.annotation.SystemProfileValueSource] for class [io.eigr.spawn.AppTest]
-21:18:25.502 [main] DEBUG org.springframework.test.annotation.ProfileValueUtils - Retrieved @ProfileValueSourceConfiguration [null] for test class [io.eigr.spawn.AppTest]
-21:18:25.502 [main] DEBUG org.springframework.test.annotation.ProfileValueUtils - Retrieved ProfileValueSource type [class org.springframework.test.annotation.SystemProfileValueSource] for class [io.eigr.spawn.AppTest]
-21:18:25.507 [main] DEBUG org.springframework.test.context.support.AbstractDirtiesContextTestExecutionListener - Before test class: context [DefaultTestContext@548a24a testClass = AppTest, testInstance = [null], testMethod = [null], testException = [null], mergedContextConfiguration = [ReactiveWebMergedContextConfiguration@433defed testClass = AppTest, locations = &apos;{}&apos;, classes = &apos;{class io.eigr.spawn.Spawn}&apos;, contextInitializerClasses = &apos;[]&apos;, activeProfiles = &apos;{}&apos;, propertySourceLocations = &apos;{}&apos;, propertySourceProperties = &apos;{org.springframework.boot.test.context.SpringBootTestContextBootstrapper=true}&apos;, contextCustomizers = set[org.springframework.boot.test.context.filter.ExcludeFilterContextCustomizer@20d28811, org.springframework.boot.test.json.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer@7adda9cc, org.springframework.boot.test.mock.mockito.MockitoContextCustomizer@0, org.springframework.boot.test.web.client.TestRestTemplateContextCustomizer@5223e5ee, org.springframework.boot.test.web.reactive.server.WebTestClientContextCustomizer@76908cc0, org.springframework.boot.test.autoconfigure.actuate.metrics.MetricsExportContextCustomizerFactory$DisableMetricExportContextCustomizer@6f96c77, org.springframework.boot.test.autoconfigure.properties.PropertyMappingContextCustomizer@0, org.springframework.boot.test.autoconfigure.web.servlet.WebDriverContextCustomizerFactory$Customizer@7e0b85f9, org.springframework.boot.test.context.SpringBootTestArgs@1, org.springframework.boot.test.context.SpringBootTestWebEnvironment@1e67a849], contextLoader = &apos;org.springframework.boot.test.context.SpringBootContextLoader&apos;, parent = [null]], attributes = map[[empty]]], class annotated with @DirtiesContext [false] with mode [null].
-21:18:25.509 [main] DEBUG org.springframework.test.annotation.ProfileValueUtils - Retrieved @ProfileValueSourceConfiguration [null] for test class [io.eigr.spawn.AppTest]
-21:18:25.509 [main] DEBUG org.springframework.test.annotation.ProfileValueUtils - Retrieved ProfileValueSource type [class org.springframework.test.annotation.SystemProfileValueSource] for class [io.eigr.spawn.AppTest]
-21:18:25.769 [main] DEBUG org.springframework.test.context.support.DependencyInjectionTestExecutionListener - Performing dependency injection for test context [[DefaultTestContext@548a24a testClass = AppTest, testInstance = io.eigr.spawn.AppTest@24ba9639, testMethod = [null], testException = [null], mergedContextConfiguration = [ReactiveWebMergedContextConfiguration@433defed testClass = AppTest, locations = &apos;{}&apos;, classes = &apos;{class io.eigr.spawn.Spawn}&apos;, contextInitializerClasses = &apos;[]&apos;, activeProfiles = &apos;{}&apos;, propertySourceLocations = &apos;{}&apos;, propertySourceProperties = &apos;{org.springframework.boot.test.context.SpringBootTestContextBootstrapper=true}&apos;, contextCustomizers = set[org.springframework.boot.test.context.filter.ExcludeFilterContextCustomizer@20d28811, org.springframework.boot.test.json.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer@7adda9cc, org.springframework.boot.test.mock.mockito.MockitoContextCustomizer@0, org.springframework.boot.test.web.client.TestRestTemplateContextCustomizer@5223e5ee, org.springframework.boot.test.web.reactive.server.WebTestClientContextCustomizer@76908cc0, org.springframework.boot.test.autoconfigure.actuate.metrics.MetricsExportContextCustomizerFactory$DisableMetricExportContextCustomizer@6f96c77, org.springframework.boot.test.autoconfigure.properties.PropertyMappingContextCustomizer@0, org.springframework.boot.test.autoconfigure.web.servlet.WebDriverContextCustomizerFactory$Customizer@7e0b85f9, org.springframework.boot.test.context.SpringBootTestArgs@1, org.springframework.boot.test.context.SpringBootTestWebEnvironment@1e67a849], contextLoader = &apos;org.springframework.boot.test.context.SpringBootContextLoader&apos;, parent = [null]], attributes = map[&apos;org.springframework.test.context.event.ApplicationEventsTestExecutionListener.recordApplicationEvents&apos; -&gt; false]]].
-
-  .   ____          _            __ _ _
- /\\ / ___&apos;_ __ _ _(_)_ __  __ _ \ \ \ \
-( ( )\___ | &apos;_ | &apos;_| | &apos;_ \/ _` | \ \ \ \
- \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
-  &apos;  |____| .__|_| |_|_| |_\__, | / / / /
- =========|_|==============|___/=/_/_/_/
- :: Spring Boot ::                (v2.7.0)
-
-2022-06-07 21:18:26.114  INFO 458775 --- [           main] io.eigr.spawn.AppTest                    : Starting AppTest using Java 11.0.15 on pop-os with PID 458775 (started by sleipnir in /home/sleipnir/workspaces/eigr/spawn/sdks/jvm/spawn-jvm)
-2022-06-07 21:18:26.115  INFO 458775 --- [           main] io.eigr.spawn.AppTest                    : No active profile set, falling back to 1 default profile: &quot;default&quot;
-2022-06-07 21:18:27.667  INFO 458775 --- [           main] io.eigr.spawn.AppTest                    : Started AppTest in 1.87 seconds (JVM running for 2.966)
-Send registration request...
-Registration response: proxy_info {
-  protocol_major_version: 1
-  protocol_minor_version: 2
-  proxy_name: &quot;spawn&quot;
-  proxy_version: &quot;0.1.0&quot;
-}
-
-Send Invocation request...
-[java.io.IOException: unexpected end of stream on http://localhost:9001/..., java.io.IOException: unexpected end of stream on http://localhost:9001/...]
-</system-out>
-  </testcase>
+  <testcase classname="io.eigr.spawn.AppTest" name="shouldAnswerWithTrue" time="20.749"/>
 </testsuite>

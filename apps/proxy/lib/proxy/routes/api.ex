@@ -36,7 +36,7 @@ defmodule Proxy.Routes.API do
 
     with request <- get_body(conn.body_params, InvocationRequest),
          {:ok, response} <- Actors.invoke(request) do
-      send!(conn, 200, InvocationResponse.encode(response), @content_type)
+      send!(conn, 200, InvocationResponse.encode(response.invocation_response), @content_type)
     else
       _ ->
         status = RequestStatus.new(status: :ERROR, message: "Error on invoke Actor")

@@ -66,8 +66,6 @@ defmodule Actors do
         %Actor{name: actor_name} = actor,
         request
       ) do
-    IO.inspect(request, label: "Requestsssssssssss")
-
     with {:ok, %{node: node, actor: _registered_actor}} <-
            ActorRegistry.lookup(system_name, actor_name),
          _pid <- Node.spawn(node, __MODULE__, :try_reactivate_actor, [system, actor]),
