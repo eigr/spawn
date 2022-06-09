@@ -44,7 +44,7 @@
 //
 // 
 // Once the system has been initialized, that is, the registration step has been successfully completed, 
-// then the user role will be able to make requests to the System Actors.
+// then the user function will be able to make requests to the System Actors.
 // This is done through a post request to the Proxy at the `/system/:name/actors/:actor_name/invoke` endpoint.
 //
 // A user function that wants to call actors in Proxy Spawn must proceed by making a POST request as the follow:
@@ -59,7 +59,7 @@
 // invocation request type bytes encoded here :-)
 // `
 // 
-// Assuming that two user roles were registered in different separate Proxies, the above request would go the following way:
+// Assuming that two user functions were registered in different separate Proxies, the above request would go the following way:
 //
 // +-----------------+                       +------------------------+       +------------------------+                                         +--------------------------------+
 // | User Function A |                       | Local Spawn Sidecar A  |       | Remote User Function B |                                         | Remote Spawn Sidecar / Actor B |
@@ -215,7 +215,7 @@ message ActorInvocation {
     google.protobuf.Any value = 5;
 }
 
-// The user role's response after executing the action originated by the local proxy request via ActorInvocation.
+// The user function's response after executing the action originated by the local proxy request via ActorInvocation.
 //
 // Params:
 //   actor_name: The name of the Actor handling the InvocationRequest request, also called the target Actor.
