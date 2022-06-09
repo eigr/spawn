@@ -145,42 +145,39 @@ defmodule Actors.Actor.Entity do
       )
       |> ActorInvocation.encode()
 
-    resp =
-      case Actors.Node.Client.invoke_host_actor(payload) do
-        {:ok, %Tesla.Env{body: ""}} ->
-          Logger.error("User Function Actor response Invocation body is empty")
-          {:error, :no_content}
+    case Actors.Node.Client.invoke_host_actor(payload) do
+      {:ok, %Tesla.Env{body: ""}} ->
+        Logger.error("User Function Actor response Invocation body is empty")
+        {:error, :no_content}
 
-        {:ok, %Tesla.Env{body: nil}} ->
-          Logger.error("User Function Actor response Invocation body is nil")
-          {:error, :no_content}
+      {:ok, %Tesla.Env{body: nil}} ->
+        Logger.error("User Function Actor response Invocation body is nil")
+        {:error, :no_content}
 
-        {:ok, %Tesla.Env{body: body}} ->
-          with %ActorInvocationResponse{} = resp <-
-                 ActorInvocationResponse.decode(body) do
-            # TODO temporary
-            {:ok, resp}
-          else
-            error ->
-              Logger.error("Error on parse response #{inspect(error)}")
-              {:error, :invalid_content}
-          end
+      {:ok, %Tesla.Env{body: body}} ->
+        with %ActorInvocationResponse{
+               updated_context: %Context{} = user_ctx
+             } = resp <- ActorInvocationResponse.decode(body) do
+          IO.inspect(resp, label: "Responseeeeeeee")
+          {:reply, {:ok, resp}, update_state(state, user_ctx)}
+        else
+          error ->
+            Logger.error("Error on parse response #{inspect(error)}")
+            {:reply, {:error, :invalid_content}, state}
+        end
 
-        {:error, timeout} ->
-          Logger.error("User Function Actor Invocation Timeout Error")
-          {:error, timeout}
+      {:error, timeout} ->
+        Logger.error("User Function Actor Invocation Timeout Error")
+        {:reply, {:error, timeout}, state}
 
-        {:error, reason} ->
-          Logger.error("User Function Actor Invocation Unknown Error: #{inspect(reason)}")
-          {:error, reason}
+      {:error, reason} ->
+        Logger.error("User Function Actor Invocation Unknown Error: #{inspect(reason)}")
+        {:reply, {:error, reason}, state}
 
-        _ ->
-          Logger.error("User Function Actor Invocation Unknown Error")
-      end
-
-    IO.inspect(resp, label: "Actors.Node.Client.invoke_host_actor(payload) ::: ")
-
-    {:reply, resp, state}
+      error ->
+        Logger.error("User Function Actor Invocation Unknown Error")
+        {:reply, {:error, error}, state}
+    end
   end
 
   @impl true
@@ -272,7 +269,10 @@ defmodule Actors.Actor.Entity do
         } = state
       )
       when is_nil(actor_state) do
-    Logger.warn("No handled internal message for actor #{name}. Message: #{inspect(message)}")
+    Logger.warn(
+      "No handled internal message for actor #{name}. Message: #{inspect(message)}. Actor state: #{inspect(state)}"
+    )
+
     {:noreply, state}
   end
 
@@ -282,7 +282,10 @@ defmodule Actors.Actor.Entity do
           actor: %Actor{name: name, state: %ActorState{} = actor_state}
         } = state
       ) do
-    Logger.warn("No handled internal message for actor #{name}. Message: #{inspect(message)}")
+    Logger.warn(
+      "No handled internal message for actor #{name}. Message: #{inspect(message)}. Actor state: #{inspect(state)}"
+    )
+
     StateManager.save(name, actor_state)
     {:noreply, state}
   end
@@ -295,7 +298,7 @@ defmodule Actors.Actor.Entity do
 
   def terminate(
         reason,
-        %EntityState{actor: %Actor{name: name, state: %ActorState{} = actor_state}} = _state
+        %EntityState{actor: %Actor{name: name, state: %ActorState{} = actor_state}} = state
       ) do
     StateManager.save(name, actor_state)
     Logger.debug("Terminating actor #{name} with reason #{inspect(reason)}")
@@ -371,6 +374,25 @@ defmodule Actors.Actor.Entity do
          timeout_factor
        ),
        do: timeout + timeout_factor
+
+  defp update_state(
+         %EntityState{
+           actor: %Actor{} = _actor
+         } = state,
+         %Context{state: updated_state} = _user_ctx
+       )
+       when is_nil(updated_state),
+       do: state
+
+  defp update_state(
+         %EntityState{
+           actor: %Actor{state: %ActorState{} = actor_state} = actor
+         } = state,
+         %Context{state: updated_state} = _user_ctx
+       ) do
+    new_state = %{actor_state | state: updated_state}
+    %{state | actor: %{actor | state: new_state}}
+  end
 
   defp via(name) do
     {:via, Horde.Registry, {Actors.Actor.Registry, {__MODULE__, name}}}
