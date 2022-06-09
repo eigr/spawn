@@ -114,7 +114,7 @@ public class SpawnTest {
 
             Thread.sleep(3000);
 
-            for (int i = 0; i < 1; i++) {
+            for (int i = 0; i < 10000; i++) {
                 try {
                     log.info("Send Invocation request...");
                     Call invocationCall = client.newCall(httpInvocationRequest);
