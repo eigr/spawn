@@ -86,11 +86,13 @@
 //         |                                             |                                |                                                                     |
 //         |                                             |                                | HTTP Reply with the result and the new state of actor B             |
 //         |                                             |                                |-------------------------------------------------------------------->|
-//         |                                             |                                |                                                                     |
-//         |                                             |                 Receive response, store new state, and return result value to original caller        |
+//         |                                             |                                |                                                                     | Store new State 
+//         |                                             |                                |                                                                     |-----------------
+//         |                                             |                                |                                                                     |                | 
+//         |                                             |                 Send response to the Spawn Sidecar A                                                 |<----------------
 //         |                                             |<-----------------------------------------------------------------------------------------------------|
 //         |                                             |                                |                                                                     |
-//         |              Respond to user                |                                |                                                                     |
+//         | Respond to user with result value           |                                |                                                                     |
 //         |<--------------------------------------------|                                |                                                                     |
 //         |                                             |                                |                                                                     |
 //

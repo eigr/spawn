@@ -27,9 +27,9 @@
 ## Calling Actors:
 
 ```
-+-----------------+                       +------------------------+       +------------------------+                                         +--------------------------------+
-| User Function A |                       | Local Spawn Sidecar A  |       | Remote User Function B |                                         | Remote Spawn Sidecar / Actor B |
-+-----------------+                       +------------------------+       +------------------------+                                         +--------------------------------+
+ +-----------------+                       +------------------------+       +------------------------+                                         +--------------------------------+
+ | User Function A |                       | Local Spawn Sidecar A  |       | Remote User Function B |                                         | Remote Spawn Sidecar / Actor B |
+ +-----------------+                       +------------------------+       +------------------------+                                         +--------------------------------+
         |                                             |                                |                                                                     |
         | HTTP POST Invocation Request.               |                                |                                                                     |
         |-------------------------------------------->|                                |                                                                     |
@@ -52,11 +52,13 @@
         |                                             |                                |                                                                     |
         |                                             |                                | HTTP Reply with the result and the new state of actor B             |
         |                                             |                                |-------------------------------------------------------------------->|
-        |                                             |                                |                                                                     |
-        |                                             |                 Receive response, store new state, and return result value to original caller        |
+        |                                             |                                |                                                                     | Store new State 
+        |                                             |                                |                                                                     |-----------------
+        |                                             |                                |                                                                     |                | 
+        |                                             |                 Send response to the Spawn Sidecar A                                                 |<----------------
         |                                             |<-----------------------------------------------------------------------------------------------------|
         |                                             |                                |                                                                     |
-        |              Respond to user                |                                |                                                                     |
+        | Respond to user with result value           |                                |                                                                     |
         |<--------------------------------------------|                                |                                                                     |
         |                                             |                                |                                                                     |
 ```        
