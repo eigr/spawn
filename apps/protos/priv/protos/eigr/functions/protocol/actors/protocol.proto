@@ -63,6 +63,10 @@ message RegistrationResponse {
     ProxyInfo proxy_info = 2;
 }
 
+message Context {
+    google.protobuf.Any state = 1;
+}
+
 message InvocationRequest {
     eigr.functions.protocol.actors.ActorSystem system =1;
     eigr.functions.protocol.actors.Actor actor = 2;
@@ -71,33 +75,26 @@ message InvocationRequest {
     bool async = 5;
 }
 
-message InvocationResponse {
-    RequestStatus status = 1;
-    eigr.functions.protocol.actors.ActorSystem system =2;
-    eigr.functions.protocol.actors.Actor actor = 3;
-}
-
 message ActorInvocation {
-    InvocationRequest invocation_request = 2;
+    string actor_name = 1;
+    string actor_system = 2;
+    string command_name = 3;
+    Context current_context = 4;
+    google.protobuf.Any value = 5;
 }
 
 message ActorInvocationResponse {
-    google.protobuf.Any updated_state = 2;
-    InvocationResponse invocation_response = 3;
-} 
-
-message ActorSystemRequest {
-    oneof message {
-        RegistrationRequest registration_request = 1;
-        InvocationRequest invocation_request = 2;
-        ActorInvocationResponse actor_invocation_response = 3;
-    }
+    string actor_name = 1;
+    string actor_system = 2;
+    Context updated_context = 3;
+    google.protobuf.Any value = 4;
 }
 
-message ActorSystemResponse {
-    oneof message {
-        RegistrationResponse registration_response = 1;
-        ActorInvocation actor_invocation = 2;
-        InvocationResponse invocation_response = 3;
-    }
+message InvocationResponse {
+    RequestStatus status = 1;
+    eigr.functions.protocol.actors.ActorSystem system = 2;
+    eigr.functions.protocol.actors.Actor actor = 3;
+    google.protobuf.Any value = 4;
 }
+
+  

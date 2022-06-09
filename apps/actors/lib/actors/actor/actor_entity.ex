@@ -14,6 +14,7 @@ defmodule Actors.Actor.Entity do
   }
 
   alias Eigr.Functions.Protocol.{
+    Context,
     ActorInvocation,
     ActorInvocationResponse,
     InvocationRequest
@@ -130,11 +131,18 @@ defmodule Actors.Actor.Entity do
          } = invocation},
         _from,
         %EntityState{
-          system: %ActorSystem{name: actor_system} = _system
+          system: %ActorSystem{name: actor_system} = _system,
+          actor: %Actor{state: %ActorState{state: current_state} = _actor_state} = _actor
         } = state
       ) do
     payload =
-      ActorInvocation.new(invocation_request: invocation)
+      ActorInvocation.new(
+        actor_name: name,
+        actor_system: actor_system,
+        command_name: command,
+        value: payload,
+        current_context: Context.new(state: current_state)
+      )
       |> ActorInvocation.encode()
 
     resp =
@@ -148,7 +156,7 @@ defmodule Actors.Actor.Entity do
           {:error, :no_content}
 
         {:ok, %Tesla.Env{body: body}} ->
-          with %ActorInvocationResponse{updated_state: _updated_state} = resp <-
+          with %ActorInvocationResponse{} = resp <-
                  ActorInvocationResponse.decode(body) do
             # TODO temporary
             {:ok, resp}

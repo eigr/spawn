@@ -90,7 +90,7 @@ public class SpawnTest {
             log.info("Registration response: {}", registrationResponse);
 
             // Send Invocation to Actor
-            Example.MyBussinessMessage valueMessage = Example.MyBussinessMessage.newBuilder()
+            Example.MyBusinessMessage valueMessage = Example.MyBusinessMessage.newBuilder()
                     .setValue(10)
                     .build();
 
@@ -114,7 +114,7 @@ public class SpawnTest {
 
             Thread.sleep(3000);
 
-            for (int i = 0; i < 10000; i++) {
+            for (int i = 0; i < 1000; i++) {
                 try {
                     log.info("Send Invocation request...");
                     Call invocationCall = client.newCall(httpInvocationRequest);
@@ -126,8 +126,8 @@ public class SpawnTest {
                             .parseFrom(callInvocationResponse.body().bytes());
 
                     log.info("Invocation response: {}", invocationResponse);
-                    Any updatedState = invocationResponse.getActor().getState().getState();
-                    Example.MyBussinessMessage updatedMyBusinessMessage = updatedState.unpack(Example.MyBussinessMessage.class);
+                    Any updatedState = invocationResponse.getValue();
+                    Example.MyBusinessMessage updatedMyBusinessMessage = updatedState.unpack(Example.MyBusinessMessage.class);
                     log.info("MyBusinessMessage result: {}", updatedMyBusinessMessage.getValue());
                     assertThat(response.code(), equalTo(200));
                 } catch (Exception e) {
@@ -144,7 +144,7 @@ public class SpawnTest {
 
     private ActorOuterClass.Actor makeActor(String name, Integer state) {
 
-        Example.MyBussinessMessage valueMessage = Example.MyBussinessMessage.newBuilder()
+        Example.MyBusinessMessage valueMessage = Example.MyBusinessMessage.newBuilder()
                 .setValue(state)
                 .build();
 

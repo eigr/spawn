@@ -5,6 +5,7 @@ defmodule Proxy.Routes.API do
   alias Eigr.Functions.Protocol.Actors.{Actor, ActorSystem}
 
   alias Eigr.Functions.Protocol.{
+    ActorInvocationResponse,
     InvocationRequest,
     InvocationResponse,
     RegistrationRequest,
@@ -34,9 +35,22 @@ defmodule Proxy.Routes.API do
       "ActorSystem #{inspect(name)} Received Actor invocation request for Actor #{inspect(actor_name)} #{inspect(conn.body_params)}"
     )
 
-    with request <- get_body(conn.body_params, InvocationRequest),
-         {:ok, response} <- Actors.invoke(request) do
-      send!(conn, 200, InvocationResponse.encode(response.invocation_response), @content_type)
+    with %InvocationRequest{system: sytem, actor: actor} = request <-
+           get_body(conn.body_params, InvocationRequest),
+         {:ok, %ActorInvocationResponse{value: value} = response} <- Actors.invoke(request) do
+      send!(
+        conn,
+        200,
+        InvocationResponse.encode(
+          InvocationResponse.new(
+            system: sytem,
+            actor: actor,
+            value: value,
+            status: RequestStatus.new(status: :OK)
+          )
+        ),
+        @content_type
+      )
     else
       _ ->
         status = RequestStatus.new(status: :ERROR, message: "Error on invoke Actor")

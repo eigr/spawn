@@ -3,7 +3,6 @@ package io.eigr.spawn.server;
 import com.google.protobuf.Any;
 import com.google.protobuf.InvalidProtocolBufferException;
 import io.eigr.functions.protocol.Protocol;
-import io.eigr.functions.protocol.actors.ActorOuterClass;
 import io.eigr.spawn.example.Example;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.core.io.ByteArrayResource;
@@ -25,38 +24,41 @@ public class ActorServiceHandler {
             produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE}
     )
     public Mono<ResponseEntity<ByteArrayResource>> post(@RequestBody() byte[] data) throws InvalidProtocolBufferException {
+
         log.info("Received Actor action request: {}", data);
         Protocol.ActorInvocation actorInvocationRequest = Protocol.ActorInvocation.parseFrom(data);
-        ActorOuterClass.Actor actor = actorInvocationRequest.getInvocationRequest().getActor();
-        ActorOuterClass.ActorSystem system = actorInvocationRequest.getInvocationRequest().getSystem();
-        String commandName = actorInvocationRequest.getInvocationRequest().getCommandName();
-        Any value = actorInvocationRequest.getInvocationRequest().getValue();
-        Example.MyBussinessMessage myBussinessMessage = value.unpack(Example.MyBussinessMessage.class);
+        Protocol.Context context = actorInvocationRequest.getCurrentContext();
 
-        log.info("Actor {} received Action invocation for command {}", actor.getName(), commandName);
+        String actor = actorInvocationRequest.getActorName();
+        String system = actorInvocationRequest.getActorSystem();
+        String commandName = actorInvocationRequest.getCommandName();
+
+        Any value = actorInvocationRequest.getValue();
+        Example.MyBusinessMessage myBusinessMessage = value.unpack(Example.MyBusinessMessage.class);
+
+        log.info("Actor {} received Action invocation for command {}", actor, commandName);
 
         Any updatedState;
         int resultValue;
 
-        resultValue = myBussinessMessage.getValue() + 1;
+        resultValue = myBusinessMessage.getValue() + 1;
 
-        Example.MyBussinessMessage valueMessage = Example.MyBussinessMessage.newBuilder()
+        Example.MyBusinessMessage valueMessage = Example.MyBusinessMessage.newBuilder()
                 .setValue(resultValue)
                 .build();
 
         updatedState = Any.pack(valueMessage);
 
+        Protocol.Context updatedContext = Protocol.Context.newBuilder()
+                .setState(updatedState)
+                .build();
+
         Protocol.ActorInvocationResponse response = Protocol.ActorInvocationResponse.newBuilder()
-                .setUpdatedState(updatedState)
-                .setInvocationResponse(
-                        Protocol.InvocationResponse.newBuilder()
-                                .setActor(actor)
-                                .setSystem(system)
-                                .setStatus(
-                                        Protocol.RequestStatus.newBuilder()
-                                                .setStatus(Protocol.Status.OK)
-                                                .build())
-                                .build())
+                .setActorName(actor)
+                .setActorSystem(system)
+                .setUpdatedContext(updatedContext)
+                .setValue(updatedState)
+                .setValue(updatedState)
                 .build();
 
         byte[] responseBytes = response.toByteArray();
@@ -70,6 +72,8 @@ public class ActorServiceHandler {
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .contentLength(length)
                 .body(resource));
+
+
     }
 
 }
