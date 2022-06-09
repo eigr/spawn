@@ -1,3 +1,99 @@
+// The Spawn Protocol
+//
+// Spawn is divided into two main parts namely:
+//
+//   1. A sidecar proxy that exposes the server part of the Spawn Protocol in the form of an HTTP API.
+//   2. A user function, written in any language that supports HTTP, that exposes the client part of the Spawn Protocol.
+//
+// Both are client and server of their counterparts.
+//
+// In turn, the proxy exposes an HTTP endpoint for registering a user function a.k.a ActorSystem.
+//
+// A user function that wants to register actors in Proxy Spawn must proceed by making a POST request to the following endpoint:
+//
+// `
+// POST /api/v1/system HTTP 1.1
+// HOST: localhost
+// User-Agent: user-function-client/0.1.0 (this is just example)
+// Accept: application/octet-stream
+// Content-Type: application/octet-stream
+//
+// registration request type bytes encoded here :-)
+// `
+//
+// The general flow of a registration action is as follows:
+//
+// +----------------+                                     +---------------------+                                     +-------+
+// | User Function  |                                     | Local Spawn Sidecar |                                     | Actor |
+// +----------------+                                     +---------------------+                                     +-------+
+//         |                                                       |                                                     |
+//         | HTTP POST Registration Request                        |                                                     |
+//         |------------------------------------------------------>|                                                     |
+//         |                                                       |                                                     |
+//         |                                                       | Upfront start Actors with BEAM Distributed Protocol |
+//         |                                                       |---------------------------------------------------->|
+//         |                                                       |                                                     |
+//         |                                                       |                                                     |Initialize Statestore
+//         |                                                       |                                                     |----------------------
+//         |                                                       |                                                     |                     |
+//         |                                                       |                                                     |<---------------------
+//         |                                                       |                                                     |
+//         |          HTTP Registration Response                   |                                                     |
+//         |<------------------------------------------------------|                                                     |
+//         |                                                       |                                                     |
+//
+//
+// Once the system has been initialized, that is, the registration step has been successfully completed,
+// then the user role will be able to make requests to the System Actors.
+// This is done through a post request to the Proxy at the `/system/:name/actors/:actor_name/invoke` endpoint.
+//
+// A user function that wants to call actors in Proxy Spawn must proceed by making a POST request as the follow:
+//
+// `
+// POST /system/:name/actors/:actor_name/invoke HTTP 1.1
+// HOST: localhost
+// User-Agent: user-function-client/0.1.0 (this is just example)
+// Accept: application/octet-stream
+// Content-Type: application/octet-stream
+//
+// invocation request type bytes encoded here :-)
+// `
+//
+// Assuming that two user roles were registered in different separate Proxies, the above request would go the following way:
+//
+// +-----------------+                       +------------------------+       +------------------------+                                         +--------------------------------+
+// | User Function A |                       | Local Spawn Sidecar A  |       | Remote User Function B |                                         | Remote Spawn Sidecar / Actor B |
+// +-----------------+                       +------------------------+       +------------------------+                                         +--------------------------------+
+//         |                                             |                                |                                                                     |
+//         | HTTP POST Invocation Request.               |                                |                                                                     |
+//         |-------------------------------------------->|                                |                                                                     |
+//         |                                             |                                |                                                                     |
+//         |                                             | Lookup for Actor               |                                                                     |
+//         |                                             |-----------------               |                                                                     |
+//         |                                             |                |               |                                                                     |
+//         |                                             |<----------------               |                                                                     |
+//         |                                             |                                |                                                                     |
+//         |                                             | Make a BEAM Distributed Protocol Call on Actor located at proxy b                                    |
+//         |                                             |----------------------------------------------------------------------------------------------------->|
+//         |                                             |                                |                                                                     |
+//         |                                             |                                |                        Make HTTP POST in /api/v1/actors/actions     |
+//         |                                             |                                |<--------------------------------------------------------------------|
+//         |                                             |                                |                                                                     |
+//         |                                             |                                | Handle request, execute command                                     |
+//         |                                             |                                |--------------------------------                                     |
+//         |                                             |                                |                               |                                     |
+//         |                                             |                                |<-------------------------------                                     |
+//         |                                             |                                |                                                                     |
+//         |                                             |                                | HTTP Reply with the result and the new state of actor B             |
+//         |                                             |                                |-------------------------------------------------------------------->|
+//         |                                             |                                |                                                                     |
+//         |                                             |                 Receive response, store new state, and return result value to original caller        |
+//         |                                             |<-----------------------------------------------------------------------------------------------------|
+//         |                                             |                                |                                                                     |
+//         |              Respond to user                |                                |                                                                     |
+//         |<--------------------------------------------|                                |                                                                     |
+//         |                                             |                                |                                                                     |
+//
 syntax = "proto3";
 
 package eigr.functions.protocol;
@@ -8,23 +104,11 @@ import "google/protobuf/any.proto";
 option java_package = "io.eigr.functions.protocol";
 option go_package = "github.com/eigr/go-support/eigr/protocol;protocol";
 
-enum Status {
-    UNKNOWN = 0;
-    OK = 1;
-    ACTOR_NOT_FOUND = 2;
-    ERROR = 3;
-}
+message RegistrationRequest {
 
-message RequestStatus {
-    Status status = 1;
-    string message = 2;
-}
+    ServiceInfo service_info = 1;
 
-message ProxyInfo {
-    int32 protocol_major_version = 1;
-    int32 protocol_minor_version = 2;
-    string proxy_name = 3;
-    string proxy_version = 4;
+    eigr.functions.protocol.actors.ActorSystem actor_system = 2;
 }
 
 message ServiceInfo {
@@ -46,53 +130,141 @@ message ServiceInfo {
     // The version of the support library being used.
     string support_library_version = 5;
 
-    // Cloudstate protocol major version accepted by the support library.
+    // Spawn protocol major version accepted by the support library.
     int32 protocol_major_version = 6;
 
-    // Cloudstate protocol minor version accepted by the support library.
+    // Spawn protocol minor version accepted by the support library.
     int32 protocol_minor_version = 7;
 }
 
-message RegistrationRequest {
-    ServiceInfo service_info = 1;
-    eigr.functions.protocol.actors.ActorSystem actor_system = 2;
+message ProxyInfo {
+
+    int32 protocol_major_version = 1;
+
+    int32 protocol_minor_version = 2;
+
+    string proxy_name = 3;
+
+    string proxy_version = 4;
 }
 
 message RegistrationResponse {
+
     RequestStatus staus = 1;
+
     ProxyInfo proxy_info = 2;
 }
 
+// Context is where current and/or updated state is stored
+// to be transmitted to/from proxy and user function
+//
+// Params:
+//   * state: Actor state passed back and forth between proxy and user function.
 message Context {
+
     google.protobuf.Any state = 1;
 }
 
+// The user function when it wants to send a message to an Actor uses the InvocationRequest message type.
+//
+// Params:
+//   * system: See ActorStstem message.
+//   * actor: The target Actor, i.e. the one that the user function is calling to perform some computation.
+//   * command_name: The function or method on the target Actor that will receive this request
+//     and perform some useful computation with the sent data.
+//   * value: This is the value sent by the user function to be computed by the request's target Actor command.
+//   * async: Indicates whether the command should be processed synchronously, where a response should be sent back to the user function,
+//            or whether the command should be processed asynchronously, i.e. no response sent to the caller and no waiting.
 message InvocationRequest {
+
     eigr.functions.protocol.actors.ActorSystem system =1;
+
     eigr.functions.protocol.actors.Actor actor = 2;
+
     string command_name = 3;
+
     google.protobuf.Any value = 4;
+
     bool async = 5;
 }
 
+// ActorInvocation is a translation message between a local invocation made via InvocationRequest
+// and the real Actor that intends to respond to this invocation and that can be located anywhere in the cluster.
+//
+// Params:
+//   actor_name: The name of the Actor handling the InvocationRequest request, also called the target Actor.
+//   actor_system: The name of ActorSystem registered in Registration step.
+//   command_name: The function or method on the target Actor that will receive this request
+//                 and perform some useful computation with the sent data.
+//   current_context: The current Context with current state value of the target Actor.
+//                    That is, the same as found via matching in %Actor{name: target_actor, state: %ActorState{state: value} = actor_state}.
+//                    In this case, the Context type will contain in the value attribute the same `value` as the matching above.
+//   value: The value to be passed to the function or method corresponding to command_name.
 message ActorInvocation {
+
     string actor_name = 1;
+
     string actor_system = 2;
+
     string command_name = 3;
+
     Context current_context = 4;
+
     google.protobuf.Any value = 5;
 }
 
+// The user role's response after executing the action originated by the local proxy request via ActorInvocation.
+//
+// Params:
+//   actor_name: The name of the Actor handling the InvocationRequest request, also called the target Actor.
+//   actor_system: The name of ActorSystem registered in Registration step.
+//   updated_context: The Context with updated state value of the target Actor after user function has processed a request.
+//   value: The value that the original request proxy will forward in response to the InvocationRequest type request.
+//          This is the final response from the point of view of the user who invoked the Actor call and its subsequent processing.
 message ActorInvocationResponse {
+
     string actor_name = 1;
+
     string actor_system = 2;
+
     Context updated_context = 3;
+
     google.protobuf.Any value = 4;
 }
 
+// InvocationResponse is the response that the proxy that received the InvocationRequest request will forward to the request's original user function.
+//
+// Params:
+//   status: Status of request. Could be one of [UNKNOWN, OK, ACTOR_NOT_FOUND, ERROR].
+//   sytem: The original ActorSystem of the InvocationRequest request.
+//   actor: The target Actor originally sent in the InvocationRequest message.
+//   value: The value resulting from the request processing that the target Actor made.
+//          This value must be passed by the user function to the one who requested the initial request in InvocationRequest.
 message InvocationResponse {
+
     RequestStatus status = 1;
+
     eigr.functions.protocol.actors.ActorSystem system = 2;
+
     eigr.functions.protocol.actors.Actor actor = 3;
+
     google.protobuf.Any value = 4;
+}
+
+enum Status {
+
+    UNKNOWN = 0;
+
+    OK = 1;
+
+    ACTOR_NOT_FOUND = 2;
+
+    ERROR = 3;
+}
+
+message RequestStatus {
+
+    Status status = 1;
+
+    string message = 2;
 }

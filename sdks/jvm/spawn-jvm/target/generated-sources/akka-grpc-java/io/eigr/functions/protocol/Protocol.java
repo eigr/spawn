@@ -136,55 +136,60 @@ public final class Protocol {
     // @@protoc_insertion_point(enum_scope:eigr.functions.protocol.Status)
   }
 
-  public interface RequestStatusOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:eigr.functions.protocol.RequestStatus)
+  public interface RegistrationRequestOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:eigr.functions.protocol.RegistrationRequest)
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>.eigr.functions.protocol.Status status = 1;</code>
-     * @return The enum numeric value on the wire for status.
+     * <code>.eigr.functions.protocol.ServiceInfo service_info = 1;</code>
+     * @return Whether the serviceInfo field is set.
      */
-    int getStatusValue();
+    boolean hasServiceInfo();
     /**
-     * <code>.eigr.functions.protocol.Status status = 1;</code>
-     * @return The status.
+     * <code>.eigr.functions.protocol.ServiceInfo service_info = 1;</code>
+     * @return The serviceInfo.
      */
-    io.eigr.functions.protocol.Protocol.Status getStatus();
+    io.eigr.functions.protocol.Protocol.ServiceInfo getServiceInfo();
+    /**
+     * <code>.eigr.functions.protocol.ServiceInfo service_info = 1;</code>
+     */
+    io.eigr.functions.protocol.Protocol.ServiceInfoOrBuilder getServiceInfoOrBuilder();
 
     /**
-     * <code>string message = 2;</code>
-     * @return The message.
+     * <code>.eigr.functions.protocol.actors.ActorSystem actor_system = 2;</code>
+     * @return Whether the actorSystem field is set.
      */
-    java.lang.String getMessage();
+    boolean hasActorSystem();
     /**
-     * <code>string message = 2;</code>
-     * @return The bytes for message.
+     * <code>.eigr.functions.protocol.actors.ActorSystem actor_system = 2;</code>
+     * @return The actorSystem.
      */
-    com.google.protobuf.ByteString
-        getMessageBytes();
+    io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem getActorSystem();
+    /**
+     * <code>.eigr.functions.protocol.actors.ActorSystem actor_system = 2;</code>
+     */
+    io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystemOrBuilder getActorSystemOrBuilder();
   }
   /**
-   * Protobuf type {@code eigr.functions.protocol.RequestStatus}
+   * Protobuf type {@code eigr.functions.protocol.RegistrationRequest}
    */
-  public  static final class RequestStatus extends
+  public  static final class RegistrationRequest extends
       com.google.protobuf.GeneratedMessageV3 implements
-      // @@protoc_insertion_point(message_implements:eigr.functions.protocol.RequestStatus)
-      RequestStatusOrBuilder {
+      // @@protoc_insertion_point(message_implements:eigr.functions.protocol.RegistrationRequest)
+      RegistrationRequestOrBuilder {
   private static final long serialVersionUID = 0L;
-    // Use RequestStatus.newBuilder() to construct.
-    private RequestStatus(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+    // Use RegistrationRequest.newBuilder() to construct.
+    private RegistrationRequest(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
     }
-    private RequestStatus() {
-      status_ = 0;
-      message_ = "";
+    private RegistrationRequest() {
     }
 
     @java.lang.Override
     @SuppressWarnings({"unused"})
     protected java.lang.Object newInstance(
         UnusedPrivateParameter unused) {
-      return new RequestStatus();
+      return new RegistrationRequest();
     }
 
     @java.lang.Override
@@ -192,7 +197,7 @@ public final class Protocol {
     getUnknownFields() {
       return this.unknownFields;
     }
-    private RequestStatus(
+    private RegistrationRequest(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -210,16 +215,30 @@ public final class Protocol {
             case 0:
               done = true;
               break;
-            case 8: {
-              int rawValue = input.readEnum();
+            case 10: {
+              io.eigr.functions.protocol.Protocol.ServiceInfo.Builder subBuilder = null;
+              if (serviceInfo_ != null) {
+                subBuilder = serviceInfo_.toBuilder();
+              }
+              serviceInfo_ = input.readMessage(io.eigr.functions.protocol.Protocol.ServiceInfo.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(serviceInfo_);
+                serviceInfo_ = subBuilder.buildPartial();
+              }
 
-              status_ = rawValue;
               break;
             }
             case 18: {
-              java.lang.String s = input.readStringRequireUtf8();
+              io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.Builder subBuilder = null;
+              if (actorSystem_ != null) {
+                subBuilder = actorSystem_.toBuilder();
+              }
+              actorSystem_ = input.readMessage(io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(actorSystem_);
+                actorSystem_ = subBuilder.buildPartial();
+              }
 
-              message_ = s;
               break;
             }
             default: {
@@ -243,70 +262,61 @@ public final class Protocol {
     }
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return io.eigr.functions.protocol.Protocol.internal_static_eigr_functions_protocol_RequestStatus_descriptor;
+      return io.eigr.functions.protocol.Protocol.internal_static_eigr_functions_protocol_RegistrationRequest_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return io.eigr.functions.protocol.Protocol.internal_static_eigr_functions_protocol_RequestStatus_fieldAccessorTable
+      return io.eigr.functions.protocol.Protocol.internal_static_eigr_functions_protocol_RegistrationRequest_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              io.eigr.functions.protocol.Protocol.RequestStatus.class, io.eigr.functions.protocol.Protocol.RequestStatus.Builder.class);
+              io.eigr.functions.protocol.Protocol.RegistrationRequest.class, io.eigr.functions.protocol.Protocol.RegistrationRequest.Builder.class);
     }
 
-    public static final int STATUS_FIELD_NUMBER = 1;
-    private int status_;
+    public static final int SERVICE_INFO_FIELD_NUMBER = 1;
+    private io.eigr.functions.protocol.Protocol.ServiceInfo serviceInfo_;
     /**
-     * <code>.eigr.functions.protocol.Status status = 1;</code>
-     * @return The enum numeric value on the wire for status.
+     * <code>.eigr.functions.protocol.ServiceInfo service_info = 1;</code>
+     * @return Whether the serviceInfo field is set.
      */
-    public int getStatusValue() {
-      return status_;
+    public boolean hasServiceInfo() {
+      return serviceInfo_ != null;
     }
     /**
-     * <code>.eigr.functions.protocol.Status status = 1;</code>
-     * @return The status.
+     * <code>.eigr.functions.protocol.ServiceInfo service_info = 1;</code>
+     * @return The serviceInfo.
      */
-    public io.eigr.functions.protocol.Protocol.Status getStatus() {
-      @SuppressWarnings("deprecation")
-      io.eigr.functions.protocol.Protocol.Status result = io.eigr.functions.protocol.Protocol.Status.valueOf(status_);
-      return result == null ? io.eigr.functions.protocol.Protocol.Status.UNRECOGNIZED : result;
+    public io.eigr.functions.protocol.Protocol.ServiceInfo getServiceInfo() {
+      return serviceInfo_ == null ? io.eigr.functions.protocol.Protocol.ServiceInfo.getDefaultInstance() : serviceInfo_;
+    }
+    /**
+     * <code>.eigr.functions.protocol.ServiceInfo service_info = 1;</code>
+     */
+    public io.eigr.functions.protocol.Protocol.ServiceInfoOrBuilder getServiceInfoOrBuilder() {
+      return getServiceInfo();
     }
 
-    public static final int MESSAGE_FIELD_NUMBER = 2;
-    private volatile java.lang.Object message_;
+    public static final int ACTOR_SYSTEM_FIELD_NUMBER = 2;
+    private io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem actorSystem_;
     /**
-     * <code>string message = 2;</code>
-     * @return The message.
+     * <code>.eigr.functions.protocol.actors.ActorSystem actor_system = 2;</code>
+     * @return Whether the actorSystem field is set.
      */
-    public java.lang.String getMessage() {
-      java.lang.Object ref = message_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        message_ = s;
-        return s;
-      }
+    public boolean hasActorSystem() {
+      return actorSystem_ != null;
     }
     /**
-     * <code>string message = 2;</code>
-     * @return The bytes for message.
+     * <code>.eigr.functions.protocol.actors.ActorSystem actor_system = 2;</code>
+     * @return The actorSystem.
      */
-    public com.google.protobuf.ByteString
-        getMessageBytes() {
-      java.lang.Object ref = message_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        message_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
+    public io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem getActorSystem() {
+      return actorSystem_ == null ? io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.getDefaultInstance() : actorSystem_;
+    }
+    /**
+     * <code>.eigr.functions.protocol.actors.ActorSystem actor_system = 2;</code>
+     */
+    public io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystemOrBuilder getActorSystemOrBuilder() {
+      return getActorSystem();
     }
 
     private byte memoizedIsInitialized = -1;
@@ -323,11 +333,11 @@ public final class Protocol {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (status_ != io.eigr.functions.protocol.Protocol.Status.UNKNOWN.getNumber()) {
-        output.writeEnum(1, status_);
+      if (serviceInfo_ != null) {
+        output.writeMessage(1, getServiceInfo());
       }
-      if (!getMessageBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, message_);
+      if (actorSystem_ != null) {
+        output.writeMessage(2, getActorSystem());
       }
       unknownFields.writeTo(output);
     }
@@ -338,12 +348,13 @@ public final class Protocol {
       if (size != -1) return size;
 
       size = 0;
-      if (status_ != io.eigr.functions.protocol.Protocol.Status.UNKNOWN.getNumber()) {
+      if (serviceInfo_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeEnumSize(1, status_);
+          .computeMessageSize(1, getServiceInfo());
       }
-      if (!getMessageBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, message_);
+      if (actorSystem_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(2, getActorSystem());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -355,14 +366,21 @@ public final class Protocol {
       if (obj == this) {
        return true;
       }
-      if (!(obj instanceof io.eigr.functions.protocol.Protocol.RequestStatus)) {
+      if (!(obj instanceof io.eigr.functions.protocol.Protocol.RegistrationRequest)) {
         return super.equals(obj);
       }
-      io.eigr.functions.protocol.Protocol.RequestStatus other = (io.eigr.functions.protocol.Protocol.RequestStatus) obj;
+      io.eigr.functions.protocol.Protocol.RegistrationRequest other = (io.eigr.functions.protocol.Protocol.RegistrationRequest) obj;
 
-      if (status_ != other.status_) return false;
-      if (!getMessage()
-          .equals(other.getMessage())) return false;
+      if (hasServiceInfo() != other.hasServiceInfo()) return false;
+      if (hasServiceInfo()) {
+        if (!getServiceInfo()
+            .equals(other.getServiceInfo())) return false;
+      }
+      if (hasActorSystem() != other.hasActorSystem()) return false;
+      if (hasActorSystem()) {
+        if (!getActorSystem()
+            .equals(other.getActorSystem())) return false;
+      }
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -374,78 +392,82 @@ public final class Protocol {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
-      hash = (37 * hash) + STATUS_FIELD_NUMBER;
-      hash = (53 * hash) + status_;
-      hash = (37 * hash) + MESSAGE_FIELD_NUMBER;
-      hash = (53 * hash) + getMessage().hashCode();
+      if (hasServiceInfo()) {
+        hash = (37 * hash) + SERVICE_INFO_FIELD_NUMBER;
+        hash = (53 * hash) + getServiceInfo().hashCode();
+      }
+      if (hasActorSystem()) {
+        hash = (37 * hash) + ACTOR_SYSTEM_FIELD_NUMBER;
+        hash = (53 * hash) + getActorSystem().hashCode();
+      }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
     }
 
-    public static io.eigr.functions.protocol.Protocol.RequestStatus parseFrom(
+    public static io.eigr.functions.protocol.Protocol.RegistrationRequest parseFrom(
         java.nio.ByteBuffer data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static io.eigr.functions.protocol.Protocol.RequestStatus parseFrom(
+    public static io.eigr.functions.protocol.Protocol.RegistrationRequest parseFrom(
         java.nio.ByteBuffer data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static io.eigr.functions.protocol.Protocol.RequestStatus parseFrom(
+    public static io.eigr.functions.protocol.Protocol.RegistrationRequest parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static io.eigr.functions.protocol.Protocol.RequestStatus parseFrom(
+    public static io.eigr.functions.protocol.Protocol.RegistrationRequest parseFrom(
         com.google.protobuf.ByteString data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static io.eigr.functions.protocol.Protocol.RequestStatus parseFrom(byte[] data)
+    public static io.eigr.functions.protocol.Protocol.RegistrationRequest parseFrom(byte[] data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static io.eigr.functions.protocol.Protocol.RequestStatus parseFrom(
+    public static io.eigr.functions.protocol.Protocol.RegistrationRequest parseFrom(
         byte[] data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static io.eigr.functions.protocol.Protocol.RequestStatus parseFrom(java.io.InputStream input)
+    public static io.eigr.functions.protocol.Protocol.RegistrationRequest parseFrom(java.io.InputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseWithIOException(PARSER, input);
     }
-    public static io.eigr.functions.protocol.Protocol.RequestStatus parseFrom(
+    public static io.eigr.functions.protocol.Protocol.RegistrationRequest parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
-    public static io.eigr.functions.protocol.Protocol.RequestStatus parseDelimitedFrom(java.io.InputStream input)
+    public static io.eigr.functions.protocol.Protocol.RegistrationRequest parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseDelimitedWithIOException(PARSER, input);
     }
-    public static io.eigr.functions.protocol.Protocol.RequestStatus parseDelimitedFrom(
+    public static io.eigr.functions.protocol.Protocol.RegistrationRequest parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
-    public static io.eigr.functions.protocol.Protocol.RequestStatus parseFrom(
+    public static io.eigr.functions.protocol.Protocol.RegistrationRequest parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseWithIOException(PARSER, input);
     }
-    public static io.eigr.functions.protocol.Protocol.RequestStatus parseFrom(
+    public static io.eigr.functions.protocol.Protocol.RegistrationRequest parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -458,7 +480,7 @@ public final class Protocol {
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
     }
-    public static Builder newBuilder(io.eigr.functions.protocol.Protocol.RequestStatus prototype) {
+    public static Builder newBuilder(io.eigr.functions.protocol.Protocol.RegistrationRequest prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
     @java.lang.Override
@@ -474,26 +496,26 @@ public final class Protocol {
       return builder;
     }
     /**
-     * Protobuf type {@code eigr.functions.protocol.RequestStatus}
+     * Protobuf type {@code eigr.functions.protocol.RegistrationRequest}
      */
     public static final class Builder extends
         com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:eigr.functions.protocol.RequestStatus)
-        io.eigr.functions.protocol.Protocol.RequestStatusOrBuilder {
+        // @@protoc_insertion_point(builder_implements:eigr.functions.protocol.RegistrationRequest)
+        io.eigr.functions.protocol.Protocol.RegistrationRequestOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
-        return io.eigr.functions.protocol.Protocol.internal_static_eigr_functions_protocol_RequestStatus_descriptor;
+        return io.eigr.functions.protocol.Protocol.internal_static_eigr_functions_protocol_RegistrationRequest_descriptor;
       }
 
       @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
-        return io.eigr.functions.protocol.Protocol.internal_static_eigr_functions_protocol_RequestStatus_fieldAccessorTable
+        return io.eigr.functions.protocol.Protocol.internal_static_eigr_functions_protocol_RegistrationRequest_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
-                io.eigr.functions.protocol.Protocol.RequestStatus.class, io.eigr.functions.protocol.Protocol.RequestStatus.Builder.class);
+                io.eigr.functions.protocol.Protocol.RegistrationRequest.class, io.eigr.functions.protocol.Protocol.RegistrationRequest.Builder.class);
       }
 
-      // Construct using io.eigr.functions.protocol.Protocol.RequestStatus.newBuilder()
+      // Construct using io.eigr.functions.protocol.Protocol.RegistrationRequest.newBuilder()
       private Builder() {
         maybeForceBuilderInitialization();
       }
@@ -511,27 +533,35 @@ public final class Protocol {
       @java.lang.Override
       public Builder clear() {
         super.clear();
-        status_ = 0;
-
-        message_ = "";
-
+        if (serviceInfoBuilder_ == null) {
+          serviceInfo_ = null;
+        } else {
+          serviceInfo_ = null;
+          serviceInfoBuilder_ = null;
+        }
+        if (actorSystemBuilder_ == null) {
+          actorSystem_ = null;
+        } else {
+          actorSystem_ = null;
+          actorSystemBuilder_ = null;
+        }
         return this;
       }
 
       @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
-        return io.eigr.functions.protocol.Protocol.internal_static_eigr_functions_protocol_RequestStatus_descriptor;
+        return io.eigr.functions.protocol.Protocol.internal_static_eigr_functions_protocol_RegistrationRequest_descriptor;
       }
 
       @java.lang.Override
-      public io.eigr.functions.protocol.Protocol.RequestStatus getDefaultInstanceForType() {
-        return io.eigr.functions.protocol.Protocol.RequestStatus.getDefaultInstance();
+      public io.eigr.functions.protocol.Protocol.RegistrationRequest getDefaultInstanceForType() {
+        return io.eigr.functions.protocol.Protocol.RegistrationRequest.getDefaultInstance();
       }
 
       @java.lang.Override
-      public io.eigr.functions.protocol.Protocol.RequestStatus build() {
-        io.eigr.functions.protocol.Protocol.RequestStatus result = buildPartial();
+      public io.eigr.functions.protocol.Protocol.RegistrationRequest build() {
+        io.eigr.functions.protocol.Protocol.RegistrationRequest result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(result);
         }
@@ -539,10 +569,18 @@ public final class Protocol {
       }
 
       @java.lang.Override
-      public io.eigr.functions.protocol.Protocol.RequestStatus buildPartial() {
-        io.eigr.functions.protocol.Protocol.RequestStatus result = new io.eigr.functions.protocol.Protocol.RequestStatus(this);
-        result.status_ = status_;
-        result.message_ = message_;
+      public io.eigr.functions.protocol.Protocol.RegistrationRequest buildPartial() {
+        io.eigr.functions.protocol.Protocol.RegistrationRequest result = new io.eigr.functions.protocol.Protocol.RegistrationRequest(this);
+        if (serviceInfoBuilder_ == null) {
+          result.serviceInfo_ = serviceInfo_;
+        } else {
+          result.serviceInfo_ = serviceInfoBuilder_.build();
+        }
+        if (actorSystemBuilder_ == null) {
+          result.actorSystem_ = actorSystem_;
+        } else {
+          result.actorSystem_ = actorSystemBuilder_.build();
+        }
         onBuilt();
         return result;
       }
@@ -581,22 +619,21 @@ public final class Protocol {
       }
       @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof io.eigr.functions.protocol.Protocol.RequestStatus) {
-          return mergeFrom((io.eigr.functions.protocol.Protocol.RequestStatus)other);
+        if (other instanceof io.eigr.functions.protocol.Protocol.RegistrationRequest) {
+          return mergeFrom((io.eigr.functions.protocol.Protocol.RegistrationRequest)other);
         } else {
           super.mergeFrom(other);
           return this;
         }
       }
 
-      public Builder mergeFrom(io.eigr.functions.protocol.Protocol.RequestStatus other) {
-        if (other == io.eigr.functions.protocol.Protocol.RequestStatus.getDefaultInstance()) return this;
-        if (other.status_ != 0) {
-          setStatusValue(other.getStatusValue());
+      public Builder mergeFrom(io.eigr.functions.protocol.Protocol.RegistrationRequest other) {
+        if (other == io.eigr.functions.protocol.Protocol.RegistrationRequest.getDefaultInstance()) return this;
+        if (other.hasServiceInfo()) {
+          mergeServiceInfo(other.getServiceInfo());
         }
-        if (!other.getMessage().isEmpty()) {
-          message_ = other.message_;
-          onChanged();
+        if (other.hasActorSystem()) {
+          mergeActorSystem(other.getActorSystem());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -613,11 +650,11 @@ public final class Protocol {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        io.eigr.functions.protocol.Protocol.RequestStatus parsedMessage = null;
+        io.eigr.functions.protocol.Protocol.RegistrationRequest parsedMessage = null;
         try {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (io.eigr.functions.protocol.Protocol.RequestStatus) e.getUnfinishedMessage();
+          parsedMessage = (io.eigr.functions.protocol.Protocol.RegistrationRequest) e.getUnfinishedMessage();
           throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
@@ -627,132 +664,242 @@ public final class Protocol {
         return this;
       }
 
-      private int status_ = 0;
+      private io.eigr.functions.protocol.Protocol.ServiceInfo serviceInfo_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          io.eigr.functions.protocol.Protocol.ServiceInfo, io.eigr.functions.protocol.Protocol.ServiceInfo.Builder, io.eigr.functions.protocol.Protocol.ServiceInfoOrBuilder> serviceInfoBuilder_;
       /**
-       * <code>.eigr.functions.protocol.Status status = 1;</code>
-       * @return The enum numeric value on the wire for status.
+       * <code>.eigr.functions.protocol.ServiceInfo service_info = 1;</code>
+       * @return Whether the serviceInfo field is set.
        */
-      public int getStatusValue() {
-        return status_;
+      public boolean hasServiceInfo() {
+        return serviceInfoBuilder_ != null || serviceInfo_ != null;
       }
       /**
-       * <code>.eigr.functions.protocol.Status status = 1;</code>
-       * @param value The enum numeric value on the wire for status to set.
-       * @return This builder for chaining.
+       * <code>.eigr.functions.protocol.ServiceInfo service_info = 1;</code>
+       * @return The serviceInfo.
        */
-      public Builder setStatusValue(int value) {
-        status_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>.eigr.functions.protocol.Status status = 1;</code>
-       * @return The status.
-       */
-      public io.eigr.functions.protocol.Protocol.Status getStatus() {
-        @SuppressWarnings("deprecation")
-        io.eigr.functions.protocol.Protocol.Status result = io.eigr.functions.protocol.Protocol.Status.valueOf(status_);
-        return result == null ? io.eigr.functions.protocol.Protocol.Status.UNRECOGNIZED : result;
-      }
-      /**
-       * <code>.eigr.functions.protocol.Status status = 1;</code>
-       * @param value The status to set.
-       * @return This builder for chaining.
-       */
-      public Builder setStatus(io.eigr.functions.protocol.Protocol.Status value) {
-        if (value == null) {
-          throw new NullPointerException();
+      public io.eigr.functions.protocol.Protocol.ServiceInfo getServiceInfo() {
+        if (serviceInfoBuilder_ == null) {
+          return serviceInfo_ == null ? io.eigr.functions.protocol.Protocol.ServiceInfo.getDefaultInstance() : serviceInfo_;
+        } else {
+          return serviceInfoBuilder_.getMessage();
         }
-        
-        status_ = value.getNumber();
-        onChanged();
+      }
+      /**
+       * <code>.eigr.functions.protocol.ServiceInfo service_info = 1;</code>
+       */
+      public Builder setServiceInfo(io.eigr.functions.protocol.Protocol.ServiceInfo value) {
+        if (serviceInfoBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          serviceInfo_ = value;
+          onChanged();
+        } else {
+          serviceInfoBuilder_.setMessage(value);
+        }
+
         return this;
       }
       /**
-       * <code>.eigr.functions.protocol.Status status = 1;</code>
-       * @return This builder for chaining.
+       * <code>.eigr.functions.protocol.ServiceInfo service_info = 1;</code>
        */
-      public Builder clearStatus() {
-        
-        status_ = 0;
-        onChanged();
+      public Builder setServiceInfo(
+          io.eigr.functions.protocol.Protocol.ServiceInfo.Builder builderForValue) {
+        if (serviceInfoBuilder_ == null) {
+          serviceInfo_ = builderForValue.build();
+          onChanged();
+        } else {
+          serviceInfoBuilder_.setMessage(builderForValue.build());
+        }
+
         return this;
+      }
+      /**
+       * <code>.eigr.functions.protocol.ServiceInfo service_info = 1;</code>
+       */
+      public Builder mergeServiceInfo(io.eigr.functions.protocol.Protocol.ServiceInfo value) {
+        if (serviceInfoBuilder_ == null) {
+          if (serviceInfo_ != null) {
+            serviceInfo_ =
+              io.eigr.functions.protocol.Protocol.ServiceInfo.newBuilder(serviceInfo_).mergeFrom(value).buildPartial();
+          } else {
+            serviceInfo_ = value;
+          }
+          onChanged();
+        } else {
+          serviceInfoBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.eigr.functions.protocol.ServiceInfo service_info = 1;</code>
+       */
+      public Builder clearServiceInfo() {
+        if (serviceInfoBuilder_ == null) {
+          serviceInfo_ = null;
+          onChanged();
+        } else {
+          serviceInfo_ = null;
+          serviceInfoBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <code>.eigr.functions.protocol.ServiceInfo service_info = 1;</code>
+       */
+      public io.eigr.functions.protocol.Protocol.ServiceInfo.Builder getServiceInfoBuilder() {
+        
+        onChanged();
+        return getServiceInfoFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.eigr.functions.protocol.ServiceInfo service_info = 1;</code>
+       */
+      public io.eigr.functions.protocol.Protocol.ServiceInfoOrBuilder getServiceInfoOrBuilder() {
+        if (serviceInfoBuilder_ != null) {
+          return serviceInfoBuilder_.getMessageOrBuilder();
+        } else {
+          return serviceInfo_ == null ?
+              io.eigr.functions.protocol.Protocol.ServiceInfo.getDefaultInstance() : serviceInfo_;
+        }
+      }
+      /**
+       * <code>.eigr.functions.protocol.ServiceInfo service_info = 1;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          io.eigr.functions.protocol.Protocol.ServiceInfo, io.eigr.functions.protocol.Protocol.ServiceInfo.Builder, io.eigr.functions.protocol.Protocol.ServiceInfoOrBuilder> 
+          getServiceInfoFieldBuilder() {
+        if (serviceInfoBuilder_ == null) {
+          serviceInfoBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              io.eigr.functions.protocol.Protocol.ServiceInfo, io.eigr.functions.protocol.Protocol.ServiceInfo.Builder, io.eigr.functions.protocol.Protocol.ServiceInfoOrBuilder>(
+                  getServiceInfo(),
+                  getParentForChildren(),
+                  isClean());
+          serviceInfo_ = null;
+        }
+        return serviceInfoBuilder_;
       }
 
-      private java.lang.Object message_ = "";
+      private io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem actorSystem_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem, io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.Builder, io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystemOrBuilder> actorSystemBuilder_;
       /**
-       * <code>string message = 2;</code>
-       * @return The message.
+       * <code>.eigr.functions.protocol.actors.ActorSystem actor_system = 2;</code>
+       * @return Whether the actorSystem field is set.
        */
-      public java.lang.String getMessage() {
-        java.lang.Object ref = message_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          message_ = s;
-          return s;
+      public boolean hasActorSystem() {
+        return actorSystemBuilder_ != null || actorSystem_ != null;
+      }
+      /**
+       * <code>.eigr.functions.protocol.actors.ActorSystem actor_system = 2;</code>
+       * @return The actorSystem.
+       */
+      public io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem getActorSystem() {
+        if (actorSystemBuilder_ == null) {
+          return actorSystem_ == null ? io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.getDefaultInstance() : actorSystem_;
         } else {
-          return (java.lang.String) ref;
+          return actorSystemBuilder_.getMessage();
         }
       }
       /**
-       * <code>string message = 2;</code>
-       * @return The bytes for message.
+       * <code>.eigr.functions.protocol.actors.ActorSystem actor_system = 2;</code>
        */
-      public com.google.protobuf.ByteString
-          getMessageBytes() {
-        java.lang.Object ref = message_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          message_ = b;
-          return b;
+      public Builder setActorSystem(io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem value) {
+        if (actorSystemBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          actorSystem_ = value;
+          onChanged();
         } else {
-          return (com.google.protobuf.ByteString) ref;
+          actorSystemBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.eigr.functions.protocol.actors.ActorSystem actor_system = 2;</code>
+       */
+      public Builder setActorSystem(
+          io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.Builder builderForValue) {
+        if (actorSystemBuilder_ == null) {
+          actorSystem_ = builderForValue.build();
+          onChanged();
+        } else {
+          actorSystemBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <code>.eigr.functions.protocol.actors.ActorSystem actor_system = 2;</code>
+       */
+      public Builder mergeActorSystem(io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem value) {
+        if (actorSystemBuilder_ == null) {
+          if (actorSystem_ != null) {
+            actorSystem_ =
+              io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.newBuilder(actorSystem_).mergeFrom(value).buildPartial();
+          } else {
+            actorSystem_ = value;
+          }
+          onChanged();
+        } else {
+          actorSystemBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.eigr.functions.protocol.actors.ActorSystem actor_system = 2;</code>
+       */
+      public Builder clearActorSystem() {
+        if (actorSystemBuilder_ == null) {
+          actorSystem_ = null;
+          onChanged();
+        } else {
+          actorSystem_ = null;
+          actorSystemBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <code>.eigr.functions.protocol.actors.ActorSystem actor_system = 2;</code>
+       */
+      public io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.Builder getActorSystemBuilder() {
+        
+        onChanged();
+        return getActorSystemFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.eigr.functions.protocol.actors.ActorSystem actor_system = 2;</code>
+       */
+      public io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystemOrBuilder getActorSystemOrBuilder() {
+        if (actorSystemBuilder_ != null) {
+          return actorSystemBuilder_.getMessageOrBuilder();
+        } else {
+          return actorSystem_ == null ?
+              io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.getDefaultInstance() : actorSystem_;
         }
       }
       /**
-       * <code>string message = 2;</code>
-       * @param value The message to set.
-       * @return This builder for chaining.
+       * <code>.eigr.functions.protocol.actors.ActorSystem actor_system = 2;</code>
        */
-      public Builder setMessage(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  
-        message_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string message = 2;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearMessage() {
-        
-        message_ = getDefaultInstance().getMessage();
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string message = 2;</code>
-       * @param value The bytes for message to set.
-       * @return This builder for chaining.
-       */
-      public Builder setMessageBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-        
-        message_ = value;
-        onChanged();
-        return this;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem, io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.Builder, io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystemOrBuilder> 
+          getActorSystemFieldBuilder() {
+        if (actorSystemBuilder_ == null) {
+          actorSystemBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem, io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.Builder, io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystemOrBuilder>(
+                  getActorSystem(),
+                  getParentForChildren(),
+                  isClean());
+          actorSystem_ = null;
+        }
+        return actorSystemBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -767,891 +914,41 @@ public final class Protocol {
       }
 
 
-      // @@protoc_insertion_point(builder_scope:eigr.functions.protocol.RequestStatus)
+      // @@protoc_insertion_point(builder_scope:eigr.functions.protocol.RegistrationRequest)
     }
 
-    // @@protoc_insertion_point(class_scope:eigr.functions.protocol.RequestStatus)
-    private static final io.eigr.functions.protocol.Protocol.RequestStatus DEFAULT_INSTANCE;
+    // @@protoc_insertion_point(class_scope:eigr.functions.protocol.RegistrationRequest)
+    private static final io.eigr.functions.protocol.Protocol.RegistrationRequest DEFAULT_INSTANCE;
     static {
-      DEFAULT_INSTANCE = new io.eigr.functions.protocol.Protocol.RequestStatus();
+      DEFAULT_INSTANCE = new io.eigr.functions.protocol.Protocol.RegistrationRequest();
     }
 
-    public static io.eigr.functions.protocol.Protocol.RequestStatus getDefaultInstance() {
+    public static io.eigr.functions.protocol.Protocol.RegistrationRequest getDefaultInstance() {
       return DEFAULT_INSTANCE;
     }
 
-    private static final com.google.protobuf.Parser<RequestStatus>
-        PARSER = new com.google.protobuf.AbstractParser<RequestStatus>() {
+    private static final com.google.protobuf.Parser<RegistrationRequest>
+        PARSER = new com.google.protobuf.AbstractParser<RegistrationRequest>() {
       @java.lang.Override
-      public RequestStatus parsePartialFrom(
+      public RegistrationRequest parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        return new RequestStatus(input, extensionRegistry);
+        return new RegistrationRequest(input, extensionRegistry);
       }
     };
 
-    public static com.google.protobuf.Parser<RequestStatus> parser() {
+    public static com.google.protobuf.Parser<RegistrationRequest> parser() {
       return PARSER;
     }
 
     @java.lang.Override
-    public com.google.protobuf.Parser<RequestStatus> getParserForType() {
+    public com.google.protobuf.Parser<RegistrationRequest> getParserForType() {
       return PARSER;
     }
 
     @java.lang.Override
-    public io.eigr.functions.protocol.Protocol.RequestStatus getDefaultInstanceForType() {
-      return DEFAULT_INSTANCE;
-    }
-
-  }
-
-  public interface ProxyInfoOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:eigr.functions.protocol.ProxyInfo)
-      com.google.protobuf.MessageOrBuilder {
-
-    /**
-     * <code>int32 protocol_major_version = 1;</code>
-     * @return The protocolMajorVersion.
-     */
-    int getProtocolMajorVersion();
-
-    /**
-     * <code>int32 protocol_minor_version = 2;</code>
-     * @return The protocolMinorVersion.
-     */
-    int getProtocolMinorVersion();
-
-    /**
-     * <code>string proxy_name = 3;</code>
-     * @return The proxyName.
-     */
-    java.lang.String getProxyName();
-    /**
-     * <code>string proxy_name = 3;</code>
-     * @return The bytes for proxyName.
-     */
-    com.google.protobuf.ByteString
-        getProxyNameBytes();
-
-    /**
-     * <code>string proxy_version = 4;</code>
-     * @return The proxyVersion.
-     */
-    java.lang.String getProxyVersion();
-    /**
-     * <code>string proxy_version = 4;</code>
-     * @return The bytes for proxyVersion.
-     */
-    com.google.protobuf.ByteString
-        getProxyVersionBytes();
-  }
-  /**
-   * Protobuf type {@code eigr.functions.protocol.ProxyInfo}
-   */
-  public  static final class ProxyInfo extends
-      com.google.protobuf.GeneratedMessageV3 implements
-      // @@protoc_insertion_point(message_implements:eigr.functions.protocol.ProxyInfo)
-      ProxyInfoOrBuilder {
-  private static final long serialVersionUID = 0L;
-    // Use ProxyInfo.newBuilder() to construct.
-    private ProxyInfo(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
-      super(builder);
-    }
-    private ProxyInfo() {
-      proxyName_ = "";
-      proxyVersion_ = "";
-    }
-
-    @java.lang.Override
-    @SuppressWarnings({"unused"})
-    protected java.lang.Object newInstance(
-        UnusedPrivateParameter unused) {
-      return new ProxyInfo();
-    }
-
-    @java.lang.Override
-    public final com.google.protobuf.UnknownFieldSet
-    getUnknownFields() {
-      return this.unknownFields;
-    }
-    private ProxyInfo(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      this();
-      if (extensionRegistry == null) {
-        throw new java.lang.NullPointerException();
-      }
-      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
-      try {
-        boolean done = false;
-        while (!done) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              done = true;
-              break;
-            case 8: {
-
-              protocolMajorVersion_ = input.readInt32();
-              break;
-            }
-            case 16: {
-
-              protocolMinorVersion_ = input.readInt32();
-              break;
-            }
-            case 26: {
-              java.lang.String s = input.readStringRequireUtf8();
-
-              proxyName_ = s;
-              break;
-            }
-            case 34: {
-              java.lang.String s = input.readStringRequireUtf8();
-
-              proxyVersion_ = s;
-              break;
-            }
-            default: {
-              if (!parseUnknownField(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
-          }
-        }
-      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
-      } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e).setUnfinishedMessage(this);
-      } finally {
-        this.unknownFields = unknownFields.build();
-        makeExtensionsImmutable();
-      }
-    }
-    public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
-      return io.eigr.functions.protocol.Protocol.internal_static_eigr_functions_protocol_ProxyInfo_descriptor;
-    }
-
-    @java.lang.Override
-    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-        internalGetFieldAccessorTable() {
-      return io.eigr.functions.protocol.Protocol.internal_static_eigr_functions_protocol_ProxyInfo_fieldAccessorTable
-          .ensureFieldAccessorsInitialized(
-              io.eigr.functions.protocol.Protocol.ProxyInfo.class, io.eigr.functions.protocol.Protocol.ProxyInfo.Builder.class);
-    }
-
-    public static final int PROTOCOL_MAJOR_VERSION_FIELD_NUMBER = 1;
-    private int protocolMajorVersion_;
-    /**
-     * <code>int32 protocol_major_version = 1;</code>
-     * @return The protocolMajorVersion.
-     */
-    public int getProtocolMajorVersion() {
-      return protocolMajorVersion_;
-    }
-
-    public static final int PROTOCOL_MINOR_VERSION_FIELD_NUMBER = 2;
-    private int protocolMinorVersion_;
-    /**
-     * <code>int32 protocol_minor_version = 2;</code>
-     * @return The protocolMinorVersion.
-     */
-    public int getProtocolMinorVersion() {
-      return protocolMinorVersion_;
-    }
-
-    public static final int PROXY_NAME_FIELD_NUMBER = 3;
-    private volatile java.lang.Object proxyName_;
-    /**
-     * <code>string proxy_name = 3;</code>
-     * @return The proxyName.
-     */
-    public java.lang.String getProxyName() {
-      java.lang.Object ref = proxyName_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        proxyName_ = s;
-        return s;
-      }
-    }
-    /**
-     * <code>string proxy_name = 3;</code>
-     * @return The bytes for proxyName.
-     */
-    public com.google.protobuf.ByteString
-        getProxyNameBytes() {
-      java.lang.Object ref = proxyName_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        proxyName_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-
-    public static final int PROXY_VERSION_FIELD_NUMBER = 4;
-    private volatile java.lang.Object proxyVersion_;
-    /**
-     * <code>string proxy_version = 4;</code>
-     * @return The proxyVersion.
-     */
-    public java.lang.String getProxyVersion() {
-      java.lang.Object ref = proxyVersion_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        proxyVersion_ = s;
-        return s;
-      }
-    }
-    /**
-     * <code>string proxy_version = 4;</code>
-     * @return The bytes for proxyVersion.
-     */
-    public com.google.protobuf.ByteString
-        getProxyVersionBytes() {
-      java.lang.Object ref = proxyVersion_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        proxyVersion_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-
-    private byte memoizedIsInitialized = -1;
-    @java.lang.Override
-    public final boolean isInitialized() {
-      byte isInitialized = memoizedIsInitialized;
-      if (isInitialized == 1) return true;
-      if (isInitialized == 0) return false;
-
-      memoizedIsInitialized = 1;
-      return true;
-    }
-
-    @java.lang.Override
-    public void writeTo(com.google.protobuf.CodedOutputStream output)
-                        throws java.io.IOException {
-      if (protocolMajorVersion_ != 0) {
-        output.writeInt32(1, protocolMajorVersion_);
-      }
-      if (protocolMinorVersion_ != 0) {
-        output.writeInt32(2, protocolMinorVersion_);
-      }
-      if (!getProxyNameBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, proxyName_);
-      }
-      if (!getProxyVersionBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 4, proxyVersion_);
-      }
-      unknownFields.writeTo(output);
-    }
-
-    @java.lang.Override
-    public int getSerializedSize() {
-      int size = memoizedSize;
-      if (size != -1) return size;
-
-      size = 0;
-      if (protocolMajorVersion_ != 0) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(1, protocolMajorVersion_);
-      }
-      if (protocolMinorVersion_ != 0) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(2, protocolMinorVersion_);
-      }
-      if (!getProxyNameBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, proxyName_);
-      }
-      if (!getProxyVersionBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, proxyVersion_);
-      }
-      size += unknownFields.getSerializedSize();
-      memoizedSize = size;
-      return size;
-    }
-
-    @java.lang.Override
-    public boolean equals(final java.lang.Object obj) {
-      if (obj == this) {
-       return true;
-      }
-      if (!(obj instanceof io.eigr.functions.protocol.Protocol.ProxyInfo)) {
-        return super.equals(obj);
-      }
-      io.eigr.functions.protocol.Protocol.ProxyInfo other = (io.eigr.functions.protocol.Protocol.ProxyInfo) obj;
-
-      if (getProtocolMajorVersion()
-          != other.getProtocolMajorVersion()) return false;
-      if (getProtocolMinorVersion()
-          != other.getProtocolMinorVersion()) return false;
-      if (!getProxyName()
-          .equals(other.getProxyName())) return false;
-      if (!getProxyVersion()
-          .equals(other.getProxyVersion())) return false;
-      if (!unknownFields.equals(other.unknownFields)) return false;
-      return true;
-    }
-
-    @java.lang.Override
-    public int hashCode() {
-      if (memoizedHashCode != 0) {
-        return memoizedHashCode;
-      }
-      int hash = 41;
-      hash = (19 * hash) + getDescriptor().hashCode();
-      hash = (37 * hash) + PROTOCOL_MAJOR_VERSION_FIELD_NUMBER;
-      hash = (53 * hash) + getProtocolMajorVersion();
-      hash = (37 * hash) + PROTOCOL_MINOR_VERSION_FIELD_NUMBER;
-      hash = (53 * hash) + getProtocolMinorVersion();
-      hash = (37 * hash) + PROXY_NAME_FIELD_NUMBER;
-      hash = (53 * hash) + getProxyName().hashCode();
-      hash = (37 * hash) + PROXY_VERSION_FIELD_NUMBER;
-      hash = (53 * hash) + getProxyVersion().hashCode();
-      hash = (29 * hash) + unknownFields.hashCode();
-      memoizedHashCode = hash;
-      return hash;
-    }
-
-    public static io.eigr.functions.protocol.Protocol.ProxyInfo parseFrom(
-        java.nio.ByteBuffer data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static io.eigr.functions.protocol.Protocol.ProxyInfo parseFrom(
-        java.nio.ByteBuffer data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static io.eigr.functions.protocol.Protocol.ProxyInfo parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static io.eigr.functions.protocol.Protocol.ProxyInfo parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static io.eigr.functions.protocol.Protocol.ProxyInfo parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static io.eigr.functions.protocol.Protocol.ProxyInfo parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static io.eigr.functions.protocol.Protocol.ProxyInfo parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input);
-    }
-    public static io.eigr.functions.protocol.Protocol.ProxyInfo parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input, extensionRegistry);
-    }
-    public static io.eigr.functions.protocol.Protocol.ProxyInfo parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseDelimitedWithIOException(PARSER, input);
-    }
-    public static io.eigr.functions.protocol.Protocol.ProxyInfo parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
-    }
-    public static io.eigr.functions.protocol.Protocol.ProxyInfo parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input);
-    }
-    public static io.eigr.functions.protocol.Protocol.ProxyInfo parseFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input, extensionRegistry);
-    }
-
-    @java.lang.Override
-    public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder() {
-      return DEFAULT_INSTANCE.toBuilder();
-    }
-    public static Builder newBuilder(io.eigr.functions.protocol.Protocol.ProxyInfo prototype) {
-      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
-    }
-    @java.lang.Override
-    public Builder toBuilder() {
-      return this == DEFAULT_INSTANCE
-          ? new Builder() : new Builder().mergeFrom(this);
-    }
-
-    @java.lang.Override
-    protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
-    }
-    /**
-     * Protobuf type {@code eigr.functions.protocol.ProxyInfo}
-     */
-    public static final class Builder extends
-        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:eigr.functions.protocol.ProxyInfo)
-        io.eigr.functions.protocol.Protocol.ProxyInfoOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
-        return io.eigr.functions.protocol.Protocol.internal_static_eigr_functions_protocol_ProxyInfo_descriptor;
-      }
-
-      @java.lang.Override
-      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-          internalGetFieldAccessorTable() {
-        return io.eigr.functions.protocol.Protocol.internal_static_eigr_functions_protocol_ProxyInfo_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                io.eigr.functions.protocol.Protocol.ProxyInfo.class, io.eigr.functions.protocol.Protocol.ProxyInfo.Builder.class);
-      }
-
-      // Construct using io.eigr.functions.protocol.Protocol.ProxyInfo.newBuilder()
-      private Builder() {
-        maybeForceBuilderInitialization();
-      }
-
-      private Builder(
-          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-        super(parent);
-        maybeForceBuilderInitialization();
-      }
-      private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessageV3
-                .alwaysUseFieldBuilders) {
-        }
-      }
-      @java.lang.Override
-      public Builder clear() {
-        super.clear();
-        protocolMajorVersion_ = 0;
-
-        protocolMinorVersion_ = 0;
-
-        proxyName_ = "";
-
-        proxyVersion_ = "";
-
-        return this;
-      }
-
-      @java.lang.Override
-      public com.google.protobuf.Descriptors.Descriptor
-          getDescriptorForType() {
-        return io.eigr.functions.protocol.Protocol.internal_static_eigr_functions_protocol_ProxyInfo_descriptor;
-      }
-
-      @java.lang.Override
-      public io.eigr.functions.protocol.Protocol.ProxyInfo getDefaultInstanceForType() {
-        return io.eigr.functions.protocol.Protocol.ProxyInfo.getDefaultInstance();
-      }
-
-      @java.lang.Override
-      public io.eigr.functions.protocol.Protocol.ProxyInfo build() {
-        io.eigr.functions.protocol.Protocol.ProxyInfo result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(result);
-        }
-        return result;
-      }
-
-      @java.lang.Override
-      public io.eigr.functions.protocol.Protocol.ProxyInfo buildPartial() {
-        io.eigr.functions.protocol.Protocol.ProxyInfo result = new io.eigr.functions.protocol.Protocol.ProxyInfo(this);
-        result.protocolMajorVersion_ = protocolMajorVersion_;
-        result.protocolMinorVersion_ = protocolMinorVersion_;
-        result.proxyName_ = proxyName_;
-        result.proxyVersion_ = proxyVersion_;
-        onBuilt();
-        return result;
-      }
-
-      @java.lang.Override
-      public Builder clone() {
-        return super.clone();
-      }
-      @java.lang.Override
-      public Builder setField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
-        return super.setField(field, value);
-      }
-      @java.lang.Override
-      public Builder clearField(
-          com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return super.clearField(field);
-      }
-      @java.lang.Override
-      public Builder clearOneof(
-          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return super.clearOneof(oneof);
-      }
-      @java.lang.Override
-      public Builder setRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, java.lang.Object value) {
-        return super.setRepeatedField(field, index, value);
-      }
-      @java.lang.Override
-      public Builder addRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
-        return super.addRepeatedField(field, value);
-      }
-      @java.lang.Override
-      public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof io.eigr.functions.protocol.Protocol.ProxyInfo) {
-          return mergeFrom((io.eigr.functions.protocol.Protocol.ProxyInfo)other);
-        } else {
-          super.mergeFrom(other);
-          return this;
-        }
-      }
-
-      public Builder mergeFrom(io.eigr.functions.protocol.Protocol.ProxyInfo other) {
-        if (other == io.eigr.functions.protocol.Protocol.ProxyInfo.getDefaultInstance()) return this;
-        if (other.getProtocolMajorVersion() != 0) {
-          setProtocolMajorVersion(other.getProtocolMajorVersion());
-        }
-        if (other.getProtocolMinorVersion() != 0) {
-          setProtocolMinorVersion(other.getProtocolMinorVersion());
-        }
-        if (!other.getProxyName().isEmpty()) {
-          proxyName_ = other.proxyName_;
-          onChanged();
-        }
-        if (!other.getProxyVersion().isEmpty()) {
-          proxyVersion_ = other.proxyVersion_;
-          onChanged();
-        }
-        this.mergeUnknownFields(other.unknownFields);
-        onChanged();
-        return this;
-      }
-
-      @java.lang.Override
-      public final boolean isInitialized() {
-        return true;
-      }
-
-      @java.lang.Override
-      public Builder mergeFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-        io.eigr.functions.protocol.Protocol.ProxyInfo parsedMessage = null;
-        try {
-          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
-        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (io.eigr.functions.protocol.Protocol.ProxyInfo) e.getUnfinishedMessage();
-          throw e.unwrapIOException();
-        } finally {
-          if (parsedMessage != null) {
-            mergeFrom(parsedMessage);
-          }
-        }
-        return this;
-      }
-
-      private int protocolMajorVersion_ ;
-      /**
-       * <code>int32 protocol_major_version = 1;</code>
-       * @return The protocolMajorVersion.
-       */
-      public int getProtocolMajorVersion() {
-        return protocolMajorVersion_;
-      }
-      /**
-       * <code>int32 protocol_major_version = 1;</code>
-       * @param value The protocolMajorVersion to set.
-       * @return This builder for chaining.
-       */
-      public Builder setProtocolMajorVersion(int value) {
-        
-        protocolMajorVersion_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>int32 protocol_major_version = 1;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearProtocolMajorVersion() {
-        
-        protocolMajorVersion_ = 0;
-        onChanged();
-        return this;
-      }
-
-      private int protocolMinorVersion_ ;
-      /**
-       * <code>int32 protocol_minor_version = 2;</code>
-       * @return The protocolMinorVersion.
-       */
-      public int getProtocolMinorVersion() {
-        return protocolMinorVersion_;
-      }
-      /**
-       * <code>int32 protocol_minor_version = 2;</code>
-       * @param value The protocolMinorVersion to set.
-       * @return This builder for chaining.
-       */
-      public Builder setProtocolMinorVersion(int value) {
-        
-        protocolMinorVersion_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>int32 protocol_minor_version = 2;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearProtocolMinorVersion() {
-        
-        protocolMinorVersion_ = 0;
-        onChanged();
-        return this;
-      }
-
-      private java.lang.Object proxyName_ = "";
-      /**
-       * <code>string proxy_name = 3;</code>
-       * @return The proxyName.
-       */
-      public java.lang.String getProxyName() {
-        java.lang.Object ref = proxyName_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          proxyName_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
-      }
-      /**
-       * <code>string proxy_name = 3;</code>
-       * @return The bytes for proxyName.
-       */
-      public com.google.protobuf.ByteString
-          getProxyNameBytes() {
-        java.lang.Object ref = proxyName_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          proxyName_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>string proxy_name = 3;</code>
-       * @param value The proxyName to set.
-       * @return This builder for chaining.
-       */
-      public Builder setProxyName(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  
-        proxyName_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string proxy_name = 3;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearProxyName() {
-        
-        proxyName_ = getDefaultInstance().getProxyName();
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string proxy_name = 3;</code>
-       * @param value The bytes for proxyName to set.
-       * @return This builder for chaining.
-       */
-      public Builder setProxyNameBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-        
-        proxyName_ = value;
-        onChanged();
-        return this;
-      }
-
-      private java.lang.Object proxyVersion_ = "";
-      /**
-       * <code>string proxy_version = 4;</code>
-       * @return The proxyVersion.
-       */
-      public java.lang.String getProxyVersion() {
-        java.lang.Object ref = proxyVersion_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          proxyVersion_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
-      }
-      /**
-       * <code>string proxy_version = 4;</code>
-       * @return The bytes for proxyVersion.
-       */
-      public com.google.protobuf.ByteString
-          getProxyVersionBytes() {
-        java.lang.Object ref = proxyVersion_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          proxyVersion_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>string proxy_version = 4;</code>
-       * @param value The proxyVersion to set.
-       * @return This builder for chaining.
-       */
-      public Builder setProxyVersion(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  
-        proxyVersion_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string proxy_version = 4;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearProxyVersion() {
-        
-        proxyVersion_ = getDefaultInstance().getProxyVersion();
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string proxy_version = 4;</code>
-       * @param value The bytes for proxyVersion to set.
-       * @return This builder for chaining.
-       */
-      public Builder setProxyVersionBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-        
-        proxyVersion_ = value;
-        onChanged();
-        return this;
-      }
-      @java.lang.Override
-      public final Builder setUnknownFields(
-          final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFields(unknownFields);
-      }
-
-      @java.lang.Override
-      public final Builder mergeUnknownFields(
-          final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.mergeUnknownFields(unknownFields);
-      }
-
-
-      // @@protoc_insertion_point(builder_scope:eigr.functions.protocol.ProxyInfo)
-    }
-
-    // @@protoc_insertion_point(class_scope:eigr.functions.protocol.ProxyInfo)
-    private static final io.eigr.functions.protocol.Protocol.ProxyInfo DEFAULT_INSTANCE;
-    static {
-      DEFAULT_INSTANCE = new io.eigr.functions.protocol.Protocol.ProxyInfo();
-    }
-
-    public static io.eigr.functions.protocol.Protocol.ProxyInfo getDefaultInstance() {
-      return DEFAULT_INSTANCE;
-    }
-
-    private static final com.google.protobuf.Parser<ProxyInfo>
-        PARSER = new com.google.protobuf.AbstractParser<ProxyInfo>() {
-      @java.lang.Override
-      public ProxyInfo parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new ProxyInfo(input, extensionRegistry);
-      }
-    };
-
-    public static com.google.protobuf.Parser<ProxyInfo> parser() {
-      return PARSER;
-    }
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<ProxyInfo> getParserForType() {
-      return PARSER;
-    }
-
-    @java.lang.Override
-    public io.eigr.functions.protocol.Protocol.ProxyInfo getDefaultInstanceForType() {
+    public io.eigr.functions.protocol.Protocol.RegistrationRequest getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
 
@@ -1767,7 +1064,7 @@ public final class Protocol {
 
     /**
      * <pre>
-     * Cloudstate protocol major version accepted by the support library.
+     * Spawn protocol major version accepted by the support library.
      * </pre>
      *
      * <code>int32 protocol_major_version = 6;</code>
@@ -1777,7 +1074,7 @@ public final class Protocol {
 
     /**
      * <pre>
-     * Cloudstate protocol minor version accepted by the support library.
+     * Spawn protocol minor version accepted by the support library.
      * </pre>
      *
      * <code>int32 protocol_minor_version = 7;</code>
@@ -2135,7 +1432,7 @@ public final class Protocol {
     private int protocolMajorVersion_;
     /**
      * <pre>
-     * Cloudstate protocol major version accepted by the support library.
+     * Spawn protocol major version accepted by the support library.
      * </pre>
      *
      * <code>int32 protocol_major_version = 6;</code>
@@ -2149,7 +1446,7 @@ public final class Protocol {
     private int protocolMinorVersion_;
     /**
      * <pre>
-     * Cloudstate protocol minor version accepted by the support library.
+     * Spawn protocol minor version accepted by the support library.
      * </pre>
      *
      * <code>int32 protocol_minor_version = 7;</code>
@@ -3056,7 +2353,7 @@ public final class Protocol {
       private int protocolMajorVersion_ ;
       /**
        * <pre>
-       * Cloudstate protocol major version accepted by the support library.
+       * Spawn protocol major version accepted by the support library.
        * </pre>
        *
        * <code>int32 protocol_major_version = 6;</code>
@@ -3067,7 +2364,7 @@ public final class Protocol {
       }
       /**
        * <pre>
-       * Cloudstate protocol major version accepted by the support library.
+       * Spawn protocol major version accepted by the support library.
        * </pre>
        *
        * <code>int32 protocol_major_version = 6;</code>
@@ -3082,7 +2379,7 @@ public final class Protocol {
       }
       /**
        * <pre>
-       * Cloudstate protocol major version accepted by the support library.
+       * Spawn protocol major version accepted by the support library.
        * </pre>
        *
        * <code>int32 protocol_major_version = 6;</code>
@@ -3098,7 +2395,7 @@ public final class Protocol {
       private int protocolMinorVersion_ ;
       /**
        * <pre>
-       * Cloudstate protocol minor version accepted by the support library.
+       * Spawn protocol minor version accepted by the support library.
        * </pre>
        *
        * <code>int32 protocol_minor_version = 7;</code>
@@ -3109,7 +2406,7 @@ public final class Protocol {
       }
       /**
        * <pre>
-       * Cloudstate protocol minor version accepted by the support library.
+       * Spawn protocol minor version accepted by the support library.
        * </pre>
        *
        * <code>int32 protocol_minor_version = 7;</code>
@@ -3124,7 +2421,7 @@ public final class Protocol {
       }
       /**
        * <pre>
-       * Cloudstate protocol minor version accepted by the support library.
+       * Spawn protocol minor version accepted by the support library.
        * </pre>
        *
        * <code>int32 protocol_minor_version = 7;</code>
@@ -3189,60 +2486,68 @@ public final class Protocol {
 
   }
 
-  public interface RegistrationRequestOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:eigr.functions.protocol.RegistrationRequest)
+  public interface ProxyInfoOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:eigr.functions.protocol.ProxyInfo)
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>.eigr.functions.protocol.ServiceInfo service_info = 1;</code>
-     * @return Whether the serviceInfo field is set.
+     * <code>int32 protocol_major_version = 1;</code>
+     * @return The protocolMajorVersion.
      */
-    boolean hasServiceInfo();
-    /**
-     * <code>.eigr.functions.protocol.ServiceInfo service_info = 1;</code>
-     * @return The serviceInfo.
-     */
-    io.eigr.functions.protocol.Protocol.ServiceInfo getServiceInfo();
-    /**
-     * <code>.eigr.functions.protocol.ServiceInfo service_info = 1;</code>
-     */
-    io.eigr.functions.protocol.Protocol.ServiceInfoOrBuilder getServiceInfoOrBuilder();
+    int getProtocolMajorVersion();
 
     /**
-     * <code>.eigr.functions.protocol.actors.ActorSystem actor_system = 2;</code>
-     * @return Whether the actorSystem field is set.
+     * <code>int32 protocol_minor_version = 2;</code>
+     * @return The protocolMinorVersion.
      */
-    boolean hasActorSystem();
+    int getProtocolMinorVersion();
+
     /**
-     * <code>.eigr.functions.protocol.actors.ActorSystem actor_system = 2;</code>
-     * @return The actorSystem.
+     * <code>string proxy_name = 3;</code>
+     * @return The proxyName.
      */
-    io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem getActorSystem();
+    java.lang.String getProxyName();
     /**
-     * <code>.eigr.functions.protocol.actors.ActorSystem actor_system = 2;</code>
+     * <code>string proxy_name = 3;</code>
+     * @return The bytes for proxyName.
      */
-    io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystemOrBuilder getActorSystemOrBuilder();
+    com.google.protobuf.ByteString
+        getProxyNameBytes();
+
+    /**
+     * <code>string proxy_version = 4;</code>
+     * @return The proxyVersion.
+     */
+    java.lang.String getProxyVersion();
+    /**
+     * <code>string proxy_version = 4;</code>
+     * @return The bytes for proxyVersion.
+     */
+    com.google.protobuf.ByteString
+        getProxyVersionBytes();
   }
   /**
-   * Protobuf type {@code eigr.functions.protocol.RegistrationRequest}
+   * Protobuf type {@code eigr.functions.protocol.ProxyInfo}
    */
-  public  static final class RegistrationRequest extends
+  public  static final class ProxyInfo extends
       com.google.protobuf.GeneratedMessageV3 implements
-      // @@protoc_insertion_point(message_implements:eigr.functions.protocol.RegistrationRequest)
-      RegistrationRequestOrBuilder {
+      // @@protoc_insertion_point(message_implements:eigr.functions.protocol.ProxyInfo)
+      ProxyInfoOrBuilder {
   private static final long serialVersionUID = 0L;
-    // Use RegistrationRequest.newBuilder() to construct.
-    private RegistrationRequest(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+    // Use ProxyInfo.newBuilder() to construct.
+    private ProxyInfo(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
     }
-    private RegistrationRequest() {
+    private ProxyInfo() {
+      proxyName_ = "";
+      proxyVersion_ = "";
     }
 
     @java.lang.Override
     @SuppressWarnings({"unused"})
     protected java.lang.Object newInstance(
         UnusedPrivateParameter unused) {
-      return new RegistrationRequest();
+      return new ProxyInfo();
     }
 
     @java.lang.Override
@@ -3250,7 +2555,7 @@ public final class Protocol {
     getUnknownFields() {
       return this.unknownFields;
     }
-    private RegistrationRequest(
+    private ProxyInfo(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -3268,30 +2573,26 @@ public final class Protocol {
             case 0:
               done = true;
               break;
-            case 10: {
-              io.eigr.functions.protocol.Protocol.ServiceInfo.Builder subBuilder = null;
-              if (serviceInfo_ != null) {
-                subBuilder = serviceInfo_.toBuilder();
-              }
-              serviceInfo_ = input.readMessage(io.eigr.functions.protocol.Protocol.ServiceInfo.parser(), extensionRegistry);
-              if (subBuilder != null) {
-                subBuilder.mergeFrom(serviceInfo_);
-                serviceInfo_ = subBuilder.buildPartial();
-              }
+            case 8: {
 
+              protocolMajorVersion_ = input.readInt32();
               break;
             }
-            case 18: {
-              io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.Builder subBuilder = null;
-              if (actorSystem_ != null) {
-                subBuilder = actorSystem_.toBuilder();
-              }
-              actorSystem_ = input.readMessage(io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.parser(), extensionRegistry);
-              if (subBuilder != null) {
-                subBuilder.mergeFrom(actorSystem_);
-                actorSystem_ = subBuilder.buildPartial();
-              }
+            case 16: {
 
+              protocolMinorVersion_ = input.readInt32();
+              break;
+            }
+            case 26: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              proxyName_ = s;
+              break;
+            }
+            case 34: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              proxyVersion_ = s;
               break;
             }
             default: {
@@ -3315,61 +2616,107 @@ public final class Protocol {
     }
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return io.eigr.functions.protocol.Protocol.internal_static_eigr_functions_protocol_RegistrationRequest_descriptor;
+      return io.eigr.functions.protocol.Protocol.internal_static_eigr_functions_protocol_ProxyInfo_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return io.eigr.functions.protocol.Protocol.internal_static_eigr_functions_protocol_RegistrationRequest_fieldAccessorTable
+      return io.eigr.functions.protocol.Protocol.internal_static_eigr_functions_protocol_ProxyInfo_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              io.eigr.functions.protocol.Protocol.RegistrationRequest.class, io.eigr.functions.protocol.Protocol.RegistrationRequest.Builder.class);
+              io.eigr.functions.protocol.Protocol.ProxyInfo.class, io.eigr.functions.protocol.Protocol.ProxyInfo.Builder.class);
     }
 
-    public static final int SERVICE_INFO_FIELD_NUMBER = 1;
-    private io.eigr.functions.protocol.Protocol.ServiceInfo serviceInfo_;
+    public static final int PROTOCOL_MAJOR_VERSION_FIELD_NUMBER = 1;
+    private int protocolMajorVersion_;
     /**
-     * <code>.eigr.functions.protocol.ServiceInfo service_info = 1;</code>
-     * @return Whether the serviceInfo field is set.
+     * <code>int32 protocol_major_version = 1;</code>
+     * @return The protocolMajorVersion.
      */
-    public boolean hasServiceInfo() {
-      return serviceInfo_ != null;
-    }
-    /**
-     * <code>.eigr.functions.protocol.ServiceInfo service_info = 1;</code>
-     * @return The serviceInfo.
-     */
-    public io.eigr.functions.protocol.Protocol.ServiceInfo getServiceInfo() {
-      return serviceInfo_ == null ? io.eigr.functions.protocol.Protocol.ServiceInfo.getDefaultInstance() : serviceInfo_;
-    }
-    /**
-     * <code>.eigr.functions.protocol.ServiceInfo service_info = 1;</code>
-     */
-    public io.eigr.functions.protocol.Protocol.ServiceInfoOrBuilder getServiceInfoOrBuilder() {
-      return getServiceInfo();
+    public int getProtocolMajorVersion() {
+      return protocolMajorVersion_;
     }
 
-    public static final int ACTOR_SYSTEM_FIELD_NUMBER = 2;
-    private io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem actorSystem_;
+    public static final int PROTOCOL_MINOR_VERSION_FIELD_NUMBER = 2;
+    private int protocolMinorVersion_;
     /**
-     * <code>.eigr.functions.protocol.actors.ActorSystem actor_system = 2;</code>
-     * @return Whether the actorSystem field is set.
+     * <code>int32 protocol_minor_version = 2;</code>
+     * @return The protocolMinorVersion.
      */
-    public boolean hasActorSystem() {
-      return actorSystem_ != null;
+    public int getProtocolMinorVersion() {
+      return protocolMinorVersion_;
+    }
+
+    public static final int PROXY_NAME_FIELD_NUMBER = 3;
+    private volatile java.lang.Object proxyName_;
+    /**
+     * <code>string proxy_name = 3;</code>
+     * @return The proxyName.
+     */
+    public java.lang.String getProxyName() {
+      java.lang.Object ref = proxyName_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        proxyName_ = s;
+        return s;
+      }
     }
     /**
-     * <code>.eigr.functions.protocol.actors.ActorSystem actor_system = 2;</code>
-     * @return The actorSystem.
+     * <code>string proxy_name = 3;</code>
+     * @return The bytes for proxyName.
      */
-    public io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem getActorSystem() {
-      return actorSystem_ == null ? io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.getDefaultInstance() : actorSystem_;
+    public com.google.protobuf.ByteString
+        getProxyNameBytes() {
+      java.lang.Object ref = proxyName_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        proxyName_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int PROXY_VERSION_FIELD_NUMBER = 4;
+    private volatile java.lang.Object proxyVersion_;
+    /**
+     * <code>string proxy_version = 4;</code>
+     * @return The proxyVersion.
+     */
+    public java.lang.String getProxyVersion() {
+      java.lang.Object ref = proxyVersion_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        proxyVersion_ = s;
+        return s;
+      }
     }
     /**
-     * <code>.eigr.functions.protocol.actors.ActorSystem actor_system = 2;</code>
+     * <code>string proxy_version = 4;</code>
+     * @return The bytes for proxyVersion.
      */
-    public io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystemOrBuilder getActorSystemOrBuilder() {
-      return getActorSystem();
+    public com.google.protobuf.ByteString
+        getProxyVersionBytes() {
+      java.lang.Object ref = proxyVersion_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        proxyVersion_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
     }
 
     private byte memoizedIsInitialized = -1;
@@ -3386,11 +2733,17 @@ public final class Protocol {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (serviceInfo_ != null) {
-        output.writeMessage(1, getServiceInfo());
+      if (protocolMajorVersion_ != 0) {
+        output.writeInt32(1, protocolMajorVersion_);
       }
-      if (actorSystem_ != null) {
-        output.writeMessage(2, getActorSystem());
+      if (protocolMinorVersion_ != 0) {
+        output.writeInt32(2, protocolMinorVersion_);
+      }
+      if (!getProxyNameBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, proxyName_);
+      }
+      if (!getProxyVersionBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 4, proxyVersion_);
       }
       unknownFields.writeTo(output);
     }
@@ -3401,13 +2754,19 @@ public final class Protocol {
       if (size != -1) return size;
 
       size = 0;
-      if (serviceInfo_ != null) {
+      if (protocolMajorVersion_ != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(1, getServiceInfo());
+          .computeInt32Size(1, protocolMajorVersion_);
       }
-      if (actorSystem_ != null) {
+      if (protocolMinorVersion_ != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(2, getActorSystem());
+          .computeInt32Size(2, protocolMinorVersion_);
+      }
+      if (!getProxyNameBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, proxyName_);
+      }
+      if (!getProxyVersionBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, proxyVersion_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -3419,21 +2778,19 @@ public final class Protocol {
       if (obj == this) {
        return true;
       }
-      if (!(obj instanceof io.eigr.functions.protocol.Protocol.RegistrationRequest)) {
+      if (!(obj instanceof io.eigr.functions.protocol.Protocol.ProxyInfo)) {
         return super.equals(obj);
       }
-      io.eigr.functions.protocol.Protocol.RegistrationRequest other = (io.eigr.functions.protocol.Protocol.RegistrationRequest) obj;
+      io.eigr.functions.protocol.Protocol.ProxyInfo other = (io.eigr.functions.protocol.Protocol.ProxyInfo) obj;
 
-      if (hasServiceInfo() != other.hasServiceInfo()) return false;
-      if (hasServiceInfo()) {
-        if (!getServiceInfo()
-            .equals(other.getServiceInfo())) return false;
-      }
-      if (hasActorSystem() != other.hasActorSystem()) return false;
-      if (hasActorSystem()) {
-        if (!getActorSystem()
-            .equals(other.getActorSystem())) return false;
-      }
+      if (getProtocolMajorVersion()
+          != other.getProtocolMajorVersion()) return false;
+      if (getProtocolMinorVersion()
+          != other.getProtocolMinorVersion()) return false;
+      if (!getProxyName()
+          .equals(other.getProxyName())) return false;
+      if (!getProxyVersion()
+          .equals(other.getProxyVersion())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -3445,82 +2802,82 @@ public final class Protocol {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
-      if (hasServiceInfo()) {
-        hash = (37 * hash) + SERVICE_INFO_FIELD_NUMBER;
-        hash = (53 * hash) + getServiceInfo().hashCode();
-      }
-      if (hasActorSystem()) {
-        hash = (37 * hash) + ACTOR_SYSTEM_FIELD_NUMBER;
-        hash = (53 * hash) + getActorSystem().hashCode();
-      }
+      hash = (37 * hash) + PROTOCOL_MAJOR_VERSION_FIELD_NUMBER;
+      hash = (53 * hash) + getProtocolMajorVersion();
+      hash = (37 * hash) + PROTOCOL_MINOR_VERSION_FIELD_NUMBER;
+      hash = (53 * hash) + getProtocolMinorVersion();
+      hash = (37 * hash) + PROXY_NAME_FIELD_NUMBER;
+      hash = (53 * hash) + getProxyName().hashCode();
+      hash = (37 * hash) + PROXY_VERSION_FIELD_NUMBER;
+      hash = (53 * hash) + getProxyVersion().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
     }
 
-    public static io.eigr.functions.protocol.Protocol.RegistrationRequest parseFrom(
+    public static io.eigr.functions.protocol.Protocol.ProxyInfo parseFrom(
         java.nio.ByteBuffer data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static io.eigr.functions.protocol.Protocol.RegistrationRequest parseFrom(
+    public static io.eigr.functions.protocol.Protocol.ProxyInfo parseFrom(
         java.nio.ByteBuffer data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static io.eigr.functions.protocol.Protocol.RegistrationRequest parseFrom(
+    public static io.eigr.functions.protocol.Protocol.ProxyInfo parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static io.eigr.functions.protocol.Protocol.RegistrationRequest parseFrom(
+    public static io.eigr.functions.protocol.Protocol.ProxyInfo parseFrom(
         com.google.protobuf.ByteString data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static io.eigr.functions.protocol.Protocol.RegistrationRequest parseFrom(byte[] data)
+    public static io.eigr.functions.protocol.Protocol.ProxyInfo parseFrom(byte[] data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static io.eigr.functions.protocol.Protocol.RegistrationRequest parseFrom(
+    public static io.eigr.functions.protocol.Protocol.ProxyInfo parseFrom(
         byte[] data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static io.eigr.functions.protocol.Protocol.RegistrationRequest parseFrom(java.io.InputStream input)
+    public static io.eigr.functions.protocol.Protocol.ProxyInfo parseFrom(java.io.InputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseWithIOException(PARSER, input);
     }
-    public static io.eigr.functions.protocol.Protocol.RegistrationRequest parseFrom(
+    public static io.eigr.functions.protocol.Protocol.ProxyInfo parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
-    public static io.eigr.functions.protocol.Protocol.RegistrationRequest parseDelimitedFrom(java.io.InputStream input)
+    public static io.eigr.functions.protocol.Protocol.ProxyInfo parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseDelimitedWithIOException(PARSER, input);
     }
-    public static io.eigr.functions.protocol.Protocol.RegistrationRequest parseDelimitedFrom(
+    public static io.eigr.functions.protocol.Protocol.ProxyInfo parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
-    public static io.eigr.functions.protocol.Protocol.RegistrationRequest parseFrom(
+    public static io.eigr.functions.protocol.Protocol.ProxyInfo parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseWithIOException(PARSER, input);
     }
-    public static io.eigr.functions.protocol.Protocol.RegistrationRequest parseFrom(
+    public static io.eigr.functions.protocol.Protocol.ProxyInfo parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -3533,7 +2890,7 @@ public final class Protocol {
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
     }
-    public static Builder newBuilder(io.eigr.functions.protocol.Protocol.RegistrationRequest prototype) {
+    public static Builder newBuilder(io.eigr.functions.protocol.Protocol.ProxyInfo prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
     @java.lang.Override
@@ -3549,26 +2906,26 @@ public final class Protocol {
       return builder;
     }
     /**
-     * Protobuf type {@code eigr.functions.protocol.RegistrationRequest}
+     * Protobuf type {@code eigr.functions.protocol.ProxyInfo}
      */
     public static final class Builder extends
         com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:eigr.functions.protocol.RegistrationRequest)
-        io.eigr.functions.protocol.Protocol.RegistrationRequestOrBuilder {
+        // @@protoc_insertion_point(builder_implements:eigr.functions.protocol.ProxyInfo)
+        io.eigr.functions.protocol.Protocol.ProxyInfoOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
-        return io.eigr.functions.protocol.Protocol.internal_static_eigr_functions_protocol_RegistrationRequest_descriptor;
+        return io.eigr.functions.protocol.Protocol.internal_static_eigr_functions_protocol_ProxyInfo_descriptor;
       }
 
       @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
-        return io.eigr.functions.protocol.Protocol.internal_static_eigr_functions_protocol_RegistrationRequest_fieldAccessorTable
+        return io.eigr.functions.protocol.Protocol.internal_static_eigr_functions_protocol_ProxyInfo_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
-                io.eigr.functions.protocol.Protocol.RegistrationRequest.class, io.eigr.functions.protocol.Protocol.RegistrationRequest.Builder.class);
+                io.eigr.functions.protocol.Protocol.ProxyInfo.class, io.eigr.functions.protocol.Protocol.ProxyInfo.Builder.class);
       }
 
-      // Construct using io.eigr.functions.protocol.Protocol.RegistrationRequest.newBuilder()
+      // Construct using io.eigr.functions.protocol.Protocol.ProxyInfo.newBuilder()
       private Builder() {
         maybeForceBuilderInitialization();
       }
@@ -3586,35 +2943,31 @@ public final class Protocol {
       @java.lang.Override
       public Builder clear() {
         super.clear();
-        if (serviceInfoBuilder_ == null) {
-          serviceInfo_ = null;
-        } else {
-          serviceInfo_ = null;
-          serviceInfoBuilder_ = null;
-        }
-        if (actorSystemBuilder_ == null) {
-          actorSystem_ = null;
-        } else {
-          actorSystem_ = null;
-          actorSystemBuilder_ = null;
-        }
+        protocolMajorVersion_ = 0;
+
+        protocolMinorVersion_ = 0;
+
+        proxyName_ = "";
+
+        proxyVersion_ = "";
+
         return this;
       }
 
       @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
-        return io.eigr.functions.protocol.Protocol.internal_static_eigr_functions_protocol_RegistrationRequest_descriptor;
+        return io.eigr.functions.protocol.Protocol.internal_static_eigr_functions_protocol_ProxyInfo_descriptor;
       }
 
       @java.lang.Override
-      public io.eigr.functions.protocol.Protocol.RegistrationRequest getDefaultInstanceForType() {
-        return io.eigr.functions.protocol.Protocol.RegistrationRequest.getDefaultInstance();
+      public io.eigr.functions.protocol.Protocol.ProxyInfo getDefaultInstanceForType() {
+        return io.eigr.functions.protocol.Protocol.ProxyInfo.getDefaultInstance();
       }
 
       @java.lang.Override
-      public io.eigr.functions.protocol.Protocol.RegistrationRequest build() {
-        io.eigr.functions.protocol.Protocol.RegistrationRequest result = buildPartial();
+      public io.eigr.functions.protocol.Protocol.ProxyInfo build() {
+        io.eigr.functions.protocol.Protocol.ProxyInfo result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(result);
         }
@@ -3622,18 +2975,12 @@ public final class Protocol {
       }
 
       @java.lang.Override
-      public io.eigr.functions.protocol.Protocol.RegistrationRequest buildPartial() {
-        io.eigr.functions.protocol.Protocol.RegistrationRequest result = new io.eigr.functions.protocol.Protocol.RegistrationRequest(this);
-        if (serviceInfoBuilder_ == null) {
-          result.serviceInfo_ = serviceInfo_;
-        } else {
-          result.serviceInfo_ = serviceInfoBuilder_.build();
-        }
-        if (actorSystemBuilder_ == null) {
-          result.actorSystem_ = actorSystem_;
-        } else {
-          result.actorSystem_ = actorSystemBuilder_.build();
-        }
+      public io.eigr.functions.protocol.Protocol.ProxyInfo buildPartial() {
+        io.eigr.functions.protocol.Protocol.ProxyInfo result = new io.eigr.functions.protocol.Protocol.ProxyInfo(this);
+        result.protocolMajorVersion_ = protocolMajorVersion_;
+        result.protocolMinorVersion_ = protocolMinorVersion_;
+        result.proxyName_ = proxyName_;
+        result.proxyVersion_ = proxyVersion_;
         onBuilt();
         return result;
       }
@@ -3672,21 +3019,29 @@ public final class Protocol {
       }
       @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof io.eigr.functions.protocol.Protocol.RegistrationRequest) {
-          return mergeFrom((io.eigr.functions.protocol.Protocol.RegistrationRequest)other);
+        if (other instanceof io.eigr.functions.protocol.Protocol.ProxyInfo) {
+          return mergeFrom((io.eigr.functions.protocol.Protocol.ProxyInfo)other);
         } else {
           super.mergeFrom(other);
           return this;
         }
       }
 
-      public Builder mergeFrom(io.eigr.functions.protocol.Protocol.RegistrationRequest other) {
-        if (other == io.eigr.functions.protocol.Protocol.RegistrationRequest.getDefaultInstance()) return this;
-        if (other.hasServiceInfo()) {
-          mergeServiceInfo(other.getServiceInfo());
+      public Builder mergeFrom(io.eigr.functions.protocol.Protocol.ProxyInfo other) {
+        if (other == io.eigr.functions.protocol.Protocol.ProxyInfo.getDefaultInstance()) return this;
+        if (other.getProtocolMajorVersion() != 0) {
+          setProtocolMajorVersion(other.getProtocolMajorVersion());
         }
-        if (other.hasActorSystem()) {
-          mergeActorSystem(other.getActorSystem());
+        if (other.getProtocolMinorVersion() != 0) {
+          setProtocolMinorVersion(other.getProtocolMinorVersion());
+        }
+        if (!other.getProxyName().isEmpty()) {
+          proxyName_ = other.proxyName_;
+          onChanged();
+        }
+        if (!other.getProxyVersion().isEmpty()) {
+          proxyVersion_ = other.proxyVersion_;
+          onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -3703,11 +3058,11 @@ public final class Protocol {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        io.eigr.functions.protocol.Protocol.RegistrationRequest parsedMessage = null;
+        io.eigr.functions.protocol.Protocol.ProxyInfo parsedMessage = null;
         try {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (io.eigr.functions.protocol.Protocol.RegistrationRequest) e.getUnfinishedMessage();
+          parsedMessage = (io.eigr.functions.protocol.Protocol.ProxyInfo) e.getUnfinishedMessage();
           throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
@@ -3717,242 +3072,216 @@ public final class Protocol {
         return this;
       }
 
-      private io.eigr.functions.protocol.Protocol.ServiceInfo serviceInfo_;
-      private com.google.protobuf.SingleFieldBuilderV3<
-          io.eigr.functions.protocol.Protocol.ServiceInfo, io.eigr.functions.protocol.Protocol.ServiceInfo.Builder, io.eigr.functions.protocol.Protocol.ServiceInfoOrBuilder> serviceInfoBuilder_;
+      private int protocolMajorVersion_ ;
       /**
-       * <code>.eigr.functions.protocol.ServiceInfo service_info = 1;</code>
-       * @return Whether the serviceInfo field is set.
+       * <code>int32 protocol_major_version = 1;</code>
+       * @return The protocolMajorVersion.
        */
-      public boolean hasServiceInfo() {
-        return serviceInfoBuilder_ != null || serviceInfo_ != null;
+      public int getProtocolMajorVersion() {
+        return protocolMajorVersion_;
       }
       /**
-       * <code>.eigr.functions.protocol.ServiceInfo service_info = 1;</code>
-       * @return The serviceInfo.
+       * <code>int32 protocol_major_version = 1;</code>
+       * @param value The protocolMajorVersion to set.
+       * @return This builder for chaining.
        */
-      public io.eigr.functions.protocol.Protocol.ServiceInfo getServiceInfo() {
-        if (serviceInfoBuilder_ == null) {
-          return serviceInfo_ == null ? io.eigr.functions.protocol.Protocol.ServiceInfo.getDefaultInstance() : serviceInfo_;
-        } else {
-          return serviceInfoBuilder_.getMessage();
-        }
-      }
-      /**
-       * <code>.eigr.functions.protocol.ServiceInfo service_info = 1;</code>
-       */
-      public Builder setServiceInfo(io.eigr.functions.protocol.Protocol.ServiceInfo value) {
-        if (serviceInfoBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          serviceInfo_ = value;
-          onChanged();
-        } else {
-          serviceInfoBuilder_.setMessage(value);
-        }
-
-        return this;
-      }
-      /**
-       * <code>.eigr.functions.protocol.ServiceInfo service_info = 1;</code>
-       */
-      public Builder setServiceInfo(
-          io.eigr.functions.protocol.Protocol.ServiceInfo.Builder builderForValue) {
-        if (serviceInfoBuilder_ == null) {
-          serviceInfo_ = builderForValue.build();
-          onChanged();
-        } else {
-          serviceInfoBuilder_.setMessage(builderForValue.build());
-        }
-
-        return this;
-      }
-      /**
-       * <code>.eigr.functions.protocol.ServiceInfo service_info = 1;</code>
-       */
-      public Builder mergeServiceInfo(io.eigr.functions.protocol.Protocol.ServiceInfo value) {
-        if (serviceInfoBuilder_ == null) {
-          if (serviceInfo_ != null) {
-            serviceInfo_ =
-              io.eigr.functions.protocol.Protocol.ServiceInfo.newBuilder(serviceInfo_).mergeFrom(value).buildPartial();
-          } else {
-            serviceInfo_ = value;
-          }
-          onChanged();
-        } else {
-          serviceInfoBuilder_.mergeFrom(value);
-        }
-
-        return this;
-      }
-      /**
-       * <code>.eigr.functions.protocol.ServiceInfo service_info = 1;</code>
-       */
-      public Builder clearServiceInfo() {
-        if (serviceInfoBuilder_ == null) {
-          serviceInfo_ = null;
-          onChanged();
-        } else {
-          serviceInfo_ = null;
-          serviceInfoBuilder_ = null;
-        }
-
-        return this;
-      }
-      /**
-       * <code>.eigr.functions.protocol.ServiceInfo service_info = 1;</code>
-       */
-      public io.eigr.functions.protocol.Protocol.ServiceInfo.Builder getServiceInfoBuilder() {
+      public Builder setProtocolMajorVersion(int value) {
         
+        protocolMajorVersion_ = value;
         onChanged();
-        return getServiceInfoFieldBuilder().getBuilder();
-      }
-      /**
-       * <code>.eigr.functions.protocol.ServiceInfo service_info = 1;</code>
-       */
-      public io.eigr.functions.protocol.Protocol.ServiceInfoOrBuilder getServiceInfoOrBuilder() {
-        if (serviceInfoBuilder_ != null) {
-          return serviceInfoBuilder_.getMessageOrBuilder();
-        } else {
-          return serviceInfo_ == null ?
-              io.eigr.functions.protocol.Protocol.ServiceInfo.getDefaultInstance() : serviceInfo_;
-        }
-      }
-      /**
-       * <code>.eigr.functions.protocol.ServiceInfo service_info = 1;</code>
-       */
-      private com.google.protobuf.SingleFieldBuilderV3<
-          io.eigr.functions.protocol.Protocol.ServiceInfo, io.eigr.functions.protocol.Protocol.ServiceInfo.Builder, io.eigr.functions.protocol.Protocol.ServiceInfoOrBuilder> 
-          getServiceInfoFieldBuilder() {
-        if (serviceInfoBuilder_ == null) {
-          serviceInfoBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-              io.eigr.functions.protocol.Protocol.ServiceInfo, io.eigr.functions.protocol.Protocol.ServiceInfo.Builder, io.eigr.functions.protocol.Protocol.ServiceInfoOrBuilder>(
-                  getServiceInfo(),
-                  getParentForChildren(),
-                  isClean());
-          serviceInfo_ = null;
-        }
-        return serviceInfoBuilder_;
-      }
-
-      private io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem actorSystem_;
-      private com.google.protobuf.SingleFieldBuilderV3<
-          io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem, io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.Builder, io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystemOrBuilder> actorSystemBuilder_;
-      /**
-       * <code>.eigr.functions.protocol.actors.ActorSystem actor_system = 2;</code>
-       * @return Whether the actorSystem field is set.
-       */
-      public boolean hasActorSystem() {
-        return actorSystemBuilder_ != null || actorSystem_ != null;
-      }
-      /**
-       * <code>.eigr.functions.protocol.actors.ActorSystem actor_system = 2;</code>
-       * @return The actorSystem.
-       */
-      public io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem getActorSystem() {
-        if (actorSystemBuilder_ == null) {
-          return actorSystem_ == null ? io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.getDefaultInstance() : actorSystem_;
-        } else {
-          return actorSystemBuilder_.getMessage();
-        }
-      }
-      /**
-       * <code>.eigr.functions.protocol.actors.ActorSystem actor_system = 2;</code>
-       */
-      public Builder setActorSystem(io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem value) {
-        if (actorSystemBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          actorSystem_ = value;
-          onChanged();
-        } else {
-          actorSystemBuilder_.setMessage(value);
-        }
-
         return this;
       }
       /**
-       * <code>.eigr.functions.protocol.actors.ActorSystem actor_system = 2;</code>
+       * <code>int32 protocol_major_version = 1;</code>
+       * @return This builder for chaining.
        */
-      public Builder setActorSystem(
-          io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.Builder builderForValue) {
-        if (actorSystemBuilder_ == null) {
-          actorSystem_ = builderForValue.build();
-          onChanged();
-        } else {
-          actorSystemBuilder_.setMessage(builderForValue.build());
-        }
-
-        return this;
-      }
-      /**
-       * <code>.eigr.functions.protocol.actors.ActorSystem actor_system = 2;</code>
-       */
-      public Builder mergeActorSystem(io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem value) {
-        if (actorSystemBuilder_ == null) {
-          if (actorSystem_ != null) {
-            actorSystem_ =
-              io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.newBuilder(actorSystem_).mergeFrom(value).buildPartial();
-          } else {
-            actorSystem_ = value;
-          }
-          onChanged();
-        } else {
-          actorSystemBuilder_.mergeFrom(value);
-        }
-
-        return this;
-      }
-      /**
-       * <code>.eigr.functions.protocol.actors.ActorSystem actor_system = 2;</code>
-       */
-      public Builder clearActorSystem() {
-        if (actorSystemBuilder_ == null) {
-          actorSystem_ = null;
-          onChanged();
-        } else {
-          actorSystem_ = null;
-          actorSystemBuilder_ = null;
-        }
-
-        return this;
-      }
-      /**
-       * <code>.eigr.functions.protocol.actors.ActorSystem actor_system = 2;</code>
-       */
-      public io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.Builder getActorSystemBuilder() {
+      public Builder clearProtocolMajorVersion() {
         
+        protocolMajorVersion_ = 0;
         onChanged();
-        return getActorSystemFieldBuilder().getBuilder();
+        return this;
+      }
+
+      private int protocolMinorVersion_ ;
+      /**
+       * <code>int32 protocol_minor_version = 2;</code>
+       * @return The protocolMinorVersion.
+       */
+      public int getProtocolMinorVersion() {
+        return protocolMinorVersion_;
       }
       /**
-       * <code>.eigr.functions.protocol.actors.ActorSystem actor_system = 2;</code>
+       * <code>int32 protocol_minor_version = 2;</code>
+       * @param value The protocolMinorVersion to set.
+       * @return This builder for chaining.
        */
-      public io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystemOrBuilder getActorSystemOrBuilder() {
-        if (actorSystemBuilder_ != null) {
-          return actorSystemBuilder_.getMessageOrBuilder();
+      public Builder setProtocolMinorVersion(int value) {
+        
+        protocolMinorVersion_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int32 protocol_minor_version = 2;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearProtocolMinorVersion() {
+        
+        protocolMinorVersion_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object proxyName_ = "";
+      /**
+       * <code>string proxy_name = 3;</code>
+       * @return The proxyName.
+       */
+      public java.lang.String getProxyName() {
+        java.lang.Object ref = proxyName_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          proxyName_ = s;
+          return s;
         } else {
-          return actorSystem_ == null ?
-              io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.getDefaultInstance() : actorSystem_;
+          return (java.lang.String) ref;
         }
       }
       /**
-       * <code>.eigr.functions.protocol.actors.ActorSystem actor_system = 2;</code>
+       * <code>string proxy_name = 3;</code>
+       * @return The bytes for proxyName.
        */
-      private com.google.protobuf.SingleFieldBuilderV3<
-          io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem, io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.Builder, io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystemOrBuilder> 
-          getActorSystemFieldBuilder() {
-        if (actorSystemBuilder_ == null) {
-          actorSystemBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-              io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem, io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystem.Builder, io.eigr.functions.protocol.actors.ActorOuterClass.ActorSystemOrBuilder>(
-                  getActorSystem(),
-                  getParentForChildren(),
-                  isClean());
-          actorSystem_ = null;
+      public com.google.protobuf.ByteString
+          getProxyNameBytes() {
+        java.lang.Object ref = proxyName_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          proxyName_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
         }
-        return actorSystemBuilder_;
+      }
+      /**
+       * <code>string proxy_name = 3;</code>
+       * @param value The proxyName to set.
+       * @return This builder for chaining.
+       */
+      public Builder setProxyName(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        proxyName_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string proxy_name = 3;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearProxyName() {
+        
+        proxyName_ = getDefaultInstance().getProxyName();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string proxy_name = 3;</code>
+       * @param value The bytes for proxyName to set.
+       * @return This builder for chaining.
+       */
+      public Builder setProxyNameBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        proxyName_ = value;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object proxyVersion_ = "";
+      /**
+       * <code>string proxy_version = 4;</code>
+       * @return The proxyVersion.
+       */
+      public java.lang.String getProxyVersion() {
+        java.lang.Object ref = proxyVersion_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          proxyVersion_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string proxy_version = 4;</code>
+       * @return The bytes for proxyVersion.
+       */
+      public com.google.protobuf.ByteString
+          getProxyVersionBytes() {
+        java.lang.Object ref = proxyVersion_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          proxyVersion_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string proxy_version = 4;</code>
+       * @param value The proxyVersion to set.
+       * @return This builder for chaining.
+       */
+      public Builder setProxyVersion(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        proxyVersion_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string proxy_version = 4;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearProxyVersion() {
+        
+        proxyVersion_ = getDefaultInstance().getProxyVersion();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string proxy_version = 4;</code>
+       * @param value The bytes for proxyVersion to set.
+       * @return This builder for chaining.
+       */
+      public Builder setProxyVersionBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        proxyVersion_ = value;
+        onChanged();
+        return this;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -3967,41 +3296,41 @@ public final class Protocol {
       }
 
 
-      // @@protoc_insertion_point(builder_scope:eigr.functions.protocol.RegistrationRequest)
+      // @@protoc_insertion_point(builder_scope:eigr.functions.protocol.ProxyInfo)
     }
 
-    // @@protoc_insertion_point(class_scope:eigr.functions.protocol.RegistrationRequest)
-    private static final io.eigr.functions.protocol.Protocol.RegistrationRequest DEFAULT_INSTANCE;
+    // @@protoc_insertion_point(class_scope:eigr.functions.protocol.ProxyInfo)
+    private static final io.eigr.functions.protocol.Protocol.ProxyInfo DEFAULT_INSTANCE;
     static {
-      DEFAULT_INSTANCE = new io.eigr.functions.protocol.Protocol.RegistrationRequest();
+      DEFAULT_INSTANCE = new io.eigr.functions.protocol.Protocol.ProxyInfo();
     }
 
-    public static io.eigr.functions.protocol.Protocol.RegistrationRequest getDefaultInstance() {
+    public static io.eigr.functions.protocol.Protocol.ProxyInfo getDefaultInstance() {
       return DEFAULT_INSTANCE;
     }
 
-    private static final com.google.protobuf.Parser<RegistrationRequest>
-        PARSER = new com.google.protobuf.AbstractParser<RegistrationRequest>() {
+    private static final com.google.protobuf.Parser<ProxyInfo>
+        PARSER = new com.google.protobuf.AbstractParser<ProxyInfo>() {
       @java.lang.Override
-      public RegistrationRequest parsePartialFrom(
+      public ProxyInfo parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        return new RegistrationRequest(input, extensionRegistry);
+        return new ProxyInfo(input, extensionRegistry);
       }
     };
 
-    public static com.google.protobuf.Parser<RegistrationRequest> parser() {
+    public static com.google.protobuf.Parser<ProxyInfo> parser() {
       return PARSER;
     }
 
     @java.lang.Override
-    public com.google.protobuf.Parser<RegistrationRequest> getParserForType() {
+    public com.google.protobuf.Parser<ProxyInfo> getParserForType() {
       return PARSER;
     }
 
     @java.lang.Override
-    public io.eigr.functions.protocol.Protocol.RegistrationRequest getDefaultInstanceForType() {
+    public io.eigr.functions.protocol.Protocol.ProxyInfo getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
 
@@ -4845,6 +4174,13 @@ public final class Protocol {
     com.google.protobuf.AnyOrBuilder getStateOrBuilder();
   }
   /**
+   * <pre>
+   * Context is where current and/or updated state is stored
+   * to be transmitted to/from proxy and user function
+   * Params:
+   *   * state: Actor state passed back and forth between proxy and user function.
+   * </pre>
+   *
    * Protobuf type {@code eigr.functions.protocol.Context}
    */
   public  static final class Context extends
@@ -5118,6 +4454,13 @@ public final class Protocol {
       return builder;
     }
     /**
+     * <pre>
+     * Context is where current and/or updated state is stored
+     * to be transmitted to/from proxy and user function
+     * Params:
+     *   * state: Actor state passed back and forth between proxy and user function.
+     * </pre>
+     *
      * Protobuf type {@code eigr.functions.protocol.Context}
      */
     public static final class Builder extends
@@ -5511,6 +4854,18 @@ public final class Protocol {
     boolean getAsync();
   }
   /**
+   * <pre>
+   * The user function when it wants to send a message to an Actor uses the InvocationRequest message type.
+   * Params:
+   *   * system: See ActorStstem message.
+   *   * actor: The target Actor, i.e. the one that the user function is calling to perform some computation.
+   *   * command_name: The function or method on the target Actor that will receive this request
+   *     and perform some useful computation with the sent data.
+   *   * value: This is the value sent by the user function to be computed by the request's target Actor command.
+   *   * async: Indicates whether the command should be processed synchronously, where a response should be sent back to the user function,
+   *            or whether the command should be processed asynchronously, i.e. no response sent to the caller and no waiting.
+   * </pre>
+   *
    * Protobuf type {@code eigr.functions.protocol.InvocationRequest}
    */
   public  static final class InvocationRequest extends
@@ -5968,6 +5323,18 @@ public final class Protocol {
       return builder;
     }
     /**
+     * <pre>
+     * The user function when it wants to send a message to an Actor uses the InvocationRequest message type.
+     * Params:
+     *   * system: See ActorStstem message.
+     *   * actor: The target Actor, i.e. the one that the user function is calling to perform some computation.
+     *   * command_name: The function or method on the target Actor that will receive this request
+     *     and perform some useful computation with the sent data.
+     *   * value: This is the value sent by the user function to be computed by the request's target Actor command.
+     *   * async: Indicates whether the command should be processed synchronously, where a response should be sent back to the user function,
+     *            or whether the command should be processed asynchronously, i.e. no response sent to the caller and no waiting.
+     * </pre>
+     *
      * Protobuf type {@code eigr.functions.protocol.InvocationRequest}
      */
     public static final class Builder extends
@@ -6749,6 +6116,20 @@ public final class Protocol {
     com.google.protobuf.AnyOrBuilder getValueOrBuilder();
   }
   /**
+   * <pre>
+   * ActorInvocation is a translation message between a local invocation made via InvocationRequest
+   * and the real Actor that intends to respond to this invocation and that can be located anywhere in the cluster.
+   * Params:
+   *   actor_name: The name of the Actor handling the InvocationRequest request, also called the target Actor.
+   *   actor_system: The name of ActorSystem registered in Registration step.
+   *   command_name: The function or method on the target Actor that will receive this request
+   *                 and perform some useful computation with the sent data.
+   *   current_context: The current Context with current state value of the target Actor.
+   *                    That is, the same as found via matching in %Actor{name: target_actor, state: %ActorState{state: value} = actor_state}.
+   *                    In this case, the Context type will contain in the value attribute the same `value` as the matching above.
+   *   value: The value to be passed to the function or method corresponding to command_name.
+   * </pre>
+   *
    * Protobuf type {@code eigr.functions.protocol.ActorInvocation}
    */
   public  static final class ActorInvocation extends
@@ -7233,6 +6614,20 @@ public final class Protocol {
       return builder;
     }
     /**
+     * <pre>
+     * ActorInvocation is a translation message between a local invocation made via InvocationRequest
+     * and the real Actor that intends to respond to this invocation and that can be located anywhere in the cluster.
+     * Params:
+     *   actor_name: The name of the Actor handling the InvocationRequest request, also called the target Actor.
+     *   actor_system: The name of ActorSystem registered in Registration step.
+     *   command_name: The function or method on the target Actor that will receive this request
+     *                 and perform some useful computation with the sent data.
+     *   current_context: The current Context with current state value of the target Actor.
+     *                    That is, the same as found via matching in %Actor{name: target_actor, state: %ActorState{state: value} = actor_state}.
+     *                    In this case, the Context type will contain in the value attribute the same `value` as the matching above.
+     *   value: The value to be passed to the function or method corresponding to command_name.
+     * </pre>
+     *
      * Protobuf type {@code eigr.functions.protocol.ActorInvocation}
      */
     public static final class Builder extends
@@ -7999,6 +7394,16 @@ public final class Protocol {
     com.google.protobuf.AnyOrBuilder getValueOrBuilder();
   }
   /**
+   * <pre>
+   * The user role's response after executing the action originated by the local proxy request via ActorInvocation.
+   * Params:
+   *   actor_name: The name of the Actor handling the InvocationRequest request, also called the target Actor.
+   *   actor_system: The name of ActorSystem registered in Registration step.
+   *   updated_context: The Context with updated state value of the target Actor after user function has processed a request.
+   *   value: The value that the original request proxy will forward in response to the InvocationRequest type request.
+   *          This is the final response from the point of view of the user who invoked the Actor call and its subsequent processing.
+   * </pre>
+   *
    * Protobuf type {@code eigr.functions.protocol.ActorInvocationResponse}
    */
   public  static final class ActorInvocationResponse extends
@@ -8430,6 +7835,16 @@ public final class Protocol {
       return builder;
     }
     /**
+     * <pre>
+     * The user role's response after executing the action originated by the local proxy request via ActorInvocation.
+     * Params:
+     *   actor_name: The name of the Actor handling the InvocationRequest request, also called the target Actor.
+     *   actor_system: The name of ActorSystem registered in Registration step.
+     *   updated_context: The Context with updated state value of the target Actor after user function has processed a request.
+     *   value: The value that the original request proxy will forward in response to the InvocationRequest type request.
+     *          This is the final response from the point of view of the user who invoked the Actor call and its subsequent processing.
+     * </pre>
+     *
      * Protobuf type {@code eigr.functions.protocol.ActorInvocationResponse}
      */
     public static final class Builder extends
@@ -9119,6 +8534,16 @@ public final class Protocol {
     com.google.protobuf.AnyOrBuilder getValueOrBuilder();
   }
   /**
+   * <pre>
+   * InvocationResponse is the response that the proxy that received the InvocationRequest request will forward to the request's original user function.
+   * Params:
+   *   status: Status of request. Could be one of [UNKNOWN, OK, ACTOR_NOT_FOUND, ERROR].
+   *   sytem: The original ActorSystem of the InvocationRequest request.
+   *   actor: The target Actor originally sent in the InvocationRequest message.
+   *   value: The value resulting from the request processing that the target Actor made.
+   *          This value must be passed by the user function to the one who requested the initial request in InvocationRequest.
+   * </pre>
+   *
    * Protobuf type {@code eigr.functions.protocol.InvocationResponse}
    */
   public  static final class InvocationResponse extends
@@ -9548,6 +8973,16 @@ public final class Protocol {
       return builder;
     }
     /**
+     * <pre>
+     * InvocationResponse is the response that the proxy that received the InvocationRequest request will forward to the request's original user function.
+     * Params:
+     *   status: Status of request. Could be one of [UNKNOWN, OK, ACTOR_NOT_FOUND, ERROR].
+     *   sytem: The original ActorSystem of the InvocationRequest request.
+     *   actor: The target Actor originally sent in the InvocationRequest message.
+     *   value: The value resulting from the request processing that the target Actor made.
+     *          This value must be passed by the user function to the one who requested the initial request in InvocationRequest.
+     * </pre>
+     *
      * Protobuf type {@code eigr.functions.protocol.InvocationResponse}
      */
     public static final class Builder extends
@@ -10272,26 +9707,692 @@ public final class Protocol {
 
   }
 
+  public interface RequestStatusOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:eigr.functions.protocol.RequestStatus)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>.eigr.functions.protocol.Status status = 1;</code>
+     * @return The enum numeric value on the wire for status.
+     */
+    int getStatusValue();
+    /**
+     * <code>.eigr.functions.protocol.Status status = 1;</code>
+     * @return The status.
+     */
+    io.eigr.functions.protocol.Protocol.Status getStatus();
+
+    /**
+     * <code>string message = 2;</code>
+     * @return The message.
+     */
+    java.lang.String getMessage();
+    /**
+     * <code>string message = 2;</code>
+     * @return The bytes for message.
+     */
+    com.google.protobuf.ByteString
+        getMessageBytes();
+  }
+  /**
+   * Protobuf type {@code eigr.functions.protocol.RequestStatus}
+   */
+  public  static final class RequestStatus extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:eigr.functions.protocol.RequestStatus)
+      RequestStatusOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use RequestStatus.newBuilder() to construct.
+    private RequestStatus(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private RequestStatus() {
+      status_ = 0;
+      message_ = "";
+    }
+
+    @java.lang.Override
+    @SuppressWarnings({"unused"})
+    protected java.lang.Object newInstance(
+        UnusedPrivateParameter unused) {
+      return new RequestStatus();
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private RequestStatus(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 8: {
+              int rawValue = input.readEnum();
+
+              status_ = rawValue;
+              break;
+            }
+            case 18: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              message_ = s;
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return io.eigr.functions.protocol.Protocol.internal_static_eigr_functions_protocol_RequestStatus_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return io.eigr.functions.protocol.Protocol.internal_static_eigr_functions_protocol_RequestStatus_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              io.eigr.functions.protocol.Protocol.RequestStatus.class, io.eigr.functions.protocol.Protocol.RequestStatus.Builder.class);
+    }
+
+    public static final int STATUS_FIELD_NUMBER = 1;
+    private int status_;
+    /**
+     * <code>.eigr.functions.protocol.Status status = 1;</code>
+     * @return The enum numeric value on the wire for status.
+     */
+    public int getStatusValue() {
+      return status_;
+    }
+    /**
+     * <code>.eigr.functions.protocol.Status status = 1;</code>
+     * @return The status.
+     */
+    public io.eigr.functions.protocol.Protocol.Status getStatus() {
+      @SuppressWarnings("deprecation")
+      io.eigr.functions.protocol.Protocol.Status result = io.eigr.functions.protocol.Protocol.Status.valueOf(status_);
+      return result == null ? io.eigr.functions.protocol.Protocol.Status.UNRECOGNIZED : result;
+    }
+
+    public static final int MESSAGE_FIELD_NUMBER = 2;
+    private volatile java.lang.Object message_;
+    /**
+     * <code>string message = 2;</code>
+     * @return The message.
+     */
+    public java.lang.String getMessage() {
+      java.lang.Object ref = message_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        message_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string message = 2;</code>
+     * @return The bytes for message.
+     */
+    public com.google.protobuf.ByteString
+        getMessageBytes() {
+      java.lang.Object ref = message_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        message_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (status_ != io.eigr.functions.protocol.Protocol.Status.UNKNOWN.getNumber()) {
+        output.writeEnum(1, status_);
+      }
+      if (!getMessageBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, message_);
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (status_ != io.eigr.functions.protocol.Protocol.Status.UNKNOWN.getNumber()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(1, status_);
+      }
+      if (!getMessageBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, message_);
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof io.eigr.functions.protocol.Protocol.RequestStatus)) {
+        return super.equals(obj);
+      }
+      io.eigr.functions.protocol.Protocol.RequestStatus other = (io.eigr.functions.protocol.Protocol.RequestStatus) obj;
+
+      if (status_ != other.status_) return false;
+      if (!getMessage()
+          .equals(other.getMessage())) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + STATUS_FIELD_NUMBER;
+      hash = (53 * hash) + status_;
+      hash = (37 * hash) + MESSAGE_FIELD_NUMBER;
+      hash = (53 * hash) + getMessage().hashCode();
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static io.eigr.functions.protocol.Protocol.RequestStatus parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static io.eigr.functions.protocol.Protocol.RequestStatus parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static io.eigr.functions.protocol.Protocol.RequestStatus parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static io.eigr.functions.protocol.Protocol.RequestStatus parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static io.eigr.functions.protocol.Protocol.RequestStatus parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static io.eigr.functions.protocol.Protocol.RequestStatus parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static io.eigr.functions.protocol.Protocol.RequestStatus parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static io.eigr.functions.protocol.Protocol.RequestStatus parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static io.eigr.functions.protocol.Protocol.RequestStatus parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static io.eigr.functions.protocol.Protocol.RequestStatus parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static io.eigr.functions.protocol.Protocol.RequestStatus parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static io.eigr.functions.protocol.Protocol.RequestStatus parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(io.eigr.functions.protocol.Protocol.RequestStatus prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code eigr.functions.protocol.RequestStatus}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:eigr.functions.protocol.RequestStatus)
+        io.eigr.functions.protocol.Protocol.RequestStatusOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return io.eigr.functions.protocol.Protocol.internal_static_eigr_functions_protocol_RequestStatus_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return io.eigr.functions.protocol.Protocol.internal_static_eigr_functions_protocol_RequestStatus_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                io.eigr.functions.protocol.Protocol.RequestStatus.class, io.eigr.functions.protocol.Protocol.RequestStatus.Builder.class);
+      }
+
+      // Construct using io.eigr.functions.protocol.Protocol.RequestStatus.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        status_ = 0;
+
+        message_ = "";
+
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return io.eigr.functions.protocol.Protocol.internal_static_eigr_functions_protocol_RequestStatus_descriptor;
+      }
+
+      @java.lang.Override
+      public io.eigr.functions.protocol.Protocol.RequestStatus getDefaultInstanceForType() {
+        return io.eigr.functions.protocol.Protocol.RequestStatus.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public io.eigr.functions.protocol.Protocol.RequestStatus build() {
+        io.eigr.functions.protocol.Protocol.RequestStatus result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public io.eigr.functions.protocol.Protocol.RequestStatus buildPartial() {
+        io.eigr.functions.protocol.Protocol.RequestStatus result = new io.eigr.functions.protocol.Protocol.RequestStatus(this);
+        result.status_ = status_;
+        result.message_ = message_;
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof io.eigr.functions.protocol.Protocol.RequestStatus) {
+          return mergeFrom((io.eigr.functions.protocol.Protocol.RequestStatus)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(io.eigr.functions.protocol.Protocol.RequestStatus other) {
+        if (other == io.eigr.functions.protocol.Protocol.RequestStatus.getDefaultInstance()) return this;
+        if (other.status_ != 0) {
+          setStatusValue(other.getStatusValue());
+        }
+        if (!other.getMessage().isEmpty()) {
+          message_ = other.message_;
+          onChanged();
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        io.eigr.functions.protocol.Protocol.RequestStatus parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (io.eigr.functions.protocol.Protocol.RequestStatus) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private int status_ = 0;
+      /**
+       * <code>.eigr.functions.protocol.Status status = 1;</code>
+       * @return The enum numeric value on the wire for status.
+       */
+      public int getStatusValue() {
+        return status_;
+      }
+      /**
+       * <code>.eigr.functions.protocol.Status status = 1;</code>
+       * @param value The enum numeric value on the wire for status to set.
+       * @return This builder for chaining.
+       */
+      public Builder setStatusValue(int value) {
+        status_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.eigr.functions.protocol.Status status = 1;</code>
+       * @return The status.
+       */
+      public io.eigr.functions.protocol.Protocol.Status getStatus() {
+        @SuppressWarnings("deprecation")
+        io.eigr.functions.protocol.Protocol.Status result = io.eigr.functions.protocol.Protocol.Status.valueOf(status_);
+        return result == null ? io.eigr.functions.protocol.Protocol.Status.UNRECOGNIZED : result;
+      }
+      /**
+       * <code>.eigr.functions.protocol.Status status = 1;</code>
+       * @param value The status to set.
+       * @return This builder for chaining.
+       */
+      public Builder setStatus(io.eigr.functions.protocol.Protocol.Status value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        
+        status_ = value.getNumber();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.eigr.functions.protocol.Status status = 1;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearStatus() {
+        
+        status_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object message_ = "";
+      /**
+       * <code>string message = 2;</code>
+       * @return The message.
+       */
+      public java.lang.String getMessage() {
+        java.lang.Object ref = message_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          message_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string message = 2;</code>
+       * @return The bytes for message.
+       */
+      public com.google.protobuf.ByteString
+          getMessageBytes() {
+        java.lang.Object ref = message_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          message_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string message = 2;</code>
+       * @param value The message to set.
+       * @return This builder for chaining.
+       */
+      public Builder setMessage(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        message_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string message = 2;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearMessage() {
+        
+        message_ = getDefaultInstance().getMessage();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string message = 2;</code>
+       * @param value The bytes for message to set.
+       * @return This builder for chaining.
+       */
+      public Builder setMessageBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        message_ = value;
+        onChanged();
+        return this;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:eigr.functions.protocol.RequestStatus)
+    }
+
+    // @@protoc_insertion_point(class_scope:eigr.functions.protocol.RequestStatus)
+    private static final io.eigr.functions.protocol.Protocol.RequestStatus DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new io.eigr.functions.protocol.Protocol.RequestStatus();
+    }
+
+    public static io.eigr.functions.protocol.Protocol.RequestStatus getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<RequestStatus>
+        PARSER = new com.google.protobuf.AbstractParser<RequestStatus>() {
+      @java.lang.Override
+      public RequestStatus parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new RequestStatus(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<RequestStatus> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<RequestStatus> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public io.eigr.functions.protocol.Protocol.RequestStatus getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_eigr_functions_protocol_RequestStatus_descriptor;
+    internal_static_eigr_functions_protocol_RegistrationRequest_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_eigr_functions_protocol_RequestStatus_fieldAccessorTable;
-  private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_eigr_functions_protocol_ProxyInfo_descriptor;
-  private static final 
-    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_eigr_functions_protocol_ProxyInfo_fieldAccessorTable;
+      internal_static_eigr_functions_protocol_RegistrationRequest_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_eigr_functions_protocol_ServiceInfo_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_eigr_functions_protocol_ServiceInfo_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_eigr_functions_protocol_RegistrationRequest_descriptor;
+    internal_static_eigr_functions_protocol_ProxyInfo_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_eigr_functions_protocol_RegistrationRequest_fieldAccessorTable;
+      internal_static_eigr_functions_protocol_ProxyInfo_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_eigr_functions_protocol_RegistrationResponse_descriptor;
   private static final 
@@ -10322,6 +10423,11 @@ public final class Protocol {
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_eigr_functions_protocol_InvocationResponse_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_eigr_functions_protocol_RequestStatus_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_eigr_functions_protocol_RequestStatus_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -10334,46 +10440,46 @@ public final class Protocol {
       "\n-eigr/functions/protocol/actors/protoco" +
       "l.proto\022\027eigr.functions.protocol\032*eigr/f" +
       "unctions/protocol/actors/actor.proto\032\031go" +
-      "ogle/protobuf/any.proto\"Q\n\rRequestStatus" +
-      "\022/\n\006status\030\001 \001(\0162\037.eigr.functions.protoc" +
-      "ol.Status\022\017\n\007message\030\002 \001(\t\"v\n\tProxyInfo\022" +
-      "\036\n\026protocol_major_version\030\001 \001(\005\022\036\n\026proto" +
-      "col_minor_version\030\002 \001(\005\022\022\n\nproxy_name\030\003 " +
-      "\001(\t\022\025\n\rproxy_version\030\004 \001(\t\"\324\001\n\013ServiceIn" +
-      "fo\022\024\n\014service_name\030\001 \001(\t\022\027\n\017service_vers" +
-      "ion\030\002 \001(\t\022\027\n\017service_runtime\030\003 \001(\t\022\034\n\024su" +
-      "pport_library_name\030\004 \001(\t\022\037\n\027support_libr" +
-      "ary_version\030\005 \001(\t\022\036\n\026protocol_major_vers" +
-      "ion\030\006 \001(\005\022\036\n\026protocol_minor_version\030\007 \001(" +
-      "\005\"\224\001\n\023RegistrationRequest\022:\n\014service_inf" +
-      "o\030\001 \001(\0132$.eigr.functions.protocol.Servic" +
-      "eInfo\022A\n\014actor_system\030\002 \001(\0132+.eigr.funct" +
-      "ions.protocol.actors.ActorSystem\"\205\001\n\024Reg" +
-      "istrationResponse\0225\n\005staus\030\001 \001(\0132&.eigr." +
-      "functions.protocol.RequestStatus\0226\n\nprox" +
-      "y_info\030\002 \001(\0132\".eigr.functions.protocol.P" +
-      "roxyInfo\".\n\007Context\022#\n\005state\030\001 \001(\0132\024.goo" +
-      "gle.protobuf.Any\"\320\001\n\021InvocationRequest\022;" +
-      "\n\006system\030\001 \001(\0132+.eigr.functions.protocol" +
-      ".actors.ActorSystem\0224\n\005actor\030\002 \001(\0132%.eig" +
-      "r.functions.protocol.actors.Actor\022\024\n\014com" +
-      "mand_name\030\003 \001(\t\022#\n\005value\030\004 \001(\0132\024.google." +
-      "protobuf.Any\022\r\n\005async\030\005 \001(\010\"\261\001\n\017ActorInv" +
-      "ocation\022\022\n\nactor_name\030\001 \001(\t\022\024\n\014actor_sys" +
-      "tem\030\002 \001(\t\022\024\n\014command_name\030\003 \001(\t\0229\n\017curre" +
-      "nt_context\030\004 \001(\0132 .eigr.functions.protoc" +
-      "ol.Context\022#\n\005value\030\005 \001(\0132\024.google.proto" +
-      "buf.Any\"\243\001\n\027ActorInvocationResponse\022\022\n\na" +
-      "ctor_name\030\001 \001(\t\022\024\n\014actor_system\030\002 \001(\t\0229\n" +
-      "\017updated_context\030\003 \001(\0132 .eigr.functions." +
-      "protocol.Context\022#\n\005value\030\004 \001(\0132\024.google" +
-      ".protobuf.Any\"\344\001\n\022InvocationResponse\0226\n\006" +
-      "status\030\001 \001(\0132&.eigr.functions.protocol.R" +
-      "equestStatus\022;\n\006system\030\002 \001(\0132+.eigr.func" +
-      "tions.protocol.actors.ActorSystem\0224\n\005act" +
-      "or\030\003 \001(\0132%.eigr.functions.protocol.actor" +
-      "s.Actor\022#\n\005value\030\004 \001(\0132\024.google.protobuf" +
-      ".Any*=\n\006Status\022\013\n\007UNKNOWN\020\000\022\006\n\002OK\020\001\022\023\n\017A" +
+      "ogle/protobuf/any.proto\"\224\001\n\023Registration" +
+      "Request\022:\n\014service_info\030\001 \001(\0132$.eigr.fun" +
+      "ctions.protocol.ServiceInfo\022A\n\014actor_sys" +
+      "tem\030\002 \001(\0132+.eigr.functions.protocol.acto" +
+      "rs.ActorSystem\"\324\001\n\013ServiceInfo\022\024\n\014servic" +
+      "e_name\030\001 \001(\t\022\027\n\017service_version\030\002 \001(\t\022\027\n" +
+      "\017service_runtime\030\003 \001(\t\022\034\n\024support_librar" +
+      "y_name\030\004 \001(\t\022\037\n\027support_library_version\030" +
+      "\005 \001(\t\022\036\n\026protocol_major_version\030\006 \001(\005\022\036\n" +
+      "\026protocol_minor_version\030\007 \001(\005\"v\n\tProxyIn" +
+      "fo\022\036\n\026protocol_major_version\030\001 \001(\005\022\036\n\026pr" +
+      "otocol_minor_version\030\002 \001(\005\022\022\n\nproxy_name" +
+      "\030\003 \001(\t\022\025\n\rproxy_version\030\004 \001(\t\"\205\001\n\024Regist" +
+      "rationResponse\0225\n\005staus\030\001 \001(\0132&.eigr.fun" +
+      "ctions.protocol.RequestStatus\0226\n\nproxy_i" +
+      "nfo\030\002 \001(\0132\".eigr.functions.protocol.Prox" +
+      "yInfo\".\n\007Context\022#\n\005state\030\001 \001(\0132\024.google" +
+      ".protobuf.Any\"\320\001\n\021InvocationRequest\022;\n\006s" +
+      "ystem\030\001 \001(\0132+.eigr.functions.protocol.ac" +
+      "tors.ActorSystem\0224\n\005actor\030\002 \001(\0132%.eigr.f" +
+      "unctions.protocol.actors.Actor\022\024\n\014comman" +
+      "d_name\030\003 \001(\t\022#\n\005value\030\004 \001(\0132\024.google.pro" +
+      "tobuf.Any\022\r\n\005async\030\005 \001(\010\"\261\001\n\017ActorInvoca" +
+      "tion\022\022\n\nactor_name\030\001 \001(\t\022\024\n\014actor_system" +
+      "\030\002 \001(\t\022\024\n\014command_name\030\003 \001(\t\0229\n\017current_" +
+      "context\030\004 \001(\0132 .eigr.functions.protocol." +
+      "Context\022#\n\005value\030\005 \001(\0132\024.google.protobuf" +
+      ".Any\"\243\001\n\027ActorInvocationResponse\022\022\n\nacto" +
+      "r_name\030\001 \001(\t\022\024\n\014actor_system\030\002 \001(\t\0229\n\017up" +
+      "dated_context\030\003 \001(\0132 .eigr.functions.pro" +
+      "tocol.Context\022#\n\005value\030\004 \001(\0132\024.google.pr" +
+      "otobuf.Any\"\344\001\n\022InvocationResponse\0226\n\006sta" +
+      "tus\030\001 \001(\0132&.eigr.functions.protocol.Requ" +
+      "estStatus\022;\n\006system\030\002 \001(\0132+.eigr.functio" +
+      "ns.protocol.actors.ActorSystem\0224\n\005actor\030" +
+      "\003 \001(\0132%.eigr.functions.protocol.actors.A" +
+      "ctor\022#\n\005value\030\004 \001(\0132\024.google.protobuf.An" +
+      "y\"Q\n\rRequestStatus\022/\n\006status\030\001 \001(\0162\037.eig" +
+      "r.functions.protocol.Status\022\017\n\007message\030\002" +
+      " \001(\t*=\n\006Status\022\013\n\007UNKNOWN\020\000\022\006\n\002OK\020\001\022\023\n\017A" +
       "CTOR_NOT_FOUND\020\002\022\t\n\005ERROR\020\003BO\n\032io.eigr.f" +
       "unctions.protocolZ1github.com/eigr/go-su" +
       "pport/eigr/protocol;protocolb\006proto3"
@@ -10384,66 +10490,66 @@ public final class Protocol {
           io.eigr.functions.protocol.actors.ActorOuterClass.getDescriptor(),
           com.google.protobuf.AnyProto.getDescriptor(),
         });
-    internal_static_eigr_functions_protocol_RequestStatus_descriptor =
-      getDescriptor().getMessageTypes().get(0);
-    internal_static_eigr_functions_protocol_RequestStatus_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_eigr_functions_protocol_RequestStatus_descriptor,
-        new java.lang.String[] { "Status", "Message", });
-    internal_static_eigr_functions_protocol_ProxyInfo_descriptor =
-      getDescriptor().getMessageTypes().get(1);
-    internal_static_eigr_functions_protocol_ProxyInfo_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_eigr_functions_protocol_ProxyInfo_descriptor,
-        new java.lang.String[] { "ProtocolMajorVersion", "ProtocolMinorVersion", "ProxyName", "ProxyVersion", });
-    internal_static_eigr_functions_protocol_ServiceInfo_descriptor =
-      getDescriptor().getMessageTypes().get(2);
-    internal_static_eigr_functions_protocol_ServiceInfo_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_eigr_functions_protocol_ServiceInfo_descriptor,
-        new java.lang.String[] { "ServiceName", "ServiceVersion", "ServiceRuntime", "SupportLibraryName", "SupportLibraryVersion", "ProtocolMajorVersion", "ProtocolMinorVersion", });
     internal_static_eigr_functions_protocol_RegistrationRequest_descriptor =
-      getDescriptor().getMessageTypes().get(3);
+      getDescriptor().getMessageTypes().get(0);
     internal_static_eigr_functions_protocol_RegistrationRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_eigr_functions_protocol_RegistrationRequest_descriptor,
         new java.lang.String[] { "ServiceInfo", "ActorSystem", });
+    internal_static_eigr_functions_protocol_ServiceInfo_descriptor =
+      getDescriptor().getMessageTypes().get(1);
+    internal_static_eigr_functions_protocol_ServiceInfo_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_eigr_functions_protocol_ServiceInfo_descriptor,
+        new java.lang.String[] { "ServiceName", "ServiceVersion", "ServiceRuntime", "SupportLibraryName", "SupportLibraryVersion", "ProtocolMajorVersion", "ProtocolMinorVersion", });
+    internal_static_eigr_functions_protocol_ProxyInfo_descriptor =
+      getDescriptor().getMessageTypes().get(2);
+    internal_static_eigr_functions_protocol_ProxyInfo_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_eigr_functions_protocol_ProxyInfo_descriptor,
+        new java.lang.String[] { "ProtocolMajorVersion", "ProtocolMinorVersion", "ProxyName", "ProxyVersion", });
     internal_static_eigr_functions_protocol_RegistrationResponse_descriptor =
-      getDescriptor().getMessageTypes().get(4);
+      getDescriptor().getMessageTypes().get(3);
     internal_static_eigr_functions_protocol_RegistrationResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_eigr_functions_protocol_RegistrationResponse_descriptor,
         new java.lang.String[] { "Staus", "ProxyInfo", });
     internal_static_eigr_functions_protocol_Context_descriptor =
-      getDescriptor().getMessageTypes().get(5);
+      getDescriptor().getMessageTypes().get(4);
     internal_static_eigr_functions_protocol_Context_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_eigr_functions_protocol_Context_descriptor,
         new java.lang.String[] { "State", });
     internal_static_eigr_functions_protocol_InvocationRequest_descriptor =
-      getDescriptor().getMessageTypes().get(6);
+      getDescriptor().getMessageTypes().get(5);
     internal_static_eigr_functions_protocol_InvocationRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_eigr_functions_protocol_InvocationRequest_descriptor,
         new java.lang.String[] { "System", "Actor", "CommandName", "Value", "Async", });
     internal_static_eigr_functions_protocol_ActorInvocation_descriptor =
-      getDescriptor().getMessageTypes().get(7);
+      getDescriptor().getMessageTypes().get(6);
     internal_static_eigr_functions_protocol_ActorInvocation_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_eigr_functions_protocol_ActorInvocation_descriptor,
         new java.lang.String[] { "ActorName", "ActorSystem", "CommandName", "CurrentContext", "Value", });
     internal_static_eigr_functions_protocol_ActorInvocationResponse_descriptor =
-      getDescriptor().getMessageTypes().get(8);
+      getDescriptor().getMessageTypes().get(7);
     internal_static_eigr_functions_protocol_ActorInvocationResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_eigr_functions_protocol_ActorInvocationResponse_descriptor,
         new java.lang.String[] { "ActorName", "ActorSystem", "UpdatedContext", "Value", });
     internal_static_eigr_functions_protocol_InvocationResponse_descriptor =
-      getDescriptor().getMessageTypes().get(9);
+      getDescriptor().getMessageTypes().get(8);
     internal_static_eigr_functions_protocol_InvocationResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_eigr_functions_protocol_InvocationResponse_descriptor,
         new java.lang.String[] { "Status", "System", "Actor", "Value", });
+    internal_static_eigr_functions_protocol_RequestStatus_descriptor =
+      getDescriptor().getMessageTypes().get(9);
+    internal_static_eigr_functions_protocol_RequestStatus_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_eigr_functions_protocol_RequestStatus_descriptor,
+        new java.lang.String[] { "Status", "Message", });
     io.eigr.functions.protocol.actors.ActorOuterClass.getDescriptor();
     com.google.protobuf.AnyProto.getDescriptor();
   }
