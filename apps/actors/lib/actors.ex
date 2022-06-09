@@ -12,12 +12,7 @@ defmodule Actors do
   alias Eigr.Functions.Protocol.Actors.{Actor, ActorSystem, Registry}
 
   alias Eigr.Functions.Protocol.{
-    ActorInvocation,
-    ActorInvocationResponse,
-    ActorSystemRequest,
-    ActorSystemResponse,
     InvocationRequest,
-    InvocationResponse,
     ProxyInfo,
     RegistrationRequest,
     RegistrationResponse,

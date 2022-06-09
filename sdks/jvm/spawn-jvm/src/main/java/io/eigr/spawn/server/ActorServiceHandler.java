@@ -41,7 +41,9 @@ public class ActorServiceHandler {
         Any updatedState;
         int resultValue;
 
-        resultValue = myBusinessMessage.getValue() + 1;
+        Example.MyBusinessMessage oldBusinessMessage = context.getState().unpack(Example.MyBusinessMessage.class);
+
+        resultValue = oldBusinessMessage.getValue() + myBusinessMessage.getValue();
 
         Example.MyBusinessMessage valueMessage = Example.MyBusinessMessage.newBuilder()
                 .setValue(resultValue)

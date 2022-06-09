@@ -2,7 +2,7 @@ defmodule Proxy.Routes.API do
   use Proxy.Routes.Base
   require Logger
 
-  alias Eigr.Functions.Protocol.Actors.{Actor, ActorSystem}
+  alias Eigr.Functions.Protocol.Actors.Actor
 
   alias Eigr.Functions.Protocol.{
     ActorInvocationResponse,
@@ -10,8 +10,7 @@ defmodule Proxy.Routes.API do
     InvocationResponse,
     RegistrationRequest,
     RegistrationResponse,
-    RequestStatus,
-    Status
+    RequestStatus
   }
 
   @content_type "application/octet-stream"
@@ -37,7 +36,7 @@ defmodule Proxy.Routes.API do
 
     with %InvocationRequest{system: sytem, actor: actor} = request <-
            get_body(conn.body_params, InvocationRequest),
-         {:ok, %ActorInvocationResponse{value: value} = response} <- Actors.invoke(request) do
+         {:ok, %ActorInvocationResponse{value: value} = _response} <- Actors.invoke(request) do
       send!(
         conn,
         200,
