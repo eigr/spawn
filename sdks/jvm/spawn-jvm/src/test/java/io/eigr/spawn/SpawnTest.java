@@ -69,7 +69,7 @@ public class SpawnTest {
                 .build();
 
         RequestBody body = RequestBody.create(
-                registration.toByteArray(), MediaType.parse("application/octet-stream"));
+                registration.toByteArray(), MediaType.parse(SPAWN_MEDIA_TYPE));
 
         Request request = new Request.Builder()
                 .url(SPAWN_PROXY_ACTORSYSTEM_URL)
@@ -114,23 +114,30 @@ public class SpawnTest {
 
             Thread.sleep(3000);
 
-            log.info("Send Invocation request...");
-            Call invocationCall = client.newCall(httpInvocationRequest);
-            callInvocationResponse = invocationCall.execute();
+            for (int i = 0; i < 10000; i++) {
+                try {
+                    log.info("Send Invocation request...");
+                    Call invocationCall = client.newCall(httpInvocationRequest);
+                    callInvocationResponse = invocationCall.execute();
 
-            assertThat(callInvocationResponse.code(), equalTo(200));
-            assert callInvocationResponse.body() != null;
-            Protocol.InvocationResponse invocationResponse = Protocol.InvocationResponse
-                    .parseFrom(callInvocationResponse.body().bytes());
+                    assertThat(callInvocationResponse.code(), equalTo(200));
+                    assert callInvocationResponse.body() != null;
+                    Protocol.InvocationResponse invocationResponse = Protocol.InvocationResponse
+                            .parseFrom(callInvocationResponse.body().bytes());
 
-            log.info("Invocation response: {}", invocationResponse);
-            Any updatedState = invocationResponse.getActor().getState().getState();
-            Example.MyBussinessMessage updatedMyBusinessMessage = updatedState.unpack(Example.MyBussinessMessage.class);
-            log.info("MyBusinessMessage result: {}", updatedMyBusinessMessage.getValue());
-            assertThat(response.code(), equalTo(200));
+                    log.info("Invocation response: {}", invocationResponse);
+                    Any updatedState = invocationResponse.getActor().getState().getState();
+                    Example.MyBussinessMessage updatedMyBusinessMessage = updatedState.unpack(Example.MyBussinessMessage.class);
+                    log.info("MyBusinessMessage result: {}", updatedMyBusinessMessage.getValue());
+                    assertThat(response.code(), equalTo(200));
+                } catch (Exception e) {
+                    log.error("Error on call Actor", e);
+                }
+            }
+
         }
 
-        Thread.sleep(10000);
+        Thread.sleep(5000);
 
         assertTrue(true);
     }
