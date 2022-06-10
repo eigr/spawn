@@ -53,8 +53,6 @@ config :logger, :console,
 
 config :protobuf, extensions: :enabled
 
-config :grpc, start_server: true
-
 # (you should replace this with the name of your plug)
 config :prometheus, Actors.Metrics.Exporter,
   path: "/metrics",

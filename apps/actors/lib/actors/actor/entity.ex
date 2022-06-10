@@ -44,12 +44,84 @@ defmodule Actors.Actor.Entity do
         %EntityState{
           actor: %Actor{
             name: name,
-            snapshot_strategy: %ActorSnapshotStrategy{strategy: snapshot_strategy},
+            persistent: false,
+            deactivate_strategy: deactivate_strategy
+          }
+        } = state
+      )
+      when is_nil(deactivate_strategy) or deactivate_strategy == %{} do
+    Logger.notice(
+      "Activating actor #{name} in Node #{inspect(Node.self())}. Persistence disabled."
+    )
+
+    Process.flag(:trap_exit, true)
+
+    strategy = {:timeout, TimeoutStrategy.new!(timeout: @default_deactivate_timeout)}
+
+    schedule_deactivate(strategy, get_timeout_factor(@timeout_factor_range))
+    {:ok, state, {:continue, :load_state}}
+  end
+
+  def init(
+        %EntityState{
+          actor: %Actor{
+            name: name,
+            persistent: false,
+            deactivate_strategy:
+              %ActorDeactivateStrategy{strategy: deactivate_strategy} = _dstrategy
+          }
+        } = state
+      ) do
+    Logger.notice(
+      "Activating actor #{name} in Node #{inspect(Node.self())}. Persistence disabled."
+    )
+
+    Process.flag(:trap_exit, true)
+
+    schedule_deactivate(deactivate_strategy, get_timeout_factor(@timeout_factor_range))
+    {:ok, state, {:continue, :load_state}}
+  end
+
+  def init(
+        %EntityState{
+          actor: %Actor{
+            name: name,
+            persistent: true,
+            snapshot_strategy: %ActorSnapshotStrategy{} = _snapshot_strategy,
+            deactivate_strategy: deactivate_strategy
+          }
+        } = state
+      )
+      when is_nil(deactivate_strategy) or deactivate_strategy == %{} do
+    Logger.notice(
+      "Activating actor #{name} in Node #{inspect(Node.self())}. Persistence enabled."
+    )
+
+    Process.flag(:trap_exit, true)
+
+    strategy = {:timeout, TimeoutStrategy.new!(timeout: @default_deactivate_timeout)}
+
+    schedule_deactivate(strategy, get_timeout_factor(@timeout_factor_range))
+
+    # Write soon in the first time
+    schedule_snapshot_advance(@min_snapshot_threshold + get_timeout_factor(@timeout_factor_range))
+    {:ok, state, {:continue, :load_state}}
+  end
+
+  def init(
+        %EntityState{
+          actor: %Actor{
+            name: name,
+            persistent: true,
+            snapshot_strategy: %ActorSnapshotStrategy{} = _snapshot_strategy,
             deactivate_strategy: %ActorDeactivateStrategy{strategy: deactivate_strategy}
           }
         } = state
       ) do
-    Logger.debug("Activating actor #{name} in Node #{inspect(Node.self())}")
+    Logger.notice(
+      "Activating actor #{name} in Node #{inspect(Node.self())}. Persistence enabled."
+    )
+
     Process.flag(:trap_exit, true)
 
     schedule_deactivate(deactivate_strategy, get_timeout_factor(@timeout_factor_range))
@@ -83,7 +155,7 @@ defmodule Actors.Actor.Entity do
   def handle_continue(
         :load_state,
         %EntityState{
-          actor: %Actor{name: name, state: %ActorState{} = actor_state} = actor
+          actor: %Actor{name: name, state: %ActorState{} = _actor_state} = actor
         } = state
       ) do
     Logger.debug(
@@ -106,7 +178,7 @@ defmodule Actors.Actor.Entity do
         :get_state,
         _from,
         %EntityState{
-          actor: %Actor{name: name, state: actor_state} = actor
+          actor: %Actor{state: actor_state} = _actor
         } = state
       )
       when is_nil(actor_state),
@@ -116,7 +188,7 @@ defmodule Actors.Actor.Entity do
         :get_state,
         _from,
         %EntityState{
-          actor: %Actor{name: name, state: %ActorState{} = actor_state} = actor
+          actor: %Actor{state: %ActorState{} = actor_state} = _actor
         } = state
       ),
       do: {:reply, actor_state, state}
@@ -125,14 +197,14 @@ defmodule Actors.Actor.Entity do
   def handle_call(
         {:invocation_request,
          %InvocationRequest{
-           actor: %Actor{name: name} = actor,
+           actor: %Actor{name: name} = _actor,
            command_name: command,
            value: payload
-         } = invocation},
+         } = _invocation},
         _from,
         %EntityState{
           system: %ActorSystem{name: actor_system} = _system,
-          actor: %Actor{state: %ActorState{state: current_state} = _actor_state} = _actor
+          actor: %Actor{state: %ActorState{state: current_state} = _actor_state} = _state_actor
         } = state
       ) do
     payload =
@@ -187,7 +259,7 @@ defmodule Actors.Actor.Entity do
             %Actor{
               state: actor_state,
               snapshot_strategy: %ActorSnapshotStrategy{
-                strategy: {:timeout, %TimeoutStrategy{timeout: timeout}} = snapshot_strategy
+                strategy: {:timeout, %TimeoutStrategy{timeout: _timeout}} = snapshot_strategy
               }
             } = _actor
         } = state
@@ -290,14 +362,20 @@ defmodule Actors.Actor.Entity do
   end
 
   @impl true
-  def terminate(reason, %EntityState{actor: %Actor{name: name, state: actor_state}} = _state)
-      when is_nil(actor_state) do
+  def terminate(
+        reason,
+        %EntityState{actor: %Actor{name: name, persistent: persistent, state: actor_state}} =
+          _state
+      )
+      when is_nil(actor_state) or persistent == false do
     Logger.debug("Terminating actor #{name} with reason #{inspect(reason)}")
   end
 
   def terminate(
         reason,
-        %EntityState{actor: %Actor{name: name, state: %ActorState{} = actor_state}} = state
+        %EntityState{
+          actor: %Actor{name: name, persistent: true, state: %ActorState{} = actor_state}
+        } = _state
       ) do
     StateManager.save(name, actor_state)
     Logger.debug("Terminating actor #{name} with reason #{inspect(reason)}")

@@ -28,9 +28,8 @@ defmodule Actors do
           actor_system:
             %ActorSystem{name: _name, registry: %Registry{actors: actors} = _registry} =
               actor_system
-        } = registration
+        } = _registration
       ) do
-    Logger.debug("Registration request received: #{inspect(registration)}")
     ActorRegistry.register(actors)
     create_actors(actor_system, actors)
 

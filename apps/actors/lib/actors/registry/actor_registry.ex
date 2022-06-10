@@ -21,8 +21,6 @@ defmodule Actors.Registry.ActorRegistry do
     :ok = PubSub.subscribe(:actor_channel, @topic)
     :ok = :net_kernel.monitor_nodes(true, node_type: :visible)
 
-    Logger.debug("Initializing Actor Registry with state #{inspect(state)}")
-
     {:ok, state, {:continue, :join_cluster}}
   end
 
@@ -116,12 +114,11 @@ defmodule Actors.Registry.ActorRegistry do
 
   @impl true
   def handle_info({:incoming_actors, node_actors}, state) do
-    Logger.debug("New Actor join. Actor: #{inspect(node_actors)}")
     {:noreply, include_entities(state, node_actors)}
   end
 
   def handle_info({:join, %{node: node}}, state) do
-    Logger.debug(fn -> "Got Node join from #{inspect(node)} sending current state" end)
+    Logger.notice(fn -> "Got Node join from #{inspect(node)} sending current state" end)
 
     :ok =
       PubSub.direct_broadcast(

@@ -49,8 +49,6 @@ defmodule Actors.Supervisor do
       end
 
     if topologies && Code.ensure_compiled(Cluster.Supervisor) do
-      Logger.info("Cluster Strategy #{cluster_strategy}")
-
       Logger.debug("Cluster topology #{inspect(topologies)}")
       {Cluster.Supervisor, [topologies, [name: Actors.ClusterSupervisor]]}
     end
