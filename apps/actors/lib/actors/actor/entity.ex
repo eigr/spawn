@@ -182,7 +182,7 @@ defmodule Actors.Actor.Entity do
         } = state
       )
       when is_nil(actor_state),
-      do: {:reply, nil, state}
+      do: {:reply, {:error, :not_found}, state}
 
   def handle_call(
         :get_state,
@@ -191,7 +191,7 @@ defmodule Actors.Actor.Entity do
           actor: %Actor{state: %ActorState{} = actor_state} = _actor
         } = state
       ),
-      do: {:reply, actor_state, state}
+      do: {:reply, {:ok, actor_state}, state}
 
   @impl true
   def handle_call(

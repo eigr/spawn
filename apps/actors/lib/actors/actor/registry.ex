@@ -21,6 +21,17 @@ defmodule Actors.Actor.Registry do
     Horde.Registry.init(args)
   end
 
+  def lookup(actor_name) do
+    Horde.Registry.lookup(__MODULE__, {Actors.Actor.Entity, actor_name})
+  end
+
+  def isAlive(actor_name) do
+    case Horde.Registry.lookup(__MODULE__, {Actors.Actor.Entity, actor_name}) do
+      [] -> false
+      _ -> true
+    end
+  end
+
   @doc """
   List all alive PIDs from given registry module.
   """
