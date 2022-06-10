@@ -1,18 +1,5 @@
-defmodule Sidecar do
+defmodule Proxy do
   @moduledoc """
-  Documentation for `Sidecar`.
+  Documentation for `Proxy`.
   """
-
-  @doc """
-  Hello world.
-
-  ## Examples
-
-      iex> Proxy.hello()
-      :world
-
-  """
-  def hello do
-    :world
-  end
 end

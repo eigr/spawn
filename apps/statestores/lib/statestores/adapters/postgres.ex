@@ -25,7 +25,7 @@ defmodule Statestores.Adapters.Postgres do
   def get_by_key(actor), do: get_by(Event, actor: actor)
 
   def save(
-        %Event{actor: actor, revision: revision, tags: tags, data_type: type, data: data} = event
+        %Event{actor: _actor, revision: revision, tags: tags, data_type: type, data: data} = event
       ) do
     map_event = ValueObjectSchema.to_map(event)
 
