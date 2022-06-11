@@ -41,7 +41,7 @@ public class SpawnTest {
     public void shouldAnswerWithTrue() throws IOException, InterruptedException {
 
         HashMap<String, ActorOuterClass.Actor> actors = new HashMap<>();
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 200; i++) {
             String actorName = String.format("actor-test-0%s", i);
             actors.put(actorName, makeActor(actorName, 1));
         }

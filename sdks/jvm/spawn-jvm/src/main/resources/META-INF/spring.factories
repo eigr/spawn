@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+io.eigr.spawn.springboot.starter.autoconfigure.SpawnAutoConfiguration
