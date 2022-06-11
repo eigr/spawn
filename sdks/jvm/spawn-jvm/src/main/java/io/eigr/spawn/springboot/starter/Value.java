@@ -1,27 +1,38 @@
 package io.eigr.spawn.springboot.starter;
 
-import com.google.protobuf.GeneratedMessageV3;
+public final class Value<S, V> {
 
-import java.util.Objects;
-
-public final class Value<S extends GeneratedMessageV3, V extends GeneratedMessageV3> {
-
-    private S state;
-
-    private V value;
-
-    public Value(V value) {
-        this.value = value;
+    enum ResponseType {
+        REPLY, NO_REPLY
     }
 
-    public Value(V value, S state) {
+    private final S state;
+
+    private final V value;
+
+    private final ResponseType type;
+
+    public Value(V value, S state, ResponseType type) {
         this.value = value;
         this.state = state;
+        this.type = type;
     }
 
-    public static final class ActorValue<S extends GeneratedMessageV3, V extends GeneratedMessageV3> {
-        private S state;
-        private V value;
+    public V getValue() {
+        return value;
+    }
+
+    public S getState() {
+        return state;
+    }
+
+    public ResponseType getType() {
+        return type;
+    }
+
+    public static final class ActorValue {
+        private Object state;
+        private Object value;
 
         public ActorValue(){}
 
@@ -29,22 +40,22 @@ public final class Value<S extends GeneratedMessageV3, V extends GeneratedMessag
             return new ActorValue();
         }
 
-        public ActorValue value(V value) {
+        public ActorValue value(Object value) {
             this.value = value;
             return this;
         }
 
-        public ActorValue state(S state){
+        public ActorValue state(Object state){
             this.state = state;
             return this;
         }
 
-        public Value send() {
-            if (Objects.isNull(this.state)) {
-                return new Value(this.value);
-            }
+        public Value reply() {
+            return new Value(this.value, this.state, ResponseType.REPLY);
+        }
 
-            return new Value(this.value, this.state);
+        public Value noReply() {
+            return new Value(this.value, this.state, ResponseType.NO_REPLY);
         }
     }
 }

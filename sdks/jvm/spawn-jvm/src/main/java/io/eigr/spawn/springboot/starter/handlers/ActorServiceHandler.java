@@ -5,7 +5,9 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import io.eigr.functions.protocol.Protocol;
 import io.eigr.spawn.example.Example;
 import io.eigr.spawn.springboot.starter.annotations.ActorHandler;
+import io.eigr.spawn.springboot.starter.internal.ActorController;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,9 @@ import reactor.core.publisher.Mono;
 @ActorHandler
 @RequestMapping("/api/v1/actors")
 public class ActorServiceHandler {
+
+    @Autowired
+    private ActorController actorController;
 
     @PostMapping(value = "/actions",
             consumes = {MediaType.APPLICATION_OCTET_STREAM_VALUE},
