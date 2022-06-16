@@ -1,9 +1,0 @@
-syntax = "proto3";
-
-package io.eigr.spawn.example;
-
-option java_package = "io.eigr.spawn.example";
-
-message MyBusinessMessage {
-  int32 value = 1;
-}

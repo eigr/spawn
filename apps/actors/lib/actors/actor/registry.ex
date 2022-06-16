@@ -21,10 +21,16 @@ defmodule Actors.Actor.Registry do
     Horde.Registry.init(args)
   end
 
+  @doc """
+  Get Process if this is alive.
+  """
   def lookup(actor_name) do
     Horde.Registry.lookup(__MODULE__, {Actors.Actor.Entity, actor_name})
   end
 
+  @doc """
+  Check if Process is alive.
+  """
   def isAlive(actor_name) do
     case Horde.Registry.lookup(__MODULE__, {Actors.Actor.Entity, actor_name}) do
       [] -> false

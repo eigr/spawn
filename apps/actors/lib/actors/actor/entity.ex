@@ -204,6 +204,65 @@ defmodule Actors.Actor.Entity do
         _from,
         %EntityState{
           system: %ActorSystem{name: actor_system} = _system,
+          actor: %Actor{state: current_state = _actor_state} = _state_actor
+        } = state
+      )
+      when is_nil(current_state) do
+    payload =
+      ActorInvocation.new(
+        actor_name: name,
+        actor_system: actor_system,
+        command_name: command,
+        value: payload,
+        current_context: Context.new()
+      )
+      |> ActorInvocation.encode()
+
+    case Actors.Node.Client.invoke_host_actor(payload) do
+      {:ok, %Tesla.Env{body: ""}} ->
+        Logger.error("User Function Actor response Invocation body is empty")
+        {:error, :no_content}
+
+      {:ok, %Tesla.Env{body: nil}} ->
+        Logger.error("User Function Actor response Invocation body is nil")
+        {:error, :no_content}
+
+      {:ok, %Tesla.Env{body: body}} ->
+        with %ActorInvocationResponse{
+               updated_context: %Context{} = user_ctx
+             } = resp <- ActorInvocationResponse.decode(body) do
+          {:reply, {:ok, resp}, update_state(state, user_ctx)}
+        else
+          error ->
+            Logger.error("Error on parse response #{inspect(error)}")
+            {:reply, {:error, :invalid_content}, state}
+        end
+
+      {:error, timeout} ->
+        Logger.error("User Function Actor Invocation Timeout Error")
+        {:reply, {:error, timeout}, state}
+
+      {:error, reason} ->
+        Logger.error("User Function Actor Invocation Unknown Error: #{inspect(reason)}")
+        {:reply, {:error, reason}, state}
+
+      error ->
+        Logger.error("User Function Actor Invocation Unknown Error")
+        {:reply, {:error, error}, state}
+    end
+  end
+
+  @impl true
+  def handle_call(
+        {:invocation_request,
+         %InvocationRequest{
+           actor: %Actor{name: name} = _actor,
+           command_name: command,
+           value: payload
+         } = _invocation},
+        _from,
+        %EntityState{
+          system: %ActorSystem{name: actor_system} = _system,
           actor: %Actor{state: %ActorState{state: current_state} = _actor_state} = _state_actor
         } = state
       ) do
