@@ -18,8 +18,7 @@ defmodule Activators.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger],
-      mod: {Activators.Application, []}
+      extra_applications: [:logger]
     ]
   end
 
@@ -30,6 +29,7 @@ defmodule Activators.MixProject do
       {:broadway_kafka, "~> 0.3"},
       {:broadway_rabbitmq, "~> 0.7"},
       {:broadway_sqs, "~> 0.7"},
+      {:cloudevents, "~> 0.4.0"},
       # {:goth, "~> 1.0"},
       {:hackney, "~> 1.9"}
     ]
