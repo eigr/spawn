@@ -11,7 +11,7 @@ build:
 
 run: 
 
-	docker run --rm --name=spawn-proxy --net=host ${image}
+	docker run --rm --name=spawn-proxy -e PROXY_DATABASE_TYPE=mysql -e SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= --net=host ${image}
 
 install:
 
