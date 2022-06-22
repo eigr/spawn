@@ -24,7 +24,7 @@ defmodule Spawn.MixProject do
     [
       proxy: [
         include_executables_for: [:unix],
-        applications: [sidecar: :permanent],
+        applications: [proxy: :permanent],
         steps: [
           :assemble,
           &Bakeware.assemble/1

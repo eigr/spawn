@@ -31,17 +31,21 @@ defmodule Actors do
         } = _registration
       ) do
     ActorRegistry.register(actors)
-    create_actors(actor_system, actors)
 
-    proxy_info =
-      ProxyInfo.new(
-        protocol_major_version: 1,
-        protocol_minor_version: 2,
-        proxy_name: "spawn",
-        proxy_version: "0.1.0"
-      )
+    with :ok <- create_actors(actor_system, actors) do
+      proxy_info =
+        ProxyInfo.new(
+          protocol_major_version: 1,
+          protocol_minor_version: 2,
+          proxy_name: "spawn",
+          proxy_version: "0.1.0"
+        )
 
-    {:ok, RegistrationResponse.new(proxy_info: proxy_info)}
+      # Start Activators here
+
+      # Then response to the caller
+      {:ok, RegistrationResponse.new(proxy_info: proxy_info)}
+    end
   end
 
   def get_state(system_name, actor_name) do
