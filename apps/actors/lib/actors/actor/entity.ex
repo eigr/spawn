@@ -50,16 +50,15 @@ defmodule Actors.Actor.Entity do
         } = state
       )
       when is_nil(deactivate_strategy) or deactivate_strategy == %{} do
+    Process.flag(:trap_exit, true)
+
     Logger.notice(
       "Activating actor #{name} in Node #{inspect(Node.self())}. Persistence disabled."
     )
 
-    Process.flag(:trap_exit, true)
-
     strategy = {:timeout, TimeoutStrategy.new!(timeout: @default_deactivate_timeout)}
-
     schedule_deactivate(strategy, get_timeout_factor(@timeout_factor_range))
-    {:ok, state, {:continue, :load_state}}
+    {:ok, state}
   end
 
   def init(
@@ -72,14 +71,14 @@ defmodule Actors.Actor.Entity do
           }
         } = state
       ) do
+    Process.flag(:trap_exit, true)
+
     Logger.notice(
       "Activating actor #{name} in Node #{inspect(Node.self())}. Persistence disabled."
     )
 
-    Process.flag(:trap_exit, true)
-
     schedule_deactivate(deactivate_strategy, get_timeout_factor(@timeout_factor_range))
-    {:ok, state, {:continue, :load_state}}
+    {:ok, state}
   end
 
   def init(
@@ -93,14 +92,13 @@ defmodule Actors.Actor.Entity do
         } = state
       )
       when is_nil(deactivate_strategy) or deactivate_strategy == %{} do
+    Process.flag(:trap_exit, true)
+
     Logger.notice(
       "Activating actor #{name} in Node #{inspect(Node.self())}. Persistence enabled."
     )
 
-    Process.flag(:trap_exit, true)
-
     strategy = {:timeout, TimeoutStrategy.new!(timeout: @default_deactivate_timeout)}
-
     schedule_deactivate(strategy, get_timeout_factor(@timeout_factor_range))
 
     # Write soon in the first time
@@ -118,11 +116,11 @@ defmodule Actors.Actor.Entity do
           }
         } = state
       ) do
+    Process.flag(:trap_exit, true)
+
     Logger.notice(
       "Activating actor #{name} in Node #{inspect(Node.self())}. Persistence enabled."
     )
-
-    Process.flag(:trap_exit, true)
 
     schedule_deactivate(deactivate_strategy, get_timeout_factor(@timeout_factor_range))
 
