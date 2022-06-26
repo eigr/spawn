@@ -1,5 +1,5 @@
-defmodule Operator.K8S.ClusterIPService do
-  @behaviour Eigr.FunctionsController.K8S.Manifest
+defmodule Operator.K8S.Resources.ClusterIPService do
+  @behaviour Operator.K8S.Manifest
 
   @http_port 9001
   @proxy_port 9000

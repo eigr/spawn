@@ -1,7 +1,7 @@
 defmodule Operator.K8S.Controller do
   @moduledoc false
 
-  alias Operator.K8S.{
+  alias Operator.K8S.Resources.{
     ClusterIPService,
     ConfigMap,
     Deployment,

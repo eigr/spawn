@@ -1,9 +1,9 @@
-defmodule Operator.K8S.NodePort do
+defmodule Operator.K8S.Resources.LoadBalancer do
   @behaviour Operator.K8S.Manifest
 
   @impl true
   def manifest(ns, name, params) do
-    nodeport = params["expose"]["nodePort"]
+    loadBalancer = params["expose"]["loadBalancer"]
 
     %{
       "apiVersion" => "v1",
@@ -14,22 +14,21 @@ defmodule Operator.K8S.NodePort do
             "#{to_string(Application.spec(:eigr_functions_controller, :vsn))}",
           "functions.eigr.io/wormhole.gate.earth.status" => "open"
         },
-        "name" => "#{name}-nodeport",
+        "name" => "#{name}-loadbalancer",
         "namespace" => ns
       },
       "spec" => %{
-        "ports" => [
-          %{
-            "port" => nodeport["port"],
-            "targetPort" => nodeport["targetPort"],
-            "nodePort" => nodeport["nodePort"],
-            "protocol" => "TCP"
-          }
-        ],
         "selector" => %{
           "app" => name
         },
-        "type" => "NodePort"
+        "ports" => [
+          %{
+            "protocol" => "TCP",
+            "port" => loadBalancer["port"],
+            "targetPort" => loadBalancer["targetPort"]
+          }
+        ],
+        "type" => "LoadBalancer"
       }
     }
   end

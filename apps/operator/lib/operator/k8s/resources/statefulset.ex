@@ -1,4 +1,4 @@
-defmodule Operator.K8S.StatefulSet do
+defmodule Operator.K8S.Resources.StatefulSet do
   @behaviour Operator.K8S.Manifest
 
   @impl true

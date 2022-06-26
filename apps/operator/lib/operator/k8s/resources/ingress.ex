@@ -1,4 +1,4 @@
-defmodule Operator.K8S.Ingress do
+defmodule Operator.K8S.Resources.Ingress do
   @behaviour Operator.K8S.Manifest
 
   alias Operator.K8S.Ingress.{Ambassador, Glbc, Gloo, Istio, Nginx, Traefik}

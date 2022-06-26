@@ -1,4 +1,4 @@
-defmodule Operator.K8S.ConfigMap do
+defmodule Operator.K8S.Resources.ConfigMap do
   @behaviour Operator.K8S.Manifest
 
   @impl true

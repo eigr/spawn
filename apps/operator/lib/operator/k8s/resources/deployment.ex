@@ -1,4 +1,4 @@
-defmodule Operator.K8S.Deployment do
+defmodule Operator.K8S.Resources.Deployment do
   @behaviour Operator.K8S.Manifest
 
   import Operator.K8S.Limits

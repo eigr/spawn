@@ -1,4 +1,4 @@
-defmodule Operator.K8S.HPA do
+defmodule Operator.K8S.Resources.HPA do
   @behaviour Operator.K8S.Manifest
 
   @impl true

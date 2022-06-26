@@ -1,4 +1,4 @@
-defmodule Operator.K8S.HeadlessService do
+defmodule Operator.K8S.Resources.HeadlessService do
   @behaviour Operator.K8S.Manifest
 
   @impl true
