@@ -4,8 +4,6 @@ defmodule Proxy.Application do
 
   alias Actors.Config.Vapor, as: Config
 
-  @http_options [port: 9001]
-
   @impl true
   def start(_type, _args) do
     config = Config.load()
@@ -14,7 +12,7 @@ defmodule Proxy.Application do
 
     children = [
       Actors.Supervisor.child_spec(config),
-      {Bandit, plug: Proxy.Router, scheme: :http, options: @http_options}
+      {Bandit, plug: Proxy.Router, scheme: :http, options: [port: config.http_port]}
     ]
 
     opts = [strategy: :one_for_one, name: Proxy.Supervisor]

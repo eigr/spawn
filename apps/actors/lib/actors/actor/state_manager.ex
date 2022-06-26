@@ -6,11 +6,12 @@ defmodule Actors.Actor.StateManager do
   alias Statestores.Schemas.Event
   alias Statestores.Manager.StateManager, as: StateStoreManager
 
+  def is_new?(_old_hash, new_state) when is_nil(new_state), do: false
+
   def is_new?(old_hash, new_state) do
     with bytes_from_state <- Any.encode(new_state),
          hash <- :crypto.hash(:sha256, bytes_from_state) do
-      r = old_hash != hash
-      r
+      old_hash != hash
     else
       _ ->
         false
@@ -20,7 +21,7 @@ defmodule Actors.Actor.StateManager do
   @spec load(String.t()) :: {:ok, any}
   def load(name) do
     case StateStoreManager.load(name) do
-      %Event{revision: _rev, tags: tags, data_type: type, data: data} = event ->
+      %Event{revision: _rev, tags: tags, data_type: type, data: data} = _event ->
         {:ok,
          ActorState.new(tags: tags, state: Google.Protobuf.Any.new(type_url: type, value: data))}
 
@@ -34,11 +35,11 @@ defmodule Actors.Actor.StateManager do
           | {:error, any(), Eigr.Functions.Protocol.Actors.ActorState.t()}
   def save(_name, nil), do: {:ok, nil}
 
-  def save(_name, %ActorState{state: actor_state} = state)
+  def save(_name, %ActorState{state: actor_state} = _state)
       when is_nil(actor_state) or actor_state == %{},
       do: {:ok, actor_state}
 
-  def save(name, %ActorState{tags: tags, state: actor_state} = state) do
+  def save(name, %ActorState{tags: tags, state: actor_state} = _state) do
     Logger.debug("Saving state for actor #{name}")
 
     try do
@@ -53,7 +54,7 @@ defmodule Actors.Actor.StateManager do
         }
         |> StateStoreManager.save()
         |> case do
-          {:ok, event} ->
+          {:ok, _event} ->
             {:ok, actor_state, hash}
 
           {:error, changeset} ->
@@ -64,7 +65,7 @@ defmodule Actors.Actor.StateManager do
         end
       end
     catch
-      kind, error ->
+      _kind, error ->
         {:error, error, actor_state}
     end
   end
@@ -72,13 +73,13 @@ defmodule Actors.Actor.StateManager do
   @spec save_async(String.t(), Eigr.Functions.Protocol.Actors.ActorState.t()) ::
           {:ok, Eigr.Functions.Protocol.Actors.ActorState.t()}
           | {:error, any(), Eigr.Functions.Protocol.Actors.ActorState.t()}
-  def save_async(_name, nil, timeout \\ 5000), do: {:ok, %{}}
+  def save_async(_name, nil, _timeout \\ 5000), do: {:ok, %{}}
 
-  def save_async(_name, %ActorState{state: actor_state} = state, timeout)
+  def save_async(_name, %ActorState{state: actor_state} = _state, _timeout)
       when is_nil(actor_state) or actor_state == %{},
       do: {:ok, actor_state}
 
-  def save_async(name, %ActorState{tags: tags, state: actor_state} = state, timeout) do
+  def save_async(name, %ActorState{tags: tags, state: actor_state} = _state, timeout) do
     parent = self()
 
     persist_data_task =
@@ -116,7 +117,7 @@ defmodule Actors.Actor.StateManager do
         end
       end
     catch
-      kind, error ->
+      _kind, error ->
         Task.shutdown(persist_data_task, :brutal_kill)
         {:error, error, actor_state}
     end
