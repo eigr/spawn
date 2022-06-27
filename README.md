@@ -61,7 +61,7 @@ To achieve these goals, the Spawn architecture is composed of the following comp
 
 ## The Protocol
 
-Spawn is based on [Protocol Buffers](https://developers.google.com/protocol-buffers) and [gRPC](https://grpc.io/) to allow a heterogeneous layer of communication between different services that can, in turn, be implemented in any language that supports the gRPC protocol.
+Spawn is based on [Protocol Buffers](https://developers.google.com/protocol-buffers) and a super simple [HTTP stack](https://github.com/eigr-labs/spawn/blob/main/docs/protocol.md) to allow a heterogeneous layer of communication between different services which can in turn be implemented in any language that supports the gRPC protocol.
 
 The Spawn protocol itself is described [here](https://github.com/eigr-labs/spawn/blob/main/apps/protos/priv/protos/eigr/functions/protocol/actors/protocol.proto).
 

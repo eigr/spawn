@@ -19,6 +19,8 @@ defmodule Operator.Controllers.V1.ActorFunction do
   use Bonny.Controller
   require Logger
 
+  alias Operator.K8S.Controller, as: K8SController
+
   @group "spawn.eigr.io"
 
   @version "v1"
