@@ -69,7 +69,11 @@ The Spawn protocol itself is described [here](https://github.com/eigr-labs/spawn
 
 Another very important part of Spawn is the support languages implemented in different languages that aim to abstract all the specifics of the protocol and expose an easy and intuitive API to developers.
 
-***TODO insert a SDKs list here***
+|  SDK 	                                                                | Language  |
+|---	                                                                |---        |
+|[Go SDK](https://github.com/eigr-labs/spawn-go-sdk)  	                | Go  	    |
+|[Spring Boot SDK](https://github.com/eigr-labs/spawn-springboot-sdk)  	| Java	    |
+
 
 ## Development
 
