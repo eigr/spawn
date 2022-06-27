@@ -67,7 +67,7 @@ The Spawn protocol itself is described [here](https://github.com/eigr-labs/spawn
 
 ## SDKs
 
-Another very important part of Spawn is the support languages implemented in different languages that aim to abstract all the specifics of the protocol and expose an easy and intuitive API to developers.
+Another very important part of Spawn is the SDKs implemented in different languages that aim to abstract all the specifics of the protocol and expose an easy and intuitive API to developers.
 
 |  SDK 	                                                                | Language  |
 |---	                                                                |---        |
