@@ -3,8 +3,11 @@ defmodule Statestores.Adapters.MySQL do
     otp_app: :statestores,
     adapter: Ecto.Adapters.MyXQL
 
+  @behaviour Statestores.Adapters.Behaviour
+
   alias Statestores.Schemas.{Event, ValueObjectSchema}
 
+  @impl true
   def init(_type, config) do
     config =
       case System.get_env("MIX_ENV") do
@@ -25,10 +28,12 @@ defmodule Statestores.Adapters.MySQL do
     {:ok, config}
   end
 
+  @impl Statestores.Adapters.Behaviour
   def get_by_key(actor), do: get_by(Event, actor: actor)
 
+  @impl Statestores.Adapters.Behaviour
   def save(
-        %Event{actor: actor, revision: revision, tags: tags, data_type: type, data: data} = event
+        %Event{actor: _actor, revision: revision, tags: tags, data_type: type, data: data} = event
       ) do
     map_event = ValueObjectSchema.to_map(event)
 
