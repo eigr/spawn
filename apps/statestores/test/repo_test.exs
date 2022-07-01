@@ -1,4 +1,4 @@
-defmodule Statestores.RepoTest do
+defmodule StatestoresTest.RepoTest do
   use ExUnit.Case
   alias Statestores.Schemas.Event
   import Statestores.Util, only: [load_repo: 0]
