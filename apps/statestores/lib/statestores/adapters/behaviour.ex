@@ -11,6 +11,7 @@ defmodule Statestores.Adapters.Behaviour do
 
   defmacro __using__(_opts) do
     quote do
+      import Statestores.Util, only: [get_default_database_port: 0]
       alias Statestores.Adapters.Behaviour
 
       @behaviour Statestores.Adapters.Behaviour
@@ -41,7 +42,7 @@ defmodule Statestores.Adapters.Behaviour do
           Keyword.put(
             config,
             :port,
-            String.to_integer(System.get_env("PROXY_DATABASE_PORT", "3306"))
+            String.to_integer(System.get_env("PROXY_DATABASE_PORT", get_default_database_port()))
           )
 
         {:ok, config}
