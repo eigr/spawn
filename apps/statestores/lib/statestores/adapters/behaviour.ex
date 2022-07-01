@@ -11,8 +11,8 @@ defmodule Statestores.Adapters.Behaviour do
 
   defmacro __using__(_opts) do
     quote do
-      import Statestores.Util, only: [get_default_database_port: 0]
       alias Statestores.Adapters.Behaviour
+      import Statestores.Util, only: [get_default_database_port: 0]
 
       @behaviour Statestores.Adapters.Behaviour
 
