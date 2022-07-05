@@ -23,15 +23,15 @@ import Config
 #  ]
 
 config :statestores,
-  ecto_repos: [Statestores.Adapters.Store.MySQL, Statestores.Adapters.Store.Postgres]
+  ecto_repos: [Statestores.Adapters.MySQL, Statestores.Adapters.Postgres]
 
-config :statestores, Statestores.Adapters.Store.MySQL,
+config :statestores, Statestores.Adapters.MySQL,
   database: "statestores_my_sql",
   username: "user",
   password: "pass",
   hostname: "localhost"
 
-config :statestores, Statestores.Adapters.Store.Postgres,
+config :statestores, Statestores.Adapters.Postgres,
   database: "statestores_postgres",
   username: "user",
   password: "pass",
