@@ -65,7 +65,7 @@ defmodule Actors.Registry.ActorRegistry do
   end
 
   @impl true
-  def handle_call({:get, system_name, actor_name}, _from, state) do
+  def handle_call({:get, _system_name, actor_name}, _from, state) do
     nodes =
       state
       |> Enum.reduce([], fn {key, value}, acc ->
@@ -80,12 +80,11 @@ defmodule Actors.Registry.ActorRegistry do
       end)
       |> List.flatten()
       |> Enum.uniq()
-      |> List.first()
 
     if Enum.all?(nodes, &is_nil/1) do
       {:reply, {:not_found, []}, state}
     else
-      {:reply, {:ok, nodes}, state}
+      {:reply, {:ok, List.first(nodes)}, state}
     end
   end
 
