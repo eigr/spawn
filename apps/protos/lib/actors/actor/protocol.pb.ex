@@ -327,9 +327,9 @@ defmodule Eigr.Functions.Protocol.RegistrationResponse do
           __unknown_fields__: [],
           default_value: nil,
           extendee: nil,
-          json_name: "staus",
+          json_name: "status",
           label: :LABEL_OPTIONAL,
-          name: "staus",
+          name: "status",
           number: 1,
           oneof_index: nil,
           options: nil,
@@ -361,7 +361,7 @@ defmodule Eigr.Functions.Protocol.RegistrationResponse do
     }
   end
 
-  field :staus, 1, type: Eigr.Functions.Protocol.RequestStatus
+  field :status, 1, type: Eigr.Functions.Protocol.RequestStatus
   field :proxy_info, 2, type: Eigr.Functions.Protocol.ProxyInfo, json_name: "proxyInfo"
 end
 defmodule Eigr.Functions.Protocol.Context do
