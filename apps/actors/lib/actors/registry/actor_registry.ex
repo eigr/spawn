@@ -66,26 +66,24 @@ defmodule Actors.Registry.ActorRegistry do
 
   @impl true
   def handle_call({:get, _system_name, actor_name}, _from, state) do
-    nodes =
-      state
-      |> Enum.reduce([], fn {key, value}, acc ->
-        Enum.map(value, fn {actor_key, actor} ->
-          # if actor.actor_system.name == system_name and actor.name == actor_name do
-          if actor_key == actor_name do
-            [%{node: key, actor: actor}] ++ acc
-          else
-            [] ++ acc
-          end
-        end)
+    state
+    |> Enum.reduce([], fn {key, value}, acc ->
+      Enum.map(value, fn {actor_key, actor} ->
+        # if actor.actor_system.name == system_name and actor.name == actor_name do
+        if actor_key == actor_name do
+          [%{node: key, actor: actor}] ++ acc
+        else
+          [] ++ acc
+        end
       end)
-      |> List.flatten()
-      |> Enum.uniq()
-
-    if Enum.all?(nodes, &is_nil/1) do
-      {:reply, {:not_found, []}, state}
-    else
-      {:reply, {:ok, List.first(nodes)}, state}
-    end
+    end)
+    |> List.flatten()
+    |> Enum.uniq()
+    |> List.first()
+    |> then(fn
+      nil -> {:reply, {:not_found, []}, state}
+      first_node_found -> {:reply, {:ok, first_node_found}, state}
+    end)
   end
 
   @impl true
