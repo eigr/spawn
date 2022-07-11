@@ -69,7 +69,7 @@ message Actor {
     // this identification mechanism is sometimes not sufficient to identify an actor 
     // when the invocation mechanism requires that multiple instances of an actor can be created. 
     // An entity id is used to compose the uri that identifies the Actor in persistent storage.
-    // Default is ´parent´
+    // Default is ´"actor://system/:system_name/actors/:name/parent´
     ActorId entity_id = 2;
 
     // Indicates whether an actor's state should be persisted in a definitive store.
