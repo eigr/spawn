@@ -95,7 +95,7 @@ defmodule Actors do
   defp invoke(
          false,
          %ActorSystem{name: system_name} = system,
-         %Actor{name: actor_name} = actor,
+         %Actor{name: actor_name} = _actor,
          request
        ) do
     case Actors.Actor.Registry.lookup(actor_name) do
@@ -105,9 +105,10 @@ defmodule Actors do
         ActorEntity.invoke(actor_name, request)
 
       _ ->
-        with {:ok, %{node: node, actor: _registered_actor}} <-
+        with {:ok, %{node: node, actor: registered_actor}} <-
                ActorRegistry.lookup(system_name, actor_name),
-             _pid <- Node.spawn(node, __MODULE__, :try_reactivate_actor, [system, actor]) do
+             _pid <-
+               Node.spawn(node, __MODULE__, :try_reactivate_actor, [system, registered_actor]) do
           Process.sleep(1)
           {:ok, response_body} = ActorEntity.invoke(actor_name, request)
 
@@ -134,7 +135,7 @@ defmodule Actors do
   defp invoke(
          true,
          %ActorSystem{name: system_name} = system,
-         %Actor{name: actor_name} = actor,
+         %Actor{name: actor_name} = _actor,
          request
        ) do
     case Actors.Actor.Registry.lookup(actor_name) do
@@ -144,9 +145,10 @@ defmodule Actors do
         ActorEntity.invoke(actor_name, request)
 
       _ ->
-        with {:ok, %{node: node, actor: _registered_actor}} <-
+        with {:ok, %{node: node, actor: registered_actor}} <-
                ActorRegistry.lookup(system_name, actor_name),
-             _pid <- Node.spawn(node, __MODULE__, :try_reactivate_actor, [system, actor]) do
+             _pid <-
+               Node.spawn(node, __MODULE__, :try_reactivate_actor, [system, registered_actor]) do
           Process.sleep(1)
           {:ok, response_body} = ActorEntity.invoke_async(actor_name, request)
 

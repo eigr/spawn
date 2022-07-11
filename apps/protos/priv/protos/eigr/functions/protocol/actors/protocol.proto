@@ -115,7 +115,7 @@ message RegistrationRequest {
 
 message ServiceInfo {
 
-    // The name of the actor system, eg, "my-actor-system".
+    // The name of the user/host function sdk.
     string service_name = 1;
 
     // The version of the service.
