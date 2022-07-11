@@ -152,7 +152,7 @@ message ProxyInfo {
 
 message RegistrationResponse {
 
-    RequestStatus staus = 1;
+    RequestStatus status = 1;
 
     ProxyInfo proxy_info = 2;
 }
