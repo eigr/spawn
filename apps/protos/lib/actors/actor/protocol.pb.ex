@@ -711,6 +711,20 @@ defmodule Eigr.Functions.Protocol.InvocationRequest do
           proto3_optional: nil,
           type: :TYPE_BOOL,
           type_name: nil
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          __unknown_fields__: [],
+          default_value: nil,
+          extendee: nil,
+          json_name: "timeout",
+          label: :LABEL_OPTIONAL,
+          name: "timeout",
+          number: 5,
+          oneof_index: nil,
+          options: nil,
+          proto3_optional: nil,
+          type: :TYPE_INT32,
+          type_name: nil
         }
       ],
       name: "InvocationRequest",
@@ -726,6 +740,7 @@ defmodule Eigr.Functions.Protocol.InvocationRequest do
   field :command_name, 2, type: :string, json_name: "commandName"
   field :value, 3, type: Google.Protobuf.Any
   field :async, 4, type: :bool
+  field :timeout, 5, type: :int32
 end
 defmodule Eigr.Functions.Protocol.ActorInvocation do
   @moduledoc false

@@ -208,6 +208,7 @@ message Forward {
 //   * value: This is the value sent by the user function to be computed by the request's target Actor command.
 //   * async: Indicates whether the command should be processed synchronously, where a response should be sent back to the user function, 
 //            or whether the command should be processed asynchronously, i.e. no response sent to the caller and no waiting.
+//   * timeout: Waiting time until request timeout. Default is 30 seconds.
 message InvocationRequest {
 
     eigr.functions.protocol.actors.ActorId actor_id = 1;
@@ -217,6 +218,8 @@ message InvocationRequest {
     google.protobuf.Any value = 3;
 
     bool async = 4;
+
+    int32 timeout = 5;
 }
 
 // ActorInvocation is a translation message between a local invocation made via InvocationRequest 
