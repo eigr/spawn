@@ -485,38 +485,10 @@ defmodule Eigr.Functions.Protocol.Pipe do
           __unknown_fields__: [],
           default_value: nil,
           extendee: nil,
-          json_name: "context",
-          label: :LABEL_OPTIONAL,
-          name: "context",
-          number: 2,
-          oneof_index: nil,
-          options: nil,
-          proto3_optional: nil,
-          type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.Context"
-        },
-        %Google.Protobuf.FieldDescriptorProto{
-          __unknown_fields__: [],
-          default_value: nil,
-          extendee: nil,
-          json_name: "value",
-          label: :LABEL_OPTIONAL,
-          name: "value",
-          number: 3,
-          oneof_index: nil,
-          options: nil,
-          proto3_optional: nil,
-          type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.Value"
-        },
-        %Google.Protobuf.FieldDescriptorProto{
-          __unknown_fields__: [],
-          default_value: nil,
-          extendee: nil,
           json_name: "commandName",
           label: :LABEL_OPTIONAL,
           name: "command_name",
-          number: 4,
+          number: 2,
           oneof_index: nil,
           options: nil,
           proto3_optional: nil,
@@ -534,9 +506,7 @@ defmodule Eigr.Functions.Protocol.Pipe do
   end
 
   field :actor_id, 1, type: Eigr.Functions.Protocol.Actors.ActorId, json_name: "actorId"
-  field :context, 2, type: Eigr.Functions.Protocol.Context
-  field :value, 3, type: Eigr.Functions.Protocol.Value
-  field :command_name, 4, type: :string, json_name: "commandName"
+  field :command_name, 2, type: :string, json_name: "commandName"
 end
 defmodule Eigr.Functions.Protocol.Effect do
   @moduledoc false
@@ -636,24 +606,10 @@ defmodule Eigr.Functions.Protocol.Forward do
           __unknown_fields__: [],
           default_value: nil,
           extendee: nil,
-          json_name: "context",
-          label: :LABEL_OPTIONAL,
-          name: "context",
-          number: 2,
-          oneof_index: nil,
-          options: nil,
-          proto3_optional: nil,
-          type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.Context"
-        },
-        %Google.Protobuf.FieldDescriptorProto{
-          __unknown_fields__: [],
-          default_value: nil,
-          extendee: nil,
           json_name: "commandName",
           label: :LABEL_OPTIONAL,
           name: "command_name",
-          number: 4,
+          number: 2,
           oneof_index: nil,
           options: nil,
           proto3_optional: nil,
@@ -664,10 +620,10 @@ defmodule Eigr.Functions.Protocol.Forward do
           __unknown_fields__: [],
           default_value: nil,
           extendee: nil,
-          json_name: "value",
+          json_name: "Value",
           label: :LABEL_OPTIONAL,
-          name: "value",
-          number: 5,
+          name: "Value",
+          number: 3,
           oneof_index: nil,
           options: nil,
           proto3_optional: nil,
@@ -685,9 +641,8 @@ defmodule Eigr.Functions.Protocol.Forward do
   end
 
   field :actor_id, 1, type: Eigr.Functions.Protocol.Actors.ActorId, json_name: "actorId"
-  field :context, 2, type: Eigr.Functions.Protocol.Context
-  field :command_name, 4, type: :string, json_name: "commandName"
-  field :value, 5, type: Eigr.Functions.Protocol.Value
+  field :command_name, 2, type: :string, json_name: "commandName"
+  field :Value, 3, type: Eigr.Functions.Protocol.Value
 end
 defmodule Eigr.Functions.Protocol.InvocationRequest do
   @moduledoc false
@@ -874,7 +829,7 @@ defmodule Eigr.Functions.Protocol.ActorInvocationResponse do
           label: :LABEL_OPTIONAL,
           name: "value",
           number: 2,
-          oneof_index: 0,
+          oneof_index: nil,
           options: nil,
           proto3_optional: nil,
           type: :TYPE_MESSAGE,
@@ -884,10 +839,24 @@ defmodule Eigr.Functions.Protocol.ActorInvocationResponse do
           __unknown_fields__: [],
           default_value: nil,
           extendee: nil,
+          json_name: "persistenceStrategy",
+          label: :LABEL_OPTIONAL,
+          name: "persistence_strategy",
+          number: 3,
+          oneof_index: nil,
+          options: nil,
+          proto3_optional: nil,
+          type: :TYPE_MESSAGE,
+          type_name: ".eigr.functions.protocol.actors.ActorSnapshotStrategy"
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          __unknown_fields__: [],
+          default_value: nil,
+          extendee: nil,
           json_name: "pipe",
           label: :LABEL_OPTIONAL,
           name: "pipe",
-          number: 3,
+          number: 4,
           oneof_index: 0,
           options: nil,
           proto3_optional: nil,
@@ -901,7 +870,7 @@ defmodule Eigr.Functions.Protocol.ActorInvocationResponse do
           json_name: "forward",
           label: :LABEL_OPTIONAL,
           name: "forward",
-          number: 4,
+          number: 5,
           oneof_index: 0,
           options: nil,
           proto3_optional: nil,
@@ -915,7 +884,7 @@ defmodule Eigr.Functions.Protocol.ActorInvocationResponse do
           json_name: "effects",
           label: :LABEL_REPEATED,
           name: "effects",
-          number: 5,
+          number: 6,
           oneof_index: nil,
           options: nil,
           proto3_optional: nil,
@@ -926,7 +895,11 @@ defmodule Eigr.Functions.Protocol.ActorInvocationResponse do
       name: "ActorInvocationResponse",
       nested_type: [],
       oneof_decl: [
-        %Google.Protobuf.OneofDescriptorProto{__unknown_fields__: [], name: "reply", options: nil}
+        %Google.Protobuf.OneofDescriptorProto{
+          __unknown_fields__: [],
+          name: "workflow",
+          options: nil
+        }
       ],
       options: nil,
       reserved_name: [],
@@ -934,13 +907,18 @@ defmodule Eigr.Functions.Protocol.ActorInvocationResponse do
     }
   end
 
-  oneof :reply, 0
+  oneof :workflow, 0
 
   field :actor_id, 1, type: Eigr.Functions.Protocol.Actors.ActorId, json_name: "actorId"
-  field :value, 2, type: Eigr.Functions.Protocol.Value, oneof: 0
-  field :pipe, 3, type: Eigr.Functions.Protocol.Pipe, oneof: 0
-  field :forward, 4, type: Eigr.Functions.Protocol.Forward, oneof: 0
-  field :effects, 5, repeated: true, type: Eigr.Functions.Protocol.Effect
+  field :value, 2, type: Eigr.Functions.Protocol.Value
+
+  field :persistence_strategy, 3,
+    type: Eigr.Functions.Protocol.Actors.ActorSnapshotStrategy,
+    json_name: "persistenceStrategy"
+
+  field :pipe, 4, type: Eigr.Functions.Protocol.Pipe, oneof: 0
+  field :forward, 5, type: Eigr.Functions.Protocol.Forward, oneof: 0
+  field :effects, 6, repeated: true, type: Eigr.Functions.Protocol.Effect
 end
 defmodule Eigr.Functions.Protocol.InvocationResponse do
   @moduledoc false

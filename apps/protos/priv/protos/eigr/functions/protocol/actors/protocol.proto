@@ -177,11 +177,7 @@ message Pipe {
     // The target actor id
     eigr.functions.protocol.actors.ActorId actor_id = 1;
 
-    Context context = 2;
-
-    Value value = 3;
-
-    string command_name = 4;
+    string command_name = 2;
 }
 
 message Effect {
@@ -197,11 +193,9 @@ message Forward {
     // The target actor id
     eigr.functions.protocol.actors.ActorId actor_id = 1;
 
-    Context context = 2;
+    string command_name = 2;
 
-    string command_name = 4;
-
-    Value value = 5;
+    Value Value = 3;
 }
 
 // The user function when it wants to send a message to an Actor uses the InvocationRequest message type.
@@ -249,19 +243,34 @@ message ActorInvocation {
 //
 // Params:
 //   actor_id: The Id of the Actor handling the InvocationRequest request, also called the target Actor.
-//   updated_context: The Context with updated state value of the target Actor after user function has processed a request.
-//   value: The value that the original request proxy will forward in response to the InvocationRequest type request. 
-//          This is the final response from the point of view of the user who invoked the Actor call and its subsequent processing.
+//
+//   value: Value has the updated context that will serve for the proxy to update the actor's internal state as well as the persistent storage 
+//          and the final result that will be forwarded to whoever made the original invocation.
+//
+//   persistence_strategy: The user can choose to override the persistence strategy. 
+//                         Thus, an actor that was started with a persistence strategy based on timeout may contain functions or methods that, 
+//                         due to their particular characteristics, override this strategy.
+//
+//   workflow: Could be one of: 
+//          ´Pipe´: The result of the request is forwarded to another actor just like Unix pipes. Pipes can be chained without restriction, 
+//                  but the caller must be returned within the timeout of a request.
+//          ´Forward´: The actor can forward the invocation directly to another Actor and the return from the target actor will be responsible for handling the request.
+//
+//   effects: A call to an actor can return in addition to the return value also side effects, 
+//            these effects have no impact on the callback made by the user and will be handled asynchronously by the proxy.
 message ActorInvocationResponse {
     eigr.functions.protocol.actors.ActorId actor_id = 1;
 
-    oneof reply {
-        Value value = 2;
-        Pipe pipe = 3;
-        Forward forward = 4;
+    Value value = 2;
+
+    eigr.functions.protocol.actors.ActorSnapshotStrategy persistence_strategy = 3;
+
+    oneof workflow {
+        Pipe pipe = 4;
+        Forward forward = 5;
     }
 
-    repeated Effect effects = 5;
+    repeated Effect effects = 6;
 }
 
 // InvocationResponse is the response that the proxy that received the InvocationRequest request will forward to the request's original user function.
