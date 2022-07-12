@@ -255,8 +255,8 @@ message ActorInvocation {
 //                         due to their particular characteristics, override this strategy.
 //
 //   workflow: Could be one of: 
-//          ´Pipe´: The result of the request is forwarded to another actor just like Unix pipes. Pipes can be chained without restriction, 
-//                  but the caller must be returned within the timeout of a request.
+//          ´Pipe´: The result of the request is forwarded as input to another actor just like Unix pipes. 
+//                  Pipes can be chained without restriction, but the caller must be returned within the timeout of a request.
 //          ´Forward´: The actor can forward the invocation directly to another Actor and the return from the target actor will be responsible for handling the request.
 //
 //   effects: A call to an actor can return in addition to the return value also side effects, 
