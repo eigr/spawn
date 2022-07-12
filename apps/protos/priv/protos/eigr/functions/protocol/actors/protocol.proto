@@ -167,6 +167,39 @@ message Context {
     google.protobuf.Any state = 1;
 }
 
+message Value {
+    Context context = 1;
+
+    google.protobuf.Any payload = 2;
+}
+
+message Pipe {
+    // The target actor id
+    eigr.functions.protocol.actors.ActorId actor_id = 1;
+
+    Value value = 2;
+
+    string command_name = 3;
+}
+
+message Effect {
+    // The target actor id
+    eigr.functions.protocol.actors.ActorId actor_id = 1;
+
+    string command_name = 3;
+
+    Value value = 4;
+}
+
+message Forward {
+    // The target actor id
+    eigr.functions.protocol.actors.ActorId actor_id = 1;
+
+    string command_name = 3;
+
+    Value value = 4;
+}
+
 // The user function when it wants to send a message to an Actor uses the InvocationRequest message type.
 //
 // Params:
@@ -179,15 +212,13 @@ message Context {
 //            or whether the command should be processed asynchronously, i.e. no response sent to the caller and no waiting.
 message InvocationRequest {
 
-    eigr.functions.protocol.actors.ActorSystem system =1;
+    eigr.functions.protocol.actors.ActorId actor_id = 1;
 
-    eigr.functions.protocol.actors.Actor actor = 2;
+    string command_name = 2;
 
-    string command_name = 3;
+    google.protobuf.Any value = 3;
 
-    google.protobuf.Any value = 4;
-
-    bool async = 5;
+    bool async = 4;
 }
 
 // ActorInvocation is a translation message between a local invocation made via InvocationRequest 
@@ -203,16 +234,11 @@ message InvocationRequest {
 //                    In this case, the Context type will contain in the value attribute the same `value` as the matching above.
 //   value: The value to be passed to the function or method corresponding to command_name.
 message ActorInvocation {
+    eigr.functions.protocol.actors.ActorId actor_id = 1;
 
-    string actor_name = 1;
+    string command_name = 2;
 
-    string actor_system = 2;
-
-    string command_name = 3;
-
-    Context current_context = 4;
-
-    google.protobuf.Any value = 5;
+    Value value = 3;
 }
 
 // The user function's response after executing the action originated by the local proxy request via ActorInvocation.
@@ -224,14 +250,15 @@ message ActorInvocation {
 //   value: The value that the original request proxy will forward in response to the InvocationRequest type request. 
 //          This is the final response from the point of view of the user who invoked the Actor call and its subsequent processing.
 message ActorInvocationResponse {
+    eigr.functions.protocol.actors.ActorId actor_id = 1;
 
-    string actor_name = 1;
+    oneof reply {
+        Value value = 2;
+        Pipe pipe = 3;
+        Forward forward = 4;
+    }
 
-    string actor_system = 2;
-
-    Context updated_context = 3;
-
-    google.protobuf.Any value = 4;
+    repeated Effect effects = 5;
 }
 
 // InvocationResponse is the response that the proxy that received the InvocationRequest request will forward to the request's original user function.
@@ -244,13 +271,11 @@ message ActorInvocationResponse {
 //          This value must be passed by the user function to the one who requested the initial request in InvocationRequest.
 message InvocationResponse {
 
-    RequestStatus status = 1;
+    eigr.functions.protocol.actors.ActorId actor_id = 1;
 
-    eigr.functions.protocol.actors.ActorSystem system = 2;
+    RequestStatus status = 2;
 
-    eigr.functions.protocol.actors.Actor actor = 3;
-
-    google.protobuf.Any value = 4;
+    google.protobuf.Any value = 3;
 }
 
 enum Status {
