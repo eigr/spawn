@@ -177,27 +177,31 @@ message Pipe {
     // The target actor id
     eigr.functions.protocol.actors.ActorId actor_id = 1;
 
-    Value value = 2;
+    Context context = 2;
 
-    string command_name = 3;
+    Value value = 3;
+
+    string command_name = 4;
 }
 
 message Effect {
     // The target actor id
     eigr.functions.protocol.actors.ActorId actor_id = 1;
 
-    string command_name = 3;
+    string command_name = 2;
 
-    Value value = 4;
+    Value value = 3;
 }
 
 message Forward {
     // The target actor id
     eigr.functions.protocol.actors.ActorId actor_id = 1;
 
-    string command_name = 3;
+    Context context = 2;
 
-    Value value = 4;
+    string command_name = 4;
+
+    Value value = 5;
 }
 
 // The user function when it wants to send a message to an Actor uses the InvocationRequest message type.
@@ -244,8 +248,7 @@ message ActorInvocation {
 // The user function's response after executing the action originated by the local proxy request via ActorInvocation.
 //
 // Params:
-//   actor_name: The name of the Actor handling the InvocationRequest request, also called the target Actor.
-//   actor_system: The name of ActorSystem registered in Registration step.
+//   actor_id: The Id of the Actor handling the InvocationRequest request, also called the target Actor.
 //   updated_context: The Context with updated state value of the target Actor after user function has processed a request.
 //   value: The value that the original request proxy will forward in response to the InvocationRequest type request. 
 //          This is the final response from the point of view of the user who invoked the Actor call and its subsequent processing.
@@ -264,9 +267,8 @@ message ActorInvocationResponse {
 // InvocationResponse is the response that the proxy that received the InvocationRequest request will forward to the request's original user function.
 //
 // Params:
+//   actor_id: The target Actor originally sent in the InvocationRequest message.
 //   status: Status of request. Could be one of [UNKNOWN, OK, ACTOR_NOT_FOUND, ERROR].
-//   sytem: The original ActorSystem of the InvocationRequest request.
-//   actor: The target Actor originally sent in the InvocationRequest message.
 //   value: The value resulting from the request processing that the target Actor made.
 //          This value must be passed by the user function to the one who requested the initial request in InvocationRequest.
 message InvocationResponse {

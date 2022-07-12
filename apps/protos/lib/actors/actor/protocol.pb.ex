@@ -485,10 +485,24 @@ defmodule Eigr.Functions.Protocol.Pipe do
           __unknown_fields__: [],
           default_value: nil,
           extendee: nil,
+          json_name: "context",
+          label: :LABEL_OPTIONAL,
+          name: "context",
+          number: 2,
+          oneof_index: nil,
+          options: nil,
+          proto3_optional: nil,
+          type: :TYPE_MESSAGE,
+          type_name: ".eigr.functions.protocol.Context"
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          __unknown_fields__: [],
+          default_value: nil,
+          extendee: nil,
           json_name: "value",
           label: :LABEL_OPTIONAL,
           name: "value",
-          number: 2,
+          number: 3,
           oneof_index: nil,
           options: nil,
           proto3_optional: nil,
@@ -502,7 +516,7 @@ defmodule Eigr.Functions.Protocol.Pipe do
           json_name: "commandName",
           label: :LABEL_OPTIONAL,
           name: "command_name",
-          number: 3,
+          number: 4,
           oneof_index: nil,
           options: nil,
           proto3_optional: nil,
@@ -520,8 +534,9 @@ defmodule Eigr.Functions.Protocol.Pipe do
   end
 
   field :actor_id, 1, type: Eigr.Functions.Protocol.Actors.ActorId, json_name: "actorId"
-  field :value, 2, type: Eigr.Functions.Protocol.Value
-  field :command_name, 3, type: :string, json_name: "commandName"
+  field :context, 2, type: Eigr.Functions.Protocol.Context
+  field :value, 3, type: Eigr.Functions.Protocol.Value
+  field :command_name, 4, type: :string, json_name: "commandName"
 end
 defmodule Eigr.Functions.Protocol.Effect do
   @moduledoc false
@@ -556,7 +571,7 @@ defmodule Eigr.Functions.Protocol.Effect do
           json_name: "commandName",
           label: :LABEL_OPTIONAL,
           name: "command_name",
-          number: 3,
+          number: 2,
           oneof_index: nil,
           options: nil,
           proto3_optional: nil,
@@ -570,7 +585,7 @@ defmodule Eigr.Functions.Protocol.Effect do
           json_name: "value",
           label: :LABEL_OPTIONAL,
           name: "value",
-          number: 4,
+          number: 3,
           oneof_index: nil,
           options: nil,
           proto3_optional: nil,
@@ -588,8 +603,8 @@ defmodule Eigr.Functions.Protocol.Effect do
   end
 
   field :actor_id, 1, type: Eigr.Functions.Protocol.Actors.ActorId, json_name: "actorId"
-  field :command_name, 3, type: :string, json_name: "commandName"
-  field :value, 4, type: Eigr.Functions.Protocol.Value
+  field :command_name, 2, type: :string, json_name: "commandName"
+  field :value, 3, type: Eigr.Functions.Protocol.Value
 end
 defmodule Eigr.Functions.Protocol.Forward do
   @moduledoc false
@@ -621,10 +636,24 @@ defmodule Eigr.Functions.Protocol.Forward do
           __unknown_fields__: [],
           default_value: nil,
           extendee: nil,
+          json_name: "context",
+          label: :LABEL_OPTIONAL,
+          name: "context",
+          number: 2,
+          oneof_index: nil,
+          options: nil,
+          proto3_optional: nil,
+          type: :TYPE_MESSAGE,
+          type_name: ".eigr.functions.protocol.Context"
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          __unknown_fields__: [],
+          default_value: nil,
+          extendee: nil,
           json_name: "commandName",
           label: :LABEL_OPTIONAL,
           name: "command_name",
-          number: 3,
+          number: 4,
           oneof_index: nil,
           options: nil,
           proto3_optional: nil,
@@ -638,7 +667,7 @@ defmodule Eigr.Functions.Protocol.Forward do
           json_name: "value",
           label: :LABEL_OPTIONAL,
           name: "value",
-          number: 4,
+          number: 5,
           oneof_index: nil,
           options: nil,
           proto3_optional: nil,
@@ -656,8 +685,9 @@ defmodule Eigr.Functions.Protocol.Forward do
   end
 
   field :actor_id, 1, type: Eigr.Functions.Protocol.Actors.ActorId, json_name: "actorId"
-  field :command_name, 3, type: :string, json_name: "commandName"
-  field :value, 4, type: Eigr.Functions.Protocol.Value
+  field :context, 2, type: Eigr.Functions.Protocol.Context
+  field :command_name, 4, type: :string, json_name: "commandName"
+  field :value, 5, type: Eigr.Functions.Protocol.Value
 end
 defmodule Eigr.Functions.Protocol.InvocationRequest do
   @moduledoc false
