@@ -266,7 +266,7 @@ message ActorInvocationResponse {
 
     Value value = 2;
 
-    eigr.functions.protocol.actors.ActorSnapshotStrategy persistence_strategy = 3;
+    bool persist = 3;
 
     oneof workflow {
         Pipe pipe = 4;

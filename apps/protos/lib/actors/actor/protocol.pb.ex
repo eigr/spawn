@@ -854,15 +854,15 @@ defmodule Eigr.Functions.Protocol.ActorInvocationResponse do
           __unknown_fields__: [],
           default_value: nil,
           extendee: nil,
-          json_name: "persistenceStrategy",
+          json_name: "persist",
           label: :LABEL_OPTIONAL,
-          name: "persistence_strategy",
+          name: "persist",
           number: 3,
           oneof_index: nil,
           options: nil,
           proto3_optional: nil,
-          type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.ActorSnapshotStrategy"
+          type: :TYPE_BOOL,
+          type_name: nil
         },
         %Google.Protobuf.FieldDescriptorProto{
           __unknown_fields__: [],
@@ -926,11 +926,7 @@ defmodule Eigr.Functions.Protocol.ActorInvocationResponse do
 
   field :actor_id, 1, type: Eigr.Functions.Protocol.Actors.ActorId, json_name: "actorId"
   field :value, 2, type: Eigr.Functions.Protocol.Value
-
-  field :persistence_strategy, 3,
-    type: Eigr.Functions.Protocol.Actors.ActorSnapshotStrategy,
-    json_name: "persistenceStrategy"
-
+  field :persist, 3, type: :bool
   field :pipe, 4, type: Eigr.Functions.Protocol.Pipe, oneof: 0
   field :forward, 5, type: Eigr.Functions.Protocol.Forward, oneof: 0
   field :effects, 6, repeated: true, type: Eigr.Functions.Protocol.Effect
