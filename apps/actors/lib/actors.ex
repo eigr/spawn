@@ -9,7 +9,7 @@ defmodule Actors do
 
   alias Actors.Registry.ActorRegistry
 
-  alias Eigr.Functions.Protocol.Actors.{Actor, ActorSystem, Registry}
+  alias Eigr.Functions.Protocol.Actors.{Actor, ActorId, ActorSystem, Registry}
 
   alias Eigr.Functions.Protocol.{
     InvocationRequest,
@@ -27,12 +27,12 @@ defmodule Actors do
           service_info: %ServiceInfo{} = _service_info,
           actor_system:
             %ActorSystem{name: _name, registry: %Registry{actors: actors} = _registry} =
-              actor_system
+              _actor_system
         } = _registration
       ) do
     ActorRegistry.register(actors)
 
-    with :ok <- create_actors(actor_system, actors) do
+    with :ok <- create_actors(actors) do
       proxy_info =
         ProxyInfo.new(
           protocol_major_version: 1,
@@ -84,18 +84,16 @@ defmodule Actors do
 
   def invoke(
         %InvocationRequest{
-          actor: %Actor{} = actor,
-          system: %ActorSystem{} = system,
+          actor_id: %ActorId{} = actor,
           async: type
         } = request
       ) do
-    invoke(type, system, actor, request)
+    invoke(type, actor, request)
   end
 
   defp invoke(
          false,
-         %ActorSystem{name: system_name} = system,
-         %Actor{name: actor_name} = _actor,
+         %ActorId{name: actor_name, actor_system: system_name} = _actor_id,
          request
        ) do
     case Actors.Actor.Registry.lookup(actor_name) do
@@ -108,7 +106,7 @@ defmodule Actors do
         with {:ok, %{node: node, actor: registered_actor}} <-
                ActorRegistry.lookup(system_name, actor_name),
              _pid <-
-               Node.spawn(node, __MODULE__, :try_reactivate_actor, [system, registered_actor]) do
+               Node.spawn(node, __MODULE__, :try_reactivate_actor, [registered_actor]) do
           Process.sleep(1)
           {:ok, response_body} = ActorEntity.invoke(actor_name, request)
 
@@ -134,8 +132,7 @@ defmodule Actors do
 
   defp invoke(
          true,
-         %ActorSystem{name: system_name} = system,
-         %Actor{name: actor_name} = _actor,
+         %ActorId{name: actor_name, actor_system: system_name} = _actor_id,
          request
        ) do
     case Actors.Actor.Registry.lookup(actor_name) do
@@ -148,7 +145,7 @@ defmodule Actors do
         with {:ok, %{node: node, actor: registered_actor}} <-
                ActorRegistry.lookup(system_name, actor_name),
              _pid <-
-               Node.spawn(node, __MODULE__, :try_reactivate_actor, [system, registered_actor]) do
+               Node.spawn(node, __MODULE__, :try_reactivate_actor, [registered_actor]) do
           Process.sleep(1)
           {:ok, response_body} = ActorEntity.invoke_async(actor_name, request)
 
@@ -172,8 +169,8 @@ defmodule Actors do
     end
   end
 
-  def try_reactivate_actor(%ActorSystem{} = system, %Actor{name: name} = actor) do
-    case ActorEntitySupervisor.lookup_or_create_actor(system, actor) do
+  def try_reactivate_actor(%Actor{actor_id: %ActorId{name: name}} = actor) do
+    case ActorEntitySupervisor.lookup_or_create_actor(actor) do
       {:ok, pid} ->
         Logger.debug("Actor #{name} reactivated. PID: #{inspect(pid)}")
         {:ok, pid}
@@ -184,20 +181,7 @@ defmodule Actors do
     end
   end
 
-  # To lookup all actors
-  def try_reactivate_actor(nil, %Actor{name: name} = actor) do
-    case ActorEntitySupervisor.lookup_or_create_actor(nil, actor) do
-      {:ok, pid} ->
-        Logger.debug("Actor #{name} reactivated. PID: #{inspect(pid)}")
-        {:ok, pid}
-
-      reason ->
-        Logger.error("Failed to reactivate actor #{name}: #{inspect(reason)}")
-        {:error, reason}
-    end
-  end
-
-  defp create_actors(actor_system, actors) do
+  defp create_actors(actors) do
     actors
     |> Flow.from_enumerable(
       min_demand: @activate_actors_min_demand,
@@ -206,7 +190,7 @@ defmodule Actors do
     |> Flow.map(fn {actor_name, actor} ->
       Logger.debug("Registering #{actor_name} #{inspect(actor)} on Node: #{inspect(Node.self())}")
 
-      {time, result} = :timer.tc(&lookup_actor/3, [actor_system, actor_name, actor])
+      {time, result} = :timer.tc(&lookup_actor/2, [actor_name, actor])
 
       Logger.info(
         "Registered and Activated the #{actor_name} on Node #{inspect(Node.self())} in #{inspect(time)}ms"
@@ -217,8 +201,8 @@ defmodule Actors do
     |> Flow.run()
   end
 
-  defp lookup_actor(actor_system, actor_name, actor) do
-    case ActorEntitySupervisor.lookup_or_create_actor(actor_system, actor) do
+  defp lookup_actor(actor_name, actor) do
+    case ActorEntitySupervisor.lookup_or_create_actor(actor) do
       {:ok, pid} ->
         {:ok, pid}
 
