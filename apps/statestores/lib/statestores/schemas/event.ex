@@ -10,8 +10,6 @@ defmodule Statestores.Schemas.Event do
 
   @primary_key {:id, :id, autogenerate: true}
   schema "events" do
-    field(:system, :string)
-
     field(:actor, :string)
 
     field(:revision, :integer)

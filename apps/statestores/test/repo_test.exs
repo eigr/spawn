@@ -13,7 +13,6 @@ defmodule StatestoresTest.RepoTest do
     repo = load_repo()
 
     event = %Event{
-      system: "test-system",
       actor: "mike",
       revision: 0,
       tags: %{},

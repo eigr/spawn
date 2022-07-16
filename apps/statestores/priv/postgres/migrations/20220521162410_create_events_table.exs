@@ -3,7 +3,6 @@ defmodule Statestores.Adapters.Postgres.Migrations.CreateEventsTable do
 
   def change do
     create table(:events) do
-      add :system, :string
       add :actor, :string
       add :revision, :integer
       add :tags, :map
