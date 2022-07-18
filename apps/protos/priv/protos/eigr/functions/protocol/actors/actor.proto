@@ -138,6 +138,7 @@ message Actor {
     // The id of Actor.
     ActorId actor_id = 1;
 
+    // Actor settings.
     ActorConfiguration configuration = 2;
     
     // A Actor state.
