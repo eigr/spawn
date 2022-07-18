@@ -11,7 +11,6 @@ defmodule Actors.Actor.Entity do
     ActorDeactivateStrategy,
     ActorState,
     ActorSnapshotStrategy,
-    ActorSystem,
     TimeoutStrategy
   }
 
