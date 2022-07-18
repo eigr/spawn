@@ -204,6 +204,27 @@ defmodule Eigr.Functions.Protocol.Actors.ActorSystem do
   field :name, 1, type: :string
   field :registry, 2, type: Eigr.Functions.Protocol.Actors.Registry
 end
+defmodule Eigr.Functions.Protocol.Actors.PermanentStrategy do
+  @moduledoc false
+  use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
+
+  def descriptor do
+    # credo:disable-for-next-line
+    %Google.Protobuf.DescriptorProto{
+      __unknown_fields__: [],
+      enum_type: [],
+      extension: [],
+      extension_range: [],
+      field: [],
+      name: "PermanentStrategy",
+      nested_type: [],
+      oneof_decl: [],
+      options: nil,
+      reserved_name: [],
+      reserved_range: []
+    }
+  end
+end
 defmodule Eigr.Functions.Protocol.Actors.TimeoutStrategy do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
@@ -427,12 +448,26 @@ defmodule Eigr.Functions.Protocol.Actors.ActorDeactivateStrategy do
           json_name: "timeout",
           label: :LABEL_OPTIONAL,
           name: "timeout",
-          number: 2,
+          number: 1,
           oneof_index: 0,
           options: nil,
           proto3_optional: nil,
           type: :TYPE_MESSAGE,
           type_name: ".eigr.functions.protocol.actors.TimeoutStrategy"
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          __unknown_fields__: [],
+          default_value: nil,
+          extendee: nil,
+          json_name: "permanent",
+          label: :LABEL_OPTIONAL,
+          name: "permanent",
+          number: 2,
+          oneof_index: 0,
+          options: nil,
+          proto3_optional: nil,
+          type: :TYPE_MESSAGE,
+          type_name: ".eigr.functions.protocol.actors.PermanentStrategy"
         }
       ],
       name: "ActorDeactivateStrategy",
@@ -452,7 +487,8 @@ defmodule Eigr.Functions.Protocol.Actors.ActorDeactivateStrategy do
 
   oneof :strategy, 0
 
-  field :timeout, 2, type: Eigr.Functions.Protocol.Actors.TimeoutStrategy, oneof: 0
+  field :timeout, 1, type: Eigr.Functions.Protocol.Actors.TimeoutStrategy, oneof: 0
+  field :permanent, 2, type: Eigr.Functions.Protocol.Actors.PermanentStrategy, oneof: 0
 end
 defmodule Eigr.Functions.Protocol.Actors.ActorState.TagsEntry do
   @moduledoc false
@@ -797,6 +833,80 @@ defmodule Eigr.Functions.Protocol.Actors.ActorId do
   field :resource, 2, type: :string
   field :actor_system, 3, type: :string, json_name: "actorSystem"
 end
+defmodule Eigr.Functions.Protocol.Actors.ActorConfiguration do
+  @moduledoc false
+  use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
+
+  def descriptor do
+    # credo:disable-for-next-line
+    %Google.Protobuf.DescriptorProto{
+      __unknown_fields__: [],
+      enum_type: [],
+      extension: [],
+      extension_range: [],
+      field: [
+        %Google.Protobuf.FieldDescriptorProto{
+          __unknown_fields__: [],
+          default_value: nil,
+          extendee: nil,
+          json_name: "persistent",
+          label: :LABEL_OPTIONAL,
+          name: "persistent",
+          number: 1,
+          oneof_index: nil,
+          options: nil,
+          proto3_optional: nil,
+          type: :TYPE_BOOL,
+          type_name: nil
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          __unknown_fields__: [],
+          default_value: nil,
+          extendee: nil,
+          json_name: "snapshotStrategy",
+          label: :LABEL_OPTIONAL,
+          name: "snapshot_strategy",
+          number: 2,
+          oneof_index: nil,
+          options: nil,
+          proto3_optional: nil,
+          type: :TYPE_MESSAGE,
+          type_name: ".eigr.functions.protocol.actors.ActorSnapshotStrategy"
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          __unknown_fields__: [],
+          default_value: nil,
+          extendee: nil,
+          json_name: "deactivateStrategy",
+          label: :LABEL_OPTIONAL,
+          name: "deactivate_strategy",
+          number: 3,
+          oneof_index: nil,
+          options: nil,
+          proto3_optional: nil,
+          type: :TYPE_MESSAGE,
+          type_name: ".eigr.functions.protocol.actors.ActorDeactivateStrategy"
+        }
+      ],
+      name: "ActorConfiguration",
+      nested_type: [],
+      oneof_decl: [],
+      options: nil,
+      reserved_name: [],
+      reserved_range: []
+    }
+  end
+
+  field :persistent, 1, type: :bool
+
+  field :snapshot_strategy, 2,
+    type: Eigr.Functions.Protocol.Actors.ActorSnapshotStrategy,
+    json_name: "snapshotStrategy"
+
+  field :deactivate_strategy, 3,
+    type: Eigr.Functions.Protocol.Actors.ActorDeactivateStrategy,
+    json_name: "deactivateStrategy"
+end
 defmodule Eigr.Functions.Protocol.Actors.Actor do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
@@ -827,15 +937,15 @@ defmodule Eigr.Functions.Protocol.Actors.Actor do
           __unknown_fields__: [],
           default_value: nil,
           extendee: nil,
-          json_name: "persistent",
+          json_name: "configuration",
           label: :LABEL_OPTIONAL,
-          name: "persistent",
+          name: "configuration",
           number: 2,
           oneof_index: nil,
           options: nil,
           proto3_optional: nil,
-          type: :TYPE_BOOL,
-          type_name: nil
+          type: :TYPE_MESSAGE,
+          type_name: ".eigr.functions.protocol.actors.ActorConfiguration"
         },
         %Google.Protobuf.FieldDescriptorProto{
           __unknown_fields__: [],
@@ -878,34 +988,6 @@ defmodule Eigr.Functions.Protocol.Actors.Actor do
           proto3_optional: nil,
           type: :TYPE_MESSAGE,
           type_name: ".eigr.functions.protocol.actors.TimerCommand"
-        },
-        %Google.Protobuf.FieldDescriptorProto{
-          __unknown_fields__: [],
-          default_value: nil,
-          extendee: nil,
-          json_name: "snapshotStrategy",
-          label: :LABEL_OPTIONAL,
-          name: "snapshot_strategy",
-          number: 6,
-          oneof_index: nil,
-          options: nil,
-          proto3_optional: nil,
-          type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.ActorSnapshotStrategy"
-        },
-        %Google.Protobuf.FieldDescriptorProto{
-          __unknown_fields__: [],
-          default_value: nil,
-          extendee: nil,
-          json_name: "deactivateStrategy",
-          label: :LABEL_OPTIONAL,
-          name: "deactivate_strategy",
-          number: 7,
-          oneof_index: nil,
-          options: nil,
-          proto3_optional: nil,
-          type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.ActorDeactivateStrategy"
         }
       ],
       name: "Actor",
@@ -918,16 +1000,8 @@ defmodule Eigr.Functions.Protocol.Actors.Actor do
   end
 
   field :actor_id, 1, type: Eigr.Functions.Protocol.Actors.ActorId, json_name: "actorId"
-  field :persistent, 2, type: :bool
+  field :configuration, 2, type: Eigr.Functions.Protocol.Actors.ActorConfiguration
   field :state, 3, type: Eigr.Functions.Protocol.Actors.ActorState
   field :commands, 4, repeated: true, type: Eigr.Functions.Protocol.Actors.Command
   field :timers, 5, repeated: true, type: Eigr.Functions.Protocol.Actors.TimerCommand
-
-  field :snapshot_strategy, 6,
-    type: Eigr.Functions.Protocol.Actors.ActorSnapshotStrategy,
-    json_name: "snapshotStrategy"
-
-  field :deactivate_strategy, 7,
-    type: Eigr.Functions.Protocol.Actors.ActorDeactivateStrategy,
-    json_name: "deactivateStrategy"
 end
