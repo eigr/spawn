@@ -1,3 +1,42 @@
+defmodule Eigr.Functions.Protocol.Actors.Dispatcher do
+  @moduledoc false
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
+
+  def descriptor do
+    # credo:disable-for-next-line
+    %Google.Protobuf.EnumDescriptorProto{
+      __unknown_fields__: [],
+      name: "Dispatcher",
+      options: nil,
+      reserved_name: [],
+      reserved_range: [],
+      value: [
+        %Google.Protobuf.EnumValueDescriptorProto{
+          __unknown_fields__: [],
+          name: "UNKNOWN_DISPATCHER",
+          number: 0,
+          options: nil
+        },
+        %Google.Protobuf.EnumValueDescriptorProto{
+          __unknown_fields__: [],
+          name: "SINGLETON_DISPATCHER",
+          number: 1,
+          options: nil
+        },
+        %Google.Protobuf.EnumValueDescriptorProto{
+          __unknown_fields__: [],
+          name: "MULTI_DISPATCHER",
+          number: 2,
+          options: nil
+        }
+      ]
+    }
+  end
+
+  field :UNKNOWN_DISPATCHER, 0
+  field :SINGLETON_DISPATCHER, 1
+  field :MULTI_DISPATCHER, 2
+end
 defmodule Eigr.Functions.Protocol.Actors.Registry.ActorsEntry do
   @moduledoc false
   use Protobuf, map: true, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
@@ -916,10 +955,24 @@ defmodule Eigr.Functions.Protocol.Actors.ActorConfiguration do
           __unknown_fields__: [],
           default_value: nil,
           extendee: nil,
+          json_name: "dispatcher",
+          label: :LABEL_OPTIONAL,
+          name: "dispatcher",
+          number: 2,
+          oneof_index: nil,
+          options: nil,
+          proto3_optional: nil,
+          type: :TYPE_ENUM,
+          type_name: ".eigr.functions.protocol.actors.Dispatcher"
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          __unknown_fields__: [],
+          default_value: nil,
+          extendee: nil,
           json_name: "snapshotStrategy",
           label: :LABEL_OPTIONAL,
           name: "snapshot_strategy",
-          number: 2,
+          number: 3,
           oneof_index: nil,
           options: nil,
           proto3_optional: nil,
@@ -933,7 +986,7 @@ defmodule Eigr.Functions.Protocol.Actors.ActorConfiguration do
           json_name: "deactivateStrategy",
           label: :LABEL_OPTIONAL,
           name: "deactivate_strategy",
-          number: 3,
+          number: 4,
           oneof_index: nil,
           options: nil,
           proto3_optional: nil,
@@ -951,12 +1004,13 @@ defmodule Eigr.Functions.Protocol.Actors.ActorConfiguration do
   end
 
   field :persistent, 1, type: :bool
+  field :dispatcher, 2, type: Eigr.Functions.Protocol.Actors.Dispatcher, enum: true
 
-  field :snapshot_strategy, 2,
+  field :snapshot_strategy, 3,
     type: Eigr.Functions.Protocol.Actors.ActorSnapshotStrategy,
     json_name: "snapshotStrategy"
 
-  field :deactivate_strategy, 3,
+  field :deactivate_strategy, 4,
     type: Eigr.Functions.Protocol.Actors.ActorDeactivateStrategy,
     json_name: "deactivateStrategy"
 end

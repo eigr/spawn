@@ -16,6 +16,20 @@ message ActorSystem {
     Registry registry = 2;
 }
 
+// Indicates whether the actor can have multiple instances or just a single one. 
+// Multiple instances of an actor are created taking into account the resource attribute of ActorId,
+// that is, an actor of type multi can create N new instances of an actor named ´X´ 
+// but that has a different ´resource´, indicating that this Actor is a X's son actor.
+// Singleton Dispatcher-type Actors are initialized early during the registration step, 
+// while Multi-Dispatcher-type Actors are initialized when they are invoked for the first time.
+enum Dispatcher {
+    UNKNOWN_DISPATCHER = 0;
+
+    SINGLETON_DISPATCHER = 1; 
+
+    MULTI_DISPATCHER = 2;
+}
+
 // A strategy without timeout. The Actor will never be deactivated
 message PermanentStrategy {}
 
@@ -138,12 +152,15 @@ message ActorConfiguration {
     // Indicates whether an actor's state should be persisted in a definitive store.
     bool persistent = 1;
 
+    // Indicates whether the actor can have multiple instances or just a single one.
+    // Default is Dispatcher.SINGLETON_DISPATCHER.
+    Dispatcher dispatcher = 2;
+
     // Snapshot strategy
-    ActorSnapshotStrategy snapshot_strategy = 2;
+    ActorSnapshotStrategy snapshot_strategy = 3;
 
     // Deactivate strategy
-    ActorDeactivateStrategy deactivate_strategy = 3;
-
+    ActorDeactivateStrategy deactivate_strategy = 4;
 }
 
 // Actor abstraction.
