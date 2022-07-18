@@ -104,6 +104,19 @@ message TimerCommand {
     Command command = 2;
 }
 
+// A CronCommand is similar to a regular TimerCommand, its main differences are that it is scheduled to run using cron expressions 
+// and only takes the actor's state as an argument.
+// Cron Commands are good for executing loops that manipulate the actor's own state. 
+// In Elixir or other languages in BEAM it would be similar to invoking Process.send_after(self(), atom, msg, timeout)
+message CronCommand {
+
+    // The expression the cron execution will follow, example: "* 5 * * *"
+    string expression = 1;
+
+    // See Command description Above
+    Command command = 2;
+}
+
 // A Actor instance identification
 message ActorId {
     // The name of a Actor Entity.
@@ -147,6 +160,9 @@ message Actor {
     // The commands registered for an actor
     repeated Command commands = 4;
 
-    // The registered timers for an actor.
+    // The registered timer commands for an actor.
     repeated TimerCommand timers = 5;
+
+    // The registered cron commands for an actor.
+    repeated CronCommand crons = 6;
 }

@@ -765,6 +765,59 @@ defmodule Eigr.Functions.Protocol.Actors.TimerCommand do
   field :seconds, 1, type: :int32
   field :command, 2, type: Eigr.Functions.Protocol.Actors.Command
 end
+defmodule Eigr.Functions.Protocol.Actors.CronCommand do
+  @moduledoc false
+  use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
+
+  def descriptor do
+    # credo:disable-for-next-line
+    %Google.Protobuf.DescriptorProto{
+      __unknown_fields__: [],
+      enum_type: [],
+      extension: [],
+      extension_range: [],
+      field: [
+        %Google.Protobuf.FieldDescriptorProto{
+          __unknown_fields__: [],
+          default_value: nil,
+          extendee: nil,
+          json_name: "expression",
+          label: :LABEL_OPTIONAL,
+          name: "expression",
+          number: 1,
+          oneof_index: nil,
+          options: nil,
+          proto3_optional: nil,
+          type: :TYPE_STRING,
+          type_name: nil
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          __unknown_fields__: [],
+          default_value: nil,
+          extendee: nil,
+          json_name: "command",
+          label: :LABEL_OPTIONAL,
+          name: "command",
+          number: 2,
+          oneof_index: nil,
+          options: nil,
+          proto3_optional: nil,
+          type: :TYPE_MESSAGE,
+          type_name: ".eigr.functions.protocol.actors.Command"
+        }
+      ],
+      name: "CronCommand",
+      nested_type: [],
+      oneof_decl: [],
+      options: nil,
+      reserved_name: [],
+      reserved_range: []
+    }
+  end
+
+  field :expression, 1, type: :string
+  field :command, 2, type: Eigr.Functions.Protocol.Actors.Command
+end
 defmodule Eigr.Functions.Protocol.Actors.ActorId do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
@@ -988,6 +1041,20 @@ defmodule Eigr.Functions.Protocol.Actors.Actor do
           proto3_optional: nil,
           type: :TYPE_MESSAGE,
           type_name: ".eigr.functions.protocol.actors.TimerCommand"
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          __unknown_fields__: [],
+          default_value: nil,
+          extendee: nil,
+          json_name: "crons",
+          label: :LABEL_REPEATED,
+          name: "crons",
+          number: 6,
+          oneof_index: nil,
+          options: nil,
+          proto3_optional: nil,
+          type: :TYPE_MESSAGE,
+          type_name: ".eigr.functions.protocol.actors.CronCommand"
         }
       ],
       name: "Actor",
@@ -1004,4 +1071,5 @@ defmodule Eigr.Functions.Protocol.Actors.Actor do
   field :state, 3, type: Eigr.Functions.Protocol.Actors.ActorState
   field :commands, 4, repeated: true, type: Eigr.Functions.Protocol.Actors.Command
   field :timers, 5, repeated: true, type: Eigr.Functions.Protocol.Actors.TimerCommand
+  field :crons, 6, repeated: true, type: Eigr.Functions.Protocol.Actors.CronCommand
 end
