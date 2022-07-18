@@ -7,6 +7,7 @@ defmodule Actors.Actor.Entity do
   alias Eigr.Functions.Protocol.Actors.{
     Actor,
     ActorId,
+    ActorConfiguration,
     ActorDeactivateStrategy,
     ActorState,
     ActorSnapshotStrategy,
@@ -45,8 +46,10 @@ defmodule Actors.Actor.Entity do
         %EntityState{
           actor: %Actor{
             actor_id: %ActorId{name: name},
-            persistent: false,
-            deactivate_strategy: deactivate_strategy
+            configuration: %ActorConfiguration{
+              persistent: false,
+              deactivate_strategy: deactivate_strategy
+            }
           }
         } = state
       )
@@ -66,9 +69,11 @@ defmodule Actors.Actor.Entity do
         %EntityState{
           actor: %Actor{
             actor_id: %ActorId{name: name},
-            persistent: false,
-            deactivate_strategy:
-              %ActorDeactivateStrategy{strategy: deactivate_strategy} = _dstrategy
+            configuration: %ActorConfiguration{
+              persistent: false,
+              deactivate_strategy:
+                %ActorDeactivateStrategy{strategy: deactivate_strategy} = _dstrategy
+            }
           }
         } = state
       ) do
@@ -86,9 +91,11 @@ defmodule Actors.Actor.Entity do
         %EntityState{
           actor: %Actor{
             actor_id: %ActorId{name: name},
-            persistent: true,
-            snapshot_strategy: %ActorSnapshotStrategy{} = _snapshot_strategy,
-            deactivate_strategy: deactivate_strategy
+            configuration: %ActorConfiguration{
+              persistent: true,
+              snapshot_strategy: %ActorSnapshotStrategy{} = _snapshot_strategy,
+              deactivate_strategy: deactivate_strategy
+            }
           }
         } = state
       )
@@ -111,9 +118,11 @@ defmodule Actors.Actor.Entity do
         %EntityState{
           actor: %Actor{
             actor_id: %ActorId{name: name},
-            persistent: true,
-            snapshot_strategy: %ActorSnapshotStrategy{} = _snapshot_strategy,
-            deactivate_strategy: %ActorDeactivateStrategy{strategy: deactivate_strategy}
+            configuration: %ActorConfiguration{
+              persistent: true,
+              snapshot_strategy: %ActorSnapshotStrategy{} = _snapshot_strategy,
+              deactivate_strategy: %ActorDeactivateStrategy{strategy: deactivate_strategy}
+            }
           }
         } = state
       ) do
@@ -313,8 +322,10 @@ defmodule Actors.Actor.Entity do
           actor:
             %Actor{
               state: actor_state,
-              snapshot_strategy: %ActorSnapshotStrategy{
-                strategy: {:timeout, %TimeoutStrategy{timeout: _timeout}} = snapshot_strategy
+              configuration: %ActorConfiguration{
+                snapshot_strategy: %ActorSnapshotStrategy{
+                  strategy: {:timeout, %TimeoutStrategy{timeout: _timeout}} = snapshot_strategy
+                }
               }
             } = _actor
         } = state
@@ -332,8 +343,10 @@ defmodule Actors.Actor.Entity do
             %Actor{
               actor_id: %ActorId{name: name},
               state: %ActorState{} = actor_state,
-              snapshot_strategy: %ActorSnapshotStrategy{
-                strategy: {:timeout, %TimeoutStrategy{timeout: timeout}} = snapshot_strategy
+              configuration: %ActorConfiguration{
+                snapshot_strategy: %ActorSnapshotStrategy{
+                  strategy: {:timeout, %TimeoutStrategy{timeout: timeout}} = snapshot_strategy
+                }
               }
             } = _actor
         } = state
@@ -371,9 +384,11 @@ defmodule Actors.Actor.Entity do
           actor:
             %Actor{
               actor_id: %ActorId{name: name},
-              deactivate_strategy:
-                %ActorDeactivateStrategy{strategy: deactivate_strategy} =
-                  _actor_deactivate_strategy
+              configuration: %ActorConfiguration{
+                deactivate_strategy:
+                  %ActorDeactivateStrategy{strategy: deactivate_strategy} =
+                    _actor_deactivate_strategy
+              }
             } = _actor
         } = state
       ) do
@@ -422,8 +437,10 @@ defmodule Actors.Actor.Entity do
         %EntityState{
           actor: %Actor{
             actor_id: %ActorId{name: name},
-            persistent: persistent,
-            state: actor_state
+            state: actor_state,
+            configuration: %ActorConfiguration{
+              persistent: persistent
+            }
           }
         } = _state
       )
@@ -436,8 +453,10 @@ defmodule Actors.Actor.Entity do
         %EntityState{
           actor: %Actor{
             actor_id: %ActorId{name: name},
-            persistent: true,
-            state: %ActorState{} = actor_state
+            state: %ActorState{} = actor_state,
+            configuration: %ActorConfiguration{
+              persistent: true
+            }
           }
         } = _state
       ) do
