@@ -9,7 +9,13 @@ defmodule Actors do
 
   alias Actors.Registry.ActorRegistry
 
-  alias Eigr.Functions.Protocol.Actors.{Actor, ActorId, ActorSystem, Registry}
+  alias Eigr.Functions.Protocol.Actors.{
+    Actor,
+    ActorId,
+    ActorConfiguration,
+    ActorSystem,
+    Registry
+  }
 
   alias Eigr.Functions.Protocol.{
     InvocationRequest,
@@ -187,6 +193,7 @@ defmodule Actors do
       min_demand: @activate_actors_min_demand,
       max_demand: @activate_actors_max_demand
     )
+    |> Flow.filter(&is_singleton?/1)
     |> Flow.map(fn {actor_name, actor} ->
       Logger.debug("Registering #{actor_name} #{inspect(actor)} on Node: #{inspect(Node.self())}")
 
@@ -200,6 +207,15 @@ defmodule Actors do
     end)
     |> Flow.run()
   end
+
+  defp is_singleton?(
+         {_actor_name,
+          %Actor{configuration: %ActorConfiguration{dispatcher: SINGLETON_DISPATCHER}}}
+       ),
+       do: true
+
+  defp is_singleton?({_actor_name, %Actor{configuration: %ActorConfiguration{dispatcher: _}}}),
+    do: false
 
   defp lookup_actor(actor_name, actor) do
     case ActorEntitySupervisor.lookup_or_create_actor(actor) do
