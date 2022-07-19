@@ -25,6 +25,7 @@ defmodule Actors.Actor.Entity do
   @min_snapshot_threshold 500
   @default_snapshot_timeout 60_000
   @default_deactivate_timeout 90_000
+  @default_invocation_timeout 30_000
   @timeout_factor_range [200, 300, 500, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000]
 
   defmodule EntityState do
@@ -471,8 +472,23 @@ defmodule Actors.Actor.Entity do
     GenServer.call(via(name), :get_state, 20_000)
   end
 
-  def invoke(name, request) do
-    GenServer.call(via(name), {:invocation_request, request}, 30_000)
+  def invoke(
+        name,
+        %InvocationRequest{
+          timeout: timeout
+        } = request
+      )
+      when timeout <= 0 do
+    GenServer.call(via(name), {:invocation_request, request}, @default_invocation_timeout)
+  end
+
+  def invoke(
+        name,
+        %InvocationRequest{
+          timeout: timeout
+        } = request
+      ) do
+    GenServer.call(via(name), {:invocation_request, request}, timeout)
   end
 
   def invoke_async(name, request) do
