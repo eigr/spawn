@@ -515,20 +515,21 @@ defmodule Actors.Actor.Entity do
   defp get_timeout_factor(factor_range) when is_list(factor_range), do: Enum.random(factor_range)
 
   defp handle_persistence_strategy(strategy) do
-    case get_snapshot_strategy(strategy) do
+    case get_initial_snapshot_strategy(strategy) do
       :snapshot ->
         schedule_snapshot_advance(
           @min_snapshot_threshold + get_timeout_factor(@timeout_factor_range)
         )
 
       _ ->
-        Logger.debug("User persistence strategy set #{inspect(strategy)}")
+        Logger.debug("Persistence not based on timeouts is set: #{inspect(strategy)}")
     end
   end
 
-  defp get_snapshot_strategy(strategy) when is_nil(strategy) or strategy == %{}, do: :snapshot
+  defp get_initial_snapshot_strategy(strategy) when is_nil(strategy) or strategy == %{},
+    do: :snapshot
 
-  defp get_snapshot_strategy(
+  defp get_initial_snapshot_strategy(
          %ActorSnapshotStrategy{
            strategy: {:timeout, %TimeoutStrategy{}}
          } = _snapshot_strategy
