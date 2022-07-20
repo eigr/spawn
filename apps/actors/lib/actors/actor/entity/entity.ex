@@ -2,6 +2,7 @@ defmodule Actors.Actor.Entity do
   use GenServer, restart: :transient
   require Logger
 
+  alias Actors.Actor.Entity.{EntityState, Finalizer, Snapshot}
   alias Actors.Actor.StateManager
 
   alias Eigr.Functions.Protocol.Actors.{
@@ -11,6 +12,8 @@ defmodule Actors.Actor.Entity do
     ActorDeactivateStrategy,
     ActorState,
     ActorSnapshotStrategy,
+    CronCommand,
+    TimerCommand,
     TimeoutStrategy
   }
 
@@ -23,21 +26,9 @@ defmodule Actors.Actor.Entity do
   }
 
   @min_snapshot_threshold 500
-  @default_snapshot_timeout 60_000
   @default_deactivate_timeout 90_000
   @default_invocation_timeout 30_000
   @timeout_factor_range [200, 300, 500, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000]
-
-  defmodule EntityState do
-    defstruct actor: nil, state_hash: nil
-
-    @type t(actor, state_hash) :: %EntityState{
-            actor: actor,
-            state_hash: state_hash
-          }
-
-    @type t :: %EntityState{actor: Actor.t(), state_hash: binary()}
-  end
 
   @impl true
   @spec init(EntityState.t()) ::
@@ -49,7 +40,9 @@ defmodule Actors.Actor.Entity do
             configuration: %ActorConfiguration{
               persistent: false,
               deactivate_strategy: deactivate_strategy
-            }
+            },
+            crons: crons,
+            timers: timers
           }
         } = state
       )
@@ -61,7 +54,10 @@ defmodule Actors.Actor.Entity do
     )
 
     strategy = {:timeout, TimeoutStrategy.new!(timeout: @default_deactivate_timeout)}
-    schedule_deactivate(strategy, get_timeout_factor(@timeout_factor_range))
+    Finalizer.schedule_deactivate(strategy, get_timeout_factor(@timeout_factor_range))
+
+    handle_crons(crons)
+    handle_timers(timers)
     {:ok, state}
   end
 
@@ -73,7 +69,9 @@ defmodule Actors.Actor.Entity do
               persistent: false,
               deactivate_strategy:
                 %ActorDeactivateStrategy{strategy: deactivate_strategy} = _dstrategy
-            }
+            },
+            crons: crons,
+            timers: timers
           }
         } = state
       ) do
@@ -85,11 +83,17 @@ defmodule Actors.Actor.Entity do
 
     case deactivate_strategy do
       {:timeout, %TimeoutStrategy{timeout: _timeout}} ->
-        schedule_deactivate(deactivate_strategy, get_timeout_factor(@timeout_factor_range))
+        Finalizer.schedule_deactivate(
+          deactivate_strategy,
+          get_timeout_factor(@timeout_factor_range)
+        )
 
       _ ->
         Logger.warn("Starting Actor without Deactivate strategy set")
     end
+
+    handle_crons(crons)
+    handle_timers(timers)
 
     {:ok, state}
   end
@@ -102,7 +106,9 @@ defmodule Actors.Actor.Entity do
               persistent: true,
               snapshot_strategy: snapshot_strategy,
               deactivate_strategy: deactivate_strategy
-            }
+            },
+            crons: crons,
+            timers: timers
           }
         } = state
       )
@@ -117,7 +123,10 @@ defmodule Actors.Actor.Entity do
     handle_persistence_strategy(snapshot_strategy)
 
     strategy = {:timeout, TimeoutStrategy.new!(timeout: @default_deactivate_timeout)}
-    schedule_deactivate(strategy, get_timeout_factor(@timeout_factor_range))
+    Finalizer.schedule_deactivate(strategy, get_timeout_factor(@timeout_factor_range))
+
+    handle_crons(crons)
+    handle_timers(timers)
 
     {:ok, state, {:continue, :load_state}}
   end
@@ -130,7 +139,9 @@ defmodule Actors.Actor.Entity do
               persistent: true,
               snapshot_strategy: snapshot_strategy,
               deactivate_strategy: %ActorDeactivateStrategy{strategy: deactivate_strategy}
-            }
+            },
+            crons: crons,
+            timers: timers
           }
         } = state
       ) do
@@ -144,13 +155,50 @@ defmodule Actors.Actor.Entity do
 
     case deactivate_strategy do
       {:timeout, %TimeoutStrategy{timeout: _timeout}} ->
-        schedule_deactivate(deactivate_strategy, get_timeout_factor(@timeout_factor_range))
+        Finalizer.schedule_deactivate(
+          deactivate_strategy,
+          get_timeout_factor(@timeout_factor_range)
+        )
 
       _ ->
         Logger.warn("Starting Actor without Deactivate strategy set")
     end
 
+    handle_crons(crons)
+    handle_timers(timers)
+
     {:ok, state, {:continue, :load_state}}
+  end
+
+  defp handle_crons(crons) do
+    crons
+    |> Flow.from_enumerable(
+      min_demand: 1,
+      max_demand: System.schedulers_online()
+    )
+    |> Flow.map(fn %CronCommand{expression: expression, command: command} = cron_command ->
+      Logger.debug("Registering cron command #{inspect(cron_command)}")
+      delay = get_time_from_cron(expression)
+      Process.send_after(self(), {:invoke_cron, command}, delay)
+    end)
+    |> Flow.run()
+  end
+
+  defp handle_timers(timers) do
+    timers
+    |> Flow.from_enumerable(
+      min_demand: 1,
+      max_demand: System.schedulers_online()
+    )
+    |> Flow.map(fn %TimerCommand{seconds: delay, command: command} = timer_command ->
+      Logger.debug("Registering timer command #{inspect(timer_command)}")
+      Process.send_after(self(), {:invoke_timer, command}, delay)
+    end)
+    |> Flow.run()
+  end
+
+  defp get_time_from_cron(_expression) do
+    10000
   end
 
   @impl true
@@ -330,91 +378,16 @@ defmodule Actors.Actor.Entity do
   end
 
   @impl true
-  def handle_info(
-        :snapshot,
-        %EntityState{
-          actor:
-            %Actor{
-              state: actor_state,
-              configuration: %ActorConfiguration{
-                snapshot_strategy: %ActorSnapshotStrategy{
-                  strategy: {:timeout, %TimeoutStrategy{timeout: _timeout}} = snapshot_strategy
-                }
-              }
-            } = _actor
-        } = state
-      )
-      when is_nil(actor_state) or actor_state == %{} do
-    schedule_snapshot(snapshot_strategy)
+  def handle_info(:snapshot, state), do: Snapshot.handle_snapshot(state)
+
+  def handle_info(:deactivate, state), do: Finalizer.handle_deactivate(state)
+
+  def handle_info({:invoke_cron, _command}, state) do
     {:noreply, state}
   end
 
-  def handle_info(
-        :snapshot,
-        %EntityState{
-          state_hash: old_hash,
-          actor:
-            %Actor{
-              actor_id: %ActorId{name: name},
-              state: %ActorState{} = actor_state,
-              configuration: %ActorConfiguration{
-                snapshot_strategy: %ActorSnapshotStrategy{
-                  strategy: {:timeout, %TimeoutStrategy{timeout: timeout}} = snapshot_strategy
-                }
-              }
-            } = _actor
-        } = state
-      ) do
-    # Persist State only when necessary
-    res =
-      if StateManager.is_new?(old_hash, actor_state.state) do
-        Logger.debug("Snapshotting actor #{name}")
-
-        # Execute with timeout equals timeout strategy - 1 to avoid mailbox congestions
-        case StateManager.save_async(name, actor_state, timeout - 1) do
-          {:ok, _, hash} ->
-            {:noreply, %{state | state_hash: hash}}
-
-          {:error, _, _, hash} ->
-            {:noreply, %{state | state_hash: hash}}
-
-          {:error, :unsuccessfully, hash} ->
-            {:noreply, %{state | state_hash: hash}}
-
-          _ ->
-            {:noreply, state}
-        end
-      else
-        {:noreply, state}
-      end
-
-    schedule_snapshot(snapshot_strategy)
-    res
-  end
-
-  def handle_info(
-        :deactivate,
-        %EntityState{
-          actor:
-            %Actor{
-              actor_id: %ActorId{name: name},
-              configuration: %ActorConfiguration{
-                deactivate_strategy:
-                  %ActorDeactivateStrategy{strategy: deactivate_strategy} =
-                    _actor_deactivate_strategy
-              }
-            } = _actor
-        } = state
-      ) do
-    case Process.info(self(), :message_queue_len) do
-      {:message_queue_len, 0} ->
-        Logger.debug("Deactivating actor #{name} for timeout")
-        {:stop, :normal, state}
-
-      _ ->
-        schedule_deactivate(deactivate_strategy)
-        {:noreply, state}
-    end
+  def handle_info({:invoke_timer, _command}, state) do
+    {:noreply, state}
   end
 
   def handle_info(
@@ -446,37 +419,7 @@ defmodule Actors.Actor.Entity do
   end
 
   @impl true
-  def terminate(
-        reason,
-        %EntityState{
-          actor: %Actor{
-            actor_id: %ActorId{name: name},
-            state: actor_state,
-            configuration: %ActorConfiguration{
-              persistent: persistent
-            }
-          }
-        } = _state
-      )
-      when is_nil(actor_state) or persistent == false do
-    Logger.debug("Terminating actor #{name} with reason #{inspect(reason)}")
-  end
-
-  def terminate(
-        reason,
-        %EntityState{
-          actor: %Actor{
-            actor_id: %ActorId{name: name},
-            state: %ActorState{} = actor_state,
-            configuration: %ActorConfiguration{
-              persistent: true
-            }
-          }
-        } = _state
-      ) do
-    StateManager.save(name, actor_state)
-    Logger.debug("Terminating actor #{name} with reason #{inspect(reason)}")
-  end
+  def terminate(reason, state), do: Finalizer.handle_terminate(reason, state)
 
   def start_link(%EntityState{actor: %Actor{actor_id: %ActorId{name: name}}} = state) do
     GenServer.start(__MODULE__, state, name: via(name))
@@ -521,8 +464,11 @@ defmodule Actors.Actor.Entity do
           @min_snapshot_threshold + get_timeout_factor(@timeout_factor_range)
         )
 
+        :ok
+
       _ ->
         Logger.debug("Persistence not based on timeouts is set: #{inspect(strategy)}")
+        :ok
     end
   end
 
@@ -544,54 +490,6 @@ defmodule Actors.Actor.Entity do
         :snapshot,
         timeout
       )
-
-  defp schedule_snapshot(snapshot_strategy, timeout_factor \\ 0),
-    do:
-      Process.send_after(
-        self(),
-        :snapshot,
-        get_snapshot_interval(snapshot_strategy, timeout_factor)
-      )
-
-  defp schedule_deactivate(deactivate_strategy, timeout_factor \\ 0),
-    do:
-      Process.send_after(
-        self(),
-        :deactivate,
-        get_deactivate_interval(deactivate_strategy, timeout_factor)
-      )
-
-  defp get_snapshot_interval(
-         {:timeout, %TimeoutStrategy{timeout: timeout}} = _timeout_strategy,
-         timeout_factor \\ 0
-       )
-       when is_nil(timeout),
-       do: @default_snapshot_timeout + timeout_factor
-
-  defp get_snapshot_interval(
-         {:timeout, %TimeoutStrategy{timeout: timeout}} = _timeout_strategy,
-         timeout_factor
-       ),
-       do: timeout + timeout_factor
-
-  defp get_deactivate_interval(
-         {:timeout, %TimeoutStrategy{timeout: timeout}} = _timeout_strategy,
-         timeout_factor \\ 0
-       )
-       when is_nil(timeout),
-       do: @default_deactivate_timeout + timeout_factor
-
-  defp get_deactivate_interval(
-         {:timeout, %TimeoutStrategy{timeout: timeout}} = _timeout_strategy,
-         timeout_factor
-       ),
-       do: timeout + timeout_factor
-
-  defp get_deactivate_interval(
-         _strategy,
-         timeout_factor
-       ),
-       do: @default_deactivate_timeout + timeout_factor
 
   defp update_state(
          %EntityState{
