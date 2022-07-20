@@ -83,7 +83,14 @@ defmodule Actors.Actor.Entity do
       "Activating actor #{name} in Node #{inspect(Node.self())}. Persistence disabled."
     )
 
-    schedule_deactivate(deactivate_strategy, get_timeout_factor(@timeout_factor_range))
+    case deactivate_strategy do
+      {:timeout, %TimeoutStrategy{timeout: _timeout}} ->
+        schedule_deactivate(deactivate_strategy, get_timeout_factor(@timeout_factor_range))
+
+      _ ->
+        Logger.warn("Starting Actor without Deactivate strategy set")
+    end
+
     {:ok, state}
   end
 
@@ -93,7 +100,7 @@ defmodule Actors.Actor.Entity do
             actor_id: %ActorId{name: name},
             configuration: %ActorConfiguration{
               persistent: true,
-              snapshot_strategy: %ActorSnapshotStrategy{} = _snapshot_strategy,
+              snapshot_strategy: snapshot_strategy,
               deactivate_strategy: deactivate_strategy
             }
           }
@@ -106,11 +113,12 @@ defmodule Actors.Actor.Entity do
       "Activating actor #{name} in Node #{inspect(Node.self())}. Persistence enabled."
     )
 
+    # Handle snapshot strategy first
+    handle_persistence_strategy(snapshot_strategy)
+
     strategy = {:timeout, TimeoutStrategy.new!(timeout: @default_deactivate_timeout)}
     schedule_deactivate(strategy, get_timeout_factor(@timeout_factor_range))
 
-    # Write soon in the first time
-    schedule_snapshot_advance(@min_snapshot_threshold + get_timeout_factor(@timeout_factor_range))
     {:ok, state, {:continue, :load_state}}
   end
 
@@ -120,7 +128,7 @@ defmodule Actors.Actor.Entity do
             actor_id: %ActorId{name: name},
             configuration: %ActorConfiguration{
               persistent: true,
-              snapshot_strategy: %ActorSnapshotStrategy{} = _snapshot_strategy,
+              snapshot_strategy: snapshot_strategy,
               deactivate_strategy: %ActorDeactivateStrategy{strategy: deactivate_strategy}
             }
           }
@@ -132,10 +140,16 @@ defmodule Actors.Actor.Entity do
       "Activating actor #{name} in Node #{inspect(Node.self())}. Persistence enabled."
     )
 
-    schedule_deactivate(deactivate_strategy, get_timeout_factor(@timeout_factor_range))
+    handle_persistence_strategy(snapshot_strategy)
 
-    # Write soon in the first time
-    schedule_snapshot_advance(@min_snapshot_threshold + get_timeout_factor(@timeout_factor_range))
+    case deactivate_strategy do
+      {:timeout, %TimeoutStrategy{timeout: _timeout}} ->
+        schedule_deactivate(deactivate_strategy, get_timeout_factor(@timeout_factor_range))
+
+      _ ->
+        Logger.warn("Starting Actor without Deactivate strategy set")
+    end
+
     {:ok, state, {:continue, :load_state}}
   end
 
@@ -500,6 +514,28 @@ defmodule Actors.Actor.Entity do
 
   defp get_timeout_factor(factor_range) when is_list(factor_range), do: Enum.random(factor_range)
 
+  defp handle_persistence_strategy(strategy) do
+    case get_snapshot_strategy(strategy) do
+      :snapshot ->
+        schedule_snapshot_advance(
+          @min_snapshot_threshold + get_timeout_factor(@timeout_factor_range)
+        )
+
+      _ ->
+        Logger.debug("User persistence strategy set #{inspect(strategy)}")
+    end
+  end
+
+  defp get_snapshot_strategy(strategy) when is_nil(strategy) or strategy == %{}, do: :snapshot
+
+  defp get_snapshot_strategy(
+         %ActorSnapshotStrategy{
+           strategy: {:timeout, %TimeoutStrategy{}}
+         } = _snapshot_strategy
+       ) do
+    :snapshot
+  end
+
   defp schedule_snapshot_advance(timeout),
     do:
       Process.send_after(
@@ -549,6 +585,12 @@ defmodule Actors.Actor.Entity do
          timeout_factor
        ),
        do: timeout + timeout_factor
+
+  defp get_deactivate_interval(
+         _strategy,
+         timeout_factor
+       ),
+       do: @default_deactivate_timeout + timeout_factor
 
   defp update_state(
          %EntityState{
