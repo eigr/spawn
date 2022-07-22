@@ -32,7 +32,7 @@ Code changes to eigr/massa are welcomed via the process below.
    the new functionality should work.
 2. Open a GitHub pull request with your changes and ensure the tests and build
    pass on CI.
-3. A eigr/massa team member will review the changes and may provide feedback to
+3. A eigr team member will review the changes and may provide feedback to
    work on. Depending on the change there may be multiple rounds of feedback.
 4. Once the changes have been approved the code will be rebased into the
    `main` branch.
