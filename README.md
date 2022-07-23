@@ -71,8 +71,12 @@ Another very important part of Spawn is the SDKs implemented in different langua
 
 |  SDK 	                                                                | Language  |
 |---	                                                                |---        |
+|[C# SDK](https://github.com/eigr-labs/spawn-dotnet-sdk)                | C#	    |
 |[Go SDK](https://github.com/eigr-labs/spawn-go-sdk)  	                | Go  	    |
 |[Spring Boot SDK](https://github.com/eigr-labs/spawn-springboot-sdk)  	| Java	    |
+|[NodeJS/Typescript SDK](https://github.com/eigr-labs/spawn-node-sdk)   | Node	    |
+|[Python SDK](https://github.com/eigr-labs/spawn-python-sdk)  	        | Python    |
+|[Rust SDK](https://github.com/eigr-labs/spawn-rust-sdk)  	            | Rust	    |
 
 
 ## Development

@@ -7,6 +7,7 @@ defmodule Actors.Actor.Entity.Invoker do
   alias Eigr.Functions.Protocol.Actors.{
     Actor,
     ActorId,
+    ActorConfiguration,
     ActorState
   }
 
@@ -25,10 +26,17 @@ defmodule Actors.Actor.Entity.Invoker do
           value: payload
         } = _invocation,
         %EntityState{
-          actor: %Actor{state: current_state = _actor_state} = _state_actor
+          actor:
+            %Actor{
+              state: current_state = _actor_state,
+              configuration: %ActorConfiguration{snapshot_strategy: strategy}
+            } = _state_actor,
+          state_hash: hash
         } = state
       )
       when is_nil(current_state) do
+    checkpoint_before(strategy, hash, actor)
+
     payload =
       ActorInvocation.new(
         actor_id: actor,
@@ -51,6 +59,7 @@ defmodule Actors.Actor.Entity.Invoker do
         with %ActorInvocationResponse{
                value: %Value{context: %Context{} = user_ctx} = _value
              } = resp <- ActorInvocationResponse.decode(body) do
+          checkpoint_after(strategy, hash, actor)
           {:reply, {:ok, resp}, update_state(state, user_ctx)}
         else
           error ->
@@ -75,9 +84,16 @@ defmodule Actors.Actor.Entity.Invoker do
           value: payload
         } = _invocation,
         %EntityState{
-          actor: %Actor{state: %ActorState{state: current_state} = _actor_state} = _state_actor
+          actor:
+            %Actor{
+              state: %ActorState{state: current_state} = _actor_state,
+              configuration: %ActorConfiguration{snapshot_strategy: strategy}
+            } = _state_actor,
+          state_hash: hash
         } = state
       ) do
+    checkpoint_before(strategy, hash, actor)
+
     payload =
       ActorInvocation.new(
         actor_id: actor,
@@ -100,6 +116,7 @@ defmodule Actors.Actor.Entity.Invoker do
         with %ActorInvocationResponse{
                value: %Value{context: %Context{} = user_ctx} = _value
              } = resp <- ActorInvocationResponse.decode(body) do
+          checkpoint_after(strategy, hash, actor)
           {:reply, {:ok, resp}, update_state(state, user_ctx)}
         else
           error ->
@@ -115,6 +132,22 @@ defmodule Actors.Actor.Entity.Invoker do
         Logger.error("User Function Actor Invocation Unknown Error")
         {:reply, {:error, error}, state}
     end
+  end
+
+  defp checkpoint_after(strategy, hash, actor)
+       when is_nil(strategy) or strategy == %{} or is_nil(hash),
+       do: :ok
+
+  defp checkpoint_after(strategy, hash, actor) do
+    :ok
+  end
+
+  defp checkpoint_before(strategy, hash, actor)
+       when is_nil(strategy) or strategy == %{} or is_nil(hash),
+       do: :ok
+
+  defp checkpoint_before(strategy, hash, actor) do
+    :ok
   end
 
   defp update_state(
