@@ -620,9 +620,9 @@ defmodule Eigr.Functions.Protocol.Forward do
           __unknown_fields__: [],
           default_value: nil,
           extendee: nil,
-          json_name: "Value",
+          json_name: "value",
           label: :LABEL_OPTIONAL,
-          name: "Value",
+          name: "value",
           number: 3,
           oneof_index: nil,
           options: nil,
@@ -642,7 +642,7 @@ defmodule Eigr.Functions.Protocol.Forward do
 
   field :actor_id, 1, type: Eigr.Functions.Protocol.Actors.ActorId, json_name: "actorId"
   field :command_name, 2, type: :string, json_name: "commandName"
-  field :Value, 3, type: Eigr.Functions.Protocol.Value
+  field :value, 3, type: Eigr.Functions.Protocol.Value
 end
 defmodule Eigr.Functions.Protocol.InvocationRequest do
   @moduledoc false

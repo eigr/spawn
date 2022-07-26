@@ -8,20 +8,27 @@ defmodule Actors.Actor.Entity.Invoker do
     Actor,
     ActorId,
     ActorConfiguration,
-    ActorState
+    ActorSnapshotStrategy,
+    ActorState,
+    AfterCallCommandStrategy,
+    BeforeCallCommandStrategy,
+    TimeoutStrategy,
+    UserDefinedStrategy
   }
 
   alias Eigr.Functions.Protocol.{
     Context,
     ActorInvocation,
     ActorInvocationResponse,
+    Forward,
     InvocationRequest,
+    Pipe,
     Value
   }
 
   def handle_invocation(
         %InvocationRequest{
-          actor_id: %ActorId{name: _name} = actor,
+          actor_id: %ActorId{resource: actor_ref} = actor,
           command_name: command,
           value: payload
         } = _invocation,
@@ -29,13 +36,15 @@ defmodule Actors.Actor.Entity.Invoker do
           actor:
             %Actor{
               state: current_state = _actor_state,
-              configuration: %ActorConfiguration{snapshot_strategy: strategy}
-            } = _state_actor,
+              configuration: %ActorConfiguration{
+                snapshot_strategy: %ActorSnapshotStrategy{strategy: strategy} = _snapshot_strategy
+              }
+            } = state_actor,
           state_hash: hash
         } = state
       )
       when is_nil(current_state) do
-    checkpoint_before(strategy, hash, actor)
+    checkpoint_before(strategy, hash, actor_ref, state_actor)
 
     payload =
       ActorInvocation.new(
@@ -59,7 +68,7 @@ defmodule Actors.Actor.Entity.Invoker do
         with %ActorInvocationResponse{
                value: %Value{context: %Context{} = user_ctx} = _value
              } = resp <- ActorInvocationResponse.decode(body) do
-          checkpoint_after(strategy, hash, actor)
+          checkpoint_after(strategy, hash, actor_ref, state_actor)
           {:reply, {:ok, resp}, update_state(state, user_ctx)}
         else
           error ->
@@ -79,7 +88,7 @@ defmodule Actors.Actor.Entity.Invoker do
 
   def handle_invocation(
         %InvocationRequest{
-          actor_id: %ActorId{} = actor,
+          actor_id: %ActorId{resource: actor_ref} = actor,
           command_name: command,
           value: payload
         } = _invocation,
@@ -87,12 +96,14 @@ defmodule Actors.Actor.Entity.Invoker do
           actor:
             %Actor{
               state: %ActorState{state: current_state} = _actor_state,
-              configuration: %ActorConfiguration{snapshot_strategy: strategy}
-            } = _state_actor,
+              configuration: %ActorConfiguration{
+                snapshot_strategy: %ActorSnapshotStrategy{strategy: strategy} = _snapshot_strategy
+              }
+            } = state_actor,
           state_hash: hash
         } = state
       ) do
-    checkpoint_before(strategy, hash, actor)
+    checkpoint_before(strategy, hash, actor_ref, state_actor)
 
     payload =
       ActorInvocation.new(
@@ -116,7 +127,11 @@ defmodule Actors.Actor.Entity.Invoker do
         with %ActorInvocationResponse{
                value: %Value{context: %Context{} = user_ctx} = _value
              } = resp <- ActorInvocationResponse.decode(body) do
-          checkpoint_after(strategy, hash, actor)
+          # Handle result and workflows
+          handle_result(resp)
+
+          # Check persistence strategies and save state if necessary
+          checkpoint_after(strategy, hash, actor_ref, state_actor)
           {:reply, {:ok, resp}, update_state(state, user_ctx)}
         else
           error ->
@@ -134,19 +149,81 @@ defmodule Actors.Actor.Entity.Invoker do
     end
   end
 
-  defp checkpoint_after(strategy, hash, actor)
+  defp handle_result(%ActorInvocationResponse{workflow: workflow, effects: _effects} = _result)
+       when is_nil(workflow) or workflow == %{} do
+    # Handle simple result without workflows
+  end
+
+  defp handle_result(
+         %ActorInvocationResponse{
+           workflow:
+             {:forward,
+              %Forward{actor_id: target_actor, command_name: command, value: target_value}},
+           effects: effects
+         } = result
+       ) do
+    # Handle forward result
+  end
+
+  defp handle_result(
+         %ActorInvocationResponse{
+           value: value,
+           workflow: {:pipe, %Pipe{actor_id: target_actor, command_name: command}},
+           effects: effects
+         } = result
+       ) do
+    # Handle pipe result
+  end
+
+  defp checkpoint_after(strategy, hash, _actor_ref, _actor)
        when is_nil(strategy) or strategy == %{} or is_nil(hash),
        do: :ok
 
-  defp checkpoint_after(strategy, hash, actor) do
+  defp checkpoint_after({:after_command, %AfterCallCommandStrategy{}}, hash, actor_ref, actor) do
+    if StateManager.is_new?(hash, actor.state) do
+      Logger.debug("AfterCallCommandStrategy triggered. Snapshotting actor #{actor_ref}")
+      StateManager.save_async(actor_ref, actor.state)
+    end
+
     :ok
   end
 
-  defp checkpoint_before(strategy, hash, actor)
+  defp checkpoint_after({:timeout, %TimeoutStrategy{}}, _hash, _actor_ref, _actor), do: :ok
+
+  defp checkpoint_after({:user_defined, %UserDefinedStrategy{}}, _hash, _actor_ref, _actor),
+    do: :ok
+
+  defp checkpoint_after(
+         {:before_command, %BeforeCallCommandStrategy{}},
+         _hash,
+         _actor_ref,
+         _actor
+       ),
+       do: :ok
+
+  defp checkpoint_before(strategy, hash, _actor_ref, _actor)
        when is_nil(strategy) or strategy == %{} or is_nil(hash),
        do: :ok
 
-  defp checkpoint_before(strategy, hash, actor) do
+  defp checkpoint_before(
+         {:after_command, %AfterCallCommandStrategy{}},
+         _hash,
+         _actor_ref,
+         _actor
+       ),
+       do: :ok
+
+  defp checkpoint_before({:timeout, %TimeoutStrategy{}}, _hash, _actor_ref, _actor), do: :ok
+
+  defp checkpoint_before({:user_defined, %UserDefinedStrategy{}}, _hash, _actor_ref, _actor),
+    do: :ok
+
+  defp checkpoint_before({:before_command, %BeforeCallCommandStrategy{}}, hash, actor_ref, actor) do
+    if StateManager.is_new?(hash, actor.state) do
+      Logger.debug("BeforeCallCommandStrategy triggered. Snapshotting actor #{actor_ref}")
+      StateManager.save_async(actor_ref, actor.state)
+    end
+
     :ok
   end
 

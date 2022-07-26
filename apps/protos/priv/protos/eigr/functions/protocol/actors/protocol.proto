@@ -195,7 +195,7 @@ message Forward {
 
     string command_name = 2;
 
-    Value Value = 3;
+    Value value = 3;
 }
 
 // The user function when it wants to send a message to an Actor uses the InvocationRequest message type.
