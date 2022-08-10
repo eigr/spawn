@@ -29,7 +29,7 @@ defmodule Activators.MixProject do
       {:broadway_kafka, "~> 0.3"},
       {:broadway_rabbitmq, "~> 0.7"},
       {:broadway_sqs, "~> 0.7"},
-      {:cloudevents, "~> 0.4.0"},
+      {:cloudevents, "~> 0.5.1"},
       # {:goth, "~> 1.0"},
       {:hackney, "~> 1.9"}
     ]
