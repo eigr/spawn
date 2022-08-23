@@ -34,15 +34,14 @@ defmodule Operator.Controllers.V1.Activator do
 
   @scope :cluster
   @names %{
-    plural: "actorfunctions",
-    singular: "actorfunction",
-    kind: "ActorFunction",
+    plural: "activators",
+    singular: "activator",
+    kind: "Activator",
     shortNames: [
-      "af",
-      "ac",
-      "acfs",
-      "actors",
-      "actorfunctions"
+      "act",
+      "acts",
+      "activator",
+      "activators"
     ]
   }
 
