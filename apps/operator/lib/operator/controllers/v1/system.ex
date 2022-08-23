@@ -1,20 +1,21 @@
-defmodule Operator.Controllers.V1.ActorFunction do
+defmodule Operator.Controllers.V1.ActorSystem do
   @doc """
-  Operator.Controllers.V1.ActorFunction
+  Operator.Controllers.V1.ActorSystem
 
   ### Examples
   ```yaml
   ---
   apiVersion: spawn.eigr.io/v1
-  kind: ActorFunction
+  kind: ActorSystem
   metadata:
-  name: actors-test # Mandatory. Name of the function
-  # The namespace where the function will be deployed to the cluster.
-  # All proxies deployed in a given namespace form a cluster, that is, they are visible to each other.
-  namespace: default # Optional. Default namespace is "default"
+    name: actors-store # Mandatory. Name of the state store
+    # The namespace where the function will be deployed to the cluster.
+    # All proxies deployed in a given namespace form a cluster, that is, they are visible to each other.
+    namespace: default # Optional. Default namespace is "default"
   spec:
-    function:
-      image: eigr/spawn-springboot-examples:latest # Mandatory
+    store:
+      type: Postgres
+      paramsSecretRef: postgres-connection-secret
   """
   use Bonny.Controller
   require Logger
@@ -33,15 +34,15 @@ defmodule Operator.Controllers.V1.ActorFunction do
 
   @scope :cluster
   @names %{
-    plural: "actorfunctions",
-    singular: "actorfunction",
-    kind: "ActorFunction",
+    plural: "actorsystems",
+    singular: "actorsystem",
+    kind: "ActorSystem",
     shortNames: [
-      "af",
-      "ac",
-      "acfs",
-      "actors",
-      "actorfunctions"
+      "as",
+      "actorsys",
+      "actorsystem",
+      "actorsystems",
+      "system"
     ]
   }
 
