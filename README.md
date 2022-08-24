@@ -452,7 +452,7 @@ This command will compile the maven application and thanks to the jib maven plug
 
 Now that we have created our container containing our Actor Host Function we must deploy it in a Kubernetes cluster that has the Eigr Functions Controller installed (See more about this process in the section on installation).
 
-In a directory of your choice, create a file called system.yaml with the following content:
+In a directory of your choice, create a file called ***system.yaml*** with the following content:
 
 ```yaml
 ---
@@ -468,7 +468,7 @@ spec:
 
 This file will be responsible for creating a system of actors in the cluster.
 
-Now create a new file called node.yaml with the following content:
+Now create a new file called ***node.yaml*** with the following content:
 
 ```yaml
 ---
