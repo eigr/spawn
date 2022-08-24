@@ -1,0 +1,19 @@
+---
+apiVersion: spawn.eigr.io/v1
+kind: Activator
+metadata:
+  name: my-pubsub-activator # Mandatory. Name of the function
+  namespace: default # Optional. Default namespace is "default"
+spec:
+  activator:
+    type: GooglePubSub
+    paramsSecretRef: pubsub-connection-secret
+  bindings:
+    source:
+      queue: my.event.queue
+    sink:
+      actor: my-actor-name
+      command: handle_command
+      instance-id-binding:
+        type: header # Possible: none, header, attribute
+        name: X-Actor-Instance-Id

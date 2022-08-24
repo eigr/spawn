@@ -1,0 +1,10 @@
+---
+apiVersion: spawn.eigr.io/v1
+kind: Node
+metadata:
+  name: my-node-app # Mandatory. Name of the Node containing Actor Host Functions
+  system: my-actor-system # mandatory. Name of the ActorSystem declared in ActorSystem CRD
+  namespace: default # Optional. Default namespace is "default"
+spec:
+  function:
+    image: eigr/spawn-springboot-examples:latest # Mandatory
