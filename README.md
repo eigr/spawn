@@ -55,9 +55,32 @@ https://medium.com/nerd-for-tech/microservice-design-pattern-sidecar-sidekick-pa
 
 Spawn takes the distribution, fault tolerance, and high concurrent capability of the Actor Model in its most famous implementation, which is the BEAM Erlang VM implementation, and adds to that the flexibility and dynamism that the sidecar pattern offers to the build cross-platform and multi-language microservice-oriented architectures.
 
-To achieve these goals, the Spawn architecture is composed of the following components:
+To achieve these goals, the Eigr Functions Spawn architecture is composed of the following components:
 
-***TODO insert diagram here.***
+![image info](docs/diagrams/spawn-architecture.jpg)
+
+As seen above, the Eigr Functions Spawn platform architecture is separated into different components, each with their own responsibility. We will detail the components below.
+
+* **k8s Operator:** Responsible for interacting with the Kubernetes API and coordinating the deployments of the other components. The user interacts with it using our specific CRDs ([Custom Resource Definitions](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/)). We'll talk more about our CRDs later.
+
+* **Cloud Storage:** Despite not being directly part of the platform, it is worth mentioning here that Spawn uses user-defined persistent storage to store the state of its Actors. Different types of persistent storage can be used, such as relational databases such as MySQL, Postgres, among others. In the future, we will support other types of databases, both relational and non-relational.
+
+* **Activators:** Activators are applications responsible for ingesting data from external sources for certain user-defined actors and are configured through their own CRD. They are basically responsible for listening to a user-configured event and forward this event through a direct invocation to a specific target actor. Different types of Activators exist to consume events from different providers such as Google PubSub, RabbitMQ, Amazon SQS and etc.
+
+* **Actor Host Function:** The container where the user defines his actors and all the business logic of his actors around the state of these actors through a specific SDK for each supported programming language.
+
+* **Spawn Sidecar Proxy:** The centerpiece of the gear is our sidecar proxy, in turn it is responsible for managing the entire lifecycle of user-defined actors through our SDKs and also responsible for managing the state of these actors in persistent storage. The Spawn proxy is also capable of allowing the user to develop different integration flows between its actors such as Forwards, Effects, Pipes, and in the future other important standards such as Saga, Aggregators, Scatter-Gather, external invocations, and others.
+Our proxy connects directly and transparently to all cluster members without the need for a single point of failure, ie a true mesh network.
+
+## Custom Resources
+
+Spawn defines some custom Resources for the user to interact with the API for deploying Spawn artifacts in Kubernetes. We'll talk more about these CRDs in the Getting Started section but for now we'll list each of these resources below for a general understanding of the concepts:
+
+* **ActorSystem CRD:** The ActorSystem CRD must be defined by the user before it attempts to deploy any other Spawn features. In it, the user defines some general parameters for the functioning of the actor cluster, as well as defines the parameters of the persistent storage connection for a given system. Multiple ActorSystems can be defined but remember that they must be referenced equally in the Actor Host Functions. Examples of this CRD can be found in the [examples/k8s folder](examples/k8s/system.yaml).
+
+* **Node CRD:** A Node is a cluster member application. A Node by definition is a Kubernetes Deployment and will contain two containers, one containing the Actor Host Function user application and another container for the Spawn proxy which is responsible for connecting to the proxies cluster via Distributed Erlang and also for providing all the necessary abstractions for the functioning of the system such as state management, activation and passivation of actors, among other infrastructure tasks. Examples of this CRD can be found in the [examples/k8s folder](examples/k8s/node.yaml).
+
+* **Activator CRD:** Activator CRD defines any means of inputting supported events such as queues, topics, http or grpc endpoints and maps these events to the appropriate actor that will handle them. Examples of this CRD can be found in the [examples/k8s folder](examples/k8s/activators/amqp.yaml).
 
 ## The Protocol
 
