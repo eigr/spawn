@@ -136,7 +136,7 @@ TODO
 More complete guides or examples can be found on the official page or in the repositories of each SDK available.
 For now let's start with a classic Hello World written with the help of the sdk for Springboot.
 
-Let's start by defining a basic springboot maven project with the following pom.xml file:
+Let's start by defining a basic springboot maven project with the following ***pom.xml*** file:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
