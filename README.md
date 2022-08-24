@@ -1,10 +1,10 @@
 # Spawn
 
-**Actor Mesh Framework**
+**Actor Mesh Platform**
 
 ## Overview
 
-Spawn is based on the sidecar proxy pattern to provide a multi-language Actor Model framework.
+Spawn is based on the sidecar proxy pattern to provide a multi-language Actor Model framework and platform.
 Spawn's technology stack on top of BEAM VM (Erlang's virtual machine) provides support for different languages from its native Actor model.
 
 Spawn is made up of the following components:
@@ -15,7 +15,20 @@ Spawn is made up of the following components:
 
 ## What problem Spawn solves
 
-TODO
+With the advancement of cloud computing, Edge computing, containers, orchestrators, the increase in demand, as well as in the supply, of data, the development of global scale products aimed at serving audiences in various regions of our world make the development of software today is a task of enormous complexity. It is not uncommon to see dozens, if not hundreds of non-functional requirements that need to be met to build a system. All this complexity falls on the developer, who often does not have all the knowledge or time to build such systems satisfactorily.
+When studying this scenario, we realize that many of these current problems belong to the following groups:
+
+- Fast delivery and business oriented.
+- State management.
+- Scalability.
+- Resilience and fault tolerance.
+- Distributed and/or regionally distributed computing.
+- Integration Services.
+- Polyglot services.
+
+The actor model, which Spawn is based on, can solve almost all the problems on this list, with Scalability, resilience, fault tolerance, and state management by far the top success stories of different known actor model implementations. So what we needed to do was add Integration Services, fast, business-oriented delivery, distributed computing, and multilingual services to the recipe so we could revolutionize software development as we know it today. That's exactly what we did with our platform called Eigr Functions Spawn.
+Spawn takes care of the entire infrastructure layer by abstracting all the complex issues that are not part of the business domain it is intended to address.
+Particularly domains such as games, machine learning and AI, real-time data ingestion, integration between services, financial or transactional services, logistics are some of the domains that can be mastered by the Eigr Functions Spawn platform.
 
 ## Spawn Architecture
 
