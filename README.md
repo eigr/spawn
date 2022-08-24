@@ -31,7 +31,7 @@ The actor model, which Spawn is based on, can solve almost all the problems on t
 That's exactly what we did with our platform called Eigr Functions Spawn.
 
 Spawn takes care of the entire infrastructure layer by abstracting all the complex issues that are not part of the business domain it is intended to address.
-Particularly domains such as games, machine learning and AI, real-time data ingestion, integration between services, financial or transactional services, logistics are some of the domains that can be mastered by the Eigr Functions Spawn platform.
+Particularly domains such as game development, machine learning pipelines, complex event processing, real-time data ingestion, service integrations, financial or transactional services, logistics are some of the domains that can be mastered by the Eigr Functions Spawn platform.
 
 ## Spawn Architecture
 
