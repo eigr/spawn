@@ -1,10 +1,10 @@
 # Spawn
 
-**Actor Mesh Framework**
+**Actor Mesh Platform**
 
 ## Overview
 
-Spawn is based on the sidecar proxy pattern to provide a multi-language Actor Model framework.
+Spawn is based on the sidecar proxy pattern to provide a multi-language Actor Model framework and platform.
 Spawn's technology stack on top of BEAM VM (Erlang's virtual machine) provides support for different languages from its native Actor model.
 
 Spawn is made up of the following components:
@@ -13,43 +13,25 @@ Spawn is made up of the following components:
 * A Sidecar Proxy written in Elixir that implements this protocol and persistent storage adapters.
 * Support libraries in different programming languages.
 
-## The Actor Model
+## What problem Spawn solves
 
-According to [Wikipedia](https://en.wikipedia.org/wiki/Wikip%C3%A9dia:P%C3%A1gina_principal) Actor Model is:
+With the advancement of Cloud Computing, Edge computing, Containers, Orchestrators, Data Oriented Services, and development of global scale products aimed at serving audiences in various regions of our world make the development of software today is a task of enormous complexity. It is not uncommon to see dozens, if not hundreds of non-functional requirements that need to be met to build a system. All this complexity falls on the developer, who often does not have all the knowledge or time to build such systems satisfactorily.
+When studying this scenario, we realize that many of these current problems belong to the following groups:
 
-"A mathematical model of concurrent computation that treats actor as the universal primitive of concurrent computation. In response to a message it receives, an actor can: [make local decisions, create more actors, send more messages, and determine how to respond to the next message received](https://www.youtube.com/watch?v=7erJ1DV_Tlo&t=22s). Actors may modify their own private state, but can only affect each other indirectly through messaging (removing the need for lock-based synchronization).
+- Fast delivery and business oriented.
+- State management.
+- Scalability.
+- Resilience and fault tolerance.
+- Distributed and/or regionally distributed computing.
+- Integration Services.
+- Polyglot services.
 
-The actor model originated in [1973](https://www.ijcai.org/Proceedings/73/Papers/027B.pdf). It has been used both as a framework for a theoretical understanding of computation and as the theoretical basis for several practical implementations of concurrent systems."
+The actor model, which Spawn is based on, can solve almost all the problems on this list, with Scalability, resilience, fault tolerance, and state management by far the top success stories of different known actor model implementations. So what we needed to do was add Integration Services, fast, business-oriented delivery, distributed computing, and polyglot services to the recipe so we could revolutionize software development as we know it today. 
 
-The Actor Model was proposed by Carl Hewitt, Peter Bishop, and Richard Steiger and is inspired, according to him, by several characteristics of the physical world.
-Although it emerged in the 70s of the last century, only in the last two decades of our century has this model gained strength in the software engineering communities due to the massive amount of existing data and the performance and distribution requirements of the most current applications. 
+That's exactly what we did with our platform called Eigr Functions Spawn.
 
-For more information about the Actor Model, see the following links:
-
-https://en.wikipedia.org/wiki/Actor_model
-
-https://codesync.global/media/almost-actors-comparing-pony-language-to-beam-languages-erlang-elixir/
-
-https://www.infoworld.com/article/2077999/understanding-actor-concurrency--part-1--actors-in-erlang.html
-
-https://doc.akka.io/docs/akka/current/general/actors.html
-
-
-## The Sidecar Pattern
-
-The sidecar pattern is a pattern for the implementation of Service Meshs and Microservices architectures where an external software is placed close to the real service in order to provide for it non-functional characteristics such as interfacing with the underlying network, routing, data transformation between other orthogonal requirements to the business.
-
-The sidecar allows components to access services from any location or using any programming language. As a communication proxy mechanism, the sidecar can also act as a translator for cross-language dependency management. This is beneficial for distributed applications with complex integration requirements, and also for application systems that rely on external business integrations.
-
-For more information about the Sidecar Pattern, see the following links:
-
-https://www.techtarget.com/searchapparchitecture/tip/The-role-of-sidecars-in-microservices-architecture
-
-https://docs.microsoft.com/en-us/azure/architecture/patterns/sidecar
-
-https://www.youtube.com/watch?v=j7JKkbAiWuI
-
-https://medium.com/nerd-for-tech/microservice-design-pattern-sidecar-sidekick-pattern-dbcea9bed783
+Spawn takes care of the entire infrastructure layer by abstracting all the complex issues that are not part of the business domain it is intended to address.
+Particularly domains such as game development, machine learning pipelines, complex event processing, real-time data ingestion, service integrations, financial or transactional services, logistics are some of the domains that can be mastered by the Eigr Functions Spawn platform.
 
 ## Spawn Architecture
 
@@ -82,12 +64,6 @@ Spawn defines some custom Resources for the user to interact with the API for de
 
 * **Activator CRD:** Activator CRD defines any means of inputting supported events such as queues, topics, http or grpc endpoints and maps these events to the appropriate actor that will handle them. Examples of this CRD can be found in the [examples/k8s folder](examples/k8s/activators/amqp.yaml).
 
-## The Protocol
-
-Spawn is based on [Protocol Buffers](https://developers.google.com/protocol-buffers) and a super simple [HTTP stack](https://github.com/eigr-labs/spawn/blob/main/docs/protocol.md) to allow a heterogeneous layer of communication between different services which can in turn be implemented in any language that supports the gRPC protocol.
-
-The Spawn protocol itself is described [here](https://github.com/eigr-labs/spawn/blob/main/apps/protos/priv/protos/eigr/functions/protocol/actors/protocol.proto).
-
 ## SDKs
 
 Another very important part of Spawn is the SDKs implemented in different languages that aim to abstract all the specifics of the protocol and expose an easy and intuitive API to developers.
@@ -102,7 +78,61 @@ Another very important part of Spawn is the SDKs implemented in different langua
 |[Rust SDK](https://github.com/eigr-labs/spawn-rust-sdk)  	            | Rust	    |
 
 
-## Development
+## Main Concepts
+
+In the sections below we will talk about the main concepts that guided our architectural choices.
+
+### The Actor Model
+
+According to [Wikipedia](https://en.wikipedia.org/wiki/Wikip%C3%A9dia:P%C3%A1gina_principal) Actor Model is:
+
+"A mathematical model of concurrent computation that treats actor as the universal primitive of concurrent computation. In response to a message it receives, an actor can: [make local decisions, create more actors, send more messages, and determine how to respond to the next message received](https://www.youtube.com/watch?v=7erJ1DV_Tlo&t=22s). Actors may modify their own private state, but can only affect each other indirectly through messaging (removing the need for lock-based synchronization).
+
+The actor model originated in [1973](https://www.ijcai.org/Proceedings/73/Papers/027B.pdf). It has been used both as a framework for a theoretical understanding of computation and as the theoretical basis for several practical implementations of concurrent systems."
+
+The Actor Model was proposed by Carl Hewitt, Peter Bishop, and Richard Steiger and is inspired, according to him, by several characteristics of the physical world.
+Although it emerged in the 70s of the last century, only in the last two decades of our century has this model gained strength in the software engineering communities due to the massive amount of existing data and the performance and distribution requirements of the most current applications. 
+
+For more information about the Actor Model, see the following links:
+
+https://en.wikipedia.org/wiki/Actor_model
+
+https://codesync.global/media/almost-actors-comparing-pony-language-to-beam-languages-erlang-elixir/
+
+https://www.infoworld.com/article/2077999/understanding-actor-concurrency--part-1--actors-in-erlang.html
+
+https://doc.akka.io/docs/akka/current/general/actors.html
+
+
+### The Sidecar Pattern
+
+The sidecar pattern is a pattern for the implementation of Service Meshs and Microservices architectures where an external software is placed close to the real service in order to provide for it non-functional characteristics such as interfacing with the underlying network, routing, data transformation between other orthogonal requirements to the business.
+
+The sidecar allows components to access services from any location or using any programming language. As a communication proxy mechanism, the sidecar can also act as a translator for cross-language dependency management. This is beneficial for distributed applications with complex integration requirements, and also for application systems that rely on external business integrations.
+
+For more information about the Sidecar Pattern, see the following links:
+
+https://www.techtarget.com/searchapparchitecture/tip/The-role-of-sidecars-in-microservices-architecture
+
+https://docs.microsoft.com/en-us/azure/architecture/patterns/sidecar
+
+https://www.youtube.com/watch?v=j7JKkbAiWuI
+
+https://medium.com/nerd-for-tech/microservice-design-pattern-sidecar-sidekick-pattern-dbcea9bed783
+
+
+### The Protocol
+
+Spawn is based on [Protocol Buffers](https://developers.google.com/protocol-buffers) and a super simple [HTTP stack](https://github.com/eigr-labs/spawn/blob/main/docs/protocol.md) to allow a heterogeneous layer of communication between different services which can in turn be implemented in any language that supports the gRPC protocol.
+
+The Spawn protocol itself is described [here](https://github.com/eigr-labs/spawn/blob/main/apps/protos/priv/protos/eigr/functions/protocol/actors/protocol.proto).
+
+
+## Getting Started
+
+TODO
+
+## Project Development
 
 Run:
 
