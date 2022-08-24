@@ -60,7 +60,7 @@ Spawn defines some custom Resources for the user to interact with the API for de
 
 * **ActorSystem CRD:** The ActorSystem CRD must be defined by the user before it attempts to deploy any other Spawn features. In it, the user defines some general parameters for the functioning of the actor cluster, as well as defines the parameters of the persistent storage connection for a given system. Multiple ActorSystems can be defined but remember that they must be referenced equally in the Actor Host Functions. Examples of this CRD can be found in the [examples/k8s folder](examples/k8s/system.yaml).
 
-* **Node CRD:** A Node is a cluster member application. A Node by definition is a Kubernetes Deployment and will contain two containers, one containing the Actor Host Function user application and another container for the Spawn proxy which is responsible for connecting to the proxies cluster via Distributed Erlang and also for providing all the necessary abstractions for the functioning of the system such as state management, activation and passivation of actors, among other infrastructure tasks. Examples of this CRD can be found in the [examples/k8s folder](examples/k8s/node.yaml).
+* **ActorNode CRD:** A ActorNode is a cluster member application. A ActorNode by definition is a Kubernetes Deployment and will contain two containers, one containing the Actor Host Function user application and another container for the Spawn proxy which is responsible for connecting to the proxies cluster via Distributed Erlang and also for providing all the necessary abstractions for the functioning of the system such as state management, activation and passivation of actors, among other infrastructure tasks. Examples of this CRD can be found in the [examples/k8s folder](examples/k8s/node.yaml).
 
 * **Activator CRD:** Activator CRD defines any means of inputting supported events such as queues, topics, http or grpc endpoints and maps these events to the appropriate actor that will handle them. Examples of this CRD can be found in the [examples/k8s folder](examples/k8s/activators/amqp.yaml).
 
@@ -127,10 +127,375 @@ Spawn is based on [Protocol Buffers](https://developers.google.com/protocol-buff
 
 The Spawn protocol itself is described [here](https://github.com/eigr-labs/spawn/blob/main/apps/protos/priv/protos/eigr/functions/protocol/actors/protocol.proto).
 
+## Installation
+
+TODO
 
 ## Getting Started
 
-TODO
+More complete guides or examples can be found on the official page or in the repositories of each SDK available.
+For now let's start with a classic Hello World written with the help of the sdk for Springboot.
+
+Let's start by defining a basic springboot maven project with the following pom.xml file:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>io.eigr</groupId>
+    <artifactId>spawn-springboot-examples</artifactId>
+    <version>0.1.9</version>
+    <name>spawn-springboot-examples</name>
+    <url>http://www.example.com</url>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+    </properties>
+
+    <parent>
+        <groupId>io.eigr</groupId>
+        <artifactId>spawn-springboot-sdk</artifactId>
+        <version>0.1.9</version>
+    </parent>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>2.7.0</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>testcontainers-bom</artifactId>
+                <version>1.17.2</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.eigr</groupId>
+            <artifactId>spawn-springboot-starter</artifactId>
+            <version>0.1.9</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.2</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <extensions>
+            <extension>
+                <groupId>kr.motd.maven</groupId>
+                <artifactId>os-maven-plugin</artifactId>
+                <version>1.6.2</version>
+            </extension>
+        </extensions>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>org.xolstice.maven.plugins</groupId>
+                <artifactId>protobuf-maven-plugin</artifactId>
+                <version>0.6.1</version>
+                <configuration>
+                    <protocArtifact>com.google.protobuf:protoc:3.19.2:exe:${os.detected.classifier}</protocArtifact>
+                    <pluginId>grpc-java</pluginId>
+                    <pluginArtifact>io.grpc:protoc-gen-grpc-java:1.47.0:exe:${os.detected.classifier}</pluginArtifact>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>compile</goal>
+                            <goal>compile-custom</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.7</version>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.5.1</version>
+                <executions>
+                    <execution>
+                        <id>getClasspathFilenames</id>
+                        <goals>
+                            <!-- provides the jars of the classpath as properties inside of maven
+                                 so that we can refer to one of the jars in the exec plugin config below -->
+                            <goal>properties</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <version>3.1.4</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <to>
+                        <image>my-dockerhub-repo/spawn-springboot-examples</image>
+                    </to>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+```
+
+As Spawn depends on the types of data exchanged between actors being defined via Protobuf types we will have to create a folder to store such files in our project. In maven projects this can be done by creating a folder under ***src/main/proto***. In our example we will create the folders ***src/main/proto/io/eigr/spawn/example*** and inside the example folder we will create the file **example.proto** with the following content:
+
+```proto
+syntax = "proto3";
+
+package io.eigr.spawn.example;
+
+option java_multiple_files = true;
+option java_package = "io.eigr.spawn.example";
+option java_outer_classname = "ExampleProtos";
+
+message MyState {
+  int32 value = 1;
+}
+
+message MyBusinessMessage {
+  int32 value = 1;
+}
+```
+
+As you can see, we have defined two types of messages, one that will be used to store the state of our actor to be created later, and the other to be able to transmit business information that will be used in our actor's methods.
+
+Now we can start writing some code. Let's start by defining our Actor class:
+
+```java
+package io.eigr.spawn.example;
+
+import io.eigr.spawn.springboot.starter.ActorContext;
+import io.eigr.spawn.springboot.starter.Value;
+import io.eigr.spawn.springboot.starter.annotations.ActorEntity;
+import io.eigr.spawn.springboot.starter.annotations.Command;
+import lombok.extern.log4j.Log4j2;
+
+import java.util.Optional;
+
+@Log4j2
+@ActorEntity(name = "joe", stateType = MyState.class, snapshotTimeout = 10000, deactivatedTimeout = 50000)
+public class JoeActor {
+
+    @Command
+    public Value get(ActorContext<MyState> context) {
+        log.info("Received invocation. Context: {}", context);
+        if (context.getState().isPresent()) {
+            MyState state = context.getState().get();
+
+            return Value.ActorValue.<MyState, MyBusinessMessage>at()
+                    .state(state)
+                    .value(MyBusinessMessage.newBuilder()
+                            .setValue(state.getValue())
+                            .build())
+                    .reply();
+        }
+
+        return Value.ActorValue.at()
+                .empty();
+    }
+
+    @Command(name = "sum", inputType = MyBusinessMessage.class)
+    public Value sum(MyBusinessMessage msg, ActorContext<MyState> context) {
+        log.info("Received invocation. Message: {}. Context: {}", msg, context);
+
+        int value = 1;
+        if (context.getState().isPresent()) {
+            log.info("State is present and value is {}", context.getState().get());
+            Optional<MyState> oldState = context.getState();
+            value = oldState.get().getValue() + msg.getValue();
+        } else {
+            log.info("State is NOT present. Msg getValue is {}", msg.getValue());
+            value = msg.getValue();
+        }
+
+        log.info("New Value is {}", value);
+        MyBusinessMessage resultValue = MyBusinessMessage.newBuilder()
+                .setValue(value)
+                .build();
+
+        return Value.ActorValue.at()
+                .value(resultValue)
+                .state(updateState(value))
+                .reply();
+    }
+
+    private MyState updateState(int value) {
+        return MyState.newBuilder()
+                .setValue(value)
+                .build();
+    }
+
+}
+
+```
+
+The code itself is somewhat self explanatory but you can check out the Springboot SDK documentation if you want to know all the details. Basically we define an Actor (our class because we are using Java which is object oriented) which in turn has two methods, one that only returns the value of the current state of our actor and another method that receives the current state but also receives our message of business. 
+
+Note that the state of an actor will always be passed as an argument through the Context type, while the business message will always be passed directly as the method's first argument.
+
+The sum method, in turn, receives the business message, extracts the value passed and adds it to the value of the actor's current state.
+
+Now that we've defined our first actor, it's time to write our Main class:
+
+```java
+package io.eigr.spawn.example;
+
+import io.eigr.spawn.springboot.starter.SpawnSystem;
+import io.eigr.spawn.springboot.starter.autoconfigure.EnableSpawn;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
+
+@Log4j2
+@EnableSpawn
+@SpringBootApplication
+@EntityScan("io.eigr.spawn.example")
+public class App {
+    public static void main(String[] args) {SpringApplication.run(App.class, args);}
+
+    @Bean
+    public CommandLineRunner commandLineRunner(ApplicationContext ctx) {
+        return args -> {
+            SpawnSystem actorSystem = ctx.getBean(SpawnSystem.class);
+            log.info("Let's invoke some Actor");
+            for (int i = 0; i < 10000; i++) {
+                MyBusinessMessage arg = MyBusinessMessage.newBuilder()
+                        .setValue(i)
+                        .build();
+
+                MyBusinessMessage sumResult = (MyBusinessMessage) actorSystem.invoke("joe", "sum", arg, MyBusinessMessage.class);
+                log.info("Actor invoke Sum Actor Action value result: {}", sumResult.getValue());
+            }
+
+            MyBusinessMessage getResult = (MyBusinessMessage) actorSystem.invoke("joe", "get", MyBusinessMessage.class);
+            log.info("Actor invoke Get Actor Action value result: {}", getResult.getValue());
+        };
+    }
+}
+```
+
+Once again the code is self explanatory and will not be discussed in detail here. Just know that what we did was start our application telling Spring that it is a Spawn Host Actor Function app and that after starting we will perform a series of invocations to our previously defined actor. In turn, at each invocation the state will be stored by the actor and even if the application is restarted, the actor will return from the point at which it was before being turned off.
+
+To proceed, just create a container and send it to a container registry that will be accessible via kubernetes in the future. This can be done by executing the following command in the application directory via terminal:
+
+```shell
+mvn install
+```
+
+This command will compile the maven application and thanks to the jib maven plugin it will also publish the container image in your dockerhub registry :)
+
+Now that we have created our container containing our Actor Host Function we must deploy it in a Kubernetes cluster that has the Eigr Functions Controller installed (See more about this process in the section on installation).
+
+In a directory of your choice, create a file called system.yaml with the following content:
+
+```yaml
+---
+apiVersion: spawn.eigr.io/v1
+kind: ActorSystem
+metadata:
+  name: spawn-system
+  namespace: default
+spec:
+  storage:
+    type: InMemory
+```
+
+This file will be responsible for creating a system of actors in the cluster.
+
+Now create a new file called node.yaml with the following content:
+
+```yaml
+---
+apiVersion: spawn.eigr.io/v1
+kind: ActorNode
+metadata:
+  name: my-first-app
+  system: spawn-system
+  namespace: default
+spec:
+  function:
+    image: my-dockerhub-repo/spawn-springboot-examples:latest
+```
+
+This file will be responsible for deploying your host function and actors in the cluster.
+Now that the files have been defined, we can apply them to the cluster:
+
+```shell
+kubectl apply -f system.yaml
+kubectl apply -f node.yaml
+```
+
+After that, just check your actors with:
+
+```shell
+kubectl get actornodes
+```
 
 ## Project Development
 
