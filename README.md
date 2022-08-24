@@ -26,7 +26,10 @@ When studying this scenario, we realize that many of these current problems belo
 - Integration Services.
 - Polyglot services.
 
-The actor model, which Spawn is based on, can solve almost all the problems on this list, with Scalability, resilience, fault tolerance, and state management by far the top success stories of different known actor model implementations. So what we needed to do was add Integration Services, fast, business-oriented delivery, distributed computing, and polyglot services to the recipe so we could revolutionize software development as we know it today. That's exactly what we did with our platform called Eigr Functions Spawn.
+The actor model, which Spawn is based on, can solve almost all the problems on this list, with Scalability, resilience, fault tolerance, and state management by far the top success stories of different known actor model implementations. So what we needed to do was add Integration Services, fast, business-oriented delivery, distributed computing, and polyglot services to the recipe so we could revolutionize software development as we know it today. 
+
+That's exactly what we did with our platform called Eigr Functions Spawn.
+
 Spawn takes care of the entire infrastructure layer by abstracting all the complex issues that are not part of the business domain it is intended to address.
 Particularly domains such as games, machine learning and AI, real-time data ingestion, integration between services, financial or transactional services, logistics are some of the domains that can be mastered by the Eigr Functions Spawn platform.
 
