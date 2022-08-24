@@ -15,7 +15,7 @@ Spawn is made up of the following components:
 
 ## What problem Spawn solves
 
-With the advancement of cloud computing, Edge computing, containers, orchestrators, the increase in demand, as well as in the supply, of data, the development of global scale products aimed at serving audiences in various regions of our world make the development of software today is a task of enormous complexity. It is not uncommon to see dozens, if not hundreds of non-functional requirements that need to be met to build a system. All this complexity falls on the developer, who often does not have all the knowledge or time to build such systems satisfactorily.
+With the advancement of Cloud Computing, Edge computing, Containers, Orchestrators, Data Oriented Services, and development of global scale products aimed at serving audiences in various regions of our world make the development of software today is a task of enormous complexity. It is not uncommon to see dozens, if not hundreds of non-functional requirements that need to be met to build a system. All this complexity falls on the developer, who often does not have all the knowledge or time to build such systems satisfactorily.
 When studying this scenario, we realize that many of these current problems belong to the following groups:
 
 - Fast delivery and business oriented.
