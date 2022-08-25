@@ -45,8 +45,12 @@ test:
 create-k8s-cluster:
 	kind create cluster -v 1 --name default --config kind-cluster-config.yaml
 
+
 delete-k8s-cluster:
 	kind delete cluster --name kind-default
 
+load-k8s-images:
+	kind load docker-image ${operator-image} ${proxy-image} ${activator-grpc-image} ${activator-http-image} ${activator-kafka-image} ${activator-pubsub-image} ${activator-rabbitmq-image} ${activator-sqs-image} --name kind-default
+
 generate-k8s-manifests:
-	cd apps/operator && MIX_ENV=dev mix bonny.gen.manifest
+	cd apps/operator && MIX_ENV=dev mix bonny.gen.manifest --image ${operator-image}
