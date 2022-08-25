@@ -1,12 +1,3 @@
-# This file is responsible for configuring your umbrella
-# and **all applications** and their dependencies with the
-# help of the Config module.
-#
-# Note that all applications in your umbrella share the
-# same configuration and dependencies, which is why they
-# all use the same configuration file. If you want different
-# configurations or dependencies per app, it is best to
-# move said applications out of the umbrella.
 import Config
 
 # config :statestores, Statestores.Vault,
@@ -53,14 +44,48 @@ config :logger, :console,
 
 config :protobuf, extensions: :enabled
 
-# (you should replace this with the name of your plug)
-config :prometheus, Actors.Metrics.Exporter,
+config :prometheus, MetricsEndpoint.Exporter,
   path: "/metrics",
-  ## or :protobuf, or :text
   format: :auto,
   registry: :default,
   auth: false
 
+config :bonny,
+  # Add each CRD Controller module for this operator to load here
+  controllers: [
+    Operator.Controllers.V1.Activator,
+    Operator.Controllers.V1.ActorNode,
+    Operator.Controllers.V1.ActorSystem
+  ],
+  namespace: :all,
+
+  #   # Set the Kubernetes API group for this operator.
+  #   # This can be overwritten using the @group attribute of a controller
+  #   group: "your-operator.example.com",
+
+  #   # Name must only consist of only lowercase letters and hyphens.
+  #   # Defaults to hyphenated mix app name
+  operator_name: "eigr-functions-controller",
+
+  #   # Name must only consist of only lowercase letters and hyphens.
+  #   # Defaults to hyphenated mix app name
+  #   service_account_name: "your-operator",
+
+  #   # Labels to apply to the operator's resources.
+  labels: %{
+    eigr_functions_protocol_minor_version: "1",
+    eigr_functions_protocol_major_version: "0",
+    proxy_name: "spawn"
+  },
+
+  #   # Operator deployment resources. These are the defaults.
+  resources: %{
+    limits: %{cpu: "500m", memory: "1024Mi"},
+    requests: %{cpu: "100m", memory: "100Mi"}
+  }
+
 # App Configuration
 config :proxy,
   http_port: System.get_env("PROXY_HTTP_PORT", "9001") |> String.to_integer()
+
+import_config "#{config_env()}.exs"

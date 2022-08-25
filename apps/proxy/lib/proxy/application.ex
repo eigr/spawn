@@ -7,8 +7,8 @@ defmodule Proxy.Application do
   @impl true
   def start(_type, _args) do
     config = Config.load()
-    Proxy.Metrics.Exporter.setup()
-    Proxy.Metrics.PrometheusPipeline.setup()
+    MetricsEndpoint.Exporter.setup()
+    MetricsEndpoint.PrometheusPipeline.setup()
 
     children = [
       Actors.Supervisor.child_spec(config),

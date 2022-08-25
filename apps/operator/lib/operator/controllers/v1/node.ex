@@ -1,4 +1,4 @@
-defmodule Operator.Controllers.V1.Node do
+defmodule Operator.Controllers.V1.ActorNode do
   @doc """
   Operator.Controllers.V1.Node
 
@@ -6,7 +6,7 @@ defmodule Operator.Controllers.V1.Node do
   ```yaml
   ---
   apiVersion: spawn.eigr.io/v1
-  kind: Node
+  kind: ActorNode
   metadata:
     name: actors-system-test # Mandatory. Name of the actor system
     # The namespace where the function will be deployed to the cluster.
@@ -33,15 +33,15 @@ defmodule Operator.Controllers.V1.Node do
 
   @scope :cluster
   @names %{
-    plural: "nodes",
-    singular: "node",
-    kind: "Node",
+    plural: "actornodes",
+    singular: "actornode",
+    kind: "ActorNode",
     shortNames: [
-      "n",
-      "nd",
-      "nds",
-      "node",
-      "nodes"
+      "ac",
+      "actor",
+      "actors",
+      "actornode",
+      "actornodes"
     ]
   }
 

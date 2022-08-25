@@ -94,7 +94,7 @@ defmodule Operator.K8S.Controller do
   }
 
   def get_function_manifests(%{
-        "apiVersion" => "functions.eigr.io/v1",
+        "apiVersion" => "spawn.eigr.io/v1",
         "kind" => "Function",
         "metadata" => %{
           "name" => name
@@ -133,7 +133,7 @@ defmodule Operator.K8S.Controller do
   end
 
   def get_function_manifests(%{
-        "apiVersion" => "functions.eigr.io/v1",
+        "apiVersion" => "spawn.eigr.io/v1",
         "kind" => "Function",
         "metadata" => %{
           "name" => name,

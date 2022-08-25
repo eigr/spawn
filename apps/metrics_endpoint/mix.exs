@@ -1,7 +1,7 @@
-defmodule Activators.MixProject do
+defmodule Metrics.MixProject do
   use Mix.Project
 
-  @app :activators
+  @app :metrics_endpoint
 
   def project do
     [
@@ -27,13 +27,8 @@ defmodule Activators.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      # {:broadway_cloud_pub_sub, "~> 0.7"},
-      {:broadway_kafka, "~> 0.3"},
-      {:broadway_rabbitmq, "~> 0.7"},
-      {:broadway_sqs, "~> 0.7"},
-      {:cloudevents, "~> 0.6.1"},
-      # {:goth, "~> 1.0"},
-      {:hackney, "~> 1.9"}
+      {:prometheus, "~> 4.8"},
+      {:prometheus_plugs, "~> 1.1"}
     ]
   end
 end

@@ -1,4 +1,4 @@
-defmodule Proxy.Metrics.PrometheusInstrumenter do
+defmodule MetricsEndpoint.PrometheusInstrumenter do
   # use Prometheus.Metric
 
   def setup() do
