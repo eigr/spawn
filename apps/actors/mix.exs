@@ -1,9 +1,11 @@
 defmodule Actors.MixProject do
   use Mix.Project
 
+  @app :actors
+
   def project do
     [
-      app: :actors,
+      app: @app,
       version: "0.1.0",
       build_path: "../../_build",
       config_path: "../../config/config.exs",

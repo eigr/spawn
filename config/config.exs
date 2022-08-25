@@ -1,12 +1,3 @@
-# This file is responsible for configuring your umbrella
-# and **all applications** and their dependencies with the
-# help of the Config module.
-#
-# Note that all applications in your umbrella share the
-# same configuration and dependencies, which is why they
-# all use the same configuration file. If you want different
-# configurations or dependencies per app, it is best to
-# move said applications out of the umbrella.
 import Config
 
 # config :statestores, Statestores.Vault,
@@ -53,10 +44,8 @@ config :logger, :console,
 
 config :protobuf, extensions: :enabled
 
-# (you should replace this with the name of your plug)
-config :prometheus, Actors.Metrics.Exporter,
+config :prometheus, MetricsEndpoint.Exporter,
   path: "/metrics",
-  ## or :protobuf, or :text
   format: :auto,
   registry: :default,
   auth: false
@@ -64,3 +53,5 @@ config :prometheus, Actors.Metrics.Exporter,
 # App Configuration
 config :proxy,
   http_port: System.get_env("PROXY_HTTP_PORT", "9001") |> String.to_integer()
+
+import_config "#{config_env()}.exs"

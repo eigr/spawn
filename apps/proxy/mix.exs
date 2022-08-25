@@ -1,9 +1,11 @@
 defmodule Proxy.MixProject do
   use Mix.Project
 
+  @app :proxy
+
   def project do
     [
-      app: :proxy,
+      app: @app,
       version: "0.1.0",
       build_path: "../../_build",
       config_path: "../../config/config.exs",
@@ -27,12 +29,10 @@ defmodule Proxy.MixProject do
   defp deps do
     [
       {:actors, "~> 0.1", in_umbrella: true},
-      {:activators, "~> 0.1", in_umbrella: true},
+      {:metrics_endpoint, "~> 0.1", in_umbrella: true},
       {:bakeware, "~> 0.2"},
       {:bandit, "~> 0.5"},
-      {:observer_cli, "~> 1.7"},
-      {:prometheus, "~> 4.8"},
-      {:prometheus_plugs, "~> 1.1"}
+      {:observer_cli, "~> 1.7"}
     ]
   end
 end
