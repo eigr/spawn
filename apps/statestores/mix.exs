@@ -1,9 +1,11 @@
 defmodule Statestores.MixProject do
   use Mix.Project
 
+  @app :statestores
+
   def project do
     [
-      app: :statestores,
+      app: @app,
       version: "0.1.0",
       build_path: "../../_build",
       config_path: "../../config/config.exs",

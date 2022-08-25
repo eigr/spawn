@@ -25,12 +25,18 @@ defmodule Operator.Application do
 
   @spec attach_logger() :: :ok
   defp attach_logger() do
-    bonny_events = Bonny.Sys.Event.events()
+    bonny_events = Bonny.Sys.Telemetry.events()
     # eo_events = EvictionOperator.Event.events()
     events = bonny_events
     # ++ eo_events
 
-    :telemetry.attach_many("eigr-functions-controller-logger", events, &log_handler/4, [])
+    :telemetry.attach_many(
+      "eigr-functions-controller-logger",
+      events,
+      &Operator.Application.log_handler/4,
+      []
+    )
+
     :ok
   end
 

@@ -13,8 +13,7 @@ defmodule Operator.MixProject do
       lockfile: "../../mix.lock",
       elixir: "~> 1.13",
       start_permanent: Mix.env() == :prod,
-      deps: deps(),
-      releases: [{@app, release()}]
+      deps: deps()
     ]
   end
 
@@ -32,20 +31,7 @@ defmodule Operator.MixProject do
       {:metrics_endpoint, "~> 0.1", in_umbrella: true},
       {:bandit, "~> 0.5"},
       {:bonny, "~> 0.5"},
-      {:bakeware, ">= 0.0.0", runtime: false},
-      {:prometheus_plugs, "~> 1.1"},
-      {:prometheus_process_collector, "~> 1.6"}
-    ]
-  end
-
-  defp release do
-    [
-      overwrite: true,
-      steps: [
-        :assemble,
-        &Bakeware.assemble/1
-      ],
-      bakeware: [compression_level: 19]
+      {:bakeware, ">= 0.0.0", runtime: false}
     ]
   end
 end
