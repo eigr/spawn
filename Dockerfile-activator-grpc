@@ -21,7 +21,7 @@ RUN mix local.rebar --force \
 RUN echo "-name activator_grpc@${HOSTNAME}" >> ./rel/vm.args.eex \
     && echo "-setcookie ${NODE_COOKIE}" >> ./rel/vm.args.eex
 
-RUN MIX_ENV=prod mix release
+RUN MIX_ENV=prod mix release activator_grpc
 
 # ---- Application Stage ----
 FROM alpine:3
