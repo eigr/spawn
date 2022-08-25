@@ -26,7 +26,7 @@ defmodule Operator.Controllers.V1.Activator do
 
   @version "v1"
 
-  @rule {"apps", ["deployments"], ["*"]}
+  @rule {"apps", ["deployments", "daemonsets"], ["*"]}
   @rule {"", ["services", "pods", "configmaps"], ["*"]}
   @rule {"autoscaling", ["horizontalpodautoscalers"], ["*"]}
   @rule {"extensions", ["ingresses", "ingressclasses"], ["*"]}
@@ -47,28 +47,16 @@ defmodule Operator.Controllers.V1.Activator do
 
   @additional_printer_columns [
     %{
-      name: "runtime",
+      name: "type",
       type: "string",
-      description: "Runtime for function execution",
-      JSONPath: ".spec.function.runtime"
+      description: "Activator Type",
+      JSONPath: ".spec.activator.type"
     },
     %{
-      name: "language",
+      name: "external",
       type: "string",
-      description: "User function language",
-      JSONPath: ".spec.function.language"
-    },
-    %{
-      name: "expose method",
-      type: "string",
-      description: "Method used to expose function",
-      JSONPath: ".spec.function.expose.method"
-    },
-    %{
-      name: "eventing",
-      type: "boolean",
-      description: "Whether the function is eventing enabled",
-      JSONPath: ".spec.function.activators.eventing"
+      description: "Method used to expose Activator",
+      JSONPath: ".spec.activator.expose.method"
     }
   ]
 

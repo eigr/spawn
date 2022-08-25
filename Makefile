@@ -46,4 +46,7 @@ create-k8s-cluster:
 	kind create cluster -v 1 --name default --config kind-cluster-config.yaml
 
 delete-k8s-cluster:
-	kind delete cluster --name kind-default 	
+	kind delete cluster --name kind-default
+
+generate-k8s-manifests:
+	cd apps/operator && MIX_ENV=dev mix bonny.gen.manifest
