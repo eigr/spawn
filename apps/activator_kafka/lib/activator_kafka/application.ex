@@ -3,7 +3,7 @@ defmodule ActivatorKafka.Application do
 
   use Application
 
-  @port 9091
+  @port if Mix.env() == :test, do: 0, else: 9091
 
   @impl true
   def start(_type, _args) do
