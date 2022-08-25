@@ -10,6 +10,10 @@ config :bonny,
     Operator.Controllers.V1.ActorNode,
     Operator.Controllers.V1.ActorSystem
   ],
+
+  # The namespace to watch for Namespaced CRDs.
+  # Defaults to "default". `:all` for all namespaces
+  # Also configurable via environment variable `BONNY_POD_NAMESPACE`
   namespace: :all,
 
   #   # Set the Kubernetes API group for this operator.
@@ -22,7 +26,7 @@ config :bonny,
 
   #   # Name must only consist of only lowercase letters and hyphens.
   #   # Defaults to hyphenated mix app name
-  #   service_account_name: "your-operator",
+  service_account_name: "eigr-functions",
 
   #   # Labels to apply to the operator's resources.
   labels: %{

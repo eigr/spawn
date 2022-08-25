@@ -3,18 +3,27 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    k8s-app: operator
-  name: operator
-  namespace: default
+    eigr_functions_protocol_major_version: '0'
+    eigr_functions_protocol_minor_version: '1'
+    proxy_name: spawn
+    k8s-app: eigr-functions-controller
+  name: eigr-functions
+  namespace: eigr-functions
 spec:
   replicas: 1
   selector:
     matchLabels:
-      k8s-app: operator
+      eigr_functions_protocol_major_version: '0'
+      eigr_functions_protocol_minor_version: '1'
+      proxy_name: spawn
+      k8s-app: eigr-functions-controller
   template:
     metadata:
       labels:
-        k8s-app: operator
+        eigr_functions_protocol_major_version: '0'
+        eigr_functions_protocol_minor_version: '1'
+        proxy_name: spawn
+        k8s-app: eigr-functions-controller
     spec:
       containers:
         - env:
@@ -37,33 +46,240 @@ spec:
                 fieldRef:
                   fieldPath: spec.serviceAccountName
           image: eigr/spawn-operator:0.1.0
-          name: operator
+          name: eigr-functions-controller
           resources:
             limits:
-              cpu: 200m
-              memory: 200Mi
+              cpu: 500m
+              memory: 1024Mi
             requests:
-              cpu: 200m
-              memory: 200Mi
+              cpu: 100m
+              memory: 100Mi
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
             runAsNonRoot: true
             runAsUser: 65534
-      serviceAccountName: operator
+      serviceAccountName: eigr-functions
+
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  labels:
+    eigr_functions_protocol_major_version: '0'
+    eigr_functions_protocol_minor_version: '1'
+    proxy_name: spawn
+    k8s-app: eigr-functions-controller
+  name: activators.spawn.eigr.io
+spec:
+  additionalPrinterColumns:
+    - JSONPath: .spec.activator.type
+      description: Activator Type
+      name: type
+      type: string
+    - JSONPath: .spec.activator.expose.method
+      description: Method used to expose Activator
+      name: external
+      type: string
+    - JSONPath: .metadata.creationTimestamp
+      description: |-
+        CreationTimestamp is a timestamp representing the server time when this object was created. It is not guaranteed to be set in happens-before order across separate operations. Clients may not set this value. It is represented in RFC3339 form and is in UTC.
+        
+              Populated by the system. Read-only. Null for lists. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata
+      name: Age
+      type: date
+  group: spawn.eigr.io
+  names:
+    kind: Activator
+    plural: activators
+    shortNames:
+      - act
+      - acts
+      - activator
+      - activators
+    singular: activator
+  scope: Cluster
+  version: v1
+
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  labels:
+    eigr_functions_protocol_major_version: '0'
+    eigr_functions_protocol_minor_version: '1'
+    proxy_name: spawn
+    k8s-app: eigr-functions-controller
+  name: actornodes.spawn.eigr.io
+spec:
+  additionalPrinterColumns: []
+  group: spawn.eigr.io
+  names:
+    kind: ActorNode
+    plural: actornodes
+    shortNames:
+      - ac
+      - actor
+      - actors
+      - actornode
+      - actornodes
+    singular: actornode
+  scope: Cluster
+  version: v1
+
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  labels:
+    eigr_functions_protocol_major_version: '0'
+    eigr_functions_protocol_minor_version: '1'
+    proxy_name: spawn
+    k8s-app: eigr-functions-controller
+  name: actorsystems.spawn.eigr.io
+spec:
+  additionalPrinterColumns:
+    - JSONPath: .spec.storage.type
+      description: Storage type of the Actor System
+      name: storage
+      type: string
+    - JSONPath: .metadata.creationTimestamp
+      description: |-
+        CreationTimestamp is a timestamp representing the server time when this object was created. It is not guaranteed to be set in happens-before order across separate operations. Clients may not set this value. It is represented in RFC3339 form and is in UTC.
+        
+              Populated by the system. Read-only. Null for lists. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata
+      name: Age
+      type: date
+  group: spawn.eigr.io
+  names:
+    kind: ActorSystem
+    plural: actorsystems
+    shortNames:
+      - as
+      - actorsys
+      - actorsystem
+      - actorsystems
+      - system
+    singular: actorsystem
+  scope: Cluster
+  version: v1
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   labels:
-    k8s-app: operator
-  name: operator
+    eigr_functions_protocol_major_version: '0'
+    eigr_functions_protocol_minor_version: '1'
+    proxy_name: spawn
+    k8s-app: eigr-functions-controller
+  name: eigr-functions
 rules:
   - apiGroups:
       - apiextensions.k8s.io
     resources:
       - customresourcedefinitions
+    verbs:
+      - '*'
+  - apiGroups:
+      - spawn.eigr.io
+    resources:
+      - activators
+    verbs:
+      - '*'
+  - apiGroups:
+      - spawn.eigr.io
+    resources:
+      - actornodes
+    verbs:
+      - '*'
+  - apiGroups:
+      - spawn.eigr.io
+    resources:
+      - actorsystems
+    verbs:
+      - '*'
+  - apiGroups:
+      - apps
+    resources:
+      - deployments
+      - daemonsets
+    verbs:
+      - '*'
+  - apiGroups:
+      - ""
+    resources:
+      - services
+      - pods
+      - configmaps
+    verbs:
+      - '*'
+  - apiGroups:
+      - autoscaling
+    resources:
+      - horizontalpodautoscalers
+    verbs:
+      - '*'
+  - apiGroups:
+      - extensions
+    resources:
+      - ingresses
+      - ingressclasses
+    verbs:
+      - '*'
+  - apiGroups:
+      - networking.k8s.io
+    resources:
+      - ingresses
+      - ingressclasses
+    verbs:
+      - '*'
+  - apiGroups:
+      - apps
+    resources:
+      - deployments
+    verbs:
+      - '*'
+  - apiGroups:
+      - ""
+    resources:
+      - services
+      - pods
+      - configmaps
+    verbs:
+      - '*'
+  - apiGroups:
+      - autoscaling
+    resources:
+      - horizontalpodautoscalers
+    verbs:
+      - '*'
+  - apiGroups:
+      - extensions
+    resources:
+      - ingresses
+      - ingressclasses
+    verbs:
+      - '*'
+  - apiGroups:
+      - networking.k8s.io
+    resources:
+      - ingresses
+      - ingressclasses
+    verbs:
+      - '*'
+  - apiGroups:
+      - apps
+    resources:
+      - deployments
+    verbs:
+      - '*'
+  - apiGroups:
+      - ""
+    resources:
+      - services
+      - pods
+      - configmaps
     verbs:
       - '*'
 
@@ -72,22 +288,28 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   labels:
-    k8s-app: operator
-  name: operator
-  namespace: default
+    eigr_functions_protocol_major_version: '0'
+    eigr_functions_protocol_minor_version: '1'
+    proxy_name: spawn
+    k8s-app: eigr-functions-controller
+  name: eigr-functions
+  namespace: eigr-functions
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   labels:
-    k8s-app: operator
-  name: operator
+    eigr_functions_protocol_major_version: '0'
+    eigr_functions_protocol_minor_version: '1'
+    proxy_name: spawn
+    k8s-app: eigr-functions-controller
+  name: eigr-functions
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: operator
+  name: eigr-functions
 subjects:
   - kind: ServiceAccount
-    name: operator
-    namespace: default
+    name: eigr-functions
+    namespace: eigr-functions
