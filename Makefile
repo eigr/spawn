@@ -41,3 +41,9 @@ install:
 
 test:
 	MIX_ENV=test PROXY_DATABASE_TYPE=mysql PROXY_HTTP_PORT=9001 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
+
+create-k8s-cluster:
+	kind create cluster -v 1 --name default --config kind-cluster-config.yaml
+
+delete-k8s-cluster:
+	kind delete cluster --name kind-default 	
