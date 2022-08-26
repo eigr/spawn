@@ -39,7 +39,7 @@ Code changes to eigr/spawn are welcomed via the process below.
 
 # Development
 
-This document describes the process for running and development this application on your local computer.
+This sections below describes the process for running and development this application on your local computer.
 
 ## Getting started
 
