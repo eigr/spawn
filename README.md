@@ -497,7 +497,7 @@ After that, just check your actors with:
 kubectl get actornodes
 ```
 
-## Project Development
+## Local Development
 
 Run:
 
@@ -510,3 +510,5 @@ Tests:
 ```shell
 MIX_ENV=test PROXY_DATABASE_TYPE=mysql PROXY_HTTP_PORT=9001 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
 ```
+
+For more information on how to collaborate or even to get to know the project structure better, go to our [contributor guide](CONTRIBUTING.md)

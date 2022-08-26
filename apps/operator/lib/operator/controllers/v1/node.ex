@@ -45,32 +45,7 @@ defmodule Operator.Controllers.V1.ActorNode do
     ]
   }
 
-  @additional_printer_columns [
-    %{
-      name: "runtime",
-      type: "string",
-      description: "Runtime for function execution",
-      JSONPath: ".spec.function.runtime"
-    },
-    %{
-      name: "language",
-      type: "string",
-      description: "User function language",
-      JSONPath: ".spec.function.language"
-    },
-    %{
-      name: "expose method",
-      type: "string",
-      description: "Method used to expose function",
-      JSONPath: ".spec.function.expose.method"
-    },
-    %{
-      name: "eventing",
-      type: "boolean",
-      description: "Whether the function is eventing enabled",
-      JSONPath: ".spec.function.activators.eventing"
-    }
-  ]
+  @additional_printer_columns []
 
   @doc """
   Called periodically for each existing CustomResource to allow for reconciliation.

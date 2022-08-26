@@ -13,7 +13,7 @@ defmodule Operator.Controllers.V1.ActorSystem do
     # All proxies deployed in a given namespace form a cluster, that is, they are visible to each other.
     namespace: default # Optional. Default namespace is "default"
   spec:
-    store:
+    storage:
       type: Postgres
       paramsSecretRef: postgres-connection-secret
   """
@@ -28,9 +28,6 @@ defmodule Operator.Controllers.V1.ActorSystem do
 
   @rule {"apps", ["deployments"], ["*"]}
   @rule {"", ["services", "pods", "configmaps"], ["*"]}
-  @rule {"autoscaling", ["horizontalpodautoscalers"], ["*"]}
-  @rule {"extensions", ["ingresses", "ingressclasses"], ["*"]}
-  @rule {"networking.k8s.io", ["ingresses", "ingressclasses"], ["*"]}
 
   @scope :cluster
   @names %{
@@ -48,28 +45,10 @@ defmodule Operator.Controllers.V1.ActorSystem do
 
   @additional_printer_columns [
     %{
-      name: "runtime",
+      name: "storage",
       type: "string",
-      description: "Runtime for function execution",
-      JSONPath: ".spec.function.runtime"
-    },
-    %{
-      name: "language",
-      type: "string",
-      description: "User function language",
-      JSONPath: ".spec.function.language"
-    },
-    %{
-      name: "expose method",
-      type: "string",
-      description: "Method used to expose function",
-      JSONPath: ".spec.function.expose.method"
-    },
-    %{
-      name: "eventing",
-      type: "boolean",
-      description: "Whether the function is eventing enabled",
-      JSONPath: ".spec.function.activators.eventing"
+      description: "Storage type of the Actor System",
+      JSONPath: ".spec.storage.type"
     }
   ]
 
