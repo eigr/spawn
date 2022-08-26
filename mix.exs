@@ -25,7 +25,6 @@ defmodule Spawn.MixProject do
       operator: [
         include_executables_for: [:unix],
         applications: [operator: :permanent],
-        overlays: "apps/operator/config",
         steps: [
           :assemble,
           &Bakeware.assemble/1

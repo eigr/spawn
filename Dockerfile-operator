@@ -32,9 +32,10 @@ WORKDIR /home/app
 COPY --from=builder /app/_build/prod/rel/bakeware .
 
 RUN adduser app --disabled-password --home app
-RUN chown -R app: /home/app
-USER app
 RUN mkdir -p app/.cache/bakeware
+RUN chown -R app: /home/app
+
+USER app
 
 ENV MIX_ENV=prod
 

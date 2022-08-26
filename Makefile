@@ -11,13 +11,13 @@ activator-sqs-image=${registry}/spawn-activator-sqs:${version}
 
 .PHONY: all
 
-all: build test build-all-images create-k8s-cluster create-k8s-namespace load-k8s-images generate-k8s-manifests apply-k8s-manifests
+all: build test build-all-images
 
 clean:
 	mix deps.clean --all
 
 clean-all:
-	mix deps.clean --all && kind delete cluster --name kind-default
+	mix deps.clean --all && kind delete cluster --name default
 
 build:
 	mix deps.get && mix compile
@@ -26,7 +26,7 @@ build-proxy-image:
 	docker build -f Dockerfile-proxy -t ${proxy-image} .
 
 build-operator-image:
-	docker build -f Dockerfile-proxy -t ${operator-image} .
+	docker build -f Dockerfile-operator -t ${operator-image} .
 
 build-all-images:
 	docker build -f Dockerfile-proxy -t ${proxy-image} .
@@ -77,5 +77,14 @@ create-k8s-namespace:
 apply-k8s-manifests:
 	kubectl -n eigr-functions apply -f apps/operator/manifest.yaml
 
-run:
+run-proxy-local:
+	cd apps/proxy && PROXY_DATABASE_TYPE=mysql SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= iex --name spawn_a2@127.0.0.1 -S mix
+
+run-operator-local:
+	cd apps/operator && MIX_ENV=dev iex --name operator@127.0.0.1 -S mix
+	
+run-proxy-image:
 	docker run --rm --name=spawn-proxy -e PROXY_DATABASE_TYPE=mysql -e SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= --net=host ${proxy-image}
+
+run-operator-image:
+	docker run --rm --name=spawn-operator --net=host ${operator-image}
