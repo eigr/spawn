@@ -62,7 +62,7 @@ jobs:
       - name: Create namespace
         run: make create-k8s-namespace
 
-      - name: Generate and Aplly Manifests
+      - name: Generate and Apply Manifests
         run: make generate-k8s-manifests apply-k8s-manifests
 
       - name: Install dependencies
