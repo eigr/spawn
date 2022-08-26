@@ -59,12 +59,6 @@ jobs:
       - name: Test cluster !
         run: kubectl get pods -A
 
-      - name: Create namespace
-        run: make create-k8s-namespace
-
-      - name: Generate and Apply Manifests
-        run: make generate-k8s-manifests apply-k8s-manifests
-
       - name: Install dependencies
         run: |
           mix deps.clean --all
