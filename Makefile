@@ -51,14 +51,14 @@ push-all-images:
 	docker push ${activator-rabbitmq-image}
 	docker push ${activator-sqs-image}
 
-create-k8s-cluster:
+create-kind-cluster:
 	kind create cluster -v 1 --name default --config kind-cluster-config.yaml
 	kubectl cluster-info --context kind-default
 
-delete-k8s-cluster:
+delete-kind-cluster:
 	kind delete cluster --name default
 
-load-k8s-images:
+load-kind-images:
 	kind load docker-image ${operator-image} --name default
 	kind load docker-image ${proxy-image} --name default
 	kind load docker-image ${activator-grpc-image} --name default
@@ -68,11 +68,11 @@ load-k8s-images:
 	kind load docker-image ${activator-rabbitmq-image} --name default
 	kind load docker-image ${activator-sqs-image} --name default
 
-generate-k8s-manifests:
-	cd apps/operator && MIX_ENV=dev mix bonny.gen.manifest --image ${operator-image} --namespace eigr-functions
-
 create-k8s-namespace:
 	kubectl create ns eigr-functions
+
+generate-k8s-manifests:
+	cd apps/operator && MIX_ENV=dev mix bonny.gen.manifest --image ${operator-image} --namespace eigr-functions
 
 apply-k8s-manifests:
 	kubectl -n eigr-functions apply -f apps/operator/manifest.yaml

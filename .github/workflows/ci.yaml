@@ -52,6 +52,19 @@ jobs:
           path: _build
           key: ${{ runner.os }}-build-${{ matrix.otp }}-${{ matrix.elixir }}-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
 
+      - name: start minikube
+        id: minikube
+        uses: medyagh/setup-minikube@master
+
+      - name: Test cluster !
+        run: kubectl get pods -A
+
+      - name: Create namespace
+        run: make create-k8s-namespace
+
+      - name: Generate and Aplly Manifests
+        run: make generate-k8s-manifests apply-k8s-manifests
+
       - name: Install dependencies
         run: |
           mix deps.clean --all
