@@ -25,15 +25,17 @@ RUN MIX_ENV=prod mix release operator
 
 # ---- Application Stage ----
 FROM alpine:3
-RUN apk add --no-cache --update bash openssl build-base ca-certificates zstd
+#RUN apk add --no-cache --update bash openssl build-base ca-certificates zstd
+RUN apk add --no-cache --update zstd ncurses-libs libstdc++ libgcc
 
 WORKDIR /home/app
-COPY --from=builder /app/_build .
+COPY --from=builder /app/_build/prod/rel/bakeware .
 
 RUN adduser app --disabled-password --home app
-RUN chown -R app: ./prod
+RUN chown -R app: /home/app
 USER app
+RUN mkdir -p app/.cache/bakeware
 
 ENV MIX_ENV=prod
 
-ENTRYPOINT ["./prod/rel/operator/bin/operator", "start"]
+ENTRYPOINT ["./operator", "start"]
