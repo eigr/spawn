@@ -2,6 +2,8 @@
 
 **Actor Mesh Platform**
 
+> :warning: Although Spawn **is functional** it is still a work in progress and we do not recommend it for **production environments at this time.** We hope to have a stable version soon.
+
 ## Overview
 
 Spawn is based on the sidecar proxy pattern to provide a polyglot Actor Model framework and platform.

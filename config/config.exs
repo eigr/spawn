@@ -55,7 +55,7 @@ config :proxy,
   http_port: System.get_env("PROXY_HTTP_PORT", "9001") |> String.to_integer()
 
 config :bonny,
-  get_conn: {K8s.Conn, :from_file, ["~/.kube/config", [context: "kind-default"]]},
+  get_conn: {K8s.Conn, :from_file, ["~/.kube/config", [context: "minikube"]]},
 
   # Add each CRD Controller module for this operator to load here
   controllers: [
