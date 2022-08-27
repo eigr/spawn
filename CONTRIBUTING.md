@@ -48,8 +48,9 @@ First of all you will need to have some tools installed on your computer:
 1. Erlang/OTP 24 or newest.
 2. Elixir 1.13 or newest.
 3. Minikube, kind, K3s, or other Kubernetes flavor for local development.
+4. MySQL, Postgres or other supported database running in local environment.
 
-> **_NOTE:_** All scripts by default will use a mysql database with a database called eigr-functions-db . Make sure you have a working instance on your localhost or you will have to change make tasks or run commands manually during testing.
+> **_NOTE:_** All scripts will use a MySQL DB with a database called eigr-functions-db by default. Make sure you have a working instance on your localhost or you will have to change make tasks or run commands manually during testing.
 
 After installing these tools, open Terminal and run the following:
 
