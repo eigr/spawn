@@ -51,6 +51,9 @@ push-all-images:
 	docker push ${activator-rabbitmq-image}
 	docker push ${activator-sqs-image}
 
+create-minikube-cluster:
+	minikube start
+
 create-kind-cluster:
 	kind create cluster -v 1 --name default --config kind-cluster-config.yaml
 	kubectl cluster-info --context kind-default
