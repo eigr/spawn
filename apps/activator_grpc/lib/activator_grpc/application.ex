@@ -3,15 +3,18 @@ defmodule ActivatorGRPC.Application do
 
   use Application
 
-  @http_port if Mix.env() == :test, do: 0, else: 9091
+  alias Activator.Config.Vapor, as: Config
+  import Activator, only: [get_http_port: 1]
 
   @impl true
   def start(_type, _args) do
+    config = Config.load()
+
     MetricsEndpoint.Exporter.setup()
     MetricsEndpoint.PrometheusPipeline.setup()
 
     children = [
-      {Bandit, plug: ActivatorGRPC.Router, scheme: :http, options: [port: @http_port]}
+      {Bandit, plug: ActivatorGRPC.Router, scheme: :http, options: [port: get_http_port(config)]}
     ]
 
     opts = [strategy: :one_for_one, name: ActivatorGRPC.Supervisor]

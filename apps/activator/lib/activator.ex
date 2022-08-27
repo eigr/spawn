@@ -11,4 +11,6 @@ defmodule Activator do
 
     @callback dispatch(data) :: {:ok, term} | {:error, String.t()}
   end
+
+  def get_http_port(config), do: if(Mix.env() == :test, do: 0, else: config.http_port)
 end

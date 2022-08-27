@@ -7,10 +7,12 @@ defmodule Proxy.Application do
   @impl true
   def start(_type, _args) do
     config = Config.load()
+
     MetricsEndpoint.Exporter.setup()
     MetricsEndpoint.PrometheusPipeline.setup()
 
     children = [
+      Statestores.Supervisor.child_spec(),
       Actors.Supervisor.child_spec(config),
       {Bandit, plug: Proxy.Router, scheme: :http, options: [port: config.http_port]}
     ]
