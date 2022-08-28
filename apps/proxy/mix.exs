@@ -29,6 +29,7 @@ defmodule Proxy.MixProject do
   defp deps do
     [
       {:actors, "~> 0.1", in_umbrella: true},
+      {:cluster, "~> 0.1", in_umbrella: true},
       {:metrics_endpoint, "~> 0.1", in_umbrella: true},
       {:statestores, "~> 0.1", in_umbrella: true},
       {:bakeware, "~> 0.2"},

@@ -3,12 +3,12 @@ defmodule ActivatorSQS.Application do
 
   use Application
 
-  alias Activator.Config.Vapor, as: Config
+  alias Actors.Config.Vapor, as: Config
   import Activator, only: [get_http_port: 1]
 
   @impl true
   def start(_type, _args) do
-    config = Config.load()
+    config = Config.load(__MODULE__)
 
     MetricsEndpoint.Exporter.setup()
     MetricsEndpoint.PrometheusPipeline.setup()

@@ -14,11 +14,10 @@ defmodule Actors.Supervisor do
   end
 
   @impl true
-  def init(config) do
+  def init(_config) do
     Protobuf.load_extensions()
 
     children = [
-      cluster_supervisor(config),
       {Registry, keys: :unique, name: Actors.NodeRegistry},
       {Finch,
        name: SpawnHTTPClient,
@@ -32,44 +31,4 @@ defmodule Actors.Supervisor do
 
     Supervisor.init(children, strategy: :one_for_one)
   end
-
-  defp cluster_supervisor(config) do
-    cluster_strategy = config.proxy_cluster_strategy
-
-    topologies =
-      case cluster_strategy do
-        "gossip" ->
-          get_gossip_strategy()
-
-        "kubernetes-dns" ->
-          get_dns_strategy(config)
-
-        _ ->
-          Logger.warn("Invalid Topology")
-      end
-
-    if topologies && Code.ensure_compiled(Cluster.Supervisor) do
-      Logger.debug("Cluster topology #{inspect(topologies)}")
-      {Cluster.Supervisor, [topologies, [name: Actors.ClusterSupervisor]]}
-    end
-  end
-
-  defp get_gossip_strategy(),
-    do: [
-      proxy: [
-        strategy: Cluster.Strategy.Gossip
-      ]
-    ]
-
-  defp get_dns_strategy(config),
-    do: [
-      proxy: [
-        strategy: Elixir.Cluster.Strategy.Kubernetes.DNS,
-        config: [
-          service: config.proxy_headless_service,
-          application_name: config.proxy_app_name,
-          polling_interval: config.proxy_cluster_poling_interval
-        ]
-      ]
-    ]
 end
