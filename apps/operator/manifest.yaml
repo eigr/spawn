@@ -3,8 +3,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    eigr_functions_protocol_major_version: '0'
-    eigr_functions_protocol_minor_version: '1'
+    eigr_functions_protocol_major_version: "0"
+    eigr_functions_protocol_minor_version: "1"
     proxy_name: spawn
     k8s-app: eigr-functions-controller
   name: eigr-functions
@@ -13,20 +13,24 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      eigr_functions_protocol_major_version: '0'
-      eigr_functions_protocol_minor_version: '1'
+      eigr_functions_protocol_major_version: "0"
+      eigr_functions_protocol_minor_version: "1"
       proxy_name: spawn
       k8s-app: eigr-functions-controller
   template:
     metadata:
       labels:
-        eigr_functions_protocol_major_version: '0'
-        eigr_functions_protocol_minor_version: '1'
+        eigr_functions_protocol_major_version: "0"
+        eigr_functions_protocol_minor_version: "1"
         proxy_name: spawn
         k8s-app: eigr-functions-controller
     spec:
       containers:
         - env:
+            - name: BAKEWARE_CACHE
+              value: /home/app/.cache/bakeware
+            - name: NODE_COOKIE
+              value: "FW9RYfQpVbuycMxSodrXIKAzuLgsaR5gyArGeap8WTHNfJj3vfltYQ=="
             - name: MIX_ENV
               value: prod
             - name: BONNY_POD_NAME
@@ -54,20 +58,31 @@ spec:
             requests:
               cpu: 100m
               memory: 100Mi
+          volumeMounts:
+            - mountPath: /home/app/.cache/bakeware
+              name: cache-data
+            # - mountPath: /.erlang_cookie
+            #   name: cookie-data
+            #   subPath: .erlang_cookie
           securityContext:
             allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: true
-            runAsNonRoot: true
+            readOnlyRootFilesystem: false
+            runAsNonRoot: false
             runAsUser: 65534
       serviceAccountName: eigr-functions
+      volumes:
+        - emptyDir: {}
+          name: cache-data
+        # - emptyDir: {}
+        #   name: cookie-data
 
 ---
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
   labels:
-    eigr_functions_protocol_major_version: '0'
-    eigr_functions_protocol_minor_version: '1'
+    eigr_functions_protocol_major_version: "0"
+    eigr_functions_protocol_minor_version: "1"
     proxy_name: spawn
     k8s-app: eigr-functions-controller
   name: activators.spawn.eigr.io
@@ -84,7 +99,7 @@ spec:
     - JSONPath: .metadata.creationTimestamp
       description: |-
         CreationTimestamp is a timestamp representing the server time when this object was created. It is not guaranteed to be set in happens-before order across separate operations. Clients may not set this value. It is represented in RFC3339 form and is in UTC.
-        
+
               Populated by the system. Read-only. Null for lists. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata
       name: Age
       type: date
@@ -106,8 +121,8 @@ apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
   labels:
-    eigr_functions_protocol_major_version: '0'
-    eigr_functions_protocol_minor_version: '1'
+    eigr_functions_protocol_major_version: "0"
+    eigr_functions_protocol_minor_version: "1"
     proxy_name: spawn
     k8s-app: eigr-functions-controller
   name: actornodes.spawn.eigr.io
@@ -132,8 +147,8 @@ apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
   labels:
-    eigr_functions_protocol_major_version: '0'
-    eigr_functions_protocol_minor_version: '1'
+    eigr_functions_protocol_major_version: "0"
+    eigr_functions_protocol_minor_version: "1"
     proxy_name: spawn
     k8s-app: eigr-functions-controller
   name: actorsystems.spawn.eigr.io
@@ -146,7 +161,7 @@ spec:
     - JSONPath: .metadata.creationTimestamp
       description: |-
         CreationTimestamp is a timestamp representing the server time when this object was created. It is not guaranteed to be set in happens-before order across separate operations. Clients may not set this value. It is represented in RFC3339 form and is in UTC.
-        
+
               Populated by the system. Read-only. Null for lists. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata
       name: Age
       type: date
@@ -169,8 +184,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   labels:
-    eigr_functions_protocol_major_version: '0'
-    eigr_functions_protocol_minor_version: '1'
+    eigr_functions_protocol_major_version: "0"
+    eigr_functions_protocol_minor_version: "1"
     proxy_name: spawn
     k8s-app: eigr-functions-controller
   name: eigr-functions
@@ -180,32 +195,32 @@ rules:
     resources:
       - customresourcedefinitions
     verbs:
-      - '*'
+      - "*"
   - apiGroups:
       - spawn.eigr.io
     resources:
       - activators
     verbs:
-      - '*'
+      - "*"
   - apiGroups:
       - spawn.eigr.io
     resources:
       - actornodes
     verbs:
-      - '*'
+      - "*"
   - apiGroups:
       - spawn.eigr.io
     resources:
       - actorsystems
     verbs:
-      - '*'
+      - "*"
   - apiGroups:
       - apps
     resources:
       - deployments
       - daemonsets
     verbs:
-      - '*'
+      - "*"
   - apiGroups:
       - ""
     resources:
@@ -213,33 +228,33 @@ rules:
       - pods
       - configmaps
     verbs:
-      - '*'
+      - "*"
   - apiGroups:
       - autoscaling
     resources:
       - horizontalpodautoscalers
     verbs:
-      - '*'
+      - "*"
   - apiGroups:
       - extensions
     resources:
       - ingresses
       - ingressclasses
     verbs:
-      - '*'
+      - "*"
   - apiGroups:
       - networking.k8s.io
     resources:
       - ingresses
       - ingressclasses
     verbs:
-      - '*'
+      - "*"
   - apiGroups:
       - apps
     resources:
       - deployments
     verbs:
-      - '*'
+      - "*"
   - apiGroups:
       - ""
     resources:
@@ -247,33 +262,33 @@ rules:
       - pods
       - configmaps
     verbs:
-      - '*'
+      - "*"
   - apiGroups:
       - autoscaling
     resources:
       - horizontalpodautoscalers
     verbs:
-      - '*'
+      - "*"
   - apiGroups:
       - extensions
     resources:
       - ingresses
       - ingressclasses
     verbs:
-      - '*'
+      - "*"
   - apiGroups:
       - networking.k8s.io
     resources:
       - ingresses
       - ingressclasses
     verbs:
-      - '*'
+      - "*"
   - apiGroups:
       - apps
     resources:
       - deployments
     verbs:
-      - '*'
+      - "*"
   - apiGroups:
       - ""
     resources:
@@ -281,15 +296,15 @@ rules:
       - pods
       - configmaps
     verbs:
-      - '*'
+      - "*"
 
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   labels:
-    eigr_functions_protocol_major_version: '0'
-    eigr_functions_protocol_minor_version: '1'
+    eigr_functions_protocol_major_version: "0"
+    eigr_functions_protocol_minor_version: "1"
     proxy_name: spawn
     k8s-app: eigr-functions-controller
   name: eigr-functions
@@ -300,8 +315,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   labels:
-    eigr_functions_protocol_major_version: '0'
-    eigr_functions_protocol_minor_version: '1'
+    eigr_functions_protocol_major_version: "0"
+    eigr_functions_protocol_minor_version: "1"
     proxy_name: spawn
     k8s-app: eigr-functions-controller
   name: eigr-functions

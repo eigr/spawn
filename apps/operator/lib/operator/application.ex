@@ -9,7 +9,7 @@ defmodule Operator.Application do
   @impl true
   def start(_type, _args) do
     Logger.info("Starting Eigr Functions Controller...")
-
+    Node.set_cookie(String.to_atom("FW9RYfQpVbuycMxSodrXIKAzuLgsaR5gyArGeap8WTHNfJj3vfltYQ=="))
     attach_logger()
 
     MetricsEndpoint.Exporter.setup()
