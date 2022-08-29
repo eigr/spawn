@@ -1,11 +1,9 @@
-defmodule ActivatorSQS.MixProject do
+defmodule Cluster.MixProject do
   use Mix.Project
-
-  @app :activator_sqs
 
   def project do
     [
-      app: @app,
+      app: :cluster,
       version: "0.1.0",
       build_path: "../../_build",
       config_path: "../../config/config.exs",
@@ -20,21 +18,16 @@ defmodule ActivatorSQS.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger],
-      mod: {ActivatorSQS.Application, []}
+      extra_applications: [:logger]
     ]
   end
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:activator, "~> 0.1", in_umbrella: true},
-      {:actors, "~> 0.1", in_umbrella: true},
-      {:cluster, "~> 0.1", in_umbrella: true},
-      {:metrics_endpoint, "~> 0.1", in_umbrella: true},
-      {:bakeware, "~> 0.2"},
-      {:bandit, "~> 0.5"},
-      {:broadway_sqs, "~> 0.7"}
+      {:libcluster, "~> 3.3"},
+      {:horde, "~> 0.8"},
+      {:phoenix_pubsub, "~> 2.1"}
     ]
   end
 end

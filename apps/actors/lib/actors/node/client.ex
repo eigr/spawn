@@ -9,7 +9,7 @@ defmodule Actors.Node.Client do
 
   plug(
     Tesla.Middleware.BaseUrl,
-    "http://#{Config.get(:user_function_host)}:#{Config.get(:user_function_port)}"
+    "http://#{Config.get(Actors, :user_function_host)}:#{Config.get(Actors, :user_function_port)}"
   )
 
   plug(Tesla.Middleware.Headers, [{"content-type", "application/octet-stream"}])

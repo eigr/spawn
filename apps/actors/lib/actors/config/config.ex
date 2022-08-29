@@ -1,5 +1,5 @@
 defmodule Actors.Config do
-  @callback load() :: map()
+  @callback load(module) :: map()
 
-  @callback get(atom()) :: any()
+  @callback get(module, atom()) :: any()
 end

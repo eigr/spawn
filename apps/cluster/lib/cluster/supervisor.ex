@@ -1,34 +1,32 @@
-defmodule Actors.Supervisor do
+defmodule Spawn.Cluster.Supervisor do
+  @moduledoc false
   use Supervisor
   require Logger
 
   def start_link(config) do
-    Supervisor.start_link(__MODULE__, config, name: __MODULE__)
+    Supervisor.start_link(__MODULE__, config,
+      name: String.to_atom("#{String.capitalize(config.app_name)}.Cluster")
+    )
   end
 
   def child_spec(config) do
+    id = String.to_atom("#{String.capitalize(config.app_name)}.Cluster")
+
     %{
-      id: __MODULE__,
+      id: id,
       start: {__MODULE__, :start_link, [config]}
     }
   end
 
   @impl true
   def init(config) do
-    Protobuf.load_extensions()
-
-    children = [
-      cluster_supervisor(config),
-      {Registry, keys: :unique, name: Actors.NodeRegistry},
-      {Finch,
-       name: SpawnHTTPClient,
-       pools: %{
-         :default => [size: 32, count: 8]
-       }},
-      Actors.Registry.ActorRegistry.Supervisor,
-      Actors.Actor.Registry.child_spec(),
-      Actors.Actor.Entity.Supervisor
-    ]
+    children =
+      [
+        cluster_supervisor(config)
+      ] ++
+        if Mix.env() == :test,
+          do: [],
+          else: [Spawn.Cluster.Node.Registry.child_spec()]
 
     Supervisor.init(children, strategy: :one_for_one)
   end
@@ -50,7 +48,9 @@ defmodule Actors.Supervisor do
 
     if topologies && Code.ensure_compiled(Cluster.Supervisor) do
       Logger.debug("Cluster topology #{inspect(topologies)}")
-      {Cluster.Supervisor, [topologies, [name: Actors.ClusterSupervisor]]}
+
+      {Cluster.Supervisor,
+       [topologies, [name: String.to_atom("#{String.capitalize(config.app_name)}.${__MODULE__}")]]}
     end
   end
 

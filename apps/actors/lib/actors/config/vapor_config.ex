@@ -5,10 +5,10 @@ defmodule Actors.Config.Vapor do
   alias Vapor.Provider.{Env, Dotenv}
 
   @impl true
-  def load() do
-    case Agent.start_link(fn -> %{} end, name: __MODULE__) do
+  def load(mod) do
+    case Agent.start_link(fn -> %{} end, name: mod) do
       {:ok, _pid} ->
-        Agent.get_and_update(__MODULE__, fn state ->
+        Agent.get_and_update(mod, fn state ->
           if state == %{} do
             config = load_system_env()
             {config, config}
@@ -18,24 +18,24 @@ defmodule Actors.Config.Vapor do
         end)
 
       {:error, {:already_started, _pid}} ->
-        Agent.get(__MODULE__, fn state -> state end)
+        Agent.get(mod, fn state -> state end)
     end
   end
 
   @impl true
-  def get(key), do: Agent.get(__MODULE__, fn state -> Map.get(state, key) end)
+  def get(mod, key), do: Agent.get(mod, fn state -> Map.get(state, key) end)
 
   defp load_system_env() do
     providers = [
       %Dotenv{},
       %Env{
         bindings: [
+          {:app_name, "PROXY_APP_NAME", default: Config.Name.generate(), required: false},
           {:http_port, "PROXY_HTTP_PORT",
            default: 4000, map: &String.to_integer/1, required: false},
           {:proxy_cluster_strategy, "PROXY_CLUSTER_STRATEGY", default: "gossip", required: false},
           {:proxy_headless_service, "PROXY_HEADLESS_SERVICE",
            default: "proxy-headless-svc", required: false},
-          {:proxy_app_name, "PROXY_APP_NAME", default: "spawn-proxy", required: false},
           {:proxy_cluster_poling_interval, "PROXY_CLUSTER_POLLING",
            default: 3_000, map: &String.to_integer/1, required: false},
           {:user_function_host, "USER_FUNCTION_HOST", default: "0.0.0.0", required: false},

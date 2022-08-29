@@ -29,6 +29,8 @@ defmodule ActivatorKafka.MixProject do
   defp deps do
     [
       {:activator, "~> 0.1", in_umbrella: true},
+      {:actors, "~> 0.1", in_umbrella: true},
+      {:cluster, "~> 0.1", in_umbrella: true},
       {:metrics_endpoint, "~> 0.1", in_umbrella: true},
       {:broadway_kafka, "~> 0.3"},
       {:bakeware, "~> 0.2"},

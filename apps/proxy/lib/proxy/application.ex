@@ -6,12 +6,16 @@ defmodule Proxy.Application do
 
   @impl true
   def start(_type, _args) do
-    config = Config.load()
+    config = Config.load(__MODULE__)
+
     MetricsEndpoint.Exporter.setup()
     MetricsEndpoint.PrometheusPipeline.setup()
 
     children = [
-      Actors.Supervisor.child_spec(config),
+      Spawn.Cluster.Supervisor.child_spec(config),
+      Statestores.Supervisor.child_spec(),
+      Actors.Supervisors.ProtocolSupervisor.child_spec(config),
+      Actors.Supervisors.EntitySupervisor.child_spec(config),
       {Bandit, plug: Proxy.Router, scheme: :http, options: [port: config.http_port]}
     ]
 

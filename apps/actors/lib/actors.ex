@@ -55,7 +55,7 @@ defmodule Actors do
   end
 
   def get_state(system_name, actor_name) do
-    case Actors.Actor.Registry.lookup(actor_name) do
+    case Spawn.Cluster.Node.Registry.lookup(Actors.Actor.Entity, actor_name) do
       [{pid, nil}] ->
         Logger.debug("Lookup Actor #{actor_name}. PID: #{inspect(pid)}")
         # This return {:ok, response_body}
@@ -102,7 +102,7 @@ defmodule Actors do
          %ActorId{name: actor_name, actor_system: system_name} = _actor_id,
          request
        ) do
-    case Actors.Actor.Registry.lookup(actor_name) do
+    case Spawn.Cluster.Node.Registry.lookup(Actors.Actor.Entity, actor_name) do
       [{pid, nil}] ->
         Logger.debug("Lookup Actor #{actor_name}. PID: #{inspect(pid)}")
         # This return {:ok, response_body}
@@ -141,7 +141,7 @@ defmodule Actors do
          %ActorId{name: actor_name, actor_system: system_name} = _actor_id,
          request
        ) do
-    case Actors.Actor.Registry.lookup(actor_name) do
+    case Spawn.Cluster.Node.Registry.lookup(Actors.Actor.Entity, actor_name) do
       [{pid, nil}] ->
         Logger.debug("Lookup Actor #{actor_name}. PID: #{inspect(pid)}")
         # This return {:ok, response_body}

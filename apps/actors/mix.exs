@@ -20,16 +20,14 @@ defmodule Actors.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [
-        :logger,
-        :statestores
-      ]
+      extra_applications: [:logger]
     ]
   end
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:cluster, "~> 0.1", in_umbrella: true},
       {:protos, "~> 0.1", in_umbrella: true},
       {:statestores, "~> 0.1", in_umbrella: true},
       {:cowlib, "~> 2.9", override: true},
@@ -38,11 +36,7 @@ defmodule Actors.MixProject do
       {:tesla, "~> 1.4"},
       {:flow, "~> 1.2"},
       {:vapor, "~> 0.10"},
-      # {:poison, "~> 5.0"},
-      {:jason, "~> 1.2"},
-      {:libcluster, "~> 3.3"},
-      {:horde, "~> 0.8"},
-      {:phoenix_pubsub, "~> 2.1"}
+      {:jason, "~> 1.2"}
     ]
   end
 end
