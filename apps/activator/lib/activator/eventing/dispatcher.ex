@@ -1,6 +1,8 @@
 defmodule Activator.Eventing.Dispatcher do
   @behaviour Activator.Dispatcher
 
+  require Logger
+
   alias Eigr.Functions.Protocol.Actors.{Actor, ActorSystem}
 
   alias Eigr.Functions.Protocol.{
@@ -8,26 +10,36 @@ defmodule Activator.Eventing.Dispatcher do
   }
 
   @impl Activator.Dispatcher
-  def dispatch(%{data: payload} = _data) when is_nil(payload), do: {:error, "Nothing to do"}
+  def dispatch(%{data: payload} = _data, _system, _actors) when is_nil(payload),
+    do: {:error, "Nothing to do"}
 
-  def dispatch(%{data: payload, source: source} = _data) do
-    options = parse_source(source)
-    cmd = Map.get(options, :command)
-    system = ActorSystem.new(name: Map.get(options, :system_name))
-    actor = Actor.new(name: Map.get(options, :actor_name))
+  def dispatch(%{data: payload, source: _source} = _data, system, actors) do
+    Logger.info("Dispatching message to Actors #{inspect(actors)}")
 
-    InvocationRequest.new(
-      system: system,
-      actor: actor,
-      value: payload,
-      command_name: cmd,
-      async: true
-    )
-    |> Actors.invoke()
-  end
+    actors
+    |> Flow.from_enumerable(max_demand: System.schedulers_online())
+    |> Flow.map(fn %{actor: actor, command: command} ->
+      actor_type = Actor.new(name: actor)
+      system_type = ActorSystem.new(name: system)
 
-  defp parse_source(source) when is_binary(source) do
-    parts = String.split(source, "/")
-    %{system_name: Enum.at(parts, 2), actor_name: Enum.at(parts, 4), command: Enum.at(parts, 5)}
+      Logger.info(
+        "Request for Activate Actor [#{actor}] using command [#{command}] with payload: #{inspect(payload)}"
+      )
+
+      res =
+        InvocationRequest.new(
+          system: system_type,
+          actor: actor_type,
+          value: payload,
+          command_name: command,
+          async: true
+        )
+        |> Actors.invoke()
+
+      Logger.info("Call result #{inspect(res)}")
+
+      res
+    end)
+    |> Flow.run()
   end
 end
