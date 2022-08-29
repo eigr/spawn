@@ -20,9 +20,13 @@ defmodule Spawn.Cluster.Supervisor do
 
   @impl true
   def init(config) do
-    children = [
-      cluster_supervisor(config)
-    ]
+    children =
+      [
+        cluster_supervisor(config)
+      ] ++
+        if Mix.env() == :test,
+          do: [],
+          else: [Spawn.Cluster.Node.Registry.child_spec()]
 
     Supervisor.init(children, strategy: :one_for_one)
   end

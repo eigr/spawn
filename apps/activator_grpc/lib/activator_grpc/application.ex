@@ -13,9 +13,15 @@ defmodule ActivatorGRPC.Application do
     MetricsEndpoint.Exporter.setup()
     MetricsEndpoint.PrometheusPipeline.setup()
 
-    children = [
-      {Bandit, plug: ActivatorGRPC.Router, scheme: :http, options: [port: get_http_port(config)]}
-    ]
+    children =
+      [
+        Spawn.Cluster.Supervisor.child_spec(config),
+        {Bandit,
+         plug: ActivatorGRPC.Router, scheme: :http, options: [port: get_http_port(config)]}
+      ] ++
+        if Mix.env() == :test,
+          do: [],
+          else: [Actors.Supervisors.EntitySupervisor.child_spec(config)]
 
     opts = [strategy: :one_for_one, name: ActivatorGRPC.Supervisor]
     Supervisor.start_link(children, opts)

@@ -28,8 +28,9 @@ defmodule ActivatorRabbitMQ.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:cluster, "~> 0.1", in_umbrella: true},
       {:activator, "~> 0.1", in_umbrella: true},
+      {:actors, "~> 0.1", in_umbrella: true},
+      {:cluster, "~> 0.1", in_umbrella: true},
       {:metrics_endpoint, "~> 0.1", in_umbrella: true},
       {:bakeware, "~> 0.2"},
       {:bandit, "~> 0.5"},

@@ -1,4 +1,4 @@
-defmodule Actors.Supervisor do
+defmodule Actors.Supervisors.ProtocolSupervisor do
   use Supervisor
   require Logger
 
@@ -23,10 +23,7 @@ defmodule Actors.Supervisor do
        name: SpawnHTTPClient,
        pools: %{
          :default => [size: 32, count: 8]
-       }},
-      Actors.Registry.ActorRegistry.Supervisor,
-      Actors.Actor.Registry.child_spec(),
-      Actors.Actor.Entity.Supervisor
+       }}
     ]
 
     Supervisor.init(children, strategy: :one_for_one)

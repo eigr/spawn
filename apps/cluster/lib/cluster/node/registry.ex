@@ -1,4 +1,4 @@
-defmodule Actors.Actor.Registry do
+defmodule Spawn.Cluster.Node.Registry do
   @moduledoc """
   Defines a distributed registry for all process
   """
@@ -24,15 +24,15 @@ defmodule Actors.Actor.Registry do
   @doc """
   Get Process if this is alive.
   """
-  def lookup(actor_name) do
-    Horde.Registry.lookup(__MODULE__, {Actors.Actor.Entity, actor_name})
+  def lookup(mod, actor_name) do
+    Horde.Registry.lookup(__MODULE__, {mod, actor_name})
   end
 
   @doc """
   Check if Process is alive.
   """
-  def isAlive(actor_name) do
-    case Horde.Registry.lookup(__MODULE__, {Actors.Actor.Entity, actor_name}) do
+  def isAlive(mod, actor_name) do
+    case Horde.Registry.lookup(__MODULE__, {mod, actor_name}) do
       [] -> false
       _ -> true
     end

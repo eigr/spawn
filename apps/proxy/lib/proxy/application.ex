@@ -14,7 +14,8 @@ defmodule Proxy.Application do
     children = [
       Spawn.Cluster.Supervisor.child_spec(config),
       Statestores.Supervisor.child_spec(),
-      Actors.Supervisor.child_spec(config),
+      Actors.Supervisors.ProtocolSupervisor.child_spec(config),
+      Actors.Supervisors.EntitySupervisor.child_spec(config),
       {Bandit, plug: Proxy.Router, scheme: :http, options: [port: config.http_port]}
     ]
 

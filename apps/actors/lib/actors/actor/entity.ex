@@ -529,6 +529,6 @@ defmodule Actors.Actor.Entity do
   end
 
   defp via(name) do
-    {:via, Horde.Registry, {Actors.Actor.Registry, {__MODULE__, name}}}
+    {:via, Horde.Registry, {Spawn.Cluster.Node.Registry, {__MODULE__, name}}}
   end
 end
