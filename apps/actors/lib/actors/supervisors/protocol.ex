@@ -2,6 +2,8 @@ defmodule Actors.Supervisors.ProtocolSupervisor do
   use Supervisor
   require Logger
 
+  alias Actors.Config.Vapor, as: Config
+
   def start_link(config) do
     Supervisor.start_link(__MODULE__, config, name: __MODULE__)
   end
@@ -15,6 +17,7 @@ defmodule Actors.Supervisors.ProtocolSupervisor do
 
   @impl true
   def init(_config) do
+    _config = Config.load(Actors)
     Protobuf.load_extensions()
 
     children = [
