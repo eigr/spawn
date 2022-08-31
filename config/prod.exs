@@ -1,6 +1,7 @@
 import Config
 
 config :bonny,
+  api_version: "apiextensions.k8s.io/v1",
   get_conn: {K8s.Conn, :from_service_account, []},
 
   # Add each CRD Controller module for this operator to load here
