@@ -3,6 +3,7 @@ import Config
 config :statestores, Statestores.Adapters.MySQL, pool: Ecto.Adapters.SQL.Sandbox
 
 config :bonny,
+  api_version: "apiextensions.k8s.io/v1",
   get_conn: {K8s.Conn, :from_file, ["~/.kube/config", [context: "minikube"]]},
 
   # Add each CRD Controller module for this operator to load here

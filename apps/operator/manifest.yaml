@@ -3,34 +3,30 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    eigr_functions_protocol_major_version: "0"
-    eigr_functions_protocol_minor_version: "1"
+    eigr_functions_protocol_major_version: '0'
+    eigr_functions_protocol_minor_version: '1'
     proxy_name: spawn
     k8s-app: eigr-functions-controller
-  name: eigr-functions
+  name: eigr-functions-controller
   namespace: eigr-functions
 spec:
   replicas: 1
   selector:
     matchLabels:
-      eigr_functions_protocol_major_version: "0"
-      eigr_functions_protocol_minor_version: "1"
+      eigr_functions_protocol_major_version: '0'
+      eigr_functions_protocol_minor_version: '1'
       proxy_name: spawn
       k8s-app: eigr-functions-controller
   template:
     metadata:
       labels:
-        eigr_functions_protocol_major_version: "0"
-        eigr_functions_protocol_minor_version: "1"
+        eigr_functions_protocol_major_version: '0'
+        eigr_functions_protocol_minor_version: '1'
         proxy_name: spawn
         k8s-app: eigr-functions-controller
     spec:
       containers:
         - env:
-            - name: BAKEWARE_CACHE
-              value: /home/app/.cache/bakeware
-            - name: NODE_COOKIE
-              value: "FW9RYfQpVbuycMxSodrXIKAzuLgsaR5gyArGeap8WTHNfJj3vfltYQ=="
             - name: MIX_ENV
               value: prod
             - name: BONNY_POD_NAME
@@ -58,51 +54,24 @@ spec:
             requests:
               cpu: 100m
               memory: 100Mi
-          volumeMounts:
-            - mountPath: /home/app/.cache/bakeware
-              name: cache-data
-            # - mountPath: /.erlang_cookie
-            #   name: cookie-data
-            #   subPath: .erlang_cookie
           securityContext:
             allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: false
-            runAsNonRoot: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
             runAsUser: 65534
       serviceAccountName: eigr-functions
-      volumes:
-        - emptyDir: {}
-          name: cache-data
-        # - emptyDir: {}
-        #   name: cookie-data
 
 ---
-apiVersion: apiextensions.k8s.io/v1beta1
+apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   labels:
-    eigr_functions_protocol_major_version: "0"
-    eigr_functions_protocol_minor_version: "1"
+    eigr_functions_protocol_major_version: '0'
+    eigr_functions_protocol_minor_version: '1'
     proxy_name: spawn
     k8s-app: eigr-functions-controller
   name: activators.spawn.eigr.io
 spec:
-  additionalPrinterColumns:
-    - JSONPath: .spec.activator.type
-      description: Activator Type
-      name: type
-      type: string
-    - JSONPath: .spec.activator.expose.method
-      description: Method used to expose Activator
-      name: external
-      type: string
-    - JSONPath: .metadata.creationTimestamp
-      description: |-
-        CreationTimestamp is a timestamp representing the server time when this object was created. It is not guaranteed to be set in happens-before order across separate operations. Clients may not set this value. It is represented in RFC3339 form and is in UTC.
-
-              Populated by the system. Read-only. Null for lists. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata
-      name: Age
-      type: date
   group: spawn.eigr.io
   names:
     kind: Activator
@@ -114,20 +83,42 @@ spec:
       - activators
     singular: activator
   scope: Cluster
-  version: v1
+  versions:
+    - additionalPrinterColumns:
+        - description: Activator Type
+          jsonPath: .spec.activator.type
+          name: type
+          type: string
+        - description: Method used to expose Activator
+          jsonPath: .spec.activator.expose.method
+          name: external
+          type: string
+        - description: |-
+            CreationTimestamp is a timestamp representing the server time when this object was created. It is not guaranteed to be set in happens-before order across separate operations. Clients may not set this value. It is represented in RFC3339 form and is in UTC.
+            
+                  Populated by the system. Read-only. Null for lists. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata
+          jsonPath: .metadata.creationTimestamp
+          name: Age
+          type: date
+      name: v1
+      schema:
+        openAPIV3Schema:
+          type: object
+          x-kubernetes-preserve-unknown-fields: true
+      served: true
+      storage: true
 
 ---
-apiVersion: apiextensions.k8s.io/v1beta1
+apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   labels:
-    eigr_functions_protocol_major_version: "0"
-    eigr_functions_protocol_minor_version: "1"
+    eigr_functions_protocol_major_version: '0'
+    eigr_functions_protocol_minor_version: '1'
     proxy_name: spawn
     k8s-app: eigr-functions-controller
   name: actornodes.spawn.eigr.io
 spec:
-  additionalPrinterColumns: []
   group: spawn.eigr.io
   names:
     kind: ActorNode
@@ -140,31 +131,27 @@ spec:
       - actornodes
     singular: actornode
   scope: Cluster
-  version: v1
+  versions:
+    - additionalPrinterColumns: []
+      name: v1
+      schema:
+        openAPIV3Schema:
+          type: object
+          x-kubernetes-preserve-unknown-fields: true
+      served: true
+      storage: true
 
 ---
-apiVersion: apiextensions.k8s.io/v1beta1
+apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   labels:
-    eigr_functions_protocol_major_version: "0"
-    eigr_functions_protocol_minor_version: "1"
+    eigr_functions_protocol_major_version: '0'
+    eigr_functions_protocol_minor_version: '1'
     proxy_name: spawn
     k8s-app: eigr-functions-controller
   name: actorsystems.spawn.eigr.io
 spec:
-  additionalPrinterColumns:
-    - JSONPath: .spec.storage.type
-      description: Storage type of the Actor System
-      name: storage
-      type: string
-    - JSONPath: .metadata.creationTimestamp
-      description: |-
-        CreationTimestamp is a timestamp representing the server time when this object was created. It is not guaranteed to be set in happens-before order across separate operations. Clients may not set this value. It is represented in RFC3339 form and is in UTC.
-
-              Populated by the system. Read-only. Null for lists. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata
-      name: Age
-      type: date
   group: spawn.eigr.io
   names:
     kind: ActorSystem
@@ -177,15 +164,34 @@ spec:
       - system
     singular: actorsystem
   scope: Cluster
-  version: v1
+  versions:
+    - additionalPrinterColumns:
+        - description: Storage type of the Actor System
+          jsonPath: .spec.storage.type
+          name: storage
+          type: string
+        - description: |-
+            CreationTimestamp is a timestamp representing the server time when this object was created. It is not guaranteed to be set in happens-before order across separate operations. Clients may not set this value. It is represented in RFC3339 form and is in UTC.
+            
+                  Populated by the system. Read-only. Null for lists. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata
+          jsonPath: .metadata.creationTimestamp
+          name: Age
+          type: date
+      name: v1
+      schema:
+        openAPIV3Schema:
+          type: object
+          x-kubernetes-preserve-unknown-fields: true
+      served: true
+      storage: true
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   labels:
-    eigr_functions_protocol_major_version: "0"
-    eigr_functions_protocol_minor_version: "1"
+    eigr_functions_protocol_major_version: '0'
+    eigr_functions_protocol_minor_version: '1'
     proxy_name: spawn
     k8s-app: eigr-functions-controller
   name: eigr-functions
@@ -195,32 +201,32 @@ rules:
     resources:
       - customresourcedefinitions
     verbs:
-      - "*"
+      - '*'
   - apiGroups:
       - spawn.eigr.io
     resources:
       - activators
     verbs:
-      - "*"
+      - '*'
   - apiGroups:
       - spawn.eigr.io
     resources:
       - actornodes
     verbs:
-      - "*"
+      - '*'
   - apiGroups:
       - spawn.eigr.io
     resources:
       - actorsystems
     verbs:
-      - "*"
+      - '*'
   - apiGroups:
       - apps
     resources:
       - deployments
       - daemonsets
     verbs:
-      - "*"
+      - '*'
   - apiGroups:
       - ""
     resources:
@@ -228,33 +234,33 @@ rules:
       - pods
       - configmaps
     verbs:
-      - "*"
+      - '*'
   - apiGroups:
       - autoscaling
     resources:
       - horizontalpodautoscalers
     verbs:
-      - "*"
+      - '*'
   - apiGroups:
       - extensions
     resources:
       - ingresses
       - ingressclasses
     verbs:
-      - "*"
+      - '*'
   - apiGroups:
       - networking.k8s.io
     resources:
       - ingresses
       - ingressclasses
     verbs:
-      - "*"
+      - '*'
   - apiGroups:
       - apps
     resources:
       - deployments
     verbs:
-      - "*"
+      - '*'
   - apiGroups:
       - ""
     resources:
@@ -262,33 +268,33 @@ rules:
       - pods
       - configmaps
     verbs:
-      - "*"
+      - '*'
   - apiGroups:
       - autoscaling
     resources:
       - horizontalpodautoscalers
     verbs:
-      - "*"
+      - '*'
   - apiGroups:
       - extensions
     resources:
       - ingresses
       - ingressclasses
     verbs:
-      - "*"
+      - '*'
   - apiGroups:
       - networking.k8s.io
     resources:
       - ingresses
       - ingressclasses
     verbs:
-      - "*"
+      - '*'
   - apiGroups:
       - apps
     resources:
       - deployments
     verbs:
-      - "*"
+      - '*'
   - apiGroups:
       - ""
     resources:
@@ -296,15 +302,15 @@ rules:
       - pods
       - configmaps
     verbs:
-      - "*"
+      - '*'
 
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   labels:
-    eigr_functions_protocol_major_version: "0"
-    eigr_functions_protocol_minor_version: "1"
+    eigr_functions_protocol_major_version: '0'
+    eigr_functions_protocol_minor_version: '1'
     proxy_name: spawn
     k8s-app: eigr-functions-controller
   name: eigr-functions
@@ -315,8 +321,8 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   labels:
-    eigr_functions_protocol_major_version: "0"
-    eigr_functions_protocol_minor_version: "1"
+    eigr_functions_protocol_major_version: '0'
+    eigr_functions_protocol_minor_version: '1'
     proxy_name: spawn
     k8s-app: eigr-functions-controller
   name: eigr-functions
