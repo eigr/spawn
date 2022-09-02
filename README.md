@@ -570,16 +570,19 @@ kubectl get actornodes
 
 ## Local Development
 
-Run:
-
-```shell
-PROXY_DATABASE_TYPE=mysql SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= iex --name spawn_a2@127.0.0.1 -S mix
-```
+> **_NOTE:_** All scripts will use a MySQL DB with a database called eigr-functions-db by default. Make sure you have a working instance on your localhost or you will have to change make tasks or run commands manually during testing.
 
 Tests:
 
 ```shell
-MIX_ENV=test PROXY_DATABASE_TYPE=mysql PROXY_HTTP_PORT=9001 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
+make test
 ```
+
+Run:
+
+```shell
+make build run-proxy-local
+```
+
 
 For more information on how to collaborate or even to get to know the project structure better, go to our [contributor guide](CONTRIBUTING.md)
