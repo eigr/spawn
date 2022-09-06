@@ -83,12 +83,48 @@ defmodule ActivatorRabbitMQ.Sources.RabbitMQ do
     |> Message.update_data(fn data ->
       Logger.info("Received message #{inspect(data)}")
 
-      with {:ok, event} <- Cloudevents.from_json(data) do
-        Dispatcher.dispatch(event, system, actors)
-      else
-        _ ->
-          Logger.warn("Failed to parse the message #{inspect(data)}")
-      end
+      # data2 = binary_to_string(data)
+      # data = if is_binary(data), do: binary_to_string(data), else: data
+
+      Dispatcher.dispatch(data, system, actors)
+
+      # with {:ok, event} <- Cloudevents.from_json(data2) do
+      #   Dispatcher.dispatch(event, system, actors)
+      # else
+      #   error ->
+      #     Logger.warn("Failed to parse the message #{inspect(data2)}. Error #{inspect(error)}")
+      #     # raise "Failed to parse the message #{inspect(data2)}"
+      # end
     end)
+  rescue
+    e ->
+      Logger.error(Exception.format(:error, e, __STACKTRACE__))
+      # reraise e, __STACKTRACE__
+  end
+
+  def binary_to_string(binary) do
+    binary
+    |> String.replace("\\", "")
+    # |> Jason.decode!()
+    # |> String.replace("\\", "")
+    # |> String.replace("\\", "")
+    |> IO.inspect(label: "String result")
+  end
+
+  def caesar(list, n) do
+    Enum.map(
+      list,
+      &(perform_addition(&1, n)
+        |> to_charlist
+        |> to_string)
+    )
+  end
+
+  defp perform_addition(char_val, n) when char_val < 122 do
+    char_val + n
+  end
+
+  defp perform_addition(_, n) do
+    97 + n
   end
 end

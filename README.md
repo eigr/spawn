@@ -584,5 +584,4 @@ Run:
 make build run-proxy-local
 ```
 
-
 For more information on how to collaborate or even to get to know the project structure better, go to our [contributor guide](CONTRIBUTING.md)

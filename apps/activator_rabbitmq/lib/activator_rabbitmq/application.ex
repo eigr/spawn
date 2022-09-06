@@ -46,8 +46,8 @@ defmodule ActivatorRabbitMQ.Application do
       rate_limiting_interval: 1_000,
       rate_limiting_allowed_messages: 100,
       targets: [
-        %{actor: "joe", command: "get"}
-        # %{actor: "robert", command: "get"}
+        # %{actor: "joe", command: "setLanguage"},
+        %{actor: "robert", command: "setLanguage"}
       ]
     ]
   end
