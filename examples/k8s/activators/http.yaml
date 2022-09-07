@@ -1,0 +1,35 @@
+---
+apiVersion: spawn.eigr.io/v1
+kind: Activator
+metadata:
+  name: myapp-http-activator # Mandatory. Name of the activator
+  namespace: default # Optional. Default namespace is "default"
+spec:
+  activator:
+    type: HTTP
+    expose: true
+    exposeMethod: ingress
+    exposeIngressType: nginx
+  bindings:
+    sources:
+      - name: robert-set-language-mapping
+        url: /api/v1/users
+        method: POST
+        transformer:
+          type: JsonToProtobuf
+          params:
+            protoMessage: "Request" # name of protobuf type
+            protoPackage: "io.eigr.functions.spawn.codebeambr.messages"
+            ignoreUnknownFields: true
+            fileDescriptor:
+              volumeMounts:
+                - name: descriptors-config
+                  mountPath: /etc/protos
+    sinks:
+      - name: robert-sink
+        actor: robert
+        command: setLanguage
+  volumes:
+    - name: descriptors-config
+      configMap:
+        name: protobuf-file-descriptors
