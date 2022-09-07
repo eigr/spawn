@@ -27,8 +27,8 @@ spec:
                   mountPath: /etc/protos
     sinks:
       - name: robert-sink
-        actor: robert
-        command: setLanguage
+        actor: robert # Name of an Actor to send queue event message
+        command: setLanguage # Name of an Actor method/function to call
   volumes:
     - name: descriptors-config
       configMap:

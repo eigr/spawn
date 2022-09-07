@@ -14,8 +14,8 @@ spec:
         queue: test
     sinks:
       - name: robert-sink
-        actor: robert
-        command: setLanguage
+        actor: robert # Name of an Actor to send queue event message
+        command: setLanguage # Name of an Actor method/function to call
         # instance-id-binding:
         #   type: header # Possible: none, header, attribute
         #   name: X-Actor-Instance-Id
