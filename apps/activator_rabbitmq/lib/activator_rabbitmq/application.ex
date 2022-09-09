@@ -43,7 +43,7 @@ defmodule ActivatorRabbitMQ.Application do
       provider_port: 5672,
       provider_url: nil,
       use_rate_limiting: true,
-      rate_limiting_interval: 1_000,
+      rate_limiting_interval: 1,
       rate_limiting_allowed_messages: 100,
       targets: [
         # %{actor: "joe", command: "setLanguage"},

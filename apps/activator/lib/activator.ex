@@ -11,6 +11,6 @@ defmodule Activator do
             | Cloudevents.Format.V_0_2.Event.t()
             | Cloudevents.Format.V_0_1.Event.t()
 
-    @callback dispatch(data, any(), any()) :: {:ok, term} | {:error, String.t()}
+    @callback dispatch(data, any(), any()) :: :ok | {:error, any()}
   end
 end
