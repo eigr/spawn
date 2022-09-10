@@ -1,5 +1,8 @@
-defmodule Activator.Codec.CloudEvent do
-  @behaviour Activator.Codec
+defmodule Activator.Encoder.CloudEvent do
+  @doc """
+  `CloudEvent`
+  """
+  @behaviour Activator.Encoder
 
   alias Google.Protobuf.Any
   alias Io.Cloudevents.V1.CloudEvent, as: CloudEventType

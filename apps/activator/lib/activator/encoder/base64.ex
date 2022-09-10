@@ -1,5 +1,8 @@
-defmodule Activator.Codec.Base64 do
-  @behaviour Activator.Codec
+defmodule Activator.Encoder.Base64 do
+  @doc """
+  `Base64`
+  """
+  @behaviour Activator.Encoder
 
   alias Google.Protobuf.Any
 

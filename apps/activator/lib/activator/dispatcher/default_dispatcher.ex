@@ -33,7 +33,7 @@ defmodule Activator.Dispatcher.DefaultDispatcher do
       actor_type = Actor.new(name: actor)
       system_type = ActorSystem.new(name: system)
 
-      Logger.info(
+      Logger.debug(
         "Request for Activate Actor [#{actor}] using command [#{command}] with payload: #{inspect(payload)}"
       )
 
@@ -47,7 +47,7 @@ defmodule Activator.Dispatcher.DefaultDispatcher do
         )
         |> Actors.invoke()
 
-      Logger.info("Call result #{inspect(res)}")
+      Logger.debug("Call result #{inspect(res)}")
 
       res
     end)

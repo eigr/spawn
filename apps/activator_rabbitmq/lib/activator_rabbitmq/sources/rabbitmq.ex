@@ -19,7 +19,7 @@ defmodule ActivatorRabbitMQ.Sources.RabbitMQ do
 
     message
     |> Message.update_data(fn data ->
-      Logger.info("Received message #{inspect(data)}")
+      Logger.debug("Received message #{inspect(data)}")
       Dispatcher.dispatch(encoder, data, system, actors)
     end)
   rescue
@@ -29,7 +29,7 @@ defmodule ActivatorRabbitMQ.Sources.RabbitMQ do
   end
 
   defp start_source(opts) do
-    encoder = Keyword.get(opts, :encoder, Activator.Codec.Base64)
+    encoder = Keyword.get(opts, :encoder, Activator.Encoder.Base64)
     actor_concurrency = Keyword.get(opts, :actor_concurrency, 1)
     actor_system = Keyword.fetch!(opts, :actor_system)
     target_actors = Keyword.fetch!(opts, :targets)

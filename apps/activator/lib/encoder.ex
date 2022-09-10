@@ -1,6 +1,6 @@
-defmodule Activator.Codec do
+defmodule Activator.Encoder do
   @moduledoc """
-  ´Codec´ convert one type to another
+  Encoder convert one type to another
   """
 
   @type data :: any()
