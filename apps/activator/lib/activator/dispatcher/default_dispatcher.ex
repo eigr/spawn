@@ -1,4 +1,4 @@
-defmodule Activator.Eventing.Dispatcher do
+defmodule Activator.Dispatcher.DefaultDispatcher do
   @behaviour Activator.Dispatcher
 
   require Logger

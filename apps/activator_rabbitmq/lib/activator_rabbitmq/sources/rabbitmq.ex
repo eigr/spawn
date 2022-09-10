@@ -5,7 +5,7 @@ defmodule ActivatorRabbitMQ.Sources.RabbitMQ do
   use Broadway
   require Logger
 
-  alias Activator.Eventing.Dispatcher
+  alias Activator.Dispatcher.DefaultDispatcher, as: Dispatcher
 
   alias Broadway.Message
 
@@ -38,7 +38,6 @@ defmodule ActivatorRabbitMQ.Sources.RabbitMQ do
       name: __MODULE__,
       context: [
         encoder: encoder,
-        dispatcher: Activator.Eventing.Dispatcher,
         system: actor_system,
         targets: target_actors
       ],
