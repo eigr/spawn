@@ -11,6 +11,23 @@ defmodule ActivatorRabbitMQ.Sources.RabbitMQ do
 
   def start_link(opts), do: start_source(opts)
 
+  @impl true
+  def handle_message(_, message, context) do
+    encoder = Keyword.fetch!(context, :encoder)
+    system = Keyword.fetch!(context, :system)
+    actors = Keyword.fetch!(context, :targets)
+
+    message
+    |> Message.update_data(fn data ->
+      Logger.info("Received message #{inspect(data)}")
+      Dispatcher.dispatch(encoder, data, system, actors)
+    end)
+  rescue
+    e ->
+      Logger.error(Exception.format(:error, e, __STACKTRACE__))
+      # reraise e, __STACKTRACE__
+  end
+
   defp start_source(opts) do
     encoder = Keyword.get(opts, :encoder, Activator.Codec.Base64)
     actor_concurrency = Keyword.get(opts, :actor_concurrency, 1)
@@ -74,48 +91,5 @@ defmodule ActivatorRabbitMQ.Sources.RabbitMQ do
       false ->
         producer
     end
-  end
-
-  @impl true
-  def handle_message(_, message, context) do
-    encoder = Keyword.fetch!(context, :encoder)
-    system = Keyword.fetch!(context, :system)
-    actors = Keyword.fetch!(context, :targets)
-
-    message
-    |> Message.update_data(fn data ->
-      Logger.info("Received message #{inspect(data)}")
-      Dispatcher.dispatch(encoder, data, system, actors)
-    end)
-  rescue
-    e ->
-      Logger.error(Exception.format(:error, e, __STACKTRACE__))
-      # reraise e, __STACKTRACE__
-  end
-
-  def binary_to_string(binary) do
-    binary
-    |> String.replace("\\", "")
-    # |> Jason.decode!()
-    # |> String.replace("\\", "")
-    # |> String.replace("\\", "")
-    |> IO.inspect(label: "String result")
-  end
-
-  def caesar(list, n) do
-    Enum.map(
-      list,
-      &(perform_addition(&1, n)
-        |> to_charlist
-        |> to_string)
-    )
-  end
-
-  defp perform_addition(char_val, n) when char_val < 122 do
-    char_val + n
-  end
-
-  defp perform_addition(_, n) do
-    97 + n
   end
 end
