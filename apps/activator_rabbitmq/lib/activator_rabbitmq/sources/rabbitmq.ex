@@ -9,6 +9,7 @@ defmodule ActivatorRabbitMQ.Sources.RabbitMQ do
 
   alias Broadway.Message
 
+  @spec start_link(keyword) :: :ignore | {:error, any} | {:ok, pid}
   def start_link(opts), do: start_source(opts)
 
   @impl true
