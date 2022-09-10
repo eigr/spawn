@@ -520,6 +520,15 @@ defmodule Actors.Actor.Entity do
 
   defp update_state(
          %EntityState{
+           actor: %Actor{state: actor_state} = _actor
+         } = state,
+         %Context{state: _updated_state} = _user_ctx
+       )
+       when is_nil(actor_state),
+       do: state
+
+  defp update_state(
+         %EntityState{
            actor: %Actor{state: %ActorState{} = actor_state} = actor
          } = state,
          %Context{state: updated_state} = _user_ctx
