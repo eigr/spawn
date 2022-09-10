@@ -2,18 +2,20 @@
 apiVersion: spawn.eigr.io/v1
 kind: Activator
 metadata:
-  name: my-pubsub-activator # Mandatory. Name of the function
+  name: rabbitmq-activator # Mandatory. Name of the activator
   namespace: default # Optional. Default namespace is "default"
 spec:
   activator:
-    type: GooglePubSub
-    paramsSecretRef: pubsub-connection-secret
+    type: AMQP
+    paramsSecretRef: rabbitmq-connection-secret
   bindings:
-    source:
-      queue: my.event.queue
-    sink:
-      actor: my-actor-name
-      command: handle_command
-      instance-id-binding:
-        type: header # Possible: none, header, attribute
-        name: X-Actor-Instance-Id
+    sources:
+      - name: amqp-source
+        queue: test
+    sinks:
+      - name: robert-sink
+        actor: robert # Name of an Actor to send queue event message
+        command: setLanguage # Name of an Actor method/function to call
+        # instance-id-binding:
+        #   type: header # Possible: none, header, attribute
+        #   name: X-Actor-Instance-Id

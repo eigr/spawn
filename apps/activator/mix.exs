@@ -27,6 +27,7 @@ defmodule Activators.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:protos, "~> 0.1", in_umbrella: true},
       {:actors, "~> 0.1", in_umbrella: true},
       {:cloudevents, "~> 0.6.1"},
       {:hackney, "~> 1.9"}

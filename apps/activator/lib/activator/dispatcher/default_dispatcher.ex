@@ -1,4 +1,4 @@
-defmodule Activator.Eventing.Dispatcher do
+defmodule Activator.Dispatcher.DefaultDispatcher do
   @behaviour Activator.Dispatcher
 
   require Logger
@@ -10,12 +10,23 @@ defmodule Activator.Eventing.Dispatcher do
   }
 
   @impl Activator.Dispatcher
-  def dispatch(%{data: payload} = _data, _system, _actors) when is_nil(payload),
-    do: {:error, "Nothing to do"}
-
-  def dispatch(%{data: payload, source: _source} = _data, system, actors) do
+  @spec dispatch(module(), any, any, any) :: :ok | {:error, any()}
+  def dispatch(encoder, data, system, actors) do
     Logger.info("Dispatching message to Actors #{inspect(actors)}")
 
+    case encoder.decode(data) do
+      {:ok, payload} ->
+        Logger.debug("Decoded event: #{inspect(payload)}")
+
+        do_dispatch(system, actors, payload)
+
+      {:error, error} ->
+        Logger.error("Failure on decode event. Error: #{inspect(error)}")
+        {:error, error}
+    end
+  end
+
+  defp do_dispatch(system, actors, payload) do
     actors
     |> Flow.from_enumerable(max_demand: System.schedulers_online())
     |> Flow.map(fn %{actor: actor, command: command} ->
@@ -32,7 +43,7 @@ defmodule Activator.Eventing.Dispatcher do
           actor: actor_type,
           value: payload,
           command_name: command,
-          async: true
+          async: false
         )
         |> Actors.invoke()
 

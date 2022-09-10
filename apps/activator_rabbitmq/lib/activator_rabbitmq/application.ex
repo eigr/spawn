@@ -32,6 +32,7 @@ defmodule ActivatorRabbitMQ.Application do
 
   defp make_opts(_config) do
     [
+      encoder: Activator.Codec.CloudEvent,
       actor_system: "spawn-system",
       actor_concurrency: 1,
       username: "guest",
@@ -43,11 +44,11 @@ defmodule ActivatorRabbitMQ.Application do
       provider_port: 5672,
       provider_url: nil,
       use_rate_limiting: true,
-      rate_limiting_interval: 1_000,
+      rate_limiting_interval: 1,
       rate_limiting_allowed_messages: 100,
       targets: [
-        %{actor: "joe", command: "get"}
-        # %{actor: "robert", command: "get"}
+        # %{actor: "joe", command: "setLanguage"},
+        %{actor: "robert", command: "setLanguage"}
       ]
     ]
   end
