@@ -32,6 +32,7 @@ defmodule ActivatorRabbitMQ.Application do
 
   defp make_opts(_config) do
     [
+      encoder: Activator.Codec.CloudEvent,
       actor_system: "spawn-system",
       actor_concurrency: 1,
       username: "guest",

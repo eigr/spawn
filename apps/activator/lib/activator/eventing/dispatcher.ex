@@ -10,12 +10,11 @@ defmodule Activator.Eventing.Dispatcher do
   }
 
   @impl Activator.Dispatcher
-  @spec dispatch(any, any, any) :: :ok | {:error, any()}
-  def dispatch(data, system, actors) do
+  @spec dispatch(module(), any, any, any) :: :ok | {:error, any()}
+  def dispatch(encoder, data, system, actors) do
     Logger.info("Dispatching message to Actors #{inspect(actors)}")
 
-    # case Activator.Codec.Base64.decode(data) do
-    case Activator.Codec.CloudEvent.decode(data) do
+    case encoder.decode(data) do
       {:ok, payload} ->
         Logger.debug("Decoded event: #{inspect(payload)}")
 

@@ -12,6 +12,7 @@ defmodule ActivatorRabbitMQ.Sources.RabbitMQ do
   def start_link(opts), do: start_source(opts)
 
   defp start_source(opts) do
+    encoder = Keyword.get(opts, :encoder, Activator.Codec.Base64)
     actor_concurrency = Keyword.get(opts, :actor_concurrency, 1)
     actor_system = Keyword.fetch!(opts, :actor_system)
     target_actors = Keyword.fetch!(opts, :targets)
@@ -19,6 +20,7 @@ defmodule ActivatorRabbitMQ.Sources.RabbitMQ do
     Broadway.start_link(__MODULE__,
       name: __MODULE__,
       context: [
+        encoder: encoder,
         dispatcher: Activator.Eventing.Dispatcher,
         system: actor_system,
         targets: target_actors
@@ -76,25 +78,14 @@ defmodule ActivatorRabbitMQ.Sources.RabbitMQ do
 
   @impl true
   def handle_message(_, message, context) do
+    encoder = Keyword.fetch!(context, :encoder)
     system = Keyword.fetch!(context, :system)
     actors = Keyword.fetch!(context, :targets)
 
     message
     |> Message.update_data(fn data ->
       Logger.info("Received message #{inspect(data)}")
-
-      # data2 = binary_to_string(data)
-      # data = if is_binary(data), do: binary_to_string(data), else: data
-
-      Dispatcher.dispatch(data, system, actors)
-
-      # with {:ok, event} <- Cloudevents.from_json(data2) do
-      #   Dispatcher.dispatch(event, system, actors)
-      # else
-      #   error ->
-      #     Logger.warn("Failed to parse the message #{inspect(data2)}. Error #{inspect(error)}")
-      #     # raise "Failed to parse the message #{inspect(data2)}"
-      # end
+      Dispatcher.dispatch(encoder, data, system, actors)
     end)
   rescue
     e ->
