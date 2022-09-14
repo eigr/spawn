@@ -442,16 +442,31 @@ defmodule Actors.Actor.Entity do
     GenServer.start(__MODULE__, state, name: via(name))
   end
 
-  def get_state(name) do
-    GenServer.call(via(name), :get_state, 20_000)
+  @spec get_state(any) :: any
+  def get_state(ref) when is_pid(ref) do
+    GenServer.call(ref, :get_state, 20_000)
   end
 
-  def invoke(name, request) do
-    GenServer.call(via(name), {:invocation_request, request}, 30_000)
+  def get_state(ref) do
+    GenServer.call(via(ref), :get_state, 20_000)
   end
 
-  def invoke_async(name, request) do
-    GenServer.cast(via(name), {:invocation_request, :async, request})
+  @spec invoke(any, any) :: any
+  def invoke(ref, request) when is_pid(ref) do
+    GenServer.call(ref, {:invocation_request, request}, 30_000)
+  end
+
+  def invoke(ref, request) do
+    GenServer.call(via(ref), {:invocation_request, request}, 30_000)
+  end
+
+  @spec invoke_async(any, any) :: :ok
+  def invoke_async(ref, request) when is_pid(ref) do
+    GenServer.cast(ref, {:invocation_request, :async, request})
+  end
+
+  def invoke_async(ref, request) do
+    GenServer.cast(via(ref), {:invocation_request, :async, request})
   end
 
   defp get_timeout_factor(factor_range) when is_number(factor_range),

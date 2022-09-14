@@ -50,10 +50,10 @@ defmodule Actors do
 
   def get_state(system_name, actor_name) do
     case Spawn.Cluster.Node.Registry.lookup(Actors.Actor.Entity, actor_name) do
-      [{pid, nil}] ->
-        Logger.debug("Lookup Actor #{actor_name}. PID: #{inspect(pid)}")
+      [{actor_ref, nil}] ->
+        Logger.debug("Lookup Actor #{actor_name}. PID: #{inspect(actor_ref)}")
         # This return {:ok, response_body}
-        ActorEntity.get_state(actor_name)
+        ActorEntity.get_state(actor_ref)
 
       _ ->
         with {:ok, %{node: node, actor: actor}} <-
@@ -99,10 +99,10 @@ defmodule Actors do
          request
        ) do
     case Spawn.Cluster.Node.Registry.lookup(Actors.Actor.Entity, actor_name) do
-      [{pid, nil}] ->
-        Logger.debug("Lookup Actor #{actor_name}. PID: #{inspect(pid)}")
+      [{actor_ref, nil}] ->
+        Logger.debug("Lookup Actor #{actor_name}. ActorRef PID: #{inspect(actor_ref)}")
         # This return {:ok, response_body}
-        ActorEntity.invoke(actor_name, request)
+        ActorEntity.invoke(actor_ref, request)
 
       _ ->
         with {:ok, %{node: node, actor: _registered_actor}} <-
@@ -138,10 +138,10 @@ defmodule Actors do
          request
        ) do
     case Spawn.Cluster.Node.Registry.lookup(Actors.Actor.Entity, actor_name) do
-      [{pid, nil}] ->
-        Logger.debug("Lookup Actor #{actor_name}. PID: #{inspect(pid)}")
+      [{actor_ref, nil}] ->
+        Logger.debug("Lookup Actor #{actor_name}. ActorRef PID: #{inspect(actor_ref)}")
         # This return {:ok, response_body}
-        ActorEntity.invoke(actor_name, request)
+        ActorEntity.invoke(actor_ref, request)
 
       _ ->
         with {:ok, %{node: node, actor: _registered_actor}} <-
@@ -172,9 +172,9 @@ defmodule Actors do
 
   def try_reactivate_actor(%ActorSystem{} = system, %Actor{name: name} = actor) do
     case ActorEntitySupervisor.lookup_or_create_actor(system, actor) do
-      {:ok, pid} ->
-        Logger.debug("Actor #{name} reactivated. PID: #{inspect(pid)}")
-        {:ok, pid}
+      {:ok, actor_ref} ->
+        Logger.debug("Actor #{name} reactivated. ActorRef PID: #{inspect(actor_ref)}")
+        {:ok, actor_ref}
 
       reason ->
         Logger.error("Failed to reactivate actor #{name}: #{inspect(reason)}")
@@ -185,9 +185,9 @@ defmodule Actors do
   # To lookup all actors
   def try_reactivate_actor(nil, %Actor{name: name} = actor) do
     case ActorEntitySupervisor.lookup_or_create_actor(nil, actor) do
-      {:ok, pid} ->
-        Logger.debug("Actor #{name} reactivated. PID: #{inspect(pid)}")
-        {:ok, pid}
+      {:ok, actor_ref} ->
+        Logger.debug("Actor #{name} reactivated. ActorRef PID: #{inspect(actor_ref)}")
+        {:ok, actor_ref}
 
       reason ->
         Logger.error("Failed to reactivate actor #{name}: #{inspect(reason)}")
