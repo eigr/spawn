@@ -9,7 +9,7 @@ defmodule Statestores.Migrator do
     {:ok, _, _} = Ecto.Migrator.with_repo(repo, &Ecto.Migrator.run(&1, :up, all: true))
   end
 
-  @spec rollback :: {:ok, any, any}
+  @spec rollback(any, any) :: {:ok, any, any}
   def rollback(repo, version) do
     load_app()
     {:ok, _, _} = Ecto.Migrator.with_repo(repo, &Ecto.Migrator.run(&1, :down, to: version))
