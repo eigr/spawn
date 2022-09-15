@@ -22,6 +22,8 @@ defmodule Actors do
   @activate_actors_min_demand 0
   @activate_actors_max_demand 4
 
+  @erpc_timeout 5_000
+
   def register(
         %RegistrationRequest{
           service_info: %ServiceInfo{} = _service_info,
@@ -49,73 +51,47 @@ defmodule Actors do
   end
 
   def get_state(system_name, actor_name) do
-    case Spawn.Cluster.Node.Registry.lookup(Actors.Actor.Entity, actor_name) do
-      [{actor_ref, nil}] ->
-        Logger.debug("Lookup Actor #{actor_name}. PID: #{inspect(actor_ref)}")
-        # This return {:ok, response_body}
-        ActorEntity.get_state(actor_ref)
-
-      _ ->
-        with {:ok, %{node: node, actor: actor}} <-
-               ActorRegistry.lookup(system_name, actor_name),
-             _pid <- Node.spawn(node, __MODULE__, :try_reactivate_actor, [nil, actor]) do
-          Process.sleep(1)
-          {:ok, response_body} = ActorEntity.get_state(actor_name)
-
-          {:ok, response_body}
-        else
-          {:not_found, _} ->
-            Logger.error("Actor #{actor_name} not found on ActorSystem #{system_name}")
-            {:error, "Actor #{actor_name} not found on ActorSystem #{system_name}"}
-
-          {:error, reason} ->
-            Logger.error(
-              "Failed to invoke Actor #{actor_name} on ActorSystem #{system_name}: #{inspect(reason)}"
-            )
-
-            {:error, reason}
-
-          _ ->
-            Logger.error("Failed to invoke Actor #{actor_name} on ActorSystem #{system_name}")
-            {:error, "Failed to invoke Actor #{actor_name} on ActorSystem #{system_name}"}
-        end
-    end
+    do_lookup_action(system_name, actor_name, nil, fn actor_ref ->
+      ActorEntity.get_state(actor_ref)
+    end)
   end
 
   def invoke(
         %InvocationRequest{
           actor: %Actor{} = actor,
           system: %ActorSystem{} = system,
-          async: type
+          async: async?
         } = request
       ) do
-    invoke(type, system, actor, request)
+    do_lookup_action(system.name, actor.name, system, fn actor_ref ->
+      maybe_invoke_async(async?, actor_ref, request)
+    end)
   end
 
-  defp invoke(
-         false,
-         %ActorSystem{name: system_name} = system,
-         %Actor{name: actor_name} = actor,
-         request
-       ) do
+  defp do_lookup_action(system_name, actor_name, system, action_fun) do
     case Spawn.Cluster.Node.Registry.lookup(Actors.Actor.Entity, actor_name) do
       [{actor_ref, nil}] ->
-        Logger.debug("Lookup Actor #{actor_name}. ActorRef PID: #{inspect(actor_ref)}")
-        # This return {:ok, response_body}
-        ActorEntity.invoke(actor_ref, request)
+        Logger.debug("Lookup Actor #{actor_name}. PID: #{inspect(actor_ref)}")
+
+        action_fun.(actor_ref)
 
       _ ->
-        with {:ok, %{node: node, actor: _registered_actor}} <-
+        with {:ok, %{node: node, actor: actor}} <-
                ActorRegistry.lookup(system_name, actor_name),
-             _pid <- Node.spawn(node, __MODULE__, :try_reactivate_actor, [system, actor]) do
-          Process.sleep(1)
-          {:ok, response_body} = ActorEntity.invoke(actor_name, request)
-
-          {:ok, response_body}
+             {:ok, actor_ref} <-
+               :erpc.call(node, __MODULE__, :try_reactivate_actor, [system, actor], @erpc_timeout) do
+          action_fun.(actor_ref)
         else
           {:not_found, _} ->
             Logger.error("Actor #{actor_name} not found on ActorSystem #{system_name}")
             {:error, "Actor #{actor_name} not found on ActorSystem #{system_name}"}
+
+          {:erpc, :timeout} ->
+            Logger.error(
+              "Failed to invoke Actor #{actor_name} on ActorSystem #{system_name}: Node connection timeout"
+            )
+
+            {:error, "Node connection timeout"}
 
           {:error, reason} ->
             Logger.error(
@@ -131,43 +107,13 @@ defmodule Actors do
     end
   end
 
-  defp invoke(
-         true,
-         %ActorSystem{name: system_name} = system,
-         %Actor{name: actor_name} = actor,
-         request
-       ) do
-    case Spawn.Cluster.Node.Registry.lookup(Actors.Actor.Entity, actor_name) do
-      [{actor_ref, nil}] ->
-        Logger.debug("Lookup Actor #{actor_name}. ActorRef PID: #{inspect(actor_ref)}")
-        # This return {:ok, response_body}
-        ActorEntity.invoke(actor_ref, request)
+  @spec maybe_invoke_async(boolean, term(), term()) :: :ok | {:ok, term()}
+  defp maybe_invoke_async(true, actor_ref, request) do
+    ActorEntity.invoke_async(actor_ref, request)
+  end
 
-      _ ->
-        with {:ok, %{node: node, actor: _registered_actor}} <-
-               ActorRegistry.lookup(system_name, actor_name),
-             _pid <- Node.spawn(node, __MODULE__, :try_reactivate_actor, [system, actor]) do
-          Process.sleep(1)
-          {:ok, response_body} = ActorEntity.invoke_async(actor_name, request)
-
-          {:ok, response_body}
-        else
-          {:not_found, _} ->
-            Logger.error("Actor #{actor_name} not found on ActorSystem #{system_name}")
-            {:error, "Actor #{actor_name} not found on ActorSystem #{system_name}"}
-
-          {:error, reason} ->
-            Logger.error(
-              "Failed to invoke Actor #{actor_name} on ActorSystem #{system_name}: #{inspect(reason)}"
-            )
-
-            {:error, reason}
-
-          _ ->
-            Logger.error("Failed to invoke Actor #{actor_name} on ActorSystem #{system_name}")
-            {:error, "Failed to invoke Actor #{actor_name} on ActorSystem #{system_name}"}
-        end
-    end
+  defp maybe_invoke_async(false, actor_ref, request) do
+    ActorEntity.invoke(actor_ref, request)
   end
 
   def try_reactivate_actor(%ActorSystem{} = system, %Actor{name: name} = actor) do

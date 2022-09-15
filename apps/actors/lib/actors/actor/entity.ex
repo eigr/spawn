@@ -442,7 +442,7 @@ defmodule Actors.Actor.Entity do
     GenServer.start(__MODULE__, state, name: via(name))
   end
 
-  @spec get_state(any) :: any
+  @spec get_state(any) :: {:error, term()} | {:ok, term()}
   def get_state(ref) when is_pid(ref) do
     GenServer.call(ref, :get_state, 20_000)
   end
