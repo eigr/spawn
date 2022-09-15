@@ -23,26 +23,37 @@
 //
 // The general flow of a registration action is as follows:
 //
-// +----------------+                                     +---------------------+                                     +-------+                   
-// | User Function  |                                     | Local Spawn Sidecar |                                     | Actor |                   
-// +----------------+                                     +---------------------+                                     +-------+                   
-//         |                                                       |                                                     |                       
-//         | HTTP POST Registration Request                        |                                                     |                       
-//         |------------------------------------------------------>|                                                     |                       
-//         |                                                       |                                                     |                       
-//         |                                                       | Upfront start Actors with BEAM Distributed Protocol |                       
-//         |                                                       |---------------------------------------------------->|
-//         |                                                       |                                                     |                       
-//         |                                                       |                                                     |Initialize Statestore 
-//         |                                                       |                                                     |---------------------- 
-//         |                                                       |                                                     |                     | 
-//         |                                                       |                                                     |<--------------------- 
-//         |                                                       |                                                     |                       
-//         |          HTTP Registration Response                   |                                                     |                       
-//         |<------------------------------------------------------|                                                     |                       
-//         |                                                       |                                                     | 
+//╔═══════════════════╗                  ╔═══════════════════╗                  ╔═══════════════════╗
+//║   User Function   ║                  ║Local Spawn Sidecar║                  ║       Actor       ║
+//╚═══════════════════╝                  ╚═══════════════════╝                  ╚═══════════════════╝
+//          ║                                      ║                                      ║
+//          ║                                      ║                                      ║
+//          ║              HTTP POST               ║                                      ║
+//          ║            Registration              ║                                      ║
+//          ║               Request                ║                                      ║
+//          ╠─────────────────────────────────────▶║                                      ║
+//          ║                                      ║       Upfront start Actors with      ║
+//          ║                                      ╠───────BEAM Distributed Protocol─────▶║
+//          ║                                      ║                                      ║
+//          ║                                      ║                                      ╠───┐Initialize
+//          ║                                      ║                                      ║   │  State
+//          ║                                      ║                                      ║   │  Store
+//          ║                                      ║                                      ║◀──┘
+//          ║           HTTP Registration          ║                                      ║
+//          ║               Response               ║                                      ║
+//          ║◀─────────────────────────────────────╣                                      ║
+//          ║                                      ║                                      ║
+//          ║                                      ║                                      ║
+//          ║                                      ║                                      ║
+//          ║                                      ║                                      ║
+//          ║                                      ║                                      ║
+//          ║                                      ║                                      ║
+//          ║                                      ║                                      ║
+//          ║                                      ║                                      ║
 //
-// 
+//     ███████████                            ███████████                            ███████████
+//
+//
 // Once the system has been initialized, that is, the registration step has been successfully completed, 
 // then the user function will be able to make requests to the System Actors.
 // This is done through a post request to the Proxy at the `/system/:name/actors/:actor_name/invoke` endpoint.
@@ -61,40 +72,41 @@
 // 
 // Assuming that two user functions were registered in different separate Proxies, the above request would go the following way:
 //
-// +-----------------+                       +------------------------+       +------------------------+                                         +--------------------------------+
-// | User Function A |                       | Local Spawn Sidecar A  |       | Remote User Function B |                                         | Remote Spawn Sidecar / Actor B |
-// +-----------------+                       +------------------------+       +------------------------+                                         +--------------------------------+
-//         |                                             |                                |                                                                     |
-//         | HTTP POST Invocation Request.               |                                |                                                                     |
-//         |-------------------------------------------->|                                |                                                                     |
-//         |                                             |                                |                                                                     |
-//         |                                             | Lookup for Actor               |                                                                     |
-//         |                                             |-----------------               |                                                                     |
-//         |                                             |                |               |                                                                     |
-//         |                                             |<----------------               |                                                                     |
-//         |                                             |                                |                                                                     |
-//         |                                             | Make a BEAM Distributed Protocol Call on Actor located at proxy b                                    |
-//         |                                             |----------------------------------------------------------------------------------------------------->|
-//         |                                             |                                |                                                                     |
-//         |                                             |                                |                        Make HTTP POST in /api/v1/actors/actions     |
-//         |                                             |                                |<--------------------------------------------------------------------|
-//         |                                             |                                |                                                                     |
-//         |                                             |                                | Handle request, execute command                                     |
-//         |                                             |                                |--------------------------------                                     |
-//         |                                             |                                |                               |                                     |
-//         |                                             |                                |<-------------------------------                                     |
-//         |                                             |                                |                                                                     |
-//         |                                             |                                | HTTP Reply with the result and the new state of actor B             |
-//         |                                             |                                |-------------------------------------------------------------------->|
-//         |                                             |                                |                                                                     | Store new State 
-//         |                                             |                                |                                                                     |-----------------
-//         |                                             |                                |                                                                     |                | 
-//         |                                             |                 Send response to the Spawn Sidecar A                                                 |<----------------
-//         |                                             |<-----------------------------------------------------------------------------------------------------|
-//         |                                             |                                |                                                                     |
-//         | Respond to user with result value           |                                |                                                                     |
-//         |<--------------------------------------------|                                |                                                                     |
-//         |                                             |                                |                                                                     |
+//╔═══════════════════╗                  ╔═══════════════════╗              ╔═════════════════════════╗        ╔═════════════════════════════╗
+//║   User Function   ║                  ║Local Spawn Sidecar║              ║ Remote User Function B  ║        ║Remote Spawn Sidecar/Actor B ║
+//╚═══════════════════╝                  ╚═══════════════════╝              ╚═════════════════════════╝        ╚═════════════════════════════╝
+//          ║              HTTP POST               ║                                     ║                                    ║
+//          ║            Registration              ║                                     ║                                    ║
+//          ║               Request                ║                                     ║                                    ║
+//          ╠─────────────────────────────────────▶║                                     ║                                    ║
+//          ║                                      ╠───┐                                 ║                                    ║
+//          ║                                      ║   │Lookup for                       ║                                    ║
+//          ║                                      ║   │  Actor                          ║                                    ║
+//          ║                                      ║◀──┘                                 ║                                    ║
+//          ║                                      ║                                     ║           BEAM Distributed         ║
+//          ║                                      ╠─────────────────────────────────────╬────────────protocol call──────────▶║
+//          ║                                      ║                                     ║                                    ║
+//          ║                                      ║                                     ║             HTTP POST:             ║
+//          ║                                      ║                                     ║◀──────/api/v1/actors/actions───────╣
+//          ║                                      ║                                     ║                                    ║
+//          ║                                      ║                                     ╠───┐                                ║
+//          ║                                      ║                                     ║   │Handle request,                 ║
+//          ║                                      ║                                     ║   │execute command                 ║
+//          ║                                      ║                                     ║◀──┘                                ║
+//          ║                                      ║                                     ║            Reply with the          ║
+//          ║                                      ║                                     ╠────────────result and the ────────▶║
+//          ║                                      ║                                     ║             new state of           ║────┐
+//          ║                                      ║                                     ║                                    ║    │
+//          ║                                      ║                                     ║                                    ║    │Store new State
+//          ║                                      ║       Send response to the          ║                                    ║ ◀──┘
+//          ║         Respond to user with         ║◀─────────Spawn Sidecar A────────────╬────────────────────────────────────╣
+//          ║             result value             ║                                     ║                                    ║
+//          ║◀─────────────────────────────────────╣                                     ║                                    ║
+//          ║                                      ║                                     ║                                    ║
+//          ║                                      ║                                     ║                                    ║
+//
+//     ███████████                           ████████████                           ███████████                          ███████████
+//
 //
 syntax = "proto3";
 
