@@ -70,7 +70,7 @@ defmodule Actors do
 
   defp do_lookup_action(system_name, actor_name, system, action_fun) do
     case Spawn.Cluster.Node.Registry.lookup(Actors.Actor.Entity, actor_name) do
-      [{actor_ref, nil}] ->
+      [{actor_ref, _}] ->
         Logger.debug("Lookup Actor #{actor_name}. PID: #{inspect(actor_ref)}")
 
         action_fun.(actor_ref)
