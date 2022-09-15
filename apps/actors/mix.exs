@@ -12,6 +12,7 @@ defmodule Actors.MixProject do
       deps_path: "../../deps",
       lockfile: "../../mix.lock",
       elixir: "~> 1.13",
+      elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       deps: deps()
     ]
@@ -36,7 +37,12 @@ defmodule Actors.MixProject do
       {:tesla, "~> 1.4"},
       {:flow, "~> 1.2"},
       {:vapor, "~> 0.10"},
-      {:jason, "~> 1.2"}
+      {:jason, "~> 1.2"},
+      {:faker, "~> 0.17", only: :test},
+      {:mimic, "~> 1.7", only: :test}
     ]
   end
+
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
 end
