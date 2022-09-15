@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+message StateTest {
+  string name = 1;
+  string nickname = 2;
+}
+
+message ChangeNameTest {
+  string new_name = 1;
+}
+
+enum ChangeNameStatusTest {
+  OK = 0;
+  NAME_ALREADY_TAKEN = 1;
+}
+
+message ChangeNameResponseTest {
+  ChangeNameStatusTest status = 1;
+  string new_name = 2;
+}
