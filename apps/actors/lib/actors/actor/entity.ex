@@ -23,7 +23,7 @@ defmodule Actors.Actor.Entity do
   @min_snapshot_threshold 500
   @default_snapshot_timeout 60_000
   @default_deactivate_timeout 90_000
-  @timeout_factor_range [200, 300, 500, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000]
+  @timeout_factor_range 200..9000
 
   defmodule EntityState do
     defstruct system: nil, actor: nil, state_hash: nil
@@ -473,6 +473,8 @@ defmodule Actors.Actor.Entity do
     do: Enum.random([factor_range])
 
   defp get_timeout_factor(factor_range) when is_list(factor_range), do: Enum.random(factor_range)
+
+  defp get_timeout_factor(factor_range), do: Enum.random(factor_range)
 
   defp schedule_snapshot_advance(timeout),
     do:
