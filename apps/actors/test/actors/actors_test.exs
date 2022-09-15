@@ -29,9 +29,12 @@ defmodule ActorsTest do
       request = build_registration_request(actor_system: system)
 
       {:ok, %RegistrationResponse{}} = Actors.register(request)
-      {:ok, %ActorState{state: %Google.Protobuf.Any{value: state}}} = Actors.get_state(system.name, actor_name)
 
-      assert %Actors.Protos.StateTest{name: "example_state_name_" <> _rand} = Actors.Protos.StateTest.decode(state)
+      {:ok, %ActorState{state: %Google.Protobuf.Any{value: state}}} =
+        Actors.get_state(system.name, actor_name)
+
+      assert %Actors.Protos.StateTest{name: "example_state_name_" <> _rand} =
+               Actors.Protos.StateTest.decode(state)
     end
   end
 
@@ -51,10 +54,13 @@ defmodule ActorsTest do
       # invoke
       invoke_request = build_invocation_request(system: system, actor: actor)
 
-      host_invoke_response = build_host_invoke_response(actor_name: actor_name, system_name: system.name)
+      host_invoke_response =
+        build_host_invoke_response(actor_name: actor_name, system_name: system.name)
+
       mock_invoke_host_actor_with_ok_response(host_invoke_response)
 
-      assert {:ok, %ActorInvocationResponse{actor_name: ^actor_name}} = Actors.invoke(invoke_request)
+      assert {:ok, %ActorInvocationResponse{actor_name: ^actor_name}} =
+               Actors.invoke(invoke_request)
     end
   end
 end

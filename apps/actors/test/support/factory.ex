@@ -39,7 +39,11 @@ defmodule Actors.FactoryTest do
   end
 
   def build_registry_with_actors(attrs \\ []) do
-    Registry.new(actors: attrs[:actors] || Enum.map(1..(attrs[:count] || 5), & build_actor_entry(name: "test_actor_#{&1}")))
+    Registry.new(
+      actors:
+        attrs[:actors] ||
+          Enum.map(1..(attrs[:count] || 5), &build_actor_entry(name: "test_actor_#{&1}"))
+    )
   end
 
   def build_registration_request(attrs \\ []) do
@@ -50,10 +54,13 @@ defmodule Actors.FactoryTest do
   end
 
   def build_invocation_request(attrs \\ []) do
-    value = Any.new(
-      type_url: get_type_url(Actors.Protos.ChangeNameTest),
-      value: Actors.Protos.ChangeNameTest.new(new_name: "new_name") |> Actors.Protos.ChangeNameTest.encode()
-    )
+    value =
+      Any.new(
+        type_url: get_type_url(Actors.Protos.ChangeNameTest),
+        value:
+          Actors.Protos.ChangeNameTest.new(new_name: "new_name")
+          |> Actors.Protos.ChangeNameTest.encode()
+      )
 
     InvocationRequest.new(
       system: attrs[:system] || build_system(),
@@ -67,7 +74,8 @@ defmodule Actors.FactoryTest do
   def build_actor_entry(attrs \\ []) do
     default_name = Faker.Superhero.name()
 
-    {attrs[:name] || default_name, attrs[:actor] || build_actor(name: attrs[:name] || default_name)}
+    {attrs[:name] || default_name,
+     attrs[:actor] || build_actor(name: attrs[:name] || default_name)}
   end
 
   def build_actor(attrs \\ []) do
@@ -81,20 +89,19 @@ defmodule Actors.FactoryTest do
   end
 
   def build_actor_state(attrs \\ []) do
-    state = Any.new(
-      type_url: get_type_url(Actors.Protos.StateTest),
-      value: Actors.Protos.StateTest.new(name: "example_state_name_#{Faker.Superhero.name()}") |> Actors.Protos.StateTest.encode()
-    )
+    state =
+      Any.new(
+        type_url: get_type_url(Actors.Protos.StateTest),
+        value:
+          Actors.Protos.StateTest.new(name: "example_state_name_#{Faker.Superhero.name()}")
+          |> Actors.Protos.StateTest.encode()
+      )
 
-    ActorState.new(
-      state: Any.new(attrs[:state] || state)
-    )
+    ActorState.new(state: Any.new(attrs[:state] || state))
   end
 
   def build_actor_deactivate_strategy(attrs \\ []) do
-    timeout = TimeoutStrategy.new(
-      timeout: attrs[:timeout] || 60_000
-    )
+    timeout = TimeoutStrategy.new(timeout: attrs[:timeout] || 60_000)
 
     ActorDeactivateStrategy.new(
       strategy: {attrs[:strategy] || :timeout, attrs[:value] || timeout}
@@ -102,13 +109,9 @@ defmodule Actors.FactoryTest do
   end
 
   def build_actor_snapshot_strategy(attrs \\ []) do
-    timeout = TimeoutStrategy.new(
-      timeout: attrs[:timeout] || 60_000
-    )
+    timeout = TimeoutStrategy.new(timeout: attrs[:timeout] || 60_000)
 
-    ActorSnapshotStrategy.new(
-      strategy: {attrs[:strategy] || :timeout, attrs[:value] || timeout}
-    )
+    ActorSnapshotStrategy.new(strategy: {attrs[:strategy] || :timeout, attrs[:value] || timeout})
   end
 
   def build_service_info(attrs \\ []) do
@@ -124,12 +127,22 @@ defmodule Actors.FactoryTest do
   end
 
   def build_host_invoke_response(attrs \\ []) do
-    state = Any.new(
-      type_url: get_type_url(Actors.Protos.ChangeNameTest),
-      value: Actors.Protos.ChangeNameResponseTest.new(status: :OK, new_name: "new_name") |> Actors.Protos.ChangeNameTest.encode()
-    )
+    state =
+      Any.new(
+        type_url: get_type_url(Actors.Protos.ChangeNameTest),
+        value:
+          Actors.Protos.ChangeNameResponseTest.new(status: :OK, new_name: "new_name")
+          |> Actors.Protos.ChangeNameTest.encode()
+      )
+
     context = Eigr.Functions.Protocol.Context.new(state: attrs[:state] || state)
-    ActorInvocationResponse.new(actor_name: attrs[:actor_name], system_name: attrs[:system_name], updated_context: attrs[:context] || context, value: attrs[:value] || state)
+
+    ActorInvocationResponse.new(
+      actor_name: attrs[:actor_name],
+      system_name: attrs[:system_name],
+      updated_context: attrs[:context] || context,
+      value: attrs[:value] || state
+    )
   end
 
   defp get_type_url(type) do

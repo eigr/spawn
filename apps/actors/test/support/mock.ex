@@ -10,7 +10,9 @@ defmodule Actors.MockTest do
 
       def mock_invoke_host_actor_with_ok_response(response) do
         Actors.Node.Client
-        |> stub(:invoke_host_actor, fn _payload -> {:ok, %Tesla.Env{body: ActorInvocationResponse.encode(response)}} end)
+        |> stub(:invoke_host_actor, fn _payload ->
+          {:ok, %Tesla.Env{body: ActorInvocationResponse.encode(response)}}
+        end)
       end
     end
   end
