@@ -81,7 +81,7 @@ defmodule Actors.FactoryTest do
   def build_actor(attrs \\ []) do
     Actor.new(
       name: attrs[:name] || "#{Faker.Superhero.name()} #{Faker.StarWars.character()}",
-      persistent: attrs[:persistent] || true,
+      persistent: attrs[:persistent] || false,
       state: attrs[:state] || build_actor_state(),
       snapshot_strategy: attrs[:snapshot_strategy] || build_actor_snapshot_strategy(),
       deactivate_strategy: attrs[:deactivate_strategy] || build_actor_deactivate_strategy()

@@ -39,6 +39,7 @@ build-all-images:
 	docker build -f Dockerfile-activator-sqs -t ${activator-sqs-image} .
 
 test:
+	MIX_ENV=test mix deps.get
 	MIX_ENV=test PROXY_DATABASE_TYPE=mysql PROXY_HTTP_PORT=9001 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
 
 push-all-images:
