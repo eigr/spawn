@@ -32,7 +32,17 @@ defmodule Proxy.Routes.API do
   post "/system/:name/actors/:actor_name/invoke" do
     with %InvocationRequest{system: sytem, actor: actor} = request <-
            get_body(conn.body_params, InvocationRequest),
-         {:ok, %ActorInvocationResponse{value: value} = _response} <- Actors.invoke(request) do
+         response <- Actors.invoke(request) do
+      # this condition is necessary because invoke can return :ok | {:ok, value} due to being async or not
+      value =
+        if response == :ok do
+          nil
+        else
+          {:ok, %ActorInvocationResponse{value: value}} = response
+
+          value
+        end
+
       send!(
         conn,
         200,
