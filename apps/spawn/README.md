@@ -1,6 +1,6 @@
-# Cluster
+# Spawn
 
-**TODO: Add description**
+This is a shared umbrella app, no apps should depend on this
 
 ## Installation
 
@@ -10,7 +10,7 @@ by adding `cluster` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:cluster, "~> 0.1.0"}
+    {:spawn, "~> 0.1.0"}
   ]
 end
 ```

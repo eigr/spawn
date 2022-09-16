@@ -28,6 +28,7 @@ defmodule Statestores.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:spawn, "~> 0.1", in_umbrella: true, only: :test},
       {:cloak_ecto, "~> 1.2"},
       {:ecto_sql, "~> 3.8"},
       {:myxql, "~> 0.6"},

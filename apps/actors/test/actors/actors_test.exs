@@ -1,13 +1,23 @@
 defmodule ActorsTest do
-  use ExUnit.Case, async: false
-  use Actors.MockTest
-  import Actors.FactoryTest
+  use Actors.DataCase, async: false
 
   alias Eigr.Functions.Protocol.ActorInvocationResponse
   alias Eigr.Functions.Protocol.Actors.ActorState
   alias Eigr.Functions.Protocol.RegistrationResponse
 
-  doctest Actors
+  setup_all do
+    actor_name = "global_actor_test"
+
+    actor = build_actor(name: actor_name)
+    actor_entry = build_actor_entry(name: actor_name)
+    registry = build_registry_with_actors(actors: [actor_entry])
+    system = build_system(name: "global_sytem_name", registry: registry)
+
+    request = build_registration_request(actor_system: system)
+    {:ok, %RegistrationResponse{}} = Actors.register(request)
+
+    %{system: system, actor: actor}
+  end
 
   describe "register/1" do
     test "register actors for a system" do
@@ -39,7 +49,7 @@ defmodule ActorsTest do
   end
 
   describe "invoke/2" do
-    test "invoke function for a newly registered actor" do
+    test "invoke actor function for a newly registered actor" do
       actor_name = "actor_test_" <> Ecto.UUID.generate()
 
       actor = build_actor(name: actor_name)
@@ -61,6 +71,83 @@ defmodule ActorsTest do
 
       assert {:ok, %ActorInvocationResponse{actor_name: ^actor_name}} =
                Actors.invoke(invoke_request)
+    end
+
+    test "invoke actor function for a already registered actor in another node", ctx do
+      %{system: system, actor: actor} = ctx
+      actor_name = actor.name
+
+      invoke_request = build_invocation_request(system: system, actor: actor)
+
+      host_invoke_response =
+        build_host_invoke_response(actor_name: actor_name, system_name: system.name)
+
+      mock_invoke_host_actor_with_ok_response(host_invoke_response)
+
+      assert {:ok, %ActorInvocationResponse{actor_name: ^actor_name}} =
+               Actors.invoke(invoke_request)
+
+      state =
+        Actors.Protos.ChangeNameResponseTest.new(
+          status: :NAME_ALREADY_TAKEN,
+          new_name: "new_name"
+        )
+        |> any_pack!
+
+      host_invoke_response =
+        build_host_invoke_response(actor_name: actor_name, system_name: system.name, state: state)
+
+      mock_invoke_host_actor_with_ok_response(host_invoke_response)
+
+      # wait for nodes to sync
+      Process.sleep(100)
+
+      assert {:ok,
+              %ActorInvocationResponse{actor_name: ^actor_name, updated_context: updated_context}} =
+               Spawn.NodeHelper.rpc(:"spawn_actors_node@127.0.0.1", Actors, :invoke, [
+                 invoke_request
+               ])
+
+      assert %Actors.Protos.ChangeNameResponseTest{status: :NAME_ALREADY_TAKEN} =
+               any_unpack!(updated_context.state, Actors.Protos.ChangeNameResponseTest)
+    end
+
+    test "invoke function for a new actor without persistence in another node", _ctx do
+      actor_name = "actor_not_persistent"
+
+      actor = build_actor(name: actor_name, persistent: false)
+      actor_entry = build_actor_entry(name: actor_name, actor: actor)
+      registry = build_registry_with_actors(actors: [actor_entry])
+      system = build_system(name: "any_system_whatever", registry: registry)
+
+      request = build_registration_request(actor_system: system)
+      {:ok, %RegistrationResponse{}} = Actors.register(request)
+
+      invoke_request = build_invocation_request(system: system, actor: actor)
+
+      state =
+        Actors.Protos.ChangeNameResponseTest.new(
+          status: :OK,
+          new_name: "new_name"
+        )
+        |> any_pack!
+
+      host_invoke_response =
+        build_host_invoke_response(actor_name: actor_name, system_name: system.name, state: state)
+
+      mock_invoke_host_actor_with_ok_response(host_invoke_response)
+
+      # wait for nodes to sync
+      Process.sleep(100)
+
+      assert {:ok,
+              %ActorInvocationResponse{actor_name: ^actor_name, updated_context: updated_context}} =
+               Spawn.NodeHelper.rpc(:"spawn_actors_node@127.0.0.1", Actors, :invoke, [
+                 invoke_request
+               ])
+
+      assert %Actors.Protos.ChangeNameResponseTest{status: :OK} =
+               any_unpack!(updated_context.state, Actors.Protos.ChangeNameResponseTest)
     end
   end
 end
