@@ -391,6 +391,17 @@ defmodule Actors.Actor.Entity do
   end
 
   def handle_info(
+        {:EXIT, pid, reason},
+        %EntityState{
+          actor: %Actor{name: name}
+        } = state
+      ) do
+    Logger.warn("Received Exit message for Actor #{name} and PID #{inspect(pid)}.")
+
+    {:stop, reason, state}
+  end
+
+  def handle_info(
         message,
         %EntityState{
           actor: %Actor{name: name, state: actor_state}
@@ -416,17 +427,6 @@ defmodule Actors.Actor.Entity do
 
     StateManager.save(name, actor_state)
     {:noreply, state}
-  end
-
-  def handle_info(
-        {:EXIT, pid, reason},
-        %EntityState{
-          actor: %Actor{name: name}
-        } = state
-      ) do
-    Logger.warn("Received Exit message for Actor #{name} and PID #{inspect(pid)}.")
-
-    {:stop, reason, state}
   end
 
   @impl true
