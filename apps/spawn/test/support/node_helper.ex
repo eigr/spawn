@@ -12,8 +12,7 @@ defmodule Spawn.NodeHelper do
     :erl_boot_server.start([])
     allow_boot to_charlist("127.0.0.1")
 
-    Task.async(fn -> spawn_node(:"#{node_name}@127.0.0.1") end)
-    |> Task.await(30_000)
+    spawn_node(:"#{node_name}@127.0.0.1")
   end
 
   def rpc(node, module, function, args) do
