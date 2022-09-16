@@ -9,7 +9,6 @@ defmodule Actors.Actor.Entity do
     ActorDeactivateStrategy,
     ActorState,
     ActorSnapshotStrategy,
-    ActorSystem,
     TimeoutStrategy
   }
 
@@ -34,7 +33,7 @@ defmodule Actors.Actor.Entity do
             state_hash: state_hash
           }
 
-    @type t :: %EntityState{system: ActorSystem.t(), actor: Actor.t(), state_hash: binary()}
+    @type t :: %EntityState{system: String.t(), actor: Actor.t(), state_hash: binary()}
   end
 
   @impl true
@@ -201,7 +200,7 @@ defmodule Actors.Actor.Entity do
          } = _invocation},
         _from,
         %EntityState{
-          system: %ActorSystem{name: actor_system} = _system,
+          system: actor_system,
           actor: %Actor{state: current_state = _actor_state} = _state_actor
         } = state
       )
@@ -260,7 +259,7 @@ defmodule Actors.Actor.Entity do
          } = _invocation},
         _from,
         %EntityState{
-          system: %ActorSystem{name: actor_system} = _system,
+          system: actor_system,
           actor: %Actor{state: %ActorState{state: current_state} = _actor_state} = _state_actor
         } = state
       ) do
