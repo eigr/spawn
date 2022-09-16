@@ -20,8 +20,13 @@ defmodule Actors.Actor.Entity do
   }
 
   @min_snapshot_threshold 500
+
   @default_snapshot_timeout 60_000
+
   @default_deactivate_timeout 90_000
+
+  @fullsweep_after 10
+
   @timeout_factor_range 200..9000
 
   defmodule EntityState do
@@ -145,7 +150,7 @@ defmodule Actors.Actor.Entity do
 
       {:not_found, %{}} ->
         Logger.debug("Not found initial Actor State on statestore for Actor #{name}.")
-        {:noreply, state}
+        {:noreply, state, :hibernate}
     end
   end
 
@@ -166,7 +171,7 @@ defmodule Actors.Actor.Entity do
 
       {:not_found, %{}} ->
         Logger.debug("Not found initial state on statestore for Actor #{name}.")
-        {:noreply, state}
+        {:noreply, state, :hibernate}
     end
   end
 
@@ -179,7 +184,7 @@ defmodule Actors.Actor.Entity do
         } = state
       )
       when is_nil(actor_state),
-      do: {:reply, {:error, :not_found}, state}
+      do: {:reply, {:error, :not_found}, state, :hibernate}
 
   def handle_call(
         :get_state,
@@ -188,7 +193,7 @@ defmodule Actors.Actor.Entity do
           actor: %Actor{state: %ActorState{} = actor_state} = _actor
         } = state
       ),
-      do: {:reply, {:ok, actor_state}, state}
+      do: {:reply, {:ok, actor_state}, state, :hibernate}
 
   @impl true
   def handle_call(
@@ -322,7 +327,7 @@ defmodule Actors.Actor.Entity do
       )
       when is_nil(actor_state) or actor_state == %{} do
     schedule_snapshot(snapshot_strategy)
-    {:noreply, state}
+    {:noreply, state, :hibernate}
   end
 
   def handle_info(
@@ -347,19 +352,19 @@ defmodule Actors.Actor.Entity do
         # Execute with timeout equals timeout strategy - 1 to avoid mailbox congestions
         case StateManager.save_async(name, actor_state, timeout - 1) do
           {:ok, _, hash} ->
-            {:noreply, %{state | state_hash: hash}}
+            {:noreply, %{state | state_hash: hash}, :hibernate}
 
           {:error, _, _, hash} ->
-            {:noreply, %{state | state_hash: hash}}
+            {:noreply, %{state | state_hash: hash}, :hibernate}
 
           {:error, :unsuccessfully, hash} ->
-            {:noreply, %{state | state_hash: hash}}
+            {:noreply, %{state | state_hash: hash}, :hibernate}
 
           _ ->
-            {:noreply, state}
+            {:noreply, state, :hibernate}
         end
       else
-        {:noreply, state}
+        {:noreply, state, :hibernate}
       end
 
     schedule_snapshot(snapshot_strategy)
@@ -385,7 +390,7 @@ defmodule Actors.Actor.Entity do
 
       _ ->
         schedule_deactivate(deactivate_strategy)
-        {:noreply, state}
+        {:noreply, state, :hibernate}
     end
   end
 
@@ -411,7 +416,7 @@ defmodule Actors.Actor.Entity do
       "No handled internal message for actor #{name}. Message: #{inspect(message)}. Actor state: #{inspect(state)}"
     )
 
-    {:noreply, state}
+    {:noreply, state, :hibernate}
   end
 
   def handle_info(
@@ -425,7 +430,7 @@ defmodule Actors.Actor.Entity do
     )
 
     StateManager.save(name, actor_state)
-    {:noreply, state}
+    {:noreply, state, :hibernate}
   end
 
   @impl true
@@ -449,7 +454,10 @@ defmodule Actors.Actor.Entity do
   end
 
   def start_link(%EntityState{actor: %Actor{name: name}} = state) do
-    GenServer.start(__MODULE__, state, name: via(name))
+    GenServer.start(__MODULE__, state,
+      name: via(name),
+      spawn_opt: [fullsweep_after: @fullsweep_after]
+    )
   end
 
   @spec get_state(any) :: {:error, term()} | {:ok, term()}
