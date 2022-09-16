@@ -28,7 +28,7 @@ defmodule Operator.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:cluster, "~> 0.1", in_umbrella: true},
+      {:spawn, "~> 0.1", in_umbrella: true},
       {:metrics_endpoint, "~> 0.1", in_umbrella: true},
       {:bandit, "~> 0.5"},
       {:bonny, "~> 0.5"},

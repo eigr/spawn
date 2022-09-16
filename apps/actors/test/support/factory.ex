@@ -81,7 +81,7 @@ defmodule Actors.FactoryTest do
   def build_actor(attrs \\ []) do
     Actor.new(
       name: attrs[:name] || "#{Faker.Superhero.name()} #{Faker.StarWars.character()}",
-      persistent: attrs[:persistent] || false,
+      persistent: Keyword.get(attrs, :persistent, true),
       state: attrs[:state] || build_actor_state(),
       snapshot_strategy: attrs[:snapshot_strategy] || build_actor_snapshot_strategy(),
       deactivate_strategy: attrs[:deactivate_strategy] || build_actor_deactivate_strategy()
@@ -90,12 +90,7 @@ defmodule Actors.FactoryTest do
 
   def build_actor_state(attrs \\ []) do
     state =
-      Any.new(
-        type_url: get_type_url(Actors.Protos.StateTest),
-        value:
-          Actors.Protos.StateTest.new(name: "example_state_name_#{Faker.Superhero.name()}")
-          |> Actors.Protos.StateTest.encode()
-      )
+      any_pack!(Actors.Protos.StateTest.new(name: "example_state_name_#{Faker.Superhero.name()}"))
 
     ActorState.new(state: Any.new(attrs[:state] || state))
   end
@@ -128,12 +123,7 @@ defmodule Actors.FactoryTest do
 
   def build_host_invoke_response(attrs \\ []) do
     state =
-      Any.new(
-        type_url: get_type_url(Actors.Protos.ChangeNameTest),
-        value:
-          Actors.Protos.ChangeNameResponseTest.new(status: :OK, new_name: "new_name")
-          |> Actors.Protos.ChangeNameTest.encode()
-      )
+      Actors.Protos.ChangeNameResponseTest.new(status: :OK, new_name: "new_name") |> any_pack!
 
     context = Eigr.Functions.Protocol.Context.new(state: attrs[:state] || state)
 
@@ -143,6 +133,17 @@ defmodule Actors.FactoryTest do
       updated_context: attrs[:context] || context,
       value: attrs[:value] || state
     )
+  end
+
+  def any_pack!(record) do
+    Any.new(
+      type_url: get_type_url(record.__struct__),
+      value: apply(record.__struct__, :encode, [record])
+    )
+  end
+
+  def any_unpack!(any_record, builder) do
+    builder.decode(any_record.value)
   end
 
   defp get_type_url(type) do

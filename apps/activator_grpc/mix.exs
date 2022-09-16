@@ -30,7 +30,7 @@ defmodule ActivatorGRPC.MixProject do
     [
       {:activator, "~> 0.1", in_umbrella: true},
       {:actors, "~> 0.1", in_umbrella: true},
-      {:cluster, "~> 0.1", in_umbrella: true},
+      {:spawn, "~> 0.1", in_umbrella: true},
       {:metrics_endpoint, "~> 0.1", in_umbrella: true}
     ]
   end
