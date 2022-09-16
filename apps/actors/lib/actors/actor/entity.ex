@@ -418,6 +418,17 @@ defmodule Actors.Actor.Entity do
     {:noreply, state}
   end
 
+  def handle_info(
+        {:EXIT, pid, reason},
+        %EntityState{
+          actor: %Actor{name: name}
+        } = state
+      ) do
+    Logger.warn("Received Exit message for Actor #{name} and PID #{inspect(pid)}.")
+
+    {:stop, reason, state}
+  end
+
   @impl true
   def terminate(
         reason,
