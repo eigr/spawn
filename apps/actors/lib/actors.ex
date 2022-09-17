@@ -34,20 +34,19 @@ defmodule Actors do
       ) do
     ActorRegistry.register(actors)
 
-    with :ok <- create_actors(actor_system, actors) do
-      proxy_info =
-        ProxyInfo.new(
-          protocol_major_version: 1,
-          protocol_minor_version: 2,
-          proxy_name: "spawn",
-          proxy_version: "0.1.0"
-        )
+    spawn(fn ->
+      create_actors(actor_system, actors)
+    end)
 
-      # Start Activators here
+    proxy_info =
+      ProxyInfo.new(
+        protocol_major_version: 1,
+        protocol_minor_version: 2,
+        proxy_name: "spawn",
+        proxy_version: "0.1.0"
+      )
 
-      # Then response to the caller
-      {:ok, RegistrationResponse.new(proxy_info: proxy_info)}
-    end
+    {:ok, RegistrationResponse.new(proxy_info: proxy_info)}
   end
 
   def get_state(system_name, actor_name) do
@@ -141,7 +140,7 @@ defmodule Actors do
     end
   end
 
-  defp create_actors(actor_system, actors) do
+  defp create_actors(actor_system, actors) when is_map(actors) do
     actors
     |> Flow.from_enumerable(
       min_demand: @activate_actors_min_demand,

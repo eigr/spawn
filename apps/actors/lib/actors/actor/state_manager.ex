@@ -16,6 +16,9 @@ defmodule Actors.Actor.StateManager do
       _ ->
         false
     end
+  catch
+    _kind, error ->
+      {:error, error}
   end
 
   @spec load(String.t()) :: {:ok, any}
@@ -28,6 +31,9 @@ defmodule Actors.Actor.StateManager do
       _ ->
         {:not_found, %{}}
     end
+  catch
+    _kind, error ->
+      {:error, error}
   end
 
   @spec save(String.t(), Eigr.Functions.Protocol.Actors.ActorState.t()) ::
@@ -42,32 +48,30 @@ defmodule Actors.Actor.StateManager do
   def save(name, %ActorState{tags: tags, state: actor_state} = _state) do
     Logger.debug("Saving state for actor #{name}")
 
-    try do
-      with bytes_from_state <- Any.encode(actor_state),
-           hash <- :crypto.hash(:sha256, bytes_from_state) do
-        %Event{
-          actor: name,
-          revision: 0,
-          tags: tags,
-          data_type: actor_state.type_url,
-          data: actor_state.value
-        }
-        |> StateStoreManager.save()
-        |> case do
-          {:ok, _event} ->
-            {:ok, actor_state, hash}
+    with bytes_from_state <- Any.encode(actor_state),
+         hash <- :crypto.hash(:sha256, bytes_from_state) do
+      %Event{
+        actor: name,
+        revision: 0,
+        tags: tags,
+        data_type: actor_state.type_url,
+        data: actor_state.value
+      }
+      |> StateStoreManager.save()
+      |> case do
+        {:ok, _event} ->
+          {:ok, actor_state, hash}
 
-          {:error, changeset} ->
-            {:error, changeset, actor_state, hash}
+        {:error, changeset} ->
+          {:error, changeset, actor_state, hash}
 
-          other ->
-            {:error, other, actor_state}
-        end
+        other ->
+          {:error, other, actor_state}
       end
-    catch
-      _kind, error ->
-        {:error, error, actor_state}
     end
+  catch
+    _kind, error ->
+      {:error, error, actor_state}
   end
 
   @spec save_async(String.t(), Eigr.Functions.Protocol.Actors.ActorState.t()) ::

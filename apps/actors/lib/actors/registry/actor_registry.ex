@@ -36,7 +36,64 @@ defmodule Actors.Registry.ActorRegistry do
   end
 
   @impl true
-  def handle_cast({:register, actors}, state) do
+  def handle_call({:get, _system_name, actor_name}, from, state) do
+    spawn(fn ->
+      state
+      |> Enum.reduce([], fn {key, value}, acc ->
+        Enum.map(value, fn {actor_key, actor} ->
+          # if actor.actor_system.name == system_name and actor.name == actor_name do
+          if actor_key == actor_name do
+            [%{node: key, actor: actor}] ++ acc
+          else
+            [] ++ acc
+          end
+        end)
+      end)
+      |> List.flatten()
+      |> Enum.uniq()
+      |> List.first()
+      |> then(fn
+        nil ->
+          GenServer.reply(from, {:not_found, []})
+
+        first_node_found ->
+          GenServer.reply(from, {:ok, first_node_found})
+      end)
+    end)
+
+    {:noreply, state}
+  end
+
+  def handle_call({:get_all, system_name}, from, state) do
+    spawn(fn ->
+      nodes =
+        state
+        |> Enum.reduce([], fn {key, value}, acc ->
+          Enum.map(value, fn actor ->
+            if actor.actor_system.name == system_name do
+              [%{node: key, actor: actor}] ++ acc
+            else
+              [] ++ acc
+            end
+          end)
+        end)
+        |> List.flatten()
+        |> Enum.uniq()
+
+      reply =
+        if Enum.all?(nodes, &is_nil/1) do
+          {:not_found, []}
+        else
+          {:ok, nodes}
+        end
+
+      GenServer.reply(from, reply)
+    end)
+
+    {:noreply, state}
+  end
+
+  def handle_call({:register, actors}, _from, state) do
     # send new entities of this node to all connected nodes
     node = Node.self()
 
@@ -61,52 +118,7 @@ defmodule Actors.Registry.ActorRegistry do
       {:incoming_actors, %{node => actors}}
     )
 
-    {:noreply, new_state}
-  end
-
-  @impl true
-  def handle_call({:get, _system_name, actor_name}, _from, state) do
-    state
-    |> Enum.reduce([], fn {key, value}, acc ->
-      Enum.map(value, fn {actor_key, actor} ->
-        # if actor.actor_system.name == system_name and actor.name == actor_name do
-        if actor_key == actor_name do
-          [%{node: key, actor: actor}] ++ acc
-        else
-          [] ++ acc
-        end
-      end)
-    end)
-    |> List.flatten()
-    |> Enum.uniq()
-    |> List.first()
-    |> then(fn
-      nil -> {:reply, {:not_found, []}, state}
-      first_node_found -> {:reply, {:ok, first_node_found}, state}
-    end)
-  end
-
-  @impl true
-  def handle_call({:get_all, system_name}, _from, state) do
-    nodes =
-      state
-      |> Enum.reduce([], fn {key, value}, acc ->
-        Enum.map(value, fn actor ->
-          if actor.actor_system.name == system_name do
-            [%{node: key, actor: actor}] ++ acc
-          else
-            [] ++ acc
-          end
-        end)
-      end)
-      |> List.flatten()
-      |> Enum.uniq()
-
-    if Enum.all?(nodes, &is_nil/1) do
-      {:reply, {:not_found, []}, state}
-    else
-      {:reply, {:ok, nodes}, state}
-    end
+    {:reply, new_state, new_state}
   end
 
   @impl true
@@ -134,7 +146,6 @@ defmodule Actors.Registry.ActorRegistry do
     {:noreply, state}
   end
 
-  @impl true
   def handle_info({:nodedown, node, _node_type}, state) do
     Logger.debug(fn -> "Received :nodedown from #{node} rebalancing registred entities" end)
 
@@ -143,7 +154,6 @@ defmodule Actors.Registry.ActorRegistry do
     {:noreply, new_state}
   end
 
-  @impl true
   def handle_info({:leave, %{node: node}}, state) do
     Logger.debug(fn -> "Received :leave from #{node} rebalancing registred entities" end)
 
@@ -170,7 +180,7 @@ defmodule Actors.Registry.ActorRegistry do
 
   # register entities to the service
   def register(node_actors) do
-    GenServer.cast(__MODULE__, {:register, node_actors})
+    GenServer.call(__MODULE__, {:register, node_actors})
   end
 
   # fetch current entities of the service
