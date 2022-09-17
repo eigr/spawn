@@ -29,6 +29,22 @@ defmodule Actors.Actor.Entity.Supervisor do
   Adds a Actor to the dynamic supervisor.
   """
   @spec lookup_or_create_actor(ActorSystem.t(), Actor.t()) :: {:ok, any}
+  def lookup_or_create_actor(system, %Actor{} = actor) when is_nil(system) do
+    entity_state = %EntityState{system: nil, actor: actor}
+
+    child_spec = %{
+      id: Actors.Actor.Entity,
+      start: {Actors.Actor.Entity, :start_link, [entity_state]},
+      restart: :transient
+    }
+
+    case DynamicSupervisor.start_child(__MODULE__, child_spec) do
+      {:error, {:already_started, pid}} -> {:ok, pid}
+      {:ok, pid} -> {:ok, pid}
+    end
+  end
+
+  @spec lookup_or_create_actor(ActorSystem.t(), Actor.t()) :: {:ok, any}
   def lookup_or_create_actor(%ActorSystem{name: actor_system} = system, %Actor{} = actor) do
     entity_state = %EntityState{system: actor_system, actor: actor}
 

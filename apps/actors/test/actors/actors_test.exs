@@ -73,6 +73,7 @@ defmodule ActorsTest do
                Actors.invoke(invoke_request)
     end
 
+    @tag :skip
     test "invoke actor function for a already registered actor in another node", ctx do
       %{system: system, actor: actor} = ctx
       actor_name = actor.name
