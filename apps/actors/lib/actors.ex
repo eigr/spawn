@@ -16,7 +16,10 @@ defmodule Actors do
     ProxyInfo,
     RegistrationRequest,
     RegistrationResponse,
-    ServiceInfo
+    RequestStatus,
+    ServiceInfo,
+    SpawnRequest,
+    SpawnResponse
   }
 
   @activate_actors_min_demand 0
@@ -47,6 +50,23 @@ defmodule Actors do
       )
 
     {:ok, RegistrationResponse.new(proxy_info: proxy_info)}
+  end
+
+  def spawn_actor(
+        %SpawnRequest{
+          actor_system:
+            %ActorSystem{name: _name, registry: %Registry{actors: actors} = _registry} =
+              actor_system
+        } = _registration
+      ) do
+    ActorRegistry.register(actors)
+
+    spawn(fn ->
+      create_actors(actor_system, actors)
+    end)
+
+    status = RequestStatus.new(status: :OK, message: "Accepted")
+    {:ok, SpawnResponse.new(status: SpawnResponse.new(status: status))}
   end
 
   def get_state(system_name, actor_name) do
