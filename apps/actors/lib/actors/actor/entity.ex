@@ -227,17 +227,17 @@ defmodule Actors.Actor.Entity do
     case Actors.Node.Client.invoke_host_actor(payload) do
       {:ok, %Tesla.Env{body: ""}} ->
         Logger.error("User Function Actor response Invocation body is empty")
-        {:error, :no_content, :hibernate}
+        {:error, :no_content}
 
       {:ok, %Tesla.Env{body: nil}} ->
         Logger.error("User Function Actor response Invocation body is nil")
-        {:error, :no_content, :hibernate}
+        {:error, :no_content}
 
       {:ok, %Tesla.Env{body: body}} ->
         with %ActorInvocationResponse{
                updated_context: %Context{} = user_ctx
              } = resp <- ActorInvocationResponse.decode(body) do
-          {:reply, {:ok, resp}, update_state(state, user_ctx), :hibernate}
+          {:reply, {:ok, resp}, update_state(state, user_ctx)}
         else
           error ->
             Logger.error("Error on parse response #{inspect(error)}")
@@ -285,17 +285,17 @@ defmodule Actors.Actor.Entity do
     case Actors.Node.Client.invoke_host_actor(payload) do
       {:ok, %Tesla.Env{body: ""}} ->
         Logger.error("User Function Actor response Invocation body is empty")
-        {:error, :no_content, :hibernate}
+        {:error, :no_content}
 
       {:ok, %Tesla.Env{body: nil}} ->
         Logger.error("User Function Actor response Invocation body is nil")
-        {:error, :no_content, :hibernate}
+        {:error, :no_content}
 
       {:ok, %Tesla.Env{body: body}} ->
         with %ActorInvocationResponse{
                updated_context: %Context{} = user_ctx
              } = resp <- ActorInvocationResponse.decode(body) do
-          {:reply, {:ok, resp}, update_state(state, user_ctx), :hibernate}
+          {:reply, {:ok, resp}, update_state(state, user_ctx)}
         else
           error ->
             Logger.error("Error on parse response #{inspect(error)}")
