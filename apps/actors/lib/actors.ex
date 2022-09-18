@@ -16,13 +16,22 @@ defmodule Actors do
     ProxyInfo,
     RegistrationRequest,
     RegistrationResponse,
-    ServiceInfo
+    RequestStatus,
+    ServiceInfo,
+    SpawnRequest,
+    SpawnResponse
   }
 
   @activate_actors_min_demand 0
   @activate_actors_max_demand 4
 
   @erpc_timeout 5_000
+
+  def get_state(system_name, actor_name) do
+    do_lookup_action(system_name, actor_name, nil, fn actor_ref ->
+      ActorEntity.get_state(actor_ref)
+    end)
+  end
 
   def register(
         %RegistrationRequest{
@@ -46,13 +55,25 @@ defmodule Actors do
         proxy_version: "0.1.0"
       )
 
-    {:ok, RegistrationResponse.new(proxy_info: proxy_info)}
+    status = RequestStatus.new(status: :OK, message: "Accepted")
+    {:ok, RegistrationResponse.new(proxy_info: proxy_info, status: status)}
   end
 
-  def get_state(system_name, actor_name) do
-    do_lookup_action(system_name, actor_name, nil, fn actor_ref ->
-      ActorEntity.get_state(actor_ref)
+  def spawn_actor(
+        %SpawnRequest{
+          actor_system:
+            %ActorSystem{name: _name, registry: %Registry{actors: actors} = _registry} =
+              actor_system
+        } = _registration
+      ) do
+    ActorRegistry.register(actors)
+
+    spawn(fn ->
+      create_actors(actor_system, actors)
     end)
+
+    status = RequestStatus.new(status: :OK, message: "Accepted")
+    {:ok, SpawnResponse.new(status: status)}
   end
 
   def invoke(
@@ -165,9 +186,9 @@ defmodule Actors do
       {:ok, pid} ->
         {:ok, pid}
 
-      error ->
+      _ ->
         Logger.debug("Failed to register Actor #{actor_name}")
-        {:error, error}
+        {:error, "Failed to register Actor #{actor_name}"}
     end
   end
 end

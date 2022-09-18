@@ -118,6 +118,14 @@ import "google/protobuf/any.proto";
 option java_package = "io.eigr.functions.protocol";
 option go_package = "github.com/eigr/go-support/eigr/protocol;protocol";
 
+message SpawnRequest {
+    eigr.functions.protocol.actors.ActorSystem actor_system = 2;
+}
+
+message SpawnResponse {
+    RequestStatus status = 1;
+}
+
 message RegistrationRequest {
 
     ServiceInfo service_info = 1;

@@ -8,10 +8,16 @@ defmodule Proxy.Routes.API do
     InvocationResponse,
     RegistrationRequest,
     RegistrationResponse,
-    RequestStatus
+    RequestStatus,
+    SpawnRequest,
+    SpawnResponse
   }
 
   @content_type "application/octet-stream"
+
+  get "/system/:name/actors/:actor_name" do
+    Actors.get_state(name, actor_name)
+  end
 
   post "/system" do
     with registration_payload <- get_body(conn.body_params, RegistrationRequest),
@@ -25,8 +31,16 @@ defmodule Proxy.Routes.API do
     end
   end
 
-  get "/system/:name/actors/:actor_name" do
-    Actors.get_state(name, actor_name)
+  post "/system/:name/actors/spawn" do
+    with spawn_payload <- get_body(conn.body_params, SpawnRequest),
+         {:ok, response} <- Actors.spawn_actor(spawn_payload) do
+      send!(conn, 200, encode(SpawnResponse, response), @content_type)
+    else
+      _ ->
+        status = RequestStatus.new(status: :ERROR, message: "Error on create Actors")
+        response = SpawnResponse.new(status: status)
+        send!(conn, 500, encode(SpawnResponse, response), @content_type)
+    end
   end
 
   post "/system/:name/actors/:actor_name/invoke" do
