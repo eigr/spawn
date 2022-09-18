@@ -52,6 +52,13 @@ defmodule Statestores.Adapters.Behaviour do
             String.to_integer(System.get_env("PROXY_DATABASE_POOL_SIZE", "60"))
           )
 
+        config =
+          Keyword.put(
+            config,
+            :queue_target,
+            String.to_integer(System.get_env("PROXY_DATABASE_QUEUE_TARGET", "10000"))
+          )
+
         {:ok, config}
       end
     end

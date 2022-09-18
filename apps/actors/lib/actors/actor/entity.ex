@@ -172,6 +172,10 @@ defmodule Actors.Actor.Entity do
       {:not_found, %{}} ->
         Logger.debug("Not found initial state on statestore for Actor #{name}.")
         {:noreply, state, :hibernate}
+
+      error ->
+        Logger.error("Error on load state for Actor #{name}. Error: #{inspect(error)}")
+        {:noreply, state, :hibernate}
     end
   end
 

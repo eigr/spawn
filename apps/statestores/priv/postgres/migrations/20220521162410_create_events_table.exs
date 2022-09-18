@@ -1,7 +1,7 @@
 defmodule Statestores.Adapters.Postgres.Migrations.CreateEventsTable do
   use Ecto.Migration
 
-  def change do
+  def up do
     create table(:events) do
       add :system, :string
       add :actor, :string
@@ -13,5 +13,9 @@ defmodule Statestores.Adapters.Postgres.Migrations.CreateEventsTable do
     end
 
     create unique_index(:events, :actor)
+  end
+
+  def down do
+    drop table(:events)
   end
 end
