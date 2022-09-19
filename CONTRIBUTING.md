@@ -74,7 +74,7 @@ The Spawn repository is divided into many directories and even though it is an U
 
 * **apps:** directory where the code of all the applications that are part of the Eigr Functions Spawn platform can be found. The applications are divided as follows:
 
-    * ***protos:*** Contains the protobuf files and compiled modules of the Spawn protocol.
+    * ***spawn:*** Contains the protobuf files, compiled modules of the Spawn protocol and all stuff to make cluster works. So with the basis of our tests.
 
     * ***actors:*** This app concentrates all of the Spawn actors logic and is where a lot of the magic happens.
 

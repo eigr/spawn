@@ -14,7 +14,7 @@ Both are client and server of their counterparts.
 
 In turn, the proxy exposes an HTTP endpoint for registering a user function a.k.a ActorSystem.
  
-A user function that wants to register actors in Proxy Spawn must proceed by making a POST request to the following endpoint:
+A user function that wants to register Actors in Proxy Spawn must proceed by making a POST request to the following endpoint:
 
 ```
 POST /api/v1/system HTTP 1.1
@@ -53,7 +53,7 @@ Once the system has been initialized, that is, the registration step has been su
 
 This is done through a post request to the Proxy at the `/system/:name/actors/:actor_name/invoke` endpoint.
 
-A user function that wants to call actors in Proxy Spawn must proceed by making a POST request as the follow:
+A user function that wants to call Actors in Proxy Spawn must proceed by making a POST request as the follow:
 
 ```
 POST /system/:name/actors/:actor_name/invoke HTTP 1.1
@@ -65,44 +65,94 @@ Content-Type: application/octet-stream
 invocation request type bytes encoded here :-)
 ```
 
+## Spawning Actors
+
+Actors are usually created at the beginning of the SDK's communication flow with the Proxy by the registration step described above. 
+However, some use cases require that Actors can be created on the fly. For these situations we have the Spawning flow described below. 
+
+A user function that wants to Spawning new Actors in Proxy Spawn must proceed by making a POST request to the following endpoint:
+
+```
+POST /system/:name/actors/spawn HTTP 1.1
+HOST: localhost
+User-Agent: user-function-client/0.1.0 (this is just example)
+Accept: application/octet-stream
+Content-Type: application/octet-stream
+
+SpawnRequest type bytes encoded here :-)
+```
+
+The general flow of a Spawning Actors is as follows:
+
+```
++----------------+                                     +---------------------+                                     +-------+                   
+| User Function  |                                     | Local Spawn Sidecar |                                     | Actor |                   
++----------------+                                     +---------------------+                                     +-------+                   
+        |                                                       |                                                     |                       
+        | HTTP POST SpawnRequest                                |                                                     |                       
+        |------------------------------------------------------>|                                                     |                       
+        |                                                       |                                                     |                       
+        |                                                       | Upfront start Actors with BEAM Distributed Protocol |                       
+        |                                                       |---------------------------------------------------->|
+        |                                                       |                                                     |                       
+        |                                                       |                                                     |Initialize Statestore 
+        |                                                       |                                                     |---------------------- 
+        |                                                       |                                                     |                     | 
+        |                                                       |                                                     |<--------------------- 
+        |                                                       |                                                     |                       
+        |          HTTP SpawnResponse                           |                                                     |                       
+        |<------------------------------------------------------|                                                     |                       
+        |                                                       |                                                     | 
+```
+
 ## Calling Actors:
 
-Assuming that two user functions were registered in different separate Proxies, the above request would go the following way:
+Assuming that two user functions were registered in different separate Proxies, the above request would go the following way.
+
+```
+POST /system/:system_name/actors/:actor_name/invoke HTTP 1.1
+HOST: localhost
+User-Agent: user-function-client/0.1.0 (this is just example)
+Accept: application/octet-stream
+Content-Type: application/octet-stream
+
+InvocationRequest type bytes encoded here :-)
+```
 
 ```
 
-+-----------------+                       +------------------------+       +------------------------+                                         +--------------------------------+
-| User Function A |                       | Local Spawn Sidecar A  |       | Remote User Function B |                                         | Remote Spawn Sidecar / Actor B |
-+-----------------+                       +------------------------+       +------------------------+                                         +--------------------------------+
-        |                                             |                                |                                                                     |
-        | HTTP POST Invocation Request.               |                                |                                                                     |
-        |-------------------------------------------->|                                |                                                                     |
-        |                                             |                                |                                                                     |
-        |                                             | Lookup for Actor               |                                                                     |
-        |                                             |-----------------               |                                                                     |
-        |                                             |                |               |                                                                     |
-        |                                             |<----------------               |                                                                     |
-        |                                             |                                |                                                                     |
-        |                                             | Make a BEAM Distributed Protocol Call on Actor located at proxy b                                    |
-        |                                             |----------------------------------------------------------------------------------------------------->|
-        |                                             |                                |                                                                     |
-        |                                             |                                |                        Make HTTP POST in /api/v1/actors/actions     |
-        |                                             |                                |<--------------------------------------------------------------------|
-        |                                             |                                |                                                                     |
-        |                                             |                                | Handle request, execute command                                     |
-        |                                             |                                |--------------------------------                                     |
-        |                                             |                                |                               |                                     |
-        |                                             |                                |<-------------------------------                                     |
-        |                                             |                                |                                                                     |
-        |                                             |                                | HTTP Reply with the result and the new state of actor B             |
-        |                                             |                                |-------------------------------------------------------------------->|
-        |                                             |                                |                                                                     | Store new State 
-        |                                             |                                |                                                                     |-----------------
-        |                                             |                                |                                                                     |                | 
-        |                                             |                 Send response to the Spawn Sidecar A                                                 |<----------------
-        |                                             |<-----------------------------------------------------------------------------------------------------|
-        |                                             |                                |                                                                     |
-        | Respond to user with result value           |                                |                                                                     |
-        |<--------------------------------------------|                                |                                                                     |
-        |                                             |                                |                                                                     |
++-----------------+                       +------------------------+       +------------------------+                                                       +--------------------------------+
+| User Function A |                       | Local Spawn Sidecar A  |       | Remote User Function B |                                                       | Remote Spawn Sidecar / Actor B |
++-----------------+                       +------------------------+       +------------------------+                                                       +--------------------------------+
+        |                                             |                                |                                                                                   |
+        | HTTP POST InvocationRequest                 |                                |                                                                                   |
+        |-------------------------------------------->|                                |                                                                                   |
+        |                                             |                                |                                                                                   |
+        |                                             | Lookup for Actor               |                                                                                   |
+        |                                             |-----------------               |                                                                                   |
+        |                                             |                |               |                                                                                   |
+        |                                             |<----------------               |                                                                                   |
+        |                                             |                                |                                                                                   |
+        |                                             | Make a BEAM Distributed Protocol Call on Actor located at proxy b                                                  |
+        |                                             |------------------------------------------------------------------------------------------------------------------->|
+        |                                             |                                |                                                                                   |
+        |                                             |                                |  Proxy Make HTTP POST in /api/v1/actors/actions on SDK sending ActorInvocation    |
+        |                                             |                                |<----------------------------------------------------------------------------------|
+        |                                             |                                |                                                                                   |
+        |                                             |                                | Handle request, execute command                                                   |
+        |                                             |                                |--------------------------------                                                   |
+        |                                             |                                |                               |                                                   |
+        |                                             |                                |<-------------------------------                                                   |
+        |                                             |                                |                                                                                   |
+        |                                             |                                | SDK HTTP Reply with ActorInvocationResponse and the new state of actor B          |
+        |                                             |                                |---------------------------------------------------------------------------------->|
+        |                                             |                                |                                                                                   | Store new State 
+        |                                             |                                |                                                                                   |-----------------
+        |                                             |                                |                                                                                   |                | 
+        |                                             |                 Send response to the Spawn Sidecar A                                                               |<----------------
+        |                                             |<-------------------------------------------------------------------------------------------------------------------|
+        |                                             |                                |                                                                                   |
+        | Respond to user with InvocationResponse     |                                |                                                                                   |
+        |<--------------------------------------------|                                |                                                                                   |
+        |                                             |                                |                                                                                   |
 ```
