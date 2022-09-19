@@ -118,7 +118,21 @@ The Spawn protocol is very simple to implement but it is necessary for the devel
 
    It is important to keep in mind and respect the terms used in the documentation so that your SDK is familiar to all developers and not just those in your language.
 
-5. **Raise your hand and seek help:**
+5. **Note on Spawning:**
+
+   The Spawning Actors on the Fly feature is very similar to the SDK registration feature on the Proxy but it has an important feature that must be considered and that refers to the previous item in this guide.
+   
+   Basically, an actor to be created on the fly must, even in these cases, be created in the SDK in advance, that is, the dynamic Actor must have a template of itself previously registered in the registration step. This is necessary because this way the proxy will know how to optimize the initialization and the way these actors will actually be created in the future. It is important for the proxy to know which are all the functions that a Host Function will define.
+   
+   For a more complete understanding, see the example in Java of how the Actors are registered and how the Spawning of these actors is performed on the fly:
+
+      * First an actor is defined and its identity is defined as Abstract.
+        https://github.com/eigr/spawn-springboot-sdk/blob/main/spawn-springboot-examples/src/main/java/io/eigr/spawn/example/AbstractActor.java
+
+      * Then, when you really want to create a concrete instance of this actor, a real name is given and this name is associated with the abstract type of the Actor.  
+        https://github.com/eigr/spawn-springboot-sdk/blob/e88b59f1505647a867adb9607a4d39baa249ebb2/spawn-springboot-examples/src/main/java/io/eigr/spawn/example/App.java#L36
+
+6. **Raise your hand and seek help:**
 
    When in doubt, look for issues and PR, or in our repository discussions to see if something related to the problem you are experiencing has already been mentioned.
 
