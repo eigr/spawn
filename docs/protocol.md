@@ -51,12 +51,12 @@ The general flow of a registration action is as follows:
 
 Once the system has been initialized, that is, the registration step has been successfully completed, then the user function will be able to make requests to the System Actors.
 
-This is done through a post request to the Proxy at the `/system/:name/actors/:actor_name/invoke` endpoint.
+This is done through a post request to the Proxy at the `/system/:system_name/actors/:actor_name/invoke` endpoint.
 
 A user function that wants to call Actors in Proxy Spawn must proceed by making a POST request as the follow:
 
 ```
-POST /system/:name/actors/:actor_name/invoke HTTP 1.1
+POST /system/:system_name/actors/:actor_name/invoke HTTP 1.1
 HOST: localhost
 User-Agent: user-function-client/0.1.0 (this is just example)
 Accept: application/octet-stream
@@ -73,7 +73,7 @@ However, some use cases require that Actors can be created ***on the fly***. For
 A user function that wants to Spawning new Actors in Proxy Spawn must proceed by making a POST request to the following endpoint:
 
 ```
-POST /system/:name/actors/spawn HTTP 1.1
+POST /system/:system_name/actors/spawn HTTP 1.1
 HOST: localhost
 User-Agent: user-function-client/0.1.0 (this is just example)
 Accept: application/octet-stream
