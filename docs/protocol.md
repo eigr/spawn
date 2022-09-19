@@ -68,7 +68,7 @@ invocation request type bytes encoded here :-)
 ## Spawning Actors
 
 Actors are usually created at the beginning of the SDK's communication flow with the Proxy by the registration step described above. 
-However, some use cases require that Actors can be created on the fly. For these situations we have the Spawning flow described below. 
+However, some use cases require that Actors can be created ***on the fly***. For these situations we have the Spawning flow described below. 
 
 A user function that wants to Spawning new Actors in Proxy Spawn must proceed by making a POST request to the following endpoint:
 
