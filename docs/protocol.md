@@ -156,3 +156,36 @@ InvocationRequest type bytes encoded here :-)
         |<--------------------------------------------|                                |                                                                                   |
         |                                             |                                |                                                                                   |
 ```
+
+## Guide for implementing new SDKs
+
+The Spawn protocol is very simple to implement but it is necessary for the developer of a new support language (we will use the term SDK from now on) to be aware of some important details_
+
+1. **Make sure you understand the request flow:** 
+
+   Before starting to develop an API around the protocol in your desired language, first try to understand how all the parts relate to each other. A good way to acquire this knowledge is to create a simple test that just fills in the protobuf objects and makes a simple request to the proxy. Here we have some example:
+   
+   https://github.com/eigr/spawn-springboot-sdk/blob/main/spawn-springboot-starter/src/test/java/io/eigr/spawn/springboot/starter/SpawnTest.java
+
+2. **Spawn is both a client and an http server:**
+   
+   To implement an SDK for Spawn you will have to implement both an http client side and an http server side.
+   This file contains the general flow of requests that occur on each side and when they should occur, but a read of the source code of other SDKs can help better understand how things connect.
+
+3. **At first, pay attention to the main:**
+
+   Despite being simple, Spawn has a lot of flexibility and can be configured in many ways. Try to implement default values for most parameters of protobufs.
+
+   It is also important to note that the essential thing is that the user is able to register with the proxy and perform his actors through the invocation resource. Focus on that at first and leave the spawning feature and other protocol options for when you are able to do the first two features mentioned.
+
+4. **API style:**
+
+   Each language has its idiosyncrasies and therefore each language will have an API that best represents the characteristics of its base language but it is important that the languages maintain a common identity, this allows developers who are not native to a certain language to feel familiar with the general concepts.
+
+   It is important to keep in mind and respect the terms used in the documentation so that your SDK is familiar to all developers and not just those in your language.
+
+5. **Raise your hand and seek help:**
+
+   When in doubt, look for issues and PR, or in our repository discussions to see if something related to the problem you are experiencing has already been mentioned.
+
+   Also feel free to ask for help at any time via Issues or Discussions on Github or via our Discord server. If you're starting to develop a new SDK, let us know and we'll create a dedicated channel on our Discord server.
