@@ -76,7 +76,7 @@ The Spawn repository is divided into many directories and even though it is an U
 
     * ***spawn:*** Contains the protobuf files, compiled modules of the Spawn protocol and all stuff to make cluster works. So with the basis of our tests.
 
-    * ***actors:*** This app concentrates all of the Spawn actors logic and is where a lot of the magic happens.
+    * ***actors:*** This app concentrates all of the Spawn Actors logic and is where a lot of the magic happens.
 
     * ***proxy:*** This is the application that will act as a sidecar of the user functions. It contains the http server responsible for implementing the Spawn HTTP/Protobuf Protocol.
 
@@ -110,7 +110,7 @@ The Spawn protocol is very simple to implement but it is necessary for the devel
 
    Despite being simple, Spawn has a lot of flexibility and can be configured in many ways. Try to implement default values for most parameters of protobufs.
 
-   It is also important to note that the essential thing is that the user is able to register with the proxy and perform his actors through the invocation resource. Focus on that at first and leave the spawning feature and other protocol options for when you are able to do the first two features mentioned.
+   It is also important to note that the essential thing is that the user is able to register with the proxy and perform his Actors through the invocation resource. Focus on that at first and leave the spawning feature and other protocol options for when you are able to do the first two features mentioned.
 
 4. **API style:**
 
@@ -122,14 +122,14 @@ The Spawn protocol is very simple to implement but it is necessary for the devel
 
    The Spawning Actors on the Fly feature is very similar to the SDK registration feature on the Proxy but it has an important feature that must be considered and that refers to the previous item in this guide.
    
-   Basically, an actor to be created on the fly must, even in these cases, be created in the SDK in advance, that is, the dynamic Actor must have a template of itself previously registered in the registration step. This is necessary because this way the proxy will know how to optimize the initialization and the way these actors will actually be created in the future. It is important for the proxy to know which are all the functions that a Host Function will define.
+   Basically, an Actor to be created on the fly must, even in these cases, be created in the SDK in advance, that is, the dynamic Actor must have a template of itself previously registered in the registration step. This is necessary because this way the proxy will know how to optimize the initialization and the way these Actors will actually be created in the future. It is important for the proxy to know which are all the functions that a Host Function will define.
    
-   For a more complete understanding, see the example in Java of how the Actors are registered and how the Spawning of these actors is performed on the fly:
+   For a more complete understanding, see the example in Java of how the Actors are registered and how the Spawning of these Actors is performed on the fly:
 
-      * First an actor is defined and its identity is defined as Abstract.
+      * First an Actor is defined and its identity is defined as Abstract.
         https://github.com/eigr/spawn-springboot-sdk/blob/main/spawn-springboot-examples/src/main/java/io/eigr/spawn/example/AbstractActor.java
 
-      * Then, when you really want to create a concrete instance of this actor, a real name is given and this name is associated with the abstract type of the Actor.  
+      * Then, when you really want to create a concrete instance of this Actor, a real name is given and this name is associated with the abstract type of the Actor.  
         https://github.com/eigr/spawn-springboot-sdk/blob/e88b59f1505647a867adb9607a4d39baa249ebb2/spawn-springboot-examples/src/main/java/io/eigr/spawn/example/App.java#L36
 
 6. **Raise your hand and seek help:**
