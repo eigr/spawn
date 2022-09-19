@@ -94,7 +94,9 @@ The Spawn repository is divided into many directories and even though it is an U
 
 ## Guide for implementing new SDKs
 
-The Spawn protocol is very simple to implement but it is necessary for the developer of a new support language (we will use the term SDK from now on) to be aware of some important details_
+The Spawn protocol is very simple to implement but it is necessary for the developer of a new support language (we will use the term SDK from now on) to be aware of some important details. 
+
+Below are some tips that can be useful to you during your journey of developing a new SDK or maintaining an existing SDK:
 
 1. **Make sure you understand the request flow:** 
 
