@@ -19,13 +19,21 @@ defmodule Actors.Actor.Entity do
     InvocationRequest
   }
 
-  @min_snapshot_threshold 500
+  @default_deactivate_timeout 90_000
+
+  @default_methods [
+    "get",
+    "Get",
+    "get_state",
+    "getState",
+    "GetState"
+  ]
 
   @default_snapshot_timeout 60_000
 
-  @default_deactivate_timeout 90_000
-
   @fullsweep_after 10
+
+  @min_snapshot_threshold 500
 
   @timeout_factor_range 200..9000
 
@@ -199,7 +207,6 @@ defmodule Actors.Actor.Entity do
       ),
       do: {:reply, {:ok, actor_state}, state, :hibernate}
 
-  @impl true
   def handle_call(
         {:invocation_request,
          %InvocationRequest{
@@ -210,110 +217,19 @@ defmodule Actors.Actor.Entity do
         _from,
         %EntityState{
           system: actor_system,
-          actor: %Actor{state: current_state = _actor_state} = _state_actor
-        } = state
-      )
-      when is_nil(current_state) do
-    payload =
-      ActorInvocation.new(
-        actor_name: name,
-        actor_system: actor_system,
-        command_name: command,
-        value: payload,
-        current_context: Context.new()
-      )
-      |> ActorInvocation.encode()
-
-    case Actors.Node.Client.invoke_host_actor(payload) do
-      {:ok, %Tesla.Env{body: ""}} ->
-        Logger.error("User Function Actor response Invocation body is empty")
-        {:error, :no_content}
-
-      {:ok, %Tesla.Env{body: nil}} ->
-        Logger.error("User Function Actor response Invocation body is nil")
-        {:error, :no_content}
-
-      {:ok, %Tesla.Env{body: body}} ->
-        with %ActorInvocationResponse{
-               updated_context: %Context{} = user_ctx
-             } = resp <- ActorInvocationResponse.decode(body) do
-          {:reply, {:ok, resp}, update_state(state, user_ctx)}
-        else
-          error ->
-            Logger.error("Error on parse response #{inspect(error)}")
-            {:reply, {:error, :invalid_content}, state, :hibernate}
-        end
-
-      {:error, timeout} ->
-        Logger.error("User Function Actor Invocation Timeout Error")
-        {:reply, {:error, timeout}, state, :hibernate}
-
-      {:error, reason} ->
-        Logger.error("User Function Actor Invocation Unknown Error: #{inspect(reason)}")
-        {:reply, {:error, reason}, state, :hibernate}
-
-      error ->
-        Logger.error("User Function Actor Invocation Unknown Error")
-        {:reply, {:error, error}, state, :hibernate}
-    end
-  end
-
-  @impl true
-  def handle_call(
-        {:invocation_request,
-         %InvocationRequest{
-           actor: %Actor{name: name} = _actor,
-           command_name: command,
-           value: payload
-         } = _invocation},
-        _from,
-        %EntityState{
-          system: actor_system,
-          actor: %Actor{state: %ActorState{state: current_state} = _actor_state} = _state_actor
+          actor: %Actor{state: actor_state}
         } = state
       ) do
-    payload =
-      ActorInvocation.new(
-        actor_name: name,
-        actor_system: actor_system,
-        command_name: command,
-        value: payload,
-        current_context: Context.new(state: current_state)
-      )
-      |> ActorInvocation.encode()
+    current_state = actor_state.state
 
-    case Actors.Node.Client.invoke_host_actor(payload) do
-      {:ok, %Tesla.Env{body: ""}} ->
-        Logger.error("User Function Actor response Invocation body is empty")
-        {:error, :no_content}
-
-      {:ok, %Tesla.Env{body: nil}} ->
-        Logger.error("User Function Actor response Invocation body is nil")
-        {:error, :no_content}
-
-      {:ok, %Tesla.Env{body: body}} ->
-        with %ActorInvocationResponse{
-               updated_context: %Context{} = user_ctx
-             } = resp <- ActorInvocationResponse.decode(body) do
-          {:reply, {:ok, resp}, update_state(state, user_ctx)}
-        else
-          error ->
-            Logger.error("Error on parse response #{inspect(error)}")
-            {:reply, {:error, :invalid_content}, state, :hibernate}
-        end
-
-      {:error, timeout} ->
-        Logger.error("User Function Actor Invocation Timeout Error")
-        {:reply, {:error, timeout}, state, :hibernate}
-
-      {:error, reason} ->
-        Logger.error("User Function Actor Invocation Unknown Error: #{inspect(reason)}")
-        {:reply, {:error, reason}, state, :hibernate}
-
-      error ->
-        Logger.error("User Function Actor Invocation Unknown Error")
-        {:reply, {:error, error}, state, :hibernate}
-    end
+    ActorInvocation.new(
+      actor_name: name,
+      actor_system: actor_system,
+      command_name: command,
+      value: payload,
+      current_context: Context.new(state: current_state)
+    )
+    |> invoke_host(state)
   end
 
   @impl true
@@ -574,6 +490,57 @@ defmodule Actors.Actor.Entity do
        ) do
     new_state = %{actor_state | state: updated_state}
     %{state | actor: %{actor | state: new_state}}
+  end
+
+  defp invoke_host(
+         %ActorInvocation{actor_name: name, actor_system: system, command_name: command} =
+           payload,
+         %EntityState{
+           actor: %Actor{state: actor_state}
+         } = state
+       ) do
+    if Enum.member?(@default_methods, command) do
+      current_state = actor_state.state
+      context = Context.new(state: current_state)
+
+      resp =
+        ActorInvocationResponse.new(
+          actor_name: name,
+          actor_system: system,
+          updated_context: context,
+          value: current_state
+        )
+
+      {:reply, {:ok, resp}, state}
+    else
+      payload
+      |> ActorInvocation.encode()
+      |> Actors.Node.Client.invoke_host_actor()
+      |> case do
+        {:ok, %Tesla.Env{body: ""}} ->
+          Logger.error("User Function Actor response Invocation body is empty")
+          {:reply, {:error, :no_content}, state}
+
+        {:ok, %Tesla.Env{body: nil}} ->
+          Logger.error("User Function Actor response Invocation body is nil")
+          {:reply, {:error, :no_content}, state}
+
+        {:ok, %Tesla.Env{body: body}} ->
+          with %ActorInvocationResponse{
+                 updated_context: %Context{} = user_ctx
+               } = resp <- ActorInvocationResponse.decode(body) do
+            {:reply, {:ok, resp}, update_state(state, user_ctx)}
+          else
+            error ->
+              Logger.error("Error on parse response #{inspect(error)}")
+              {:reply, {:error, :invalid_content}, state, :hibernate}
+          end
+
+        {:error, reason} ->
+          Logger.error("User Function Actor Invocation Unknown Error: #{inspect(reason)}")
+          {:reply, {:error, reason}, state, :hibernate}
+      end
+    end
   end
 
   defp via(name) do
