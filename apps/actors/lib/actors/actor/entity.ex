@@ -541,11 +541,11 @@ defmodule Actors.Actor.Entity do
       |> case do
         {:ok, %Tesla.Env{body: ""}} ->
           Logger.error("User Function Actor response Invocation body is empty")
-          {:error, :no_content}
+          {:reply, {:error, :no_content}, state}
 
         {:ok, %Tesla.Env{body: nil}} ->
           Logger.error("User Function Actor response Invocation body is nil")
-          {:error, :no_content}
+          {:reply, {:error, :no_content}, state}
 
         {:ok, %Tesla.Env{body: body}} ->
           with %ActorInvocationResponse{
