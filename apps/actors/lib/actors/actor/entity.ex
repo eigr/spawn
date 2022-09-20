@@ -522,15 +522,8 @@ defmodule Actors.Actor.Entity do
          } = state
        ) do
     if Enum.member?(@default_methods, command) do
-      {context, current_state} =
-        case actor_state do
-          nil ->
-            {Context.new(), nil}
-
-          _ ->
-            %ActorState{state: current_state} = actor_state
-            {Context.new(state: current_state), current_state}
-        end
+      current_state = get_in(actor_state, [:state])
+      context = Context.new(state: current_state)
 
       resp =
         ActorInvocationResponse.new(
