@@ -5,11 +5,11 @@ defmodule ActorsTest do
   alias Eigr.Functions.Protocol.Actors.ActorState
   alias Eigr.Functions.Protocol.RegistrationResponse
 
-  setup_all do
+  setup do
     actor_name = "global_actor_test"
 
     actor = build_actor(name: actor_name)
-    actor_entry = build_actor_entry(name: actor_name)
+    actor_entry = build_actor_entry(name: actor_name, actor: actor)
     registry = build_registry_with_actors(actors: [actor_entry])
     system = build_system(name: "global_sytem_name", registry: registry)
 
@@ -73,7 +73,6 @@ defmodule ActorsTest do
                Actors.invoke(invoke_request)
     end
 
-    @tag :skip
     test "invoke actor function for a already registered actor in another node", ctx do
       %{system: system, actor: actor} = ctx
       actor_name = actor.name
@@ -100,8 +99,8 @@ defmodule ActorsTest do
 
       mock_invoke_host_actor_with_ok_response(host_invoke_response)
 
-      # wait for nodes to sync
-      Process.sleep(100)
+      # wait for nodes and actors to sync
+      while_actor_synqued(system.name, actor_name)
 
       assert {:ok,
               %ActorInvocationResponse{actor_name: ^actor_name, updated_context: updated_context}} =
@@ -138,8 +137,8 @@ defmodule ActorsTest do
 
       mock_invoke_host_actor_with_ok_response(host_invoke_response)
 
-      # wait for nodes to sync
-      Process.sleep(100)
+      # wait for nodes and actors to sync
+      while_actor_synqued(system.name, actor_name)
 
       assert {:ok,
               %ActorInvocationResponse{actor_name: ^actor_name, updated_context: updated_context}} =
@@ -149,6 +148,18 @@ defmodule ActorsTest do
 
       assert %Actors.Protos.ChangeNameResponseTest{status: :OK} =
                any_unpack!(updated_context.state, Actors.Protos.ChangeNameResponseTest)
+    end
+  end
+
+  defp while_actor_synqued(system_name, actor_name) do
+    case Spawn.NodeHelper.rpc(
+           :"spawn_actors_node@127.0.0.1",
+           Actors.Registry.ActorRegistry,
+           :lookup,
+           [system_name, actor_name]
+         ) do
+      {:not_found, _} -> while_actor_synqued(system_name, actor_name)
+      _ -> :ok
     end
   end
 end
