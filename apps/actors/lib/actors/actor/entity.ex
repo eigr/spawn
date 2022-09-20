@@ -217,33 +217,11 @@ defmodule Actors.Actor.Entity do
         _from,
         %EntityState{
           system: actor_system,
-          actor: %Actor{state: current_state = _actor_state} = _state_actor
-        } = state
-      )
-      when is_nil(current_state) do
-    ActorInvocation.new(
-      actor_name: name,
-      actor_system: actor_system,
-      command_name: command,
-      value: payload,
-      current_context: Context.new()
-    )
-    |> invoke_host(state)
-  end
-
-  def handle_call(
-        {:invocation_request,
-         %InvocationRequest{
-           actor: %Actor{name: name} = _actor,
-           command_name: command,
-           value: payload
-         } = _invocation},
-        _from,
-        %EntityState{
-          system: actor_system,
-          actor: %Actor{state: %ActorState{state: current_state} = _actor_state} = _state_actor
+          actor: %Actor{state: actor_state}
         } = state
       ) do
+    current_state = actor_state.state
+
     ActorInvocation.new(
       actor_name: name,
       actor_system: actor_system,
@@ -522,7 +500,7 @@ defmodule Actors.Actor.Entity do
          } = state
        ) do
     if Enum.member?(@default_methods, command) do
-      current_state = get_in(actor_state, [:state])
+      current_state = actor_state.state
       context = Context.new(state: current_state)
 
       resp =
