@@ -232,7 +232,6 @@ defmodule Actors.Actor.Entity do
     |> invoke_host(state)
     |> case do
       {:ok, response, state} -> {:reply, {:ok, response}, state}
-      {:error, :no_content, state} -> {:reply, {:error, :no_content}, state}
       {:error, reason, state} -> {:reply, {:error, reason}, state, :hibernate}
     end
   end
@@ -262,7 +261,6 @@ defmodule Actors.Actor.Entity do
     |> invoke_host(state)
     |> case do
       {:ok, _whatever, state} -> {:noreply, state}
-      {:error, :no_content, state} -> {:noreply, state}
       {:error, _reason, state} -> {:noreply, state, :hibernate}
     end
   end
