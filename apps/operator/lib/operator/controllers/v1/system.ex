@@ -81,7 +81,7 @@ defmodule Operator.Controllers.V1.ActorSystem do
           Logger.info("Cluster service created")
 
         {:error, err} ->
-          Logger.warn(
+          Logger.warning(
             "Failure creating cluster service: #{inspect(err)}. Probably already exists."
           )
       end
@@ -94,14 +94,14 @@ defmodule Operator.Controllers.V1.ActorSystem do
                 K8s.Client.create(definition) |> run()
 
               {:load_balancer, definition} ->
-                Logger.warn(
+                Logger.warning(
                   "Using LoadBalancer is extremely discouraged. Instead try using the Ingress method"
                 )
 
                 K8s.Client.create(definition) |> run()
 
               {:node_port, definition} ->
-                Logger.warn(
+                Logger.warning(
                   "Using NodePort is extremely discouraged. Instead try using the Ingress method"
                 )
 
@@ -163,14 +163,14 @@ defmodule Operator.Controllers.V1.ActorSystem do
                 K8s.Client.patch(definition) |> run()
 
               {:load_balancer, definition} ->
-                Logger.warn(
+                Logger.warning(
                   "Using LoadBalancer is extremely discouraged. Instead try using the Ingress method"
                 )
 
                 K8s.Client.patch(definition) |> run()
 
               {:node_port, definition} ->
-                Logger.warn(
+                Logger.warning(
                   "Using NodePort is extremely discouraged. Instead try using the Ingress method"
                 )
 

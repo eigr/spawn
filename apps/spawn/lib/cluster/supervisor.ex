@@ -43,7 +43,7 @@ defmodule Spawn.Cluster.Supervisor do
           get_dns_strategy(config)
 
         _ ->
-          Logger.warn("Invalid Topology")
+          Logger.warning("Invalid Topology")
       end
 
     if topologies && Code.ensure_compiled(Cluster.Supervisor) do

@@ -230,6 +230,39 @@ defmodule Actors.Actor.Entity do
       current_context: Context.new(state: current_state)
     )
     |> invoke_host(state)
+    |> case do
+      {:ok, response, state} -> {:reply, {:ok, response}, state}
+      {:error, reason, state} -> {:reply, {:error, reason}, state, :hibernate}
+    end
+  end
+
+  @impl true
+  def handle_cast(
+        {:invocation_request,
+         %InvocationRequest{
+           actor: %Actor{name: name} = _actor,
+           command_name: command,
+           value: payload
+         } = _invocation},
+        %EntityState{
+          system: actor_system,
+          actor: %Actor{state: actor_state}
+        } = state
+      ) do
+    current_state = Map.get(actor_state || %{}, :state)
+
+    ActorInvocation.new(
+      actor_name: name,
+      actor_system: actor_system,
+      command_name: command,
+      value: payload,
+      current_context: Context.new(state: current_state)
+    )
+    |> invoke_host(state)
+    |> case do
+      {:ok, _whatever, state} -> {:noreply, state}
+      {:error, _reason, state} -> {:noreply, state, :hibernate}
+    end
   end
 
   @impl true
@@ -320,7 +353,7 @@ defmodule Actors.Actor.Entity do
           actor: %Actor{name: name}
         } = state
       ) do
-    Logger.warn("Received Exit message for Actor #{name} and PID #{inspect(pid)}.")
+    Logger.warning("Received Exit message for Actor #{name} and PID #{inspect(pid)}.")
 
     {:stop, reason, state}
   end
@@ -332,7 +365,7 @@ defmodule Actors.Actor.Entity do
         } = state
       )
       when is_nil(actor_state) do
-    Logger.warn(
+    Logger.warning(
       "No handled internal message for actor #{name}. Message: #{inspect(message)}. Actor state: #{inspect(state)}"
     )
 
@@ -345,7 +378,7 @@ defmodule Actors.Actor.Entity do
           actor: %Actor{name: name, state: %ActorState{} = actor_state}
         } = state
       ) do
-    Logger.warn(
+    Logger.warning(
       "No handled internal message for actor #{name}. Message: #{inspect(message)}. Actor state: #{inspect(state)}"
     )
 
@@ -400,11 +433,11 @@ defmodule Actors.Actor.Entity do
 
   @spec invoke_async(any, any) :: :ok
   def invoke_async(ref, request) when is_pid(ref) do
-    GenServer.cast(ref, {:invocation_request, :async, request})
+    GenServer.cast(ref, {:invocation_request, request})
   end
 
   def invoke_async(ref, request) do
-    GenServer.cast(via(ref), {:invocation_request, :async, request})
+    GenServer.cast(via(ref), {:invocation_request, request})
   end
 
   defp get_timeout_factor(factor_range) when is_number(factor_range),
@@ -511,7 +544,7 @@ defmodule Actors.Actor.Entity do
           value: current_state
         )
 
-      {:reply, {:ok, resp}, state}
+      {:ok, resp, state}
     else
       payload
       |> ActorInvocation.encode()
@@ -519,26 +552,26 @@ defmodule Actors.Actor.Entity do
       |> case do
         {:ok, %Tesla.Env{body: ""}} ->
           Logger.error("User Function Actor response Invocation body is empty")
-          {:reply, {:error, :no_content}, state}
+          {:error, :no_content, state}
 
         {:ok, %Tesla.Env{body: nil}} ->
           Logger.error("User Function Actor response Invocation body is nil")
-          {:reply, {:error, :no_content}, state}
+          {:error, :no_content, state}
 
         {:ok, %Tesla.Env{body: body}} ->
           with %ActorInvocationResponse{
                  updated_context: %Context{} = user_ctx
                } = resp <- ActorInvocationResponse.decode(body) do
-            {:reply, {:ok, resp}, update_state(state, user_ctx)}
+            {:ok, resp, update_state(state, user_ctx)}
           else
             error ->
               Logger.error("Error on parse response #{inspect(error)}")
-              {:reply, {:error, :invalid_content}, state, :hibernate}
+              {:error, :invalid_content, state}
           end
 
         {:error, reason} ->
           Logger.error("User Function Actor Invocation Unknown Error: #{inspect(reason)}")
-          {:reply, {:error, reason}, state, :hibernate}
+          {:error, reason, state}
       end
     end
   end

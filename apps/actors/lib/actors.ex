@@ -76,6 +76,7 @@ defmodule Actors do
     {:ok, SpawnResponse.new(status: status)}
   end
 
+  @spec invoke(%InvocationRequest{}) :: {:ok, :async} | {:ok, term()} | {:error, term()}
   def invoke(
         %InvocationRequest{
           actor: %Actor{} = actor,
@@ -127,9 +128,10 @@ defmodule Actors do
     end
   end
 
-  @spec maybe_invoke_async(boolean, term(), term()) :: :ok | {:ok, term()}
   defp maybe_invoke_async(true, actor_ref, request) do
     ActorEntity.invoke_async(actor_ref, request)
+
+    {:ok, :async}
   end
 
   defp maybe_invoke_async(false, actor_ref, request) do
