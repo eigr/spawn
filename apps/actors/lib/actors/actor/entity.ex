@@ -220,7 +220,7 @@ defmodule Actors.Actor.Entity do
           actor: %Actor{state: actor_state}
         } = state
       ) do
-    current_state = actor_state.state
+    current_state = Map.get(actor_state || %{}, :state)
 
     ActorInvocation.new(
       actor_name: name,
@@ -500,7 +500,7 @@ defmodule Actors.Actor.Entity do
          } = state
        ) do
     if Enum.member?(@default_methods, command) do
-      current_state = actor_state.state
+      current_state = Map.get(actor_state || %{}, :state)
       context = Context.new(state: current_state)
 
       resp =
