@@ -149,6 +149,20 @@ defmodule ActorsTest do
       assert %Actors.Protos.ChangeNameResponseTest{status: :OK} =
                any_unpack!(updated_context.state, Actors.Protos.ChangeNameResponseTest)
     end
+
+    test "invoke async actor function", ctx do
+      %{system: system, actor: actor} = ctx
+      actor_name = actor.name
+
+      invoke_request = build_invocation_request(system: system, actor: actor, async: true)
+
+      host_invoke_response =
+        build_host_invoke_response(actor_name: actor_name, system_name: system.name)
+
+      mock_invoke_host_actor_with_ok_response(host_invoke_response)
+
+      assert {:ok, :async} = Actors.invoke(invoke_request)
+    end
   end
 
   defp while_actor_synqued(system_name, actor_name) do
