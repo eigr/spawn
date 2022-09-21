@@ -8,7 +8,7 @@ Spawn.InitializerHelper.setup()
 Actors.Supervisors.ProtocolSupervisor.start_link(%{})
 Actors.Supervisors.EntitySupervisor.start_link(%{})
 
-node = Spawn.NodeHelper.spawn_peer("spawn_actors_node")
+node = Spawn.NodeHelper.spawn_peer("spawn_actors_node", applications: [:actors, :spawn, :statestores])
 
 Spawn.NodeHelper.rpc(node, Spawn.InitializerHelper, :setup, [])
 Spawn.NodeHelper.rpc(node, Actors.Supervisors.ProtocolSupervisor, :start_link, [%{}])
