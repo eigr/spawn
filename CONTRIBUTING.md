@@ -46,7 +46,7 @@ This sections below describes the process for running and development this appli
 First of all you will need to have some tools installed on your computer:
 
 1. Erlang/OTP 24 or newest.
-2. Elixir 1.13 or newest.
+2. Elixir 1.14 or newest.
 3. Minikube, kind, K3s, or other Kubernetes flavor for local development.
 4. MySQL, Postgres or other supported database running in local environment.
 
