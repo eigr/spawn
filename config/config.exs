@@ -39,7 +39,7 @@ config :logger,
 
 # Our Console Backend-specific configuration
 config :logger, :console,
-  format: "$date $time [$node]:[$metadata]:[$level]:$levelpad$message\n",
+  format: "$date $time [$node]:[$metadata]:[$level]:$message\n",
   metadata: [:pid]
 
 config :protobuf, extensions: :enabled

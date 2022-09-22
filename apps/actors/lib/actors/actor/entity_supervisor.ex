@@ -38,17 +38,14 @@ defmodule Actors.Actor.Entity.Supervisor do
       restart: :transient
     }
 
-    case DynamicSupervisor.start_child(
-           {:via, PartitionSupervisor, {__MODULE__, self()}},
-           child_spec
-         ) do
+    case DynamicSupervisor.start_child(via(), child_spec) do
       {:error, {:already_started, pid}} -> {:ok, pid}
       {:ok, pid} -> {:ok, pid}
     end
   end
 
   @spec lookup_or_create_actor(ActorSystem.t(), Actor.t()) :: {:ok, any}
-  def lookup_or_create_actor(%ActorSystem{name: actor_system} = system, %Actor{} = actor) do
+  def lookup_or_create_actor(%ActorSystem{name: actor_system} = _system, %Actor{} = actor) do
     entity_state = %EntityState{system: actor_system, actor: actor}
 
     child_spec = %{
@@ -57,12 +54,11 @@ defmodule Actors.Actor.Entity.Supervisor do
       restart: :transient
     }
 
-    case DynamicSupervisor.start_child(
-           {:via, PartitionSupervisor, {__MODULE__, self()}},
-           child_spec
-         ) do
+    case DynamicSupervisor.start_child(via(), child_spec) do
       {:error, {:already_started, pid}} -> {:ok, pid}
       {:ok, pid} -> {:ok, pid}
     end
   end
+
+  defp via(), do: {:via, PartitionSupervisor, {__MODULE__, self()}}
 end
