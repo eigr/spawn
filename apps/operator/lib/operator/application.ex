@@ -12,8 +12,8 @@ defmodule Operator.Application do
     # Node.set_cookie(String.to_atom("FW9RYfQpVbuycMxSodrXIKAzuLgsaR5gyArGeap8WTHNfJj3vfltYQ=="))
     attach_logger()
 
-    MetricsEndpoint.Exporter.setup()
-    MetricsEndpoint.PrometheusPipeline.setup()
+    # MetricsEndpoint.Exporter.setup()
+    # MetricsEndpoint.PrometheusPipeline.setup()
 
     children = [
       {Bandit, plug: Operator.Router, scheme: :http, options: [port: @port]}

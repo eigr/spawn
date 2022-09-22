@@ -3,8 +3,8 @@ defmodule Proxy.Router do
 
   plug(Plug.Logger)
 
-  plug(MetricsEndpoint.Exporter)
-  plug(MetricsEndpoint.PrometheusPipeline)
+  # plug(MetricsEndpoint.Exporter)
+  # plug(MetricsEndpoint.PrometheusPipeline)
 
   plug(:match)
   plug(Plug.Parsers, parsers: [:json, Proxy.Parsers.Protobuf], json_decoder: Jason)

@@ -27,9 +27,8 @@ defmodule Metrics.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:prometheus, "~> 4.8"},
-      {:prometheus_plugs, "~> 1.1"}
-      # {:prometheus_process_collector, "~> 1.6"}
+      # {:prometheus, "~> 4.8"},
+      # {:prometheus_plugs, "~> 1.1"}
     ]
   end
 end

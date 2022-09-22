@@ -3,9 +3,6 @@ defmodule ActivatorRabbitMQ.Router do
 
   plug(Plug.Logger)
 
-  plug(MetricsEndpoint.Exporter)
-  plug(MetricsEndpoint.PrometheusPipeline)
-
   plug(:match)
   plug(Plug.Parsers, parsers: [:json], json_decoder: Jason)
   plug(:dispatch)

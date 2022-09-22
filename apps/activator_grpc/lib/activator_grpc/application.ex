@@ -10,9 +10,6 @@ defmodule ActivatorGRPC.Application do
   def start(_type, _args) do
     config = Config.load(__MODULE__)
 
-    MetricsEndpoint.Exporter.setup()
-    MetricsEndpoint.PrometheusPipeline.setup()
-
     children =
       [
         Spawn.Cluster.Supervisor.child_spec(config),

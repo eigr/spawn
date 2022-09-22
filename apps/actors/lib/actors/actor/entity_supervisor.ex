@@ -5,9 +5,9 @@ defmodule Actors.Actor.Entity.Supervisor do
   alias Actors.Actor.Entity.EntityState
 
   def child_spec() do
-    %{
-      id: __MODULE__,
-      start: {__MODULE__, :start_link, [%{}]}
+    {
+      PartitionSupervisor,
+      child_spec: DynamicSupervisor, name: __MODULE__
     }
   end
 
@@ -38,7 +38,10 @@ defmodule Actors.Actor.Entity.Supervisor do
       restart: :transient
     }
 
-    case DynamicSupervisor.start_child(__MODULE__, child_spec) do
+    case DynamicSupervisor.start_child(
+           {:via, PartitionSupervisor, {__MODULE__, self()}},
+           child_spec
+         ) do
       {:error, {:already_started, pid}} -> {:ok, pid}
       {:ok, pid} -> {:ok, pid}
     end
@@ -54,7 +57,10 @@ defmodule Actors.Actor.Entity.Supervisor do
       restart: :transient
     }
 
-    case DynamicSupervisor.start_child(__MODULE__, child_spec) do
+    case DynamicSupervisor.start_child(
+           {:via, PartitionSupervisor, {__MODULE__, self()}},
+           child_spec
+         ) do
       {:error, {:already_started, pid}} -> {:ok, pid}
       {:ok, pid} -> {:ok, pid}
     end

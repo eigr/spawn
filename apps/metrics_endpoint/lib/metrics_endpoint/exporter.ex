@@ -1,3 +1,3 @@
 defmodule MetricsEndpoint.Exporter do
-  use Prometheus.PlugExporter
+  # use Prometheus.PlugExporter
 end
