@@ -8,11 +8,9 @@ defmodule Statestores.Schemas.Event do
 
   @type t() :: %__MODULE__{}
 
-  @primary_key {:id, :id, autogenerate: true}
+  @primary_key {:actor, :string, autogenerate: false}
   schema "events" do
     field(:system, :string)
-
-    field(:actor, :string)
 
     field(:revision, :integer)
 
@@ -30,7 +28,6 @@ defmodule Statestores.Schemas.Event do
     event
     |> cast(attrs, [:actor, :revision, :tags, :data_type, :data])
     |> validate_required([:actor, :revision, :tags, :data_type])
-    |> unique_constraint(:actor)
     |> case do
       %{valid?: false, changes: changes} = changeset when changes == %{} ->
         # If the changeset is invalid and has no changes, it is
