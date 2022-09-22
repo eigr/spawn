@@ -28,7 +28,6 @@ defmodule Statestores.Schemas.Event do
     event
     |> cast(attrs, [:actor, :revision, :tags, :data_type, :data])
     |> validate_required([:actor, :revision, :tags, :data_type])
-    |> unique_constraint(:actor)
     |> case do
       %{valid?: false, changes: changes} = changeset when changes == %{} ->
         # If the changeset is invalid and has no changes, it is
