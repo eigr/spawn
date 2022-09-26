@@ -1,4 +1,28 @@
 defmodule SpawnSdk.Actor do
+  @moduledoc """
+  Documentation for `Actor`.
+
+  Actor look like this:
+
+    defmodule MyActor do
+      use SpawnSdk.Actor,
+        name: "joe",
+        state_type: MyActorStateModule,
+        deactivate_timeout: 5_000,
+        snapshot_timeout: 2_000
+
+      @impl true
+      handle_command({:sum, %MyPayloadProtobufModule{} = _data}, ctx) do
+        current_state = ctx.state
+        new_state = current_state
+
+        response = %MyResponseProtobufModule{}
+        result = %Value{state: new_state, value: response}
+
+        {:ok, result}
+      end
+  """
+
   alias SpawnSdk.{Context, Value}
 
   @type command :: atom()
@@ -16,6 +40,8 @@ defmodule SpawnSdk.Actor do
 
   defmacro __using__(opts) do
     quote bind_quoted: [opts: opts] do
+      alias SpawnSdk.{Context, Value}
+
       import SpawnSdk.Actor
       import SpawnSdk.System.SpawnSystem
 
