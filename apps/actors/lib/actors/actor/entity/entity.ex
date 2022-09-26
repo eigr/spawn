@@ -209,7 +209,7 @@ defmodule Actors.Actor.Entity do
           opts: opts
         } = state
       ) do
-    invoker = Keyword.get(opts, :invoker, Actors.Actor.Invoker.Http)
+    invoker = get_invoker(opts)
     current_state = Map.get(actor_state || %{}, :state)
 
     ActorInvocation.new(
@@ -240,7 +240,7 @@ defmodule Actors.Actor.Entity do
           opts: opts
         } = state
       ) do
-    invoker = Keyword.get(opts, :invoker, Actors.Actor.Invoker.Http)
+    invoker = get_invoker(opts)
     current_state = Map.get(actor_state || %{}, :state)
 
     ActorInvocation.new(
