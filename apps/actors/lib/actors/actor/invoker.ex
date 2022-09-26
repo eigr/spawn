@@ -8,8 +8,9 @@ defmodule Actors.Actor.Invoker do
 
   @type state :: EntityState.t()
   @type payload :: ActorInvocation.t()
+  @type default_methods :: []
 
-  @callback invoke_host(any(), state()) ::
+  @callback invoke_host(any(), state(), default_methods()) ::
               {:ok, any(), state()} | {:error, any(), state()}
 
   defmacro __using__(_opts) do

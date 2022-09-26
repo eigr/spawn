@@ -1,7 +1,5 @@
 defmodule Actors.Actor.Entity do
   use GenServer, restart: :transient
-  use Actors.Actor.Invoker
-
   require Logger
 
   alias Actors.Actor.{Entity.EntityState, StateManager}
@@ -207,9 +205,11 @@ defmodule Actors.Actor.Entity do
         _from,
         %EntityState{
           system: actor_system,
-          actor: %Actor{state: actor_state}
+          actor: %Actor{state: actor_state},
+          opts: opts
         } = state
       ) do
+    invoker = Keyword.get(opts, :invoker, Actors.Actor.Invoker.Http)
     current_state = Map.get(actor_state || %{}, :state)
 
     ActorInvocation.new(
@@ -219,7 +219,7 @@ defmodule Actors.Actor.Entity do
       value: payload,
       current_context: Context.new(state: current_state)
     )
-    |> invoke_host(state)
+    |> invoker.invoke_host(state, @default_methods)
     |> case do
       {:ok, response, state} -> {:reply, {:ok, response}, state}
       {:error, reason, state} -> {:reply, {:error, reason}, state, :hibernate}
@@ -236,9 +236,11 @@ defmodule Actors.Actor.Entity do
          } = _invocation},
         %EntityState{
           system: actor_system,
-          actor: %Actor{state: actor_state}
+          actor: %Actor{state: actor_state},
+          opts: opts
         } = state
       ) do
+    invoker = Keyword.get(opts, :invoker, Actors.Actor.Invoker.Http)
     current_state = Map.get(actor_state || %{}, :state)
 
     ActorInvocation.new(
@@ -248,7 +250,7 @@ defmodule Actors.Actor.Entity do
       value: payload,
       current_context: Context.new(state: current_state)
     )
-    |> invoke_host(state)
+    |> invoker.invoke_host(state, @default_methods)
     |> case do
       {:ok, _whatever, state} -> {:noreply, state}
       {:error, _reason, state} -> {:noreply, state, :hibernate}
@@ -396,57 +398,6 @@ defmodule Actors.Actor.Entity do
     Logger.debug("Terminating actor #{name} with reason #{inspect(reason)}")
   end
 
-  @impl true
-  def invoke_host(
-        %ActorInvocation{actor_name: name, actor_system: system, command_name: command} = payload,
-        %EntityState{
-          actor: %Actor{state: actor_state}
-        } = state
-      ) do
-    if Enum.member?(@default_methods, command) do
-      current_state = Map.get(actor_state || %{}, :state)
-      context = Context.new(state: current_state)
-
-      resp =
-        ActorInvocationResponse.new(
-          actor_name: name,
-          actor_system: system,
-          updated_context: context,
-          value: current_state
-        )
-
-      {:ok, resp, state}
-    else
-      payload
-      |> ActorInvocation.encode()
-      |> Actors.Node.Client.invoke_host_actor()
-      |> case do
-        {:ok, %Tesla.Env{body: ""}} ->
-          Logger.error("User Function Actor response Invocation body is empty")
-          {:error, :no_content, state}
-
-        {:ok, %Tesla.Env{body: nil}} ->
-          Logger.error("User Function Actor response Invocation body is nil")
-          {:error, :no_content, state}
-
-        {:ok, %Tesla.Env{body: body}} ->
-          with %ActorInvocationResponse{
-                 updated_context: %Context{} = user_ctx
-               } = resp <- ActorInvocationResponse.decode(body) do
-            {:ok, resp, update_state(state, user_ctx)}
-          else
-            error ->
-              Logger.error("Error on parse response #{inspect(error)}")
-              {:error, :invalid_content, state}
-          end
-
-        {:error, reason} ->
-          Logger.error("User Function Actor Invocation Unknown Error: #{inspect(reason)}")
-          {:error, reason, state}
-      end
-    end
-  end
-
   def start_link(%EntityState{actor: %Actor{name: name}} = state) do
     GenServer.start(__MODULE__, state,
       name: via(name),
@@ -480,6 +431,8 @@ defmodule Actors.Actor.Entity do
   def invoke_async(ref, request) do
     GenServer.cast(via(ref), {:invocation_request, request})
   end
+
+  defp get_invoker(opts), do: Keyword.get(opts, :invoker, Actors.Actor.Invoker.Http)
 
   defp get_timeout_factor(factor_range) when is_number(factor_range),
     do: Enum.random([factor_range])
@@ -537,34 +490,6 @@ defmodule Actors.Actor.Entity do
          timeout_factor
        ),
        do: timeout + timeout_factor
-
-  defp update_state(
-         %EntityState{
-           actor: %Actor{} = _actor
-         } = state,
-         %Context{state: updated_state} = _user_ctx
-       )
-       when is_nil(updated_state),
-       do: state
-
-  defp update_state(
-         %EntityState{
-           actor: %Actor{state: actor_state} = _actor
-         } = state,
-         %Context{state: _updated_state} = _user_ctx
-       )
-       when is_nil(actor_state),
-       do: state
-
-  defp update_state(
-         %EntityState{
-           actor: %Actor{state: %ActorState{} = actor_state} = actor
-         } = state,
-         %Context{state: updated_state} = _user_ctx
-       ) do
-    new_state = %{actor_state | state: updated_state}
-    %{state | actor: %{actor | state: new_state}}
-  end
 
   defp via(name) do
     {:via, Horde.Registry, {Spawn.Cluster.Node.Registry, {__MODULE__, name}}}
