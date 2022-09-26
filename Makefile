@@ -9,6 +9,12 @@ activator-pubsub-image=${registry}/spawn-activator-pubsub:${version}
 activator-rabbitmq-image=${registry}/spawn-activator-rabbitmq:${version}
 activator-sqs-image=${registry}/spawn-activator-sqs:${version}
 
+ifeq "$(PROXY_DATABASE_TYPE)" ""
+    database:=mysql
+else
+    database:=$(PROXY_DATABASE_TYPE)
+endif
+
 .PHONY: all
 
 all: build test build-all-images
@@ -82,7 +88,7 @@ apply-k8s-manifests:
 	kubectl -n eigr-functions apply -f apps/operator/manifest.yaml
 
 run-proxy-local:
-	cd apps/proxy && PROXY_DATABASE_TYPE=mysql SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= iex --name spawn_a2@127.0.0.1 -S mix
+	cd apps/proxy && PROXY_DATABASE_TYPE=$(database) SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= iex --name spawn_a2@127.0.0.1 -S mix
 
 run-operator-local:
 	cd apps/operator && MIX_ENV=dev iex --name operator@127.0.0.1 -S mix
