@@ -16,7 +16,7 @@ defmodule ActivatorRabbitMQ.Application do
       [
         {Bandit,
          plug: ActivatorRabbitMQ.Router, scheme: :http, options: [port: get_http_port(config)]},
-        Spawn.Cluster.Supervisor.child_spec(config),
+        Spawn.Supervisor.child_spec(config),
         {ActivatorRabbitMQ.Sources.RabbitMQ, make_opts(config)}
       ] ++
         if Mix.env() == :test,

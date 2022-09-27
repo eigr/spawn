@@ -12,7 +12,7 @@ defmodule Proxy.Application do
     # MetricsEndpoint.PrometheusPipeline.setup()
 
     children = [
-      Spawn.Cluster.Supervisor.child_spec(config),
+      Spawn.Supervisor.child_spec(config),
       Statestores.Supervisor.child_spec(),
       Actors.Supervisors.ProtocolSupervisor.child_spec(config),
       Actors.Supervisors.EntitySupervisor.child_spec(config),

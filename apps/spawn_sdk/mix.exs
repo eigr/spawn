@@ -21,14 +21,17 @@ defmodule SpawnSdk.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger]
+      extra_applications: [
+        :logger,
+        :proxy
+      ]
     ]
   end
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:actors, in_umbrella: true}
+      {:proxy, in_umbrella: true}
     ]
   end
 end

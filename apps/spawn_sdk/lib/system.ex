@@ -19,7 +19,7 @@ defmodule SpawnSdk.System do
 
   @callback register(system(), actors()) :: :ok | {:error, term()}
 
-  @callback spawn(actor_name(), actor_mod()) :: {:ok, term()} | {:error, term()}
+  @callback spawn_actor(actor_name(), actor_mod()) :: {:ok, term()} | {:error, term()}
 
   @callback invoke(actor_name(), command(), payload(), options()) ::
               {:ok, term()} | {:error, term()}

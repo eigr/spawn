@@ -51,15 +51,17 @@ defmodule SpawnSdk.Actor do
       actor_name = Keyword.fetch!(opts, :name)
       state_type = Keyword.fetch!(opts, :state_type)
       persistent = Keyword.get(opts, :persistent, true)
+      abstract_actor = Keyword.get(opts, :abstract, false)
 
       snapshot_timeout = Keyword.get(opts, :snapshot_timeout, 10_000)
       deactivate_timeout = Keyword.get(opts, :deactivate_timeout, 30_000)
 
-      def __name__(), do: unquote(actor_name)
-      def __persistent__(), do: unquote(persistent)
-      def __state_type__(), do: unquote(state_type)
-      def __snapshot_timeout__(), do: unquote(snapshot_timeout)
-      def __deactivate_timeout__(), do: unquote(deactivate_timeout)
+      def __meta__(:name), do: unquote(actor_name)
+      def __meta__(:persistent), do: unquote(persistent)
+      def __meta__(:abstract), do: unquote(abstract_actor)
+      def __meta__(:state_type), do: unquote(state_type)
+      def __meta__(:snapshot_timeout), do: unquote(snapshot_timeout)
+      def __meta__(:deactivate_timeout), do: unquote(deactivate_timeout)
     end
   end
 end

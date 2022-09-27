@@ -1,4 +1,4 @@
-defmodule Spawn.Cluster.Supervisor do
+defmodule Spawn.Supervisor do
   @moduledoc false
   use Supervisor
   require Logger

@@ -2,8 +2,10 @@ defmodule SpawnSdk.System.SpawnSystem do
   @moduledoc """
   `SpawnSystem`
   """
-  @behaviour SpawnSdk.System
+  use GenServer
   require Logger
+
+  @behaviour SpawnSdk.System
 
   alias Actors
 
@@ -19,7 +21,6 @@ defmodule SpawnSdk.System.SpawnSystem do
 
   alias Eigr.Functions.Protocol.{
     InvocationRequest,
-    ProxyInfo,
     RegistrationRequest,
     RegistrationResponse,
     RequestStatus,
@@ -35,8 +36,53 @@ defmodule SpawnSdk.System.SpawnSystem do
   @support_library_name "spawn-elixir-sdk"
   @support_library_version @service_version
 
+  @impl true
+  def init(state) do
+    system = Keyword.fetch!(state, :system)
+    actors = Keyword.fetch!(state, :actors)
+
+    case do_register(system, actors) do
+      :ok ->
+        {:ok, state}
+
+      {:error, msg} ->
+        raise msg
+    end
+  end
+
+  @impl true
+  def handle_call({:register, system, actors}, from, state) do
+    spawn(fn ->
+      GenServer.reply(from, do_register(system, actors))
+    end)
+
+    {:noreply, state}
+  end
+
+  def handle_call({:invoke, actor, command, payload, options}, from, state) do
+    spawn(fn ->
+      GenServer.reply(from, do_invoke(actor, command, payload, options))
+    end)
+
+    {:noreply, state}
+  end
+
+  def start_link(state) do
+    GenServer.start_link(__MODULE__, state, name: __MODULE__)
+  end
+
   @impl SpawnSdk.System
   def register(system, actors) do
+    GenServer.call(__MODULE__, {:register, system, actors}, 20_000)
+  end
+
+  @impl SpawnSdk.System
+  def invoke(actor, command, payload, options) do
+    call_timeout = Keyword.get(options, :timeout, 20_000)
+    GenServer.call(__MODULE__, {:invoke, actor, command, payload, options}, call_timeout)
+  end
+
+  defp do_register(system, actors) do
     case Actors.register(build_registration_req(system, actors)) do
       {:ok, %RegistrationResponse{proxy_info: proxy_info, status: status}} ->
         Logger.debug(
@@ -50,12 +96,11 @@ defmodule SpawnSdk.System.SpawnSystem do
     end
   end
 
-  @impl SpawnSdk.System
-  def invoke(actor, command, payload, options) do
-    async = Keyword.get(options, :async, false)
-    input_type = Keyword.fetch!(options, :input_type)
-    output_type = Keyword.fetch!(options, :output_type)
-    {:ok, nil}
+  defp do_invoke(_actor, _command, _payload, options) do
+    _async = Keyword.get(options, :async, false)
+    _input_type = Keyword.fetch!(options, :input_type)
+    _output_type = Keyword.fetch!(options, :output_type)
+    :ok
   end
 
   defp build_registration_req(system, actors) do
@@ -82,10 +127,10 @@ defmodule SpawnSdk.System.SpawnSystem do
   defp to_map(actors) do
     actors
     |> Enum.into(%{}, fn actor ->
-      name = actor.__name__
-      persistent = actor.__persistent__
-      snapshot_timeout = actor.__snapshot_timeout__
-      deactivate_timeout = actor.__deactivate_timeout__
+      name = actor.__meta__(:name)
+      persistent = actor.__meta__(:persistent)
+      snapshot_timeout = actor.__meta__(:snapshot_timeout)
+      deactivate_timeout = actor.__meta__(:deactivate_timeout)
 
       snapshot_strategy =
         ActorSnapshotStrategy.new(
@@ -94,7 +139,7 @@ defmodule SpawnSdk.System.SpawnSystem do
 
       deactivate_strategy =
         ActorDeactivateStrategy.new(
-          strategy: {:timout, TimeoutStrategy.new(timeout: snapshot_timeout)}
+          strategy: {:timout, TimeoutStrategy.new(timeout: deactivate_timeout)}
         )
 
       {name,

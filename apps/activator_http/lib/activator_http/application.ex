@@ -12,7 +12,7 @@ defmodule ActivatorHTTP.Application do
 
     children =
       [
-        Spawn.Cluster.Supervisor.child_spec(config),
+        Spawn.Supervisor.child_spec(config),
         {Bandit,
          plug: ActivatorHTTP.Router, scheme: :http, options: [port: get_http_port(config)]}
       ] ++
