@@ -7,6 +7,7 @@ defmodule SpawnSdk.Actor do
     defmodule MyActor do
       use SpawnSdk.Actor,
         name: "joe",
+        persistent: false
         state_type: MyActorStateModule,
         deactivate_timeout: 5_000,
         snapshot_timeout: 2_000
