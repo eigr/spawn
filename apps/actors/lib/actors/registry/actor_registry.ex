@@ -3,6 +3,7 @@ defmodule Actors.Registry.ActorRegistry do
   use GenServer
   require Logger
 
+  alias Actors.Registry.ActorNode
   alias Phoenix.PubSub
 
   @topic "actors"
@@ -39,11 +40,11 @@ defmodule Actors.Registry.ActorRegistry do
   def handle_call({:get, _system_name, actor_name}, from, state) do
     spawn(fn ->
       state
-      |> Enum.reduce([], fn {key, value}, acc ->
-        Enum.map(value, fn {actor_key, actor} ->
+      |> Enum.reduce([], fn {key, %ActorNode{actors: actors, opts: opts} = _value}, acc ->
+        Enum.map(actors, fn {actor_key, actor} ->
           # if actor.actor_system.name == system_name and actor.name == actor_name do
           if actor_key == actor_name do
-            [%{node: key, actor: actor}] ++ acc
+            [%{node: key, actor: %ActorNode{actors: [actor], opts: opts}}] ++ acc
           else
             [] ++ acc
           end
@@ -68,10 +69,10 @@ defmodule Actors.Registry.ActorRegistry do
     spawn(fn ->
       nodes =
         state
-        |> Enum.reduce([], fn {key, value}, acc ->
-          Enum.map(value, fn actor ->
+        |> Enum.reduce([], fn {key, %ActorNode{actors: actors, opts: opts} = _value}, acc ->
+          Enum.map(actors, fn actor ->
             if actor.actor_system.name == system_name do
-              [%{node: key, actor: actor}] ++ acc
+              [%{node: key, actor: %ActorNode{actors: [actor], opts: opts}}] ++ acc
             else
               [] ++ acc
             end
@@ -93,20 +94,20 @@ defmodule Actors.Registry.ActorRegistry do
     {:noreply, state}
   end
 
-  def handle_call({:register, actors}, _from, state) do
+  def handle_call({:register, %ActorNode{} = actor_node}, _from, state) do
     # send new entities of this node to all connected nodes
     node = Node.self()
 
     # convert initial state to map if empty list
     # Accumulate new entities for the node key
     new_state =
-      Enum.reduce(actors, state, fn actor, acc ->
+      Enum.reduce([actor_node], state, fn actor, acc ->
         acc_entity = Map.get(acc, node)
 
         entities =
           case acc_entity do
             nil -> [actor]
-            _ -> [actor] ++ Map.get(acc, node)
+            _ -> [actor] ++ acc_entity
           end
 
         Map.put(acc, node, entities)
@@ -115,7 +116,7 @@ defmodule Actors.Registry.ActorRegistry do
     PubSub.broadcast(
       :actor_channel,
       @topic,
-      {:incoming_actors, %{node => actors}}
+      {:incoming_actors, %{node => actor_node}}
     )
 
     {:reply, new_state, new_state}
@@ -179,8 +180,8 @@ defmodule Actors.Registry.ActorRegistry do
   end
 
   # register entities to the service
-  def register(node_actors) do
-    GenServer.call(__MODULE__, {:register, node_actors})
+  def register(node_actor) do
+    GenServer.call(__MODULE__, {:register, node_actor})
   end
 
   # fetch current entities of the service

@@ -83,7 +83,9 @@ defmodule SpawnSdk.System.SpawnSystem do
   end
 
   defp do_register(system, actors) do
-    case Actors.register(build_registration_req(system, actors)) do
+    opts = [invoker: SpawnSdk.Invoker]
+
+    case Actors.register(build_registration_req(system, actors), opts) do
       {:ok, %RegistrationResponse{proxy_info: proxy_info, status: status}} ->
         Logger.debug(
           "Actors registration succed. Proxy info: #{inspect(proxy_info)}. Status: #{inspect(status)}"
@@ -100,6 +102,7 @@ defmodule SpawnSdk.System.SpawnSystem do
     _async = Keyword.get(options, :async, false)
     _input_type = Keyword.fetch!(options, :input_type)
     _output_type = Keyword.fetch!(options, :output_type)
+    # Actors.invoke()
     :ok
   end
 

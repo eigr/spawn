@@ -7,7 +7,7 @@ defmodule Actors do
   alias Actors.Actor.Entity, as: ActorEntity
   alias Actors.Actor.Entity.Supervisor, as: ActorEntitySupervisor
 
-  alias Actors.Registry.ActorRegistry
+  alias Actors.Registry.{ActorNode, ActorRegistry}
 
   alias Eigr.Functions.Protocol.Actors.{Actor, ActorSystem, Registry}
 
@@ -46,7 +46,8 @@ defmodule Actors do
         } = _registration,
         opts
       ) do
-    ActorRegistry.register(actors)
+    actor_node = %ActorNode{actors: actors, opts: opts}
+    ActorRegistry.register(actor_node)
 
     spawn(fn ->
       create_actors(actor_system, actors, opts)
@@ -75,7 +76,8 @@ defmodule Actors do
         } = _registration,
         opts
       ) do
-    ActorRegistry.register(actors)
+    actor_node = %ActorNode{actors: actors, opts: opts}
+    ActorRegistry.register(actor_node)
 
     spawn(fn ->
       create_actors(actor_system, actors, opts)
@@ -106,10 +108,19 @@ defmodule Actors do
         action_fun.(actor_ref)
 
       _ ->
-        with {:ok, %{node: node, actor: actor}} <-
-               ActorRegistry.lookup(system_name, actor_name),
-             {:ok, actor_ref} <-
-               :erpc.call(node, __MODULE__, :try_reactivate_actor, [system, actor], @erpc_timeout) do
+        with {:ok, %{node: node, actor: %ActorNode{actors: actors, opts: opts}}} <-
+               ActorRegistry.lookup(system_name, actor_name) do
+          actor = List.first(actors)
+
+          {:ok, actor_ref} =
+            :erpc.call(
+              node,
+              __MODULE__,
+              :try_reactivate_actor,
+              [system, actor, opts],
+              @erpc_timeout
+            )
+
           action_fun.(actor_ref)
         else
           {:not_found, _} ->
