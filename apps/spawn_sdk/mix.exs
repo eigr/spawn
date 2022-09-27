@@ -22,8 +22,7 @@ defmodule SpawnSdk.MixProject do
   def application do
     [
       extra_applications: [
-        :logger,
-        :proxy
+        :logger
       ]
     ]
   end

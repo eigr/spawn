@@ -12,14 +12,11 @@ defmodule Proxy.Application do
     # MetricsEndpoint.PrometheusPipeline.setup()
 
     children = [
-      Spawn.Supervisor.child_spec(config),
-      Statestores.Supervisor.child_spec(),
-      Actors.Supervisors.ProtocolSupervisor.child_spec(config),
-      Actors.Supervisors.EntitySupervisor.child_spec(config),
+      {Proxy.Supervisor, config},
       {Bandit, plug: Proxy.Router, scheme: :http, options: get_http_options(config)}
     ]
 
-    opts = [strategy: :one_for_one, name: Proxy.Supervisor]
+    opts = [strategy: :one_for_one, name: Proxy.RootSupervisor]
     Supervisor.start_link(children, opts)
   end
 

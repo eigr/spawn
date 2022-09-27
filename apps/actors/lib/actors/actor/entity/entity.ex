@@ -15,7 +15,6 @@ defmodule Actors.Actor.Entity do
   alias Eigr.Functions.Protocol.{
     Context,
     ActorInvocation,
-    ActorInvocationResponse,
     InvocationRequest
   }
 
@@ -465,9 +464,11 @@ defmodule Actors.Actor.Entity do
         get_deactivate_interval(deactivate_strategy, timeout_factor)
       )
 
+  defp get_snapshot_interval(timeout_strategy, timeout_factor \\ 0)
+
   defp get_snapshot_interval(
          {:timeout, %TimeoutStrategy{timeout: timeout}} = _timeout_strategy,
-         timeout_factor \\ 0
+         timeout_factor
        )
        when is_nil(timeout),
        do: @default_snapshot_timeout + timeout_factor
@@ -478,9 +479,11 @@ defmodule Actors.Actor.Entity do
        ),
        do: timeout + timeout_factor
 
+  defp get_deactivate_interval(timeout_strategy, timeout_factor \\ 0)
+
   defp get_deactivate_interval(
          {:timeout, %TimeoutStrategy{timeout: timeout}} = _timeout_strategy,
-         timeout_factor \\ 0
+         timeout_factor
        )
        when is_nil(timeout),
        do: @default_deactivate_timeout + timeout_factor
