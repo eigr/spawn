@@ -31,6 +31,8 @@ defmodule SpawnSdk.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:actors, in_umbrella: true},
+      {:spawn, in_umbrella: true},
       {:sidecar, in_umbrella: true},
       {:faker, "~> 0.17", only: :test}
     ]

@@ -8,6 +8,7 @@ defmodule SpawnSdk.System.SpawnSystem do
   @behaviour SpawnSdk.System
 
   alias Actors
+  alias Actors.Actor.Entity.EntityState
 
   alias Eigr.Functions.Protocol.Actors.{
     Actor,
@@ -20,7 +21,10 @@ defmodule SpawnSdk.System.SpawnSystem do
   }
 
   alias Eigr.Functions.Protocol.{
+    ActorInvocation,
+    ActorInvocationResponse,
     InvocationRequest,
+    InvocationResponse,
     RegistrationRequest,
     RegistrationResponse,
     RequestStatus,
@@ -28,6 +32,8 @@ defmodule SpawnSdk.System.SpawnSystem do
     SpawnRequest,
     SpawnResponse
   }
+
+  import Spawn.Utils.AnySerializer
 
   @app :spawn_sdk
   @service_name "spawn-elixir"
@@ -45,7 +51,7 @@ defmodule SpawnSdk.System.SpawnSystem do
     actors = Keyword.fetch!(state, :actors)
 
     case do_register(system, actors) do
-      :ok ->
+      {:ok, state} ->
         {:ok, state}
 
       {:error, msg} ->
@@ -54,17 +60,85 @@ defmodule SpawnSdk.System.SpawnSystem do
   end
 
   @impl true
-  def handle_call({:register, system, actors}, from, state) do
-    spawn(fn ->
-      GenServer.reply(from, do_register(system, actors))
-    end)
+  def handle_call({:register, system, actors}, _from, state) do
+    reply =
+      {:ok, map} =
+      case do_register(system, actors) do
+        {:ok, map} ->
+          {:ok, map}
 
-    {:noreply, state}
+        _ ->
+          :error
+      end
+
+    if is_map(state) do
+      {:reply, reply, Map.merge(state, map)}
+    else
+      {:reply, reply, map}
+    end
   end
 
-  def handle_call({:invoke, actor, command, payload, options}, from, state) do
+  def handle_call(
+        {:call,
+         %ActorInvocation{actor_name: name, actor_system: system, command_name: command} =
+           _payload,
+         %EntityState{
+           actor: %Actor{state: actor_state}
+         } = entity_state, default_methods},
+        _from,
+        state
+      ) do
+    current_state = Map.get(actor_state || %{}, :state)
+
+    call_response =
+      if Enum.member?(default_methods, command) do
+        context = Eigr.Functions.Protocol.Context.new(state: current_state)
+
+        resp =
+          ActorInvocationResponse.new(
+            actor_name: name,
+            actor_system: system,
+            updated_context: context,
+            value: current_state
+          )
+
+        {:ok, resp, entity_state}
+      else
+        if Map.has_key?(state, name) do
+          actor_instance = Map.get(state, name)
+
+          new_ctx =
+            if current_state != %{} do
+              actor_state = unpack_any_bin(current_state)
+              %SpawnSdk.Context{state: actor_state}
+            else
+              %SpawnSdk.Context{}
+            end
+
+          case actor_instance.handle_command({String.to_existing_atom(command)}, new_ctx) do
+            {:ok, %SpawnSdk.Value{state: new_state, value: response} = _value} ->
+              resp = %ActorInvocationResponse{
+                updated_context: Eigr.Functions.Protocol.Context.new(state: any_pack!(new_state)),
+                value: any_pack!(response)
+              }
+
+              {:ok, resp, entity_state}
+
+            {:error, error} ->
+              {:error, error, entity_state}
+
+            {:error, error, %SpawnSdk.Value{state: _new_state, value: _response} = _value} ->
+              {:error, error, entity_state}
+          end
+        end
+      end
+
+    {:reply, call_response, state}
+  end
+
+  def handle_call({:invoke, system, actor, command, payload, options}, from, state) do
     spawn(fn ->
-      GenServer.reply(from, do_invoke(actor, command, payload, options))
+      GenServer.reply(from, do_invoke(system, actor, command, payload, options))
     end)
 
     {:noreply, state}
@@ -80,33 +154,52 @@ defmodule SpawnSdk.System.SpawnSystem do
   end
 
   @impl SpawnSdk.System
-  def invoke(actor, command, payload, options) do
+  def invoke(system, actor, command, payload, options) do
     call_timeout = Keyword.get(options, :timeout, 20_000)
-    GenServer.call(__MODULE__, {:invoke, actor, command, payload, options}, call_timeout)
+    GenServer.call(__MODULE__, {:invoke, system, actor, command, payload, options}, call_timeout)
+  end
+
+  def call(invocation, entity_state, default_methods) do
+    GenServer.call(__MODULE__, {:call, invocation, entity_state, default_methods}, 20_000)
   end
 
   defp do_register(system, actors) do
+    new_state = state_to_map(actors)
     opts = [host_interface: SpawnSdk.Interface]
 
     case Actors.register(build_registration_req(system, actors), opts) do
       {:ok, %RegistrationResponse{proxy_info: proxy_info, status: status}} ->
         Logger.debug(
-          "Actors registration succed. Proxy info: #{inspect(proxy_info)}. Status: #{inspect(status)}"
+          "Actors registration succeed. Proxy info: #{inspect(proxy_info)}. Status: #{inspect(status)}"
         )
 
-        :ok
+        {:ok, new_state}
 
       error ->
         {:error, "Actors registration failed. Error #{inspect(error)}"}
     end
   end
 
-  defp do_invoke(_actor, _command, _payload, options) do
-    _async = Keyword.get(options, :async, false)
-    _input_type = Keyword.fetch!(options, :input_type)
-    _output_type = Keyword.fetch!(options, :output_type)
-    # Actors.invoke()
-    :ok
+  defp do_invoke(system, actor, command, payload, options) do
+    async = Keyword.get(options, :async, false)
+
+    req =
+      InvocationRequest.new(
+        system: system,
+        actor: actor,
+        value: payload,
+        command_name: command,
+        async: async
+      )
+
+    if async do
+      Actors.invoke(req)
+      {:ok, "ok"}
+    else
+      _resp = %InvocationResponse{status: _status, value: value} = Actors.invoke(req)
+
+      {:ok, unpack_unknown(value)}
+    end
   end
 
   defp build_registration_req(system, actors) do
@@ -128,6 +221,13 @@ defmodule SpawnSdk.System.SpawnSystem do
       )
 
     req
+  end
+
+  defp state_to_map(actors) do
+    actors
+    |> Enum.into(%{}, fn actor ->
+      {actor.__meta__(:name), actor}
+    end)
   end
 
   defp to_map(actors) do
