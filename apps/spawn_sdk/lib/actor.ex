@@ -7,13 +7,13 @@ defmodule SpawnSdk.Actor do
     defmodule MyActor do
       use SpawnSdk.Actor,
         name: "joe",
-        persistent: false
+        persistent: false,
         state_type: MyActorStateModule,
         deactivate_timeout: 5_000,
         snapshot_timeout: 2_000
 
       @impl true
-      handle_command({:sum, %MyPayloadProtobufModule{} = _data}, ctx) do
+      def handle_command({:sum, %MyPayloadProtobufModule{} = _data}, ctx) do
         current_state = ctx.state
         new_state = current_state
 
