@@ -1,8 +1,5 @@
 defmodule SpawnSdk.Interface do
   use Actors.Actor.Interface
-  require Logger
-
-  alias Actors.Actor.Entity.EntityState
 
   alias SpawnSdk.System.SpawnSystem
 
