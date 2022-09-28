@@ -22,9 +22,14 @@ defmodule SpawnSdk.System.Supervisor do
   """
   use Supervisor
 
+  alias Actors.Config.Vapor, as: Config
+
   @impl true
   def init(state) do
+    config = Config.load(__MODULE__)
+
     children = [
+      {Sidecar.Supervisor, config},
       {SpawnSdk.System.SpawnSystem, state}
     ]
 

@@ -1,4 +1,4 @@
-defmodule Proxy.Supervisor do
+defmodule Sidecar.Supervisor do
   @moduledoc false
   use Supervisor
 

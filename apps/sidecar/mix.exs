@@ -1,7 +1,7 @@
-defmodule SpawnSdk.MixProject do
+defmodule Sidecar.MixProject do
   use Mix.Project
 
-  @app :spawn_sdk
+  @app :sidecar
   @version "0.1.0"
 
   def project do
@@ -21,16 +21,17 @@ defmodule SpawnSdk.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [
-        :logger
-      ]
+      extra_applications: [:logger]
     ]
   end
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:sidecar, in_umbrella: true}
+      {:actors, "~> 0.1", in_umbrella: true},
+      {:spawn, "~> 0.1", in_umbrella: true},
+      {:metrics_endpoint, "~> 0.1", in_umbrella: true},
+      {:statestores, "~> 0.1", in_umbrella: true}
     ]
   end
 end

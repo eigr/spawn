@@ -12,7 +12,7 @@ defmodule Proxy.Application do
     # MetricsEndpoint.PrometheusPipeline.setup()
 
     children = [
-      {Proxy.Supervisor, config},
+      {Sidecar.Supervisor, config},
       {Bandit, plug: Proxy.Router, scheme: :http, options: get_http_options(config)}
     ]
 

@@ -2,11 +2,12 @@ defmodule Proxy.MixProject do
   use Mix.Project
 
   @app :proxy
+  @version "0.1.0"
 
   def project do
     [
       app: @app,
-      version: "0.1.0",
+      version: @version,
       build_path: "../../_build",
       config_path: "../../config/config.exs",
       deps_path: "../../deps",
@@ -28,10 +29,7 @@ defmodule Proxy.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:actors, "~> 0.1", in_umbrella: true},
-      {:spawn, "~> 0.1", in_umbrella: true},
-      {:metrics_endpoint, "~> 0.1", in_umbrella: true},
-      {:statestores, "~> 0.1", in_umbrella: true},
+      {:sidecar, "~> 0.1", in_umbrella: true},
       {:bakeware, "~> 0.2"},
       {:bandit, "~> 0.5"},
       {:observer_cli, "~> 1.7"}

@@ -37,7 +37,10 @@ defmodule SpawnSdk.System.SpawnSystem do
   @support_library_version @service_version
 
   @impl true
-  def init(state) do
+  def init(state), do: {:ok, state, {:continue, :setup}}
+
+  @impl true
+  def handle_continue(:setup, state) do
     system = Keyword.fetch!(state, :system)
     actors = Keyword.fetch!(state, :actors)
 
