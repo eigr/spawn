@@ -208,7 +208,7 @@ defmodule Actors.Actor.Entity do
           opts: opts
         } = state
       ) do
-    invoker = get_invoker(opts)
+    interface = get_interface(opts)
     current_state = Map.get(actor_state || %{}, :state)
 
     ActorInvocation.new(
@@ -218,7 +218,7 @@ defmodule Actors.Actor.Entity do
       value: payload,
       current_context: Context.new(state: current_state)
     )
-    |> invoker.invoke_host(state, @default_methods)
+    |> interface.invoke_host(state, @default_methods)
     |> case do
       {:ok, response, state} -> {:reply, {:ok, response}, state}
       {:error, reason, state} -> {:reply, {:error, reason}, state, :hibernate}
@@ -239,7 +239,7 @@ defmodule Actors.Actor.Entity do
           opts: opts
         } = state
       ) do
-    invoker = get_invoker(opts)
+    interface = get_interface(opts)
     current_state = Map.get(actor_state || %{}, :state)
 
     ActorInvocation.new(
@@ -249,7 +249,7 @@ defmodule Actors.Actor.Entity do
       value: payload,
       current_context: Context.new(state: current_state)
     )
-    |> invoker.invoke_host(state, @default_methods)
+    |> interface.invoke_host(state, @default_methods)
     |> case do
       {:ok, _whatever, state} -> {:noreply, state}
       {:error, _reason, state} -> {:noreply, state, :hibernate}
@@ -431,7 +431,7 @@ defmodule Actors.Actor.Entity do
     GenServer.cast(via(ref), {:invocation_request, request})
   end
 
-  defp get_invoker(opts), do: Keyword.get(opts, :invoker, Actors.Actor.Invoker.Http)
+  defp get_interface(opts), do: Keyword.get(opts, :host_interface, Actors.Actor.Interface.Http)
 
   defp get_timeout_factor(factor_range) when is_number(factor_range),
     do: Enum.random([factor_range])

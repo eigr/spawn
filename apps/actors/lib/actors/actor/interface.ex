@@ -1,4 +1,4 @@
-defmodule Actors.Actor.Invoker do
+defmodule Actors.Actor.Interface do
   @moduledoc """
   `Invoker` is responsible for making calls to the Host Function
   """
@@ -15,13 +15,13 @@ defmodule Actors.Actor.Invoker do
 
   defmacro __using__(_opts) do
     quote do
-      @behaviour Actors.Actor.Invoker
+      @behaviour Actors.Actor.Interface
 
       defp invoke_host(payload, state) do
         {:ok, nil, state}
       end
 
-      defoverridable Actors.Actor.Invoker
+      defoverridable Actors.Actor.Interface
     end
   end
 end

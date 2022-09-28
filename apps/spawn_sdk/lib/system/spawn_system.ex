@@ -83,7 +83,7 @@ defmodule SpawnSdk.System.SpawnSystem do
   end
 
   defp do_register(system, actors) do
-    opts = [invoker: SpawnSdk.Invoker]
+    opts = [host_interface: SpawnSdk.Interface]
 
     case Actors.register(build_registration_req(system, actors), opts) do
       {:ok, %RegistrationResponse{proxy_info: proxy_info, status: status}} ->

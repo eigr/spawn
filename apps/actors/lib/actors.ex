@@ -186,7 +186,7 @@ defmodule Actors do
     end
   end
 
-  defp create_actors(actor_system, actors, opts \\ []) when is_map(actors) do
+  defp create_actors(actor_system, actors, opts) when is_map(actors) do
     actors
     |> Flow.from_enumerable(
       min_demand: @activate_actors_min_demand,
@@ -208,8 +208,6 @@ defmodule Actors do
 
   @spec lookup_actor(ActorSystem.t(), String.t(), Actor.t(), any()) ::
           {:ok, pid()} | {:error, String.t()}
-  defp lookup_actor(actor_system, actor_name, actor, opts \\ [])
-
   defp lookup_actor(actor_system, actor_name, actor, opts) do
     case ActorEntitySupervisor.lookup_or_create_actor(actor_system, actor, opts) do
       {:ok, pid} ->

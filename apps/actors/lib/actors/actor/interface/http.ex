@@ -1,5 +1,5 @@
-defmodule Actors.Actor.Invoker.Http do
-  use Actors.Actor.Invoker
+defmodule Actors.Actor.Interface.Http do
+  use Actors.Actor.Interface
   require Logger
 
   alias Actors.{
