@@ -52,10 +52,10 @@ defmodule SpawnSdk.System.SpawnSystem do
 
     case do_register(system, actors) do
       {:ok, state} ->
-        {:ok, state}
+        {:noreply, state}
 
       {:error, msg} ->
-        raise msg
+        {:stop, msg, state}
     end
   end
 
@@ -80,8 +80,12 @@ defmodule SpawnSdk.System.SpawnSystem do
 
   def handle_call(
         {:call,
-         %ActorInvocation{actor_name: name, actor_system: system, command_name: command} =
-           _payload,
+         %ActorInvocation{
+           actor_name: name,
+           actor_system: system,
+           command_name: command,
+           value: value
+         } = _payload,
          %EntityState{
            actor: %Actor{state: actor_state}
          } = entity_state, default_methods},
@@ -108,14 +112,18 @@ defmodule SpawnSdk.System.SpawnSystem do
           actor_instance = Map.get(state, name)
 
           new_ctx =
-            if current_state != %{} do
-              actor_state = unpack_any_bin(current_state)
+            if !is_nil(current_state) or current_state != %{} do
+              IO.inspect(current_state, label: "unpack_any_bin(current_state)")
+              # actor_state = unpack_any_bin(current_state)
               %SpawnSdk.Context{state: actor_state}
             else
               %SpawnSdk.Context{}
             end
 
-          case actor_instance.handle_command({String.to_existing_atom(command)}, new_ctx) do
+          case actor_instance.handle_command(
+                 {String.to_existing_atom(command), unpack_unknown(value)},
+                 new_ctx
+               ) do
             {:ok, %SpawnSdk.Value{state: new_state, value: response} = _value} ->
               resp = %ActorInvocationResponse{
                 updated_context: Eigr.Functions.Protocol.Context.new(state: any_pack!(new_state)),
@@ -154,7 +162,7 @@ defmodule SpawnSdk.System.SpawnSystem do
   end
 
   @impl SpawnSdk.System
-  def invoke(system, actor, command, payload, options) do
+  def invoke(system, actor, command, payload, options \\ []) do
     call_timeout = Keyword.get(options, :timeout, 20_000)
     GenServer.call(__MODULE__, {:invoke, system, actor, command, payload, options}, call_timeout)
   end
@@ -185,9 +193,9 @@ defmodule SpawnSdk.System.SpawnSystem do
 
     req =
       InvocationRequest.new(
-        system: system,
-        actor: actor,
-        value: payload,
+        system: %Eigr.Functions.Protocol.Actors.ActorSystem{name: system},
+        actor: %Eigr.Functions.Protocol.Actors.Actor{name: actor},
+        value: any_pack!(payload),
         command_name: command,
         async: async
       )
@@ -240,12 +248,12 @@ defmodule SpawnSdk.System.SpawnSystem do
 
       snapshot_strategy =
         ActorSnapshotStrategy.new(
-          strategy: {:timout, TimeoutStrategy.new(timeout: snapshot_timeout)}
+          strategy: {:timeout, TimeoutStrategy.new(timeout: snapshot_timeout)}
         )
 
       deactivate_strategy =
         ActorDeactivateStrategy.new(
-          strategy: {:timout, TimeoutStrategy.new(timeout: deactivate_timeout)}
+          strategy: {:timeout, TimeoutStrategy.new(timeout: deactivate_timeout)}
         )
 
       {name,
