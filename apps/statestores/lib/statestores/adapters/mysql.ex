@@ -9,14 +9,20 @@ defmodule Statestores.Adapters.MySQL do
 
   def get_by_key(actor), do: get_by(Event, actor: actor)
 
-  def save(
-        %Event{actor: _actor, revision: revision, tags: tags, data_type: type, data: data} = event
-      ) do
-    map_event = ValueObjectSchema.to_map(event)
-
+  def save(%Event{revision: revision, tags: tags, data_type: type, data: data} = event) do
     %Event{}
-    |> Event.changeset(map_event)
-    |> insert!(on_conflict: [set: [revision: revision, tags: tags, data_type: type, data: data]])
+    |> Event.changeset(ValueObjectSchema.to_map(event))
+    |> insert_or_update!(
+      on_conflict: [
+        set: [
+          revision: revision,
+          tags: tags,
+          data_type: type,
+          data: data,
+          updated_at: DateTime.utc_now()
+        ]
+      ]
+    )
     |> case do
       {:ok, event} ->
         {:ok, event}
