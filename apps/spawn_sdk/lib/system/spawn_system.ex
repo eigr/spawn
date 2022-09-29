@@ -24,10 +24,8 @@ defmodule SpawnSdk.System.SpawnSystem do
     ActorInvocation,
     ActorInvocationResponse,
     InvocationRequest,
-    InvocationResponse,
     RegistrationRequest,
     RegistrationResponse,
-    RequestStatus,
     ServiceInfo,
     SpawnRequest,
     SpawnResponse
@@ -124,7 +122,7 @@ defmodule SpawnSdk.System.SpawnSystem do
                  {String.to_existing_atom(command), unpack_unknown(value)},
                  new_ctx
                ) do
-            {:ok, %SpawnSdk.Value{state: host_state, value: response} = _value} ->
+            {:reply, %SpawnSdk.Value{state: host_state, value: response} = _value} ->
               resp = %ActorInvocationResponse{
                 updated_context:
                   Eigr.Functions.Protocol.Context.new(state: any_pack!(host_state)),
@@ -205,11 +203,15 @@ defmodule SpawnSdk.System.SpawnSystem do
 
     if async do
       Actors.invoke(req)
-      {:ok, "ok"}
+      {:ok, :async}
     else
-      _resp = {:ok, %ActorInvocationResponse{value: value}} = Actors.invoke(req)
+      case Actors.invoke(req) do
+        {:ok, %ActorInvocationResponse{value: value}} ->
+          {:ok, unpack_unknown(value)}
 
-      {:ok, unpack_unknown(value)}
+        error ->
+          {:error, error}
+      end
     end
   end
 

@@ -37,7 +37,7 @@ defmodule SpawnSdk.Actor do
   @type value :: Value.t()
 
   @callback handle_command({command(), data()}, context()) ::
-              {:ok, value()} | {:error, error()} | {:error, error(), value()}
+              {:reply, value()} | {:error, error()} | {:error, error(), value()}
 
   defmacro __using__(opts) do
     quote bind_quoted: [opts: opts] do

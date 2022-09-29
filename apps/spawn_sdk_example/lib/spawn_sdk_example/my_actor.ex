@@ -17,6 +17,9 @@ defmodule SpawnSdkExample.MyActor do
     Logger.info("Received Request: #{inspect(data)}. Context: #{inspect(ctx)}")
 
     new_value = (state.value || 0) + value
-    {:ok, %Value{state: %MyState{value: new_value}, value: %MyBusinessMessage{value: new_value}}}
+
+    %Value{}
+    |> Value.of(%MyBusinessMessage{value: new_value}, %MyState{value: new_value})
+    |> Value.reply!()
   end
 end
