@@ -122,10 +122,7 @@ defmodule SpawnSdk.System.SpawnSystem do
               %SpawnSdk.Context{state: actor_state}
             end
 
-          case actor_instance.handle_command(
-                 {String.to_existing_atom(command), unpack_unknown(value)},
-                 new_ctx
-               ) do
+          case call_instance(actor_instance, command, value, new_ctx) do
             {:reply, %SpawnSdk.Value{state: host_state, value: response} = _value} ->
               resp = %ActorInvocationResponse{
                 updated_context:
@@ -179,6 +176,17 @@ defmodule SpawnSdk.System.SpawnSystem do
 
   def call(invocation, entity_state, default_methods) do
     GenServer.call(__MODULE__, {:call, invocation, entity_state, default_methods}, 20_000)
+  end
+
+  defp call_instance(instance, command, value, context) when is_atom(command) do
+    instance.handle_command({command, unpack_unknown(value)}, context)
+  end
+
+  defp call_instance(instance, command, value, context) when is_binary(command) do
+    instance.handle_command(
+      {String.to_existing_atom(command), unpack_unknown(value)},
+      context
+    )
   end
 
   defp do_register(system, actors) do
