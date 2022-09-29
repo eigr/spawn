@@ -8,8 +8,10 @@ defmodule Statestores.Schemas.Event do
 
   @type t() :: %__MODULE__{}
 
-  @primary_key {:actor, :string, autogenerate: false}
+  @primary_key false
   schema "events" do
+    field :actor, :string, primary_key: true
+
     field(:system, :string)
 
     field(:revision, :integer)
@@ -20,7 +22,7 @@ defmodule Statestores.Schemas.Event do
 
     field(:data, Statestores.Types.Binary)
 
-    timestamps()
+    timestamps([type: :utc_datetime_usec])
   end
 
   @spec changeset(%__MODULE__{}, map()) :: Ecto.Changeset.t() | {:error, Ecto.Changeset.t()}

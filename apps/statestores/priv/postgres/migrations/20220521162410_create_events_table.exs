@@ -9,7 +9,7 @@ defmodule Statestores.Adapters.Postgres.Migrations.CreateEventsTable do
       add :tags, :map
       add :data_type, :string
       add :data, :binary
-      timestamps()
+      timestamps([type: :utc_datetime_usec])
     end
   end
 
