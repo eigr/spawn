@@ -8,19 +8,25 @@ defmodule SpawnSdk.Actor do
       use SpawnSdk.Actor,
         name: "joe",
         persistent: false,
-        state_type: MyActorStateModule,
+        state_type: Io.Eigr.Spawn.Example.MyState,
         deactivate_timeout: 5_000,
         snapshot_timeout: 2_000
 
+      require Logger
+      alias Io.Eigr.Spawn.Example.{MyState, MyBusinessMessage}
+
       @impl true
-      def handle_command({:sum, %MyPayloadProtobufModule{} = _data}, ctx) do
-        current_state = ctx.state
-        new_state = current_state
+      def handle_command(
+            {:sum, %MyBusinessMessage{value: value} = data},
+            %Context{state: state} = ctx
+          ) do
+        Logger.info("Received Request: #{inspect(data)}. Context: #{inspect(ctx)}")
 
-        response = %MyResponseProtobufModule{}
-        result = %Value{state: new_state, value: response}
+        new_value = (state.value || 0) + value
 
-        {:ok, result}
+        %Value{}
+        |> Value.of(%MyBusinessMessage{value: new_value}, %MyState{value: new_value})
+        |> Value.reply!()
       end
   """
 
@@ -44,7 +50,13 @@ defmodule SpawnSdk.Actor do
       alias SpawnSdk.{Context, Value}
 
       import SpawnSdk.Actor
-      import SpawnSdk.System.SpawnSystem
+
+      import SpawnSdk.System.SpawnSystem,
+        only: [
+          register: 2,
+          spawn_actor: 3,
+          invoke: 5
+        ]
 
       @behaviour SpawnSdk.Actor
 

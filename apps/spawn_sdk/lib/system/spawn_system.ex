@@ -76,6 +76,10 @@ defmodule SpawnSdk.System.SpawnSystem do
     end
   end
 
+  def handle_call({:spawn_actor, _system, _actor_name, _actor_mod}, _from, state) do
+    {:reply, {:ok, nil}, state}
+  end
+
   def handle_call(
         {:call,
          %ActorInvocation{
@@ -160,6 +164,11 @@ defmodule SpawnSdk.System.SpawnSystem do
   @impl SpawnSdk.System
   def register(system, actors) do
     GenServer.call(__MODULE__, {:register, system, actors}, 20_000)
+  end
+
+  @impl SpawnSdk.System
+  def spawn_actor(system, actor_name, actor_mod) do
+    GenServer.call(__MODULE__, {:spawn_actor, system, actor_name, actor_mod}, 20_000)
   end
 
   @impl SpawnSdk.System
