@@ -197,7 +197,7 @@ defmodule SpawnSdk.System.SpawnSystem do
     req =
       InvocationRequest.new(
         system: %Eigr.Functions.Protocol.Actors.ActorSystem{name: system},
-        actor: %Eigr.Functions.Protocol.Actors.Actor{name: actor, persistent: true},
+        actor: %Eigr.Functions.Protocol.Actors.Actor{name: actor},
         value: any_pack!(payload),
         command_name: command,
         async: async
