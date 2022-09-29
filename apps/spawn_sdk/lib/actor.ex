@@ -20,7 +20,7 @@ defmodule SpawnSdk.Actor do
             {:sum, %MyBusinessMessage{value: value} = data},
             %Context{state: state} = ctx
           ) do
-        Logger.info("Received Request: #{inspect(data)}. Context: #{inspect(ctx)}")
+        Logger.info("Received Request...")
 
         new_value = (state.value || 0) + value
 
