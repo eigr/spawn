@@ -22,7 +22,7 @@ defmodule Statestores.Schemas.Event do
 
     field(:data, Statestores.Types.Binary)
 
-    timestamps([type: :utc_datetime_usec])
+    timestamps(type: :utc_datetime_usec)
   end
 
   @spec changeset(%__MODULE__{}, map()) :: Ecto.Changeset.t() | {:error, Ecto.Changeset.t()}
