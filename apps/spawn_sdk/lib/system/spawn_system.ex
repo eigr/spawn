@@ -87,11 +87,12 @@ defmodule SpawnSdk.System.SpawnSystem do
            value: value
          } = _payload,
          %EntityState{
-           actor: %Actor{state: actor_state}
+           actor: %Actor{state: actor_state} = actor
          } = entity_state, default_methods},
         _from,
         state
       ) do
+    actor_state = actor_state || %{}
     current_state = Map.get(actor_state || %{}, :state)
 
     call_response =
@@ -112,25 +113,27 @@ defmodule SpawnSdk.System.SpawnSystem do
           actor_instance = Map.get(state, name)
 
           new_ctx =
-            if !is_nil(current_state) or current_state != %{} do
-              IO.inspect(current_state, label: "unpack_any_bin(current_state)")
-              # actor_state = unpack_any_bin(current_state)
-              %SpawnSdk.Context{state: actor_state}
-            else
+            if is_nil(current_state) or current_state == %{} do
               %SpawnSdk.Context{}
+            else
+              actor_state = unpack_unknown(current_state)
+              %SpawnSdk.Context{state: actor_state}
             end
 
           case actor_instance.handle_command(
                  {String.to_existing_atom(command), unpack_unknown(value)},
                  new_ctx
                ) do
-            {:ok, %SpawnSdk.Value{state: new_state, value: response} = _value} ->
+            {:ok, %SpawnSdk.Value{state: host_state, value: response} = _value} ->
               resp = %ActorInvocationResponse{
-                updated_context: Eigr.Functions.Protocol.Context.new(state: any_pack!(new_state)),
+                updated_context:
+                  Eigr.Functions.Protocol.Context.new(state: any_pack!(host_state)),
                 value: any_pack!(response)
               }
 
-              {:ok, resp, entity_state}
+              new_actor_state = %{actor_state | state: any_pack!(host_state)}
+
+              {:ok, resp, %{entity_state | actor: %{actor | state: new_actor_state}}}
 
             {:error, error} ->
               {:error, error, entity_state}
@@ -194,7 +197,7 @@ defmodule SpawnSdk.System.SpawnSystem do
     req =
       InvocationRequest.new(
         system: %Eigr.Functions.Protocol.Actors.ActorSystem{name: system},
-        actor: %Eigr.Functions.Protocol.Actors.Actor{name: actor},
+        actor: %Eigr.Functions.Protocol.Actors.Actor{name: actor, persistent: true},
         value: any_pack!(payload),
         command_name: command,
         async: async
@@ -204,7 +207,7 @@ defmodule SpawnSdk.System.SpawnSystem do
       Actors.invoke(req)
       {:ok, "ok"}
     else
-      _resp = %InvocationResponse{status: _status, value: value} = Actors.invoke(req)
+      _resp = {:ok, %ActorInvocationResponse{value: value}} = Actors.invoke(req)
 
       {:ok, unpack_unknown(value)}
     end
