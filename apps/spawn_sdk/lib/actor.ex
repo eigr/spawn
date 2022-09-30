@@ -60,7 +60,7 @@ defmodule SpawnSdk.Actor do
 
       @behaviour SpawnSdk.Actor
 
-      actor_name = Keyword.fetch!(opts, :name)
+      actor_name = Keyword.get(opts, :name, Atom.to_string(__MODULE__))
       state_type = Keyword.fetch!(opts, :state_type)
       persistent = Keyword.get(opts, :persistent, true)
       abstract_actor = Keyword.get(opts, :abstract, false)

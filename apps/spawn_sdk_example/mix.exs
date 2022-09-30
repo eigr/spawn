@@ -26,7 +26,8 @@ defmodule SpawnSdkExample.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:spawn_sdk, in_umbrella: true}
+      {:spawn_sdk, in_umbrella: true},
+      {:duration_tc, "~> 0.1.0"}
     ]
   end
 end

@@ -7,7 +7,11 @@ defmodule SpawnSdkExample.Application do
     children = [
       {
         SpawnSdk.System.Supervisor,
-        system: "spawn-system", actors: [SpawnSdkExample.MyActor]
+        system: "spawn-system",
+        actors: [
+          SpawnSdkExample.MyActor,
+          SpawnSdkExample.AbstractActor
+        ]
       }
     ]
 

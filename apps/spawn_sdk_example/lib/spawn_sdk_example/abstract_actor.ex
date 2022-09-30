@@ -1,10 +1,8 @@
-defmodule SpawnSdkExample.MyActor do
+defmodule SpawnSdkExample.AbstractActor do
   use SpawnSdk.Actor,
-    name: "jose",
+    abstract: true,
     persistent: true,
-    state_type: Io.Eigr.Spawn.Example.MyState,
-    deactivate_timeout: 30_000,
-    snapshot_timeout: 2_000
+    state_type: Io.Eigr.Spawn.Example.MyState
 
   require Logger
   alias Io.Eigr.Spawn.Example.{MyState, MyBusinessMessage}

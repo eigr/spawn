@@ -93,10 +93,11 @@ defmodule Actors do
           actor: %Actor{} = actor,
           system: %ActorSystem{} = system,
           async: async?
-        } = request
+        } = request,
+        opts \\ []
       ) do
     do_lookup_action(system.name, actor.name, system, fn actor_ref ->
-      maybe_invoke_async(async?, actor_ref, request)
+      maybe_invoke_async(async?, actor_ref, request, opts)
     end)
   end
 
@@ -148,14 +149,14 @@ defmodule Actors do
     end
   end
 
-  defp maybe_invoke_async(true, actor_ref, request) do
-    ActorEntity.invoke_async(actor_ref, request)
+  defp maybe_invoke_async(true, actor_ref, request, opts) do
+    ActorEntity.invoke_async(actor_ref, request, opts)
 
     {:ok, :async}
   end
 
-  defp maybe_invoke_async(false, actor_ref, request) do
-    ActorEntity.invoke(actor_ref, request)
+  defp maybe_invoke_async(false, actor_ref, request, opts) do
+    ActorEntity.invoke(actor_ref, request, opts)
   end
 
   @spec try_reactivate_actor(ActorSystem.t(), Actor.t(), any()) :: {:ok, any()} | {:error, any()}
