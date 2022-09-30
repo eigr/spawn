@@ -1,7 +1,4 @@
-defmodule Actors.Registry.ActorNode do
-  @moduledoc """
-  `ActorNode`
-  """
+defmodule Actors.Registry.Host do
   alias Eigr.Functions.Protocol.Actors.Actor
 
   defstruct actors: nil, opts: nil

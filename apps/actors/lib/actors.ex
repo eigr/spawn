@@ -7,7 +7,7 @@ defmodule Actors do
   alias Actors.Actor.Entity, as: ActorEntity
   alias Actors.Actor.Entity.Supervisor, as: ActorEntitySupervisor
 
-  alias Actors.Registry.{ActorNode, ActorRegistry}
+  alias Actors.Registry.{ActorRegistry, Member, Host}
 
   alias Eigr.Functions.Protocol.Actors.{Actor, ActorSystem, Registry}
 
@@ -46,8 +46,12 @@ defmodule Actors do
         } = _registration,
         opts
       ) do
-    actor_node = %ActorNode{actors: actors, opts: opts}
-    ActorRegistry.register(actor_node)
+    member = %Member{
+      id: Node.self(),
+      host_function: %Host{actors: Map.values(actors), opts: opts}
+    }
+
+    ActorRegistry.register(member)
 
     spawn(fn ->
       create_actors(actor_system, actors, opts)
@@ -76,8 +80,12 @@ defmodule Actors do
         } = _registration,
         opts
       ) do
-    actor_node = %ActorNode{actors: actors, opts: opts}
-    ActorRegistry.register(actor_node)
+    member = %Member{
+      id: Node.self(),
+      host_function: %Host{actors: Map.values(actors), opts: opts}
+    }
+
+    ActorRegistry.register(member)
 
     spawn(fn ->
       create_actors(actor_system, actors, opts)
@@ -109,7 +117,7 @@ defmodule Actors do
         action_fun.(actor_ref)
 
       _ ->
-        with {:ok, %{node: node, actor: %ActorNode{actors: actors, opts: opts}}} <-
+        with {:ok, %Member{id: node, host_function: %Host{actors: actors, opts: opts}}} <-
                ActorRegistry.lookup(system_name, actor_name) do
           actor = List.first(actors)
 
