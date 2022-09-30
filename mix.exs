@@ -94,6 +94,15 @@ defmodule Spawn.MixProject do
           &Bakeware.assemble/1
         ],
         bakeware: [compression_level: 19]
+      ],
+      spawn_sdk_example: [
+        include_executables_for: [:unix],
+        applications: [spawn_sdk_example: :permanent],
+        steps: [
+          :assemble,
+          &Bakeware.assemble/1
+        ],
+        bakeware: [compression_level: 19]
       ]
     ]
   end

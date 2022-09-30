@@ -12,7 +12,7 @@ defmodule ActivatorSQS.Application do
 
     children =
       [
-        Spawn.Cluster.Supervisor.child_spec(config),
+        Spawn.Supervisor.child_spec(config),
         {Bandit, plug: ActivatorSQS.Router, scheme: :http, options: [port: get_http_port(config)]}
       ] ++
         if Mix.env() == :test,

@@ -28,9 +28,11 @@ defmodule Actors.Actor.Entity.Supervisor do
   @doc """
   Adds a Actor to the dynamic supervisor.
   """
-  @spec lookup_or_create_actor(ActorSystem.t(), Actor.t()) :: {:ok, any}
-  def lookup_or_create_actor(system, %Actor{} = actor) when is_nil(system) do
-    entity_state = %EntityState{system: nil, actor: actor}
+  @spec lookup_or_create_actor(ActorSystem.t(), Actor.t(), any()) :: {:ok, any}
+  def lookup_or_create_actor(system, actor, opts \\ [])
+
+  def lookup_or_create_actor(system, %Actor{} = actor, opts) when is_nil(system) do
+    entity_state = %EntityState{system: nil, actor: actor, opts: opts}
 
     child_spec = %{
       id: Actors.Actor.Entity,
@@ -44,9 +46,12 @@ defmodule Actors.Actor.Entity.Supervisor do
     end
   end
 
-  @spec lookup_or_create_actor(ActorSystem.t(), Actor.t()) :: {:ok, any}
-  def lookup_or_create_actor(%ActorSystem{name: actor_system} = _system, %Actor{} = actor) do
-    entity_state = %EntityState{system: actor_system, actor: actor}
+  def lookup_or_create_actor(
+        %ActorSystem{name: actor_system} = _system,
+        %Actor{} = actor,
+        opts
+      ) do
+    entity_state = %EntityState{system: actor_system, actor: actor, opts: opts}
 
     child_spec = %{
       id: Actors.Actor.Entity,

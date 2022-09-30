@@ -8,6 +8,7 @@ activator-kafka-image=${registry}/spawn-activator-kafka:${version}
 activator-pubsub-image=${registry}/spawn-activator-pubsub:${version}
 activator-rabbitmq-image=${registry}/spawn-activator-rabbitmq:${version}
 activator-sqs-image=${registry}/spawn-activator-sqs:${version}
+spawn-sdk-example-image=${registry}/spawn-sdk-example:${version}
 
 ifeq "$(PROXY_DATABASE_TYPE)" ""
     database:=mysql
@@ -34,6 +35,9 @@ build-proxy-image:
 build-operator-image:
 	docker build -f Dockerfile-operator -t ${operator-image} .
 
+build-elixir-sdk-image:
+	docker build -f Dockerfile-elixir-example -t ${spawn-sdk-example-image} .
+
 build-all-images:
 	docker build -f Dockerfile-proxy -t ${proxy-image} .
 	docker build -f Dockerfile-operator -t ${operator-image} .
@@ -43,6 +47,7 @@ build-all-images:
 	docker build -f Dockerfile-activator-pubsub -t ${activator-pubsub-image} .
 	docker build -f Dockerfile-activator-rabbitmq -t ${activator-rabbitmq-image} .
 	docker build -f Dockerfile-activator-sqs -t ${activator-sqs-image} .
+	docker build -f Dockerfile-elixir-example -t ${spawn-sdk-example-image} .
 
 test:
 	MIX_ENV=test mix deps.get
@@ -57,6 +62,7 @@ push-all-images:
 	docker push ${activator-pubsub-image}
 	docker push ${activator-rabbitmq-image}
 	docker push ${activator-sqs-image}
+	docker push ${spawn-sdk-example-image}
 
 create-minikube-cluster:
 	minikube start

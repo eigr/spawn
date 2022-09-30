@@ -49,8 +49,11 @@ defmodule Proxy.Routes.API do
          {:ok, response} <- Actors.invoke(request) do
       value =
         case response do
-          :async -> nil
-          %ActorInvocationResponse{value: value} -> value
+          :async ->
+            nil
+
+          %ActorInvocationResponse{value: value} ->
+            value
         end
 
       send!(

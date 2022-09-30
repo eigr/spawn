@@ -20,7 +20,7 @@ defmodule Actors.Supervisors.EntitySupervisor do
     children = [
       {Phoenix.PubSub, name: :actor_channel},
       Actors.Actor.Entity.Supervisor.child_spec(),
-      Actors.Registry.ActorRegistry.child_spec(%{})
+      Actors.Registry.ActorRegistry.child_spec()
     ]
 
     Supervisor.init(children, strategy: :one_for_one)

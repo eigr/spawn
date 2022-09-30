@@ -15,7 +15,6 @@ defmodule Actors.Actor.Entity do
   alias Eigr.Functions.Protocol.{
     Context,
     ActorInvocation,
-    ActorInvocationResponse,
     InvocationRequest
   }
 
@@ -201,15 +200,14 @@ defmodule Actors.Actor.Entity do
            actor: %Actor{name: name} = _actor,
            command_name: command,
            value: payload
-         } = _invocation},
+         } = _invocation, opts},
         _from,
         %EntityState{
           system: actor_system,
-          actor: %Actor{state: actor_state},
-          opts: opts
+          actor: %Actor{state: actor_state}
         } = state
       ) do
-    invoker = get_invoker(opts)
+    interface = get_interface(opts)
     current_state = Map.get(actor_state || %{}, :state)
 
     ActorInvocation.new(
@@ -219,7 +217,7 @@ defmodule Actors.Actor.Entity do
       value: payload,
       current_context: Context.new(state: current_state)
     )
-    |> invoker.invoke_host(state, @default_methods)
+    |> interface.invoke_host(state, @default_methods)
     |> case do
       {:ok, response, state} -> {:reply, {:ok, response}, state}
       {:error, reason, state} -> {:reply, {:error, reason}, state, :hibernate}
@@ -233,14 +231,13 @@ defmodule Actors.Actor.Entity do
            actor: %Actor{name: name} = _actor,
            command_name: command,
            value: payload
-         } = _invocation},
+         } = _invocation, opts},
         %EntityState{
           system: actor_system,
-          actor: %Actor{state: actor_state},
-          opts: opts
+          actor: %Actor{state: actor_state}
         } = state
       ) do
-    invoker = get_invoker(opts)
+    interface = get_interface(opts)
     current_state = Map.get(actor_state || %{}, :state)
 
     ActorInvocation.new(
@@ -250,7 +247,7 @@ defmodule Actors.Actor.Entity do
       value: payload,
       current_context: Context.new(state: current_state)
     )
-    |> invoker.invoke_host(state, @default_methods)
+    |> interface.invoke_host(state, @default_methods)
     |> case do
       {:ok, _whatever, state} -> {:noreply, state}
       {:error, _reason, state} -> {:noreply, state, :hibernate}
@@ -414,25 +411,25 @@ defmodule Actors.Actor.Entity do
     GenServer.call(via(ref), :get_state, 20_000)
   end
 
-  @spec invoke(any, any) :: any
-  def invoke(ref, request) when is_pid(ref) do
-    GenServer.call(ref, {:invocation_request, request}, 30_000)
+  @spec invoke(any, any, any) :: any
+  def invoke(ref, request, opts) when is_pid(ref) do
+    GenServer.call(ref, {:invocation_request, request, opts}, 30_000)
   end
 
-  def invoke(ref, request) do
-    GenServer.call(via(ref), {:invocation_request, request}, 30_000)
+  def invoke(ref, request, opts) do
+    GenServer.call(via(ref), {:invocation_request, request, opts}, 30_000)
   end
 
-  @spec invoke_async(any, any) :: :ok
-  def invoke_async(ref, request) when is_pid(ref) do
-    GenServer.cast(ref, {:invocation_request, request})
+  @spec invoke_async(any, any, any) :: :ok
+  def invoke_async(ref, request, opts) when is_pid(ref) do
+    GenServer.cast(ref, {:invocation_request, request, opts})
   end
 
-  def invoke_async(ref, request) do
-    GenServer.cast(via(ref), {:invocation_request, request})
+  def invoke_async(ref, request, opts) do
+    GenServer.cast(via(ref), {:invocation_request, request, opts})
   end
 
-  defp get_invoker(opts), do: Keyword.get(opts, :invoker, Actors.Actor.Invoker.Http)
+  defp get_interface(opts), do: Keyword.get(opts, :host_interface, Actors.Actor.Interface.Http)
 
   defp get_timeout_factor(factor_range) when is_number(factor_range),
     do: Enum.random([factor_range])
@@ -465,9 +462,11 @@ defmodule Actors.Actor.Entity do
         get_deactivate_interval(deactivate_strategy, timeout_factor)
       )
 
+  defp get_snapshot_interval(timeout_strategy, timeout_factor \\ 0)
+
   defp get_snapshot_interval(
          {:timeout, %TimeoutStrategy{timeout: timeout}} = _timeout_strategy,
-         timeout_factor \\ 0
+         timeout_factor
        )
        when is_nil(timeout),
        do: @default_snapshot_timeout + timeout_factor
@@ -478,9 +477,11 @@ defmodule Actors.Actor.Entity do
        ),
        do: timeout + timeout_factor
 
+  defp get_deactivate_interval(timeout_strategy, timeout_factor \\ 0)
+
   defp get_deactivate_interval(
          {:timeout, %TimeoutStrategy{timeout: timeout}} = _timeout_strategy,
-         timeout_factor \\ 0
+         timeout_factor
        )
        when is_nil(timeout),
        do: @default_deactivate_timeout + timeout_factor

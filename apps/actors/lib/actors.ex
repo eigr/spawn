@@ -7,7 +7,7 @@ defmodule Actors do
   alias Actors.Actor.Entity, as: ActorEntity
   alias Actors.Actor.Entity.Supervisor, as: ActorEntitySupervisor
 
-  alias Actors.Registry.ActorRegistry
+  alias Actors.Registry.{ActorRegistry, Member, Host}
 
   alias Eigr.Functions.Protocol.Actors.{Actor, ActorSystem, Registry}
 
@@ -27,11 +27,15 @@ defmodule Actors do
 
   @erpc_timeout 5_000
 
+  @spec get_state(String.t(), String.t()) :: {:ok, term()} | {:error, term()}
   def get_state(system_name, actor_name) do
     do_lookup_action(system_name, actor_name, nil, fn actor_ref ->
       ActorEntity.get_state(actor_ref)
     end)
   end
+
+  @spec register(RegistrationRequest.t(), any()) :: {:ok, RegistrationResponse.t()}
+  def register(registration, opts \\ [])
 
   def register(
         %RegistrationRequest{
@@ -39,12 +43,18 @@ defmodule Actors do
           actor_system:
             %ActorSystem{name: _name, registry: %Registry{actors: actors} = _registry} =
               actor_system
-        } = _registration
+        } = _registration,
+        opts
       ) do
-    ActorRegistry.register(actors)
+    member = %Member{
+      id: Node.self(),
+      host_function: %Host{actors: Map.values(actors), opts: opts}
+    }
+
+    ActorRegistry.register(member)
 
     spawn(fn ->
-      create_actors(actor_system, actors)
+      create_actors(actor_system, actors, opts)
     end)
 
     proxy_info =
@@ -59,17 +69,26 @@ defmodule Actors do
     {:ok, RegistrationResponse.new(proxy_info: proxy_info, status: status)}
   end
 
+  @spec spawn_actor(SpawnRequest.t(), any()) :: {:ok, SpawnResponse.t()}
+  def spawn_actor(registration, opts \\ [])
+
   def spawn_actor(
         %SpawnRequest{
           actor_system:
             %ActorSystem{name: _name, registry: %Registry{actors: actors} = _registry} =
               actor_system
-        } = _registration
+        } = _registration,
+        opts
       ) do
-    ActorRegistry.register(actors)
+    member = %Member{
+      id: Node.self(),
+      host_function: %Host{actors: Map.values(actors), opts: opts}
+    }
+
+    ActorRegistry.register(member)
 
     spawn(fn ->
-      create_actors(actor_system, actors)
+      create_actors(actor_system, actors, opts)
     end)
 
     status = RequestStatus.new(status: :OK, message: "Accepted")
@@ -82,10 +101,11 @@ defmodule Actors do
           actor: %Actor{} = actor,
           system: %ActorSystem{} = system,
           async: async?
-        } = request
+        } = request,
+        opts \\ []
       ) do
     do_lookup_action(system.name, actor.name, system, fn actor_ref ->
-      maybe_invoke_async(async?, actor_ref, request)
+      maybe_invoke_async(async?, actor_ref, request, opts)
     end)
   end
 
@@ -97,10 +117,19 @@ defmodule Actors do
         action_fun.(actor_ref)
 
       _ ->
-        with {:ok, %{node: node, actor: actor}} <-
-               ActorRegistry.lookup(system_name, actor_name),
-             {:ok, actor_ref} <-
-               :erpc.call(node, __MODULE__, :try_reactivate_actor, [system, actor], @erpc_timeout) do
+        with {:ok, %Member{id: node, host_function: %Host{actors: actors, opts: opts}}} <-
+               ActorRegistry.lookup(system_name, actor_name) do
+          actor = List.first(actors)
+
+          {:ok, actor_ref} =
+            :erpc.call(
+              node,
+              __MODULE__,
+              :try_reactivate_actor,
+              [system, actor, opts],
+              @erpc_timeout
+            )
+
           action_fun.(actor_ref)
         else
           {:not_found, _} ->
@@ -128,18 +157,22 @@ defmodule Actors do
     end
   end
 
-  defp maybe_invoke_async(true, actor_ref, request) do
-    ActorEntity.invoke_async(actor_ref, request)
+  defp maybe_invoke_async(true, actor_ref, request, opts) do
+    ActorEntity.invoke_async(actor_ref, request, opts)
 
     {:ok, :async}
   end
 
-  defp maybe_invoke_async(false, actor_ref, request) do
-    ActorEntity.invoke(actor_ref, request)
+  defp maybe_invoke_async(false, actor_ref, request, opts) do
+    Logger.debug("maybe_invoke_async false")
+    ActorEntity.invoke(actor_ref, request, opts)
   end
 
-  def try_reactivate_actor(%ActorSystem{} = system, %Actor{name: name} = actor) do
-    case ActorEntitySupervisor.lookup_or_create_actor(system, actor) do
+  @spec try_reactivate_actor(ActorSystem.t(), Actor.t(), any()) :: {:ok, any()} | {:error, any()}
+  def try_reactivate_actor(system, actor, opts \\ [])
+
+  def try_reactivate_actor(%ActorSystem{} = system, %Actor{name: name} = actor, opts) do
+    case ActorEntitySupervisor.lookup_or_create_actor(system, actor, opts) do
       {:ok, actor_ref} ->
         Logger.debug("Actor #{name} reactivated. ActorRef PID: #{inspect(actor_ref)}")
         {:ok, actor_ref}
@@ -151,8 +184,8 @@ defmodule Actors do
   end
 
   # To lookup all actors
-  def try_reactivate_actor(nil, %Actor{name: name} = actor) do
-    case ActorEntitySupervisor.lookup_or_create_actor(nil, actor) do
+  def try_reactivate_actor(nil, %Actor{name: name} = actor, opts) do
+    case ActorEntitySupervisor.lookup_or_create_actor(nil, actor, opts) do
       {:ok, actor_ref} ->
         Logger.debug("Actor #{name} reactivated. ActorRef PID: #{inspect(actor_ref)}")
         {:ok, actor_ref}
@@ -163,7 +196,7 @@ defmodule Actors do
     end
   end
 
-  defp create_actors(actor_system, actors) when is_map(actors) do
+  defp create_actors(actor_system, actors, opts) when is_map(actors) do
     actors
     |> Flow.from_enumerable(
       min_demand: @activate_actors_min_demand,
@@ -172,7 +205,7 @@ defmodule Actors do
     |> Flow.map(fn {actor_name, actor} ->
       Logger.debug("Registering #{actor_name} #{inspect(actor)} on Node: #{inspect(Node.self())}")
 
-      {time, result} = :timer.tc(&lookup_actor/3, [actor_system, actor_name, actor])
+      {time, result} = :timer.tc(&lookup_actor/4, [actor_system, actor_name, actor, opts])
 
       Logger.info(
         "Registered and Activated the #{actor_name} on Node #{inspect(Node.self())} in #{inspect(time)}ms"
@@ -183,8 +216,10 @@ defmodule Actors do
     |> Flow.run()
   end
 
-  defp lookup_actor(actor_system, actor_name, actor) do
-    case ActorEntitySupervisor.lookup_or_create_actor(actor_system, actor) do
+  @spec lookup_actor(ActorSystem.t(), String.t(), Actor.t(), any()) ::
+          {:ok, pid()} | {:error, String.t()}
+  defp lookup_actor(actor_system, actor_name, actor, opts) do
+    case ActorEntitySupervisor.lookup_or_create_actor(actor_system, actor, opts) do
       {:ok, pid} ->
         {:ok, pid}
 

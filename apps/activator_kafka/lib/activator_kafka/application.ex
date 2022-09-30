@@ -12,7 +12,7 @@ defmodule ActivatorKafka.Application do
 
     children =
       [
-        Spawn.Cluster.Supervisor.child_spec(config),
+        Spawn.Supervisor.child_spec(config),
         {Bandit,
          plug: ActivatorKafka.Router, scheme: :http, options: [port: get_http_port(config)]}
       ] ++
