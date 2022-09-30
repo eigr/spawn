@@ -155,6 +155,28 @@ MIX_ENV=prod USER_FUNCTION_PORT=8092 PROXY_DATABASE_TYPE=mysql SPAWN_STATESTORE_
 
 The full example of this application can be found [here](https://github.com/eigr/spawn/tree/main/apps/spawn_sdk_example).
 
+### Test App
+
+Invoke Actors:
+
+```elixir
+SpawnSdk.System.SpawnSystem.invoke("spawn-system", "jose", "sum", %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1})
+```
+
+Spawning Actors:
+
+```elixir
+SpawnSdk.System.SpawnSystem.spawn_actor("spawn-system", "robert", SpawnSdkExample.Actors.AbstractActor)
+```
+
+Invoke Spawning Actors:
+
+```elixir
+SpawnSdk.System.SpawnSystem.invoke("spawn-system", "robert", "sum", %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1})
+```
+
+### Deploy
+
 Ready you now have a valid Elixir application for use in a Spawn cluster. However, you will still need to generate a container image with your application so that you can use it together with the Spawn Operator for Kubernetes.
 
 This and other information can be found in the [documentation]().
