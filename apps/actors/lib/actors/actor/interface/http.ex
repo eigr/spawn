@@ -18,6 +18,8 @@ defmodule Actors.Actor.Interface.Http do
     ActorInvocationResponse
   }
 
+  alias Google.Protobuf.Any
+
   @impl true
   def invoke_host(
         %ActorInvocation{actor_name: name, actor_system: system, command_name: command} = payload,
@@ -28,7 +30,11 @@ defmodule Actors.Actor.Interface.Http do
       ) do
     if Enum.member?(default_methods, command) do
       current_state = Map.get(actor_state || %{}, :state)
-      context = Context.new(state: current_state)
+
+      context =
+        if is_nil(current_state),
+          do: Context.new(state: Any.new()),
+          else: Context.new(state: current_state)
 
       resp =
         ActorInvocationResponse.new(

@@ -164,6 +164,7 @@ defmodule Actors do
   end
 
   defp maybe_invoke_async(false, actor_ref, request, opts) do
+    Logger.debug("maybe_invoke_async false")
     ActorEntity.invoke(actor_ref, request, opts)
   end
 
