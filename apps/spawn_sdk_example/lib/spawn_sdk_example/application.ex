@@ -9,8 +9,8 @@ defmodule SpawnSdkExample.Application do
         SpawnSdk.System.Supervisor,
         system: "spawn-system",
         actors: [
-          SpawnSdkExample.MyActor,
-          SpawnSdkExample.AbstractActor
+          SpawnSdkExample.Actors.MyActor,
+          SpawnSdkExample.Actors.AbstractActor
         ]
       }
     ]

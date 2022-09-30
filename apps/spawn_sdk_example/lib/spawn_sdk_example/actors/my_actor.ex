@@ -1,4 +1,4 @@
-defmodule SpawnSdkExample.MyActor do
+defmodule SpawnSdkExample.Actors.MyActor do
   use SpawnSdk.Actor,
     name: "jose",
     persistent: true,

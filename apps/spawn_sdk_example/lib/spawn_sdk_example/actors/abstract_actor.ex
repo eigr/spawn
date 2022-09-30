@@ -1,4 +1,4 @@
-defmodule SpawnSdkExample.AbstractActor do
+defmodule SpawnSdkExample.Actors.AbstractActor do
   use SpawnSdk.Actor,
     abstract: true,
     persistent: true,
