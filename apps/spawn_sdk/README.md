@@ -86,7 +86,7 @@ defmodule SpawnSdkExample.Actors.MyActor do
 end
 ```
 
-In this example we are creating an actor in an Eager way ie it is a known actor at compile time. We can also create Lazy actors, that is, despite having its abstract behavior defined at compile time, a Lazy actor will only have a concrete instance when it is associated with an identifier/name at runtime. Below follows the same previous actor being defined as abstract.
+In this example we are creating an actor in an Named/Eager way ie it is a known actor at compile time. We can also create Unnamed Dyncamic/Lazy actors, that is, despite having its abstract behavior defined at compile time, a Lazy actor will only have a concrete instance when it is associated with an identifier/name at runtime. Below follows the same previous actor being defined as abstract.
 
 ```elixir
 defmodule SpawnSdkExample.Actors.AbstractActor do
@@ -120,6 +120,8 @@ end
 ```
 
 Notice that the only thing that has changed is the absence of the name argument definition and the abstract argument definition being set to true.
+
+> **_NOTE:_** Can Elixir programmers think in terms of named vs abstract actors as more or less known at startup vs dynamically supervised/registered? That is, defining your actors directly in the supervision tree or using a Dynamic Supervisor for that.
 
 ### Declaring the supervision tree
 
