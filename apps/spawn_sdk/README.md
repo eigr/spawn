@@ -49,6 +49,8 @@ while `MyBusiness` is the type of message that we will send and receive from thi
 
 Now that we have defined our input and output types as Protobuf types we will need to compile these files to generate their respective Elixir modules. An example of how to do this can be found [here](https://github.com/eigr/spawn/blob/main/apps/spawn_sdk_example/compile-example-pb.sh)
 
+> **_NOTE:_** You need to have installed the elixir plugin for protoc. More information on how to obtain and install the necessary tools can be found here [here](https://github.com/elixir-protobuf/protobuf#usage) 
+
 Now that the protobuf types have been created we can proceed with the code. Example definition of an Actor:
 
 ```elixir
