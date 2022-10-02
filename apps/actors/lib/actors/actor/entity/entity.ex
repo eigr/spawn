@@ -42,10 +42,8 @@ defmodule Actors.Actor.Entity do
   def init(initial_state) do
     state = EntityState.unpack(initial_state)
 
-    case do_init(state) do
-      {:ok, state} -> {:ok, EntityState.pack(state)}
-      {:ok, state, opts} -> {:ok, EntityState.pack(state), opts}
-    end
+    do_init(state)
+    |> parse_packed_response()
   end
 
   defp do_init(
@@ -142,12 +140,8 @@ defmodule Actors.Actor.Entity do
   def handle_continue(action, state) do
     state = EntityState.unpack(state)
 
-    IO.inspect(self())
-
-    case do_handle_continue(action, state) do
-      {:noreply, state} -> {:noreply, EntityState.pack(state)}
-      {:noreply, state, opts} -> {:noreply, EntityState.pack(state), opts}
-    end
+    do_handle_continue(action, state)
+    |> parse_packed_response()
   end
 
   defp do_handle_continue(
@@ -198,10 +192,8 @@ defmodule Actors.Actor.Entity do
   def handle_call(action, from, state) do
     state = EntityState.unpack(state)
 
-    case do_handle_call(action, from, state) do
-      {:reply, response, state} -> {:reply, response, EntityState.pack(state)}
-      {:reply, response, state, opts} -> {:reply, response, EntityState.pack(state), opts}
-    end
+    do_handle_call(action, from, state)
+    |> parse_packed_response()
   end
 
   defp do_handle_call(
@@ -257,10 +249,8 @@ defmodule Actors.Actor.Entity do
   def handle_cast(action, state) do
     state = EntityState.unpack(state)
 
-    case do_handle_cast(action, state) do
-      {:noreply, state} -> {:noreply, EntityState.pack(state)}
-      {:noreply, state, opts} -> {:noreply, EntityState.pack(state), opts}
-    end
+    do_handle_cast(action, state)
+    |> parse_packed_response()
   end
 
   defp do_handle_cast(
@@ -277,8 +267,6 @@ defmodule Actors.Actor.Entity do
        ) do
     interface = get_interface(opts)
     current_state = Map.get(actor_state || %{}, :state)
-
-    IO.inspect(self(), label: "aquii")
 
     ActorInvocation.new(
       actor_name: name,
@@ -298,10 +286,8 @@ defmodule Actors.Actor.Entity do
   def handle_info(action, state) do
     state = EntityState.unpack(state)
 
-    case do_handle_info(action, state) do
-      {:noreply, state} -> {:noreply, EntityState.pack(state)}
-      {:noreply, state, opts} -> {:noreply, EntityState.pack(state), opts}
-    end
+    do_handle_info(action, state)
+    |> parse_packed_response()
   end
 
   defp do_handle_info(
@@ -546,6 +532,19 @@ defmodule Actors.Actor.Entity do
          timeout_factor
        ),
        do: timeout + timeout_factor
+
+  defp parse_packed_response(response) do
+    case response do
+      {:reply, response, state} -> {:reply, response, EntityState.pack(state)}
+      {:reply, response, state, opts} -> {:reply, response, EntityState.pack(state), opts}
+      {:stop, reason, state, opts} -> {:stop, reason, EntityState.pack(state), opts}
+      {:stop, reason, state} -> {:stop, reason, EntityState.pack(state)}
+      {:noreply, state} -> {:noreply, EntityState.pack(state)}
+      {:noreply, state, opts} -> {:noreply, EntityState.pack(state), opts}
+      {:ok, state} -> {:ok, EntityState.pack(state)}
+      {:ok, state, opts} -> {:ok, EntityState.pack(state), opts}
+    end
+  end
 
   defp via(name) do
     {:via, Horde.Registry, {Spawn.Cluster.Node.Registry, {__MODULE__, name}}}
