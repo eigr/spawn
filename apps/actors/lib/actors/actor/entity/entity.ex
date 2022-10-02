@@ -39,16 +39,25 @@ defmodule Actors.Actor.Entity do
   @impl true
   @spec init(EntityState.t()) ::
           {:ok, EntityState.t(), {:continue, :load_state}}
-  def init(
-        %EntityState{
-          actor: %Actor{
-            name: name,
-            persistent: false,
-            deactivate_strategy: deactivate_strategy
-          }
-        } = state
-      )
-      when is_nil(deactivate_strategy) or deactivate_strategy == %{} do
+  def init(initial_state) do
+    state = EntityState.unpack(initial_state)
+
+    case do_init(state) do
+      {:ok, state} -> {:ok, EntityState.pack(state)}
+      {:ok, state, opts} -> {:ok, EntityState.pack(state), opts}
+    end
+  end
+
+  defp do_init(
+         %EntityState{
+           actor: %Actor{
+             name: name,
+             persistent: false,
+             deactivate_strategy: deactivate_strategy
+           }
+         } = state
+       )
+       when is_nil(deactivate_strategy) or deactivate_strategy == %{} do
     Process.flag(:trap_exit, true)
 
     Logger.notice(
@@ -60,16 +69,16 @@ defmodule Actors.Actor.Entity do
     {:ok, state}
   end
 
-  def init(
-        %EntityState{
-          actor: %Actor{
-            name: name,
-            persistent: false,
-            deactivate_strategy:
-              %ActorDeactivateStrategy{strategy: deactivate_strategy} = _dstrategy
-          }
-        } = state
-      ) do
+  defp do_init(
+         %EntityState{
+           actor: %Actor{
+             name: name,
+             persistent: false,
+             deactivate_strategy:
+               %ActorDeactivateStrategy{strategy: deactivate_strategy} = _dstrategy
+           }
+         } = state
+       ) do
     Process.flag(:trap_exit, true)
 
     Logger.notice(
@@ -80,17 +89,17 @@ defmodule Actors.Actor.Entity do
     {:ok, state}
   end
 
-  def init(
-        %EntityState{
-          actor: %Actor{
-            name: name,
-            persistent: true,
-            snapshot_strategy: %ActorSnapshotStrategy{} = _snapshot_strategy,
-            deactivate_strategy: deactivate_strategy
-          }
-        } = state
-      )
-      when is_nil(deactivate_strategy) or deactivate_strategy == %{} do
+  defp do_init(
+         %EntityState{
+           actor: %Actor{
+             name: name,
+             persistent: true,
+             snapshot_strategy: %ActorSnapshotStrategy{} = _snapshot_strategy,
+             deactivate_strategy: deactivate_strategy
+           }
+         } = state
+       )
+       when is_nil(deactivate_strategy) or deactivate_strategy == %{} do
     Process.flag(:trap_exit, true)
 
     Logger.notice(
@@ -105,16 +114,16 @@ defmodule Actors.Actor.Entity do
     {:ok, state, {:continue, :load_state}}
   end
 
-  def init(
-        %EntityState{
-          actor: %Actor{
-            name: name,
-            persistent: true,
-            snapshot_strategy: %ActorSnapshotStrategy{} = _snapshot_strategy,
-            deactivate_strategy: %ActorDeactivateStrategy{strategy: deactivate_strategy}
-          }
-        } = state
-      ) do
+  defp do_init(
+         %EntityState{
+           actor: %Actor{
+             name: name,
+             persistent: true,
+             snapshot_strategy: %ActorSnapshotStrategy{} = _snapshot_strategy,
+             deactivate_strategy: %ActorDeactivateStrategy{strategy: deactivate_strategy}
+           }
+         } = state
+       ) do
     Process.flag(:trap_exit, true)
 
     Logger.notice(
@@ -130,13 +139,24 @@ defmodule Actors.Actor.Entity do
 
   @impl true
   @spec handle_continue(:load_state, EntityState.t()) :: {:noreply, EntityState.t()}
-  def handle_continue(
-        :load_state,
-        %EntityState{
-          actor: %Actor{name: name, state: actor_state} = actor
-        } = state
-      )
-      when is_nil(actor_state) do
+  def handle_continue(action, state) do
+    state = EntityState.unpack(state)
+
+    IO.inspect(self())
+
+    case do_handle_continue(action, state) do
+      {:noreply, state} -> {:noreply, EntityState.pack(state)}
+      {:noreply, state, opts} -> {:noreply, EntityState.pack(state), opts}
+    end
+  end
+
+  defp do_handle_continue(
+         :load_state,
+         %EntityState{
+           actor: %Actor{name: name, state: actor_state} = actor
+         } = state
+       )
+       when is_nil(actor_state) do
     Logger.debug("Initial state is empty... Getting state from state manager.")
 
     case StateManager.load(name) do
@@ -149,12 +169,12 @@ defmodule Actors.Actor.Entity do
     end
   end
 
-  def handle_continue(
-        :load_state,
-        %EntityState{
-          actor: %Actor{name: name, state: %ActorState{} = _actor_state} = actor
-        } = state
-      ) do
+  defp do_handle_continue(
+         :load_state,
+         %EntityState{
+           actor: %Actor{name: name, state: %ActorState{} = _actor_state} = actor
+         } = state
+       ) do
     Logger.debug(
       "Initial state is not empty... Trying to reconcile the state with state manager."
     )
@@ -175,38 +195,47 @@ defmodule Actors.Actor.Entity do
   end
 
   @impl true
-  def handle_call(
-        :get_state,
-        _from,
-        %EntityState{
-          actor: %Actor{state: actor_state} = _actor
-        } = state
-      )
-      when is_nil(actor_state),
-      do: {:reply, {:error, :not_found}, state, :hibernate}
+  def handle_call(action, from, state) do
+    state = EntityState.unpack(state)
 
-  def handle_call(
-        :get_state,
-        _from,
-        %EntityState{
-          actor: %Actor{state: %ActorState{} = actor_state} = _actor
-        } = state
-      ),
-      do: {:reply, {:ok, actor_state}, state, :hibernate}
+    case do_handle_call(action, from, state) do
+      {:reply, response, state} -> {:reply, response, EntityState.pack(state)}
+      {:reply, response, state, opts} -> {:reply, response, EntityState.pack(state), opts}
+    end
+  end
 
-  def handle_call(
-        {:invocation_request,
-         %InvocationRequest{
-           actor: %Actor{name: name} = _actor,
-           command_name: command,
-           value: payload
-         } = _invocation, opts},
-        _from,
-        %EntityState{
-          system: actor_system,
-          actor: %Actor{state: actor_state}
-        } = state
-      ) do
+  defp do_handle_call(
+         :get_state,
+         _from,
+         %EntityState{
+           actor: %Actor{state: actor_state} = _actor
+         } = state
+       )
+       when is_nil(actor_state),
+       do: {:reply, {:error, :not_found}, state, :hibernate}
+
+  defp do_handle_call(
+         :get_state,
+         _from,
+         %EntityState{
+           actor: %Actor{state: %ActorState{} = actor_state} = _actor
+         } = state
+       ),
+       do: {:reply, {:ok, actor_state}, state, :hibernate}
+
+  defp do_handle_call(
+         {:invocation_request,
+          %InvocationRequest{
+            actor: %Actor{name: name} = _actor,
+            command_name: command,
+            value: payload
+          } = _invocation, opts},
+         _from,
+         %EntityState{
+           system: actor_system,
+           actor: %Actor{state: actor_state}
+         } = state
+       ) do
     interface = get_interface(opts)
     current_state = Map.get(actor_state || %{}, :state)
 
@@ -225,20 +254,31 @@ defmodule Actors.Actor.Entity do
   end
 
   @impl true
-  def handle_cast(
-        {:invocation_request,
-         %InvocationRequest{
-           actor: %Actor{name: name} = _actor,
-           command_name: command,
-           value: payload
-         } = _invocation, opts},
-        %EntityState{
-          system: actor_system,
-          actor: %Actor{state: actor_state}
-        } = state
-      ) do
+  def handle_cast(action, state) do
+    state = EntityState.unpack(state)
+
+    case do_handle_cast(action, state) do
+      {:noreply, state} -> {:noreply, EntityState.pack(state)}
+      {:noreply, state, opts} -> {:noreply, EntityState.pack(state), opts}
+    end
+  end
+
+  defp do_handle_cast(
+         {:invocation_request,
+          %InvocationRequest{
+            actor: %Actor{name: name} = _actor,
+            command_name: command,
+            value: payload
+          } = _invocation, opts},
+         %EntityState{
+           system: actor_system,
+           actor: %Actor{state: actor_state}
+         } = state
+       ) do
     interface = get_interface(opts)
     current_state = Map.get(actor_state || %{}, :state)
+
+    IO.inspect(self(), label: "aquii")
 
     ActorInvocation.new(
       actor_name: name,
@@ -255,37 +295,46 @@ defmodule Actors.Actor.Entity do
   end
 
   @impl true
-  def handle_info(
-        :snapshot,
-        %EntityState{
-          actor:
-            %Actor{
-              state: actor_state,
-              snapshot_strategy: %ActorSnapshotStrategy{
-                strategy: {:timeout, %TimeoutStrategy{timeout: _timeout}} = snapshot_strategy
-              }
-            } = _actor
-        } = state
-      )
-      when is_nil(actor_state) or actor_state == %{} do
+  def handle_info(action, state) do
+    state = EntityState.unpack(state)
+
+    case do_handle_info(action, state) do
+      {:noreply, state} -> {:noreply, EntityState.pack(state)}
+      {:noreply, state, opts} -> {:noreply, EntityState.pack(state), opts}
+    end
+  end
+
+  defp do_handle_info(
+         :snapshot,
+         %EntityState{
+           actor:
+             %Actor{
+               state: actor_state,
+               snapshot_strategy: %ActorSnapshotStrategy{
+                 strategy: {:timeout, %TimeoutStrategy{timeout: _timeout}} = snapshot_strategy
+               }
+             } = _actor
+         } = state
+       )
+       when is_nil(actor_state) or actor_state == %{} do
     schedule_snapshot(snapshot_strategy)
     {:noreply, state, :hibernate}
   end
 
-  def handle_info(
-        :snapshot,
-        %EntityState{
-          state_hash: old_hash,
-          actor:
-            %Actor{
-              name: name,
-              state: %ActorState{} = actor_state,
-              snapshot_strategy: %ActorSnapshotStrategy{
-                strategy: {:timeout, %TimeoutStrategy{timeout: timeout}} = snapshot_strategy
-              }
-            } = _actor
-        } = state
-      ) do
+  defp do_handle_info(
+         :snapshot,
+         %EntityState{
+           state_hash: old_hash,
+           actor:
+             %Actor{
+               name: name,
+               state: %ActorState{} = actor_state,
+               snapshot_strategy: %ActorSnapshotStrategy{
+                 strategy: {:timeout, %TimeoutStrategy{timeout: timeout}} = snapshot_strategy
+               }
+             } = _actor
+         } = state
+       ) do
     # Persist State only when necessary
     res =
       if StateManager.is_new?(old_hash, actor_state.state) do
@@ -313,18 +362,18 @@ defmodule Actors.Actor.Entity do
     res
   end
 
-  def handle_info(
-        :deactivate,
-        %EntityState{
-          actor:
-            %Actor{
-              name: name,
-              deactivate_strategy:
-                %ActorDeactivateStrategy{strategy: deactivate_strategy} =
-                  _actor_deactivate_strategy
-            } = _actor
-        } = state
-      ) do
+  defp do_handle_info(
+         :deactivate,
+         %EntityState{
+           actor:
+             %Actor{
+               name: name,
+               deactivate_strategy:
+                 %ActorDeactivateStrategy{strategy: deactivate_strategy} =
+                   _actor_deactivate_strategy
+             } = _actor
+         } = state
+       ) do
     case Process.info(self(), :message_queue_len) do
       {:message_queue_len, 0} ->
         Logger.debug("Deactivating actor #{name} for timeout")
@@ -336,24 +385,24 @@ defmodule Actors.Actor.Entity do
     end
   end
 
-  def handle_info(
-        {:EXIT, pid, reason},
-        %EntityState{
-          actor: %Actor{name: name}
-        } = state
-      ) do
+  defp do_handle_info(
+         {:EXIT, pid, reason},
+         %EntityState{
+           actor: %Actor{name: name}
+         } = state
+       ) do
     Logger.warning("Received Exit message for Actor #{name} and PID #{inspect(pid)}.")
 
     {:stop, reason, state}
   end
 
-  def handle_info(
-        message,
-        %EntityState{
-          actor: %Actor{name: name, state: actor_state}
-        } = state
-      )
-      when is_nil(actor_state) do
+  defp do_handle_info(
+         message,
+         %EntityState{
+           actor: %Actor{name: name, state: actor_state}
+         } = state
+       )
+       when is_nil(actor_state) do
     Logger.warning(
       "No handled internal message for actor #{name}. Message: #{inspect(message)}. Actor state: #{inspect(state)}"
     )
@@ -361,12 +410,12 @@ defmodule Actors.Actor.Entity do
     {:noreply, state, :hibernate}
   end
 
-  def handle_info(
-        message,
-        %EntityState{
-          actor: %Actor{name: name, state: %ActorState{} = actor_state}
-        } = state
-      ) do
+  defp do_handle_info(
+         message,
+         %EntityState{
+           actor: %Actor{name: name, state: %ActorState{} = actor_state}
+         } = state
+       ) do
     Logger.warning(
       "No handled internal message for actor #{name}. Message: #{inspect(message)}. Actor state: #{inspect(state)}"
     )
@@ -376,21 +425,27 @@ defmodule Actors.Actor.Entity do
   end
 
   @impl true
-  def terminate(
-        reason,
-        %EntityState{actor: %Actor{name: name, persistent: persistent, state: actor_state}} =
-          _state
-      )
-      when is_nil(actor_state) or persistent == false do
+  def terminate(action, state) do
+    state = EntityState.unpack(state)
+
+    do_terminate(action, state)
+  end
+
+  defp do_terminate(
+         reason,
+         %EntityState{actor: %Actor{name: name, persistent: persistent, state: actor_state}} =
+           _state
+       )
+       when is_nil(actor_state) or persistent == false do
     Logger.debug("Terminating actor #{name} with reason #{inspect(reason)}")
   end
 
-  def terminate(
-        reason,
-        %EntityState{
-          actor: %Actor{name: name, persistent: true, state: %ActorState{} = actor_state}
-        } = _state
-      ) do
+  defp do_terminate(
+         reason,
+         %EntityState{
+           actor: %Actor{name: name, persistent: true, state: %ActorState{} = actor_state}
+         } = _state
+       ) do
     StateManager.save(name, actor_state)
     Logger.debug("Terminating actor #{name} with reason #{inspect(reason)}")
   end

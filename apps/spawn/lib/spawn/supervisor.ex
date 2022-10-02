@@ -54,12 +54,18 @@ defmodule Spawn.Supervisor do
     end
   end
 
-  defp get_gossip_strategy(),
-    do: [
+  defp get_gossip_strategy do
+    port = if Mix.env() == :test, do: Enum.random(45_000..49_999), else: 45892
+
+    [
       proxy: [
-        strategy: Cluster.Strategy.Gossip
+        strategy: Cluster.Strategy.Gossip,
+        config: [
+          port: port
+        ]
       ]
     ]
+  end
 
   defp get_dns_strategy(config),
     do: [

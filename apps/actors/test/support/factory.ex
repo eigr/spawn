@@ -16,6 +16,7 @@ defmodule Actors.FactoryTest do
     ActorState
   }
 
+  alias Eigr.Functions.Protocol.Actors.Registry.ActorsEntry
   alias Google.Protobuf.Any
 
   def encode_decode(record) do
@@ -42,7 +43,11 @@ defmodule Actors.FactoryTest do
     Registry.new(
       actors:
         attrs[:actors] ||
-          Enum.map(1..(attrs[:count] || 5), &build_actor_entry(name: "test_actor_#{&1}"))
+          Enum.reduce(
+            1..(attrs[:count] || 5),
+            %{},
+            &Map.merge(build_actor_entry(name: "test_actor_#{&1}"), &2)
+          )
     )
   end
 
@@ -74,8 +79,10 @@ defmodule Actors.FactoryTest do
   def build_actor_entry(attrs \\ []) do
     default_name = Faker.Superhero.name()
 
-    {attrs[:name] || default_name,
-     attrs[:actor] || build_actor(name: attrs[:name] || default_name)}
+    %{
+      (attrs[:name] || default_name) =>
+        attrs[:actor] || build_actor(name: attrs[:name] || default_name)
+    }
   end
 
   def build_actor(attrs \\ []) do
