@@ -264,8 +264,7 @@ defmodule SpawnSdk.System.SpawnSystem do
         {:ok, %ActorInvocationResponse{value: value}} ->
           {:ok, unpack_unknown(value)}
 
-        error ->
-          {:error, error}
+        error -> error
       end
     end
   end

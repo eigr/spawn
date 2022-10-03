@@ -87,10 +87,6 @@ defmodule Actors do
 
     ActorRegistry.register(member)
 
-    spawn(fn ->
-      create_actors(actor_system, actors, opts)
-    end)
-
     status = RequestStatus.new(status: :OK, message: "Accepted")
     {:ok, SpawnResponse.new(status: status)}
   end
