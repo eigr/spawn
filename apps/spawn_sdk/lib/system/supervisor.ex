@@ -48,7 +48,6 @@ defmodule SpawnSdk.System.Supervisor do
                receive do
                  {:EXIT, _pid, _reason} ->
                    :persistent_term.erase(system)
-                   :persistent_term.erase("#{system}:actors")
 
                    :ok
                end
