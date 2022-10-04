@@ -38,6 +38,7 @@ defmodule StatestoresTest.RepoTest do
     _result = repo.save(event)
     actor_state = repo.get_by_key(actor)
 
+    Process.sleep(1000)
     event = %{event | data: "new joe"}
     _result = repo.save(event)
     actor_state2 = repo.get_by_key(actor)

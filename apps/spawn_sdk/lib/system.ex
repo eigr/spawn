@@ -11,16 +11,23 @@ defmodule SpawnSdk.System do
 
   @type payload :: struct()
 
-  @type options :: [
-          input_type: module(),
-          output_type: module(),
+  @type invoke_opts :: [
+          command: command(),
+          ref: actor_mod(),
+          payload: payload(),
+          system: system(),
           async: boolean()
+        ]
+
+  @type spawn_actor_opts :: [
+          actor: actor_mod(),
+          system: system()
         ]
 
   @callback register(system(), actors()) :: :ok | {:error, term()}
 
-  @callback spawn_actor(system, actor_name(), actor_mod()) :: {:ok, term()} | {:error, term()}
+  @callback spawn_actor(actor_name(), spawn_actor_opts()) :: {:ok, term()} | {:error, term()}
 
-  @callback invoke(system, actor_name(), command(), payload(), options()) ::
+  @callback invoke(actor_name(), invoke_opts()) ::
               {:ok, term()} | {:error, term()}
 end

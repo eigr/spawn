@@ -166,19 +166,51 @@ The full example of this application can be found [here](https://github.com/eigr
 Invoke Actors:
 
 ```elixir
-SpawnSdk.System.SpawnSystem.invoke("spawn-system", "jose", "sum", %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1})
+SpawnSdk.invoke(
+  "jose", 
+  system: "spawn-system",
+  command: "sum",
+  payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1}
+)
+```
+
+You can invoke actor default functions like "get" to get its current state
+
+```elixir
+SpawnSdk.invoke(
+  "jose", 
+  system: "spawn-system",
+  command: "get"
+)
 ```
 
 Spawning Actors:
 
 ```elixir
-SpawnSdk.System.SpawnSystem.spawn_actor("spawn-system", "robert", SpawnSdkExample.Actors.AbstractActor)
+SpawnSdk.spawn_actor("robert", system: "spawn-system", actor: SpawnSdkExample.Actors.AbstractActor)
 ```
 
 Invoke Spawning Actors:
 
 ```elixir
-SpawnSdk.System.SpawnSystem.invoke("spawn-system", "robert", "sum", %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1})
+SpawnSdk.invoke(
+  "robert",
+  system: "spawn-system",
+  command: "sum",
+  payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1}
+)
+```
+
+Invoke Actors in a lazy way without having to spawn before:
+
+```elixir
+SpawnSdk.invoke(
+  "robert_lazy",
+  ref: SpawnSdkExample.Actors.AbstractActor,
+  system: "spawn-system",
+  command: "sum",
+  payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1}
+)
 ```
 
 ### Deploy

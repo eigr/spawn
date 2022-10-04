@@ -6,9 +6,9 @@ defmodule Spawn.Utils.AnySerializer do
       Any.decode(bin)
       |> unpack_unknown()
 
-  def unpack_unknown(any) do
+  def unpack_unknown(%{type_url: type_url} = any) do
     package_name =
-      any.type_url
+      type_url
       |> String.replace("type.googleapis.com/", "")
       |> String.split(".")
       |> Enum.map(&upcase_first(&1))
@@ -17,6 +17,10 @@ defmodule Spawn.Utils.AnySerializer do
 
     any_unpack!(any, String.to_existing_atom(package_name))
   end
+
+  def unpack_unknown(_), do: nil
+
+  def any_pack!(nil), do: nil
 
   def any_pack!(record) do
     Any.new(

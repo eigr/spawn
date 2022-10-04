@@ -25,12 +25,35 @@ defmodule SpawnSdk.System.Supervisor do
   alias Actors.Config.Vapor, as: Config
 
   @impl true
-  def init(state) do
+  def init(opts) do
     config = Config.load(__MODULE__)
+
+    system = Keyword.fetch!(opts, :system)
+    actors = Keyword.fetch!(opts, :actors)
+
+    start_persisted_system(system)
 
     children = [
       {Sidecar.Supervisor, config},
-      {SpawnSdk.System.SpawnSystem, state}
+      %{
+        id: :spawn_system_register_task,
+        start:
+          {Task, :start_link,
+           [
+             fn ->
+               Process.flag(:trap_exit, true)
+
+               SpawnSdk.System.SpawnSystem.register(system, actors)
+
+               receive do
+                 {:EXIT, _pid, _reason} ->
+                   :persistent_term.erase(system)
+
+                   :ok
+               end
+             end
+           ]}
+      }
     ]
 
     Supervisor.init(children, strategy: :one_for_one)
@@ -43,5 +66,14 @@ defmodule SpawnSdk.System.Supervisor do
       shutdown: 120_000,
       strategy: :one_for_one
     )
+  end
+
+  defp start_persisted_system(system) do
+    if :persistent_term.get(system, false) do
+      raise "System already registered"
+    else
+      :persistent_term.put(system, true)
+      :ets.new(:"#{system}:actors", [:public, :named_table])
+    end
   end
 end

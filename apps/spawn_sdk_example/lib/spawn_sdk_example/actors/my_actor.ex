@@ -1,7 +1,7 @@
 defmodule SpawnSdkExample.Actors.MyActor do
   use SpawnSdk.Actor,
     name: "jose",
-    persistent: true,
+    persistent: false,
     state_type: Io.Eigr.Spawn.Example.MyState,
     deactivate_timeout: 30_000,
     snapshot_timeout: 2_000

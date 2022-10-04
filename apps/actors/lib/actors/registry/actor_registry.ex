@@ -239,33 +239,41 @@ defmodule Actors.Registry.ActorRegistry do
 
   defp include_entities(state, incoming_member) do
     members = Map.get(state, :members)
+    merge_state(incoming_member, members, state)
+  end
 
-    actual_host_member =
+  defp merge_state(incoming_member, members, state) do
+    actual_host_member_list =
       Enum.filter(members, fn m ->
         m.id == incoming_member.id
       end)
       |> Enum.uniq()
-      |> List.first()
 
-    actual_opts = actual_host_member.host_function.opts
-    actual_actors = actual_host_member.host_function.actors
+    if length(actual_host_member_list) > 0 do
+      actual_host_member = actual_host_member_list |> List.first()
 
-    incoming_opts = incoming_member.host_function.opts
-    incoming_actors = incoming_member.host_function.actors
+      actual_opts = actual_host_member.host_function.opts
+      actual_actors = actual_host_member.host_function.actors
 
-    new_actor_list = actual_actors ++ incoming_actors
-    new_opts = Keyword.merge(actual_opts, incoming_opts)
+      incoming_opts = incoming_member.host_function.opts
+      incoming_actors = incoming_member.host_function.actors
 
-    new_member = %{
-      actual_host_member
-      | host_function: %Host{actors: new_actor_list, opts: new_opts}
-    }
+      new_actor_list = actual_actors ++ incoming_actors
+      new_opts = Keyword.merge(actual_opts, incoming_opts)
 
-    new_members =
-      Enum.map(members, fn member ->
-        if member.id == new_member.id, do: new_member, else: member
-      end)
+      new_member = %{
+        actual_host_member
+        | host_function: %Host{actors: new_actor_list, opts: new_opts}
+      }
 
-    %{state | members: new_members}
+      new_members =
+        Enum.map(members, fn member ->
+          if member.id == new_member.id, do: new_member, else: member
+        end)
+
+      %{state | members: new_members}
+    else
+      %{state | members: [incoming_member]}
+    end
   end
 end

@@ -50,7 +50,7 @@ defmodule ActorsTest do
 
   describe "invoke/2" do
     test "invoke actor function for a newly registered actor" do
-      actor_name = "actor_test_" <> Ecto.UUID.generate()
+      actor_name = "newly_actor_test_" <> Ecto.UUID.generate()
 
       actor = build_actor(name: actor_name)
       actor_entry = build_actor_entry(name: actor_name, actor: actor)
