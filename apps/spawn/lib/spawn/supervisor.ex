@@ -36,6 +36,9 @@ defmodule Spawn.Supervisor do
 
     topologies =
       case cluster_strategy do
+        "epmd" ->
+          get_epmd_strategy()
+
         "gossip" ->
           get_gossip_strategy()
 
@@ -54,14 +57,36 @@ defmodule Spawn.Supervisor do
     end
   end
 
+  defp get_epmd_strategy do
+    port = if Mix.env() == :test, do: Enum.random(45_000..49_999), else: 45892
+
+    [
+      proxy: [
+        strategy: Cluster.Strategy.Epmd,
+        config: [
+          hosts: [
+            :"spawn_a@127.0.0.1",
+            :"spawn_a1@127.0.0.1",
+            :"spawn_a2@127.0.0.1",
+            :"spawn_a3@127.0.0.1",
+            :"spawn_a4@127.0.0.1",
+            :"spawn_actors_node@127.0.0.1",
+            :"spawn_actors_node1@127.0.0.1"
+          ]
+        ]
+      ]
+    ]
+  end
+
   defp get_gossip_strategy do
     port = if Mix.env() == :test, do: Enum.random(45_000..49_999), else: 45892
 
     [
       proxy: [
-        strategy: Cluster.Strategy.Gossip,
+        strategy: Cluster.Strategy.Epmd,
         config: [
-          port: port
+          port: port,
+          multicast_if: {192, 168, 0, 100}
         ]
       ]
     ]

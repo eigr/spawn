@@ -105,6 +105,8 @@ defmodule ActorsTest do
                  Spawn.NodeHelper.rpc(:"spawn_actors_node@127.0.0.1", Actors, :invoke, [
                    invoke_request
                  ])
+
+                 Process.sleep(5000)
                end)
 
       assert %Actors.Protos.ChangeNameResponseTest{status: :NAME_ALREADY_TAKEN} =
@@ -142,6 +144,8 @@ defmodule ActorsTest do
                  Spawn.NodeHelper.rpc(:"spawn_actors_node@127.0.0.1", Actors, :invoke, [
                    invoke_request
                  ])
+
+                 Process.sleep(10000)
                end)
 
       assert %Actors.Protos.ChangeNameResponseTest{status: :OK} =

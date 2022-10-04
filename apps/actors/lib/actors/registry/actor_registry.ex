@@ -239,15 +239,19 @@ defmodule Actors.Registry.ActorRegistry do
 
   defp include_entities(state, incoming_member) do
     members = Map.get(state, :members)
+    merge_state(incoming_member, members, state)
+  end
 
-    actual_host_member =
+  defp merge_state(incoming_member, members, state) do
+    actual_host_member_list =
       Enum.filter(members, fn m ->
         m.id == incoming_member.id
       end)
       |> Enum.uniq()
-      |> List.first()
 
-    if actual_host_member do
+    if length(actual_host_member_list) > 0 do
+      actual_host_member = actual_host_member_list |> List.first()
+
       actual_opts = actual_host_member.host_function.opts
       actual_actors = actual_host_member.host_function.actors
 
@@ -269,7 +273,7 @@ defmodule Actors.Registry.ActorRegistry do
 
       %{state | members: new_members}
     else
-      state
+      %{state | members: [incoming_member]}
     end
   end
 end

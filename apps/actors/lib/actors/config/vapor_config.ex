@@ -33,7 +33,7 @@ defmodule Actors.Config.Vapor do
           {:app_name, "PROXY_APP_NAME", default: Config.Name.generate(), required: false},
           {:http_port, "PROXY_HTTP_PORT",
            default: 4000, map: &String.to_integer/1, required: false},
-          {:proxy_cluster_strategy, "PROXY_CLUSTER_STRATEGY", default: "gossip", required: false},
+          {:proxy_cluster_strategy, "PROXY_CLUSTER_STRATEGY", default: "epmd", required: false},
           {:proxy_headless_service, "PROXY_HEADLESS_SERVICE",
            default: "proxy-headless-svc", required: false},
           {:proxy_cluster_poling_interval, "PROXY_CLUSTER_POLLING",
