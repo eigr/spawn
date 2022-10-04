@@ -76,7 +76,7 @@ defmodule Actors do
         %SpawnRequest{
           actor_system:
             %ActorSystem{name: _name, registry: %Registry{actors: actors} = _registry} =
-              actor_system
+              _actor_system
         } = _registration,
         opts
       ) do
@@ -86,10 +86,6 @@ defmodule Actors do
     }
 
     ActorRegistry.register(member)
-
-    spawn(fn ->
-      create_actors(actor_system, actors, opts)
-    end)
 
     status = RequestStatus.new(status: :OK, message: "Accepted")
     {:ok, SpawnResponse.new(status: status)}
@@ -164,7 +160,6 @@ defmodule Actors do
   end
 
   defp maybe_invoke_async(false, actor_ref, request, opts) do
-    Logger.debug("maybe_invoke_async false")
     ActorEntity.invoke(actor_ref, request, opts)
   end
 
@@ -202,6 +197,9 @@ defmodule Actors do
       min_demand: @activate_actors_min_demand,
       max_demand: @activate_actors_max_demand
     )
+    |> Flow.filter(fn {_actor_name, %Actor{persistent: persistent} = _actor} ->
+      is_boolean(persistent) && match?(true, persistent)
+    end)
     |> Flow.map(fn {actor_name, actor} ->
       Logger.debug("Registering #{actor_name} #{inspect(actor)} on Node: #{inspect(Node.self())}")
 
