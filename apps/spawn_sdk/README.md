@@ -206,7 +206,7 @@ Invoke Actors in a lazy way without having to spawn before:
 ```elixir
 SpawnSdk.invoke(
   "robert_lazy",
-  lazy_spawn: SpawnSdkExample.Actors.AbstractActor,
+  ref: SpawnSdkExample.Actors.AbstractActor,
   system: "spawn-system",
   command: "sum",
   payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1}

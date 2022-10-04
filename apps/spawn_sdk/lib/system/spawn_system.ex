@@ -90,10 +90,10 @@ defmodule SpawnSdk.System.SpawnSystem do
     command = Keyword.get(invoke_opts, :command, nil)
     payload = Keyword.get(invoke_opts, :payload, nil)
     async = Keyword.get(invoke_opts, :async, false)
-    lazy_spawn = Keyword.get(invoke_opts, :lazy_spawn, nil)
+    actor_reference = Keyword.get(invoke_opts, :ref, nil)
 
-    if lazy_spawn do
-      spawn_actor(actor_name, system: system, actor: lazy_spawn)
+    if actor_reference do
+      spawn_actor(actor_name, system: system, actor: actor_reference)
     end
 
     opts = [host_interface: SpawnSdk.Interface]

@@ -13,7 +13,7 @@ defmodule SpawnSdk.System do
 
   @type invoke_opts :: [
           command: command(),
-          lazy_spawn: actor_mod(),
+          ref: actor_mod(),
           payload: payload(),
           system: system(),
           async: boolean()

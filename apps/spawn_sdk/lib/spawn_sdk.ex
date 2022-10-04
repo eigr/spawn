@@ -50,7 +50,7 @@ defmodule SpawnSdk do
   ```elixir
   iex> SpawnSdk.invoke(
     "robert_lazy",
-    lazy_spawn: SpawnSdkExample.Actors.AbstractActor,
+    ref: SpawnSdkExample.Actors.AbstractActor,
     system: "spawn-system",
     command: "sum",
     payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1}
@@ -65,7 +65,7 @@ defmodule SpawnSdk do
   ## Opts
 
   - `system` this is required
-  - `lazy_spawn` attribute attribute will always lookup to see if the referenced actor is already started or not.
+  - `ref` attribute attribute will always lookup to see if the referenced actor is already started or not.
   - `payload` attribute is optional.
   - `command` has default values that you can use to get current actor state
     - get, get_state, Get, getState, GetState
@@ -75,7 +75,7 @@ defmodule SpawnSdk do
   ```elixir
   iex> SpawnSdk.invoke(
     "actor_name",
-    lazy_spawn: SpawnSdkExample.Actors.AbstractActor,
+    ref: SpawnSdkExample.Actors.AbstractActor,
     system: "spawn-system",
     command: "sum", # "sum" or :sum
     payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 5}
