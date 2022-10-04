@@ -247,25 +247,29 @@ defmodule Actors.Registry.ActorRegistry do
       |> Enum.uniq()
       |> List.first()
 
-    actual_opts = actual_host_member.host_function.opts
-    actual_actors = actual_host_member.host_function.actors
+    if actual_host_member do
+      actual_opts = actual_host_member.host_function.opts
+      actual_actors = actual_host_member.host_function.actors
 
-    incoming_opts = incoming_member.host_function.opts
-    incoming_actors = incoming_member.host_function.actors
+      incoming_opts = incoming_member.host_function.opts
+      incoming_actors = incoming_member.host_function.actors
 
-    new_actor_list = actual_actors ++ incoming_actors
-    new_opts = Keyword.merge(actual_opts, incoming_opts)
+      new_actor_list = actual_actors ++ incoming_actors
+      new_opts = Keyword.merge(actual_opts, incoming_opts)
 
-    new_member = %{
-      actual_host_member
-      | host_function: %Host{actors: new_actor_list, opts: new_opts}
-    }
+      new_member = %{
+        actual_host_member
+        | host_function: %Host{actors: new_actor_list, opts: new_opts}
+      }
 
-    new_members =
-      Enum.map(members, fn member ->
-        if member.id == new_member.id, do: new_member, else: member
-      end)
+      new_members =
+        Enum.map(members, fn member ->
+          if member.id == new_member.id, do: new_member, else: member
+        end)
 
-    %{state | members: new_members}
+      %{state | members: new_members}
+    else
+      state
+    end
   end
 end

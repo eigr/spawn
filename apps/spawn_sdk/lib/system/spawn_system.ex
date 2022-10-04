@@ -2,10 +2,9 @@ defmodule SpawnSdk.System.SpawnSystem do
   @moduledoc """
   `SpawnSystem`
   """
-  use GenServer
-  require Logger
-
   @behaviour SpawnSdk.System
+
+  require Logger
 
   alias Actors
   alias Actors.Actor.Entity.EntityState
@@ -40,175 +39,8 @@ defmodule SpawnSdk.System.SpawnSystem do
   @support_library_name "spawn-elixir-sdk"
   @support_library_version @service_version
 
-  @impl true
-  def init(state), do: {:ok, state, {:continue, :setup}}
-
-  @impl true
-  def handle_continue(:setup, state) do
-    system = Keyword.fetch!(state, :system)
-    actors = Keyword.fetch!(state, :actors)
-
-    case do_register(system, actors) do
-      {:ok, state} ->
-        {:noreply, state}
-
-      {:error, msg} ->
-        {:stop, msg, state}
-    end
-  end
-
-  @impl true
-  def handle_call({:register, system, actors}, _from, state) do
-    reply =
-      {:ok, map} =
-      case do_register(system, actors) do
-        {:ok, map} ->
-          {:ok, map}
-
-        _ ->
-          :error
-      end
-
-    if is_map(state) do
-      {:reply, reply, Map.merge(state, map)}
-    else
-      {:reply, reply, map}
-    end
-  end
-
-  def handle_call({:spawn_actor, system, actor_name, actor_mod}, _from, state) do
-    reply =
-      {:ok, map} =
-      case do_spawn(system, actor_name, actor_mod) do
-        {:ok, map} ->
-          {:ok, map}
-
-        _ ->
-          :error
-      end
-
-    if is_map(state) do
-      {:reply, reply, Map.merge(state, map)}
-    else
-      {:reply, reply, map}
-    end
-  end
-
-  def handle_call(
-        {:call,
-         %ActorInvocation{
-           actor_name: name,
-           actor_system: system,
-           command_name: command,
-           value: value
-         } = _payload,
-         %EntityState{
-           actor: %Actor{state: actor_state} = actor
-         } = entity_state, default_methods},
-        from,
-        state
-      ) do
-    spawn(fn ->
-      actor_state = actor_state || %{}
-      current_state = Map.get(actor_state || %{}, :state)
-
-      call_response =
-        if Enum.member?(default_methods, command) do
-          context = Eigr.Functions.Protocol.Context.new(state: current_state)
-
-          resp =
-            ActorInvocationResponse.new(
-              actor_name: name,
-              actor_system: system,
-              updated_context: context,
-              value: current_state
-            )
-
-          {:ok, resp, entity_state}
-        else
-          if Map.has_key?(state, name) do
-            actor_instance = Map.get(state, name)
-
-            new_ctx =
-              if is_nil(current_state) or current_state == %{} do
-                %SpawnSdk.Context{}
-              else
-                actor_state = unpack_unknown(current_state)
-                %SpawnSdk.Context{state: actor_state}
-              end
-
-            case call_instance(actor_instance, command, value, new_ctx) do
-              {:reply, %SpawnSdk.Value{state: host_state, value: response} = _value} ->
-                resp = %ActorInvocationResponse{
-                  updated_context:
-                    Eigr.Functions.Protocol.Context.new(state: any_pack!(host_state)),
-                  value: any_pack!(response)
-                }
-
-                new_actor_state = %{actor_state | state: any_pack!(host_state)}
-
-                {:ok, resp, %{entity_state | actor: %{actor | state: new_actor_state}}}
-
-              {:error, error} ->
-                {:error, error, entity_state}
-
-              {:error, error, %SpawnSdk.Value{state: _new_state, value: _response} = _value} ->
-                {:error, error, entity_state}
-            end
-          end
-        end
-
-      GenServer.reply(from, call_response)
-    end)
-
-    {:noreply, state}
-  end
-
-  def handle_call({:invoke, system, actor, command, payload, options}, from, state) do
-    spawn(fn ->
-      GenServer.reply(from, do_invoke(system, actor, command, payload, options))
-    end)
-
-    {:noreply, state}
-  end
-
-  def start_link(state) do
-    GenServer.start_link(__MODULE__, state, name: __MODULE__)
-  end
-
   @impl SpawnSdk.System
   def register(system, actors) do
-    GenServer.call(__MODULE__, {:register, system, actors}, 20_000)
-  end
-
-  @impl SpawnSdk.System
-  def spawn_actor(system, actor_name, actor_mod) do
-    GenServer.call(__MODULE__, {:spawn_actor, system, actor_name, actor_mod}, 20_000)
-  end
-
-  @impl SpawnSdk.System
-  def invoke(system, actor, command, payload, options \\ []) do
-    call_timeout = Keyword.get(options, :timeout, 20_000)
-    GenServer.call(__MODULE__, {:invoke, system, actor, command, payload, options}, call_timeout)
-  end
-
-  def call(invocation, entity_state, default_methods) do
-    GenServer.call(__MODULE__, {:call, invocation, entity_state, default_methods}, 20_000)
-  end
-
-  defp call_instance(instance, command, value, context) when is_atom(command) do
-    instance.handle_command({command, unpack_unknown(value)}, context)
-  end
-
-  defp call_instance(instance, command, value, context) when is_binary(command) do
-    instance.handle_command(
-      {String.to_existing_atom(command), unpack_unknown(value)},
-      context
-    )
-  end
-
-  defp do_register(system, actors) do
-    new_state = state_to_map(actors)
     opts = [host_interface: SpawnSdk.Interface]
 
     case Actors.register(build_registration_req(system, actors), opts) do
@@ -217,14 +49,20 @@ defmodule SpawnSdk.System.SpawnSystem do
           "Actors registration succeed. Proxy info: #{inspect(proxy_info)}. Status: #{inspect(status)}"
         )
 
-        {:ok, new_state}
+        all_actors = merge_cache_actors(system, state_to_map(actors))
+
+        {:ok, all_actors}
 
       error ->
         {:error, "Actors registration failed. Error #{inspect(error)}"}
     end
   end
 
-  defp do_spawn(system, actor_name, actor_mod) do
+  @impl SpawnSdk.System
+  def spawn_actor(actor_name, spawn_actor_opts) do
+    system = Keyword.get(spawn_actor_opts, :system, nil)
+    actor_mod = Keyword.get(spawn_actor_opts, :actor, %{})
+
     if !actor_mod.__meta__(:abstract) do
       raise "Invalid Actor reference. Only abstract Actor are permited for spawning!"
     end
@@ -234,40 +72,134 @@ defmodule SpawnSdk.System.SpawnSystem do
 
     case Actors.spawn_actor(build_spawn_req(system, actor_name, actor_mod), opts) do
       {:ok, %SpawnResponse{status: status}} ->
-        Logger.debug("Actor Spawned succeed.. Status: #{inspect(status)}")
+        Logger.debug("Actor Spawned successfully. Status: #{inspect(status)}")
+
+        merge_cache_actors(system, new_state)
 
         {:ok, new_state}
 
       error ->
-        {:error, "Actors Spawned failed. Error #{inspect(error)}"}
+        {:error, "Actors Spawned failing. Error #{inspect(error)}"}
     end
   end
 
-  defp do_invoke(system, actor, command, payload, options) do
+  @impl SpawnSdk.System
+  @doc "hey"
+  def invoke(actor_name, invoke_opts \\ []) do
+    system = Keyword.get(invoke_opts, :system, nil)
+    command = Keyword.get(invoke_opts, :command, nil)
+    payload = Keyword.get(invoke_opts, :payload, nil)
+    async = Keyword.get(invoke_opts, :async, false)
+    lazy_spawn = Keyword.get(invoke_opts, :lazy_spawn, nil)
+
+    if lazy_spawn do
+      spawn_actor(actor_name, system: system, actor: lazy_spawn)
+    end
+
     opts = [host_interface: SpawnSdk.Interface]
-    async = Keyword.get(options, :async, false)
 
     req =
       InvocationRequest.new(
         system: %Eigr.Functions.Protocol.Actors.ActorSystem{name: system},
-        actor: %Eigr.Functions.Protocol.Actors.Actor{name: actor},
+        actor: %Eigr.Functions.Protocol.Actors.Actor{name: actor_name},
         value: any_pack!(payload),
         command_name: command,
         async: async
       )
 
-    if async do
-      Actors.invoke(req, opts)
-      {:ok, :async}
-    else
-      case Actors.invoke(req, opts) do
-        {:ok, %ActorInvocationResponse{value: value}} ->
-          {:ok, unpack_unknown(value)}
-
-        error -> error
-      end
+    case Actors.invoke(req, opts) do
+      {:ok, :async} -> {:ok, :async}
+      {:ok, %ActorInvocationResponse{value: value}} -> {:ok, unpack_unknown(value)}
+      error -> error
     end
   end
+
+  def call(invocation, entity_state, default_methods) do
+    %ActorInvocation{
+      actor_name: name,
+      actor_system: system,
+      command_name: command,
+      value: value
+    } = invocation
+
+    %EntityState{
+      actor: %Actor{state: actor_state} = actor
+    } = entity_state
+
+    actor_state = actor_state || %{}
+    current_state = Map.get(actor_state, :state)
+    actor_instance = get_cached_actor(system, name)
+
+    cond do
+      Enum.member?(default_methods, command) ->
+        context = Eigr.Functions.Protocol.Context.new(state: current_state)
+
+        resp =
+          ActorInvocationResponse.new(
+            actor_name: name,
+            actor_system: system,
+            updated_context: context,
+            value: current_state
+          )
+
+        {:ok, resp, entity_state}
+
+      is_nil(actor_instance) ->
+        {:error, :not_found, entity_state}
+
+      true ->
+        new_ctx = %SpawnSdk.Context{state: unpack_unknown(current_state)}
+
+        case call_instance(actor_instance, command, value, new_ctx) do
+          {:reply, %SpawnSdk.Value{state: host_state, value: response} = _value} ->
+            resp = %ActorInvocationResponse{
+              updated_context: Eigr.Functions.Protocol.Context.new(state: any_pack!(host_state)),
+              value: any_pack!(response)
+            }
+
+            new_actor_state = %{actor_state | state: any_pack!(host_state)}
+
+            {:ok, resp, %{entity_state | actor: %{actor | state: new_actor_state}}}
+
+          {:error, error} ->
+            {:error, error, entity_state}
+
+          {:error, error, %SpawnSdk.Value{state: _new_state, value: _response} = _value} ->
+            {:error, error, entity_state}
+        end
+    end
+  end
+
+  def merge_cache_actors(system, actors) do
+    actors = Map.merge(get_cached_actors(system), state_to_map(actors))
+
+    :ets.insert(:"#{system}:actors", {"actors", actors})
+
+    actors
+  end
+
+  defp get_cached_actors(system) do
+    case :ets.lookup(:"#{system}:actors", "actors") do
+      [{"actors", actors}] -> actors
+      _ -> %{}
+    end
+  end
+
+  defp get_cached_actor(system, name) do
+    get_cached_actors(system)
+    |> Map.get(name)
+  end
+
+  defp call_instance(instance, command, value, context) do
+    instance.handle_command({parse_command(command), unpack_unknown(value)}, context)
+  rescue
+    FunctionClauseError -> {:error, :command_not_handled}
+    # in case atom doesn't exist
+    ArgumentError -> {:error, :command_not_handled}
+  end
+
+  defp parse_command(command) when is_atom(command), do: command
+  defp parse_command(command) when is_binary(command), do: String.to_existing_atom(command)
 
   defp build_spawn_req(system, actor_name, actor) do
     %SpawnRequest{
@@ -280,30 +212,28 @@ defmodule SpawnSdk.System.SpawnSystem do
   end
 
   defp build_registration_req(system, actors) do
-    req =
-      RegistrationRequest.new(
-        service_info:
-          ServiceInfo.new(
-            service_name: @service_name,
-            service_version: @service_version,
-            service_runtime: @service_runtime,
-            support_library_name: @support_library_name,
-            support_library_version: @support_library_version
-          ),
-        actor_system:
-          ActorSystem.new(
-            name: system,
-            registry: %Registry{actors: to_map(actors)}
-          )
-      )
-
-    req
+    RegistrationRequest.new(
+      service_info:
+        ServiceInfo.new(
+          service_name: @service_name,
+          service_version: @service_version,
+          service_runtime: @service_runtime,
+          support_library_name: @support_library_name,
+          support_library_version: @support_library_version
+        ),
+      actor_system:
+        ActorSystem.new(
+          name: system,
+          registry: %Registry{actors: to_map(actors)}
+        )
+    )
   end
 
   defp state_to_map(actors) do
     actors
-    |> Enum.into(%{}, fn actor ->
-      {actor.__meta__(:name), actor}
+    |> Enum.into(%{}, fn
+      {key, value} -> {key, value}
+      actor -> {actor.__meta__(:name), actor}
     end)
   end
 
