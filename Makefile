@@ -96,6 +96,9 @@ apply-k8s-manifests:
 run-proxy-local:
 	cd apps/proxy && PROXY_DATABASE_TYPE=$(database) SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= iex --name spawn_a2@127.0.0.1 -S mix
 
+run-sdk-local:
+	cd apps/spawn_sdk_example && PROXY_DATABASE_TYPE=$(database) SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= iex --name spawn_sdk@127.0.0.1 -S mix
+
 run-operator-local:
 	cd apps/operator && MIX_ENV=dev iex --name operator@127.0.0.1 -S mix
 	

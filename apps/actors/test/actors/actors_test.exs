@@ -99,14 +99,13 @@ defmodule ActorsTest do
 
       mock_invoke_host_actor_with_ok_response(host_invoke_response)
 
-      # wait for nodes and actors to sync
-      while_actor_synqued(system.name, actor_name)
-
       assert {:ok,
               %ActorInvocationResponse{actor_name: ^actor_name, updated_context: updated_context}} =
-               Spawn.NodeHelper.rpc(:"spawn_actors_node@127.0.0.1", Actors, :invoke, [
-                 invoke_request
-               ])
+               loop_until_ok(fn ->
+                 Spawn.NodeHelper.rpc(:"spawn_actors_node@127.0.0.1", Actors, :invoke, [
+                   invoke_request
+                 ])
+               end)
 
       assert %Actors.Protos.ChangeNameResponseTest{status: :NAME_ALREADY_TAKEN} =
                any_unpack!(updated_context.state, Actors.Protos.ChangeNameResponseTest)
@@ -137,16 +136,13 @@ defmodule ActorsTest do
 
       mock_invoke_host_actor_with_ok_response(host_invoke_response)
 
-      # wait for nodes and actors to sync
-      while_actor_synqued(system.name, actor_name)
-
-      Process.sleep(100)
-
       assert {:ok,
               %ActorInvocationResponse{actor_name: ^actor_name, updated_context: updated_context}} =
-               Spawn.NodeHelper.rpc(:"spawn_actors_node@127.0.0.1", Actors, :invoke, [
-                 invoke_request
-               ])
+               loop_until_ok(fn ->
+                 Spawn.NodeHelper.rpc(:"spawn_actors_node@127.0.0.1", Actors, :invoke, [
+                   invoke_request
+                 ])
+               end)
 
       assert %Actors.Protos.ChangeNameResponseTest{status: :OK} =
                any_unpack!(updated_context.state, Actors.Protos.ChangeNameResponseTest)
@@ -165,17 +161,22 @@ defmodule ActorsTest do
 
       assert {:ok, :async} = Actors.invoke(invoke_request)
     end
-  end
 
-  defp while_actor_synqued(system_name, actor_name) do
-    case Spawn.NodeHelper.rpc(
-           :"spawn_actors_node@127.0.0.1",
-           Actors.Registry.ActorRegistry,
-           :lookup,
-           [system_name, actor_name]
-         ) do
-      {:not_found, _} -> while_actor_synqued(system_name, actor_name)
-      _ -> :ok
+    # Useful for distributed testing due to natural eventuality problems
+    defp loop_until_ok(func, timeout \\ 10_000) do
+      task = Task.async(fn -> do_loop(func, func.()) end)
+
+      Task.await(task, timeout)
+    end
+
+    defp do_loop(_func, {:ok, term}), do: {:ok, term}
+
+    defp do_loop(func, _resp) do
+      do_loop(func, func.())
+    catch
+      _ -> do_loop(func, func.())
+    rescue
+      _ -> do_loop(func, func.())
     end
   end
 end
