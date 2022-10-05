@@ -7,6 +7,8 @@ defmodule Actors.Registry.ActorRegistry do
   alias Eigr.Functions.Protocol.Actors.Actor
   alias Spawn.Cluster.StateHandoff
 
+  import Spawn.Utils.ErrorHandling, only: [loop_until_ok: 1]
+
   def child_spec(state \\ []) do
     %{
       id: __MODULE__,
@@ -25,8 +27,11 @@ defmodule Actors.Registry.ActorRegistry do
   @impl true
   def handle_info({:nodeup, node, _node_type}, state) do
     Logger.debug("Received :nodeup event from #{inspect(node)}")
-    Process.sleep(1000)
-    StateHandoff.join(node)
+
+    loop_until_ok(fn ->
+      StateHandoff.join(node)
+    end)
+
     {:noreply, state}
   end
 
