@@ -82,10 +82,9 @@ defmodule Spawn.Supervisor do
 
     [
       proxy: [
-        strategy: Cluster.Strategy.Epmd,
+        strategy: Cluster.Strategy.Gossip,
         config: [
-          port: port,
-          multicast_if: {192, 168, 0, 100}
+          port: port
         ]
       ]
     ]
