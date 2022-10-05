@@ -7,7 +7,7 @@ defmodule Actors do
   alias Actors.Actor.Entity, as: ActorEntity
   alias Actors.Actor.Entity.Supervisor, as: ActorEntitySupervisor
 
-  alias Actors.Registry.{ActorRegistry, Member, Host}
+  alias Actors.Registry.{ActorRegistry, HostActor}
 
   alias Eigr.Functions.Protocol.Actors.{Actor, ActorSystem, Registry}
 
@@ -46,12 +46,12 @@ defmodule Actors do
         } = _registration,
         opts
       ) do
-    member = %Member{
-      id: Node.self(),
-      host_function: %Host{actors: Map.values(actors), opts: opts}
-    }
+    hosts =
+      Enum.map(Map.values(actors), fn actor ->
+        %HostActor{node: Node.self(), actor: actor, opts: opts}
+      end)
 
-    ActorRegistry.register(member)
+    :ok = ActorRegistry.register(hosts)
 
     spawn(fn ->
       create_actors(actor_system, actors, opts)
@@ -80,12 +80,12 @@ defmodule Actors do
         } = _registration,
         opts
       ) do
-    member = %Member{
-      id: Node.self(),
-      host_function: %Host{actors: Map.values(actors), opts: opts}
-    }
+    hosts =
+      Enum.map(Map.values(actors), fn actor ->
+        %HostActor{node: Node.self(), actor: actor, opts: opts}
+      end)
 
-    ActorRegistry.register(member)
+    :ok = ActorRegistry.register(hosts)
 
     status = RequestStatus.new(status: :OK, message: "Accepted")
     {:ok, SpawnResponse.new(status: status)}
@@ -113,10 +113,8 @@ defmodule Actors do
         action_fun.(actor_ref)
 
       _ ->
-        with {:ok, %Member{id: node, host_function: %Host{actors: actors, opts: opts}}} <-
+        with {:ok, %HostActor{node: node, actor: actor, opts: opts}} <-
                ActorRegistry.lookup(system_name, actor_name) do
-          actor = List.first(actors)
-
           {:ok, actor_ref} =
             :erpc.call(
               node,

@@ -3,21 +3,11 @@ defmodule Actors.Registry.ActorRegistry do
   use GenServer
   require Logger
 
-  alias Actors.Registry.{Cluster, Host, Member}
-  alias Phoenix.PubSub
+  alias Actors.Registry.HostActor
+  alias Eigr.Functions.Protocol.Actors.Actor
+  alias Spawn.Cluster.StateHandoff
 
-  @topic "actors"
-
-  def child_spec(
-        state \\ %Cluster{
-          members: [
-            %Member{
-              id: Node.self(),
-              host_function: %Host{actors: [], opts: []}
-            }
-          ]
-        }
-      ) do
+  def child_spec(state \\ []) do
     %{
       id: __MODULE__,
       start: {__MODULE__, :start_link, [state]},
@@ -28,134 +18,72 @@ defmodule Actors.Registry.ActorRegistry do
 
   @impl true
   def init(state) do
-    :ok = PubSub.subscribe(:actor_channel, @topic)
     :ok = :net_kernel.monitor_nodes(true, node_type: :visible)
-
-    {:ok, state, {:continue, :join_cluster}}
+    {:ok, state}
   end
 
   @impl true
-  def handle_continue(:join_cluster, %Cluster{members: members} = state) do
-    me =
-      members
-      |> Enum.uniq()
-      |> List.first()
+  def handle_info({:nodeup, node, _node_type}, state) do
+    Logger.debug("Received :nodeup event from #{inspect(node)}")
+    Process.sleep(1000)
+    StateHandoff.join(node)
+    {:noreply, state}
+  end
 
-    PubSub.broadcast(
-      :actor_channel,
-      @topic,
-      {:join, me}
-    )
-
+  def handle_info({:nodedown, node, _node_type}, state) do
+    Logger.debug("Received :nodedown event from #{inspect(node)}")
     {:noreply, state}
   end
 
   @impl true
-  def handle_info({:join, %Member{id: node} = member}, %Cluster{} = state) do
-    Logger.notice(fn -> "Got Node join from #{inspect(node)} sending current state" end)
-
-    :ok =
-      PubSub.direct_broadcast(
-        node,
-        :actor_channel,
-        @topic,
-        {:incoming_actors, member}
-      )
-
-    {:noreply, state}
-  end
-
-  def handle_info({:incoming_actors, member}, %Cluster{} = state) do
-    {:noreply, include_entities(state, member)}
-  end
-
-  def handle_info({:nodeup, _node, _node_type}, %Cluster{} = state) do
-    {:noreply, state}
-  end
-
-  def handle_info({:nodedown, node, _node_type}, %Cluster{members: members} = state) do
-    Logger.debug(fn -> "Received :nodedown from #{node} rebalancing registred entities" end)
-
-    node_member =
-      members
-      |> Enum.filter(fn member -> member.id == node end)
-      |> List.first()
-
-    new_members = List.delete(members, node_member)
-
-    new_state = %Cluster{state | members: new_members}
-
-    {:noreply, new_state}
-  end
-
-  def handle_info({:leave, %{node: node}}, %Cluster{members: members} = state) do
-    Logger.debug(fn -> "Received :leave from #{node} rebalancing registred entities" end)
-
-    node_member =
-      members
-      |> Enum.filter(fn member -> member.id == node end)
-      |> List.first()
-
-    new_members = List.delete(members, node_member)
-
-    new_state = %Cluster{state | members: new_members}
-
-    {:noreply, new_state}
-  end
-
-  @impl true
-  def handle_call({:get, _system_name, actor_name}, from, %Cluster{members: members} = state) do
+  def handle_call({:get, _system_name, actor_name}, from, state) do
     spawn(fn ->
-      members
-      |> Enum.reduce([], fn member, acc ->
-        opts = member.host_function.opts
-        actors = member.host_function.actors
-
-        Enum.map(actors, fn actor ->
-          if actor.name == actor_name do
-            [%Member{id: member.id, host_function: %Host{actors: [actor], opts: opts}}] ++ acc
-          else
-            [] ++ acc
-          end
-        end)
-      end)
-      |> List.flatten()
-      |> Enum.uniq()
-      |> List.first()
-      |> then(fn
+      case StateHandoff.get(actor_name) do
         nil ->
           GenServer.reply(from, {:not_found, []})
 
-        first_node_found ->
-          GenServer.reply(from, {:ok, first_node_found})
-      end)
+        hosts ->
+          filtered_list = Enum.filter(hosts, fn ac -> ac.actor.name == actor_name end)
+
+          filtered_list
+          |> Enum.uniq()
+          |> List.first()
+          |> then(fn
+            nil ->
+              GenServer.reply(from, {:not_found, []})
+
+            first_node_found ->
+              GenServer.reply(from, {:ok, first_node_found})
+          end)
+      end
     end)
 
     {:noreply, state}
   end
 
-  def handle_call({:register, %Member{} = member}, _from, state) do
-    new_state = include_entities(state, member)
+  def handle_call({:register, hosts}, _from, state) do
+    Enum.each(hosts, fn %HostActor{node: node, actor: %Actor{name: name} = _actor} = host ->
+      case StateHandoff.get(name) do
+        nil ->
+          StateHandoff.set(name, [host])
 
-    # send new entities of this node to all connected nodes
-    PubSub.broadcast(
-      :actor_channel,
-      @topic,
-      {:incoming_actors, member}
-    )
+        hosts ->
+          filtered_list =
+            Enum.filter(hosts, fn ac -> ac.node == node && ac.actor.name == name end)
 
-    {:reply, new_state, new_state}
+          if length(filtered_list) <= 0 do
+            updated_hosts = hosts ++ [host]
+            StateHandoff.set(name, updated_hosts)
+          end
+      end
+    end)
+
+    {:reply, :ok, state}
   end
 
   @impl true
   def terminate(_reason, _state) do
-    node = Node.self()
-
-    PubSub.broadcast(
-      :actor_channel,
-      @topic,
-      {:leave, %{node: node}}
-    )
+    _node = Node.self()
   end
 
   def start_link(args) do
@@ -169,22 +97,15 @@ defmodule Actors.Registry.ActorRegistry do
 
   ## Examples
 
-      iex> member = %Member{id: Node.self(), host_function: %Host{actors: [], opts: []}}
-      iex> ActorRegistry.register(member)
-      %Cluster{
-          members: [
-            %Member{
-              id: Node.self(),
-              host_function: %Host{actors: [], opts: []}
-            }
-          ]
-        }
+      iex> hosts = [%HostActor{node: Node.self(), actor: actor, opts: []}}]
+      iex> ActorRegistry.register(hosts)
+      :ok
 
   """
   @doc since: "0.1.0"
-  @spec register(Member.t()) :: Cluster.t()
-  def register(member) do
-    GenServer.call(__MODULE__, {:register, member})
+  @spec register(list(HostActor.t())) :: :ok
+  def register(hosts) do
+    GenServer.call(__MODULE__, {:register, hosts})
   end
 
   @doc """
@@ -198,7 +119,7 @@ defmodule Actors.Registry.ActorRegistry do
       {:ok,
        %Actors.Registry.Member{
          id: :"spawn_a2@127.0.0.1",
-         host_function: %Actors.Registry.Host{
+         host_function: %Actors.Registry.HostActor{
            actors: [
              %Eigr.Functions.Protocol.Actors.Actor{
                name: "jose",
@@ -235,45 +156,5 @@ defmodule Actors.Registry.ActorRegistry do
   @spec lookup(String.t(), String.t()) :: {:ok, Member.t()} | {:not_found, []}
   def lookup(system_name, actor_name) do
     GenServer.call(__MODULE__, {:get, system_name, actor_name})
-  end
-
-  defp include_entities(state, incoming_member) do
-    members = Map.get(state, :members)
-    merge_state(incoming_member, members, state)
-  end
-
-  defp merge_state(incoming_member, members, state) do
-    actual_host_member_list =
-      Enum.filter(members, fn m ->
-        m.id == incoming_member.id
-      end)
-      |> Enum.uniq()
-
-    if length(actual_host_member_list) > 0 do
-      actual_host_member = actual_host_member_list |> List.first()
-
-      actual_opts = actual_host_member.host_function.opts
-      actual_actors = actual_host_member.host_function.actors
-
-      incoming_opts = incoming_member.host_function.opts
-      incoming_actors = incoming_member.host_function.actors
-
-      new_actor_list = actual_actors ++ incoming_actors
-      new_opts = Keyword.merge(actual_opts, incoming_opts)
-
-      new_member = %{
-        actual_host_member
-        | host_function: %Host{actors: new_actor_list, opts: new_opts}
-      }
-
-      new_members =
-        Enum.map(members, fn member ->
-          if member.id == new_member.id, do: new_member, else: member
-        end)
-
-      %{state | members: new_members}
-    else
-      %{state | members: [incoming_member]}
-    end
   end
 end
