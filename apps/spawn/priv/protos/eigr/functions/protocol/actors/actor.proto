@@ -64,9 +64,6 @@ message ActorId {
 
     // Name of a ActorSystem
     string system = 2;
-
-    // Actor identifier in persistent storage. For internal proxy use only
-    string hash_key = 3;
 }
 
 message Actor {
