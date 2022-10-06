@@ -11,6 +11,9 @@ defmodule Actors.Actor.Entity do
     ActorSettings,
     ActorState,
     ActorSnapshotStrategy,
+    Command,
+    FixedTimerCommand,
+    ScheduledTimerCommand,
     TimeoutStrategy
   }
 
@@ -19,6 +22,8 @@ defmodule Actors.Actor.Entity do
     ActorInvocation,
     InvocationRequest
   }
+
+  alias Google.Protobuf.Any
 
   @default_deactivate_timeout 90_000
 
@@ -79,7 +84,9 @@ defmodule Actors.Actor.Entity do
                  persistent: false,
                  deactivate_strategy:
                    %ActorDeactivateStrategy{strategy: deactivate_strategy} = _dstrategy
-               } = _settings
+               } = _settings,
+             timer_commands: timer_commands,
+             scheduled_commands: scheduled_commands
            }
          } = state
        ) do
@@ -89,6 +96,8 @@ defmodule Actors.Actor.Entity do
       "Activating actor #{name} in Node #{inspect(Node.self())}. Persistence disabled."
     )
 
+    handle_timers(timer_commands)
+    handle_schedulers(scheduled_commands)
     schedule_deactivate(deactivate_strategy, get_timeout_factor(@timeout_factor_range))
     {:ok, state}
   end
@@ -102,7 +111,9 @@ defmodule Actors.Actor.Entity do
                  persistent: true,
                  snapshot_strategy: %ActorSnapshotStrategy{} = _snapshot_strategy,
                  deactivate_strategy: deactivate_strategy
-               } = _settings
+               } = _settings,
+             timer_commands: timer_commands,
+             scheduled_commands: scheduled_commands
            }
          } = state
        )
@@ -112,6 +123,9 @@ defmodule Actors.Actor.Entity do
     Logger.notice(
       "Activating actor #{name} in Node #{inspect(Node.self())}. Persistence enabled."
     )
+
+    handle_timers(timer_commands)
+    handle_schedulers(scheduled_commands)
 
     strategy = {:timeout, TimeoutStrategy.new!(timeout: @default_deactivate_timeout)}
     schedule_deactivate(strategy, get_timeout_factor(@timeout_factor_range))
@@ -130,7 +144,9 @@ defmodule Actors.Actor.Entity do
                  persistent: true,
                  snapshot_strategy: %ActorSnapshotStrategy{} = _snapshot_strategy,
                  deactivate_strategy: %ActorDeactivateStrategy{strategy: deactivate_strategy}
-               } = _settings
+               } = _settings,
+             timer_commands: timer_commands,
+             scheduled_commands: scheduled_commands
            }
          } = state
        ) do
@@ -139,6 +155,9 @@ defmodule Actors.Actor.Entity do
     Logger.notice(
       "Activating actor #{name} in Node #{inspect(Node.self())}. Persistence enabled."
     )
+
+    handle_timers(timer_commands)
+    handle_schedulers(scheduled_commands)
 
     schedule_deactivate(deactivate_strategy, get_timeout_factor(@timeout_factor_range))
 
@@ -238,9 +257,10 @@ defmodule Actors.Actor.Entity do
          _from,
          %EntityState{
            system: actor_system,
-           actor: %Actor{state: actor_state}
+           actor: %Actor{state: actor_state, commands: _commands}
          } = state
        ) do
+    # TODO: Do something only if the desired command exists in the actor a.k.a Enum.any?(commands, &(&1.name == command))
     interface = get_interface(opts)
     current_state = Map.get(actor_state || %{}, :state)
 
@@ -275,9 +295,10 @@ defmodule Actors.Actor.Entity do
           } = _invocation, opts},
          %EntityState{
            system: actor_system,
-           actor: %Actor{state: actor_state}
+           actor: %Actor{state: actor_state, commands: _commands}
          } = state
        ) do
+    # TODO: Do something only if the desired command exists in the actor a.k.a Enum.any?(commands, &(&1.name == command))
     interface = get_interface(opts)
     current_state = Map.get(actor_state || %{}, :state)
 
@@ -301,6 +322,24 @@ defmodule Actors.Actor.Entity do
 
     do_handle_info(action, state)
     |> parse_packed_response()
+  end
+
+  defp do_handle_info(
+         {:invoke_timer_command, %Command{name: cmd} = _command},
+         %EntityState{
+           system: _actor_system,
+           actor: actor
+         } = state
+       ) do
+    invocation = %InvocationRequest{
+      actor: actor,
+      command_name: cmd,
+      value: Any.new(),
+      async: true
+    }
+
+    do_handle_cast({:invocation_request, invocation}, state)
+    {:noreply, state, :hibernate}
   end
 
   defp do_handle_info(
@@ -560,6 +599,39 @@ defmodule Actors.Actor.Entity do
          timeout_factor
        ),
        do: timeout + timeout_factor
+
+  defp handle_schedulers(schedulers) when is_list(schedulers) do
+    schedulers
+    |> Flow.from_enumerable()
+    |> Flow.map(fn %ScheduledTimerCommand{expression: expression, command: command} = cron_command ->
+      Logger.debug("Registering cron command #{inspect(cron_command)}")
+      delay = get_time_from_cron(expression)
+      Process.send_after(self(), {:invoke_timer_command, command}, delay)
+    end)
+    |> Flow.run()
+  end
+
+  defp handle_schedulers(nil), do: :ok
+
+  defp handle_schedulers([]), do: :ok
+
+  defp handle_timers(timers) when is_list(timers) do
+    timers
+    |> Flow.from_enumerable()
+    |> Flow.map(fn %FixedTimerCommand{seconds: delay, command: command} = timer_command ->
+      Logger.debug("Registering timer command #{inspect(timer_command)}")
+      Process.send_after(self(), {:invoke_timer_command, command}, delay)
+    end)
+    |> Flow.run()
+  end
+
+  defp handle_timers(nil), do: :ok
+
+  defp handle_timers([]), do: :ok
+
+  defp get_time_from_cron(_expression) do
+    10000
+  end
 
   defp parse_packed_response(response) do
     case response do
