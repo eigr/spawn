@@ -78,7 +78,7 @@ defmodule Spawn.Cluster.StateHandoff do
   def join(other_node) do
     # the second element of the tuple, { __MODULE__, node } is a syntax that
     #  identifies the process named __MODULE__ running on the other node other_node
-    Logger.warn("Joining StateHandoff at #{inspect(other_node)}")
+    Logger.debug("Joining StateHandoff at #{inspect(other_node)}")
     GenServer.call(__MODULE__, {:set_neighbours, {__MODULE__, other_node}})
   end
 

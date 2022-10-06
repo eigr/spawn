@@ -22,8 +22,8 @@ defmodule Spawn.Supervisor do
   def init(config) do
     children =
       [
-        cluster_supervisor(config),
-        Spawn.Cluster.StateHandoff.Supervisor
+        Spawn.Cluster.StateHandoff.Supervisor,
+        cluster_supervisor(config)
       ] ++
         if Mix.env() == :test,
           do: [],

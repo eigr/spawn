@@ -28,10 +28,6 @@ defmodule Actors.Registry.ActorRegistry do
   def handle_info({:nodeup, node, _node_type}, state) do
     Logger.debug("Received :nodeup event from #{inspect(node)}")
 
-    loop_until_ok(fn ->
-      StateHandoff.join(node)
-    end)
-
     {:noreply, state}
   end
 
@@ -89,6 +85,7 @@ defmodule Actors.Registry.ActorRegistry do
   @impl true
   def terminate(_reason, _state) do
     _node = Node.self()
+    # TODO: Kill all actors to
   end
 
   def start_link(args) do
