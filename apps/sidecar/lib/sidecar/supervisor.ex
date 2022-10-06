@@ -10,7 +10,7 @@ defmodule Sidecar.Supervisor do
       Actors.Supervisors.ProtocolSupervisor.child_spec(config),
       Actors.Supervisors.EntitySupervisor.child_spec(config),
       %{
-        id: StateHandoffJoin,
+        id: StateHandoffJoinTask,
         restart: :transient,
         start: {
           Task,
