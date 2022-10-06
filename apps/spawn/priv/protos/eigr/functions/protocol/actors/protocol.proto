@@ -54,6 +54,50 @@
 //     ███████████                            ███████████                            ███████████
 //
 //
+// ## Spawning Actors
+//
+// Actors are usually created at the beginning of the SDK's communication flow with the Proxy by the registration step described above. 
+// However, some use cases require that Actors can be created ***on the fly***. 
+// In other words, Spawn is used to bring to life Actors previously registered as Abstracts, giving them a name and thus creating a concrete instance 
+// at runtime for that Actor. Actors created with the Spawn feature are generally used when you want to share a behavior while maintaining 
+// the isolation characteristics of the actors.
+// For these situations we have the Spawning flow described below. 
+//
+// A user function that wants to Spawning new Actors in Proxy Spawn must proceed by making a POST request to the following endpoint:
+//
+// ```
+// POST /system/:system_name/actors/spawn HTTP 1.1
+// HOST: localhost
+// User-Agent: user-function-client/0.1.0 (this is just example)
+// Accept: application/octet-stream
+// Content-Type: application/octet-stream
+//
+// SpawnRequest type bytes encoded here :-)
+// ```
+//
+// The general flow of a Spawning Actors is as follows:
+//
+// ```
+// +----------------+                                     +---------------------+                                     +-------+                   
+// | User Function  |                                     | Local Spawn Sidecar |                                     | Actor |                   
+// +----------------+                                     +---------------------+                                     +-------+                   
+//         |                                                       |                                                     |                       
+//         | HTTP POST SpawnRequest                                |                                                     |                       
+//         |------------------------------------------------------>|                                                     |                       
+//         |                                                       |                                                     |                       
+//         |                                                       | Upfront start Actors with BEAM Distributed Protocol |                       
+//         |                                                       |---------------------------------------------------->|
+//         |                                                       |                                                     |                       
+//         |                                                       |                                                     |Initialize Statestore 
+//         |                                                       |                                                     |---------------------- 
+//         |                                                       |                                                     |                     | 
+//         |                                                       |                                                     |<--------------------- 
+//         |                                                       |                                                     |                       
+//         |          HTTP SpawnResponse                           |                                                     |                       
+//         |<------------------------------------------------------|                                                     |                       
+//         |                                                       |                                                     | 
+// ```
+//
 // Once the system has been initialized, that is, the registration step has been successfully completed, 
 // then the user function will be able to make requests to the System Actors.
 // This is done through a post request to the Proxy at the `/system/:name/actors/:actor_name/invoke` endpoint.
