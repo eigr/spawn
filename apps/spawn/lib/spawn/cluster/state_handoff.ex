@@ -70,6 +70,29 @@ defmodule Spawn.Cluster.StateHandoff do
     {:reply, hosts, crdt_pid}
   end
 
+  @impl true
+  def handle_call({:clean, node}, _from, crdt_pid) do
+    Logger.debug("Received cleanup action from Node #{inspect(node)}")
+    actors = DeltaCrdt.to_map(crdt_pid)
+
+    hosts = Map.values(actors)
+
+    keys =
+      hosts
+      |> List.flatten()
+      |> Enum.filter(fn host ->
+        node == host.node
+      end)
+      |> Enum.map(fn host -> host.actor.name end)
+
+    Logger.debug("Drop keys #{inspect(keys)} from #{inspect(node)}")
+
+    res = DeltaCrdt.drop(crdt_pid, keys)
+
+    Logger.debug("Drop keys result #{inspect(res)}")
+    {:reply, :ok, crdt_pid}
+  end
+
   def start_link(opts) do
     GenServer.start_link(__MODULE__, opts, name: __MODULE__)
   end
@@ -90,5 +113,9 @@ defmodule Spawn.Cluster.StateHandoff do
   # pickup the stored entity data for a actor
   def get(actor) do
     GenServer.call(__MODULE__, {:get, actor})
+  end
+
+  def clean(node) do
+    GenServer.call(__MODULE__, {:clean, node})
   end
 end

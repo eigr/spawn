@@ -7,8 +7,6 @@ defmodule Actors.Registry.ActorRegistry do
   alias Eigr.Functions.Protocol.Actors.Actor
   alias Spawn.Cluster.StateHandoff
 
-  import Spawn.Utils.ErrorHandling, only: [loop_until_ok: 1]
-
   def child_spec(state \\ []) do
     %{
       id: __MODULE__,
@@ -20,6 +18,7 @@ defmodule Actors.Registry.ActorRegistry do
 
   @impl true
   def init(state) do
+    Process.flag(:trap_exit, true)
     :ok = :net_kernel.monitor_nodes(true, node_type: :visible)
     {:ok, state}
   end
@@ -84,8 +83,9 @@ defmodule Actors.Registry.ActorRegistry do
 
   @impl true
   def terminate(_reason, _state) do
-    _node = Node.self()
-    # TODO: Remove all actors from CRDT
+    Logger.debug("Stopping ActorRegistry...")
+    node = Node.self()
+    # StateHandoff.clean(node)
   end
 
   def start_link(args) do
