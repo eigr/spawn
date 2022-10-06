@@ -75,7 +75,7 @@ defmodule ActorsTest do
 
     test "invoke actor function for a already registered actor in another node", ctx do
       %{system: system, actor: actor} = ctx
-      actor_name = actor.name
+      actor_name = actor.id.name
 
       invoke_request = build_invocation_request(system: system, actor: actor)
 
@@ -150,7 +150,7 @@ defmodule ActorsTest do
 
     test "invoke async actor function", ctx do
       %{system: system, actor: actor} = ctx
-      actor_name = actor.name
+      actor_name = actor.id.name
 
       invoke_request = build_invocation_request(system: system, actor: actor, async: true)
 

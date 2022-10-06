@@ -43,10 +43,39 @@ message ActorState {
     google.protobuf.Any state = 2;
 }
 
-message Actor {
-    string name = 1;
+message ActorSettings {
+
+    // Indicates if actor´s is abstract or non abstract.
+    bool abstract = 1;
+
+    // Indicates whether an actor's state should be persisted in a definitive store.
     bool persistent = 2;
-    ActorState state = 3;
-    ActorSnapshotStrategy snapshot_strategy = 4;
-    ActorDeactivateStrategy deactivate_strategy = 5;
+
+    // Snapshot strategy
+    ActorSnapshotStrategy snapshot_strategy = 3;
+
+    // Deactivate strategy
+    ActorDeactivateStrategy deactivate_strategy = 4;
+}
+
+message ActorId {
+    // The name of a Actor Entity.
+    string name = 1;
+
+    // Name of a ActorSystem
+    string system = 2;
+
+    // Actor identifier in persistent storage. For internal proxy use only
+    string hash_key = 3;
+}
+
+message Actor {
+    // Actor Identification
+    ActorId id = 1;
+
+    // A Actor state.
+    ActorState state = 2;
+
+    // Actor settings.
+    ActorSettings settings = 3;
 }

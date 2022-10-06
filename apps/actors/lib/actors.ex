@@ -9,7 +9,7 @@ defmodule Actors do
 
   alias Actors.Registry.{ActorRegistry, HostActor}
 
-  alias Eigr.Functions.Protocol.Actors.{Actor, ActorSystem, Registry}
+  alias Eigr.Functions.Protocol.Actors.{Actor, ActorId, ActorSettings, ActorSystem, Registry}
 
   alias Eigr.Functions.Protocol.{
     InvocationRequest,
@@ -100,7 +100,7 @@ defmodule Actors do
         } = request,
         opts \\ []
       ) do
-    do_lookup_action(system.name, actor.name, system, fn actor_ref ->
+    do_lookup_action(system.name, actor.id.name, system, fn actor_ref ->
       maybe_invoke_async(async?, actor_ref, request, opts)
     end)
   end
@@ -164,7 +164,11 @@ defmodule Actors do
   @spec try_reactivate_actor(ActorSystem.t(), Actor.t(), any()) :: {:ok, any()} | {:error, any()}
   def try_reactivate_actor(system, actor, opts \\ [])
 
-  def try_reactivate_actor(%ActorSystem{} = system, %Actor{name: name} = actor, opts) do
+  def try_reactivate_actor(
+        %ActorSystem{} = system,
+        %Actor{id: %ActorId{name: name} = _id} = actor,
+        opts
+      ) do
     case ActorEntitySupervisor.lookup_or_create_actor(system, actor, opts) do
       {:ok, actor_ref} ->
         Logger.debug("Actor #{name} reactivated. ActorRef PID: #{inspect(actor_ref)}")
@@ -177,7 +181,7 @@ defmodule Actors do
   end
 
   # To lookup all actors
-  def try_reactivate_actor(nil, %Actor{name: name} = actor, opts) do
+  def try_reactivate_actor(nil, %Actor{id: %ActorId{name: name} = _id} = actor, opts) do
     case ActorEntitySupervisor.lookup_or_create_actor(nil, actor, opts) do
       {:ok, actor_ref} ->
         Logger.debug("Actor #{name} reactivated. ActorRef PID: #{inspect(actor_ref)}")
@@ -195,7 +199,8 @@ defmodule Actors do
       min_demand: @activate_actors_min_demand,
       max_demand: @activate_actors_max_demand
     )
-    |> Flow.filter(fn {_actor_name, %Actor{persistent: persistent} = _actor} ->
+    |> Flow.filter(fn {_actor_name,
+                       %Actor{settings: %ActorSettings{persistent: persistent}} = _actor} ->
       is_boolean(persistent) && match?(true, persistent)
     end)
     |> Flow.map(fn {actor_name, actor} ->
