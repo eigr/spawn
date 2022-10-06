@@ -85,7 +85,7 @@ defmodule Actors.Registry.ActorRegistry do
   @impl true
   def terminate(_reason, _state) do
     _node = Node.self()
-    # TODO: Kill all actors to
+    # TODO: Remove all actors from CRDT
   end
 
   def start_link(args) do
