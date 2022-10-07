@@ -61,81 +61,60 @@ jobs:
           mix deps.clean --all
           mix deps.get
 
-      - parallel:
-        spawn:
-          steps:
-            - name: Run tests spawn
-              run: |
-                MIX_ENV=test PROXY_DATABASE_TYPE=mysql PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
+      - name: Run tests spawn
+        run: |
+          MIX_ENV=test PROXY_DATABASE_TYPE=mysql PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
 
-        activator:
-          steps:
-            - name: Run tests activator
-              run: |
-                cd spawn_activators/activator
-                MIX_ENV=test PROXY_DATABASE_TYPE=mysql PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
-                cd ../../
+      - name: Run tests activator
+        run: |
+          cd spawn_activators/activator
+          MIX_ENV=test PROXY_DATABASE_TYPE=mysql PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
+          cd ../../
 
-        activator_grpc:
-          steps:
-            - name: Run tests activator_grpc
-              run: |
-                cd spawn_activators/activator_grpc
-                MIX_ENV=test PROXY_DATABASE_TYPE=mysql PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
-                cd ../../
+      - name: Run tests activator_grpc
+        run: |
+          cd spawn_activators/activator_grpc
+          MIX_ENV=test PROXY_DATABASE_TYPE=mysql PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
+          cd ../../
 
-        activator_http:
-          steps:
-            - name: Run tests activator_http
-              run: |
-                cd spawn_activators/activator_grpc
-                MIX_ENV=test PROXY_DATABASE_TYPE=mysql PROXY_HTTP_PORT=905 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
-                cd ../../
+      - name: Run tests activator_http
+        run: |
+          cd spawn_activators/activator_grpc
+          MIX_ENV=test PROXY_DATABASE_TYPE=mysql PROXY_HTTP_PORT=905 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
+          cd ../../
+        
+      - name: Run tests activator_kafka
+        run: |
+          cd spawn_activators/activator_kafka
+          MIX_ENV=test PROXY_DATABASE_TYPE=mysql PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
+          cd ../../
 
-        activator_kafka:
-          steps:
-            - name: Run tests activator_kafka
-              run: |
-                cd spawn_activators/activator_kafka
-                MIX_ENV=test PROXY_DATABASE_TYPE=mysql PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
-                cd ../../
+      - name: Run tests activator_pubsub
+        run: |
+          cd spawn_activators/activator_pubsub
+          MIX_ENV=test PROXY_DATABASE_TYPE=mysql PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
+          cd ../../
+        
+      - name: Run tests activator_rabbitmq
+        run: |
+          cd spawn_activators/activator_rabbitmq
+          MIX_ENV=test PROXY_DATABASE_TYPE=mysql PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
+          cd ../../
 
-        activator_pubsub:
-          steps:
-            - name: Run tests activator_pubsub
-              run: |
-                cd spawn_activators/activator_pubsub
-                MIX_ENV=test PROXY_DATABASE_TYPE=mysql PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
-                cd ../../
+      - name: Run tests activator_sqs
+        run: |
+          cd spawn_activators/activator_sqs
+          MIX_ENV=test PROXY_DATABASE_TYPE=mysql PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
+          cd ../../
 
-        activator_rabbitmq:
-          steps:
-            - name: Run tests activator_rabbitmq
-              run: |
-                cd spawn_activators/activator_rabbitmq
-                MIX_ENV=test PROXY_DATABASE_TYPE=mysql PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
-                cd ../../
+      - name: Run tests operator
+        run: |
+          cd spawn_operator/operator
+          MIX_ENV=test PROXY_DATABASE_TYPE=mysql PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
+          cd ../../
 
-        activator_sqs:
-          steps:
-            - name: Run tests activator_sqs
-              run: |
-                cd spawn_activators/activator_sqs
-                MIX_ENV=test PROXY_DATABASE_TYPE=mysql PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
-                cd ../../
-
-        operator:
-          steps:
-            - name: Run tests operator
-              run: |
-                cd spawn_operator/operator
-                MIX_ENV=test PROXY_DATABASE_TYPE=mysql PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
-                cd ../../
-
-        spawn_sdk:
-          steps:
-            - name: Run tests spawn_sdk
-              run: |
-                cd spawn_sdk/spawn_sdk
-                MIX_ENV=test PROXY_DATABASE_TYPE=mysql PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
-                cd ../../
+      - name: Run tests spawn_sdk
+        run: |
+          cd spawn_sdk/spawn_sdk
+          MIX_ENV=test PROXY_DATABASE_TYPE=mysql PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
+          cd ../../
