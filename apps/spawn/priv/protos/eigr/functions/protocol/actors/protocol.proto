@@ -243,7 +243,7 @@ message Context {
 //            or whether the command should be processed asynchronously, i.e. no response sent to the caller and no waiting.
 message InvocationRequest {
 
-    eigr.functions.protocol.actors.ActorSystem system =1;
+    eigr.functions.protocol.actors.ActorSystem system = 1;
 
     eigr.functions.protocol.actors.Actor actor = 2;
 

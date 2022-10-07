@@ -4,7 +4,7 @@ defmodule Actors.Registry.ActorRegistry do
   require Logger
 
   alias Actors.Registry.HostActor
-  alias Eigr.Functions.Protocol.Actors.Actor
+  alias Eigr.Functions.Protocol.Actors.{Actor, ActorId}
   alias Spawn.Cluster.StateHandoff
 
   def child_spec(state \\ []) do
@@ -43,7 +43,7 @@ defmodule Actors.Registry.ActorRegistry do
           GenServer.reply(from, {:not_found, []})
 
         hosts ->
-          filtered_list = Enum.filter(hosts, fn ac -> ac.actor.name == actor_name end)
+          filtered_list = Enum.filter(hosts, fn ac -> ac.actor.id.name == actor_name end)
 
           filtered_list
           |> Enum.uniq()
@@ -62,14 +62,17 @@ defmodule Actors.Registry.ActorRegistry do
   end
 
   def handle_call({:register, hosts}, _from, state) do
-    Enum.each(hosts, fn %HostActor{node: node, actor: %Actor{name: name} = _actor} = host ->
+    Enum.each(hosts, fn %HostActor{
+                          node: node,
+                          actor: %Actor{id: %ActorId{name: name} = _id} = _actor
+                        } = host ->
       case StateHandoff.get(name) do
         nil ->
           StateHandoff.set(name, [host])
 
         hosts ->
           filtered_list =
-            Enum.filter(hosts, fn ac -> ac.node == node && ac.actor.name == name end)
+            Enum.filter(hosts, fn ac -> ac.node == node && ac.actor.id.name == name end)
 
           if length(filtered_list) <= 0 do
             updated_hosts = hosts ++ [host]
@@ -84,7 +87,7 @@ defmodule Actors.Registry.ActorRegistry do
   @impl true
   def terminate(_reason, _state) do
     Logger.debug("Stopping ActorRegistry...")
-    node = Node.self()
+    _node = Node.self()
     # StateHandoff.clean(node)
   end
 
