@@ -1,5 +1,6 @@
 defmodule Spawn.InitializerHelper do
   def setup do
-    Spawn.Cluster.Node.Registry.start_link(%{})
+    config = Actors.Config.Vapor.load(__MODULE__)
+    Sidecar.Supervisor.start_link(config)
   end
 end

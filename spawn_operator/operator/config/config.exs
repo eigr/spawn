@@ -41,5 +41,5 @@ config :bonny,
     requests: %{cpu: "100m", memory: "100Mi"}
   }
 
-import_config "../../config/config.exs"
+import_config "../../../config/config.exs"
 import_config "#{config_env()}.exs"

@@ -7,8 +7,7 @@ defmodule Spawn.MixProject do
       version: "0.1.0",
       elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
-      deps: deps(),
-      releases: releases()
+      deps: deps()
     ]
   end
 
@@ -19,19 +18,5 @@ defmodule Spawn.MixProject do
   # Run "mix help deps" for examples and options.
   defp deps do
     []
-  end
-
-  defp releases() do
-    [
-      proxy: [
-        include_executables_for: [:unix],
-        applications: [proxy: :permanent],
-        steps: [
-          :assemble,
-          &Bakeware.assemble/1
-        ],
-        bakeware: [compression_level: 19]
-      ]
-    ]
   end
 end

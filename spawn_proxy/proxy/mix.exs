@@ -9,12 +9,12 @@ defmodule Proxy.MixProject do
       app: @app,
       version: @version,
       build_path: "../../_build",
-      config_path: "../../config/config.exs",
       deps_path: "../../deps",
       lockfile: "../../mix.lock",
       elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      releases: releases()
     ]
   end
 
@@ -29,10 +29,24 @@ defmodule Proxy.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:sidecar, "~> 0.1", in_umbrella: true},
+      {:sidecar, path: "../../apps/sidecar"},
       {:bakeware, "~> 0.2"},
       {:bandit, "~> 0.5"},
       {:observer_cli, "~> 1.7"}
+    ]
+  end
+
+  defp releases do
+    [
+      proxy: [
+        include_executables_for: [:unix],
+        applications: [proxy: :permanent],
+        steps: [
+          :assemble,
+          &Bakeware.assemble/1
+        ],
+        bakeware: [compression_level: 19]
+      ]
     ]
   end
 end
