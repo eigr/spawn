@@ -48,6 +48,6 @@ defmodule Google.Protobuf.Any do
     }
   end
 
-  field :type_url, 1, type: :string, json_name: "typeUrl"
-  field :value, 2, type: :bytes
+  field(:type_url, 1, type: :string, json_name: "typeUrl")
+  field(:value, 2, type: :bytes)
 end

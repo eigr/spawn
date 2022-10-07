@@ -60,13 +60,11 @@ defmodule Spawn.Cluster.StateHandoff do
 
   def handle_call({:handoff, actor, hosts}, _from, crdt_pid) do
     DeltaCrdt.put(crdt_pid, actor, hosts)
-    Logger.debug("Added #{actor} actor '#{inspect(hosts)} to CRDT")
     {:reply, :ok, crdt_pid}
   end
 
   def handle_call({:get, actor}, _from, crdt_pid) do
     hosts = DeltaCrdt.get(crdt_pid, actor)
-    Logger.debug("Get Hosts #{inspect(hosts)} for #{actor}")
     {:reply, hosts, crdt_pid}
   end
 

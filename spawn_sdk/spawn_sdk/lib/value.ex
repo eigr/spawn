@@ -1,20 +1,43 @@
 defmodule SpawnSdk.Value do
-  defstruct state: nil, value: nil
+  alias SpawnSdk.Flow.SideEffect
+
+  defstruct state: nil, value: nil, effects: nil
 
   @type t :: %__MODULE__{
           state: module(),
-          value: module()
+          value: module(),
+          effects: list(SideEffect.t())
         }
 
   @type value :: __MODULE__.t()
+
+  @type effects :: list(SideEffect.t())
 
   @type response :: module()
 
   @type new_state :: module()
 
+  @spec of() :: value()
+  def of(), do: %SpawnSdk.Value{}
+
   @spec of(value(), response(), new_state()) :: value()
   def of(%SpawnSdk.Value{} = value, response, new_state) do
     struct(value, value: response, state: new_state)
+  end
+
+  @spec state(value(), new_state()) :: value()
+  def state(%SpawnSdk.Value{} = value, new_state) do
+    struct(value, state: new_state)
+  end
+
+  @spec value(value(), response()) :: value()
+  def value(%SpawnSdk.Value{} = value, response) do
+    struct(value, value: response)
+  end
+
+  @spec effects(value(), effects()) :: value()
+  def effects(%SpawnSdk.Value{} = value, effects) do
+    struct(value, effects: effects)
   end
 
   @spec reply!(value()) :: {:reply, value()}

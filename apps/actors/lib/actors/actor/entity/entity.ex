@@ -3,6 +3,7 @@ defmodule Actors.Actor.Entity do
   require Logger
 
   alias Actors.Actor.{Entity.EntityState, StateManager}
+  alias Actors.Registry.{ActorRegistry, HostActor}
 
   alias Eigr.Functions.Protocol.Actors.{
     Actor,
@@ -11,13 +12,17 @@ defmodule Actors.Actor.Entity do
     ActorSettings,
     ActorState,
     ActorSnapshotStrategy,
+    ActorSystem,
     TimeoutStrategy
   }
 
   alias Eigr.Functions.Protocol.{
-    Context,
     ActorInvocation,
-    InvocationRequest
+    ActorInvocationResponse,
+    Context,
+    InvocationRequest,
+    SideEffect,
+    Workflow
   }
 
   @default_deactivate_timeout 90_000
@@ -253,7 +258,7 @@ defmodule Actors.Actor.Entity do
     )
     |> interface.invoke_host(state, @default_methods)
     |> case do
-      {:ok, response, state} -> {:reply, {:ok, response}, state}
+      {:ok, response, state} -> {:reply, {:ok, do_response(response, state)}, state}
       {:error, reason, state} -> {:reply, {:error, reason}, state, :hibernate}
     end
   end
@@ -462,6 +467,68 @@ defmodule Actors.Actor.Entity do
        ) do
     StateManager.save(name, actor_state)
     Logger.debug("Terminating actor #{name} with reason #{inspect(reason)}")
+  end
+
+  defp do_response(%ActorInvocationResponse{workflow: workflow} = response, _state)
+       when is_nil(workflow) or workflow == %{} do
+    response
+  end
+
+  defp do_response(response, state) do
+    do_run_workflow(response, state)
+  end
+
+  defp do_run_workflow(%ActorInvocationResponse{workflow: workflow} = response, _state)
+       when is_nil(workflow) or workflow == %{} do
+    response
+  end
+
+  defp do_run_workflow(
+         %ActorInvocationResponse{workflow: %Workflow{effects: effects} = _workflow} = response,
+         state
+       ) do
+    do_side_effects(effects)
+    response
+  end
+
+  def do_side_effects(effects) when is_list(effects) and effects == [] do
+    :ok
+  end
+
+  def do_side_effects(effects) when is_list(effects) do
+    spawn(fn ->
+      effects
+      |> Flow.from_enumerable(min_demand: 1, max_demand: System.schedulers_online())
+      |> Flow.map(fn %SideEffect{
+                       request:
+                         %InvocationRequest{
+                           actor: %Actor{id: %ActorId{name: actor_name} = _id} = _actor,
+                           system: %ActorSystem{name: system_name}
+                         } = invocation
+                     } ->
+        try do
+          case ActorRegistry.lookup(system_name, actor_name) do
+            {:ok, %HostActor{opts: opts}} ->
+              Actors.invoke(invocation, opts)
+
+            _ ->
+              :ok
+          end
+        catch
+          error ->
+            Logger.warning(
+              "Error during Side Effect request to Actor #{system_name}:#{actor_name}. Error: #{inspect(error)}"
+            )
+
+            :ok
+        end
+      end)
+      |> Flow.run()
+    end)
+  catch
+    error ->
+      Logger.warning("Error during Side Effect request. Error: #{inspect(error)}")
+      :ok
   end
 
   def start_link(%EntityState{actor: %Actor{id: %ActorId{name: name} = _id}} = state) do

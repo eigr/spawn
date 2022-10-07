@@ -56,9 +56,10 @@ defmodule Eigr.Functions.Protocol.Actors.Registry.ActorsEntry do
     }
   end
 
-  field :key, 1, type: :string
-  field :value, 2, type: Eigr.Functions.Protocol.Actors.Actor
+  field(:key, 1, type: :string)
+  field(:value, 2, type: Eigr.Functions.Protocol.Actors.Actor)
 end
+
 defmodule Eigr.Functions.Protocol.Actors.Registry do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
@@ -146,11 +147,13 @@ defmodule Eigr.Functions.Protocol.Actors.Registry do
     }
   end
 
-  field :actors, 1,
+  field(:actors, 1,
     repeated: true,
     type: Eigr.Functions.Protocol.Actors.Registry.ActorsEntry,
     map: true
+  )
 end
+
 defmodule Eigr.Functions.Protocol.Actors.ActorSystem do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
@@ -201,9 +204,10 @@ defmodule Eigr.Functions.Protocol.Actors.ActorSystem do
     }
   end
 
-  field :name, 1, type: :string
-  field :registry, 2, type: Eigr.Functions.Protocol.Actors.Registry
+  field(:name, 1, type: :string)
+  field(:registry, 2, type: Eigr.Functions.Protocol.Actors.Registry)
 end
+
 defmodule Eigr.Functions.Protocol.Actors.ActorSnapshotStrategy do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
@@ -246,10 +250,11 @@ defmodule Eigr.Functions.Protocol.Actors.ActorSnapshotStrategy do
     }
   end
 
-  oneof :strategy, 0
+  oneof(:strategy, 0)
 
-  field :timeout, 1, type: Eigr.Functions.Protocol.Actors.TimeoutStrategy, oneof: 0
+  field(:timeout, 1, type: Eigr.Functions.Protocol.Actors.TimeoutStrategy, oneof: 0)
 end
+
 defmodule Eigr.Functions.Protocol.Actors.ActorDeactivateStrategy do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
@@ -292,10 +297,11 @@ defmodule Eigr.Functions.Protocol.Actors.ActorDeactivateStrategy do
     }
   end
 
-  oneof :strategy, 0
+  oneof(:strategy, 0)
 
-  field :timeout, 1, type: Eigr.Functions.Protocol.Actors.TimeoutStrategy, oneof: 0
+  field(:timeout, 1, type: Eigr.Functions.Protocol.Actors.TimeoutStrategy, oneof: 0)
 end
+
 defmodule Eigr.Functions.Protocol.Actors.TimeoutStrategy do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
@@ -332,8 +338,9 @@ defmodule Eigr.Functions.Protocol.Actors.TimeoutStrategy do
     }
   end
 
-  field :timeout, 1, type: :int64
+  field(:timeout, 1, type: :int64)
 end
+
 defmodule Eigr.Functions.Protocol.Actors.ActorState.TagsEntry do
   @moduledoc false
   use Protobuf, map: true, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
@@ -392,9 +399,10 @@ defmodule Eigr.Functions.Protocol.Actors.ActorState.TagsEntry do
     }
   end
 
-  field :key, 1, type: :string
-  field :value, 2, type: :string
+  field(:key, 1, type: :string)
+  field(:value, 2, type: :string)
 end
+
 defmodule Eigr.Functions.Protocol.Actors.ActorState do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
@@ -496,13 +504,15 @@ defmodule Eigr.Functions.Protocol.Actors.ActorState do
     }
   end
 
-  field :tags, 1,
+  field(:tags, 1,
     repeated: true,
     type: Eigr.Functions.Protocol.Actors.ActorState.TagsEntry,
     map: true
+  )
 
-  field :state, 2, type: Google.Protobuf.Any
+  field(:state, 2, type: Google.Protobuf.Any)
 end
+
 defmodule Eigr.Functions.Protocol.Actors.ActorSettings do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
@@ -581,17 +591,20 @@ defmodule Eigr.Functions.Protocol.Actors.ActorSettings do
     }
   end
 
-  field :abstract, 1, type: :bool
-  field :persistent, 2, type: :bool
+  field(:abstract, 1, type: :bool)
+  field(:persistent, 2, type: :bool)
 
-  field :snapshot_strategy, 3,
+  field(:snapshot_strategy, 3,
     type: Eigr.Functions.Protocol.Actors.ActorSnapshotStrategy,
     json_name: "snapshotStrategy"
+  )
 
-  field :deactivate_strategy, 4,
+  field(:deactivate_strategy, 4,
     type: Eigr.Functions.Protocol.Actors.ActorDeactivateStrategy,
     json_name: "deactivateStrategy"
+  )
 end
+
 defmodule Eigr.Functions.Protocol.Actors.ActorId do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
@@ -631,20 +644,6 @@ defmodule Eigr.Functions.Protocol.Actors.ActorId do
           proto3_optional: nil,
           type: :TYPE_STRING,
           type_name: nil
-        },
-        %Google.Protobuf.FieldDescriptorProto{
-          __unknown_fields__: [],
-          default_value: nil,
-          extendee: nil,
-          json_name: "hashKey",
-          label: :LABEL_OPTIONAL,
-          name: "hash_key",
-          number: 3,
-          oneof_index: nil,
-          options: nil,
-          proto3_optional: nil,
-          type: :TYPE_STRING,
-          type_name: nil
         }
       ],
       name: "ActorId",
@@ -656,10 +655,10 @@ defmodule Eigr.Functions.Protocol.Actors.ActorId do
     }
   end
 
-  field :name, 1, type: :string
-  field :system, 2, type: :string
-  field :hash_key, 3, type: :string, json_name: "hashKey"
+  field(:name, 1, type: :string)
+  field(:system, 2, type: :string)
 end
+
 defmodule Eigr.Functions.Protocol.Actors.Actor do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
@@ -724,7 +723,7 @@ defmodule Eigr.Functions.Protocol.Actors.Actor do
     }
   end
 
-  field :id, 1, type: Eigr.Functions.Protocol.Actors.ActorId
-  field :state, 2, type: Eigr.Functions.Protocol.Actors.ActorState
-  field :settings, 3, type: Eigr.Functions.Protocol.Actors.ActorSettings
+  field(:id, 1, type: Eigr.Functions.Protocol.Actors.ActorId)
+  field(:state, 2, type: Eigr.Functions.Protocol.Actors.ActorState)
+  field(:settings, 3, type: Eigr.Functions.Protocol.Actors.ActorSettings)
 end

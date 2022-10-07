@@ -231,6 +231,18 @@ message Context {
     google.protobuf.Any state = 1;
 }
 
+// When a Host Function is invoked it returns the updated state and return value to the call. 
+// It can also return a number of side effects to other Actors as a result of its computation. 
+// These side effects will be forwarded to the respective Actors asynchronously and should not affect the Host Function's response to its caller.
+// Internally side effects is just a special kind of InvocationRequest.
+message SideEffect {
+    InvocationRequest request = 1;
+}
+
+message Workflow {
+    repeated SideEffect effects = 1;
+}
+
 // The user function when it wants to send a message to an Actor uses the InvocationRequest message type.
 //
 // Params:
@@ -296,6 +308,8 @@ message ActorInvocationResponse {
     Context updated_context = 3;
 
     google.protobuf.Any value = 4;
+
+    Workflow workflow = 5;
 }
 
 // InvocationResponse is the response that the proxy that received the InvocationRequest request will forward to the request's original user function.

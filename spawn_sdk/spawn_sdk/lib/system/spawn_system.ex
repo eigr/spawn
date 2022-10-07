@@ -29,7 +29,8 @@ defmodule SpawnSdk.System.SpawnSystem do
     RegistrationResponse,
     ServiceInfo,
     SpawnRequest,
-    SpawnResponse
+    SpawnResponse,
+    Workflow
   }
 
   import Spawn.Utils.AnySerializer
@@ -153,11 +154,38 @@ defmodule SpawnSdk.System.SpawnSystem do
         new_ctx = %SpawnSdk.Context{state: unpack_unknown(current_state)}
 
         case call_instance(actor_instance, command, value, new_ctx) do
-          {:reply, %SpawnSdk.Value{state: host_state, value: response} = _value} ->
-            resp = %ActorInvocationResponse{
-              updated_context: Eigr.Functions.Protocol.Context.new(state: any_pack!(host_state)),
-              value: any_pack!(response)
-            }
+          {:reply, %SpawnSdk.Value{state: host_state, value: response, effects: effects} = _value} ->
+            resp =
+              if is_nil(effects) or effects == [] do
+                %ActorInvocationResponse{
+                  updated_context:
+                    Eigr.Functions.Protocol.Context.new(state: any_pack!(host_state)),
+                  value: any_pack!(response)
+                }
+              else
+                side_effects =
+                  Enum.map(effects, fn %SpawnSdk.Flow.SideEffect{} = effect ->
+                    %Eigr.Functions.Protocol.SideEffect{
+                      request:
+                        InvocationRequest.new(
+                          system: %Eigr.Functions.Protocol.Actors.ActorSystem{name: system},
+                          actor: %Eigr.Functions.Protocol.Actors.Actor{
+                            id: %ActorId{name: effect.actor_name}
+                          },
+                          value: any_pack!(effect.payload),
+                          command_name: effect.command,
+                          async: true
+                        )
+                    }
+                  end)
+
+                %ActorInvocationResponse{
+                  updated_context:
+                    Eigr.Functions.Protocol.Context.new(state: any_pack!(host_state)),
+                  value: any_pack!(response),
+                  workflow: %Workflow{effects: side_effects}
+                }
+              end
 
             new_actor_state = %{actor_state | state: any_pack!(host_state)}
 

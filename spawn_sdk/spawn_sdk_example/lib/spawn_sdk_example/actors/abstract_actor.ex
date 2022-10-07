@@ -5,7 +5,10 @@ defmodule SpawnSdkExample.Actors.AbstractActor do
     state_type: Io.Eigr.Spawn.Example.MyState
 
   require Logger
+
   alias Io.Eigr.Spawn.Example.{MyState, MyBusinessMessage}
+
+  alias SpawnSdk.Flow.SideEffect
 
   @impl true
   def handle_command(
@@ -21,8 +24,16 @@ defmodule SpawnSdkExample.Actors.AbstractActor do
         (state.value || 0) + value
       end
 
-    %Value{}
-    |> Value.of(%MyBusinessMessage{value: new_value}, %MyState{value: new_value})
+    result = %MyBusinessMessage{value: new_value}
+    new_state = %MyState{value: new_value}
+
+    Value.of()
+    |> Value.value(result)
+    |> Value.state(new_state)
+    |> Value.effects(
+      SideEffect.of()
+      |> SideEffect.effect("joe", :sum, result)
+    )
     |> Value.reply!()
   end
 end
