@@ -10,6 +10,8 @@ defmodule Actors.FactoryTest do
     Registry,
     ActorSystem,
     Actor,
+    ActorId,
+    ActorSettings,
     TimeoutStrategy,
     ActorSnapshotStrategy,
     ActorDeactivateStrategy,
@@ -86,12 +88,16 @@ defmodule Actors.FactoryTest do
   end
 
   def build_actor(attrs \\ []) do
+    actor_name = attrs[:name] || "#{Faker.Superhero.name()} #{Faker.StarWars.character()}"
+
     Actor.new(
-      name: attrs[:name] || "#{Faker.Superhero.name()} #{Faker.StarWars.character()}",
-      persistent: Keyword.get(attrs, :persistent, true),
-      state: attrs[:state] || build_actor_state(),
-      snapshot_strategy: attrs[:snapshot_strategy] || build_actor_snapshot_strategy(),
-      deactivate_strategy: attrs[:deactivate_strategy] || build_actor_deactivate_strategy()
+      id: %ActorId{name: actor_name},
+      settings: %ActorSettings{
+        persistent: Keyword.get(attrs, :persistent, true),
+        snapshot_strategy: attrs[:snapshot_strategy] || build_actor_snapshot_strategy(),
+        deactivate_strategy: attrs[:deactivate_strategy] || build_actor_deactivate_strategy()
+      },
+      state: attrs[:state] || build_actor_state()
     )
   end
 
