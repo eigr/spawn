@@ -123,6 +123,60 @@ Notice that the only thing that has changed is the absence of the name argument 
 
 > **_NOTE:_** Can Elixir programmers think in terms of named vs abstract actors as more or less known at startup vs dynamically supervised/registered? That is, defining your actors directly in the supervision tree or using a Dynamic Supervisor for that.
 
+## Side Effects
+
+Actors can also emit side effects to other Actors as part of their response. See an example:
+
+```elixir
+defmodule SpawnSdkExample.Actors.AbstractActor do
+  use SpawnSdk.Actor,
+    abstract: true,
+    persistent: false,
+    state_type: Io.Eigr.Spawn.Example.MyState
+
+  require Logger
+
+  alias Io.Eigr.Spawn.Example.{MyState, MyBusinessMessage}
+
+  alias SpawnSdk.Flow.SideEffect
+
+  @impl true
+  def handle_command(
+        {:sum, %MyBusinessMessage{value: value} = data},
+        %Context{state: state} = ctx
+      ) do
+    Logger.info("Received Request: #{inspect(data)}. Context: #{inspect(ctx)}")
+
+    new_value =
+      if is_nil(state) do
+        0 + value
+      else
+        (state.value || 0) + value
+      end
+
+    result = %MyBusinessMessage{value: new_value}
+    new_state = %MyState{value: new_value}
+
+    Value.of()
+    |> Value.value(result)
+    |> Value.state(new_state)
+    |> Value.effects(
+      # This returns a list of side effects. In this case containing only one effect. However, multiple effects can be chained together, 
+      # just by calling the effect function as shown here.
+      # If only one effect is desired, you can also choose to use the to/3 function together with Value.effect(). 
+      # Example: Values.effect(SideEffect.to(name, func, payload))
+      SideEffect.of()
+      |> SideEffect.effect("joe", :sum, result) 
+    )
+    |> Value.reply!()
+  end
+end
+```
+
+In the example above we see that the Actor joe will receive a request as a side effect from the Actor who issued this effect.
+
+Side effects do not interfere with an actor's request-response flow. They will "always" be processed asynchronously and any response sent back from the Actor receiving the effect will be ignored by the effector.
+
 ### Declaring the supervision tree
 
 Once we define our actors we can now declare our supervision tree:

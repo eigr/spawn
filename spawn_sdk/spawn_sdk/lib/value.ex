@@ -35,6 +35,11 @@ defmodule SpawnSdk.Value do
     struct(value, value: response)
   end
 
+  @spec effect(value(), effects()) :: value()
+  def effect(%SpawnSdk.Value{} = value, effect) do
+    struct(value, effects: [effect])
+  end
+
   @spec effects(value(), effects()) :: value()
   def effects(%SpawnSdk.Value{} = value, effects) do
     struct(value, effects: effects)
