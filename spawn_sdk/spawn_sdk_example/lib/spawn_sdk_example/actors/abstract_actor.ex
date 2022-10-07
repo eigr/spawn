@@ -1,7 +1,6 @@
 defmodule SpawnSdkExample.Actors.AbstractActor do
   use SpawnSdk.Actor,
     abstract: true,
-    persistent: false,
     state_type: Io.Eigr.Spawn.Example.MyState
 
   require Logger

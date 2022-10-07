@@ -65,8 +65,8 @@ defmodule SpawnSdk.Actor do
       persistent = Keyword.get(opts, :persistent, true)
       abstract_actor = Keyword.get(opts, :abstract, false)
 
-      snapshot_timeout = Keyword.get(opts, :snapshot_timeout, 10_000)
-      deactivate_timeout = Keyword.get(opts, :deactivate_timeout, 30_000)
+      snapshot_timeout = Keyword.get(opts, :snapshot_timeout, 2_000)
+      deactivate_timeout = Keyword.get(opts, :deactivate_timeout, 10_000)
 
       def __meta__(:name), do: unquote(actor_name)
       def __meta__(:persistent), do: unquote(persistent)
