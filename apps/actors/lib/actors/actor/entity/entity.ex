@@ -3,7 +3,7 @@ defmodule Actors.Actor.Entity do
   require Logger
 
   alias Actors.Actor.{Entity.EntityState, StateManager}
-  alias Actors.Registry.{ActorRegistry, HostActor}
+  alias Actors.Registry.HostActor
 
   alias Eigr.Functions.Protocol.Actors.{
     Actor,
@@ -25,7 +25,10 @@ defmodule Actors.Actor.Entity do
     Workflow
   }
 
-  @default_deactivate_timeout 90_000
+  import Actors, only: [invoke: 2]
+  import Actors.Registry.ActorRegistry, only: [lookup: 2]
+
+  @default_deactivate_timeout 10_000
 
   @default_methods [
     "get",
@@ -35,7 +38,7 @@ defmodule Actors.Actor.Entity do
     "GetState"
   ]
 
-  @default_snapshot_timeout 60_000
+  @default_snapshot_timeout 2_000
 
   @fullsweep_after 10
 
@@ -485,7 +488,7 @@ defmodule Actors.Actor.Entity do
 
   defp do_run_workflow(
          %ActorInvocationResponse{workflow: %Workflow{effects: effects} = _workflow} = response,
-         state
+         _state
        ) do
     do_side_effects(effects)
     response
@@ -507,9 +510,9 @@ defmodule Actors.Actor.Entity do
                          } = invocation
                      } ->
         try do
-          case ActorRegistry.lookup(system_name, actor_name) do
+          case lookup(system_name, actor_name) do
             {:ok, %HostActor{opts: opts}} ->
-              Actors.invoke(invocation, opts)
+              invoke(invocation, opts)
 
             _ ->
               :ok
