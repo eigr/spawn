@@ -11,13 +11,10 @@ defmodule Proxy.Application do
     # MetricsEndpoint.Exporter.setup()
     # MetricsEndpoint.PrometheusPipeline.setup()
 
-    supervisor = if Mix.env() != :test, do: [{Sidecar.Supervisor, config}], else: []
-
-    children =
-      supervisor ++
-        [
-          {Bandit, plug: Proxy.Router, scheme: :http, options: get_http_options(config)}
-        ]
+    children = [
+      {Sidecar.Supervisor, config},
+      {Bandit, plug: Proxy.Router, scheme: :http, options: get_http_options(config)}
+    ]
 
     opts = [strategy: :one_for_one, name: Proxy.RootSupervisor]
     Supervisor.start_link(children, opts)

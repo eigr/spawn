@@ -9,10 +9,7 @@ defmodule Spawn.Cluster.StateHandoff.Supervisor do
 
   @impl true
   def init(_args) do
-    children =
-      if Mix.env() == :test,
-        do: [],
-        else: [Spawn.Cluster.StateHandoff]
+    children = [Spawn.Cluster.StateHandoff]
 
     Supervisor.init(children, strategy: :one_for_one)
   end

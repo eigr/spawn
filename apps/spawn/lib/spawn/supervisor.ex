@@ -20,14 +20,11 @@ defmodule Spawn.Supervisor do
 
   @impl true
   def init(config) do
-    children =
-      [
-        Spawn.Cluster.StateHandoff.Supervisor,
-        cluster_supervisor(config)
-      ] ++
-        if Mix.env() == :test,
-          do: [],
-          else: [Spawn.Cluster.Node.Registry.child_spec()]
+    children = [
+      Spawn.Cluster.StateHandoff.Supervisor,
+      cluster_supervisor(config),
+      Spawn.Cluster.Node.Registry.child_spec()
+    ]
 
     Supervisor.init(children, strategy: :one_for_one)
   end
@@ -78,14 +75,9 @@ defmodule Spawn.Supervisor do
   end
 
   defp get_gossip_strategy do
-    port = if Mix.env() == :test, do: Enum.random(45_000..49_999), else: 45892
-
     [
       proxy: [
-        strategy: Cluster.Strategy.Gossip,
-        config: [
-          port: port
-        ]
+        strategy: Cluster.Strategy.Gossip
       ]
     ]
   end

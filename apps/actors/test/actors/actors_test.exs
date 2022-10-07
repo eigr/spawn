@@ -163,7 +163,7 @@ defmodule ActorsTest do
     end
 
     # Useful for distributed testing due to natural eventuality problems
-    defp loop_until_ok(func, timeout \\ 10_000) do
+    defp loop_until_ok(func, timeout \\ 15_000) do
       task = Task.async(fn -> do_loop(func, func.()) end)
 
       Task.await(task, timeout)
