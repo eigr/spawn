@@ -11,7 +11,9 @@ defmodule SpawnSdk.System.SpawnSystem do
 
   alias Eigr.Functions.Protocol.Actors.{
     Actor,
+    ActorId,
     ActorState,
+    ActorSettings,
     ActorDeactivateStrategy,
     ActorSnapshotStrategy,
     ActorSystem,
@@ -101,7 +103,7 @@ defmodule SpawnSdk.System.SpawnSystem do
     req =
       InvocationRequest.new(
         system: %Eigr.Functions.Protocol.Actors.ActorSystem{name: system},
-        actor: %Eigr.Functions.Protocol.Actors.Actor{name: actor_name},
+        actor: %Eigr.Functions.Protocol.Actors.Actor{id: %ActorId{name: actor_name}},
         value: any_pack!(payload),
         command_name: command,
         async: async
@@ -206,7 +208,7 @@ defmodule SpawnSdk.System.SpawnSystem do
       actor_system:
         ActorSystem.new(
           name: system,
-          registry: %Registry{actors: to_map(actor_name, [actor])}
+          registry: %Registry{actors: to_map(system, actor_name, [actor])}
         )
     }
   end
@@ -224,7 +226,7 @@ defmodule SpawnSdk.System.SpawnSystem do
       actor_system:
         ActorSystem.new(
           name: system,
-          registry: %Registry{actors: to_map(actors)}
+          registry: %Registry{actors: to_map(system, actors)}
         )
     )
   end
@@ -244,10 +246,11 @@ defmodule SpawnSdk.System.SpawnSystem do
     end)
   end
 
-  defp to_map(actors) do
+  defp to_map(system, actors) do
     actors
     |> Enum.into(%{}, fn actor ->
       name = actor.__meta__(:name)
+      abstract = actor.__meta__(:abstract)
       persistent = actor.__meta__(:persistent)
       snapshot_timeout = actor.__meta__(:snapshot_timeout)
       deactivate_timeout = actor.__meta__(:deactivate_timeout)
@@ -264,19 +267,23 @@ defmodule SpawnSdk.System.SpawnSystem do
 
       {name,
        Actor.new(
-         name: name,
-         persistent: persistent,
-         snapshot_strategy: snapshot_strategy,
-         deactivate_strategy: deactivate_strategy,
+         id: %ActorId{system: system, name: name},
+         settings: %ActorSettings{
+           abstract: abstract,
+           persistent: persistent,
+           snapshot_strategy: snapshot_strategy,
+           deactivate_strategy: deactivate_strategy
+         },
          state: ActorState.new()
        )}
     end)
   end
 
-  defp to_map(actor_name, actors) do
+  defp to_map(system, actor_name, actors) do
     actors
     |> Enum.into(%{}, fn actor ->
       name = actor_name
+      abstract = actor.__meta__(:abstract)
       persistent = actor.__meta__(:persistent)
       snapshot_timeout = actor.__meta__(:snapshot_timeout)
       deactivate_timeout = actor.__meta__(:deactivate_timeout)
@@ -293,10 +300,13 @@ defmodule SpawnSdk.System.SpawnSystem do
 
       {name,
        Actor.new(
-         name: name,
-         persistent: persistent,
-         snapshot_strategy: snapshot_strategy,
-         deactivate_strategy: deactivate_strategy,
+         id: %ActorId{system: system, name: name},
+         settings: %ActorSettings{
+           abstract: abstract,
+           persistent: persistent,
+           snapshot_strategy: snapshot_strategy,
+           deactivate_strategy: deactivate_strategy
+         },
          state: ActorState.new()
        )}
     end)

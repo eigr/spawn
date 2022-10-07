@@ -83,7 +83,7 @@ defmodule Spawn.Cluster.StateHandoff do
       |> Enum.filter(fn host ->
         node == host.node
       end)
-      |> Enum.map(fn host -> host.actor.name end)
+      |> Enum.map(fn host -> host.actor.id.name end)
 
     Logger.debug("Drop keys #{inspect(keys)} from #{inspect(node)}")
 

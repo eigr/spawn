@@ -6,7 +6,9 @@ defmodule Actors.Actor.Entity do
 
   alias Eigr.Functions.Protocol.Actors.{
     Actor,
+    ActorId,
     ActorDeactivateStrategy,
+    ActorSettings,
     ActorState,
     ActorSnapshotStrategy,
     TimeoutStrategy
@@ -49,9 +51,10 @@ defmodule Actors.Actor.Entity do
   defp do_init(
          %EntityState{
            actor: %Actor{
-             name: name,
-             persistent: false,
-             deactivate_strategy: deactivate_strategy
+             id: %ActorId{name: name} = _id,
+             settings:
+               %ActorSettings{persistent: false, deactivate_strategy: deactivate_strategy} =
+                 _settings
            }
          } = state
        )
@@ -70,10 +73,13 @@ defmodule Actors.Actor.Entity do
   defp do_init(
          %EntityState{
            actor: %Actor{
-             name: name,
-             persistent: false,
-             deactivate_strategy:
-               %ActorDeactivateStrategy{strategy: deactivate_strategy} = _dstrategy
+             id: %ActorId{name: name} = _id,
+             settings:
+               %ActorSettings{
+                 persistent: false,
+                 deactivate_strategy:
+                   %ActorDeactivateStrategy{strategy: deactivate_strategy} = _dstrategy
+               } = _settings
            }
          } = state
        ) do
@@ -90,10 +96,13 @@ defmodule Actors.Actor.Entity do
   defp do_init(
          %EntityState{
            actor: %Actor{
-             name: name,
-             persistent: true,
-             snapshot_strategy: %ActorSnapshotStrategy{} = _snapshot_strategy,
-             deactivate_strategy: deactivate_strategy
+             id: %ActorId{name: name} = _id,
+             settings:
+               %ActorSettings{
+                 persistent: true,
+                 snapshot_strategy: %ActorSnapshotStrategy{} = _snapshot_strategy,
+                 deactivate_strategy: deactivate_strategy
+               } = _settings
            }
          } = state
        )
@@ -115,10 +124,13 @@ defmodule Actors.Actor.Entity do
   defp do_init(
          %EntityState{
            actor: %Actor{
-             name: name,
-             persistent: true,
-             snapshot_strategy: %ActorSnapshotStrategy{} = _snapshot_strategy,
-             deactivate_strategy: %ActorDeactivateStrategy{strategy: deactivate_strategy}
+             id: %ActorId{name: name} = _id,
+             settings:
+               %ActorSettings{
+                 persistent: true,
+                 snapshot_strategy: %ActorSnapshotStrategy{} = _snapshot_strategy,
+                 deactivate_strategy: %ActorDeactivateStrategy{strategy: deactivate_strategy}
+               } = _settings
            }
          } = state
        ) do
@@ -147,7 +159,7 @@ defmodule Actors.Actor.Entity do
   defp do_handle_continue(
          :load_state,
          %EntityState{
-           actor: %Actor{name: name, state: actor_state} = actor
+           actor: %Actor{id: %ActorId{name: name} = _id, state: actor_state} = actor
          } = state
        )
        when is_nil(actor_state) do
@@ -166,7 +178,8 @@ defmodule Actors.Actor.Entity do
   defp do_handle_continue(
          :load_state,
          %EntityState{
-           actor: %Actor{name: name, state: %ActorState{} = _actor_state} = actor
+           actor:
+             %Actor{id: %ActorId{name: name} = _id, state: %ActorState{} = _actor_state} = actor
          } = state
        ) do
     Logger.debug(
@@ -218,7 +231,7 @@ defmodule Actors.Actor.Entity do
   defp do_handle_call(
          {:invocation_request,
           %InvocationRequest{
-            actor: %Actor{name: name} = _actor,
+            actor: %Actor{id: %ActorId{name: name} = _id} = _actor,
             command_name: command,
             value: payload
           } = _invocation, opts},
@@ -256,7 +269,7 @@ defmodule Actors.Actor.Entity do
   defp do_handle_cast(
          {:invocation_request,
           %InvocationRequest{
-            actor: %Actor{name: name} = _actor,
+            actor: %Actor{id: %ActorId{name: name} = _id} = _actor,
             command_name: command,
             value: payload
           } = _invocation, opts},
@@ -296,8 +309,10 @@ defmodule Actors.Actor.Entity do
            actor:
              %Actor{
                state: actor_state,
-               snapshot_strategy: %ActorSnapshotStrategy{
-                 strategy: {:timeout, %TimeoutStrategy{timeout: _timeout}} = snapshot_strategy
+               settings: %ActorSettings{
+                 snapshot_strategy: %ActorSnapshotStrategy{
+                   strategy: {:timeout, %TimeoutStrategy{timeout: _timeout}} = snapshot_strategy
+                 }
                }
              } = _actor
          } = state
@@ -313,10 +328,12 @@ defmodule Actors.Actor.Entity do
            state_hash: old_hash,
            actor:
              %Actor{
-               name: name,
+               id: %ActorId{name: name} = _id,
                state: %ActorState{} = actor_state,
-               snapshot_strategy: %ActorSnapshotStrategy{
-                 strategy: {:timeout, %TimeoutStrategy{timeout: timeout}} = snapshot_strategy
+               settings: %ActorSettings{
+                 snapshot_strategy: %ActorSnapshotStrategy{
+                   strategy: {:timeout, %TimeoutStrategy{timeout: timeout}} = snapshot_strategy
+                 }
                }
              } = _actor
          } = state
@@ -353,10 +370,12 @@ defmodule Actors.Actor.Entity do
          %EntityState{
            actor:
              %Actor{
-               name: name,
-               deactivate_strategy:
-                 %ActorDeactivateStrategy{strategy: deactivate_strategy} =
-                   _actor_deactivate_strategy
+               id: %ActorId{name: name} = _id,
+               settings: %ActorSettings{
+                 deactivate_strategy:
+                   %ActorDeactivateStrategy{strategy: deactivate_strategy} =
+                     _actor_deactivate_strategy
+               }
              } = _actor
          } = state
        ) do
@@ -374,7 +393,7 @@ defmodule Actors.Actor.Entity do
   defp do_handle_info(
          {:EXIT, pid, reason},
          %EntityState{
-           actor: %Actor{name: name}
+           actor: %Actor{id: %ActorId{name: name} = _id}
          } = state
        ) do
     Logger.warning("Received Exit message for Actor #{name} and PID #{inspect(pid)}.")
@@ -385,7 +404,7 @@ defmodule Actors.Actor.Entity do
   defp do_handle_info(
          message,
          %EntityState{
-           actor: %Actor{name: name, state: actor_state}
+           actor: %Actor{id: %ActorId{name: name} = _id, state: actor_state}
          } = state
        )
        when is_nil(actor_state) do
@@ -399,7 +418,7 @@ defmodule Actors.Actor.Entity do
   defp do_handle_info(
          message,
          %EntityState{
-           actor: %Actor{name: name, state: %ActorState{} = actor_state}
+           actor: %Actor{id: %ActorId{name: name} = _id, state: %ActorState{} = actor_state}
          } = state
        ) do
     Logger.warning(
@@ -419,8 +438,13 @@ defmodule Actors.Actor.Entity do
 
   defp do_terminate(
          reason,
-         %EntityState{actor: %Actor{name: name, persistent: persistent, state: actor_state}} =
-           _state
+         %EntityState{
+           actor: %Actor{
+             id: %ActorId{name: name} = _id,
+             state: actor_state,
+             settings: %ActorSettings{persistent: persistent}
+           }
+         } = _state
        )
        when is_nil(actor_state) or persistent == false do
     Logger.debug("Terminating actor #{name} with reason #{inspect(reason)}")
@@ -429,14 +453,18 @@ defmodule Actors.Actor.Entity do
   defp do_terminate(
          reason,
          %EntityState{
-           actor: %Actor{name: name, persistent: true, state: %ActorState{} = actor_state}
+           actor: %Actor{
+             id: %ActorId{name: name} = _id,
+             settings: %ActorSettings{persistent: true},
+             state: %ActorState{} = actor_state
+           }
          } = _state
        ) do
     StateManager.save(name, actor_state)
     Logger.debug("Terminating actor #{name} with reason #{inspect(reason)}")
   end
 
-  def start_link(%EntityState{actor: %Actor{name: name}} = state) do
+  def start_link(%EntityState{actor: %Actor{id: %ActorId{name: name} = _id}} = state) do
     GenServer.start(__MODULE__, state,
       name: via(name),
       spawn_opt: [fullsweep_after: @fullsweep_after]
