@@ -97,15 +97,11 @@ defmodule Actors.Registry.ActorRegistry do
 
   @doc """
   Register `member` entities to the ActorRegistry.
-
   Returns `Cluster` with all Host members.
-
   ## Examples
-
       iex> hosts = [%HostActor{node: Node.self(), actor: actor, opts: []}}]
       iex> ActorRegistry.register(hosts)
       :ok
-
   """
   @doc since: "0.1.0"
   @spec register(list(HostActor.t())) :: :ok
@@ -115,11 +111,8 @@ defmodule Actors.Registry.ActorRegistry do
 
   @doc """
   Fetch current entities of the service.
-
   Returns `Member` with Host and specific actor.
-
   ## Examples
-
       iex> ActorRegistry.lookup("spawn-system", "joe")
       {:ok,
        %Actors.Registry.Member{

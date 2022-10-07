@@ -88,19 +88,22 @@ create-k8s-namespace:
 	kubectl create ns eigr-functions
 
 generate-k8s-manifests:
-	cd apps/operator && MIX_ENV=dev mix bonny.gen.manifest --image ${operator-image} --namespace eigr-functions
+	cd spawn_operator/operator && MIX_ENV=dev mix bonny.gen.manifest --image ${operator-image} --namespace eigr-functions
 
 apply-k8s-manifests:
-	kubectl -n eigr-functions apply -f apps/operator/manifest.yaml
+	kubectl -n eigr-functions apply -f spawn_operator/operator/manifest.yaml
 
 run-proxy-local:
-	cd apps/proxy && PROXY_DATABASE_TYPE=$(database) SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= iex --name spawn_a2@127.0.0.1 -S mix
+	cd spawn_proxy/proxy && PROXY_DATABASE_TYPE=$(database) SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= iex --name spawn_a2@127.0.0.1 -S mix
 
 run-sdk-local:
-	cd apps/spawn_sdk_example && PROXY_DATABASE_TYPE=$(database) SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= iex --name spawn_sdk@127.0.0.1 -S mix
+	cd spawn_sdk/spawn_sdk_example && PROXY_CLUSTER_STRATEGY=epmd PROXY_DATABASE_TYPE=$(database) SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= iex --name spawn_actors_node@127.0.0.1 -S mix
+
+run-sdk-local2:
+	cd spawn_sdk/spawn_sdk_example && PROXY_CLUSTER_STRATEGY=epmd PROXY_DATABASE_TYPE=$(database) SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= iex --name spawn_actors_node1@127.0.0.1 -S mix
 
 run-operator-local:
-	cd apps/operator && MIX_ENV=dev iex --name operator@127.0.0.1 -S mix
+	cd spawn_operator/operator && MIX_ENV=dev iex --name operator@127.0.0.1 -S mix
 	
 run-proxy-image:
 	docker run --rm --name=spawn-proxy -e PROXY_DATABASE_TYPE=mysql -e SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= --net=host ${proxy-image}

@@ -7,8 +7,7 @@ defmodule Spawn.MixProject do
       version: "0.1.0",
       elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
-      deps: deps(),
-      releases: releases()
+      deps: deps()
     ]
   end
 
@@ -19,91 +18,5 @@ defmodule Spawn.MixProject do
   # Run "mix help deps" for examples and options.
   defp deps do
     []
-  end
-
-  defp releases() do
-    [
-      operator: [
-        include_executables_for: [:unix],
-        applications: [operator: :permanent],
-        steps: [
-          :assemble,
-          &Bakeware.assemble/1
-        ],
-        bakeware: [compression_level: 19]
-      ],
-      proxy: [
-        include_executables_for: [:unix],
-        applications: [proxy: :permanent],
-        steps: [
-          :assemble,
-          &Bakeware.assemble/1
-        ],
-        bakeware: [compression_level: 19]
-      ],
-      activator_grpc: [
-        include_executables_for: [:unix],
-        applications: [activator_grpc: :permanent],
-        steps: [
-          :assemble,
-          &Bakeware.assemble/1
-        ],
-        bakeware: [compression_level: 19]
-      ],
-      activator_http: [
-        include_executables_for: [:unix],
-        applications: [activator_http: :permanent],
-        steps: [
-          :assemble,
-          &Bakeware.assemble/1
-        ],
-        bakeware: [compression_level: 19]
-      ],
-      activator_kafka: [
-        include_executables_for: [:unix],
-        applications: [activator_kafka: :permanent],
-        steps: [
-          :assemble,
-          &Bakeware.assemble/1
-        ],
-        bakeware: [compression_level: 19]
-      ],
-      activator_pubsub: [
-        include_executables_for: [:unix],
-        applications: [activator_pubsub: :permanent],
-        steps: [
-          :assemble,
-          &Bakeware.assemble/1
-        ],
-        bakeware: [compression_level: 19]
-      ],
-      activator_rabbitmq: [
-        include_executables_for: [:unix],
-        applications: [activator_rabbitmq: :permanent],
-        steps: [
-          :assemble,
-          &Bakeware.assemble/1
-        ],
-        bakeware: [compression_level: 19]
-      ],
-      activator_sqs: [
-        include_executables_for: [:unix],
-        applications: [activator_sqs: :permanent],
-        steps: [
-          :assemble,
-          &Bakeware.assemble/1
-        ],
-        bakeware: [compression_level: 19]
-      ],
-      spawn_sdk_example: [
-        include_executables_for: [:unix],
-        applications: [spawn_sdk_example: :permanent],
-        steps: [
-          :assemble,
-          &Bakeware.assemble/1
-        ],
-        bakeware: [compression_level: 19]
-      ]
-    ]
   end
 end

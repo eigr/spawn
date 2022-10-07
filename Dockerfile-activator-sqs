@@ -8,20 +8,22 @@ RUN apk add --no-cache --update git build-base ca-certificates zstd
 
 RUN mkdir config
 COPY config/ ./config
-COPY . .
+COPY spawn_activators/activator_sqs/ ./spawn_activators/activator_sqs
+COPY apps/ ./apps
 COPY mix.exs .
 COPY mix.lock .
 
 RUN mix local.rebar --force \
     && mix local.hex --force \
     && mix deps.get \
-    && mix deps.get \
     && mix release.init
 
 RUN echo "-name activator_sqs@${HOSTNAME}" >> ./rel/vm.args.eex \
     && echo "-setcookie ${NODE_COOKIE}" >> ./rel/vm.args.eex
 
-RUN MIX_ENV=prod mix release activator_sqs
+RUN cd spawn_activators/activator_sqs \
+    && mix deps.get \
+    && mix release activator_sqs
 
 # ---- Application Stage ----
 FROM alpine:3
