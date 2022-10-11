@@ -201,7 +201,7 @@ defmodule Actors do
     )
     |> Flow.filter(fn {_actor_name,
                        %Actor{settings: %ActorSettings{persistent: persistent}} = _actor} ->
-      is_boolean(persistent) && match?(true, persistent)
+      is_boolean(persistent) and match?(true, persistent)
     end)
     |> Flow.map(fn {actor_name, actor} ->
       Logger.debug("Registering #{actor_name} #{inspect(actor)} on Node: #{inspect(Node.self())}")

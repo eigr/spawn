@@ -53,4 +53,13 @@ defmodule SpawnSdk.Value do
   def reply!(%SpawnSdk.Value{} = value) do
     {:reply, value}
   end
+
+  @spec noreply!(value()) :: {:reply, value()}
+  def noreply!(%SpawnSdk.Value{state: new_state} = _value)
+      when is_nil(new_state),
+      do: raise("Response Value and New State are required!")
+
+  def noreply!(%SpawnSdk.Value{} = value) do
+    {:reply, value}
+  end
 end

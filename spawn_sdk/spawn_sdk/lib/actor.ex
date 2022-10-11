@@ -60,20 +60,24 @@ defmodule SpawnSdk.Actor do
 
       @behaviour SpawnSdk.Actor
 
-      actor_name = Keyword.get(opts, :name, Atom.to_string(__MODULE__))
-      state_type = Keyword.fetch!(opts, :state_type)
-      persistent = Keyword.get(opts, :persistent, true)
       abstract_actor = Keyword.get(opts, :abstract, false)
+      actions = Keyword.get(opts, :actions, [])
+      actor_name = Keyword.get(opts, :name, Atom.to_string(__MODULE__))
+      persistent = Keyword.get(opts, :persistent, true)
+      state_type = Keyword.fetch!(opts, :state_type)
+      timers = Keyword.get(opts, :timers, [])
 
-      snapshot_timeout = Keyword.get(opts, :snapshot_timeout, 2_000)
       deactivate_timeout = Keyword.get(opts, :deactivate_timeout, 10_000)
+      snapshot_timeout = Keyword.get(opts, :snapshot_timeout, 2_000)
 
+      def __meta__(:actions), do: unquote(actions)
       def __meta__(:name), do: unquote(actor_name)
       def __meta__(:persistent), do: unquote(persistent)
       def __meta__(:abstract), do: unquote(abstract_actor)
       def __meta__(:state_type), do: unquote(state_type)
       def __meta__(:snapshot_timeout), do: unquote(snapshot_timeout)
       def __meta__(:deactivate_timeout), do: unquote(deactivate_timeout)
+      def __meta__(:timers), do: unquote(timers)
     end
   end
 end

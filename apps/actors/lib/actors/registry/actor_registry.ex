@@ -72,7 +72,7 @@ defmodule Actors.Registry.ActorRegistry do
 
         hosts ->
           filtered_list =
-            Enum.filter(hosts, fn ac -> ac.node == node && ac.actor.id.name == name end)
+            Enum.filter(hosts, fn ac -> ac.node == node and ac.actor.id.name == name end)
 
           if length(filtered_list) <= 0 do
             updated_hosts = hosts ++ [host]

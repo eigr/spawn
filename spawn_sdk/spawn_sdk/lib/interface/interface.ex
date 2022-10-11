@@ -1,10 +1,10 @@
 defmodule SpawnSdk.Interface do
   use Actors.Actor.Interface
 
-  alias SpawnSdk.System.SpawnSystem
+  import SpawnSdk.System.SpawnSystem, only: [call: 3]
 
   @impl true
   def invoke_host(payload, state, default_methods) do
-    SpawnSystem.call(payload, state, default_methods)
+    call(payload, state, default_methods)
   end
 end

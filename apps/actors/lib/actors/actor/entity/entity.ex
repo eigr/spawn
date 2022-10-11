@@ -13,6 +13,8 @@ defmodule Actors.Actor.Entity do
     ActorState,
     ActorSnapshotStrategy,
     ActorSystem,
+    Command,
+    FixedTimerCommand,
     TimeoutStrategy
   }
 
@@ -29,6 +31,8 @@ defmodule Actors.Actor.Entity do
   import Actors.Registry.ActorRegistry, only: [lookup: 2]
 
   @default_deactivate_timeout 10_000
+
+  @default_host_interface Actors.Actor.Interface.Http
 
   @default_methods [
     "get",
@@ -62,7 +66,8 @@ defmodule Actors.Actor.Entity do
              id: %ActorId{name: name} = _id,
              settings:
                %ActorSettings{persistent: false, deactivate_strategy: deactivate_strategy} =
-                 _settings
+                 _settings,
+             timer_commands: timer_commands
            }
          } = state
        )
@@ -72,6 +77,8 @@ defmodule Actors.Actor.Entity do
     Logger.notice(
       "Activating actor #{name} in Node #{inspect(Node.self())}. Persistence disabled."
     )
+
+    :ok = handle_timers(timer_commands)
 
     strategy = {:timeout, TimeoutStrategy.new!(timeout: @default_deactivate_timeout)}
     schedule_deactivate(strategy, get_timeout_factor(@timeout_factor_range))
@@ -87,7 +94,8 @@ defmodule Actors.Actor.Entity do
                  persistent: false,
                  deactivate_strategy:
                    %ActorDeactivateStrategy{strategy: deactivate_strategy} = _dstrategy
-               } = _settings
+               } = _settings,
+             timer_commands: timer_commands
            }
          } = state
        ) do
@@ -96,6 +104,8 @@ defmodule Actors.Actor.Entity do
     Logger.notice(
       "Activating actor #{name} in Node #{inspect(Node.self())}. Persistence disabled."
     )
+
+    :ok = handle_timers(timer_commands)
 
     schedule_deactivate(deactivate_strategy, get_timeout_factor(@timeout_factor_range))
     {:ok, state}
@@ -110,7 +120,8 @@ defmodule Actors.Actor.Entity do
                  persistent: true,
                  snapshot_strategy: %ActorSnapshotStrategy{} = _snapshot_strategy,
                  deactivate_strategy: deactivate_strategy
-               } = _settings
+               } = _settings,
+             timer_commands: timer_commands
            }
          } = state
        )
@@ -120,6 +131,8 @@ defmodule Actors.Actor.Entity do
     Logger.notice(
       "Activating actor #{name} in Node #{inspect(Node.self())}. Persistence enabled."
     )
+
+    :ok = handle_timers(timer_commands)
 
     strategy = {:timeout, TimeoutStrategy.new!(timeout: @default_deactivate_timeout)}
     schedule_deactivate(strategy, get_timeout_factor(@timeout_factor_range))
@@ -138,7 +151,8 @@ defmodule Actors.Actor.Entity do
                  persistent: true,
                  snapshot_strategy: %ActorSnapshotStrategy{} = _snapshot_strategy,
                  deactivate_strategy: %ActorDeactivateStrategy{strategy: deactivate_strategy}
-               } = _settings
+               } = _settings,
+             timer_commands: timer_commands
            }
          } = state
        ) do
@@ -147,6 +161,8 @@ defmodule Actors.Actor.Entity do
     Logger.notice(
       "Activating actor #{name} in Node #{inspect(Node.self())}. Persistence enabled."
     )
+
+    :ok = handle_timers(timer_commands)
 
     schedule_deactivate(deactivate_strategy, get_timeout_factor(@timeout_factor_range))
 
@@ -239,30 +255,48 @@ defmodule Actors.Actor.Entity do
   defp do_handle_call(
          {:invocation_request,
           %InvocationRequest{
-            actor: %Actor{id: %ActorId{name: name} = _id} = _actor,
+            actor:
+              %Actor{
+                id: %ActorId{name: actor_name} = _id
+              } = _actor,
             command_name: command,
             value: payload
           } = _invocation, opts},
          _from,
          %EntityState{
            system: actor_system,
-           actor: %Actor{state: actor_state}
+           actor: %Actor{state: actor_state, commands: commands, timer_commands: timers}
          } = state
        ) do
-    interface = get_interface(opts)
-    current_state = Map.get(actor_state || %{}, :state)
+    if length(commands) <= 0 do
+      Logger.warning("Actor [#{actor_name}] has not registered any Actions")
+    end
 
-    ActorInvocation.new(
-      actor_name: name,
-      actor_system: actor_system,
-      command_name: command,
-      value: payload,
-      current_context: Context.new(state: current_state)
-    )
-    |> interface.invoke_host(state, @default_methods)
-    |> case do
-      {:ok, response, state} -> {:reply, {:ok, do_response(response, state)}, state}
-      {:error, reason, state} -> {:reply, {:error, reason}, state, :hibernate}
+    all_commands =
+      commands ++ Enum.map(timers, fn %FixedTimerCommand{command: cmd} = _timer_cmd -> cmd end)
+
+    case Enum.member?(@default_methods, command) or
+           Enum.any?(all_commands, fn cmd -> cmd.name == command end) do
+      true ->
+        interface = get_interface(actor_system, actor_name, opts)
+        current_state = Map.get(actor_state || %{}, :state)
+
+        ActorInvocation.new(
+          actor_name: actor_name,
+          actor_system: actor_system,
+          command_name: command,
+          value: payload,
+          current_context: Context.new(state: current_state)
+        )
+        |> interface.invoke_host(state, @default_methods)
+        |> case do
+          {:ok, response, state} -> {:reply, {:ok, do_response(response, state)}, state}
+          {:error, reason, state} -> {:reply, {:error, reason}, state, :hibernate}
+        end
+
+      false ->
+        {:reply, {:error, "Command [#{command}] not found for Actor [#{actor_name}]"}, state,
+         :hibernate}
     end
   end
 
@@ -277,29 +311,44 @@ defmodule Actors.Actor.Entity do
   defp do_handle_cast(
          {:invocation_request,
           %InvocationRequest{
-            actor: %Actor{id: %ActorId{name: name} = _id} = _actor,
+            actor: %Actor{id: %ActorId{name: actor_name} = _id} = _actor,
             command_name: command,
             value: payload
           } = _invocation, opts},
          %EntityState{
            system: actor_system,
-           actor: %Actor{state: actor_state}
+           actor: %Actor{state: actor_state, commands: commands, timer_commands: timers}
          } = state
        ) do
-    interface = get_interface(opts)
-    current_state = Map.get(actor_state || %{}, :state)
+    if length(commands) <= 0 do
+      Logger.warning("Actor [#{actor_name}] has not registered any Actions")
+    end
 
-    ActorInvocation.new(
-      actor_name: name,
-      actor_system: actor_system,
-      command_name: command,
-      value: payload,
-      current_context: Context.new(state: current_state)
-    )
-    |> interface.invoke_host(state, @default_methods)
-    |> case do
-      {:ok, _whatever, state} -> {:noreply, state}
-      {:error, _reason, state} -> {:noreply, state, :hibernate}
+    all_commands =
+      commands ++ Enum.map(timers, fn %FixedTimerCommand{command: cmd} = _timer_cmd -> cmd end)
+
+    case Enum.member?(@default_methods, command) or
+           Enum.any?(all_commands, fn cmd -> cmd.name == command end) do
+      true ->
+        interface = get_interface(actor_system, actor_name, opts)
+        current_state = Map.get(actor_state || %{}, :state)
+
+        ActorInvocation.new(
+          actor_name: actor_name,
+          actor_system: actor_system,
+          command_name: command,
+          value: payload,
+          current_context: Context.new(state: current_state)
+        )
+        |> interface.invoke_host(state, @default_methods)
+        |> case do
+          {:ok, _whatever, state} -> {:noreply, state}
+          {:error, _reason, state} -> {:noreply, state, :hibernate}
+        end
+
+      false ->
+        {:reply, {:error, "Command [#{command}] not found for Actor [#{actor_name}]"}, state,
+         :hibernate}
     end
   end
 
@@ -309,6 +358,30 @@ defmodule Actors.Actor.Entity do
 
     do_handle_info(action, state)
     |> parse_packed_response()
+  end
+
+  defp do_handle_info(
+         {:invoke_timer_command,
+          %FixedTimerCommand{command: %Command{name: cmd} = _command} = timer},
+         %EntityState{
+           system: _actor_system,
+           actor: %Actor{state: actor_state} = actor
+         } = state
+       ) do
+    current_state = Map.get(actor_state || %{}, :state)
+
+    invocation = %InvocationRequest{
+      actor: actor,
+      command_name: cmd,
+      value: current_state,
+      async: true
+    }
+
+    result = do_handle_cast({:invocation_request, invocation, []}, state)
+
+    :ok = handle_timers([timer])
+
+    result
   end
 
   defp do_handle_info(
@@ -568,7 +641,23 @@ defmodule Actors.Actor.Entity do
     GenServer.cast(via(ref), {:invocation_request, request, opts})
   end
 
-  defp get_interface(opts), do: Keyword.get(opts, :host_interface, Actors.Actor.Interface.Http)
+  defp get_interface(system_name, actor_name, opts),
+    do:
+      Keyword.get(
+        opts,
+        :host_interface,
+        get_interface_by_actor_or_default(system_name, actor_name)
+      )
+
+  defp get_interface_by_actor_or_default(system_name, actor_name) do
+    case lookup(system_name, actor_name) do
+      {:ok, %HostActor{opts: opts}} ->
+        Keyword.get(opts, :host_interface, @default_host_interface)
+
+      _ ->
+        @default_host_interface
+    end
+  end
 
   defp get_timeout_factor(factor_range) when is_number(factor_range),
     do: Enum.random([factor_range])
@@ -630,6 +719,24 @@ defmodule Actors.Actor.Entity do
          timeout_factor
        ),
        do: timeout + timeout_factor
+
+  defp handle_timers(timers) when is_list(timers) do
+    if length(timers) > 0 do
+      timers
+      |> Stream.map(fn %FixedTimerCommand{seconds: delay} = timer_command ->
+        Process.send_after(self(), {:invoke_timer_command, timer_command}, delay)
+      end)
+      |> Stream.run()
+    end
+
+    :ok
+  catch
+    error -> Logger.error("Error on handle timers #{inspect(error)}")
+  end
+
+  defp handle_timers(nil), do: :ok
+
+  defp handle_timers([]), do: :ok
 
   defp parse_packed_response(response) do
     case response do

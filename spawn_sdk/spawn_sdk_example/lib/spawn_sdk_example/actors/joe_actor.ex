@@ -1,7 +1,7 @@
-defmodule SpawnSdkExample.Actors.MyActor do
+defmodule SpawnSdkExample.Actors.JoeActor do
   use SpawnSdk.Actor,
     name: "joe",
-    persistent: false,
+    actions: [:sum],
     state_type: Io.Eigr.Spawn.Example.MyState,
     deactivate_timeout: 30_000,
     snapshot_timeout: 2_000
@@ -26,5 +26,20 @@ defmodule SpawnSdkExample.Actors.MyActor do
     %Value{}
     |> Value.of(%MyBusinessMessage{value: new_value}, %MyState{value: new_value})
     |> Value.reply!()
+  end
+
+  def handle_command({:ping, _data}, %Context{state: state} = ctx) do
+    Logger.info("Received Request. Context: #{inspect(ctx)}")
+
+    new_state =
+      if is_nil(state) do
+        %MyState{value: 0}
+      else
+        state
+      end
+
+    Value.of()
+    |> Value.state(new_state)
+    |> Value.noreply!()
   end
 end

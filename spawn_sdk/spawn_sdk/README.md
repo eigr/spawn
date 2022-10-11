@@ -221,7 +221,7 @@ Invoke Actors:
 
 ```elixir
 SpawnSdk.invoke(
-  "jose", 
+  "joe", 
   system: "spawn-system",
   command: "sum",
   payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1}
@@ -232,7 +232,7 @@ You can invoke actor default functions like "get" to get its current state
 
 ```elixir
 SpawnSdk.invoke(
-  "jose", 
+  "joe", 
   system: "spawn-system",
   command: "get"
 )

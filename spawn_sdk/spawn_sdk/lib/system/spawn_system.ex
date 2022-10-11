@@ -17,6 +17,8 @@ defmodule SpawnSdk.System.SpawnSystem do
     ActorDeactivateStrategy,
     ActorSnapshotStrategy,
     ActorSystem,
+    Command,
+    FixedTimerCommand,
     Registry,
     TimeoutStrategy
   }
@@ -46,7 +48,9 @@ defmodule SpawnSdk.System.SpawnSystem do
   def register(system, actors) do
     opts = [host_interface: SpawnSdk.Interface]
 
-    case Actors.register(build_registration_req(system, actors), opts) do
+    registration_request = build_registration_req(system, actors)
+
+    case Actors.register(registration_request, opts) do
       {:ok, %RegistrationResponse{proxy_info: proxy_info, status: status}} ->
         Logger.debug(
           "Actors registration succeed. Proxy info: #{inspect(proxy_info)}. Status: #{inspect(status)}"
@@ -66,14 +70,16 @@ defmodule SpawnSdk.System.SpawnSystem do
     system = Keyword.get(spawn_actor_opts, :system, nil)
     actor_mod = Keyword.get(spawn_actor_opts, :actor, %{})
 
-    if !actor_mod.__meta__(:abstract) do
+    if not actor_mod.__meta__(:abstract) do
       raise "Invalid Actor reference. Only abstract Actor are permited for spawning!"
     end
 
     new_state = state_to_map(actor_name, [actor_mod])
     opts = [host_interface: SpawnSdk.Interface]
 
-    case Actors.spawn_actor(build_spawn_req(system, actor_name, actor_mod), opts) do
+    spawn_request = build_spawn_req(system, actor_name, actor_mod)
+
+    case Actors.spawn_actor(spawn_request, opts) do
       {:ok, %SpawnResponse{status: status}} ->
         Logger.debug("Actor Spawned successfully. Status: #{inspect(status)}")
 
@@ -223,9 +229,13 @@ defmodule SpawnSdk.System.SpawnSystem do
   defp call_instance(instance, command, value, context) do
     instance.handle_command({parse_command(command), unpack_unknown(value)}, context)
   rescue
-    FunctionClauseError -> {:error, :command_not_handled}
+    FunctionClauseError ->
+      Logger.error("Error on call instance #{inspect(instance)}. Details: FunctionClauseError Command not handled")
+      {:error, :command_not_handled}
     # in case atom doesn't exist
-    ArgumentError -> {:error, :command_not_handled}
+    ArgumentError ->
+      Logger.error("Error on call instance #{inspect(instance)}. Details: ArgumentError Command not handled")
+      {:error, :command_not_handled}
   end
 
   defp parse_command(command) when is_atom(command), do: command
@@ -279,9 +289,11 @@ defmodule SpawnSdk.System.SpawnSystem do
     |> Enum.into(%{}, fn actor ->
       name = actor.__meta__(:name)
       abstract = actor.__meta__(:abstract)
+      actions = actor.__meta__(:actions)
       persistent = actor.__meta__(:persistent)
       snapshot_timeout = actor.__meta__(:snapshot_timeout)
       deactivate_timeout = actor.__meta__(:deactivate_timeout)
+      timer_actions = actor.__meta__(:timers)
 
       snapshot_strategy =
         ActorSnapshotStrategy.new(
@@ -302,6 +314,9 @@ defmodule SpawnSdk.System.SpawnSystem do
            snapshot_strategy: snapshot_strategy,
            deactivate_strategy: deactivate_strategy
          },
+         commands: Enum.map(actions, fn action -> get_action(action) end),
+         timer_commands:
+           Enum.map(timer_actions, fn {action, seconds} -> get_timer_action(action, seconds) end),
          state: ActorState.new()
        )}
     end)
@@ -312,9 +327,11 @@ defmodule SpawnSdk.System.SpawnSystem do
     |> Enum.into(%{}, fn actor ->
       name = actor_name
       abstract = actor.__meta__(:abstract)
+      actions = actor.__meta__(:actions)
       persistent = actor.__meta__(:persistent)
       snapshot_timeout = actor.__meta__(:snapshot_timeout)
       deactivate_timeout = actor.__meta__(:deactivate_timeout)
+      timer_actions = actor.__meta__(:timers)
 
       snapshot_strategy =
         ActorSnapshotStrategy.new(
@@ -335,8 +352,19 @@ defmodule SpawnSdk.System.SpawnSystem do
            snapshot_strategy: snapshot_strategy,
            deactivate_strategy: deactivate_strategy
          },
+         commands: Enum.map(actions, fn action -> get_action(action) end),
+         timer_commands:
+           Enum.map(timer_actions, fn {action, seconds} -> get_timer_action(action, seconds) end),
          state: ActorState.new()
        )}
     end)
+  end
+
+  defp get_action(action_atom) do
+    %Command{name: Atom.to_string(action_atom)}
+  end
+
+  defp get_timer_action(action_atom, seconds) do
+    %FixedTimerCommand{command: get_action(action_atom), seconds: seconds}
   end
 end

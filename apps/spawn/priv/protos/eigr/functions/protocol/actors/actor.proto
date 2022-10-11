@@ -38,6 +38,29 @@ message TimeoutStrategy {
     int64 timeout = 1;
 }
 
+// A command represents an action that the user can perform on an Actor. 
+// Commands in supporting languages are represented by functions or methods.
+// An Actor command has nothing to do with the semantics of Commands in a CQRS/EventSourced system. 
+// It just represents an action that supporting languages can invoke.
+message Command {
+
+    // The name of the function or method in the supporting language that has been registered in Ator.
+    string name = 1;
+}
+
+// A FixedTimerCommand is similar to a regular Command, its main differences are that it is scheduled to run at regular intervals 
+// and only takes the actor's state as an argument.
+// Timer Commands are good for executing loops that manipulate the actor's own state. 
+// In Elixir or other languages in BEAM it would be similar to invoking Process.send_after(self(), atom, msg, timeout)
+message FixedTimerCommand {
+
+    // The time to wait until the command is triggered
+    int32 seconds = 1;
+
+    // See Command description Above
+    Command command = 2;
+}
+
 message ActorState {
     map<string, string> tags = 1;
     google.protobuf.Any state = 2;
@@ -75,4 +98,10 @@ message Actor {
 
     // Actor settings.
     ActorSettings settings = 3;
+
+    // The commands registered for an actor
+    repeated Command commands = 4;
+
+    // The registered timer commands for an actor.
+    repeated FixedTimerCommand timer_commands = 5;
 }
