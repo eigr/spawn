@@ -50,6 +50,7 @@ defmodule SpawnSdk.Actor do
       alias SpawnSdk.{Context, Value}
 
       import SpawnSdk.Actor
+      import SpawnSdk.Defact
 
       import SpawnSdk.System.SpawnSystem,
         only: [
