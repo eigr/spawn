@@ -230,11 +230,18 @@ defmodule SpawnSdk.System.SpawnSystem do
     instance.handle_command({parse_command(command), unpack_unknown(value)}, context)
   rescue
     FunctionClauseError ->
-      Logger.error("Error on call instance #{inspect(instance)}. Details: FunctionClauseError Command not handled")
+      Logger.error(
+        "Error on call instance #{inspect(instance)}. Details: FunctionClauseError Command not handled"
+      )
+
       {:error, :command_not_handled}
+
     # in case atom doesn't exist
     ArgumentError ->
-      Logger.error("Error on call instance #{inspect(instance)}. Details: ArgumentError Command not handled")
+      Logger.error(
+        "Error on call instance #{inspect(instance)}. Details: ArgumentError Command not handled"
+      )
+
       {:error, :command_not_handled}
   end
 
