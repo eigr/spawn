@@ -8,6 +8,10 @@ defmodule SpawnSdkExample.Actors.AbstractActor do
 
   alias Io.Eigr.Spawn.Example.{MyState, MyBusinessMessage}
 
+  defact sum(:test, :test) do
+    Logger.info("Test. Calling macro defact")
+  end
+
   @impl true
   def handle_command(
         {:sum, %MyBusinessMessage{value: value} = data},
