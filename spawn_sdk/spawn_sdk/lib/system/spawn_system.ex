@@ -72,7 +72,7 @@ defmodule SpawnSdk.System.SpawnSystem do
     actor_mod = Keyword.get(spawn_actor_opts, :actor, %{})
 
     if not actor_mod.__meta__(:abstract) do
-      raise "Invalid Actor reference. Only abstract Actor are permited for spawning!"
+      raise "Invalid Actor reference. Only abstract Actor are permitted for spawning!"
     end
 
     new_state = state_to_map(actor_name, [actor_mod])
