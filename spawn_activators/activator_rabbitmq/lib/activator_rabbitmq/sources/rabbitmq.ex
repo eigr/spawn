@@ -54,7 +54,7 @@ defmodule ActivatorRabbitMQ.Sources.RabbitMQ do
   defp get_producer_settings(opts) do
     queue = Keyword.fetch!(opts, :source_queue)
     username = Keyword.fetch!(opts, :username)
-    pasword = Keyword.fetch!(opts, :password)
+    password = Keyword.fetch!(opts, :password)
     provider_host = Keyword.get(opts, :provider_host, "localhost")
     provider_port = Keyword.get(opts, :provider_port, 5672)
     source_concurrency = Keyword.get(opts, :source_concurrency, 1)
@@ -68,7 +68,7 @@ defmodule ActivatorRabbitMQ.Sources.RabbitMQ do
            host: provider_host,
            port: provider_port,
            username: username,
-           password: pasword
+           password: password
          ],
          qos: [
            prefetch_count: qos_prefetch_count

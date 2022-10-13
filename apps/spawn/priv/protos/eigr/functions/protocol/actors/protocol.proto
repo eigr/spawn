@@ -316,7 +316,7 @@ message ActorInvocationResponse {
 //
 // Params:
 //   status: Status of request. Could be one of [UNKNOWN, OK, ACTOR_NOT_FOUND, ERROR].
-//   sytem: The original ActorSystem of the InvocationRequest request.
+//   system: The original ActorSystem of the InvocationRequest request.
 //   actor: The target Actor originally sent in the InvocationRequest message.
 //   value: The value resulting from the request processing that the target Actor made.
 //          This value must be passed by the user function to the one who requested the initial request in InvocationRequest.
