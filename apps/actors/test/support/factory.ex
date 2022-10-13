@@ -14,7 +14,7 @@ defmodule Actors.FactoryTest do
     ActorSettings,
     TimeoutStrategy,
     ActorSnapshotStrategy,
-    ActorDeactivateStrategy,
+    ActorDeactivationStrategy,
     ActorState
   }
 
@@ -95,7 +95,8 @@ defmodule Actors.FactoryTest do
       settings: %ActorSettings{
         persistent: Keyword.get(attrs, :persistent, true),
         snapshot_strategy: attrs[:snapshot_strategy] || build_actor_snapshot_strategy(),
-        deactivate_strategy: attrs[:deactivate_strategy] || build_actor_deactivate_strategy()
+        deactivation_strategy:
+          attrs[:deactivation_strategy] || build_actor_deactivation_strategy()
       },
       state: attrs[:state] || build_actor_state()
     )
@@ -108,10 +109,10 @@ defmodule Actors.FactoryTest do
     ActorState.new(state: Any.new(attrs[:state] || state))
   end
 
-  def build_actor_deactivate_strategy(attrs \\ []) do
+  def build_actor_deactivation_strategy(attrs \\ []) do
     timeout = TimeoutStrategy.new(timeout: attrs[:timeout] || 60_000)
 
-    ActorDeactivateStrategy.new(
+    ActorDeactivationStrategy.new(
       strategy: {attrs[:strategy] || :timeout, attrs[:value] || timeout}
     )
   end

@@ -250,7 +250,7 @@ defmodule Eigr.Functions.Protocol.Actors.ActorSnapshotStrategy do
 
   field :timeout, 1, type: Eigr.Functions.Protocol.Actors.TimeoutStrategy, oneof: 0
 end
-defmodule Eigr.Functions.Protocol.Actors.ActorDeactivateStrategy do
+defmodule Eigr.Functions.Protocol.Actors.ActorDeactivationStrategy do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
 
@@ -277,7 +277,7 @@ defmodule Eigr.Functions.Protocol.Actors.ActorDeactivateStrategy do
           type_name: ".eigr.functions.protocol.actors.TimeoutStrategy"
         }
       ],
-      name: "ActorDeactivateStrategy",
+      name: "ActorDeactivationStrategy",
       nested_type: [],
       oneof_decl: [
         %Google.Protobuf.OneofDescriptorProto{
@@ -652,15 +652,15 @@ defmodule Eigr.Functions.Protocol.Actors.ActorSettings do
           __unknown_fields__: [],
           default_value: nil,
           extendee: nil,
-          json_name: "deactivateStrategy",
+          json_name: "deactivationStrategy",
           label: :LABEL_OPTIONAL,
-          name: "deactivate_strategy",
+          name: "deactivation_strategy",
           number: 4,
           oneof_index: nil,
           options: nil,
           proto3_optional: nil,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.ActorDeactivateStrategy"
+          type_name: ".eigr.functions.protocol.actors.ActorDeactivationStrategy"
         }
       ],
       name: "ActorSettings",
@@ -679,9 +679,9 @@ defmodule Eigr.Functions.Protocol.Actors.ActorSettings do
     type: Eigr.Functions.Protocol.Actors.ActorSnapshotStrategy,
     json_name: "snapshotStrategy"
 
-  field :deactivate_strategy, 4,
-    type: Eigr.Functions.Protocol.Actors.ActorDeactivateStrategy,
-    json_name: "deactivateStrategy"
+  field :deactivation_strategy, 4,
+    type: Eigr.Functions.Protocol.Actors.ActorDeactivationStrategy,
+    json_name: "deactivationStrategy"
 end
 defmodule Eigr.Functions.Protocol.Actors.ActorId do
   @moduledoc false

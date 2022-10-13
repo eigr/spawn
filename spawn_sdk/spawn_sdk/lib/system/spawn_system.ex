@@ -14,7 +14,7 @@ defmodule SpawnSdk.System.SpawnSystem do
     ActorId,
     ActorState,
     ActorSettings,
-    ActorDeactivateStrategy,
+    ActorDeactivationStrategy,
     ActorSnapshotStrategy,
     ActorSystem,
     Command,
@@ -300,8 +300,8 @@ defmodule SpawnSdk.System.SpawnSystem do
           strategy: {:timeout, TimeoutStrategy.new(timeout: snapshot_timeout)}
         )
 
-      deactivate_strategy =
-        ActorDeactivateStrategy.new(
+      deactivation_strategy =
+        ActorDeactivationStrategy.new(
           strategy: {:timeout, TimeoutStrategy.new(timeout: deactivate_timeout)}
         )
 
@@ -312,7 +312,7 @@ defmodule SpawnSdk.System.SpawnSystem do
            abstract: abstract,
            persistent: persistent,
            snapshot_strategy: snapshot_strategy,
-           deactivate_strategy: deactivate_strategy
+           deactivation_strategy: deactivation_strategy
          },
          commands: Enum.map(actions, fn action -> get_action(action) end),
          timer_commands:
@@ -338,8 +338,8 @@ defmodule SpawnSdk.System.SpawnSystem do
           strategy: {:timeout, TimeoutStrategy.new(timeout: snapshot_timeout)}
         )
 
-      deactivate_strategy =
-        ActorDeactivateStrategy.new(
+      deactivation_strategy =
+        ActorDeactivationStrategy.new(
           strategy: {:timeout, TimeoutStrategy.new(timeout: deactivate_timeout)}
         )
 
@@ -350,7 +350,7 @@ defmodule SpawnSdk.System.SpawnSystem do
            abstract: abstract,
            persistent: persistent,
            snapshot_strategy: snapshot_strategy,
-           deactivate_strategy: deactivate_strategy
+           deactivation_strategy: deactivation_strategy
          },
          commands: Enum.map(actions, fn action -> get_action(action) end),
          timer_commands:

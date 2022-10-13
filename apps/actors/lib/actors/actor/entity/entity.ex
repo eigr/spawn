@@ -8,7 +8,7 @@ defmodule Actors.Actor.Entity do
   alias Eigr.Functions.Protocol.Actors.{
     Actor,
     ActorId,
-    ActorDeactivateStrategy,
+    ActorDeactivationStrategy,
     ActorSettings,
     ActorState,
     ActorSnapshotStrategy,
@@ -65,13 +65,13 @@ defmodule Actors.Actor.Entity do
            actor: %Actor{
              id: %ActorId{name: name} = _id,
              settings:
-               %ActorSettings{persistent: false, deactivate_strategy: deactivate_strategy} =
+               %ActorSettings{persistent: false, deactivation_strategy: deactivation_strategy} =
                  _settings,
              timer_commands: timer_commands
            }
          } = state
        )
-       when is_nil(deactivate_strategy) or deactivate_strategy == %{} do
+       when is_nil(deactivation_strategy) or deactivation_strategy == %{} do
     Process.flag(:trap_exit, true)
 
     Logger.notice(
@@ -92,8 +92,8 @@ defmodule Actors.Actor.Entity do
              settings:
                %ActorSettings{
                  persistent: false,
-                 deactivate_strategy:
-                   %ActorDeactivateStrategy{strategy: deactivate_strategy} = _dstrategy
+                 deactivation_strategy:
+                   %ActorDeactivationStrategy{strategy: deactivation_strategy} = _dstrategy
                } = _settings,
              timer_commands: timer_commands
            }
@@ -107,7 +107,7 @@ defmodule Actors.Actor.Entity do
 
     :ok = handle_timers(timer_commands)
 
-    schedule_deactivate(deactivate_strategy, get_timeout_factor(@timeout_factor_range))
+    schedule_deactivate(deactivation_strategy, get_timeout_factor(@timeout_factor_range))
     {:ok, state}
   end
 
@@ -119,13 +119,13 @@ defmodule Actors.Actor.Entity do
                %ActorSettings{
                  persistent: true,
                  snapshot_strategy: %ActorSnapshotStrategy{} = _snapshot_strategy,
-                 deactivate_strategy: deactivate_strategy
+                 deactivation_strategy: deactivation_strategy
                } = _settings,
              timer_commands: timer_commands
            }
          } = state
        )
-       when is_nil(deactivate_strategy) or deactivate_strategy == %{} do
+       when is_nil(deactivation_strategy) or deactivation_strategy == %{} do
     Process.flag(:trap_exit, true)
 
     Logger.notice(
@@ -150,7 +150,9 @@ defmodule Actors.Actor.Entity do
                %ActorSettings{
                  persistent: true,
                  snapshot_strategy: %ActorSnapshotStrategy{} = _snapshot_strategy,
-                 deactivate_strategy: %ActorDeactivateStrategy{strategy: deactivate_strategy}
+                 deactivation_strategy: %ActorDeactivationStrategy{
+                   strategy: deactivation_strategy
+                 }
                } = _settings,
              timer_commands: timer_commands
            }
@@ -164,7 +166,7 @@ defmodule Actors.Actor.Entity do
 
     :ok = handle_timers(timer_commands)
 
-    schedule_deactivate(deactivate_strategy, get_timeout_factor(@timeout_factor_range))
+    schedule_deactivate(deactivation_strategy, get_timeout_factor(@timeout_factor_range))
 
     # Write soon in the first time
     schedule_snapshot_advance(@min_snapshot_threshold + get_timeout_factor(@timeout_factor_range))
@@ -453,9 +455,9 @@ defmodule Actors.Actor.Entity do
              %Actor{
                id: %ActorId{name: name} = _id,
                settings: %ActorSettings{
-                 deactivate_strategy:
-                   %ActorDeactivateStrategy{strategy: deactivate_strategy} =
-                     _actor_deactivate_strategy
+                 deactivation_strategy:
+                   %ActorDeactivationStrategy{strategy: deactivation_strategy} =
+                     _actor_deactivation_strategy
                }
              } = _actor
          } = state
@@ -466,7 +468,7 @@ defmodule Actors.Actor.Entity do
         {:stop, :normal, state}
 
       _ ->
-        schedule_deactivate(deactivate_strategy)
+        schedule_deactivate(deactivation_strategy)
         {:noreply, state, :hibernate}
     end
   end
@@ -682,12 +684,12 @@ defmodule Actors.Actor.Entity do
         get_snapshot_interval(snapshot_strategy, timeout_factor)
       )
 
-  defp schedule_deactivate(deactivate_strategy, timeout_factor \\ 0),
+  defp schedule_deactivate(deactivation_strategy, timeout_factor \\ 0),
     do:
       Process.send_after(
         self(),
         :deactivate,
-        get_deactivate_interval(deactivate_strategy, timeout_factor)
+        get_deactivate_interval(deactivation_strategy, timeout_factor)
       )
 
   defp get_snapshot_interval(timeout_strategy, timeout_factor \\ 0)

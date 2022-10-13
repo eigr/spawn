@@ -135,7 +135,7 @@ defmodule Actors.Registry.ActorRegistry do
                    }},
                  __unknown_fields__: []
                },
-               deactivate_strategy: %Eigr.Functions.Protocol.Actors.ActorDeactivateStrategy{
+               deactivation_strategy: %Eigr.Functions.Protocol.Actors.ActorDeactivationStrategy{
                  strategy: {:timeout,
                    %Eigr.Functions.Protocol.Actors.TimeoutStrategy{
                      timeout: 30000,
