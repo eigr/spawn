@@ -3,7 +3,7 @@ defmodule SpawnSdkExample.Actors.ClockActor do
     name: "clock_actor",
     timers: [clock: 10_000],
     state_type: Io.Eigr.Spawn.Example.MyState,
-    deactivate_timeout: 86400000
+    deactivate_timeout: 86_400_000
 
   require Logger
 

@@ -41,8 +41,8 @@ defmodule ActivatorPubSub.MixProject do
   end
 
   defp releases do
-[
-          activator_pubsub: [
+    [
+      activator_pubsub: [
         include_executables_for: [:unix],
         applications: [activator_pubsub: :permanent],
         steps: [
@@ -50,7 +50,7 @@ defmodule ActivatorPubSub.MixProject do
           &Bakeware.assemble/1
         ],
         bakeware: [compression_level: 19]
-      ],
-]
+      ]
+    ]
   end
 end

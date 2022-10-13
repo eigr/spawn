@@ -12,14 +12,13 @@ defmodule ActivatorRabbitMQ.Application do
   def start(_type, _args) do
     config = Config.load(__MODULE__)
 
-    children =
-      [
-        {Bandit,
-         plug: ActivatorRabbitMQ.Router, scheme: :http, options: [port: get_http_port(config)]},
-        Spawn.Supervisor.child_spec(config),
-        {ActivatorRabbitMQ.Sources.RabbitMQ, make_opts(config)},
-        Actors.Supervisors.EntitySupervisor.child_spec(config)
-      ]
+    children = [
+      {Bandit,
+       plug: ActivatorRabbitMQ.Router, scheme: :http, options: [port: get_http_port(config)]},
+      Spawn.Supervisor.child_spec(config),
+      {ActivatorRabbitMQ.Sources.RabbitMQ, make_opts(config)},
+      Actors.Supervisors.EntitySupervisor.child_spec(config)
+    ]
 
     opts = [strategy: :one_for_one, name: ActivatorRabbitMQ.Supervisor]
     Supervisor.start_link(children, opts)
