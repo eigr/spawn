@@ -53,9 +53,9 @@ defmodule SpawnSdk.Actor do
 
       import SpawnSdk.System.SpawnSystem,
         only: [
-          invoke: 2
+          invoke: 2,
           register: 2,
-          spawn_actor: 2,
+          spawn_actor: 2
         ]
 
       @behaviour SpawnSdk.Actor
