@@ -91,7 +91,7 @@ defmodule SpawnSdk do
   @doc """
   Spawns a abstract actor
 
-  A abstract actor means that you can spawn dinamically the same actor for multiple different names.
+  A abstract actor means that you can spawn dynamically the same actor for multiple different names.
   It is analog to `DynamicSupervisor`
 
   ## Opts

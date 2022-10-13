@@ -47,16 +47,21 @@ defmodule SpawnSdk.Actor do
 
   defmacro __using__(opts) do
     quote bind_quoted: [opts: opts] do
-      alias SpawnSdk.{Context, Value}
+      alias SpawnSdk.{
+        Context,
+        Flow.Broadcast,
+        Flow.SideEffect,
+        Value
+      }
 
       import SpawnSdk.Actor
       import SpawnSdk.Defact
 
       import SpawnSdk.System.SpawnSystem,
         only: [
+          invoke: 2,
           register: 2,
-          spawn_actor: 2,
-          invoke: 2
+          spawn_actor: 2
         ]
 
       @behaviour SpawnSdk.Actor
@@ -64,6 +69,7 @@ defmodule SpawnSdk.Actor do
       abstract_actor = Keyword.get(opts, :abstract, false)
       actions = Keyword.get(opts, :actions, [])
       actor_name = Keyword.get(opts, :name, Atom.to_string(__MODULE__))
+      channel_group = Keyword.get(opts, :channel, nil)
       persistent = Keyword.get(opts, :persistent, true)
       state_type = Keyword.fetch!(opts, :state_type)
       timers = Keyword.get(opts, :timers, [])
@@ -72,6 +78,7 @@ defmodule SpawnSdk.Actor do
       snapshot_timeout = Keyword.get(opts, :snapshot_timeout, 2_000)
 
       def __meta__(:actions), do: unquote(actions)
+      def __meta__(:channel), do: unquote(channel_group)
       def __meta__(:name), do: unquote(actor_name)
       def __meta__(:persistent), do: unquote(persistent)
       def __meta__(:abstract), do: unquote(abstract_actor)

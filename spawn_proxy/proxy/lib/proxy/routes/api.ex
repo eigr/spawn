@@ -44,7 +44,7 @@ defmodule Proxy.Routes.API do
   end
 
   post "/system/:name/actors/:actor_name/invoke" do
-    with %InvocationRequest{system: sytem, actor: actor} = request <-
+    with %InvocationRequest{system: system, actor: actor} = request <-
            get_body(conn.body_params, InvocationRequest),
          {:ok, response} <- Actors.invoke(request) do
       value =
@@ -62,7 +62,7 @@ defmodule Proxy.Routes.API do
         encode(
           InvocationResponse,
           InvocationResponse.new(
-            system: sytem,
+            system: system,
             actor: actor,
             value: value,
             status: RequestStatus.new(status: :OK)

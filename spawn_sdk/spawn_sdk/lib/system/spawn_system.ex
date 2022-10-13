@@ -19,6 +19,7 @@ defmodule SpawnSdk.System.SpawnSystem do
     ActorSystem,
     Command,
     FixedTimerCommand,
+    Metadata,
     Registry,
     TimeoutStrategy
   }
@@ -71,7 +72,7 @@ defmodule SpawnSdk.System.SpawnSystem do
     actor_mod = Keyword.get(spawn_actor_opts, :actor, %{})
 
     if not actor_mod.__meta__(:abstract) do
-      raise "Invalid Actor reference. Only abstract Actor are permited for spawning!"
+      raise "Invalid Actor reference. Only abstract Actor are permitted for spawning!"
     end
 
     new_state = state_to_map(actor_name, [actor_mod])
@@ -160,38 +161,21 @@ defmodule SpawnSdk.System.SpawnSystem do
         new_ctx = %SpawnSdk.Context{state: unpack_unknown(current_state)}
 
         case call_instance(actor_instance, command, value, new_ctx) do
-          {:reply, %SpawnSdk.Value{state: host_state, value: response, effects: effects} = _value} ->
-            resp =
-              if is_nil(effects) or effects == [] do
-                %ActorInvocationResponse{
-                  updated_context:
-                    Eigr.Functions.Protocol.Context.new(state: any_pack!(host_state)),
-                  value: any_pack!(response)
-                }
-              else
-                side_effects =
-                  Enum.map(effects, fn %SpawnSdk.Flow.SideEffect{} = effect ->
-                    %Eigr.Functions.Protocol.SideEffect{
-                      request:
-                        InvocationRequest.new(
-                          system: %Eigr.Functions.Protocol.Actors.ActorSystem{name: system},
-                          actor: %Eigr.Functions.Protocol.Actors.Actor{
-                            id: %ActorId{name: effect.actor_name}
-                          },
-                          value: any_pack!(effect.payload),
-                          command_name: effect.command,
-                          async: true
-                        )
-                    }
-                  end)
+          {:reply,
+           %SpawnSdk.Value{
+             state: host_state,
+             value: response,
+             broadcast: broadcast,
+             effects: effects
+           } = decoded_value} ->
+            broadcast = handle_broadcast(decoded_value)
+            side_effects = handle_side_effects(system, decoded_value)
 
-                %ActorInvocationResponse{
-                  updated_context:
-                    Eigr.Functions.Protocol.Context.new(state: any_pack!(host_state)),
-                  value: any_pack!(response),
-                  workflow: %Workflow{effects: side_effects}
-                }
-              end
+            resp = %ActorInvocationResponse{
+              updated_context: Eigr.Functions.Protocol.Context.new(state: any_pack!(host_state)),
+              value: any_pack!(response),
+              workflow: %Workflow{broadcast: broadcast, effects: side_effects}
+            }
 
             new_actor_state = %{actor_state | state: any_pack!(host_state)}
 
@@ -212,6 +196,63 @@ defmodule SpawnSdk.System.SpawnSystem do
     :ets.insert(:"#{system}:actors", {"actors", actors})
 
     actors
+  end
+
+  defp handle_broadcast(
+         %SpawnSdk.Value{
+           broadcast: broadcast
+         } = _value
+       )
+       when is_nil(broadcast) or broadcast == %{},
+       do: nil
+
+  defp handle_broadcast(
+         %SpawnSdk.Value{
+           broadcast:
+             %SpawnSdk.Flow.Broadcast{channel: channel, command: command, payload: payload} =
+               _broadcast
+         } = _value
+       ) do
+    cmd = if is_atom(command), do: Atom.to_string(command), else: command
+
+    Eigr.Functions.Protocol.Broadcast.new(
+      channel_group: channel,
+      command_name: cmd,
+      value: any_pack!(payload)
+    )
+  end
+
+  defp handle_side_effects(
+         _system,
+         %SpawnSdk.Value{
+           effects: effects
+         } = _value
+       )
+       when is_nil(effects) or effects == [] do
+    []
+  end
+
+  defp handle_side_effects(
+         system,
+         %SpawnSdk.Value{
+           effects: effects
+         } = _value
+       ) do
+    side_effects =
+      Enum.map(effects, fn %SpawnSdk.Flow.SideEffect{} = effect ->
+        %Eigr.Functions.Protocol.SideEffect{
+          request:
+            InvocationRequest.new(
+              system: %Eigr.Functions.Protocol.Actors.ActorSystem{name: system},
+              actor: %Eigr.Functions.Protocol.Actors.Actor{
+                id: %ActorId{name: effect.actor_name}
+              },
+              value: any_pack!(effect.payload),
+              command_name: effect.command,
+              async: true
+            )
+        }
+      end)
   end
 
   defp get_cached_actors(system) do
@@ -295,6 +336,7 @@ defmodule SpawnSdk.System.SpawnSystem do
     actors
     |> Enum.into(%{}, fn actor ->
       name = actor.__meta__(:name)
+      channel = actor.__meta__(:channel)
       abstract = actor.__meta__(:abstract)
       actions = actor.__meta__(:actions)
       persistent = actor.__meta__(:persistent)
@@ -307,7 +349,7 @@ defmodule SpawnSdk.System.SpawnSystem do
           strategy: {:timeout, TimeoutStrategy.new(timeout: snapshot_timeout)}
         )
 
-      deactivate_strategy =
+      deactivation_strategy =
         ActorDeactivationStrategy.new(
           strategy: {:timeout, TimeoutStrategy.new(timeout: deactivate_timeout)}
         )
@@ -315,11 +357,12 @@ defmodule SpawnSdk.System.SpawnSystem do
       {name,
        Actor.new(
          id: %ActorId{system: system, name: name},
+         metadata: %Metadata{channel_group: channel},
          settings: %ActorSettings{
            abstract: abstract,
            persistent: persistent,
            snapshot_strategy: snapshot_strategy,
-           deactivate_strategy: deactivate_strategy
+           deactivation_strategy: deactivation_strategy
          },
          commands: Enum.map(actions, fn action -> get_action(action) end),
          timer_commands:
@@ -333,6 +376,7 @@ defmodule SpawnSdk.System.SpawnSystem do
     actors
     |> Enum.into(%{}, fn actor ->
       name = actor_name
+      channel = actor.__meta__(:channel)
       abstract = actor.__meta__(:abstract)
       actions = actor.__meta__(:actions)
       persistent = actor.__meta__(:persistent)
@@ -345,7 +389,7 @@ defmodule SpawnSdk.System.SpawnSystem do
           strategy: {:timeout, TimeoutStrategy.new(timeout: snapshot_timeout)}
         )
 
-      deactivate_strategy =
+      deactivation_strategy =
         ActorDeactivationStrategy.new(
           strategy: {:timeout, TimeoutStrategy.new(timeout: deactivate_timeout)}
         )
@@ -353,11 +397,12 @@ defmodule SpawnSdk.System.SpawnSystem do
       {name,
        Actor.new(
          id: %ActorId{system: system, name: name},
+         metadata: %Metadata{channel_group: channel},
          settings: %ActorSettings{
            abstract: abstract,
            persistent: persistent,
            snapshot_strategy: snapshot_strategy,
-           deactivate_strategy: deactivate_strategy
+           deactivation_strategy: deactivation_strategy
          },
          commands: Enum.map(actions, fn action -> get_action(action) end),
          timer_commands:

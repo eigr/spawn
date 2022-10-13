@@ -15,17 +15,21 @@ defmodule Actors.Actor.Entity do
     ActorSystem,
     Command,
     FixedTimerCommand,
+    Metadata,
     TimeoutStrategy
   }
 
   alias Eigr.Functions.Protocol.{
     ActorInvocation,
     ActorInvocationResponse,
+    Broadcast,
     Context,
     InvocationRequest,
     SideEffect,
     Workflow
   }
+
+  alias Phoenix.PubSub
 
   import Actors, only: [invoke: 2]
   import Actors.Registry.ActorRegistry, only: [lookup: 2]
@@ -64,20 +68,22 @@ defmodule Actors.Actor.Entity do
          %EntityState{
            actor: %Actor{
              id: %ActorId{name: name} = _id,
+             metadata: metadata,
              settings:
-               %ActorSettings{persistent: false, deactivate_strategy: deactivate_strategy} =
+               %ActorSettings{persistent: false, deactivation_strategy: deactivation_strategy} =
                  _settings,
              timer_commands: timer_commands
            }
          } = state
        )
-       when is_nil(deactivate_strategy) or deactivate_strategy == %{} do
+       when is_nil(deactivation_strategy) or deactivation_strategy == %{} do
     Process.flag(:trap_exit, true)
 
     Logger.notice(
       "Activating actor #{name} in Node #{inspect(Node.self())}. Persistence disabled."
     )
 
+    :ok = handle_metadata(name, metadata)
     :ok = handle_timers(timer_commands)
 
     strategy = {:timeout, TimeoutStrategy.new!(timeout: @default_deactivate_timeout)}
@@ -89,11 +95,12 @@ defmodule Actors.Actor.Entity do
          %EntityState{
            actor: %Actor{
              id: %ActorId{name: name} = _id,
+             metadata: metadata,
              settings:
                %ActorSettings{
                  persistent: false,
-                 deactivate_strategy:
-                   %ActorDeactivationStrategy{strategy: deactivate_strategy} = _dstrategy
+                 deactivation_strategy:
+                   %ActorDeactivationStrategy{strategy: deactivation_strategy} = _dstrategy
                } = _settings,
              timer_commands: timer_commands
            }
@@ -105,9 +112,10 @@ defmodule Actors.Actor.Entity do
       "Activating actor #{name} in Node #{inspect(Node.self())}. Persistence disabled."
     )
 
+    :ok = handle_metadata(name, metadata)
     :ok = handle_timers(timer_commands)
 
-    schedule_deactivate(deactivate_strategy, get_timeout_factor(@timeout_factor_range))
+    schedule_deactivate(deactivation_strategy, get_timeout_factor(@timeout_factor_range))
     {:ok, state}
   end
 
@@ -115,23 +123,25 @@ defmodule Actors.Actor.Entity do
          %EntityState{
            actor: %Actor{
              id: %ActorId{name: name} = _id,
+             metadata: metadata,
              settings:
                %ActorSettings{
                  persistent: true,
                  snapshot_strategy: %ActorSnapshotStrategy{} = _snapshot_strategy,
-                 deactivate_strategy: deactivate_strategy
+                 deactivation_strategy: deactivation_strategy
                } = _settings,
              timer_commands: timer_commands
            }
          } = state
        )
-       when is_nil(deactivate_strategy) or deactivate_strategy == %{} do
+       when is_nil(deactivation_strategy) or deactivation_strategy == %{} do
     Process.flag(:trap_exit, true)
 
     Logger.notice(
       "Activating actor #{name} in Node #{inspect(Node.self())}. Persistence enabled."
     )
 
+    :ok = handle_metadata(name, metadata)
     :ok = handle_timers(timer_commands)
 
     strategy = {:timeout, TimeoutStrategy.new!(timeout: @default_deactivate_timeout)}
@@ -146,11 +156,14 @@ defmodule Actors.Actor.Entity do
          %EntityState{
            actor: %Actor{
              id: %ActorId{name: name} = _id,
+             metadata: metadata,
              settings:
                %ActorSettings{
                  persistent: true,
                  snapshot_strategy: %ActorSnapshotStrategy{} = _snapshot_strategy,
-                 deactivate_strategy: %ActorDeactivationStrategy{strategy: deactivate_strategy}
+                 deactivation_strategy: %ActorDeactivationStrategy{
+                   strategy: deactivation_strategy
+                 }
                } = _settings,
              timer_commands: timer_commands
            }
@@ -159,12 +172,13 @@ defmodule Actors.Actor.Entity do
     Process.flag(:trap_exit, true)
 
     Logger.notice(
-      "Activating actor #{name} in Node #{inspect(Node.self())}. Persistence enabled."
+      "Activating actor #{inspect(name)} in Node #{inspect(Node.self())}. Persistence enabled."
     )
 
+    :ok = handle_metadata(name, metadata)
     :ok = handle_timers(timer_commands)
 
-    schedule_deactivate(deactivate_strategy, get_timeout_factor(@timeout_factor_range))
+    schedule_deactivate(deactivation_strategy, get_timeout_factor(@timeout_factor_range))
 
     # Write soon in the first time
     schedule_snapshot_advance(@min_snapshot_threshold + get_timeout_factor(@timeout_factor_range))
@@ -385,6 +399,27 @@ defmodule Actors.Actor.Entity do
   end
 
   defp do_handle_info(
+         {:receive, cmd, payload},
+         %EntityState{
+           system: _actor_system,
+           actor: %Actor{id: %ActorId{name: actor_name} = _id} = actor
+         } = state
+       ) do
+    Logger.debug(
+      "Actor [#{actor_name}] Received Broadcast Event [#{inspect(payload)}] to perform Action [#{cmd}]"
+    )
+
+    invocation = %InvocationRequest{
+      actor: actor,
+      command_name: cmd,
+      value: payload,
+      async: true
+    }
+
+    do_handle_cast({:invocation_request, invocation, []}, state)
+  end
+
+  defp do_handle_info(
          :snapshot,
          %EntityState{
            actor:
@@ -453,9 +488,9 @@ defmodule Actors.Actor.Entity do
              %Actor{
                id: %ActorId{name: name} = _id,
                settings: %ActorSettings{
-                 deactivate_strategy:
-                   %ActorDeactivationStrategy{strategy: deactivate_strategy} =
-                     _actor_deactivate_strategy
+                 deactivation_strategy:
+                   %ActorDeactivationStrategy{strategy: deactivation_strategy} =
+                     _actor_deactivation_strategy
                }
              } = _actor
          } = state
@@ -466,7 +501,7 @@ defmodule Actors.Actor.Entity do
         {:stop, :normal, state}
 
       _ ->
-        schedule_deactivate(deactivate_strategy)
+        schedule_deactivate(deactivation_strategy)
         {:noreply, state, :hibernate}
     end
   end
@@ -560,11 +595,24 @@ defmodule Actors.Actor.Entity do
   end
 
   defp do_run_workflow(
-         %ActorInvocationResponse{workflow: %Workflow{effects: effects} = _workflow} = response,
+         %ActorInvocationResponse{
+           workflow: %Workflow{broadcast: broadcast, effects: effects} = _workflow
+         } = response,
          _state
        ) do
     do_side_effects(effects)
+    do_broadcast(broadcast)
     response
+  end
+
+  def do_broadcast(broadcast) when is_nil(broadcast) or broadcast == %{} do
+    :ok
+  end
+
+  def do_broadcast(
+        %Broadcast{channel_group: channel, command_name: command, value: payload} = _broadcast
+      ) do
+    publish(channel, command, payload)
   end
 
   def do_side_effects(effects) when is_list(effects) and effects == [] do
@@ -641,6 +689,30 @@ defmodule Actors.Actor.Entity do
     GenServer.cast(via(ref), {:invocation_request, request, opts})
   end
 
+  defp handle_metadata(_actor, metadata) when is_nil(metadata) or metadata == %{} do
+    :ok
+  end
+
+  defp handle_metadata(actor, %Metadata{channel_group: channel, tags: _tags} = _metadata) do
+    :ok = subscribe(actor, channel)
+    :ok
+  end
+
+  defp publish(channel, command, payload) do
+    PubSub.broadcast(
+      :actor_channel,
+      channel,
+      {:receive, command, payload}
+    )
+  end
+
+  defp subscribe(_actor, channel) when is_nil(channel), do: :ok
+
+  defp subscribe(actor, channel) do
+    Logger.debug("Actor [#{actor}] is subscribing to channel [#{channel}]")
+    PubSub.subscribe(:actor_channel, channel)
+  end
+
   defp get_interface(system_name, actor_name, opts),
     do:
       Keyword.get(
@@ -682,12 +754,12 @@ defmodule Actors.Actor.Entity do
         get_snapshot_interval(snapshot_strategy, timeout_factor)
       )
 
-  defp schedule_deactivate(deactivate_strategy, timeout_factor \\ 0),
+  defp schedule_deactivate(deactivation_strategy, timeout_factor \\ 0),
     do:
       Process.send_after(
         self(),
         :deactivate,
-        get_deactivate_interval(deactivate_strategy, timeout_factor)
+        get_deactivate_interval(deactivation_strategy, timeout_factor)
       )
 
   defp get_snapshot_interval(timeout_strategy, timeout_factor \\ 0)

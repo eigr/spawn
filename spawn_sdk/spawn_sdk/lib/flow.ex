@@ -1,4 +1,31 @@
 defmodule SpawnSdk.Flow do
+  defmodule Broadcast do
+    defstruct channel: nil, command: nil, payload: nil
+
+    @type t :: %__MODULE__{
+            channel: String.t(),
+            command: String.t() | atom(),
+            payload: module()
+          }
+
+    @type channel :: String.t()
+
+    @type command :: String.t() | atom()
+
+    @type payload :: module()
+
+    @spec to(channel(), command(), payload()) :: Broadcast.t()
+    def to(channel, command, payload) do
+      command_name = if is_atom(command), do: Atom.to_string(command), else: command
+
+      %__MODULE__{
+        channel: channel,
+        command: command_name,
+        payload: payload
+      }
+    end
+  end
+
   defmodule SideEffect do
     defstruct actor_name: nil, command: nil, payload: nil
 

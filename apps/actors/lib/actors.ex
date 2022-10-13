@@ -200,8 +200,12 @@ defmodule Actors do
       max_demand: @activate_actors_max_demand
     )
     |> Flow.filter(fn {_actor_name,
-                       %Actor{settings: %ActorSettings{persistent: persistent}} = _actor} ->
-      is_boolean(persistent) and match?(true, persistent)
+                       %Actor{
+                         settings: %ActorSettings{persistent: persistent, abstract: abstract}
+                       } = _actor} ->
+      is_boolean(persistent) and
+        match?(true, persistent) and
+        match?(false, abstract)
     end)
     |> Flow.map(fn {actor_name, actor} ->
       Logger.debug("Registering #{actor_name} #{inspect(actor)} on Node: #{inspect(Node.self())}")
