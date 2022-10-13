@@ -39,7 +39,7 @@ defmodule ActivatorHTTP.MixProject do
   end
 
   defp releases do
-[
+    [
       activator_http: [
         include_executables_for: [:unix],
         applications: [activator_http: :permanent],
@@ -48,7 +48,7 @@ defmodule ActivatorHTTP.MixProject do
           &Bakeware.assemble/1
         ],
         bakeware: [compression_level: 19]
-      ],
-]
+      ]
+    ]
   end
 end

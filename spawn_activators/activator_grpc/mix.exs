@@ -37,8 +37,8 @@ defmodule ActivatorGRPC.MixProject do
   end
 
   defp releases do
-[
-          activator_grpc: [
+    [
+      activator_grpc: [
         include_executables_for: [:unix],
         applications: [activator_grpc: :permanent],
         steps: [
@@ -46,7 +46,7 @@ defmodule ActivatorGRPC.MixProject do
           &Bakeware.assemble/1
         ],
         bakeware: [compression_level: 19]
-      ],
-]
+      ]
+    ]
   end
 end

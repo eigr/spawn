@@ -40,8 +40,8 @@ defmodule ActivatorSQS.MixProject do
   end
 
   defp releases do
-[
-          activator_sqs: [
+    [
+      activator_sqs: [
         include_executables_for: [:unix],
         applications: [activator_sqs: :permanent],
         steps: [
@@ -49,7 +49,7 @@ defmodule ActivatorSQS.MixProject do
           &Bakeware.assemble/1
         ],
         bakeware: [compression_level: 19]
-      ],
-]
+      ]
+    ]
   end
 end
