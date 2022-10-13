@@ -14,7 +14,7 @@ defmodule Actors.FactoryTest do
     ActorSettings,
     TimeoutStrategy,
     ActorSnapshotStrategy,
-    ActorDeactivateStrategy,
+    ActorDeactivationStrategy,
     ActorState
   }
 
@@ -111,7 +111,7 @@ defmodule Actors.FactoryTest do
   def build_actor_deactivate_strategy(attrs \\ []) do
     timeout = TimeoutStrategy.new(timeout: attrs[:timeout] || 60_000)
 
-    ActorDeactivateStrategy.new(
+    ActorDeactivationStrategy.new(
       strategy: {attrs[:strategy] || :timeout, attrs[:value] || timeout}
     )
   end

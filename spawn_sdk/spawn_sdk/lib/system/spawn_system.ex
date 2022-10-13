@@ -14,7 +14,7 @@ defmodule SpawnSdk.System.SpawnSystem do
     ActorId,
     ActorState,
     ActorSettings,
-    ActorDeactivateStrategy,
+    ActorDeactivationStrategy,
     ActorSnapshotStrategy,
     ActorSystem,
     Command,
@@ -308,7 +308,7 @@ defmodule SpawnSdk.System.SpawnSystem do
         )
 
       deactivate_strategy =
-        ActorDeactivateStrategy.new(
+        ActorDeactivationStrategy.new(
           strategy: {:timeout, TimeoutStrategy.new(timeout: deactivate_timeout)}
         )
 
@@ -346,7 +346,7 @@ defmodule SpawnSdk.System.SpawnSystem do
         )
 
       deactivate_strategy =
-        ActorDeactivateStrategy.new(
+        ActorDeactivationStrategy.new(
           strategy: {:timeout, TimeoutStrategy.new(timeout: deactivate_timeout)}
         )
 

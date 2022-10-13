@@ -8,7 +8,7 @@ defmodule Actors.Actor.Entity do
   alias Eigr.Functions.Protocol.Actors.{
     Actor,
     ActorId,
-    ActorDeactivateStrategy,
+    ActorDeactivationStrategy,
     ActorSettings,
     ActorState,
     ActorSnapshotStrategy,
@@ -93,7 +93,7 @@ defmodule Actors.Actor.Entity do
                %ActorSettings{
                  persistent: false,
                  deactivate_strategy:
-                   %ActorDeactivateStrategy{strategy: deactivate_strategy} = _dstrategy
+                   %ActorDeactivationStrategy{strategy: deactivate_strategy} = _dstrategy
                } = _settings,
              timer_commands: timer_commands
            }
@@ -150,7 +150,7 @@ defmodule Actors.Actor.Entity do
                %ActorSettings{
                  persistent: true,
                  snapshot_strategy: %ActorSnapshotStrategy{} = _snapshot_strategy,
-                 deactivate_strategy: %ActorDeactivateStrategy{strategy: deactivate_strategy}
+                 deactivate_strategy: %ActorDeactivationStrategy{strategy: deactivate_strategy}
                } = _settings,
              timer_commands: timer_commands
            }
@@ -454,7 +454,7 @@ defmodule Actors.Actor.Entity do
                id: %ActorId{name: name} = _id,
                settings: %ActorSettings{
                  deactivate_strategy:
-                   %ActorDeactivateStrategy{strategy: deactivate_strategy} =
+                   %ActorDeactivationStrategy{strategy: deactivate_strategy} =
                      _actor_deactivate_strategy
                }
              } = _actor
