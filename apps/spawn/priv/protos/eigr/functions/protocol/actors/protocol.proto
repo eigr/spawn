@@ -239,7 +239,22 @@ message SideEffect {
     InvocationRequest request = 1;
 }
 
+// Broadcast a message to many Actors
+message Broadcast {
+    // Channel of target Actors
+    string channel_group = 1;
+
+    // Command. Only Actors that have this command will run successfully
+    string command_name = 2;
+
+    // Payload
+    google.protobuf.Any value = 3;
+}
+
 message Workflow {
+    
+    Broadcast broadcast = 2;
+
     repeated SideEffect effects = 1;
 }
 

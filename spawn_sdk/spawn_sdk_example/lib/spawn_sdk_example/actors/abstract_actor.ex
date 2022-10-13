@@ -8,8 +8,6 @@ defmodule SpawnSdkExample.Actors.AbstractActor do
 
   alias Io.Eigr.Spawn.Example.{MyState, MyBusinessMessage}
 
-  alias SpawnSdk.Flow.SideEffect
-
   @impl true
   def handle_command(
         {:sum, %MyBusinessMessage{value: value} = data},

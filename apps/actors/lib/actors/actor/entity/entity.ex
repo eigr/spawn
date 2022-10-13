@@ -15,17 +15,21 @@ defmodule Actors.Actor.Entity do
     ActorSystem,
     Command,
     FixedTimerCommand,
+    Metadata,
     TimeoutStrategy
   }
 
   alias Eigr.Functions.Protocol.{
     ActorInvocation,
     ActorInvocationResponse,
+    Broadcast,
     Context,
     InvocationRequest,
     SideEffect,
     Workflow
   }
+
+  alias Phoenix.PubSub
 
   import Actors, only: [invoke: 2]
   import Actors.Registry.ActorRegistry, only: [lookup: 2]
@@ -64,6 +68,7 @@ defmodule Actors.Actor.Entity do
          %EntityState{
            actor: %Actor{
              id: %ActorId{name: name} = _id,
+             metadata: metadata,
              settings:
                %ActorSettings{persistent: false, deactivation_strategy: deactivation_strategy} =
                  _settings,
@@ -78,6 +83,7 @@ defmodule Actors.Actor.Entity do
       "Activating actor #{name} in Node #{inspect(Node.self())}. Persistence disabled."
     )
 
+    :ok = handle_metadata(name, metadata)
     :ok = handle_timers(timer_commands)
 
     strategy = {:timeout, TimeoutStrategy.new!(timeout: @default_deactivate_timeout)}
@@ -89,6 +95,7 @@ defmodule Actors.Actor.Entity do
          %EntityState{
            actor: %Actor{
              id: %ActorId{name: name} = _id,
+             metadata: metadata,
              settings:
                %ActorSettings{
                  persistent: false,
@@ -105,6 +112,7 @@ defmodule Actors.Actor.Entity do
       "Activating actor #{name} in Node #{inspect(Node.self())}. Persistence disabled."
     )
 
+    :ok = handle_metadata(name, metadata)
     :ok = handle_timers(timer_commands)
 
     schedule_deactivate(deactivation_strategy, get_timeout_factor(@timeout_factor_range))
@@ -115,6 +123,7 @@ defmodule Actors.Actor.Entity do
          %EntityState{
            actor: %Actor{
              id: %ActorId{name: name} = _id,
+             metadata: metadata,
              settings:
                %ActorSettings{
                  persistent: true,
@@ -132,6 +141,7 @@ defmodule Actors.Actor.Entity do
       "Activating actor #{name} in Node #{inspect(Node.self())}. Persistence enabled."
     )
 
+    :ok = handle_metadata(name, metadata)
     :ok = handle_timers(timer_commands)
 
     strategy = {:timeout, TimeoutStrategy.new!(timeout: @default_deactivate_timeout)}
@@ -146,6 +156,7 @@ defmodule Actors.Actor.Entity do
          %EntityState{
            actor: %Actor{
              id: %ActorId{name: name} = _id,
+             metadata: metadata,
              settings:
                %ActorSettings{
                  persistent: true,
@@ -161,9 +172,10 @@ defmodule Actors.Actor.Entity do
     Process.flag(:trap_exit, true)
 
     Logger.notice(
-      "Activating actor #{name} in Node #{inspect(Node.self())}. Persistence enabled."
+      "Activating actor #{inspect(name)} in Node #{inspect(Node.self())}. Persistence enabled."
     )
 
+    :ok = handle_metadata(name, metadata)
     :ok = handle_timers(timer_commands)
 
     schedule_deactivate(deactivation_strategy, get_timeout_factor(@timeout_factor_range))
@@ -387,6 +399,27 @@ defmodule Actors.Actor.Entity do
   end
 
   defp do_handle_info(
+         {:receive, cmd, payload},
+         %EntityState{
+           system: _actor_system,
+           actor: %Actor{id: %ActorId{name: actor_name} = _id} = actor
+         } = state
+       ) do
+    Logger.debug(
+      "Actor [#{actor_name}] Received Broadcast Event [#{inspect(payload)}] to perform Action [#{cmd}]"
+    )
+
+    invocation = %InvocationRequest{
+      actor: actor,
+      command_name: cmd,
+      value: payload,
+      async: true
+    }
+
+    do_handle_cast({:invocation_request, invocation, []}, state)
+  end
+
+  defp do_handle_info(
          :snapshot,
          %EntityState{
            actor:
@@ -562,11 +595,24 @@ defmodule Actors.Actor.Entity do
   end
 
   defp do_run_workflow(
-         %ActorInvocationResponse{workflow: %Workflow{effects: effects} = _workflow} = response,
+         %ActorInvocationResponse{
+           workflow: %Workflow{broadcast: broadcast, effects: effects} = _workflow
+         } = response,
          _state
        ) do
     do_side_effects(effects)
+    do_broadcast(broadcast)
     response
+  end
+
+  def do_broadcast(broadcast) when is_nil(broadcast) or broadcast == %{} do
+    :ok
+  end
+
+  def do_broadcast(
+        %Broadcast{channel_group: channel, command_name: command, value: payload} = broadcast
+      ) do
+    publish(channel, command, payload)
   end
 
   def do_side_effects(effects) when is_list(effects) and effects == [] do
@@ -641,6 +687,30 @@ defmodule Actors.Actor.Entity do
 
   def invoke_async(ref, request, opts) do
     GenServer.cast(via(ref), {:invocation_request, request, opts})
+  end
+
+  defp handle_metadata(_actor, metadata) when is_nil(metadata) or metadata == %{} do
+    :ok
+  end
+
+  defp handle_metadata(actor, %Metadata{channel_group: channel, tags: _tags} = _metadata) do
+    :ok = subscribe(actor, channel)
+    :ok
+  end
+
+  defp publish(channel, command, payload) do
+    PubSub.broadcast(
+      :actor_channel,
+      channel,
+      {:receive, command, payload}
+    )
+  end
+
+  defp subscribe(actor, channel) when is_nil(channel), do: :ok
+
+  defp subscribe(actor, channel) do
+    Logger.debug("Actor [#{actor}] is subscribing to channel [#{channel}]")
+    PubSub.subscribe(:actor_channel, channel)
   end
 
   defp get_interface(system_name, actor_name, opts),

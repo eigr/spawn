@@ -518,6 +518,74 @@ defmodule Eigr.Functions.Protocol.SideEffect do
 
   field :request, 1, type: Eigr.Functions.Protocol.InvocationRequest
 end
+defmodule Eigr.Functions.Protocol.Broadcast do
+  @moduledoc false
+  use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
+
+  def descriptor do
+    # credo:disable-for-next-line
+    %Google.Protobuf.DescriptorProto{
+      __unknown_fields__: [],
+      enum_type: [],
+      extension: [],
+      extension_range: [],
+      field: [
+        %Google.Protobuf.FieldDescriptorProto{
+          __unknown_fields__: [],
+          default_value: nil,
+          extendee: nil,
+          json_name: "channelGroup",
+          label: :LABEL_OPTIONAL,
+          name: "channel_group",
+          number: 1,
+          oneof_index: nil,
+          options: nil,
+          proto3_optional: nil,
+          type: :TYPE_STRING,
+          type_name: nil
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          __unknown_fields__: [],
+          default_value: nil,
+          extendee: nil,
+          json_name: "commandName",
+          label: :LABEL_OPTIONAL,
+          name: "command_name",
+          number: 2,
+          oneof_index: nil,
+          options: nil,
+          proto3_optional: nil,
+          type: :TYPE_STRING,
+          type_name: nil
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          __unknown_fields__: [],
+          default_value: nil,
+          extendee: nil,
+          json_name: "value",
+          label: :LABEL_OPTIONAL,
+          name: "value",
+          number: 3,
+          oneof_index: nil,
+          options: nil,
+          proto3_optional: nil,
+          type: :TYPE_MESSAGE,
+          type_name: ".google.protobuf.Any"
+        }
+      ],
+      name: "Broadcast",
+      nested_type: [],
+      oneof_decl: [],
+      options: nil,
+      reserved_name: [],
+      reserved_range: []
+    }
+  end
+
+  field :channel_group, 1, type: :string, json_name: "channelGroup"
+  field :command_name, 2, type: :string, json_name: "commandName"
+  field :value, 3, type: Google.Protobuf.Any
+end
 defmodule Eigr.Functions.Protocol.Workflow do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
@@ -530,6 +598,20 @@ defmodule Eigr.Functions.Protocol.Workflow do
       extension: [],
       extension_range: [],
       field: [
+        %Google.Protobuf.FieldDescriptorProto{
+          __unknown_fields__: [],
+          default_value: nil,
+          extendee: nil,
+          json_name: "broadcast",
+          label: :LABEL_OPTIONAL,
+          name: "broadcast",
+          number: 2,
+          oneof_index: nil,
+          options: nil,
+          proto3_optional: nil,
+          type: :TYPE_MESSAGE,
+          type_name: ".eigr.functions.protocol.Broadcast"
+        },
         %Google.Protobuf.FieldDescriptorProto{
           __unknown_fields__: [],
           default_value: nil,
@@ -554,6 +636,7 @@ defmodule Eigr.Functions.Protocol.Workflow do
     }
   end
 
+  field :broadcast, 2, type: Eigr.Functions.Protocol.Broadcast
   field :effects, 1, repeated: true, type: Eigr.Functions.Protocol.SideEffect
 end
 defmodule Eigr.Functions.Protocol.InvocationRequest do

@@ -66,6 +66,15 @@ message ActorState {
     google.protobuf.Any state = 2;
 }
 
+// TODO doc here
+message Metadata {
+    // A channel group represents a way to send commands to various actors 
+    // that belong to a certain semantic group.
+    string channel_group = 1;
+
+    map<string, string> tags = 2;
+}
+
 message ActorSettings {
 
     // Indicates if actor´s is abstract or non abstract.
@@ -95,6 +104,9 @@ message Actor {
 
     // A Actor state.
     ActorState state = 2;
+
+    // Actor metadata
+    Metadata metadata = 6;
 
     // Actor settings.
     ActorSettings settings = 3;

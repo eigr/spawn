@@ -1,15 +1,18 @@
 defmodule SpawnSdk.Value do
-  alias SpawnSdk.Flow.SideEffect
+  alias SpawnSdk.Flow.{Broadcast, SideEffect}
 
-  defstruct state: nil, value: nil, effects: nil
+  defstruct state: nil, value: nil, broadcast: nil, effects: nil
 
   @type t :: %__MODULE__{
           state: module(),
           value: module(),
+          broadcast: Broadcast.t(),
           effects: list(SideEffect.t())
         }
 
   @type value :: __MODULE__.t()
+
+  @type broadcast :: Broadcast.t()
 
   @type effects :: list(SideEffect.t())
 
@@ -33,6 +36,11 @@ defmodule SpawnSdk.Value do
   @spec value(value(), response()) :: value()
   def value(%SpawnSdk.Value{} = value, response) do
     struct(value, value: response)
+  end
+
+  @spec broadcast(value(), broadcast()) :: value()
+  def broadcast(%SpawnSdk.Value{} = value, broadcast) do
+    struct(value, broadcast: broadcast)
   end
 
   @spec effect(value(), effects()) :: value()
