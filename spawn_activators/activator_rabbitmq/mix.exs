@@ -39,8 +39,8 @@ defmodule ActivatorRabbitMQ.MixProject do
   end
 
   defp releases do
-[
-          activator_rabbitmq: [
+    [
+      activator_rabbitmq: [
         include_executables_for: [:unix],
         applications: [activator_rabbitmq: :permanent],
         steps: [
@@ -48,7 +48,7 @@ defmodule ActivatorRabbitMQ.MixProject do
           &Bakeware.assemble/1
         ],
         bakeware: [compression_level: 19]
-      ],
-]
+      ]
+    ]
   end
 end

@@ -40,8 +40,8 @@ defmodule ActivatorKafka.MixProject do
   end
 
   defp releases do
-[
-          activator_kafka: [
+    [
+      activator_kafka: [
         include_executables_for: [:unix],
         applications: [activator_kafka: :permanent],
         steps: [
@@ -49,7 +49,7 @@ defmodule ActivatorKafka.MixProject do
           &Bakeware.assemble/1
         ],
         bakeware: [compression_level: 19]
-      ],
-]
+      ]
+    ]
   end
 end
