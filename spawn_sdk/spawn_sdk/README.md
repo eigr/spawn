@@ -63,11 +63,10 @@ defmodule SpawnSdkExample.Actors.MyActor do
     snapshot_timeout: 2_000
 
   require Logger
+
   alias Io.Eigr.Spawn.Example.{MyState, MyBusinessMessage}
 
-  @impl true
-  def handle_command(
-        {:sum, %MyBusinessMessage{value: value} = data},
+  defact sum(%MyBusinessMessage{value: value} = data},
         %Context{state: state} = ctx
       ) do
     Logger.info("Received Request: #{inspect(data)}. Context: #{inspect(ctx)}")
@@ -96,11 +95,10 @@ defmodule SpawnSdkExample.Actors.AbstractActor do
     state_type: Io.Eigr.Spawn.Example.MyState
 
   require Logger
+
   alias Io.Eigr.Spawn.Example.{MyState, MyBusinessMessage}
 
-  @impl true
-  def handle_command(
-        {:sum, %MyBusinessMessage{value: value} = data},
+  defact sum(%MyBusinessMessage{value: value} = data},
         %Context{state: state} = ctx
       ) do
     Logger.info("Received Request: #{inspect(data)}. Context: #{inspect(ctx)}")
@@ -140,11 +138,7 @@ defmodule SpawnSdkExample.Actors.AbstractActor do
 
   alias SpawnSdk.Flow.SideEffect
 
-  @impl true
-  def handle_command(
-        {:sum, %MyBusinessMessage{value: value} = data},
-        %Context{state: state} = ctx
-      ) do
+  defact sum(%MyBusinessMessage{value: value} = data}, %Context{state: state} = ctx) do
     Logger.info("Received Request: #{inspect(data)}. Context: #{inspect(ctx)}")
 
     new_value =
@@ -176,6 +170,88 @@ end
 In the example above we see that the Actor joe will receive a request as a side effect from the Actor who issued this effect.
 
 Side effects do not interfere with an actor's request-response flow. They will "always" be processed asynchronously and any response sent back from the Actor receiving the effect will be ignored by the effector.
+
+## Broadcast
+
+Actors can also send messages to a group of actors at once as an action callback. See the example below:
+
+```elixir
+defmodule Fleet.Actors.Driver do
+  use SpawnSdk.Actor,
+    abstract: true,
+    channel: "drivers", # Set ´driver´ channel for all actors of the same type (Fleet.Actors.Driver)
+    state_type: Fleet.Domain.Driver
+
+  alias Fleet.Domain.{
+    Driver,
+    OfferRequest,
+    OfferResponse,
+    Point
+  }
+
+  require Logger
+
+  @brain_actor_channel "fleet-controllers"
+
+  defact update_position(%Point{} = position}, %Context{state: %Driver{id: name} = driver} = ctx) do
+    Logger.info(
+      "Driver [#{name}] Received Update Position Event. Position: [#{inspect(position)}]. Context: #{inspect(ctx)}"
+    )
+
+    driver_state = %Driver{driver | position: position}
+
+    %Value{}
+    |> Value.of(driver_state, driver_state)
+    |> Value.broadcast(
+      Broadcast.to(
+        @brain_actor_channel,
+        "driver_position",
+        driver_state
+      )
+    )
+    |> Value.reply!()
+  end
+end
+```
+
+In the case above, every time an Actor "driver" executes the update_position action it will send a message to all the actors participating in the channel called "fleet-controllers".
+
+## Timers
+
+Actors can also declare Actions that act recursively as timers. See an example below:
+
+```elixir
+defmodule SpawnSdkExample.Actors.ClockActor do
+  use SpawnSdk.Actor,
+    name: "clock_actor",
+    state_type: Io.Eigr.Spawn.Example.MyState,
+    deactivate_timeout: 86_400_000
+
+  require Logger
+
+  alias Io.Eigr.Spawn.Example.MyState
+
+  @set_timer 15_000
+  defact clock(_ignored_data, %Context{state: state} = ctx) do
+    Logger.info("Clock Actor Received Request. Context: #{inspect(ctx)}")
+
+    new_state =
+      if is_nil(state) do
+        %MyState{value: 0}
+      else
+        state
+      end
+
+    Value.of()
+    |> Value.state(new_state)
+    |> Value.noreply!()
+  end
+end
+```
+
+> **_NOTE:_** Timers Actions are ephemeral and only exist while the Actor is Enabled, ie running. Therefore Timers are not persistent and will not reactivate a timer's Actor after it is deactivated. Note that in the example above we set the value of deactivate timeout to an exceptionally high number, this is done to make the Actor remain active.
+
+In the example above the ´clock´ action will be called every 15 seconds.
 
 ### Declaring the supervision tree
 
