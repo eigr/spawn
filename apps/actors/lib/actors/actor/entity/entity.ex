@@ -610,7 +610,7 @@ defmodule Actors.Actor.Entity do
   end
 
   def do_broadcast(
-        %Broadcast{channel_group: channel, command_name: command, value: payload} = broadcast
+        %Broadcast{channel_group: channel, command_name: command, value: payload} = _broadcast
       ) do
     publish(channel, command, payload)
   end
@@ -706,7 +706,7 @@ defmodule Actors.Actor.Entity do
     )
   end
 
-  defp subscribe(actor, channel) when is_nil(channel), do: :ok
+  defp subscribe(_actor, channel) when is_nil(channel), do: :ok
 
   defp subscribe(actor, channel) do
     Logger.debug("Actor [#{actor}] is subscribing to channel [#{channel}]")

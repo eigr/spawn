@@ -1,18 +1,13 @@
 defmodule SpawnSdkExample.Actors.AbstractActor do
   use SpawnSdk.Actor,
     abstract: true,
-    actions: [:sum],
     state_type: Io.Eigr.Spawn.Example.MyState
 
   require Logger
 
   alias Io.Eigr.Spawn.Example.{MyState, MyBusinessMessage}
 
-  @impl true
-  def handle_command(
-        {:sum, %MyBusinessMessage{value: value} = data},
-        %Context{state: state} = ctx
-      ) do
+  defact sum(%MyBusinessMessage{value: value} = data, %Context{state: state} = ctx) do
     Logger.info("Received Request: #{inspect(data)}. Context: #{inspect(ctx)}")
 
     new_value =
