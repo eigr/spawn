@@ -1,37 +1,42 @@
 defmodule SpawnSdk.Defact do
   @moduledoc """
   Define actions like a Elixir functions
+
+  ### Internal :defact_exports metadata saved as
+  [
+    {action_name, %{timer: 10_000}},
+    {action_name2, %{timer: nil}}
+  ]
   """
 
-  @defact_actions_exports :__defact_actions_exports__
-  @defact_timer_actions_exports :__defact_timer_actions_exports__
+  defmacro __using__(_args) do
+    quote do
+      import SpawnSdk.Defact
+
+      Module.register_attribute(__MODULE__, :defact_exports, accumulate: true)
+
+      @set_timer nil
+    end
+  end
 
   defmacro defact(call, do: block) do
     define_defact(:def, call, block, __CALLER__)
   end
 
   defp define_defact(kind, call, block, env) do
-    # TODO some magic here
-    IO.inspect(kind, label: "kind")
-    IO.inspect(call, label: "call")
-    IO.inspect(block, label: "block")
-    IO.inspect(env, label: "env")
-
     {name, args} = decompose_call!(kind, call, env)
-    IO.inspect(name, label: "Name")
-    IO.inspect(args, label: "args")
-    arity = length(args)
+    [first_arg, last_arg] = args
 
-    #if length(arity) <= 0, do: raise(ArgumentError)
+    quote do
+      Module.put_attribute(
+        __MODULE__,
+        :defact_exports,
+        Macro.escape({unquote(name), %{timer: @set_timer}})
+      )
 
-    # TODO PUT Actions and TimerActions functions in Modules attributes
-
-    quote bind_quoted: [
-            name: name,
-            args: args,
-            block: block
-          ] do
-      def unquote(name)(unquote(args)), do: unquote(block)
+      def handle_command({unquote(name), unquote(first_arg)}, unquote(last_arg)) do
+        unquote(block)
+      end
     end
   end
 

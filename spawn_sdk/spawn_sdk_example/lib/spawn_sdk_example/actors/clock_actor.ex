@@ -1,7 +1,6 @@
 defmodule SpawnSdkExample.Actors.ClockActor do
   use SpawnSdk.Actor,
     name: "clock_actor",
-    timers: [clock: 10_000],
     state_type: Io.Eigr.Spawn.Example.MyState,
     deactivate_timeout: 86_400_000
 
@@ -9,8 +8,8 @@ defmodule SpawnSdkExample.Actors.ClockActor do
 
   alias Io.Eigr.Spawn.Example.MyState
 
-  @impl true
-  def handle_command({:clock, _ignored_data}, %Context{state: state} = ctx) do
+  @set_timer 15_000
+  defact clock(_ignored_data, %Context{state: state} = ctx) do
     Logger.info("Clock Actor Received Request. Context: #{inspect(ctx)}")
 
     new_state =

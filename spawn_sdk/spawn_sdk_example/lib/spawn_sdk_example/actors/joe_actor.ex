@@ -1,7 +1,6 @@
 defmodule SpawnSdkExample.Actors.JoeActor do
   use SpawnSdk.Actor,
     name: "joe",
-    actions: [:sum],
     state_type: Io.Eigr.Spawn.Example.MyState,
     deactivate_timeout: 30_000,
     snapshot_timeout: 2_000
@@ -9,11 +8,7 @@ defmodule SpawnSdkExample.Actors.JoeActor do
   require Logger
   alias Io.Eigr.Spawn.Example.{MyState, MyBusinessMessage}
 
-  @impl true
-  def handle_command(
-        {:sum, %MyBusinessMessage{value: value} = data},
-        %Context{state: state} = ctx
-      ) do
+  defact sum(%MyBusinessMessage{value: value} = data, %Context{state: state} = ctx) do
     Logger.info("Received Request: #{inspect(data)}. Context: #{inspect(ctx)}")
 
     new_value =
@@ -28,7 +23,7 @@ defmodule SpawnSdkExample.Actors.JoeActor do
     |> Value.reply!()
   end
 
-  def handle_command({:ping, _data}, %Context{state: state} = ctx) do
+  defact ping(_data, %Context{state: state} = ctx) do
     Logger.info("Received Request. Context: #{inspect(ctx)}")
 
     new_state =

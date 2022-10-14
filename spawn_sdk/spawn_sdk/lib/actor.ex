@@ -55,7 +55,7 @@ defmodule SpawnSdk.Actor do
       }
 
       import SpawnSdk.Actor
-      import SpawnSdk.Defact
+      use SpawnSdk.Defact
 
       import SpawnSdk.System.SpawnSystem,
         only: [
@@ -64,20 +64,40 @@ defmodule SpawnSdk.Actor do
           spawn_actor: 2
         ]
 
+      Module.register_attribute(__MODULE__, :actor_opts, persist: true)
+      Module.put_attribute(__MODULE__, :actor_opts, opts)
+
       @behaviour SpawnSdk.Actor
+      @before_compile SpawnSdk.Actor
+    end
+  end
 
-      abstract_actor = Keyword.get(opts, :abstract, false)
-      actions = Keyword.get(opts, :actions, [])
-      actor_name = Keyword.get(opts, :name, Atom.to_string(__MODULE__))
-      channel_group = Keyword.get(opts, :channel, nil)
-      persistent = Keyword.get(opts, :persistent, true)
-      state_type = Keyword.fetch!(opts, :state_type)
-      timers = Keyword.get(opts, :timers, [])
+  defmacro __before_compile__(_a) do
+    opts = Module.get_attribute(__CALLER__.module, :actor_opts)
+    actions = Module.get_attribute(__CALLER__.module, :defact_exports)
 
-      deactivate_timeout = Keyword.get(opts, :deactivate_timeout, 10_000)
-      snapshot_timeout = Keyword.get(opts, :snapshot_timeout, 2_000)
+    abstract_actor = Keyword.get(opts, :abstract, false)
+    actor_name = Keyword.get(opts, :name, Atom.to_string(__MODULE__))
+    channel_group = Keyword.get(opts, :channel, nil)
+    persistent = Keyword.get(opts, :persistent, true)
+    state_type = Keyword.fetch!(opts, :state_type)
 
-      def __meta__(:actions), do: unquote(actions)
+    deactivate_timeout = Keyword.get(opts, :deactivate_timeout, 10_000)
+    snapshot_timeout = Keyword.get(opts, :snapshot_timeout, 2_000)
+
+    quote do
+      def __meta__(:actions) do
+        unquote(actions)
+        |> Enum.filter(fn {_action, %{timer: timer}} -> is_nil(timer) end)
+        |> Enum.map(fn {action, %{timer: timer}} -> action end)
+      end
+
+      def __meta__(:timers) do
+        unquote(actions)
+        |> Enum.reject(fn {_action, %{timer: timer}} -> is_nil(timer) end)
+        |> Enum.map(fn {action, %{timer: timer}} -> {action, timer} end)
+      end
+
       def __meta__(:channel), do: unquote(channel_group)
       def __meta__(:name), do: unquote(actor_name)
       def __meta__(:persistent), do: unquote(persistent)
@@ -85,7 +105,6 @@ defmodule SpawnSdk.Actor do
       def __meta__(:state_type), do: unquote(state_type)
       def __meta__(:snapshot_timeout), do: unquote(snapshot_timeout)
       def __meta__(:deactivate_timeout), do: unquote(deactivate_timeout)
-      def __meta__(:timers), do: unquote(timers)
     end
   end
 end
