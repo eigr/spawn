@@ -66,9 +66,10 @@ defmodule SpawnSdkExample.Actors.MyActor do
 
   alias Io.Eigr.Spawn.Example.{MyState, MyBusinessMessage}
 
-  defact sum(%MyBusinessMessage{value: value} = data},
-        %Context{state: state} = ctx
-      ) do
+  defact sum(
+           %MyBusinessMessage{value: value} = data,
+           %Context{state: state} = ctx
+         ) do
     Logger.info("Received Request: #{inspect(data)}. Context: #{inspect(ctx)}")
 
     new_value =
@@ -83,6 +84,7 @@ defmodule SpawnSdkExample.Actors.MyActor do
     |> Value.reply!()
   end
 end
+
 ```
 
 In this example we are creating an actor in an Named/Eager way ie it is a known actor at compile time. We can also create Unnamed Dyncamic/Lazy actors, that is, despite having its abstract behavior defined at compile time, a Lazy actor will only have a concrete instance when it is associated with an identifier/name at runtime. Below follows the same previous actor being defined as abstract.
@@ -98,9 +100,10 @@ defmodule SpawnSdkExample.Actors.AbstractActor do
 
   alias Io.Eigr.Spawn.Example.{MyState, MyBusinessMessage}
 
-  defact sum(%MyBusinessMessage{value: value} = data},
-        %Context{state: state} = ctx
-      ) do
+  defact sum(
+           %MyBusinessMessage{value: value} = data,
+           %Context{state: state} = ctx
+         ) do
     Logger.info("Received Request: #{inspect(data)}. Context: #{inspect(ctx)}")
 
     new_value =
@@ -138,7 +141,7 @@ defmodule SpawnSdkExample.Actors.AbstractActor do
 
   alias SpawnSdk.Flow.SideEffect
 
-  defact sum(%MyBusinessMessage{value: value} = data}, %Context{state: state} = ctx) do
+  defact sum(%MyBusinessMessage{value: value} = data, %Context{state: state} = ctx) do
     Logger.info("Received Request: #{inspect(data)}. Context: #{inspect(ctx)}")
 
     new_value =
@@ -155,16 +158,17 @@ defmodule SpawnSdkExample.Actors.AbstractActor do
     |> Value.value(result)
     |> Value.state(new_state)
     |> Value.effects(
-      # This returns a list of side effects. In this case containing only one effect. However, multiple effects can be chained together, 
+      # This returns a list of side effects. In this case containing only one effect. However, multiple effects can be chained together,
       # just by calling the effect function as shown here.
-      # If only one effect is desired, you can also choose to use the to/3 function together with Value.effect(). 
+      # If only one effect is desired, you can also choose to use the to/3 function together with Value.effect().
       # Example: Values.effect(SideEffect.to(name, func, payload))
       SideEffect.of()
-      |> SideEffect.effect("joe", :sum, result) 
+      |> SideEffect.effect("joe", :sum, result)
     )
     |> Value.reply!()
   end
 end
+
 ```
 
 In the example above we see that the Actor joe will receive a request as a side effect from the Actor who issued this effect.
@@ -179,7 +183,8 @@ Actors can also send messages to a group of actors at once as an action callback
 defmodule Fleet.Actors.Driver do
   use SpawnSdk.Actor,
     abstract: true,
-    channel: "drivers", # Set ´driver´ channel for all actors of the same type (Fleet.Actors.Driver)
+    # Set ´driver´ channel for all actors of the same type (Fleet.Actors.Driver)
+    channel: "drivers",
     state_type: Fleet.Domain.Driver
 
   alias Fleet.Domain.{
@@ -193,7 +198,7 @@ defmodule Fleet.Actors.Driver do
 
   @brain_actor_channel "fleet-controllers"
 
-  defact update_position(%Point{} = position}, %Context{state: %Driver{id: name} = driver} = ctx) do
+  defact update_position(%Point{} = position, %Context{state: %Driver{id: name} = driver} = ctx) do
     Logger.info(
       "Driver [#{name}] Received Update Position Event. Position: [#{inspect(position)}]. Context: #{inspect(ctx)}"
     )
