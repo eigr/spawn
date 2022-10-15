@@ -356,8 +356,12 @@ defmodule Actors.Actor.Entity do
         )
         |> interface.invoke_host(state, @default_methods)
         |> case do
-          {:ok, _whatever, state} -> {:noreply, state}
-          {:error, _reason, state} -> {:noreply, state, :hibernate}
+          {:ok, response, state} ->
+            do_response(response, state)
+            {:noreply, state}
+
+          {:error, _reason, state} ->
+            {:noreply, state, :hibernate}
         end
 
       false ->

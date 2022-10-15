@@ -164,9 +164,7 @@ defmodule SpawnSdk.System.SpawnSystem do
           {:reply,
            %SpawnSdk.Value{
              state: host_state,
-             value: response,
-             broadcast: broadcast,
-             effects: effects
+             value: response
            } = decoded_value} ->
             broadcast = handle_broadcast(decoded_value)
             side_effects = handle_side_effects(system, decoded_value)
@@ -238,21 +236,20 @@ defmodule SpawnSdk.System.SpawnSystem do
            effects: effects
          } = _value
        ) do
-    side_effects =
-      Enum.map(effects, fn %SpawnSdk.Flow.SideEffect{} = effect ->
-        %Eigr.Functions.Protocol.SideEffect{
-          request:
-            InvocationRequest.new(
-              system: %Eigr.Functions.Protocol.Actors.ActorSystem{name: system},
-              actor: %Eigr.Functions.Protocol.Actors.Actor{
-                id: %ActorId{name: effect.actor_name}
-              },
-              value: any_pack!(effect.payload),
-              command_name: effect.command,
-              async: true
-            )
-        }
-      end)
+    Enum.map(effects, fn %SpawnSdk.Flow.SideEffect{} = effect ->
+      %Eigr.Functions.Protocol.SideEffect{
+        request:
+          InvocationRequest.new(
+            system: %Eigr.Functions.Protocol.Actors.ActorSystem{name: system},
+            actor: %Eigr.Functions.Protocol.Actors.Actor{
+              id: %ActorId{name: effect.actor_name}
+            },
+            value: any_pack!(effect.payload),
+            command_name: effect.command,
+            async: true
+          )
+      }
+    end)
   end
 
   defp get_cached_actors(system) do

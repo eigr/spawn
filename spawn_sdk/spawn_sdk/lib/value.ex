@@ -63,11 +63,17 @@ defmodule SpawnSdk.Value do
   end
 
   @spec noreply!(value()) :: {:reply, value()}
-  def noreply!(%SpawnSdk.Value{state: new_state} = _value)
-      when is_nil(new_state),
-      do: raise("Response Value and New State are required!")
+  def noreply!(%SpawnSdk.Value{state: new_state} = value, opts \\ []) do
+    force = Keyword.get(opts, :force, false)
 
-  def noreply!(%SpawnSdk.Value{} = value) do
+    if is_nil(new_state) and not force do
+      raise("Argumenterror. Response New State are required!")
+    end
+
+    {:reply, value}
+  end
+
+  def void(%SpawnSdk.Value{} = value) do
     {:reply, value}
   end
 end

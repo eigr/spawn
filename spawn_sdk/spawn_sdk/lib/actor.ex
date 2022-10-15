@@ -79,8 +79,13 @@ defmodule SpawnSdk.Actor do
     abstract_actor = Keyword.get(opts, :abstract, false)
     actor_name = Keyword.get(opts, :name, Atom.to_string(__MODULE__))
     channel_group = Keyword.get(opts, :channel, nil)
+
+    state_type = Keyword.get(opts, :state_type, nil)
     persistent = Keyword.get(opts, :persistent, true)
-    state_type = Keyword.fetch!(opts, :state_type)
+
+    if state_type == nil and persistent do
+      raise "ArgumentError. State type is mandatory if persistent is true"
+    end
 
     deactivate_timeout = Keyword.get(opts, :deactivate_timeout, 10_000)
     snapshot_timeout = Keyword.get(opts, :snapshot_timeout, 2_000)
