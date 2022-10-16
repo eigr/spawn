@@ -166,13 +166,14 @@ defmodule SpawnSdk.System.SpawnSystem do
              state: host_state,
              value: response
            } = decoded_value} ->
+            pipe = handle_pipe(decoded_value)
             broadcast = handle_broadcast(decoded_value)
             side_effects = handle_side_effects(system, decoded_value)
 
             resp = %ActorInvocationResponse{
               updated_context: Eigr.Functions.Protocol.Context.new(state: any_pack!(host_state)),
               value: any_pack!(response),
-              workflow: %Workflow{broadcast: broadcast, effects: side_effects}
+              workflow: %Workflow{broadcast: broadcast, effects: side_effects, routing: pipe}
             }
 
             new_actor_state = %{actor_state | state: any_pack!(host_state)}
@@ -218,6 +219,30 @@ defmodule SpawnSdk.System.SpawnSystem do
       command_name: cmd,
       value: any_pack!(payload)
     )
+  end
+
+  defp handle_pipe(
+         %SpawnSdk.Value{
+           pipe: pipe
+         } = _value
+       )
+       when is_nil(pipe) or pipe == %{},
+       do: nil
+
+  defp handle_pipe(
+         %SpawnSdk.Value{
+           pipe: %SpawnSdk.Flow.Pipe{actor_name: actor_name, command: command} = _pipe
+         } = _value
+       ) do
+    cmd = if is_atom(command), do: Atom.to_string(command), else: command
+
+    pipe =
+      Eigr.Functions.Protocol.Pipe.new(
+        actor: actor_name,
+        command_name: cmd
+      )
+
+    {:pipe, pipe}
   end
 
   defp handle_side_effects(

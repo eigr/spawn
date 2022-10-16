@@ -50,6 +50,7 @@ defmodule SpawnSdk.Actor do
       alias SpawnSdk.{
         Context,
         Flow.Broadcast,
+        Flow.Pipe,
         Flow.SideEffect,
         Value
       }

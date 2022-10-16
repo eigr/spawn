@@ -26,6 +26,29 @@ defmodule SpawnSdk.Flow do
     end
   end
 
+  defmodule Pipe do
+    defstruct actor_name: nil, command: nil
+
+    @type t :: %__MODULE__{
+            actor_name: String.t(),
+            command: String.t() | atom()
+          }
+
+    @type actor_name :: String.t()
+
+    @type command :: String.t() | atom()
+
+    @spec to(actor_name(), command()) :: SideEffect.t()
+    def to(actor_name, command) do
+      command_name = if is_atom(command), do: Atom.to_string(command), else: command
+
+      %__MODULE__{
+        actor_name: actor_name,
+        command: command_name
+      }
+    end
+  end
+
   defmodule SideEffect do
     defstruct actor_name: nil, command: nil, payload: nil
 

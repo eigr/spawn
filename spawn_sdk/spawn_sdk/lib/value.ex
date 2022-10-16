@@ -1,12 +1,13 @@
 defmodule SpawnSdk.Value do
-  alias SpawnSdk.Flow.{Broadcast, SideEffect}
+  alias SpawnSdk.Flow.{Broadcast, Pipe, SideEffect}
 
-  defstruct state: nil, value: nil, broadcast: nil, effects: nil
+  defstruct state: nil, value: nil, broadcast: nil, pipe: nil, effects: nil
 
   @type t :: %__MODULE__{
           state: module(),
           value: module(),
           broadcast: Broadcast.t(),
+          pipe: Pipe.t(),
           effects: list(SideEffect.t())
         }
 
@@ -15,6 +16,8 @@ defmodule SpawnSdk.Value do
   @type broadcast :: Broadcast.t()
 
   @type effects :: list(SideEffect.t())
+
+  @type pipe :: Pipe.t()
 
   @type response :: module()
 
@@ -51,6 +54,15 @@ defmodule SpawnSdk.Value do
   @spec effects(value(), effects()) :: value()
   def effects(%SpawnSdk.Value{} = value, effects) do
     struct(value, effects: effects)
+  end
+
+  @spec pipe(value(), pipe()) :: value()
+  def pipe(%SpawnSdk.Value{value: result} = _value, _pipe) when is_nil(result) or result == %{},
+    do: raise("Response Value are required!")
+
+  @spec pipe(value(), pipe()) :: value()
+  def pipe(%SpawnSdk.Value{} = value, pipe) do
+    struct(value, pipe: pipe)
   end
 
   @spec reply!(value()) :: {:reply, value()}

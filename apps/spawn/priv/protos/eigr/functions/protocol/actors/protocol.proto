@@ -235,11 +235,18 @@ message Context {
 // It can also return a number of side effects to other Actors as a result of its computation. 
 // These side effects will be forwarded to the respective Actors asynchronously and should not affect the Host Function's response to its caller.
 // Internally side effects is just a special kind of InvocationRequest.
+// Useful for handle handle `recipient list` and `Composed Message Processor` patterns:
+// https://www.enterpriseintegrationpatterns.com/patterns/messaging/RecipientList.html
+// https://www.enterpriseintegrationpatterns.com/patterns/messaging/DistributionAggregate.html
 message SideEffect {
     InvocationRequest request = 1;
 }
 
 // Broadcast a message to many Actors
+// Useful for handle `recipient list`, `publish-subscribe channel`, and `scatter-gatther` patterns:
+// https://www.enterpriseintegrationpatterns.com/patterns/messaging/RecipientList.html
+// https://www.enterpriseintegrationpatterns.com/patterns/messaging/PublishSubscribeChannel.html
+// https://www.enterpriseintegrationpatterns.com/patterns/messaging/BroadcastAggregate.html
 message Broadcast {
     // Channel of target Actors
     string channel_group = 1;
@@ -251,11 +258,39 @@ message Broadcast {
     google.protobuf.Any value = 3;
 }
 
+// Sends the output of a command of an Actor to the input of another command of an Actor
+// Useful for handle `pipes` pattern:
+// https://www.enterpriseintegrationpatterns.com/patterns/messaging/PipesAndFilters.html
+message Pipe {
+  // Target Actor
+  string actor = 1;
+
+  // Command. 
+  string command_name = 2;
+}
+
+// Sends the input of a command of an Actor to the input of another command of an Actor
+// Useful for handle `content-basead router` pattern
+// https://www.enterpriseintegrationpatterns.com/patterns/messaging/ContentBasedRouter.html
+message Forward {
+  // Target Actor
+  string actor = 1;
+
+  // Command. 
+  string command_name = 2;
+}
+
+// Container for archicetural message patterns 
 message Workflow {
     
     Broadcast broadcast = 2;
 
     repeated SideEffect effects = 1;
+
+    oneof routing {
+        Pipe pipe = 3;
+        Forward forward = 4;
+    }
 }
 
 // The user function when it wants to send a message to an Actor uses the InvocationRequest message type.

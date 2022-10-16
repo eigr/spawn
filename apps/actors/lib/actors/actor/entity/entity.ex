@@ -24,7 +24,9 @@ defmodule Actors.Actor.Entity do
     ActorInvocationResponse,
     Broadcast,
     Context,
+    Forward,
     InvocationRequest,
+    Pipe,
     SideEffect,
     Workflow
   }
@@ -295,16 +297,18 @@ defmodule Actors.Actor.Entity do
         interface = get_interface(actor_system, actor_name, opts)
         current_state = Map.get(actor_state || %{}, :state)
 
-        ActorInvocation.new(
-          actor_name: actor_name,
-          actor_system: actor_system,
-          command_name: command,
-          value: payload,
-          current_context: Context.new(state: current_state)
-        )
-        |> interface.invoke_host(state, @default_methods)
+        request =
+          ActorInvocation.new(
+            actor_name: actor_name,
+            actor_system: actor_system,
+            command_name: command,
+            value: payload,
+            current_context: Context.new(state: current_state)
+          )
+
+        interface.invoke_host(request, state, @default_methods)
         |> case do
-          {:ok, response, state} -> {:reply, {:ok, do_response(response, state)}, state}
+          {:ok, response, state} -> {:reply, {:ok, do_response(request, response, state)}, state}
           {:error, reason, state} -> {:reply, {:error, reason}, state, :hibernate}
         end
 
@@ -347,17 +351,19 @@ defmodule Actors.Actor.Entity do
         interface = get_interface(actor_system, actor_name, opts)
         current_state = Map.get(actor_state || %{}, :state)
 
-        ActorInvocation.new(
-          actor_name: actor_name,
-          actor_system: actor_system,
-          command_name: command,
-          value: payload,
-          current_context: Context.new(state: current_state)
-        )
-        |> interface.invoke_host(state, @default_methods)
+        request =
+          ActorInvocation.new(
+            actor_name: actor_name,
+            actor_system: actor_system,
+            command_name: command,
+            value: payload,
+            current_context: Context.new(state: current_state)
+          )
+
+        interface.invoke_host(request, state, @default_methods)
         |> case do
           {:ok, response, state} ->
-            do_response(response, state)
+            do_response(request, response, state)
             {:noreply, state}
 
           {:error, _reason, state} ->
@@ -584,21 +590,22 @@ defmodule Actors.Actor.Entity do
     Logger.debug("Terminating actor #{name} with reason #{inspect(reason)}")
   end
 
-  defp do_response(%ActorInvocationResponse{workflow: workflow} = response, _state)
+  defp do_response(_request, %ActorInvocationResponse{workflow: workflow} = response, _state)
        when is_nil(workflow) or workflow == %{} do
     response
   end
 
-  defp do_response(response, state) do
-    do_run_workflow(response, state)
+  defp do_response(request, response, state) do
+    do_run_workflow(request, response, state)
   end
 
-  defp do_run_workflow(%ActorInvocationResponse{workflow: workflow} = response, _state)
+  defp do_run_workflow(_request, %ActorInvocationResponse{workflow: workflow} = response, _state)
        when is_nil(workflow) or workflow == %{} do
     response
   end
 
   defp do_run_workflow(
+         request,
          %ActorInvocationResponse{
            workflow: %Workflow{broadcast: broadcast, effects: effects} = _workflow
          } = response,
@@ -606,7 +613,92 @@ defmodule Actors.Actor.Entity do
        ) do
     do_side_effects(effects)
     do_broadcast(broadcast)
-    response
+    do_handle_routing(request, response)
+  end
+
+  defp do_handle_routing(
+         _request,
+         %ActorInvocationResponse{
+           workflow: %Workflow{routing: routing} = _workflow
+         } = response
+       )
+       when is_nil(routing),
+       do: response
+
+  defp do_handle_routing(
+         _request,
+         %ActorInvocationResponse{
+           actor_system: system_name,
+           value: value,
+           workflow:
+             %Workflow{
+               routing: {:pipe, %Pipe{actor: actor_name, command_name: cmd} = _pipe} = _workflow
+             } = _response
+         }
+       ) do
+    invocation = %InvocationRequest{
+      # TODO check if system is really necessary
+      system: %ActorSystem{name: system_name},
+      actor: %Actor{id: %ActorId{name: actor_name}},
+      command_name: cmd,
+      value: value
+    }
+
+    try do
+      case lookup(system_name, actor_name) do
+        {:ok, %HostActor{opts: opts}} ->
+          invoke(invocation, opts)
+
+        _ ->
+          :ok
+      end
+    catch
+      error ->
+        Logger.warning(
+          "Error during Pipe request to Actor #{system_name}:#{actor_name}. Error: #{inspect(error)}"
+        )
+
+        :ok
+    end
+  end
+
+  defp do_handle_routing(
+         %ActorInvocation{
+           actor_system: system_name,
+           value: value
+         } = _request,
+         %ActorInvocationResponse{
+           workflow:
+             %Workflow{
+               routing:
+                 {:forward, %Forward{actor: actor_name, command_name: cmd} = _pipe} = _workflow
+             } = _response
+         }
+       ) do
+    invocation = %InvocationRequest{
+      # TODO check if system is really necessary
+      system: %ActorSystem{name: system_name},
+      actor: %Actor{id: %ActorId{name: actor_name}},
+      command_name: cmd,
+      value: value
+    }
+
+    try do
+      case lookup(system_name, actor_name) do
+        {:ok, %HostActor{opts: opts}} ->
+          invoke(invocation, opts)
+
+        _ ->
+          :ok
+      end
+    catch
+      error ->
+        Logger.warning(
+          "Error during Pipe request to Actor #{system_name}:#{actor_name}. Error: #{inspect(error)}"
+        )
+
+        :ok
+    end
   end
 
   def do_broadcast(broadcast) when is_nil(broadcast) or broadcast == %{} do

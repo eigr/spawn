@@ -598,6 +598,114 @@ defmodule Eigr.Functions.Protocol.Broadcast do
   field(:value, 3, type: Google.Protobuf.Any)
 end
 
+defmodule Eigr.Functions.Protocol.Pipe do
+  @moduledoc false
+  use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
+
+  def descriptor do
+    # credo:disable-for-next-line
+    %Google.Protobuf.DescriptorProto{
+      __unknown_fields__: [],
+      enum_type: [],
+      extension: [],
+      extension_range: [],
+      field: [
+        %Google.Protobuf.FieldDescriptorProto{
+          __unknown_fields__: [],
+          default_value: nil,
+          extendee: nil,
+          json_name: "actor",
+          label: :LABEL_OPTIONAL,
+          name: "actor",
+          number: 1,
+          oneof_index: nil,
+          options: nil,
+          proto3_optional: nil,
+          type: :TYPE_STRING,
+          type_name: nil
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          __unknown_fields__: [],
+          default_value: nil,
+          extendee: nil,
+          json_name: "commandName",
+          label: :LABEL_OPTIONAL,
+          name: "command_name",
+          number: 2,
+          oneof_index: nil,
+          options: nil,
+          proto3_optional: nil,
+          type: :TYPE_STRING,
+          type_name: nil
+        }
+      ],
+      name: "Pipe",
+      nested_type: [],
+      oneof_decl: [],
+      options: nil,
+      reserved_name: [],
+      reserved_range: []
+    }
+  end
+
+  field(:actor, 1, type: :string)
+  field(:command_name, 2, type: :string, json_name: "commandName")
+end
+
+defmodule Eigr.Functions.Protocol.Forward do
+  @moduledoc false
+  use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
+
+  def descriptor do
+    # credo:disable-for-next-line
+    %Google.Protobuf.DescriptorProto{
+      __unknown_fields__: [],
+      enum_type: [],
+      extension: [],
+      extension_range: [],
+      field: [
+        %Google.Protobuf.FieldDescriptorProto{
+          __unknown_fields__: [],
+          default_value: nil,
+          extendee: nil,
+          json_name: "actor",
+          label: :LABEL_OPTIONAL,
+          name: "actor",
+          number: 1,
+          oneof_index: nil,
+          options: nil,
+          proto3_optional: nil,
+          type: :TYPE_STRING,
+          type_name: nil
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          __unknown_fields__: [],
+          default_value: nil,
+          extendee: nil,
+          json_name: "commandName",
+          label: :LABEL_OPTIONAL,
+          name: "command_name",
+          number: 2,
+          oneof_index: nil,
+          options: nil,
+          proto3_optional: nil,
+          type: :TYPE_STRING,
+          type_name: nil
+        }
+      ],
+      name: "Forward",
+      nested_type: [],
+      oneof_decl: [],
+      options: nil,
+      reserved_name: [],
+      reserved_range: []
+    }
+  end
+
+  field(:actor, 1, type: :string)
+  field(:command_name, 2, type: :string, json_name: "commandName")
+end
+
 defmodule Eigr.Functions.Protocol.Workflow do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
@@ -637,19 +745,57 @@ defmodule Eigr.Functions.Protocol.Workflow do
           proto3_optional: nil,
           type: :TYPE_MESSAGE,
           type_name: ".eigr.functions.protocol.SideEffect"
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          __unknown_fields__: [],
+          default_value: nil,
+          extendee: nil,
+          json_name: "pipe",
+          label: :LABEL_OPTIONAL,
+          name: "pipe",
+          number: 3,
+          oneof_index: 0,
+          options: nil,
+          proto3_optional: nil,
+          type: :TYPE_MESSAGE,
+          type_name: ".eigr.functions.protocol.Pipe"
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          __unknown_fields__: [],
+          default_value: nil,
+          extendee: nil,
+          json_name: "forward",
+          label: :LABEL_OPTIONAL,
+          name: "forward",
+          number: 4,
+          oneof_index: 0,
+          options: nil,
+          proto3_optional: nil,
+          type: :TYPE_MESSAGE,
+          type_name: ".eigr.functions.protocol.Forward"
         }
       ],
       name: "Workflow",
       nested_type: [],
-      oneof_decl: [],
+      oneof_decl: [
+        %Google.Protobuf.OneofDescriptorProto{
+          __unknown_fields__: [],
+          name: "routing",
+          options: nil
+        }
+      ],
       options: nil,
       reserved_name: [],
       reserved_range: []
     }
   end
 
+  oneof(:routing, 0)
+
   field(:broadcast, 2, type: Eigr.Functions.Protocol.Broadcast)
   field(:effects, 1, repeated: true, type: Eigr.Functions.Protocol.SideEffect)
+  field(:pipe, 3, type: Eigr.Functions.Protocol.Pipe, oneof: 0)
+  field(:forward, 4, type: Eigr.Functions.Protocol.Forward, oneof: 0)
 end
 
 defmodule Eigr.Functions.Protocol.InvocationRequest do
