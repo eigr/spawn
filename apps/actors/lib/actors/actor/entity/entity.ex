@@ -633,7 +633,7 @@ defmodule Actors.Actor.Entity do
            workflow:
              %Workflow{
                routing: {:pipe, %Pipe{actor: actor_name, command_name: cmd} = _pipe} = _workflow
-             } = _response
+             } = response
          }
        ) do
     invocation = %InvocationRequest{
@@ -650,7 +650,7 @@ defmodule Actors.Actor.Entity do
           invoke(invocation, opts)
 
         _ ->
-          :ok
+          response
       end
     catch
       error ->
@@ -658,7 +658,7 @@ defmodule Actors.Actor.Entity do
           "Error during Pipe request to Actor #{system_name}:#{actor_name}. Error: #{inspect(error)}"
         )
 
-        :ok
+        response
     end
   end
 
@@ -672,7 +672,7 @@ defmodule Actors.Actor.Entity do
              %Workflow{
                routing:
                  {:forward, %Forward{actor: actor_name, command_name: cmd} = _pipe} = _workflow
-             } = _response
+             } = response
          }
        ) do
     invocation = %InvocationRequest{
@@ -689,15 +689,15 @@ defmodule Actors.Actor.Entity do
           invoke(invocation, opts)
 
         _ ->
-          :ok
+          response
       end
     catch
       error ->
         Logger.warning(
-          "Error during Pipe request to Actor #{system_name}:#{actor_name}. Error: #{inspect(error)}"
+          "Error during Forward request to Actor #{system_name}:#{actor_name}. Error: #{inspect(error)}"
         )
 
-        :ok
+        response
     end
   end
 
