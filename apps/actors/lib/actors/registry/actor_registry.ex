@@ -43,31 +43,13 @@ defmodule Actors.Registry.ActorRegistry do
           GenServer.reply(from, {:not_found, []})
 
         hosts ->
-          filtered_list = Enum.filter(hosts, fn ac -> ac.actor.id.name == actor_name end)
-
-          filtered_list
-          |> Enum.uniq()
+          Enum.filter(hosts, fn ac -> ac.actor.id.name == actor_name end)
+          |> Enum.random()
           |> then(fn
             nil ->
               GenServer.reply(from, {:not_found, []})
 
-            actors_list ->
-              random_type_hosts =
-                Enum.filter(actors_list, fn host ->
-                  if host.actor.settings.abstract or host.actor.settings.persistent == false do
-                    true
-                  end
-                end)
-
-              node_host =
-                if length(random_type_hosts) > 0 do
-                  actors_list
-                  |> Enum.random()
-                else
-                  actors_list
-                  |> List.first()
-                end
-
+            node_host ->
               GenServer.reply(from, {:ok, node_host})
           end)
       end
