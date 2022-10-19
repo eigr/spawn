@@ -114,16 +114,15 @@ defmodule Actors do
 
       _ ->
         with {:ok, %HostActor{node: node, actor: actor, opts: opts}} <-
-               ActorRegistry.lookup(system_name, actor_name) do
-          {:ok, actor_ref} =
-            :erpc.call(
-              node,
-              __MODULE__,
-              :try_reactivate_actor,
-              [system, actor, opts],
-              @erpc_timeout
-            )
-
+               ActorRegistry.lookup(system_name, actor_name),
+             {:ok, actor_ref} =
+               :erpc.call(
+                 node,
+                 __MODULE__,
+                 :try_reactivate_actor,
+                 [system, actor, opts],
+                 @erpc_timeout
+               ) do
           action_fun.(actor_ref)
         else
           {:not_found, _} ->
