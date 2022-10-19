@@ -30,6 +30,7 @@ defmodule Statestores.MixProject do
     [
       {:spawn, "~> 0.1", in_umbrella: true, only: :test},
       {:cloak_ecto, "~> 1.2"},
+      {:ecto3_mnesia, "~> 0.2.0"},
       {:ecto_sql, "~> 3.8"},
       {:ecto_sqlite3, "~> 0.8.2"},
       {:myxql, "~> 0.6"},
