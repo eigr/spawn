@@ -517,12 +517,30 @@ defmodule Actors.Actor.Entity do
   end
 
   defp do_handle_info(
-         {:EXIT, pid, reason},
+         {:EXIT, from, {:name_conflict, {key, value}, registry, pid}},
+         %EntityState{
+           actor: %Actor{id: %ActorId{} = id}
+         } = state
+       ) do
+    Logger.warning("A conflict has been detected for ActorId #{id}. Possible NetSplit!
+      Trace Data: [
+        from: #{inspect(from)},
+        key: #{inspect(key)},
+        value: #{inspect(value)},
+        registry: #{inspect(registry)},
+        pid: #{inspect(pid)}
+      ] ")
+
+    {:stop, :normal, state}
+  end
+
+  defp do_handle_info(
+         {:EXIT, from, reason},
          %EntityState{
            actor: %Actor{id: %ActorId{name: name} = _id}
          } = state
        ) do
-    Logger.warning("Received Exit message for Actor #{name} and PID #{inspect(pid)}.")
+    Logger.warning("Received Exit message for Actor #{name} and PID #{inspect(from)}.")
 
     {:stop, reason, state}
   end
