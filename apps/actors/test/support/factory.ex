@@ -15,10 +15,10 @@ defmodule Actors.FactoryTest do
     TimeoutStrategy,
     ActorSnapshotStrategy,
     ActorDeactivationStrategy,
-    ActorState
+    ActorState,
+    Command
   }
 
-  alias Eigr.Functions.Protocol.Actors.Registry.ActorsEntry
   alias Google.Protobuf.Any
 
   def encode_decode(record) do
@@ -92,6 +92,7 @@ defmodule Actors.FactoryTest do
 
     Actor.new(
       id: %ActorId{name: actor_name},
+      commands: attrs[:commands] || [build_actor_command()],
       settings: %ActorSettings{
         persistent: Keyword.get(attrs, :persistent, true),
         snapshot_strategy: attrs[:snapshot_strategy] || build_actor_snapshot_strategy(),
@@ -100,6 +101,10 @@ defmodule Actors.FactoryTest do
       },
       state: attrs[:state] || build_actor_state()
     )
+  end
+
+  def build_actor_command(attrs \\ []) do
+    Command.new(name: attrs[:name] || "ChangeNameTest")
   end
 
   def build_actor_state(attrs \\ []) do

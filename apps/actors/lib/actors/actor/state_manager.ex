@@ -77,7 +77,8 @@ defmodule Actors.Actor.StateManager do
   @spec save_async(String.t(), Eigr.Functions.Protocol.Actors.ActorState.t()) ::
           {:ok, Eigr.Functions.Protocol.Actors.ActorState.t()}
           | {:error, any(), Eigr.Functions.Protocol.Actors.ActorState.t()}
-  def save_async(_name, nil, _timeout \\ 5000), do: {:ok, %{}}
+  def save_async(name, state, timeout \\ 5000)
+  def save_async(_name, nil, _timeout), do: {:ok, %{}}
 
   def save_async(_name, %ActorState{state: actor_state} = _state, _timeout)
       when is_nil(actor_state) or actor_state == %{},

@@ -173,9 +173,9 @@ defmodule ActorsTest do
 
     defp do_loop(func, _resp) do
       do_loop(func, func.())
-    catch
-      _ -> do_loop(func, func.())
     rescue
+      _ -> do_loop(func, func.())
+    catch
       _ -> do_loop(func, func.())
     end
   end
