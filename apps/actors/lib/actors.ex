@@ -3,6 +3,8 @@ defmodule Actors do
   Documentation for `Spawn`.
   """
   require Logger
+  use Retry
+  import Stream
 
   alias Actors.Actor.Entity, as: ActorEntity
   alias Actors.Actor.Entity.Supervisor, as: ActorEntitySupervisor
@@ -100,9 +102,17 @@ defmodule Actors do
         } = request,
         opts \\ []
       ) do
-    do_lookup_action(system.name, actor.id.name, system, fn actor_ref ->
-      maybe_invoke_async(async?, actor_ref, request, opts)
-    end)
+    retry with: exponential_backoff() |> randomize |> expiry(10_000),
+          atoms: [:exit, :noproc, :erpc, :noconnection],
+          rescue_only: [ErlangError] do
+      do_lookup_action(system.name, actor.id.name, system, fn actor_ref ->
+        maybe_invoke_async(async?, actor_ref, request, opts)
+      end)
+    after
+      result -> result
+    else
+      error -> error
+    end
   end
 
   defp do_lookup_action(system_name, actor_name, system, action_fun) do

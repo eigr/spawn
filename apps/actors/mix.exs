@@ -21,7 +21,7 @@ defmodule Actors.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger]
+      extra_applications: [:logger, :retry]
     ]
   end
 
@@ -33,6 +33,7 @@ defmodule Actors.MixProject do
       {:cowlib, "~> 2.9", override: true},
       {:decimal, "~> 2.0", override: true},
       {:finch, "~> 0.12"},
+      {:retry, "~> 0.17"},
       {:tesla, "~> 1.4"},
       {:flow, "~> 1.2"},
       {:vapor, "~> 0.10"},
