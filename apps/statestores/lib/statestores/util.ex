@@ -10,6 +10,7 @@ defmodule Statestores.Util do
           Statestores.Adapters.MySQL
           | Statestores.Adapters.Postgres
           | Statestores.Adapters.SQLite3
+          | Statestores.Adapters.MSSQL
   def load_repo() do
     type = String.to_existing_atom(System.get_env("PROXY_DATABASE_TYPE", "mysql"))
     load_repo(type)
@@ -23,6 +24,8 @@ defmodule Statestores.Util do
 
   def load_repo(:sqlite), do: Statestores.Adapters.SQLite3
 
+  def load_repo(:mssql), do: Statestores.Adapters.MSSQL
+
   @spec get_default_database_port :: <<_::32>>
   def get_default_database_port() do
     String.to_existing_atom(System.get_env("PROXY_DATABASE_TYPE", "mysql"))
@@ -35,4 +38,6 @@ defmodule Statestores.Util do
   def get_default_database_port(:postgres), do: "5432"
 
   def get_default_database_port(:sqlite), do: "0"
+
+  def get_default_database_port(:mssql), do: "1433"
 end
