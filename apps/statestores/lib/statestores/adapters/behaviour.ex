@@ -12,7 +12,7 @@ defmodule Statestores.Adapters.Behaviour do
   defmacro __using__(_opts) do
     quote do
       alias Statestores.Adapters.Behaviour
-      import Statestores.Util, only: [get_default_database_port: 0]
+      import Statestores.Util, only: [get_default_database_port: 0, get_database_type: 0]
 
       @behaviour Statestores.Adapters.Behaviour
 
@@ -29,6 +29,19 @@ defmodule Statestores.Adapters.Behaviour do
             :database,
             System.get_env("PROXY_DATABASE_NAME", "eigr-functions-db")
           )
+
+        config =
+          case get_database_type() do
+            :cockroachdb ->
+              Keyword.put(
+                config,
+                :migration_lock,
+                nil
+              )
+
+            _ ->
+              config
+          end
 
         config =
           Keyword.put(config, :username, System.get_env("PROXY_DATABASE_USERNAME", "admin"))
