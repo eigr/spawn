@@ -33,7 +33,8 @@ defmodule Statestores.MixProject do
       {:ecto_sql, "~> 3.8"},
       {:ecto_sqlite3, "~> 0.8.2"},
       {:myxql, "~> 0.6"},
-      {:postgrex, "~> 0.16"}
+      {:postgrex, "~> 0.16"},
+      {:tds, "~> 2.3"}
     ]
   end
 
