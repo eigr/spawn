@@ -9,10 +9,10 @@ defmodule Statestores.Adapters.MSSQL do
 
   def get_by_key(actor), do: get_by(Event, actor: actor)
 
-  def save(%Event{} = event) do
+  def save(%Event{actor: actor} = event) do
     %Event{}
     |> Event.changeset(ValueObjectSchema.to_map(event))
-    |> insert_or_update!(on_conflict: :raise)
+    |> insert!()
     |> case do
       {:ok, event} ->
         {:ok, event}
@@ -25,7 +25,7 @@ defmodule Statestores.Adapters.MSSQL do
     end
   rescue
     _e ->
-      %Event{}
+      get_by(Event, actor: actor)
       |> Event.changeset(ValueObjectSchema.to_map(event))
       |> update!()
       |> case do
