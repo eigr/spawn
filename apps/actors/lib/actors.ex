@@ -4,7 +4,6 @@ defmodule Actors do
   """
   require Logger
   use Retry
-  import Stream
 
   alias Actors.Actor.Entity, as: ActorEntity
   alias Actors.Actor.Entity.Supervisor, as: ActorEntitySupervisor
@@ -103,7 +102,7 @@ defmodule Actors do
         opts \\ []
       ) do
     retry with: exponential_backoff() |> randomize |> expiry(10_000),
-          atoms: [:exit, :noproc, :erpc, :noconnection],
+          atoms: [:error, :exit, :noproc, :erpc, :noconnection],
           rescue_only: [ErlangError] do
       do_lookup_action(system.name, actor.id.name, system, fn actor_ref ->
         maybe_invoke_async(async?, actor_ref, request, opts)
