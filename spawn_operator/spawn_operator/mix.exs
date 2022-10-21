@@ -22,7 +22,7 @@ defmodule Operator.MixProject do
   def application do
     [
       extra_applications: [:logger],
-      mod: {Operator.Application, []}
+      mod: {SpawnOperator.Application, []}
     ]
   end
 
@@ -39,9 +39,9 @@ defmodule Operator.MixProject do
 
   defp releases do
     [
-      operator: [
+      spawn_operator: [
         include_executables_for: [:unix],
-        applications: [operator: :permanent],
+        applications: [spawn_operator: :permanent],
         steps: [
           :assemble,
           &Bakeware.assemble/1

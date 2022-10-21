@@ -18,12 +18,12 @@ RUN mix local.rebar --force \
     && mix deps.get \
     && mix release.init
 
-RUN echo "-name operator@${HOSTNAME}" >> ./rel/vm.args.eex \
+RUN echo "-name spawn_operator@${HOSTNAME}" >> ./rel/vm.args.eex \
     && echo "-setcookie ${NODE_COOKIE}" >> ./rel/vm.args.eex
 
-RUN cd spawn_operator/operator \
+RUN cd spawn_operator/spawn_operator \
     && mix deps.get \
-    && mix release operator
+    && mix release spawn_operator
 
 # ---- Application Stage ----
 FROM alpine:3
@@ -31,7 +31,7 @@ FROM alpine:3
 RUN apk add --no-cache --update zstd ncurses-libs libstdc++ libgcc
 
 WORKDIR /home/app
-COPY --from=builder /app/_build/prod/rel/bakeware/operator .
+COPY --from=builder /app/_build/prod/rel/bakeware/spawn_operator .
 
 RUN adduser app --disabled-password --home app
 RUN mkdir -p app/.cache/bakeware
@@ -44,4 +44,4 @@ USER app
 
 ENV MIX_ENV=prod
 
-ENTRYPOINT ["./operator", "start"]
+ENTRYPOINT ["./spawn_operator", "start"]

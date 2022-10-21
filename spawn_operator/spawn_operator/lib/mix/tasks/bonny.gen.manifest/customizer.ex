@@ -21,5 +21,4 @@ defmodule Mix.Tasks.Bonny.Gen.Manifest.SpawnOperatorCustomizer do
 
   # fallback
   def override(resource), do: resource
-
 end

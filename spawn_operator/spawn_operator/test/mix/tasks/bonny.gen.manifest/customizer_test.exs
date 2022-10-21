@@ -9,5 +9,4 @@ defmodule Mix.Tasks.Bonny.Gen.Manifest.SpawnOperatorCustomizerTest do
       assert test_map == MUT.override(test_map)
     end
   end
-
 end
