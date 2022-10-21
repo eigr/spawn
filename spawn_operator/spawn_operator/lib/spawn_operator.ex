@@ -4,11 +4,14 @@ defmodule SpawnOperator do
   """
   require Logger
 
-  alias SpawnOperator.K8s.{
-    Deployment,
-    ConfigMap.ActivatorCM,
-    ConfigMap.ActorSystemCM,
-    ConfigMap.SidecarCM
+  SpawnOperator.K8s.ConfigMap.SidecarCM
+
+  alias SpawnOperator.K8s.Deployment
+
+  alias SpawnOperator.K8s.ConfigMap.{
+    ActivatorCM,
+    ActorSystemCM,
+    SidecarCM
   }
 
   import Bonny.Config, only: [conn: 0]
@@ -66,19 +69,26 @@ defmodule SpawnOperator do
   defp apply_resource(crd, resources) when is_list(resources) do
     resources
     |> Enum.each(fn resource ->
-      Logger.debug("Applying resource #{inspect(resource)}")
+      kind = Map.get(resource, "kind")
+      Logger.debug("Applying resource #{inspect(kind)}")
       apply_resource(crd, resource)
     end)
   end
 
   defp apply_resource(crd, resource) when is_map(resource) do
-    crd
-    |> add_owner_reference(resource)
-    |> IO.inspect()
-    |> K8s.Client.create()
-    |> then(&K8s.Client.run(conn(), &1))
+    result =
+      resource
+      |> add_owner_reference(crd)
+      |> IO.inspect()
+      |> K8s.Client.create()
+      |> then(&K8s.Client.run(conn(), &1))
+
+    # IO.inspect(result, label: "Result ------------")
+    result
   end
 
-  def track_event(type, resource),
-    do: Logger.info("#{type}: #{inspect(resource)}")
+  def track_event(type, resource) do
+    kind = Map.get(resource, "kind")
+    Logger.info("#{type}: #{inspect(kind)}")
+  end
 end

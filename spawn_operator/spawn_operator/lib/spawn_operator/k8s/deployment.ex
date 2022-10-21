@@ -6,7 +6,7 @@ defmodule SpawnOperator.K8s.Deployment do
   @default_actor_host_function_env [
     %{
       "name" => "SPAWN_PROXY_PORT",
-      "value" => 9001
+      "value" => "9001"
     },
     %{
       "name" => "SPAWN_PROXY_INTERFACE",
@@ -60,10 +60,17 @@ defmodule SpawnOperator.K8s.Deployment do
         "labels" => %{"app" => name, "actor-system" => system}
       },
       "spec" => %{
+        "replicas" => replicas,
         "selector" => %{
           "matchLabels" => %{"app" => name, "actor-system" => system}
         },
-        "replicas" => replicas,
+        "strategy" => %{
+          "type" => "RollingUpdate",
+          "rollingUpdate" => %{
+            "maxSurge" => 1,
+            "maxUnavailable" => 1
+          }
+        },
         "template" => %{
           "metadata" => %{
             "annotations" => %{
@@ -144,7 +151,7 @@ defmodule SpawnOperator.K8s.Deployment do
       Application.get_env(
         :spawn_operator,
         :proxy_image,
-        "docker.io/eigr/spawn-operator:0.1.0"
+        "docker.io/eigr/spawn-proxy:0.1.0"
       )
 
   defp default_cookie(ns),

@@ -14,12 +14,14 @@ defmodule SpawnOperator.Handler.ActorHostHandler do
       def add(resource) do
         track_event(:add, resource)
         build_actor_host_deployment(resource)
+        :ok
       end
 
       @impl true
       def modify(resource) do
         track_event(:modify, resource)
         build_actor_host_deployment(resource)
+        :ok
       end
 
       @impl true
