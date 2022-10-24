@@ -18,7 +18,7 @@ def deps do
   [
     {:spawn_sdk, "~> 0.1.0"},
 
-    # Remove this only if you will be using non-persistent actors
+    # You can remove this if you will ONLY USE non-persistent actors
     {:spawn_statestores, "~> 0.1.0"}
   ]
 end
