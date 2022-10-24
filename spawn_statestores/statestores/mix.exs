@@ -2,13 +2,15 @@ defmodule Statestores.MixProject do
   use Mix.Project
 
   @app :spawn_statestores
+  @version "0.1.0"
+  @source_url "https://github.com/eigr/spawn/blob/main/spawn_statestores/statestores"
 
   def project do
     [
       app: @app,
-      version: "0.1.0",
+      version: @version,
       description: "Spawn Statestores is the storage lib for the Spawn Actors System",
-      source_url: "https://github.com/eigr/spawn/tree/main/spawn_statestores/statestores",
+      source_url: @source_url,
       homepage_url: "https://eigr.io/",
       build_path: "../../_build",
       config_path: "../../config/config.exs",
@@ -18,10 +20,7 @@ defmodule Statestores.MixProject do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       elixirc_paths: elixirc_paths(Mix.env()),
-      package: [
-        licenses: ["Apache-2.0"],
-        links: %{"GitHub" => "https://github.com/eigr/spawn"}
-      ]
+      package: package()
     ]
   end
 
@@ -29,6 +28,14 @@ defmodule Statestores.MixProject do
   def application do
     [
       extra_applications: [:logger]
+    ]
+  end
+
+  defp package do
+    [
+      files: ["lib", "mix.exs", "README.md", "LICENSE"],
+      licenses: ["Apache-2.0"],
+      links: %{GitHub: @source_url}
     ]
   end
 

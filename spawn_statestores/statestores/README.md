@@ -1,6 +1,8 @@
 # Statestores
 
-**TODO: Add description**
+<!-- MDOC !-->
+
+Spawn Statestores is the core storage lib for the Spawn Actors System
 
 ## Installation
 

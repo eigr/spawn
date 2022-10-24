@@ -3,13 +3,14 @@ defmodule SpawnSdk.MixProject do
 
   @app :spawn_sdk
   @version "0.1.0"
+  @source_url "https://github.com/eigr/spawn/tree/main/spawn_sdk/spawn_sdk"
 
   def project do
     [
       app: @app,
       version: @version,
       description: "Spawn Elixir SDK is the support library for the Spawn Actors System",
-      source_url: "https://github.com/eigr/spawn/tree/main/spawn_sdk/spawn_sdk",
+      source_url: @source_url,
       homepage_url: "https://eigr.io/",
       build_path: "../../_build",
       config_path: "../../config/config.exs",
@@ -34,8 +35,9 @@ defmodule SpawnSdk.MixProject do
 
   defp package do
     [
+      files: ["lib", "mix.exs", "README.md", "LICENSE"],
       licenses: ["Apache-2.0"],
-      links: %{"GitHub" => "https://github.com/eigr/spawn"}
+      links: %{GitHub: @source_url}
     ]
   end
 

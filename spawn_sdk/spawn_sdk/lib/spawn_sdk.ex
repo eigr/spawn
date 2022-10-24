@@ -1,63 +1,8 @@
 defmodule SpawnSdk do
-  @moduledoc """
-  This defines public SpawnSdk delegations
-
-  ## Examples
-
-  To invoke Actors, use:
-
-  ```elixir
-  iex> SpawnSdk.invoke(
-    "jose",
-    system: "spawn-system",
-    command: "sum",
-    payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1}
-  )
-  {:ok, %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 12}}
-  ```
-
-  You can invoke actor default functions like "get" to get its current state
-
-  ```elixir
-  SpawnSdk.invoke(
-    "jose",
-    system: "spawn-system",
-    command: "get"
-  )
-  ```
-
-  Spawning Actors:
-
-  ```elixir
-  iex> SpawnSdk.spawn_actor("robert", system: "spawn-system", actor: SpawnSdkExample.Actors.AbstractActor)
-  {:ok, %{"robert" => SpawnSdkExample.Actors.AbstractActor}}
-  ```
-
-  Invoke Spawned Actors:
-
-  ```elixir
-  iex> SpawnSdk.invoke(
-    "robert",
-    system: "spawn-system",
-    command: "sum",
-    payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1}
-  )
-  {:ok, %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 16}}
-  ```
-
-  Invoke Actors in a lazy way without having to spawn them before:
-
-  ```elixir
-  iex> SpawnSdk.invoke(
-    "robert_lazy",
-    ref: SpawnSdkExample.Actors.AbstractActor,
-    system: "spawn-system",
-    command: "sum",
-    payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1}
-  )
-  {:ok, %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1}}
-  ```
-  """
+  @moduledoc "README.md"
+             |> File.read!()
+             |> String.split("<!-- MDOC !-->")
+             |> Enum.fetch!(1)
 
   @doc """
   Invokes a function for a actor_name

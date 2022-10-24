@@ -2,11 +2,13 @@ defmodule Spawn.MixProject do
   use Mix.Project
 
   @app :spawn
+  @version "0.1.0"
+  @source_url "https://github.com/eigr/spawn"
 
   def project do
     [
       app: @app,
-      version: "0.1.0",
+      version: @version,
       description: "Spawn is the core lib for Spawn Actors System",
       source_url: "https://github.com/eigr/spawn",
       homepage_url: "https://eigr.io/",
@@ -18,10 +20,7 @@ defmodule Spawn.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      package: [
-        licenses: ["Apache-2.0"],
-        links: %{"GitHub" => "https://github.com/eigr/spawn"}
-      ]
+      package: package()
     ]
   end
 
@@ -29,6 +28,14 @@ defmodule Spawn.MixProject do
   def application do
     [
       extra_applications: [:logger, :retry]
+    ]
+  end
+
+  defp package do
+    [
+      files: ["lib", "mix.exs", "README.md", "LICENSE"],
+      licenses: ["Apache-2.0"],
+      links: %{GitHub: @source_url}
     ]
   end
 

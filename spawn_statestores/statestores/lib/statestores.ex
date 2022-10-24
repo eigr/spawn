@@ -1,5 +1,6 @@
 defmodule Statestores do
-  @moduledoc """
-  Documentation for `Statestores`.
-  """
+  @moduledoc "README.md"
+             |> File.read!()
+             |> String.split("<!-- MDOC !-->")
+             |> Enum.fetch!(1)
 end

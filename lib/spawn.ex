@@ -1,5 +1,6 @@
 defmodule Spawn do
-  @moduledoc """
-  Documentation for `Spawn`.
-  """
+  @moduledoc "README.md"
+             |> File.read!()
+             |> String.split("<!-- MDOC !-->")
+             |> Enum.fetch!(1)
 end

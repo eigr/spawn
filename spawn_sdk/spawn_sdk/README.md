@@ -1,12 +1,14 @@
 # Spawn Elixir SDK
 
+<!-- MDOC !-->
+
 Spawn Elixir SDK is the support library for the Spawn Actors System.
 
 Spawn is based on the sidecar proxy pattern to provide the multi-language Actor Model framework.
 Spawn's technology stack on top of BEAM VM (Erlang's virtual machine) provides support for different languages from its 
 native Actor model.
 
-For a broader understanding of Spawn please consult its official [repository](https://github.com/eigr-labs/spawn).
+For a broader understanding of Spawn please consult its official [repository](https://github.com/eigr/spawn).
 
 ## Installation
 
@@ -27,7 +29,7 @@ end
 ## How to use
 
 After creating an elixir application project create the protobuf files for your business domain.
-It is common practice to do this under the priv/ folder. Let's demonstrate an example:
+It is common practice to do this under the **priv/** folder. Let's demonstrate an example:
 
 ```protobuf
 syntax = "proto3";
@@ -50,7 +52,7 @@ as a protobuf type, and it is a good practice to separate these types of message
 In the above case `MyState` is the type protobuf that represents the state of the Actor that we will create later 
 while `MyBusiness` is the type of message that we will send and receive from this Actor.
 
-Now that we have defined our input and output types as Protobuf types we will need to compile these files to generate their respective Elixir modules. An example of how to do this can be found [here](https://github.com/eigr/spawn/blob/main/apps/spawn_sdk_example/compile-example-pb.sh)
+Now that we have defined our input and output types as Protobuf types we will need to compile these files to generate their respective Elixir modules. An example of how to do this can be found [here](https://github.com/eigr/spawn/blob/main/spawn_sdk/spawn_sdk_example/compile-example-pb.sh)
 
 > **_NOTE:_** You need to have installed the elixir plugin for protoc. More information on how to obtain and install the necessary tools can be found here [here](https://github.com/elixir-protobuf/protobuf#usage) 
 
@@ -297,62 +299,64 @@ MIX_ENV=prod USER_FUNCTION_PORT=8092 PROXY_DATABASE_TYPE=mysql SPAWN_STATESTORE_
 
 > **_NOTE:_** This example uses the MySQL database as persistent storage for its actors. And it is also expected that you have previously created a database called eigr-functions-db in the MySQL instance.
 
-The full example of this application can be found [here](https://github.com/eigr/spawn/tree/main/apps/spawn_sdk_example).
+The full example of this application can be found [here](https://github.com/eigr/spawn/tree/main/spawn_sdk/spawn_sdk_example).
 
-### Test App
+## Client API Examples
 
-Invoke Actors:
+  To invoke Actors, use:
 
-```elixir
-SpawnSdk.invoke(
-  "joe", 
-  system: "spawn-system",
-  command: "sum",
-  payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1}
-)
-```
+  ```elixir
+  iex> SpawnSdk.invoke(
+    "jose",
+    system: "spawn-system",
+    command: "sum",
+    payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1}
+  )
+  {:ok, %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 12}}
+  ```
 
-You can invoke actor default functions like "get" to get its current state
+  You can invoke actor default functions like "get" to get its current state
 
-```elixir
-SpawnSdk.invoke(
-  "joe", 
-  system: "spawn-system",
-  command: "get"
-)
-```
+  ```elixir
+  SpawnSdk.invoke(
+    "jose",
+    system: "spawn-system",
+    command: "get"
+  )
+  ```
 
-Spawning Actors:
+  Spawning Actors:
 
-```elixir
-SpawnSdk.spawn_actor("robert", system: "spawn-system", actor: SpawnSdkExample.Actors.AbstractActor)
-```
+  ```elixir
+  iex> SpawnSdk.spawn_actor("robert", system: "spawn-system", actor: SpawnSdkExample.Actors.AbstractActor)
+  {:ok, %{"robert" => SpawnSdkExample.Actors.AbstractActor}}
+  ```
 
-Invoke Spawning Actors:
+  Invoke Spawned Actors:
 
-```elixir
-SpawnSdk.invoke(
-  "robert",
-  system: "spawn-system",
-  command: "sum",
-  payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1}
-)
-```
+  ```elixir
+  iex> SpawnSdk.invoke(
+    "robert",
+    system: "spawn-system",
+    command: "sum",
+    payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1}
+  )
+  {:ok, %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 16}}
+  ```
 
-Invoke Actors in a lazy way without having to spawn before:
+  Invoke Actors in a lazy way without having to spawn them before:
 
-```elixir
-SpawnSdk.invoke(
-  "robert_lazy",
-  ref: SpawnSdkExample.Actors.AbstractActor,
-  system: "spawn-system",
-  command: "sum",
-  payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1}
-)
-```
+  ```elixir
+  iex> SpawnSdk.invoke(
+    "robert_lazy",
+    ref: SpawnSdkExample.Actors.AbstractActor,
+    system: "spawn-system",
+    command: "sum",
+    payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1}
+  )
+  {:ok, %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1}}
+  ```
 
 ### Deploy
 
-Ready you now have a valid Elixir application for use in a Spawn cluster. However, you will still need to generate a container image with your application so that you can use it together with the Spawn Operator for Kubernetes.
-
-This and other information can be found in the [documentation]().
+Ready you now have a valid Elixir application for use in a Spawn cluster. However, you will still need to generate a container image with your application so that you can use it together with the [Spawn Operator for Kubernetes](https://github.com/eigr/spawn/tree/main/spawn_operator/spawn_operator).
