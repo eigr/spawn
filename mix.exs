@@ -3,6 +3,7 @@ defmodule Spawn.MixProject do
 
   @app :spawn
   @version "0.1.0"
+  @site "https://eigr.io/"
   @source_url "https://github.com/eigr/spawn"
 
   def project do
@@ -10,8 +11,8 @@ defmodule Spawn.MixProject do
       app: @app,
       version: @version,
       description: "Spawn is the core lib for Spawn Actors System",
-      source_url: "https://github.com/eigr/spawn",
-      homepage_url: "https://eigr.io/",
+      source_url: @source_url,
+      homepage_url: @site,
       build_path: "_build",
       config_path: "config/config.exs",
       deps_path: "deps",
@@ -35,7 +36,7 @@ defmodule Spawn.MixProject do
     [
       files: ["lib", "mix.exs", "README.md", "LICENSE"],
       licenses: ["Apache-2.0"],
-      links: %{GitHub: @source_url}
+      links: %{GitHub: @source_url, Site: @site}
     ]
   end
 
