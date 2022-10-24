@@ -12,7 +12,8 @@ defmodule Statestores.Config do
           {:proxy_db_username, "PROXY_DATABASE_USERNAME", default: "admin", required: false},
           {:proxy_db_secret, "PROXY_DATABASE_SECRET", default: "admin", required: false},
           {:proxy_db_host, "PROXY_DATABASE_HOST", default: "localhost", required: false},
-          {:proxy_db_port, "PROXY_DATABASE_PORT", default: 5432, map: &String.to_integer/1, required: false}
+          {:proxy_db_port, "PROXY_DATABASE_PORT",
+           default: 5432, map: &String.to_integer/1, required: false}
         ]
       }
     ]

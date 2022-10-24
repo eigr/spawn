@@ -30,6 +30,7 @@ defmodule Proxy.MixProject do
   defp deps do
     [
       {:spawn, path: "../../"},
+      {:spawn_statestores, path: "../../spawn_statestores/statestores"},
       {:bakeware, "~> 0.2"},
       {:bandit, "~> 0.5"},
       {:observer_cli, "~> 1.7"}

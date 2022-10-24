@@ -30,7 +30,7 @@ defmodule ActivatorGRPC.MixProject do
   defp deps do
     [
       {:activator, path: "../activator"},
-      {:spawn, path: "../../"},
+      {:spawn, path: "../../"}
     ]
   end
 

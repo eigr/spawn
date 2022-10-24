@@ -4,28 +4,30 @@ defmodule Sidecar.Supervisor do
 
   @impl true
   def init(config) do
-    children = [
-      Spawn.Supervisor.child_spec(config),
-      statestores(),
-      Actors.Supervisors.ProtocolSupervisor.child_spec(config),
-      Actors.Supervisors.EntitySupervisor.child_spec(config),
-      %{
-        id: StateHandoffJoinTask,
-        restart: :transient,
-        start: {
-          Task,
-          :start_link,
-          [
-            fn ->
-              Node.list()
-              |> Enum.each(fn node ->
-                Spawn.Cluster.StateHandoff.join(node)
-              end)
-            end
-          ]
+    children =
+      [
+        Spawn.Supervisor.child_spec(config),
+        statestores(),
+        Actors.Supervisors.ProtocolSupervisor.child_spec(config),
+        Actors.Supervisors.EntitySupervisor.child_spec(config),
+        %{
+          id: StateHandoffJoinTask,
+          restart: :transient,
+          start: {
+            Task,
+            :start_link,
+            [
+              fn ->
+                Node.list()
+                |> Enum.each(fn node ->
+                  Spawn.Cluster.StateHandoff.join(node)
+                end)
+              end
+            ]
+          }
         }
-      }
-    ] |> Enum.reject(&is_nil/1)
+      ]
+      |> Enum.reject(&is_nil/1)
 
     Supervisor.init(children, strategy: :one_for_one)
   end

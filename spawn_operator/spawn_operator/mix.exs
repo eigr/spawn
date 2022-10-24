@@ -32,7 +32,7 @@ defmodule Operator.MixProject do
       {:bandit, "~> 0.5"},
       {:bakeware, ">= 0.0.0", runtime: false},
       {:bonny, git: "https://github.com/coryodaniel/bonny.git", branch: "master"},
-      {:spawn, path: "../../"},
+      {:spawn, path: "../../"}
     ]
   end
 
