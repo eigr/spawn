@@ -1,7 +1,7 @@
-defmodule Activators.MixProject do
+defmodule Statestores.MixProject do
   use Mix.Project
 
-  @app :activator
+  @app :spawn_statestores
 
   def project do
     [
@@ -13,7 +13,8 @@ defmodule Activators.MixProject do
       lockfile: "../../mix.lock",
       elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      elixirc_paths: elixirc_paths(Mix.env())
     ]
   end
 
@@ -27,9 +28,16 @@ defmodule Activators.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:spawn, path: "../../"},
-      {:cloudevents, "~> 0.6.1"},
-      {:hackney, "~> 1.9"}
+      {:vapor, "~> 0.10"},
+      {:cloak_ecto, "~> 1.2"},
+      {:ecto_sql, "~> 3.8"},
+      {:ecto_sqlite3, "~> 0.8.2"},
+      {:myxql, "~> 0.6"},
+      {:postgrex, "~> 0.16"},
+      {:tds, "~> 2.3"}
     ]
   end
+
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
 end

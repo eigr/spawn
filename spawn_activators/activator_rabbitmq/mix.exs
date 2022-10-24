@@ -30,8 +30,7 @@ defmodule ActivatorRabbitMQ.MixProject do
   defp deps do
     [
       {:activator, path: "../activator"},
-      {:spawn, path: "../../apps/spawn"},
-      {:metrics_endpoint, path: "../../apps/metrics_endpoint"},
+      {:spawn, path: "../../"},
       {:bakeware, "~> 0.2"},
       {:bandit, "~> 0.5"},
       {:broadway_rabbitmq, "~> 0.7"}

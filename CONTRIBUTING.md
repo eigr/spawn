@@ -84,8 +84,6 @@ The Spawn repository is divided into many directories and even though it is an U
 
     * ***operator:*** This is the Kubernetes Controller/Operator that controls the provisioning of the sidecars and user functions.
 
-    * ***metrics_endpoint:*** Helper library for exposing metrics in Prometheus format across applications.
-
     * ***activator:*** It has the behaviors/contracts and implementation of the event handlers to be used by the different providers of the Activators.
 
     * ***activator_´name´:*** Each application that starts with activator and follows the name of a given event provider implements in turn the connection logic and event management of that specific provider.

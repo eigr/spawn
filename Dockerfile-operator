@@ -9,7 +9,7 @@ RUN apk add --no-cache --update git build-base ca-certificates zstd
 RUN mkdir config
 COPY config/ ./config
 COPY spawn_operator/ ./spawn_operator
-COPY apps/ ./apps
+COPY lib/ ./lib
 COPY mix.exs .
 COPY mix.lock .
 

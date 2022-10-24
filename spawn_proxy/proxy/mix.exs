@@ -29,7 +29,7 @@ defmodule Proxy.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:sidecar, path: "../../apps/sidecar"},
+      {:spawn, path: "../../"},
       {:bakeware, "~> 0.2"},
       {:bandit, "~> 0.5"},
       {:observer_cli, "~> 1.7"}

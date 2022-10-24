@@ -1,6 +1,6 @@
 import Config
 
-config :statestores, Statestores.Adapters.MySQL,
+config :spawn_statestores, Statestores.Adapters.MySQL,
   pool: Ecto.Adapters.SQL.Sandbox,
   ownership_timeout: :infinity,
   pool_size: 24,

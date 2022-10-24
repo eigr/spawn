@@ -9,7 +9,7 @@ RUN apk add --no-cache --update git build-base ca-certificates zstd
 RUN mkdir config
 COPY config/ ./config
 COPY spawn_activators/activator_kafka/ ./spawn_activators/activator_kafka
-COPY apps/ ./apps
+COPY lib/ ./lib
 COPY mix.exs .
 COPY mix.lock .
 

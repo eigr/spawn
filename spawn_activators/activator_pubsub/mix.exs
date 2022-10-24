@@ -30,9 +30,7 @@ defmodule ActivatorPubSub.MixProject do
   defp deps do
     [
       {:activator, path: "../activator"},
-      {:actors, path: "../../apps/actors"},
-      {:spawn, path: "../../apps/spawn"},
-      {:metrics_endpoint, path: "../../apps/metrics_endpoint"},
+      {:spawn, path: "../../"},
       {:bakeware, "~> 0.2"},
       {:bandit, "~> 0.5"}
       # {:broadway_cloud_pub_sub, "~> 0.7"},

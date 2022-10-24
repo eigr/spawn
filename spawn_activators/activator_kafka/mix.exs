@@ -30,9 +30,7 @@ defmodule ActivatorKafka.MixProject do
   defp deps do
     [
       {:activator, path: "../activator"},
-      {:actors, path: "../../apps/actors"},
-      {:spawn, path: "../../apps/spawn"},
-      {:metrics_endpoint, path: "../../apps/metrics_endpoint"},
+      {:spawn, path: "../../"},
       {:broadway_kafka, "~> 0.3"},
       {:bakeware, "~> 0.2"},
       {:bandit, "~> 0.5"}

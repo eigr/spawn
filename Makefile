@@ -49,9 +49,11 @@ build-all-images:
 	docker build -f Dockerfile-activator-sqs -t ${activator-sqs-image} .
 	docker build -f Dockerfile-elixir-example -t ${spawn-sdk-example-image} .
 
-test:
-	MIX_ENV=test mix deps.get
+test-spawn:
 	MIX_ENV=test PROXY_DATABASE_TYPE=mysql PROXY_CLUSTER_STRATEGY=epmd PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
+
+test-statestores:
+	cd spawn_statestores/statestores && MIX_ENV=test mix deps.get && MIX_ENV=test PROXY_DATABASE_TYPE=mysql PROXY_CLUSTER_STRATEGY=epmd PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
 
 push-all-images:
 	docker push ${proxy-image}
@@ -94,12 +96,10 @@ apply-k8s-manifests:
 	kubectl -n eigr-functions apply -f spawn_operator/operator/manifest.yaml
 
 run-proxy-local:
-	cd spawn_proxy/proxy && && mix deps.get
-	PROXY_DATABASE_TYPE=$(database) SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= iex --name spawn_a2@127.0.0.1 -S mix
+	cd spawn_proxy/proxy && mix deps.get && PROXY_DATABASE_TYPE=$(database) SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= iex --name spawn_a2@127.0.0.1 -S mix
 
 run-sdk-local:
-	cd spawn_sdk/spawn_sdk_example && mix deps.get
-	PROXY_CLUSTER_STRATEGY=epmd PROXY_DATABASE_TYPE=$(database) SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= iex --name spawn_actors_node@127.0.0.1 -S mix
+	cd spawn_sdk/spawn_sdk_example && mix deps.get && PROXY_CLUSTER_STRATEGY=epmd PROXY_DATABASE_TYPE=$(database) SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= iex --name spawn_actors_node@127.0.0.1 -S mix
 
 run-sdk-local2:
 	cd spawn_sdk/spawn_sdk_example && PROXY_CLUSTER_STRATEGY=epmd PROXY_DATABASE_TYPE=$(database) SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= iex --name spawn_actors_node1@127.0.0.1 -S mix

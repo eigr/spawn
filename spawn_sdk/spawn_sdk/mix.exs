@@ -8,6 +8,9 @@ defmodule SpawnSdk.MixProject do
     [
       app: @app,
       version: @version,
+      description: "Spawn Elixir SDK is the support library for the Spawn Actors System",
+      source_url: "https://github.com/eigr/spawn/tree/main/spawn_sdk/spawn_sdk",
+      homepage_url: "https://eigr.io/",
       build_path: "../../_build",
       config_path: "../../config/config.exs",
       deps_path: "../../deps",
@@ -15,7 +18,8 @@ defmodule SpawnSdk.MixProject do
       elixir: "~> 1.14",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      package: package()
     ]
   end
 
@@ -28,12 +32,17 @@ defmodule SpawnSdk.MixProject do
     ]
   end
 
+  defp package do
+    [
+      licenses: ["Apache-2.0"],
+      links: %{"GitHub" => "https://github.com/eigr/spawn"}
+    ]
+  end
+
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:actors, path: "../../apps/actors"},
-      {:spawn, path: "../../apps/spawn"},
-      {:sidecar, path: "../../apps/sidecar"},
+      {:spawn, path: "../../"},
       {:faker, "~> 0.17", only: :test}
     ]
   end
