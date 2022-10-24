@@ -10,13 +10,16 @@ For a broader understanding of Spawn please consult its official [repository](ht
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `spawn_sdk` to your list of dependencies in `mix.exs`:
+[Available in Hex](https://hex.pm/packages/spawn_sdk), the package can be installed
+by adding `spawn_sdk` and `spawn_statestores` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
   [
-    {:spawn_sdk, "~> 0.1.0"}
+    {:spawn_sdk, "~> 0.1.0"},
+
+    # Remove this only if you will be using non-persistent actors
+    {:spawn_statestores, "~> 0.1.0"}
   ]
 end
 ```

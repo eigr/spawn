@@ -32,8 +32,8 @@ defmodule Actor.ActorTest do
     test "get defaults" do
       assert Actor.MyActor.__meta__(:abstract) == false
       assert true = Actor.MyActor.__meta__(:persistent)
-      assert 30000 = Actor.MyActor.__meta__(:deactivate_timeout)
-      assert 10000 = Actor.MyActor.__meta__(:snapshot_timeout)
+      assert 10_000 = Actor.MyActor.__meta__(:deactivate_timeout)
+      assert 2_000 = Actor.MyActor.__meta__(:snapshot_timeout)
     end
   end
 

@@ -184,7 +184,7 @@ The Spawn protocol itself is described [here](https://github.com/eigr-labs/spawn
 
 ## Installation
 
-TODO
+- [Using Elixir SDK](./spawn_sdk/spawn_sdk/)
 
 ## Getting Started
 

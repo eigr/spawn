@@ -42,9 +42,23 @@ defmodule SpawnSdk.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:spawn, path: "../../"},
-      {:faker, "~> 0.17", only: :test}
-    ]
+      {:faker, "~> 0.17", only: :test},
+      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false}
+    ] ++ deps_for_release()
+  end
+
+  @is_release System.get_env("RELEASE")
+
+  defp deps_for_release do
+    if @is_release do
+      [
+        {:spawn, "~> 0.1"}
+      ]
+    else
+      [
+        {:spawn, path: "../../"}
+      ]
+    end
   end
 
   defp elixirc_paths(:test), do: ["lib", "test/support"]
