@@ -20,7 +20,8 @@ defmodule SpawnSdk.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      package: package()
+      package: package(),
+      docs: docs()
     ]
   end
 
@@ -38,6 +39,18 @@ defmodule SpawnSdk.MixProject do
       files: ["lib", "mix.exs", "README.md", "LICENSE"],
       licenses: ["Apache-2.0"],
       links: %{GitHub: @source_url}
+    ]
+  end
+
+  defp docs do
+    [
+      main: "readme",
+      source_url: @source_url,
+      source_ref: "v#{@version}",
+      formatter_opts: [gfm: true],
+      extras: [
+        "README.md"
+      ]
     ]
   end
 
