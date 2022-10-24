@@ -84,6 +84,13 @@ defmodule SpawnSdk.Actor do
     state_type = Keyword.get(opts, :state_type, nil)
     persistent = Keyword.get(opts, :persistent, true)
 
+    if persistent and !Code.ensure_loaded?(Statestores.Supervisor) do
+      raise """
+      ArgumentError. You need to add :spawn_statestores to your dependency if you are going to use persistent actors.
+      Otherwise, set `persistent: false` in your Actor attributes
+      """
+    end
+
     if state_type == nil and persistent do
       raise "ArgumentError. State type is mandatory if persistent is true"
     end
