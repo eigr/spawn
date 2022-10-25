@@ -8,9 +8,6 @@ defmodule Proxy.Application do
   def start(_type, _args) do
     config = Config.load(__MODULE__)
 
-    # MetricsEndpoint.Exporter.setup()
-    # MetricsEndpoint.PrometheusPipeline.setup()
-
     children = [
       {Sidecar.Supervisor, config},
       {Bandit, plug: Proxy.Router, scheme: :http, options: get_http_options(config)}

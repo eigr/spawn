@@ -6,8 +6,8 @@ defmodule Sidecar.Supervisor do
   def init(config) do
     children =
       [
-        Spawn.Supervisor.child_spec(config),
         statestores(),
+        Spawn.Supervisor.child_spec(config),
         Actors.Supervisors.ProtocolSupervisor.child_spec(config),
         Actors.Supervisors.EntitySupervisor.child_spec(config),
         %{
