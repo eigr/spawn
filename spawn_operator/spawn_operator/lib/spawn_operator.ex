@@ -26,8 +26,13 @@ defmodule SpawnOperator do
     system: my-actor-system # mandatory. Name of the ActorSystem declared in ActorSystem CRD
     namespace: default # Optional. Default namespace is "default"
   spec:
-    function:
-      image: eigr/spawn-springboot-examples:latest # Mandatory
+    replicas: 1 # Optional
+
+    sidecar: # Optional
+      image: docker.io/eigr/spawn-proxy:0.1.0
+
+    host: # Mandatory
+      image: docker.io/eigr/spawn-springboot-examples:latest # Mandatory
       ports:
       - containerPort: 80
 

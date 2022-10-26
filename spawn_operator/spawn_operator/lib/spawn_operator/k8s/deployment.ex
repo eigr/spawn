@@ -33,23 +33,22 @@ defmodule SpawnOperator.K8s.Deployment do
   def manifest(system, ns, name, params), do: gen_deployment(system, ns, name, params)
 
   defp gen_deployment(system, ns, name, params) do
-    function_params = Map.get(params, "function")
-    actor_host_function_image = Map.get(function_params, "image")
-
-    replicas = Map.get(function_params, "replicas", @default_actor_host_function_replicas)
-
+    # TODO: How to treat it? Autoscaling or user defined number of replicas?
+    replicas = Map.get(host_params, "replicas", @default_actor_host_function_replicas)
     # TODO: The right thing would be this coming from the ActorSystem CRD configmap
     cookie = Map.get(params, "cookie", default_cookie(ns))
 
-    actor_host_function_envs =
-      Map.get(function_params, "env", []) ++ @default_actor_host_function_env
+    sidecar_params = Map.get(params, "sidecar")
 
-    # TODO: How to treat it? Autoscaling or user defined number of replicas?
-    actor_host_function_ports =
-      Map.get(function_params, "ports", @default_actor_host_function_ports)
+    host_params = Map.get(params, "host")
+    actor_host_function_image = Map.get(host_params, "image")
+
+    actor_host_function_envs = Map.get(host_params, "env", []) ++ @default_actor_host_function_env
+
+    actor_host_function_ports = Map.get(host_params, "ports", @default_actor_host_function_ports)
 
     actor_host_function_resources =
-      Map.get(function_params, "resources", @default_actor_host_function_resources)
+      Map.get(host_params, "resources", @default_actor_host_function_resources)
 
     %{
       "apiVersion" => "apps/v1",
