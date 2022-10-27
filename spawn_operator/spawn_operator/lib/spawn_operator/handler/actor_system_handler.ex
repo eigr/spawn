@@ -1,40 +1,62 @@
 defmodule SpawnOperator.Handler.ActorSystemHandler do
   @moduledoc """
   `ActorSystemHandler` handles ActorSystem CRD events
+
+      ---
+      apiVersion: spawn.eigr.io/v1
+      kind: ActorSystem
+      metadata:
+        name: spawn-system # Mandatory. Name of the state store
+        namespace: default # Optional. Default namespace is "default"
+      spec:
+        mesh: # Optional
+          kind: erlang # Optional. Default erlang. Possible values [erlang | quic]
+          cookie: default-c21f969b5f03d33d43e04f8f136e7682 # Optional. Only used if kind is erlang
+        statestore:
+          type: Postgres
+          credentialsSecretRef: postgres-connection-secret # The secret containing connection params
+          pool: # Optional
+            size: 10
+
   """
-  defmacro __using__(_) do
-    quote do
-      import SpawnOperator,
-        only: [
-          build_actor_system: 1,
-          track_event: 2
-        ]
+  alias SpawnOperator.K8s.ConfigMap.ActorSystemSecret
+  alias SpawnOperator.K8s.HeadlessService
+  alias SpawnOperator.K8s.Secret.ActorSystemSecret
 
-      @impl true
-      def add(resource) do
-        track_event(:add, resource)
-        build_actor_system(resource)
-        :ok
-      end
+  @behaviour Pluggable
 
-      @impl true
-      def modify(resource) do
-        track_event(:modify, resource)
-        build_actor_system(resource)
-        :ok
-      end
+  @impl Pluggable
+  def init(_opts), do: nil
 
-      @impl true
-      def delete(resource) do
-        track_event(:delete, resource)
-        :ok
-      end
+  @impl Pluggable
+  def call(%Bonny.Axn{action: action} = axn, nil) when action in [:add, :modify] do
+    %Bonny.Axn{resource: resource} = axn
 
-      @impl true
-      def reconcile(resource) do
-        track_event(:reconcile, resource)
-        :ok
-      end
-    end
+    system_configmap = build_system_configmap(resource)
+    system_cluster_serve = build_system_service(resource)
+
+    axn
+    |> Bonny.Axn.register_descendant(system_configmap)
+    |> Bonny.Axn.register_descendant(system_cluster_serve)
+    |> Bonny.Axn.success_event()
+  end
+
+  @impl Pluggable
+  def call(%Bonny.Axn{action: action} = axn, nil) when action in [:delete, :reconcile] do
+    Bonny.Axn.success_event(axn)
+  end
+
+  defp build_system_configmap(resource) do
+    %{system: system, namespace: ns, name: name, params: params} =
+      SpawnOperator.get_args(resource)
+
+    ActorSystemSecret.manifest(system, ns, name, params)
+  end
+
+  defp build_system_service(resource) do
+    %{system: system, namespace: ns, name: name, params: params} =
+      SpawnOperator.get_args(resource)
+
+    HeadlessService.manifest(system, ns, name, params)
   end
 end

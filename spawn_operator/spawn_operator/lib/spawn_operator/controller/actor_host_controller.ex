@@ -1,21 +1,21 @@
 defmodule SpawnOperator.Controller.ActorHostController do
   require Bonny.API.CRD
 
-  use Bonny.ControllerV2,
-    for_resource:
-      Bonny.API.CRD.build_for_controller!(
-        group: "spawn-eigr.io",
-        scope: :Cluster,
-        versions: [SpawnOperator.Versions.Api.V1.ActorHost]
-      )
+  use Bonny.ControllerV2
 
-  use SpawnOperator.Handler.ActorHostHandler
+  # step Bonny.Pluggable.SkipObservedGenerations
+  step SpawnOperator.Handler.ActorHostHandler
 
-  rbac_rule({"", ["secrets"], ["*"]})
-  rbac_rule({"v1", ["pods"], ["*"]})
-  rbac_rule({"apps", ["deployments"], ["*"]})
-  rbac_rule({"", ["services", "configmaps"], ["*"]})
-  rbac_rule({"autoscaling", ["horizontalpodautoscalers"], ["*"]})
-  rbac_rule({"extensions", ["ingresses", "ingressclasses"], ["*"]})
-  rbac_rule({"networking.k8s.io", ["ingresses", "ingressclasses"], ["*"]})
+  @impl true
+  def rbac_rules() do
+    [
+      to_rbac_rule({"", ["secrets"], ["*"]}),
+      to_rbac_rule({"v1", ["pods"], ["*"]}),
+      to_rbac_rule({"apps", ["deployments"], ["*"]}),
+      to_rbac_rule({"", ["services", "configmaps"], ["*"]}),
+      to_rbac_rule({"autoscaling", ["horizontalpodautoscalers"], ["*"]}),
+      to_rbac_rule({"extensions", ["ingresses", "ingressclasses"], ["*"]}),
+      to_rbac_rule({"networking.k8s.io", ["ingresses", "ingressclasses"], ["*"]})
+    ]
+  end
 end

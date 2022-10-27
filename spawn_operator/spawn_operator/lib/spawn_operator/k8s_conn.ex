@@ -10,7 +10,10 @@ defmodule SpawnOperator.K8sConn do
   """
 
   @spec get(atom()) :: K8s.Conn.t()
-  def get(:dev), do: K8s.Conn.from_file("~/.kube/config", context: "minikube")
+  def get(:dev) do
+    {:ok, conn} = K8s.Conn.from_file("~/.kube/config", context: "minikube")
+    conn
+  end
 
   def get(:test),
     do: %K8s.Conn{

@@ -7,13 +7,14 @@ defmodule SpawnOperator.Application do
   @port 9090
 
   @impl true
-  def start(_type, _args) do
+  def start(_type, env: env) do
     Logger.info("Starting Eigr Spawn Operator Controller...")
     # Node.set_cookie(String.to_atom("FW9RYfQpVbuycMxSodrXIKAzuLgsaR5gyArGeap8WTHNfJj3vfltYQ=="))
     attach_logger()
 
     children = [
-      {Bandit, plug: SpawnOperator.Router, scheme: :http, options: [port: @port]}
+      {Bandit, plug: SpawnOperator.Router, scheme: :http, options: [port: @port]},
+      {SpawnOperator.Operator, conn: SpawnOperator.K8sConn.get(env)}
     ]
 
     opts = [strategy: :one_for_one, name: SpawnOperator.Supervisor]

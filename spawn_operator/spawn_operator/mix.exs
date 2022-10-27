@@ -22,7 +22,7 @@ defmodule Operator.MixProject do
   def application do
     [
       extra_applications: [:logger],
-      mod: {SpawnOperator.Application, []}
+      mod: {SpawnOperator.Application, [env: Mix.env()]}
     ]
   end
 
@@ -31,7 +31,7 @@ defmodule Operator.MixProject do
     [
       {:bandit, "~> 0.5"},
       {:bakeware, ">= 0.0.0", runtime: false},
-      {:bonny, git: "https://github.com/coryodaniel/bonny.git", tag: "v0.6.0-alpha1"},
+      {:bonny, git: "https://github.com/coryodaniel/bonny.git", tag: "master"},
       {:spawn, path: "../../"}
     ]
   end
