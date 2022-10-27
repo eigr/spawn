@@ -2,19 +2,14 @@ defmodule SpawnOperator.Handler.ActivatorHandler do
   @moduledoc """
   `ActivatorHandler` handles Activator CRD events
   """
-  defmacro __using__(_) do
-    quote do
-      @impl true
-      def add(_res), do: :ok
 
-      @impl true
-      def modify(_res), do: :ok
+  @behaviour Pluggable
 
-      @impl true
-      def delete(_res), do: :ok
+  @impl Pluggable
+  def init(_opts), do: nil
 
-      @impl true
-      def reconcile(_res), do: :ok
-    end
+  @impl Pluggable
+  def call(axn, nil) do
+    axn
   end
 end
