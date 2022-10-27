@@ -11,7 +11,7 @@ defmodule SpawnOperator.Controller.ActorSystemController do
       to_rbac_rule({"v1", ["pods"], ["*"]}),
       to_rbac_rule({"apps", ["deployments"], ["*"]}),
       to_rbac_rule({"", ["secrets"], ["*"]}),
-      to_rbac_rule({"", ["services", "configmaps"], ["*"]}),
+      to_rbac_rule({"", ["services", "configmaps"], ["*"]})
     ]
   end
 end

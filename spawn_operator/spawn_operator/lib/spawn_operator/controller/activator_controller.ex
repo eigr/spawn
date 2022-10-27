@@ -15,7 +15,7 @@ defmodule SpawnOperator.Controller.ActivatorController do
       to_rbac_rule({"", ["services", "configmaps"], ["*"]}),
       to_rbac_rule({"autoscaling", ["horizontalpodautoscalers"], ["*"]}),
       to_rbac_rule({"extensions", ["ingresses", "ingressclasses"], ["*"]}),
-      to_rbac_rule({"networking.k8s.io", ["ingresses", "ingressclasses"], ["*"]}),
+      to_rbac_rule({"networking.k8s.io", ["ingresses", "ingressclasses"], ["*"]})
     ]
   end
 end

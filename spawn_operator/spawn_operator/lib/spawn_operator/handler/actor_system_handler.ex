@@ -23,14 +23,13 @@ defmodule SpawnOperator.Handler.ActorSystemHandler do
   alias SpawnOperator.K8s.HeadlessService
   alias SpawnOperator.K8s.Secret.ActorSystemSecret
 
-
   @behaviour Pluggable
 
   @impl Pluggable
   def init(_opts), do: nil
 
   @impl Pluggable
-  def call(%Bonny.Axn{action: action} = axn, nil) when action in[:add, :modify] do
+  def call(%Bonny.Axn{action: action} = axn, nil) when action in [:add, :modify] do
     %Bonny.Axn{resource: resource} = axn
 
     system_configmap = build_system_configmap(resource)
@@ -43,17 +42,21 @@ defmodule SpawnOperator.Handler.ActorSystemHandler do
   end
 
   @impl Pluggable
-  def call(%Bonny.Axn{action: action} = axn, nil) when action in[:delete, :reconcile] do
+  def call(%Bonny.Axn{action: action} = axn, nil) when action in [:delete, :reconcile] do
     Bonny.Axn.success_event(axn)
   end
 
   defp build_system_configmap(resource) do
-    %{system: system, namespace: ns, name: name, params: params} = SpawnOperator.get_args(resource)
+    %{system: system, namespace: ns, name: name, params: params} =
+      SpawnOperator.get_args(resource)
+
     ActorSystemSecret.manifest(system, ns, name, params)
   end
 
   defp build_system_service(resource) do
-    %{system: system, namespace: ns, name: name, params: params} = SpawnOperator.get_args(resource)
+    %{system: system, namespace: ns, name: name, params: params} =
+      SpawnOperator.get_args(resource)
+
     HeadlessService.manifest(system, ns, name, params)
   end
 end

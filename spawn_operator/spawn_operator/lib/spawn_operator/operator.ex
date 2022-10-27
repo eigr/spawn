@@ -9,21 +9,34 @@ defmodule SpawnOperator.Operator do
   def crds() do
     [
       Bonny.API.CRD.new!(
-        names: Bonny.API.CRD.kind_to_names("Activator", ["act", "acts", "activator", "activators"]),
+        names:
+          Bonny.API.CRD.kind_to_names("Activator", ["act", "acts", "activator", "activators"]),
         group: "spawn-eigr.io",
         scope: :Cluster,
         versions: [SpawnOperator.Versions.Api.V1.Activator]
       ),
-
       Bonny.API.CRD.new!(
-        names: Bonny.API.CRD.kind_to_names("ActorHost", ["ac", "actor", "actors", "actorhost", "actorhosts"]),
+        names:
+          Bonny.API.CRD.kind_to_names("ActorHost", [
+            "ac",
+            "actor",
+            "actors",
+            "actorhost",
+            "actorhosts"
+          ]),
         group: "spawn-eigr.io",
         scope: :Cluster,
         versions: [SpawnOperator.Versions.Api.V1.ActorHost]
       ),
-
       Bonny.API.CRD.new!(
-        names: Bonny.API.CRD.kind_to_names("ActorSystem", ["as", "actorsys", "actorsystem", "actorsystems", "system"]),
+        names:
+          Bonny.API.CRD.kind_to_names("ActorSystem", [
+            "as",
+            "actorsys",
+            "actorsystem",
+            "actorsystems",
+            "system"
+          ]),
         group: "spawn-eigr.io",
         scope: :Cluster,
         versions: [SpawnOperator.Versions.Api.V1.ActorSystem]
@@ -46,6 +59,5 @@ defmodule SpawnOperator.Operator do
         controller: SpawnOperator.Controller.ActorSystemController
       }
     ]
-
   end
 end

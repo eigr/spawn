@@ -34,7 +34,7 @@ defmodule SpawnOperator.Handler.ActorHostHandler do
   def init(_opts), do: nil
 
   @impl Pluggable
-  def call(%Bonny.Axn{action: action} = axn, nil) when action in[:add, :modify] do
+  def call(%Bonny.Axn{action: action} = axn, nil) when action in [:add, :modify] do
     %Bonny.Axn{resource: resource} = axn
     host_resource = build_host_deploy(resource)
     host_config_map = build_host_configmap(resource)
@@ -46,18 +46,21 @@ defmodule SpawnOperator.Handler.ActorHostHandler do
   end
 
   @impl Pluggable
-  def call(%Bonny.Axn{action: action} = axn, nil) when action in[:delete, :reconcile] do
+  def call(%Bonny.Axn{action: action} = axn, nil) when action in [:delete, :reconcile] do
     Bonny.Axn.success_event(axn)
   end
 
   defp build_host_deploy(resource) do
-    %{system: system, namespace: ns, name: name, params: params} = SpawnOperator.get_args(resource)
+    %{system: system, namespace: ns, name: name, params: params} =
+      SpawnOperator.get_args(resource)
+
     Deployment.manifest(system, ns, name, params)
   end
 
   defp build_host_configmap(resource) do
-    %{system: system, namespace: ns, name: name, params: params} = SpawnOperator.get_args(resource)
+    %{system: system, namespace: ns, name: name, params: params} =
+      SpawnOperator.get_args(resource)
+
     SidecarCM.manifest(system, ns, name, params)
   end
-
 end
