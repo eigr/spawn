@@ -19,6 +19,35 @@ Spawn is made up of the following components:
 adapters.
 * Support libraries in different programming languages.
 
+These are the main concepts:
+
+1. **A Stateful Serverless Platform** running on top of Kubernetes, based on the Sidecar pattern and built on top of the BEAM VM.
+
+2. **Inversion of State**. This means that unlike conventional Serverless architectures where the developer fetches state from persistent storage we on the other hand send the state as the context of the event the function is receiving.
+
+3. **Polyglot**. The platform must embrace as many software communities as possible. That's why the polyglot language model is adopted with SDK development for various programming languages.
+
+4. **Less Infrastructure More Domain Code**. This means that our platform will give the developer the tools to focus only on their business without worrying about issues such as:
+
+  * Resource allocation
+  * Definition of connections and Pools
+  * Service discovery
+  * Source/Sink of Events
+  * Other infrastructure issues
+
+5. **The basic primitive is the Actor** (from the actors model) and not the Function (from the traditional serverless architectures).
+
+6. Horizontal scalability with automatic **Activation** and **Deactivation** of Actors on demand. 
+
+7. **Embracing Edge** and Less Conventional Hardware Architectures.
+
+Watch the video explaining how it works:
+
+[![asciicast](https://asciinema.org/a/V2zUGsRmOjs0kI7swVTsKg7BQ.svg)](https://asciinema.org/a/V2zUGsRmOjs0kI7swVTsKg7BQ)
+
+> **_NOTE:_** This video was recorded with an old version of the SDK for Java. That's why errors are seen in Deployment 
+
+
 ## What problem Spawn solves
 
 The advancement of Cloud Computing, Edge computing, Containers, Orchestrators, Data-
