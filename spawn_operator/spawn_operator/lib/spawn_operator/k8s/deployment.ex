@@ -122,8 +122,8 @@ defmodule SpawnOperator.K8s.Deployment do
                     }
                   },
                   %{
-                    "configMapRef" => %{
-                      "name" => "#{system}-cm"
+                    "secretRef" => %{
+                      "name" => "#{system}-secret"
                     }
                   }
                 ]

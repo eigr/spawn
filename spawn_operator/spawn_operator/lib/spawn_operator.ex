@@ -4,15 +4,14 @@ defmodule SpawnOperator do
   """
   require Logger
 
-  SpawnOperator.K8s.ConfigMap.SidecarCM
-
-  alias SpawnOperator.K8s.{Deployment, ActorSystem}
+  alias SpawnOperator.K8s.{Deployment, HeadlessService}
 
   alias SpawnOperator.K8s.ConfigMap.{
     ActivatorCM,
-    ActorSystemCM,
     SidecarCM
   }
+
+  alias SpawnOperator.K8s.Secret.ActorSystemSecret
 
   import Bonny.Config, only: [conn: 0]
   import Bonny.Resource, only: [add_owner_reference: 2]
@@ -30,10 +29,6 @@ defmodule SpawnOperator do
       cookie: default-c21f969b5f03d33d43e04f8f136e7682 # Optional. Only used if kind is erlang
     statestore:
       type: Postgres
-      databaseName: eigr-functions-db
-      databaseHost: someHost
-      databasePort: 5432
-      statestoreCryptoKey: "3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE="
       credentialsSecretRef: postgres-connection-secret # The secret containing connection params
       pool: # Optional
         size: 10
@@ -42,8 +37,9 @@ defmodule SpawnOperator do
   """
   def build_actor_system(resource) do
     system_configmap = build_system_configmap(resource)
+    system_cluster_serve = build_system_service(resource)
 
-    case apply_resource(resource, [system_configmap]) do
+    case apply_resource(resource, [system_configmap, system_cluster_serve]) do
       :ok ->
         {:ok, "ActorSystem Created Suscessfully"}
 
@@ -100,7 +96,12 @@ defmodule SpawnOperator do
 
   defp build_system_configmap(resource) do
     %{system: system, namespace: ns, name: name, params: params} = get_args(resource)
-    ActorSystem.manifest(system, ns, name, params)
+    ActorSystemSecret.manifest(system, ns, name, params)
+  end
+
+  defp build_system_service(resource) do
+    %{system: system, namespace: ns, name: name, params: params} = get_args(resource)
+    HeadlessService.manifest(system, ns, name, params)
   end
 
   defp get_args(resource) do
@@ -130,9 +131,8 @@ defmodule SpawnOperator do
       |> IO.inspect()
       |> K8s.Client.create()
       |> then(&K8s.Client.run(conn(), &1))
-      |> IO.inspect(label: "Result ------------")
+      |> IO.inspect(label: "Resource -----------------------")
 
-    # IO.inspect(result, label: "Result ------------")
     result
   end
 

@@ -1,4 +1,4 @@
-defmodule SpawnOperator.K8s.ActorSystem do
+defmodule SpawnOperator.K8s.Secret.ActorSystemSecret do
   @moduledoc false
 
   @behaviour SpawnOperator.K8s.Manifest
@@ -6,37 +6,30 @@ defmodule SpawnOperator.K8s.ActorSystem do
   import Bonny.Config, only: [conn: 0]
 
   @impl true
-  def manifest(system, ns, name, params), do: gen_configmap(system, ns, name, params)
+  def manifest(system, ns, name, params), do: gen_secret(system, ns, name, params)
 
-  defp gen_configmap(system, ns, name, params) do
-    IO.inspect(params, label: "Initial Params")
+  defp gen_secret(system, ns, _name, params) do
     mesh_params = Map.get(params, "mesh", %{})
     statestore_params = Map.get(params, "statestore", %{})
 
     distributed_options = get_dist_options(system, ns, mesh_params)
-    IO.inspect(distributed_options, label: "Distributed Options")
     storage_options = get_storage_options(system, ns, statestore_params)
-    IO.inspect(storage_options, label: "Storage Options")
 
     %{
       "apiVersion" => "v1",
-      "kind" => "ConfigMap",
+      "kind" => "Secret",
       "metadata" => %{
-        "name" => "#{system}-cm",
+        "name" => "#{system}-secret",
         "namespace" => ns
       },
       "data" => Map.merge(distributed_options, storage_options)
     }
   end
 
-  defp get_storage_options(system, ns, params) do
-    statestore = String.downcase(Map.get(params, "type", "native"))
-    statestore_key = Map.fetch!(params, "statestoreCryptoKey")
-    statestore_db_name = Map.get(params, "databaseName", "eigr-functions-db")
-    statestore_db_host = Map.get(params, "databaseHost")
-    statestore_db_port = Map.get(params, "databasePort")
+  defp get_storage_options(_system, ns, params) do
+    statestore = String.downcase(Map.get(params, "type", "native")) |> Base.encode64()
     pool_params = Map.get(params, "pool", %{})
-    pool_size = Map.get(pool_params, "size", "10")
+    pool_size = Map.get(pool_params, "size", "10") |> Base.encode64()
     statestore_credentials_secret_ref = Map.fetch!(params, "credentialsSecretRef")
 
     {:ok, secret} =
@@ -49,6 +42,10 @@ defmodule SpawnOperator.K8s.ActorSystem do
     secret_data = Map.fetch!(secret, "data")
     statestore_db_user = Map.fetch!(secret_data, "username")
     statestore_db_secret = Map.fetch!(secret_data, "password")
+    statestore_key = Map.fetch!(secret_data, "encryptionKey")
+    statestore_db_name = Map.get(secret_data, "database", "eigr-functions-db")
+    statestore_db_host = Map.get(secret_data, "host")
+    statestore_db_port = Map.get(secret_data, "port")
 
     %{
       "PROXY_DATABASE_TYPE" => statestore,
@@ -67,22 +64,30 @@ defmodule SpawnOperator.K8s.ActorSystem do
 
     case String.to_existing_atom(kind) do
       :erlang ->
-        cookie = Map.get(params, "cookie", default_cookie(ns))
+        cookie = Map.get(params, "cookie", default_cookie(ns)) |> Base.encode64()
+        cluster_poolling = "3000" |> Base.encode64()
+        cluster_strategy = "kubernetes-dns" |> Base.encode64()
+        cluster_service = "system-#{system}-svc" |> Base.encode64()
+        cluster_heartbeat = "240000" |> Base.encode64()
+        cluster_poolling = "3000" |> Base.encode64()
 
         %{
           "NODE_COOKIE" => cookie,
-          "PROXY_CLUSTER_POLLING" => "3000",
-          "PROXY_CLUSTER_STRATEGY" => "kubernetes-dns",
-          "PROXY_HEADLESS_SERVICE" => "system-#{system}-svc",
-          "PROXY_HEARTBEAT_INTERVAL" => "240000"
+          "PROXY_CLUSTER_POLLING" => cluster_poolling,
+          "PROXY_CLUSTER_STRATEGY" => cluster_strategy,
+          "PROXY_HEADLESS_SERVICE" => cluster_service,
+          "PROXY_HEARTBEAT_INTERVAL" => cluster_heartbeat
         }
 
       :quic ->
+        cluster_service = "system-#{system}-svc" |> Base.encode64()
+        cluster_strategy = "quic_dist" |> Base.encode64()
+
         %{
-          "PROXY_CLUSTER_STRATEGY" => "quic_dist",
-          "PROXY_HEADLESS_SERVICE" => "system-#{system}-svc",
-          "PROXY_TLS_CERT_PATH" => "",
-          "PROXY_TLS_KEY_PATH" => ""
+          "PROXY_CLUSTER_STRATEGY" => cluster_strategy,
+          "PROXY_HEADLESS_SERVICE" => cluster_service
+          # "PROXY_TLS_CERT_PATH" => "",
+          # "PROXY_TLS_KEY_PATH" => ""
         }
 
       _other ->
