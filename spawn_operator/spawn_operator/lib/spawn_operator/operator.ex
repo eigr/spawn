@@ -1,7 +1,10 @@
 defmodule SpawnOperator.Operator do
   use Bonny.Operator, default_watch_namespace: :all
 
+  step Bonny.Pluggable.Logger
   step :delegate_to_controller
+  step Bonny.Pluggable.ApplyStatus
+  step Bonny.Pluggable.ApplyDescendants
 
   def crds() do
     [

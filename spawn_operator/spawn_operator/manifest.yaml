@@ -3,18 +3,18 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    k8s-app: spawn-operator-controller
-  name: spawn-operator-controller
+    k8s-app: spawn-operator
+  name: spawn-operator
   namespace: eigr-functions
 spec:
   replicas: 1
   selector:
     matchLabels:
-      k8s-app: spawn-operator-controller
+      k8s-app: spawn-operator
   template:
     metadata:
       labels:
-        k8s-app: spawn-operator-controller
+        k8s-app: spawn-operator
     spec:
       containers:
         - env:
@@ -36,32 +36,28 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: spec.serviceAccountName
-          image: eigr/spawn-operator:0.1.0
-          name: spawn-operator-controller
+          image: spawn-operator-controller
+          name: spawn-operator
           resources:
             limits:
-              cpu: 500m
-              memory: 1024Mi
+              cpu: 200m
+              memory: 200Mi
             requests:
-              cpu: 100m
-              memory: 100Mi
+              cpu: 200m
+              memory: 200Mi
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
             runAsNonRoot: true
             runAsUser: 65534
       serviceAccountName: spawn-operator
+
 ---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
-  labels:
-    eigr_functions_protocol_major_version: "0"
-    eigr_functions_protocol_minor_version: "1"
-    proxy_name: spawn
-    k8s-app: spawn-operator
+  labels: {}
   name: activators.spawn-eigr.io
-  namespace: eigr-functions
 spec:
   group: spawn-eigr.io
   names:
@@ -75,25 +71,24 @@ spec:
     singular: activator
   scope: Cluster
   versions:
-    - name: v1
+    - additionalPrinterColumns: []
+      deprecated: false
+      deprecationWarning:
+      name: v1
       schema:
         openAPIV3Schema:
           type: object
           x-kubernetes-preserve-unknown-fields: true
       served: true
       storage: true
+      subresources: {}
 
 ---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
-  labels:
-    eigr_functions_protocol_major_version: "0"
-    eigr_functions_protocol_minor_version: "1"
-    proxy_name: spawn
-    k8s-app: spawn-operator
+  labels: {}
   name: actorhosts.spawn-eigr.io
-  namespace: eigr-functions
 spec:
   group: spawn-eigr.io
   names:
@@ -109,6 +104,8 @@ spec:
   scope: Cluster
   versions:
     - additionalPrinterColumns: []
+      deprecated: false
+      deprecationWarning:
       name: v1
       schema:
         openAPIV3Schema:
@@ -116,18 +113,14 @@ spec:
           x-kubernetes-preserve-unknown-fields: true
       served: true
       storage: true
+      subresources: {}
 
 ---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
-  labels:
-    eigr_functions_protocol_major_version: "0"
-    eigr_functions_protocol_minor_version: "1"
-    proxy_name: spawn
-    k8s-app: spawn-operator
+  labels: {}
   name: actorsystems.spawn-eigr.io
-  namespace: eigr-functions
 spec:
   group: spawn-eigr.io
   names:
@@ -142,13 +135,17 @@ spec:
     singular: actorsystem
   scope: Cluster
   versions:
-    - name: v1
+    - additionalPrinterColumns: []
+      deprecated: false
+      deprecationWarning:
+      name: v1
       schema:
         openAPIV3Schema:
           type: object
           x-kubernetes-preserve-unknown-fields: true
       served: true
       storage: true
+      subresources: {}
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -163,114 +160,101 @@ rules:
     resources:
       - customresourcedefinitions
     verbs:
-      - "*"
+      - '*'
   - apiGroups:
       - events.k8s.io/v1
     resources:
       - events
     verbs:
-      - "*"
+      - '*'
   - apiGroups:
-      - spawn.eigr.io
+      - spawn-eigr.io/v1
     resources:
       - activators
     verbs:
-      - "*"
+      - '*'
   - apiGroups:
-      - spawn.eigr.io
+      - spawn-eigr.io/v1
     resources:
-      - actorhosts
+      - activators/status
     verbs:
-      - "*"
+      - '*'
   - apiGroups:
-      - spawn.eigr.io
+      - ""
     resources:
-      - actorsystems
+      - secrets
     verbs:
-      - "*"
+      - '*'
+  - apiGroups:
+      - v1
+    resources:
+      - pods
+    verbs:
+      - '*'
   - apiGroups:
       - apps
     resources:
       - deployments
       - daemonsets
     verbs:
-      - "*"
+      - '*'
   - apiGroups:
       - ""
     resources:
       - services
-      - pods
       - configmaps
     verbs:
-      - "*"
+      - '*'
   - apiGroups:
       - autoscaling
     resources:
       - horizontalpodautoscalers
     verbs:
-      - "*"
+      - '*'
   - apiGroups:
       - extensions
     resources:
       - ingresses
       - ingressclasses
     verbs:
-      - "*"
+      - '*'
   - apiGroups:
       - networking.k8s.io
     resources:
       - ingresses
       - ingressclasses
     verbs:
-      - "*"
+      - '*'
+  - apiGroups:
+      - spawn-eigr.io/v1
+    resources:
+      - actorhosts
+    verbs:
+      - '*'
+  - apiGroups:
+      - spawn-eigr.io/v1
+    resources:
+      - actorhosts/status
+    verbs:
+      - '*'
   - apiGroups:
       - apps
     resources:
       - deployments
     verbs:
-      - "*"
+      - '*'
   - apiGroups:
-      - ""
+      - spawn-eigr.io/v1
     resources:
-      - services
-      - pods
-      - configmaps
+      - actorsystems
     verbs:
-      - "*"
+      - '*'
   - apiGroups:
-      - autoscaling
+      - spawn-eigr.io/v1
     resources:
-      - horizontalpodautoscalers
+      - actorsystems/status
     verbs:
-      - "*"
-  - apiGroups:
-      - extensions
-    resources:
-      - ingresses
-      - ingressclasses
-    verbs:
-      - "*"
-  - apiGroups:
-      - networking.k8s.io
-    resources:
-      - ingresses
-      - ingressclasses
-    verbs:
-      - "*"
-  - apiGroups:
-      - apps
-    resources:
-      - deployments
-    verbs:
-      - "*"
-  - apiGroups:
-      - ""
-    resources:
-      - services
-      - pods
-      - configmaps
-    verbs:
-      - "*"
+      - '*'
 
 ---
 apiVersion: v1
@@ -295,4 +279,4 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: spawn-operator
-    namespace: default
+    namespace: eigr-functions

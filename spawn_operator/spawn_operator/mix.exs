@@ -22,7 +22,7 @@ defmodule Operator.MixProject do
   def application do
     [
       extra_applications: [:logger],
-      mod: {SpawnOperator.Application, []}
+      mod: {SpawnOperator.Application, [env: Mix.env()]}
     ]
   end
 

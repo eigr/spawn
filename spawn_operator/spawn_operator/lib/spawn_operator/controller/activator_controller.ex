@@ -3,6 +3,7 @@ defmodule SpawnOperator.Controller.ActivatorController do
 
   use Bonny.ControllerV2
 
+  # step Bonny.Pluggable.SkipObservedGenerations
   step SpawnOperator.Handler.ActivatorHandler
 
   @impl true
