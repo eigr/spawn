@@ -303,7 +303,7 @@ defmodule Actors.Actor.Entity do
             actor_system: actor_system,
             command_name: command,
             value: payload,
-            current_context: Context.new(state: current_state)
+            current_context: Context.new(name: actor_name, state: current_state)
           )
 
         interface.invoke_host(request, state, @default_methods)
@@ -357,7 +357,7 @@ defmodule Actors.Actor.Entity do
             actor_system: actor_system,
             command_name: command,
             value: payload,
-            current_context: Context.new(state: current_state)
+            current_context: Context.new(name: actor_name, state: current_state)
           )
 
         interface.invoke_host(request, state, @default_methods)

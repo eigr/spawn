@@ -476,6 +476,20 @@ defmodule Eigr.Functions.Protocol.Context do
           proto3_optional: nil,
           type: :TYPE_MESSAGE,
           type_name: ".google.protobuf.Any"
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          __unknown_fields__: [],
+          default_value: nil,
+          extendee: nil,
+          json_name: "name",
+          label: :LABEL_OPTIONAL,
+          name: "name",
+          number: 2,
+          oneof_index: nil,
+          options: nil,
+          proto3_optional: nil,
+          type: :TYPE_STRING,
+          type_name: nil
         }
       ],
       name: "Context",
@@ -488,6 +502,7 @@ defmodule Eigr.Functions.Protocol.Context do
   end
 
   field(:state, 1, type: Google.Protobuf.Any)
+  field(:name, 2, type: :string)
 end
 
 defmodule Eigr.Functions.Protocol.SideEffect do

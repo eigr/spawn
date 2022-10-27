@@ -142,7 +142,7 @@ defmodule SpawnSdk.System.SpawnSystem do
 
     cond do
       Enum.member?(default_methods, command) ->
-        context = Eigr.Functions.Protocol.Context.new(state: current_state)
+        context = Eigr.Functions.Protocol.Context.new(name: name, state: current_state)
 
         resp =
           ActorInvocationResponse.new(
@@ -171,7 +171,8 @@ defmodule SpawnSdk.System.SpawnSystem do
             side_effects = handle_side_effects(system, decoded_value)
 
             resp = %ActorInvocationResponse{
-              updated_context: Eigr.Functions.Protocol.Context.new(state: any_pack!(host_state)),
+              updated_context:
+                Eigr.Functions.Protocol.Context.new(name: name, state: any_pack!(host_state)),
               value: any_pack!(response),
               workflow: %Workflow{broadcast: broadcast, effects: side_effects, routing: pipe}
             }
@@ -291,21 +292,6 @@ defmodule SpawnSdk.System.SpawnSystem do
 
   defp call_instance(instance, command, value, context) do
     instance.handle_command({parse_command(command), unpack_unknown(value)}, context)
-  rescue
-    FunctionClauseError ->
-      Logger.error(
-        "Error on call instance #{inspect(instance)}. Details: FunctionClauseError Command not handled"
-      )
-
-      {:error, :command_not_handled}
-
-    # in case atom doesn't exist
-    ArgumentError ->
-      Logger.error(
-        "Error on call instance #{inspect(instance)}. Details: ArgumentError Command not handled"
-      )
-
-      {:error, :command_not_handled}
   end
 
   defp parse_command(command) when is_atom(command), do: command

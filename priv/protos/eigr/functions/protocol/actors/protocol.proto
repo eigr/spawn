@@ -226,9 +226,11 @@ message RegistrationResponse {
 //
 // Params:
 //   * state: Actor state passed back and forth between proxy and user function. 
+//   * name: Actor name, having this data here is very useful for abstract actors
 message Context {
 
     google.protobuf.Any state = 1;
+    string name = 2;
 }
 
 // When a Host Function is invoked it returns the updated state and return value to the call. 

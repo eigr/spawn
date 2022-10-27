@@ -33,8 +33,8 @@ defmodule Actors.Actor.Interface.Http do
 
       context =
         if is_nil(current_state),
-          do: Context.new(state: Any.new()),
-          else: Context.new(state: current_state)
+          do: Context.new(name: name, state: Any.new()),
+          else: Context.new(name: name, state: current_state)
 
       resp =
         ActorInvocationResponse.new(
