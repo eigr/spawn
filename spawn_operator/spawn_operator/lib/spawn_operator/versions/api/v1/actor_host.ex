@@ -8,7 +8,6 @@ defmodule SpawnOperator.Versions.Api.V1.ActorHost do
       name: "v1",
       storage: true
     )
-
-    # |> add_observed_generation_status()
+    |> add_observed_generation_status()
   end
 end
