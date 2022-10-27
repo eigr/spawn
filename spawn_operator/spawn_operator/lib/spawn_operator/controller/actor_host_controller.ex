@@ -5,7 +5,7 @@ defmodule SpawnOperator.Controller.ActorHostController do
     for_resource:
       Bonny.API.CRD.build_for_controller!(
         group: "spawn-eigr.io",
-        scope: :Namespaced,
+        scope: :Cluster,
         versions: [SpawnOperator.Versions.Api.V1.ActorHost]
       )
 

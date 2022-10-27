@@ -6,7 +6,7 @@ defmodule SpawnOperator do
 
   SpawnOperator.K8s.ConfigMap.SidecarCM
 
-  alias SpawnOperator.K8s.Deployment
+  alias SpawnOperator.K8s.{Deployment, ActorSystem}
 
   alias SpawnOperator.K8s.ConfigMap.{
     ActivatorCM,
@@ -19,6 +19,41 @@ defmodule SpawnOperator do
 
   @doc """
   ---
+  apiVersion: spawn.eigr.io/v1
+  kind: ActorSystem
+  metadata:
+    name: spawn-system # Mandatory. Name of the state store
+    namespace: default # Optional. Default namespace is "default"
+  spec:
+    mesh: # Optional
+      kind: erlang # Optional. Default erlang. Possible values [erlang | quic]
+      cookie: default-c21f969b5f03d33d43e04f8f136e7682 # Optional. Only used if kind is erlang
+    statestore:
+      type: Postgres
+      databaseName: eigr-functions-db
+      databaseHost: someHost
+      databasePort: 5432
+      statestoreCryptoKey: "3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE="
+      credentialsSecretRef: postgres-connection-secret # The secret containing connection params
+      pool: # Optional
+        size: 10
+
+
+  """
+  def build_actor_system(resource) do
+    system_configmap = build_system_configmap(resource)
+
+    case apply_resource(resource, [system_configmap]) do
+      :ok ->
+        {:ok, "ActorSystem Created Suscessfully"}
+
+      error ->
+        {:error, "Failure to create ActorSystem. Cause #{inspect(error)}"}
+    end
+  end
+
+  @doc """
+  ---
   apiVersion: spawn-eigr.io/v1
   kind: ActorHost
   metadata:
@@ -26,18 +61,21 @@ defmodule SpawnOperator do
     system: my-actor-system # mandatory. Name of the ActorSystem declared in ActorSystem CRD
     namespace: default # Optional. Default namespace is "default"
   spec:
-    replicas: 1 # Optional
+    affinity: k8s_affinity_declaration_here # Optional
 
-    sidecar: # Optional
-      image: docker.io/eigr/spawn-proxy:0.1.0
+    replicas: 1 # Optional. If negative number than autoscaling is enable
 
     host: # Mandatory
       image: docker.io/eigr/spawn-springboot-examples:latest # Mandatory
+      embedded: false # Optional. Default false. True only when the SDK supports a native connection to the Spawn mesh network
       ports:
       - containerPort: 80
 
+    sidecar: # Optional. If embedded true then this section will be ignored
+      image: docker.io/eigr/spawn-proxy:0.1.0
+
   """
-  def build_actor_host_deployment(resource) do
+  def build_actor_host(resource) do
     host_resource = build_host_deploy(resource)
     host_config_map = build_host_configmap(resource)
 
@@ -58,6 +96,11 @@ defmodule SpawnOperator do
   defp build_host_configmap(resource) do
     %{system: system, namespace: ns, name: name, params: params} = get_args(resource)
     SidecarCM.manifest(system, ns, name, params)
+  end
+
+  defp build_system_configmap(resource) do
+    %{system: system, namespace: ns, name: name, params: params} = get_args(resource)
+    ActorSystem.manifest(system, ns, name, params)
   end
 
   defp get_args(resource) do
@@ -87,6 +130,7 @@ defmodule SpawnOperator do
       |> IO.inspect()
       |> K8s.Client.create()
       |> then(&K8s.Client.run(conn(), &1))
+      |> IO.inspect(label: "Result ------------")
 
     # IO.inspect(result, label: "Result ------------")
     result

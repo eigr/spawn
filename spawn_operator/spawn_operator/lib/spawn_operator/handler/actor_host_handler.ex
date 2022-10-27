@@ -6,21 +6,21 @@ defmodule SpawnOperator.Handler.ActorHostHandler do
     quote do
       import SpawnOperator,
         only: [
-          build_actor_host_deployment: 1,
+          build_actor_host: 1,
           track_event: 2
         ]
 
       @impl true
       def add(resource) do
         track_event(:add, resource)
-        build_actor_host_deployment(resource)
+        build_actor_host(resource)
         :ok
       end
 
       @impl true
       def modify(resource) do
         track_event(:modify, resource)
-        build_actor_host_deployment(resource)
+        build_actor_host(resource)
         :ok
       end
 

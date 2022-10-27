@@ -33,14 +33,12 @@ defmodule SpawnOperator.K8s.Deployment do
   def manifest(system, ns, name, params), do: gen_deployment(system, ns, name, params)
 
   defp gen_deployment(system, ns, name, params) do
-    # TODO: How to treat it? Autoscaling or user defined number of replicas?
-    replicas = Map.get(host_params, "replicas", @default_actor_host_function_replicas)
-    # TODO: The right thing would be this coming from the ActorSystem CRD configmap
-    cookie = Map.get(params, "cookie", default_cookie(ns))
-
-    sidecar_params = Map.get(params, "sidecar")
-
     host_params = Map.get(params, "host")
+    sidecar_params = Map.get(params, "sidecar", %{})
+
+    # TODO: How to treat it? Autoscaling or user defined number of replicas?
+    replicas = Map.get(params, "replicas", @default_actor_host_function_replicas)
+
     actor_host_function_image = Map.get(host_params, "image")
 
     actor_host_function_envs = Map.get(host_params, "env", []) ++ @default_actor_host_function_env
@@ -88,11 +86,6 @@ defmodule SpawnOperator.K8s.Deployment do
                 "image" => "#{resolve_proxy_image()}",
                 "env" => [
                   %{
-                    "name" => "NODE_COOKIE",
-                    # TODO: fetch from actor-system configmap
-                    "value" => cookie
-                  },
-                  %{
                     "name" => "PROXY_POD_IP",
                     "valueFrom" => %{"fieldRef" => %{"fieldPath" => "status.podIP"}}
                   }
@@ -127,6 +120,11 @@ defmodule SpawnOperator.K8s.Deployment do
                     "configMapRef" => %{
                       "name" => "#{name}-sidecar-cm"
                     }
+                  },
+                  %{
+                    "configMapRef" => %{
+                      "name" => "#{system}-cm"
+                    }
                   }
                 ]
               },
@@ -152,7 +150,4 @@ defmodule SpawnOperator.K8s.Deployment do
         :proxy_image,
         "docker.io/eigr/spawn-proxy:0.1.0"
       )
-
-  defp default_cookie(ns),
-    do: "#{ns}-#{:crypto.hash(:md5, ns) |> Base.encode16(case: :lower)}"
 end
