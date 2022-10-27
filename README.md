@@ -127,7 +127,7 @@ Actor Host Function user application and another container for the Spawn proxy, 
 responsible for connecting to the proxies cluster via Distributed Erlang and also for providing
 all the necessary abstractions for the functioning of the system such as state management,
 activation, and passivation of actors, among other infrastructure tasks. Examples of this CRD
-can be found in the [examples/k8s folder](examples/k8s/node.yaml).
+can be found in the [examples/k8s folder](examples/k8s/host.yaml).
 
 * **Activator CRD:** Activator CRD defines any means of inputting supported events such as
 queues, topics, HTTP, or grpc endpoints and maps these events to the appropriate actor to
