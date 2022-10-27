@@ -19,6 +19,35 @@ Spawn is made up of the following components:
 adapters.
 * Support libraries in different programming languages.
 
+These are the main concepts:
+
+1. **A Stateful Serverless Platform** running on top of Kubernetes, based on the Sidecar pattern and built on top of the BEAM VM.
+
+2. **Inversion of State**. This means that unlike conventional Serverless architectures where the developer fetches state from persistent storage we on the other hand send the state as the context of the event the function is receiving.
+
+3. **Polyglot**. The platform must embrace as many software communities as possible. That's why the polyglot language model is adopted with SDK development for various programming languages.
+
+4. **Less Infrastructure More Domain Code**. This means that our platform will give the developer the tools to focus only on their business without worrying about issues such as:
+
+  * Resource allocation
+  * Definition of connections and Pools
+  * Service discovery
+  * Source/Sink of Events
+  * Other infrastructure issues
+
+5. **The basic primitive is the Actor** (from the actors model) and not the Function (from the traditional serverless architectures).
+
+6. Horizontal scalability with automatic **Activation** and **Deactivation** of Actors on demand. 
+
+7. **Embracing Edge** and Less Conventional Hardware Architectures.
+
+Watch the video explaining how it works:
+
+[![asciicast](https://asciinema.org/a/V2zUGsRmOjs0kI7swVTsKg7BQ.svg)](https://asciinema.org/a/V2zUGsRmOjs0kI7swVTsKg7BQ)
+
+> **_NOTE:_** This video was recorded with an old version of the SDK for Java. That's why errors are seen in Deployment 
+
+
 ## What problem Spawn solves
 
 The advancement of Cloud Computing, Edge computing, Containers, Orchestrators, Data-
@@ -92,13 +121,13 @@ given system. Multiple ActorSystems can be defined but remember that they must b
 referenced equally in the Actor Host Functions. Examples of this CRD can be found in the
 [examples/k8s folder](examples/k8s/system.yaml).
 
-* **ActorNode CRD:** A ActorNode is a cluster member application. An ActorNode, by
+* **ActorHost CRD:** A ActorHost is a cluster member application. An ActorHost, by
 definition, is a Kubernetes Deployment and will contain two containers, one containing the
 Actor Host Function user application and another container for the Spawn proxy, which is
 responsible for connecting to the proxies cluster via Distributed Erlang and also for providing
 all the necessary abstractions for the functioning of the system such as state management,
 activation, and passivation of actors, among other infrastructure tasks. Examples of this CRD
-can be found in the [examples/k8s folder](examples/k8s/node.yaml).
+can be found in the [examples/k8s folder](examples/k8s/host.yaml).
 
 * **Activator CRD:** Activator CRD defines any means of inputting supported events such as
 queues, topics, HTTP, or grpc endpoints and maps these events to the appropriate actor to
@@ -547,7 +576,7 @@ Now create a new file called ***node.yaml*** with the following content:
 ```yaml
 ---
 apiVersion: spawn.eigr.io/v1
-kind: ActorNode
+kind: ActorHost
 metadata:
   name: my-first-app
   system: spawn-system
