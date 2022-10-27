@@ -39,14 +39,7 @@ defmodule SpawnOperator.K8s.Deployment do
     # TODO: How to treat it? Autoscaling or user defined number of replicas?
     replicas = Map.get(params, "replicas", @default_actor_host_function_replicas)
 
-    actor_host_function_image = Map.get(host_params, "image")
-
-    actor_host_function_envs = Map.get(host_params, "env", []) ++ @default_actor_host_function_env
-
-    actor_host_function_ports = Map.get(host_params, "ports", @default_actor_host_function_ports)
-
-    actor_host_function_resources =
-      Map.get(host_params, "resources", @default_actor_host_function_resources)
+    embedded = Map.get(host_params, "embedded", false)
 
     %{
       "apiVersion" => "apps/v1",
@@ -80,67 +73,101 @@ defmodule SpawnOperator.K8s.Deployment do
             }
           },
           "spec" => %{
-            "containers" => [
-              %{
-                "name" => "spawn-sidecar",
-                "image" => "#{resolve_proxy_image()}",
-                "env" => [
-                  %{
-                    "name" => "PROXY_POD_IP",
-                    "valueFrom" => %{"fieldRef" => %{"fieldPath" => "status.podIP"}}
-                  }
-                ],
-                "ports" => [
-                  %{"containerPort" => 9000},
-                  %{"containerPort" => 9001},
-                  %{"containerPort" => 4369}
-                ],
-                "livenessProbe" => %{
-                  "failureThreshold" => 10,
-                  "httpGet" => %{
-                    "path" => "/health",
-                    "port" => 9001,
-                    "scheme" => "HTTP"
-                  },
-                  "initialDelaySeconds" => 300,
-                  "periodSeconds" => 3600,
-                  "successThreshold" => 1,
-                  "timeoutSeconds" => 1200
-                },
-                "resources" => %{
-                  "limits" => %{
-                    "memory" => "1024Mi"
-                  },
-                  "requests" => %{
-                    "memory" => "70Mi"
-                  }
-                },
-                "envFrom" => [
-                  %{
-                    "configMapRef" => %{
-                      "name" => "#{name}-sidecar-cm"
-                    }
-                  },
-                  %{
-                    "secretRef" => %{
-                      "name" => "#{system}-secret"
-                    }
-                  }
-                ]
-              },
-              %{
-                "name" => "actor-host-function",
-                "image" => actor_host_function_image,
-                "env" => actor_host_function_envs,
-                "ports" => actor_host_function_ports,
-                "resources" => actor_host_function_resources
-              }
-            ],
+            "containers" => get_containers(embedded, system, name, host_params, sidecar_params),
             "terminationGracePeriodSeconds" => 120
           }
         }
       }
     }
+  end
+
+  defp get_containers(true, _system, _name, host_params, _sidecar_params) do
+    actor_host_function_image = Map.get(host_params, "image")
+
+    actor_host_function_envs = Map.get(host_params, "env", []) ++ @default_actor_host_function_env
+
+    actor_host_function_ports = Map.get(host_params, "ports", @default_actor_host_function_ports)
+
+    actor_host_function_resources =
+      Map.get(host_params, "resources", @default_actor_host_function_resources)
+
+    [
+      %{
+        "name" => "actor-host-function",
+        "image" => actor_host_function_image,
+        "env" => actor_host_function_envs,
+        "ports" => actor_host_function_ports,
+        "resources" => actor_host_function_resources
+      }
+    ]
+  end
+
+  defp get_containers(false, system, name, host_params, _sidecar_params) do
+    actor_host_function_image = Map.get(host_params, "image")
+
+    actor_host_function_envs = Map.get(host_params, "env", []) ++ @default_actor_host_function_env
+
+    actor_host_function_ports = Map.get(host_params, "ports", @default_actor_host_function_ports)
+
+    actor_host_function_resources =
+      Map.get(host_params, "resources", @default_actor_host_function_resources)
+
+    [
+      %{
+        "name" => "spawn-sidecar",
+        "image" => "#{resolve_proxy_image()}",
+        "env" => [
+          %{
+            "name" => "PROXY_POD_IP",
+            "valueFrom" => %{"fieldRef" => %{"fieldPath" => "status.podIP"}}
+          }
+        ],
+        "ports" => [
+          %{"containerPort" => 9000},
+          %{"containerPort" => 9001},
+          %{"containerPort" => 4369}
+        ],
+        "livenessProbe" => %{
+          "failureThreshold" => 10,
+          "httpGet" => %{
+            "path" => "/health",
+            "port" => 9001,
+            "scheme" => "HTTP"
+          },
+          "initialDelaySeconds" => 300,
+          "periodSeconds" => 3600,
+          "successThreshold" => 1,
+          "timeoutSeconds" => 1200
+        },
+        "resources" => %{
+          "limits" => %{
+            "memory" => "1024Mi"
+          },
+          "requests" => %{
+            "memory" => "70Mi"
+          }
+        },
+        "envFrom" => [
+          %{
+            "configMapRef" => %{
+              "name" => "#{name}-sidecar-cm"
+            }
+          },
+          %{
+            "secretRef" => %{
+              "name" => "#{system}-secret"
+            }
+          }
+        ]
+      },
+      %{
+        "name" => "actor-host-function",
+        "image" => actor_host_function_image,
+        "env" => actor_host_function_envs,
+        "ports" => actor_host_function_ports,
+        "resources" => actor_host_function_resources
+      }
+    ]
   end
 
   defp resolve_proxy_image(),
