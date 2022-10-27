@@ -121,7 +121,7 @@ given system. Multiple ActorSystems can be defined but remember that they must b
 referenced equally in the Actor Host Functions. Examples of this CRD can be found in the
 [examples/k8s folder](examples/k8s/system.yaml).
 
-* **ActorNode CRD:** A ActorNode is a cluster member application. An ActorNode, by
+* **ActorHost CRD:** A ActorHost is a cluster member application. An ActorHost, by
 definition, is a Kubernetes Deployment and will contain two containers, one containing the
 Actor Host Function user application and another container for the Spawn proxy, which is
 responsible for connecting to the proxies cluster via Distributed Erlang and also for providing
@@ -576,7 +576,7 @@ Now create a new file called ***node.yaml*** with the following content:
 ```yaml
 ---
 apiVersion: spawn.eigr.io/v1
-kind: ActorNode
+kind: ActorHost
 metadata:
   name: my-first-app
   system: spawn-system
