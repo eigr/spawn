@@ -1,7 +1,9 @@
 defmodule SpawnSdk.Context do
-  defstruct state: nil
+  defstruct [:state, :from, :self]
 
   @type t :: %__MODULE__{
-          state: module()
+          state: term(),
+          from: term(),
+          self: term()
         }
 end

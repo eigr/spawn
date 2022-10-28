@@ -226,11 +226,17 @@ message RegistrationResponse {
 //
 // Params:
 //   * state: Actor state passed back and forth between proxy and user function. 
-//   * name: Actor name, having this data here is very useful for abstract actors
+//   * from: ActorId of who is calling target actor
+//   * self: ActorId of itself
 message Context {
 
     google.protobuf.Any state = 1;
-    string name = 2;
+
+    // Who is calling target actor
+    eigr.functions.protocol.actors.ActorId from = 2;
+
+    // The target actor itself
+    eigr.functions.protocol.actors.ActorId self = 3;
 }
 
 // When a Host Function is invoked it returns the updated state and return value to the call. 

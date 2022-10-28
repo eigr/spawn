@@ -113,7 +113,7 @@ defmodule SpawnSdk.System.SpawnSystem do
         system: %Eigr.Functions.Protocol.Actors.ActorSystem{name: system},
         actor: %Eigr.Functions.Protocol.Actors.Actor{id: %ActorId{name: actor_name}},
         value: any_pack!(payload),
-        command_name: command,
+        command_name: parse_command_name(command),
         async: async
       )
 
@@ -291,11 +291,8 @@ defmodule SpawnSdk.System.SpawnSystem do
   end
 
   defp call_instance(instance, command, value, context) do
-    instance.handle_command({parse_command(command), unpack_unknown(value)}, context)
+    instance.handle_command({parse_command_name(command), unpack_unknown(value)}, context)
   end
-
-  defp parse_command(command) when is_atom(command), do: command
-  defp parse_command(command) when is_binary(command), do: String.to_existing_atom(command)
 
   defp build_spawn_req(system, actor_name, actor) do
     %SpawnRequest{
@@ -421,10 +418,13 @@ defmodule SpawnSdk.System.SpawnSystem do
   end
 
   defp get_action(action_atom) do
-    %Command{name: Atom.to_string(action_atom)}
+    %Command{name: parse_command_name(action_atom)}
   end
 
   defp get_timer_action(action_atom, seconds) do
     %FixedTimerCommand{command: get_action(action_atom), seconds: seconds}
   end
+
+  defp parse_command_name(command) when is_atom(command), do: Atom.to_string(command)
+  defp parse_command_name(command) when is_binary(command), do: command
 end

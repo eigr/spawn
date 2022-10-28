@@ -10,7 +10,7 @@ defmodule Actor.ActorTest do
 
     @impl true
     def handle_command(
-          {:sum, %MyMessageRequest{id: id, data: data}},
+          {"sum", %MyMessageRequest{id: id, data: data}},
           %Context{state: %MyState{}} = ctx
         ) do
       current_state = ctx.state
@@ -44,13 +44,13 @@ defmodule Actor.ActorTest do
       ctx = %SpawnSdk.Context{state: Eigr.Spawn.Actor.MyState.new(id: "1", value: 1)}
 
       request = Eigr.Spawn.Actor.MyMessageRequest.new(id: id, data: data)
-      Actor.MyActor.handle_command({:sum, request}, ctx)
+      Actor.MyActor.handle_command({"sum", request}, ctx)
 
       assert {:ok,
               %SpawnSdk.Value{
                 state: %Eigr.Spawn.Actor.MyState{id: "1", value: 1},
                 value: %Eigr.Spawn.Actor.MyMessageResponse{}
-              }} = Actor.MyActor.handle_command({:sum, request}, ctx)
+              }} = Actor.MyActor.handle_command({"sum", request}, ctx)
     end
   end
 end

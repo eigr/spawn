@@ -9,6 +9,7 @@ defmodule Actors.Actor.Interface.Http do
 
   alias Eigr.Functions.Protocol.Actors.{
     Actor,
+    ActorId,
     ActorState
   }
 
