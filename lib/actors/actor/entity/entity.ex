@@ -662,10 +662,10 @@ defmodule Actors.Actor.Entity do
 
   defp do_handle_routing(
          %ActorInvocation{
-           actor_name: caller_actor_name
+           actor_name: caller_actor_name,
+           actor_system: system_name
          },
          %ActorInvocationResponse{
-           actor_system: system_name,
            value: value,
            workflow:
              %Workflow{
@@ -674,9 +674,8 @@ defmodule Actors.Actor.Entity do
          }
        ) do
     invocation = %InvocationRequest{
-      # TODO check if system is really necessary
       system: %ActorSystem{name: system_name},
-      actor: %Actor{id: %ActorId{name: actor_name}},
+      actor: %Actor{id: ActorId.new(name: actor_name, system: system_name)},
       command_name: cmd,
       value: value,
       caller: ActorId.new(name: caller_actor_name, system: system_name)
@@ -718,9 +717,8 @@ defmodule Actors.Actor.Entity do
          }
        ) do
     invocation = %InvocationRequest{
-      # TODO check if system is really necessary
       system: %ActorSystem{name: system_name},
-      actor: %Actor{id: %ActorId{name: actor_name}},
+      actor: %Actor{id: ActorId.new(name: actor_name, system: system_name)},
       command_name: cmd,
       value: value,
       caller: ActorId.new(name: caller_actor_name, system: system_name)
@@ -905,8 +903,6 @@ defmodule Actors.Actor.Entity do
         get_deactivate_interval(deactivation_strategy, timeout_factor)
       )
 
-  defp get_snapshot_interval(timeout_strategy, timeout_factor \\ 0)
-
   defp get_snapshot_interval(
          {:timeout, %TimeoutStrategy{timeout: timeout}} = _timeout_strategy,
          timeout_factor
@@ -919,8 +915,6 @@ defmodule Actors.Actor.Entity do
          timeout_factor
        ),
        do: timeout + timeout_factor
-
-  defp get_deactivate_interval(timeout_strategy, timeout_factor \\ 0)
 
   defp get_deactivate_interval(
          {:timeout, %TimeoutStrategy{timeout: timeout}} = _timeout_strategy,

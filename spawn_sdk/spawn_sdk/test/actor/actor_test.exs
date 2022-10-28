@@ -30,6 +30,7 @@ defmodule Actor.ActorTest do
   defmodule Actor.OtherActor do
     use SpawnSdk.Actor,
       name: "second_actor",
+      persistent: false,
       state_type: Eigr.Spawn.Actor.MyState,
       deactivate_timeout: 30_000,
       snapshot_timeout: 2_000
@@ -49,6 +50,7 @@ defmodule Actor.ActorTest do
   defmodule Actor.ThirdActor do
     use SpawnSdk.Actor,
       name: "third_actor",
+      persistent: false,
       state_type: Eigr.Spawn.Actor.MyState,
       deactivate_timeout: 30_000,
       snapshot_timeout: 2_000
