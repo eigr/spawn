@@ -2,8 +2,10 @@ defmodule Actors do
   @moduledoc """
   Documentation for `Actors`.
   """
-  require Logger
   use Retry
+
+  require Logger
+  require OpenTelemetry.Tracer, as: Tracer
 
   alias Actors.Actor.Entity, as: ActorEntity
   alias Actors.Actor.Entity.Supervisor, as: ActorEntitySupervisor
@@ -94,68 +96,118 @@ defmodule Actors do
 
   @spec invoke(%InvocationRequest{}) :: {:ok, :async} | {:ok, term()} | {:error, term()}
   def invoke(
-        %InvocationRequest{
-          actor: %Actor{} = actor,
-          system: %ActorSystem{} = system,
-          async: async?
-        } = request,
+        %InvocationRequest{} = request,
         opts \\ []
       ) do
-    retry with: exponential_backoff() |> randomize |> expiry(10_000),
-          atoms: [:error, :exit, :noproc, :erpc, :noconnection],
-          rescue_only: [ErlangError] do
-      do_lookup_action(system.name, actor.id.name, system, fn actor_ref ->
-        maybe_invoke_async(async?, actor_ref, request, opts)
-      end)
-    after
-      result -> result
-    else
-      error -> error
+    invoke_with_span(request)
+  end
+
+  defp invoke_with_span(
+         %InvocationRequest{
+           actor: %Actor{} = actor,
+           system: %ActorSystem{} = system,
+           async: async?
+         } = request,
+         opts \\ []
+       ) do
+    Tracer.with_span "invoke" do
+      Tracer.add_event("invoke-actor", [{"target", actor.id.name}])
+      Tracer.set_attributes([{:async, async?}])
+
+      retry with: exponential_backoff() |> randomize |> expiry(10_000),
+            atoms: [:error, :exit, :noproc, :erpc, :noconnection],
+            rescue_only: [ErlangError] do
+        do_lookup_action(system.name, actor.id.name, system, fn actor_ref ->
+          maybe_invoke_async(async?, actor_ref, request, opts)
+        end)
+      after
+        result -> result
+      else
+        error -> error
+      end
     end
   end
 
   defp do_lookup_action(system_name, actor_name, system, action_fun) do
-    case Spawn.Cluster.Node.Registry.lookup(Actors.Actor.Entity, actor_name) do
-      [{actor_ref, _}] ->
-        Logger.debug("Lookup Actor #{actor_name}. PID: #{inspect(actor_ref)}")
+    Tracer.with_span "actor-lookup" do
+      Tracer.set_attributes([{:system_name, system_name}])
+      Tracer.set_attributes([{:actor_name, actor_name}])
 
-        action_fun.(actor_ref)
+      case Spawn.Cluster.Node.Registry.lookup(Actors.Actor.Entity, actor_name) do
+        [{actor_ref, _}] ->
+          Tracer.add_event("actor-status", [{"alive", true}])
+          Tracer.set_attributes([{"actor-pid", "#{inspect(actor_ref)}"}])
+          Logger.debug("Lookup Actor #{actor_name}. PID: #{inspect(actor_ref)}")
 
-      _ ->
-        with {:ok, %HostActor{node: node, actor: actor, opts: opts}} <-
-               ActorRegistry.lookup(system_name, actor_name),
-             {:ok, actor_ref} =
-               :erpc.call(
-                 node,
-                 __MODULE__,
-                 :try_reactivate_actor,
-                 [system, actor, opts],
-                 @erpc_timeout
-               ) do
           action_fun.(actor_ref)
-        else
-          {:not_found, _} ->
-            Logger.error("Actor #{actor_name} not found on ActorSystem #{system_name}")
-            {:error, "Actor #{actor_name} not found on ActorSystem #{system_name}"}
 
-          {:erpc, :timeout} ->
-            Logger.error(
-              "Failed to invoke Actor #{actor_name} on ActorSystem #{system_name}: Node connection timeout"
-            )
+        _ ->
+          Tracer.add_event("actor-status", [{"alive", false}])
 
-            {:error, "Node connection timeout"}
+          Tracer.with_span "actor-reactivation" do
+            Tracer.set_attributes([{:system_name, system_name}])
+            Tracer.set_attributes([{:actor_name, actor_name}])
 
-          {:error, reason} ->
-            Logger.error(
-              "Failed to invoke Actor #{actor_name} on ActorSystem #{system_name}: #{inspect(reason)}"
-            )
+            with {:ok, %HostActor{node: node, actor: actor, opts: opts}} <-
+                   ActorRegistry.lookup(system_name, actor_name),
+                 {:ok, actor_ref} =
+                   :erpc.call(
+                     node,
+                     __MODULE__,
+                     :try_reactivate_actor,
+                     [system, actor, opts],
+                     @erpc_timeout
+                   ) do
+              Tracer.set_attributes([{"actor-pid", "#{inspect(actor_ref)}"}])
 
-            {:error, reason}
+              Tracer.add_event("try-reactivate-actor", [
+                {"reactivation-on-node", "#{inspect(node)}"}
+              ])
 
-          _ ->
-            Logger.error("Failed to invoke Actor #{actor_name} on ActorSystem #{system_name}")
-            {:error, "Failed to invoke Actor #{actor_name} on ActorSystem #{system_name}"}
-        end
+              action_fun.(actor_ref)
+            else
+              {:not_found, _} ->
+                Logger.error("Actor #{actor_name} not found on ActorSystem #{system_name}")
+
+                Tracer.add_event("reactivation-failure", [
+                  {:cause, "not_found"}
+                ])
+
+                {:error, "Actor #{actor_name} not found on ActorSystem #{system_name}"}
+
+              {:erpc, :timeout} ->
+                Logger.error(
+                  "Failed to invoke Actor #{actor_name} on ActorSystem #{system_name}: Node connection timeout"
+                )
+
+                Tracer.add_event("reactivation-failure", [
+                  {:cause, "timeout"}
+                ])
+
+                {:error, "Node connection timeout"}
+
+              {:error, reason} ->
+                Logger.error(
+                  "Failed to invoke Actor #{actor_name} on ActorSystem #{system_name}: #{inspect(reason)}"
+                )
+
+                Tracer.add_event("reactivation-failure", [
+                  {:cause, "#{inspect(reason)}"}
+                ])
+
+                {:error, reason}
+
+              _ ->
+                Logger.error("Failed to invoke Actor #{actor_name} on ActorSystem #{system_name}")
+
+                Tracer.add_event("reactivation-failure", [
+                  {:cause, "unknown"}
+                ])
+
+                {:error, "Failed to invoke Actor #{actor_name} on ActorSystem #{system_name}"}
+            end
+          end
+      end
     end
   end
 
