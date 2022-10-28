@@ -46,7 +46,7 @@ defmodule Actors.Actor.Interface.Http do
           actor_name: name,
           actor_system: system,
           updated_context: context,
-          value: current_state
+          payload: current_state
         )
 
       {:ok, resp, state}

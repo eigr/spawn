@@ -47,6 +47,7 @@ defmodule SpawnSdk.Actor do
         Context,
         Flow.Broadcast,
         Flow.Pipe,
+        Flow.Forward,
         Flow.SideEffect,
         Value
       }

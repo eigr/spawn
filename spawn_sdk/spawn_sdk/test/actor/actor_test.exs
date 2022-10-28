@@ -25,6 +25,13 @@ defmodule Actor.ActorTest do
       |> Value.pipe(Pipe.to("second_actor", "caller_name"))
       |> Value.void()
     end
+
+    defact forward_caller(%MyMessageRequest{data: data}, %Context{} = _ctx) do
+      %Value{}
+      |> Value.value(MyMessageResponse.new(data: "first_actor_value"))
+      |> Value.forward(Forward.to("second_actor", "forward_caller_name"))
+      |> Value.void()
+    end
   end
 
   defmodule Actor.OtherActor do
@@ -37,12 +44,17 @@ defmodule Actor.ActorTest do
 
     alias Eigr.Spawn.Actor.MyMessageResponse
 
-    defact caller_name(_whatever, %Context{} = ctx) do
-      caller_name = Map.get(ctx.caller || %{}, :name)
-
+    defact caller_name(%Context{}) do
       %Value{}
-      |> Value.value(MyMessageResponse.new(data: caller_name))
+      |> Value.value(nil)
       |> Value.pipe(Pipe.to("third_actor", "caller_name"))
+      |> Value.void()
+    end
+
+    defact forward_caller_name(%Context{} = ctx) do
+      %Value{}
+      |> Value.value(MyMessageResponse.new(data: "second_caller"))
+      |> Value.forward(Forward.to("third_actor", "forward_caller_name"))
       |> Value.void()
     end
   end
@@ -57,13 +69,36 @@ defmodule Actor.ActorTest do
 
     alias Eigr.Spawn.Actor.MyMessageResponse
 
-    defact caller_name(_whatever, %Context{} = ctx) do
+    defact caller_name(%Context{} = ctx) do
       caller_name = "#{Map.get(ctx.caller || %{}, :name)} as caller to third_actor"
 
       %Value{}
       |> Value.value(MyMessageResponse.new(data: caller_name))
       |> Value.void()
     end
+
+    defact forward_caller_name(value, %Context{} = ctx) do
+      %Value{}
+      |> Value.value(MyMessageResponse.new(id: value.data, data: "third forwarding"))
+      |> Value.void()
+    end
+  end
+
+  setup_all do
+    system = "tst_syst"
+
+    Supervisor.start_link(
+      [
+        {
+          SpawnSdk.System.Supervisor,
+          system: system, actors: [Actor.OtherActor, Actor.ThirdActor, Actor.MyActor]
+        }
+      ],
+      strategy: :one_for_one,
+      name: :random_ass_supervisor
+    )
+
+    %{system: system}
   end
 
   describe "meta/1" do
@@ -102,19 +137,8 @@ defmodule Actor.ActorTest do
   end
 
   describe "invoke with pipe" do
-    test "simple call that goes through 3 actors piping each other" do
-      system = "tst_sys"
-
-      Supervisor.start_link(
-        [
-          {
-            SpawnSdk.System.Supervisor,
-            system: system, actors: [Actor.OtherActor, Actor.ThirdActor, Actor.MyActor]
-          }
-        ],
-        strategy: :one_for_one,
-        name: :random_ass_supervisor
-      )
+    test "simple call that goes through 3 actors piping each other", ctx do
+      system = ctx.system
 
       payload = Eigr.Spawn.Actor.MyMessageRequest.new(data: "non_intended_data")
 
@@ -129,6 +153,27 @@ defmodule Actor.ActorTest do
                )
 
       assert %{data: "second_actor as caller to third_actor"} = response
+    end
+
+    test "simple call that goes through 3 actors forwarding each other", ctx do
+      system = ctx.system
+
+      payload = Eigr.Spawn.Actor.MyMessageRequest.new(data: "initial_calling")
+
+      dynamic_actor_name = Faker.Pokemon.name() <> "forward_caller"
+
+      assert {:ok, response} =
+               SpawnSdk.invoke(dynamic_actor_name,
+                 ref: Actor.MyActor,
+                 system: system,
+                 command: "forward_caller",
+                 payload: payload
+               )
+
+      # keeps the original message request value even though values changed during forwarding (in id key)
+      # gets the response value of the last forward (in data key)
+      assert %Eigr.Spawn.Actor.MyMessageResponse{id: "initial_calling", data: "third forwarding"} =
+               response
     end
   end
 end
