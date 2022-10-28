@@ -10,7 +10,7 @@ defmodule SpawnSdkExample.Actors.ClockActor do
 
   @set_timer 15_000
   defact clock(_ignored_data, %Context{state: state} = ctx) do
-    Logger.info("Clock Actor Received Request. Context: #{inspect(ctx)}")
+    Logger.info("[clock] Clock Actor Received Request. Context: #{inspect(ctx)}")
 
     new_state =
       if is_nil(state) do

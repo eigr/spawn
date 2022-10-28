@@ -23,9 +23,14 @@ defmodule Actors.Actor.Interface.Http do
 
   @impl true
   def invoke_host(
-        %ActorInvocation{actor_name: name, actor_system: system, command_name: command} = payload,
+        %ActorInvocation{
+          actor_name: name,
+          actor_system: system,
+          command_name: command,
+          caller: caller
+        } = payload,
         %EntityState{
-          actor: %Actor{state: actor_state}
+          actor: %Actor{state: actor_state, id: actor_id}
         } = state,
         default_methods
       ) do
@@ -34,8 +39,8 @@ defmodule Actors.Actor.Interface.Http do
 
       context =
         if is_nil(current_state),
-          do: Context.new(name: name, state: Any.new()),
-          else: Context.new(name: name, state: current_state)
+          do: Context.new(caller: caller, self: actor_id, state: Any.new()),
+          else: Context.new(caller: caller, self: actor_id, state: current_state)
 
       resp =
         ActorInvocationResponse.new(
