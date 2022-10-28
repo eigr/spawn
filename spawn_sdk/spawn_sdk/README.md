@@ -307,7 +307,7 @@ The full example of this application can be found [here](https://github.com/eigr
 
   ```elixir
   iex> SpawnSdk.invoke(
-    "jose",
+    "joe",
     system: "spawn-system",
     command: "sum",
     payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1}
@@ -319,7 +319,7 @@ The full example of this application can be found [here](https://github.com/eigr
 
   ```elixir
   SpawnSdk.invoke(
-    "jose",
+    "joe",
     system: "spawn-system",
     command: "get"
   )

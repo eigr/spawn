@@ -180,8 +180,9 @@ message Context {
     eigr.functions.protocol.actors.ActorId self = 3;
 }
 
-// Noop is used when the input or output value of a function or method does not matter to the caller
-// of a Workflow or when the user just wants to receive the Context in the request, that is, 
+// Noop is used when the input or output value of a function or method 
+// does not matter to the caller of a Workflow or when the user just wants to receive 
+// the Context in the request, that is, 
 // he does not care about the input value only with the state.
 message Noop {}
 

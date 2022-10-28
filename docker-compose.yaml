@@ -1,6 +1,24 @@
 version: "3.8"
 
 services:
+  otel:
+    image: otel/opentelemetry-collector-contrib:0.60.0
+    command: [ "--config=/conf/otel-collector-config.yaml" ]
+    privileged: true
+    ports:
+      - 4317:4317
+      - 4318:4318
+    volumes:
+      - ./config/otel-collector-config.yaml:/conf/otel-collector-config.yaml
+    links:
+      - zipkin
+
+  zipkin:
+    image: openzipkin/zipkin-slim
+    ports:
+      - 9411:9411
+    privileged: true
+
   postgres:
     image: postgres
     restart: always
