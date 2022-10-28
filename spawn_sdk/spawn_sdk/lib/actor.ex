@@ -15,11 +15,7 @@ defmodule SpawnSdk.Actor do
       require Logger
       alias Io.Eigr.Spawn.Example.{MyState, MyBusinessMessage}
 
-      @impl true
-      def handle_command(
-            {:sum, %MyBusinessMessage{value: value} = data},
-            %Context{state: state} = ctx
-          ) do
+      defact sum(%MyBusinessMessage{value: value} = data}, %Context{state: state} = ctx) do
         Logger.info("Received Request...")
 
         new_value = (state.value || 0) + value
@@ -32,7 +28,7 @@ defmodule SpawnSdk.Actor do
 
   alias SpawnSdk.{Context, Value}
 
-  @type command :: atom()
+  @type command :: String.t()
 
   @type context :: Context.t()
 

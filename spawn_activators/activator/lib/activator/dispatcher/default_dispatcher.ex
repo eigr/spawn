@@ -43,7 +43,8 @@ defmodule Activator.Dispatcher.DefaultDispatcher do
           actor: actor_type,
           value: payload,
           command_name: command,
-          async: false
+          async: false,
+          caller: nil
         )
         |> Actors.invoke()
 

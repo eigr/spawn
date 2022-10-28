@@ -113,8 +113,9 @@ defmodule SpawnSdk.System.SpawnSystem do
         system: %Eigr.Functions.Protocol.Actors.ActorSystem{name: system},
         actor: %Eigr.Functions.Protocol.Actors.Actor{id: %ActorId{name: actor_name}},
         value: any_pack!(payload),
-        command_name: command,
-        async: async
+        command_name: parse_command_name(command),
+        async: async,
+        caller: nil
       )
 
     case Actors.invoke(req, opts) do
@@ -129,11 +130,12 @@ defmodule SpawnSdk.System.SpawnSystem do
       actor_name: name,
       actor_system: system,
       command_name: command,
-      value: value
+      value: value,
+      caller: caller
     } = invocation
 
     %EntityState{
-      actor: %Actor{state: actor_state} = actor
+      actor: %Actor{state: actor_state, id: self_actor_id} = actor
     } = entity_state
 
     actor_state = actor_state || %{}
@@ -142,7 +144,12 @@ defmodule SpawnSdk.System.SpawnSystem do
 
     cond do
       Enum.member?(default_methods, command) ->
-        context = Eigr.Functions.Protocol.Context.new(state: current_state)
+        context =
+          Eigr.Functions.Protocol.Context.new(
+            caller: caller,
+            self: self_actor_id,
+            state: current_state
+          )
 
         resp =
           ActorInvocationResponse.new(
@@ -158,7 +165,11 @@ defmodule SpawnSdk.System.SpawnSystem do
         {:error, :not_found, entity_state}
 
       true ->
-        new_ctx = %SpawnSdk.Context{state: unpack_unknown(current_state)}
+        new_ctx = %SpawnSdk.Context{
+          caller: caller,
+          self: self_actor_id,
+          state: unpack_unknown(current_state)
+        }
 
         case call_instance(actor_instance, command, value, new_ctx) do
           {:reply,
@@ -168,10 +179,15 @@ defmodule SpawnSdk.System.SpawnSystem do
            } = decoded_value} ->
             pipe = handle_pipe(decoded_value)
             broadcast = handle_broadcast(decoded_value)
-            side_effects = handle_side_effects(system, decoded_value)
+            side_effects = handle_side_effects(name, system, decoded_value)
 
             resp = %ActorInvocationResponse{
-              updated_context: Eigr.Functions.Protocol.Context.new(state: any_pack!(host_state)),
+              updated_context:
+                Eigr.Functions.Protocol.Context.new(
+                  caller: caller,
+                  self: self_actor_id,
+                  state: any_pack!(host_state)
+                ),
               value: any_pack!(response),
               workflow: %Workflow{broadcast: broadcast, effects: side_effects, routing: pipe}
             }
@@ -246,6 +262,7 @@ defmodule SpawnSdk.System.SpawnSystem do
   end
 
   defp handle_side_effects(
+         _caller_name,
          _system,
          %SpawnSdk.Value{
            effects: effects
@@ -256,6 +273,7 @@ defmodule SpawnSdk.System.SpawnSystem do
   end
 
   defp handle_side_effects(
+         caller_name,
          system,
          %SpawnSdk.Value{
            effects: effects
@@ -271,7 +289,8 @@ defmodule SpawnSdk.System.SpawnSystem do
             },
             value: any_pack!(effect.payload),
             command_name: effect.command,
-            async: true
+            async: true,
+            caller: ActorId.new(name: caller_name, system: system)
           )
       }
     end)
@@ -290,26 +309,8 @@ defmodule SpawnSdk.System.SpawnSystem do
   end
 
   defp call_instance(instance, command, value, context) do
-    instance.handle_command({parse_command(command), unpack_unknown(value)}, context)
-  rescue
-    FunctionClauseError ->
-      Logger.error(
-        "Error on call instance #{inspect(instance)}. Details: FunctionClauseError Command not handled"
-      )
-
-      {:error, :command_not_handled}
-
-    # in case atom doesn't exist
-    ArgumentError ->
-      Logger.error(
-        "Error on call instance #{inspect(instance)}. Details: ArgumentError Command not handled"
-      )
-
-      {:error, :command_not_handled}
+    instance.handle_command({parse_command_name(command), unpack_unknown(value)}, context)
   end
-
-  defp parse_command(command) when is_atom(command), do: command
-  defp parse_command(command) when is_binary(command), do: String.to_existing_atom(command)
 
   defp build_spawn_req(system, actor_name, actor) do
     %SpawnRequest{
@@ -435,10 +436,13 @@ defmodule SpawnSdk.System.SpawnSystem do
   end
 
   defp get_action(action_atom) do
-    %Command{name: Atom.to_string(action_atom)}
+    %Command{name: parse_command_name(action_atom)}
   end
 
   defp get_timer_action(action_atom, seconds) do
     %FixedTimerCommand{command: get_action(action_atom), seconds: seconds}
   end
+
+  defp parse_command_name(command) when is_atom(command), do: Atom.to_string(command)
+  defp parse_command_name(command) when is_binary(command), do: command
 end

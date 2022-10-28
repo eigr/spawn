@@ -9,7 +9,7 @@ defmodule SpawnSdkExample.Actors.JoeActor do
   alias Io.Eigr.Spawn.Example.{MyState, MyBusinessMessage}
 
   defact sum(%MyBusinessMessage{value: value} = data, %Context{state: state} = ctx) do
-    Logger.info("Received Request: #{inspect(data)}. Context: #{inspect(ctx)}")
+    Logger.info("[joe] Received Request: #{inspect(data)}. Context: #{inspect(ctx)}")
 
     new_value =
       if is_nil(state) do

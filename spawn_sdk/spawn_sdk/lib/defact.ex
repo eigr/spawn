@@ -44,13 +44,13 @@ defmodule SpawnSdk.Defact do
     do: decompose_call!(kind, call, env)
 
   defp decompose_call!(_kind, {{:unquote, _, [name]}, _, args}, _env) do
-    {name, args}
+    {parse_command_name(name), args}
   end
 
   defp decompose_call!(kind, call, env) do
     case Macro.decompose_call(call) do
       {name, args} ->
-        {name, args}
+        {parse_command_name(name), args}
 
       :error ->
         compile_error!(
@@ -59,6 +59,9 @@ defmodule SpawnSdk.Defact do
         )
     end
   end
+
+  defp parse_command_name(command) when is_atom(command), do: Atom.to_string(command)
+  defp parse_command_name(command) when is_binary(command), do: command
 
   defp compile_error!(env, description) do
     raise CompileError, line: env.line, file: env.file, description: description

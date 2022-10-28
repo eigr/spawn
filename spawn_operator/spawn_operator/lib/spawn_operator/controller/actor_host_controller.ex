@@ -3,8 +3,8 @@ defmodule SpawnOperator.Controller.ActorHostController do
 
   use Bonny.ControllerV2
 
-  step Bonny.Pluggable.SkipObservedGenerations
-  step SpawnOperator.Handler.ActorHostHandler
+  step(Bonny.Pluggable.SkipObservedGenerations)
+  step(SpawnOperator.Handler.ActorHostHandler)
 
   @impl true
   def rbac_rules() do

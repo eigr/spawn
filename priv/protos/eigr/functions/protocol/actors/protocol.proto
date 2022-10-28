@@ -226,9 +226,17 @@ message RegistrationResponse {
 //
 // Params:
 //   * state: Actor state passed back and forth between proxy and user function. 
+//   * caller: ActorId of who is calling target actor
+//   * self: ActorId of itself
 message Context {
 
     google.protobuf.Any state = 1;
+
+    // Who is calling target actor
+    eigr.functions.protocol.actors.ActorId caller = 2;
+
+    // The target actor itself
+    eigr.functions.protocol.actors.ActorId self = 3;
 }
 
 // When a Host Function is invoked it returns the updated state and return value to the call. 
@@ -314,6 +322,8 @@ message InvocationRequest {
     google.protobuf.Any value = 4;
 
     bool async = 5;
+
+    eigr.functions.protocol.actors.ActorId caller = 6;
 }
 
 // ActorInvocation is a translation message between a local invocation made via InvocationRequest 
@@ -339,6 +349,8 @@ message ActorInvocation {
     Context current_context = 4;
 
     google.protobuf.Any value = 5;
+
+    eigr.functions.protocol.actors.ActorId caller = 6;
 }
 
 // The user function's response after executing the action originated by the local proxy request via ActorInvocation.

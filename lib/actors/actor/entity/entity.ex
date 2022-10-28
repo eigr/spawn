@@ -276,7 +276,8 @@ defmodule Actors.Actor.Entity do
                 id: %ActorId{name: actor_name} = _id
               } = _actor,
             command_name: command,
-            value: payload
+            value: payload,
+            caller: caller
           } = _invocation, opts},
          _from,
          %EntityState{
@@ -303,7 +304,13 @@ defmodule Actors.Actor.Entity do
             actor_system: actor_system,
             command_name: command,
             value: payload,
-            current_context: Context.new(state: current_state)
+            current_context:
+              Context.new(
+                caller: caller,
+                self: ActorId.new(name: actor_name, system: actor_system),
+                state: current_state
+              ),
+            caller: caller
           )
 
         interface.invoke_host(request, state, @default_methods)
@@ -331,7 +338,8 @@ defmodule Actors.Actor.Entity do
           %InvocationRequest{
             actor: %Actor{id: %ActorId{name: actor_name} = _id} = _actor,
             command_name: command,
-            value: payload
+            value: payload,
+            caller: caller
           } = _invocation, opts},
          %EntityState{
            system: actor_system,
@@ -357,7 +365,13 @@ defmodule Actors.Actor.Entity do
             actor_system: actor_system,
             command_name: command,
             value: payload,
-            current_context: Context.new(state: current_state)
+            current_context:
+              Context.new(
+                caller: caller,
+                self: ActorId.new(name: actor_name, system: actor_system),
+                state: current_state
+              ),
+            caller: caller
           )
 
         interface.invoke_host(request, state, @default_methods)
@@ -389,7 +403,7 @@ defmodule Actors.Actor.Entity do
           %FixedTimerCommand{command: %Command{name: cmd} = _command} = timer},
          %EntityState{
            system: _actor_system,
-           actor: %Actor{state: actor_state} = actor
+           actor: %Actor{id: caller_actor_id, state: actor_state} = actor
          } = state
        ) do
     current_state = Map.get(actor_state || %{}, :state)
@@ -398,7 +412,8 @@ defmodule Actors.Actor.Entity do
       actor: actor,
       command_name: cmd,
       value: current_state,
-      async: true
+      async: true,
+      caller: caller_actor_id
     }
 
     result = do_handle_cast({:invocation_request, invocation, []}, state)
@@ -409,7 +424,8 @@ defmodule Actors.Actor.Entity do
   end
 
   defp do_handle_info(
-         {:receive, cmd, payload},
+         {:receive, cmd, payload,
+          %ActorInvocation{actor_name: caller_actor_name, actor_system: actor_system}},
          %EntityState{
            system: _actor_system,
            actor: %Actor{id: %ActorId{name: actor_name} = _id} = actor
@@ -423,7 +439,8 @@ defmodule Actors.Actor.Entity do
       actor: actor,
       command_name: cmd,
       value: payload,
-      async: true
+      async: true,
+      caller: ActorId.new(name: caller_actor_name, system: actor_system)
     }
 
     do_handle_cast({:invocation_request, invocation, []}, state)
@@ -630,7 +647,7 @@ defmodule Actors.Actor.Entity do
          _state
        ) do
     do_side_effects(effects)
-    do_broadcast(broadcast)
+    do_broadcast(request, broadcast)
     do_handle_routing(request, response)
   end
 
@@ -644,9 +661,11 @@ defmodule Actors.Actor.Entity do
        do: response
 
   defp do_handle_routing(
-         _request,
+         %ActorInvocation{
+           actor_name: caller_actor_name,
+           actor_system: system_name
+         },
          %ActorInvocationResponse{
-           actor_system: system_name,
            value: value,
            workflow:
              %Workflow{
@@ -655,17 +674,20 @@ defmodule Actors.Actor.Entity do
          }
        ) do
     invocation = %InvocationRequest{
-      # TODO check if system is really necessary
       system: %ActorSystem{name: system_name},
-      actor: %Actor{id: %ActorId{name: actor_name}},
+      actor: %Actor{id: ActorId.new(name: actor_name, system: system_name)},
       command_name: cmd,
-      value: value
+      value: value,
+      caller: ActorId.new(name: caller_actor_name, system: system_name)
     }
 
     try do
       case lookup(system_name, actor_name) do
         {:ok, %HostActor{opts: opts}} ->
-          invoke(invocation, opts)
+          case invoke(invocation, opts) do
+            {:ok, response} -> response
+            error -> error
+          end
 
         _ ->
           response
@@ -683,7 +705,8 @@ defmodule Actors.Actor.Entity do
   defp do_handle_routing(
          %ActorInvocation{
            actor_system: system_name,
-           value: value
+           value: value,
+           actor_name: caller_actor_name
          } = _request,
          %ActorInvocationResponse{
            workflow:
@@ -694,17 +717,20 @@ defmodule Actors.Actor.Entity do
          }
        ) do
     invocation = %InvocationRequest{
-      # TODO check if system is really necessary
       system: %ActorSystem{name: system_name},
-      actor: %Actor{id: %ActorId{name: actor_name}},
+      actor: %Actor{id: ActorId.new(name: actor_name, system: system_name)},
       command_name: cmd,
-      value: value
+      value: value,
+      caller: ActorId.new(name: caller_actor_name, system: system_name)
     }
 
     try do
       case lookup(system_name, actor_name) do
         {:ok, %HostActor{opts: opts}} ->
-          invoke(invocation, opts)
+          case invoke(invocation, opts) do
+            {:ok, response} -> response
+            error -> error
+          end
 
         _ ->
           response
@@ -719,14 +745,15 @@ defmodule Actors.Actor.Entity do
     end
   end
 
-  def do_broadcast(broadcast) when is_nil(broadcast) or broadcast == %{} do
+  def do_broadcast(_request, broadcast) when is_nil(broadcast) or broadcast == %{} do
     :ok
   end
 
   def do_broadcast(
+        request,
         %Broadcast{channel_group: channel, command_name: command, value: payload} = _broadcast
       ) do
-    publish(channel, command, payload)
+    publish(channel, command, payload, request)
   end
 
   def do_side_effects(effects) when is_list(effects) and effects == [] do
@@ -812,11 +839,11 @@ defmodule Actors.Actor.Entity do
     :ok
   end
 
-  defp publish(channel, command, payload) do
+  defp publish(channel, command, payload, request) do
     PubSub.broadcast(
       :actor_channel,
       channel,
-      {:receive, command, payload}
+      {:receive, command, payload, request}
     )
   end
 
@@ -876,8 +903,6 @@ defmodule Actors.Actor.Entity do
         get_deactivate_interval(deactivation_strategy, timeout_factor)
       )
 
-  defp get_snapshot_interval(timeout_strategy, timeout_factor \\ 0)
-
   defp get_snapshot_interval(
          {:timeout, %TimeoutStrategy{timeout: timeout}} = _timeout_strategy,
          timeout_factor
@@ -890,8 +915,6 @@ defmodule Actors.Actor.Entity do
          timeout_factor
        ),
        do: timeout + timeout_factor
-
-  defp get_deactivate_interval(timeout_strategy, timeout_factor \\ 0)
 
   defp get_deactivate_interval(
          {:timeout, %TimeoutStrategy{timeout: timeout}} = _timeout_strategy,
