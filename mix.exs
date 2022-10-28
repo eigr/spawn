@@ -70,7 +70,8 @@ defmodule Spawn.MixProject do
       {:jason, "~> 1.3"},
       {:faker, "~> 0.17", only: :test},
       {:mimic, "~> 1.7", only: :test},
-      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false}
+      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
+      {:pluggable, "~> 1.0.1", only: :dev, runtime: false}
     ] ++ deps_for_release()
   end
 

@@ -34,8 +34,9 @@ defmodule Io.Eigr.Spawn.Example.MyState do
     }
   end
 
-  field :value, 1, type: :int32
+  field(:value, 1, type: :int32)
 end
+
 defmodule Io.Eigr.Spawn.Example.MyBusinessMessage do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
@@ -72,5 +73,5 @@ defmodule Io.Eigr.Spawn.Example.MyBusinessMessage do
     }
   end
 
-  field :value, 1, type: :int32
+  field(:value, 1, type: :int32)
 end

@@ -39,11 +39,12 @@ defmodule Eigr.Functions.Protocol.Status do
     }
   end
 
-  field :UNKNOWN, 0
-  field :OK, 1
-  field :ACTOR_NOT_FOUND, 2
-  field :ERROR, 3
+  field(:UNKNOWN, 0)
+  field(:OK, 1)
+  field(:ACTOR_NOT_FOUND, 2)
+  field(:ERROR, 3)
 end
+
 defmodule Eigr.Functions.Protocol.Context do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
@@ -108,10 +109,11 @@ defmodule Eigr.Functions.Protocol.Context do
     }
   end
 
-  field :state, 1, type: Google.Protobuf.Any
-  field :caller, 2, type: Eigr.Functions.Protocol.Actors.ActorId
-  field :self, 3, type: Eigr.Functions.Protocol.Actors.ActorId
+  field(:state, 1, type: Google.Protobuf.Any)
+  field(:caller, 2, type: Eigr.Functions.Protocol.Actors.ActorId)
+  field(:self, 3, type: Eigr.Functions.Protocol.Actors.ActorId)
 end
+
 defmodule Eigr.Functions.Protocol.RegistrationRequest do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
@@ -162,12 +164,14 @@ defmodule Eigr.Functions.Protocol.RegistrationRequest do
     }
   end
 
-  field :service_info, 1, type: Eigr.Functions.Protocol.ServiceInfo, json_name: "serviceInfo"
+  field(:service_info, 1, type: Eigr.Functions.Protocol.ServiceInfo, json_name: "serviceInfo")
 
-  field :actor_system, 2,
+  field(:actor_system, 2,
     type: Eigr.Functions.Protocol.Actors.ActorSystem,
     json_name: "actorSystem"
+  )
 end
+
 defmodule Eigr.Functions.Protocol.RegistrationResponse do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
@@ -218,9 +222,10 @@ defmodule Eigr.Functions.Protocol.RegistrationResponse do
     }
   end
 
-  field :status, 1, type: Eigr.Functions.Protocol.RequestStatus
-  field :proxy_info, 2, type: Eigr.Functions.Protocol.ProxyInfo, json_name: "proxyInfo"
+  field(:status, 1, type: Eigr.Functions.Protocol.RequestStatus)
+  field(:proxy_info, 2, type: Eigr.Functions.Protocol.ProxyInfo, json_name: "proxyInfo")
 end
+
 defmodule Eigr.Functions.Protocol.ServiceInfo do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
@@ -341,14 +346,15 @@ defmodule Eigr.Functions.Protocol.ServiceInfo do
     }
   end
 
-  field :service_name, 1, type: :string, json_name: "serviceName"
-  field :service_version, 2, type: :string, json_name: "serviceVersion"
-  field :service_runtime, 3, type: :string, json_name: "serviceRuntime"
-  field :support_library_name, 4, type: :string, json_name: "supportLibraryName"
-  field :support_library_version, 5, type: :string, json_name: "supportLibraryVersion"
-  field :protocol_major_version, 6, type: :int32, json_name: "protocolMajorVersion"
-  field :protocol_minor_version, 7, type: :int32, json_name: "protocolMinorVersion"
+  field(:service_name, 1, type: :string, json_name: "serviceName")
+  field(:service_version, 2, type: :string, json_name: "serviceVersion")
+  field(:service_runtime, 3, type: :string, json_name: "serviceRuntime")
+  field(:support_library_name, 4, type: :string, json_name: "supportLibraryName")
+  field(:support_library_version, 5, type: :string, json_name: "supportLibraryVersion")
+  field(:protocol_major_version, 6, type: :int32, json_name: "protocolMajorVersion")
+  field(:protocol_minor_version, 7, type: :int32, json_name: "protocolMinorVersion")
 end
+
 defmodule Eigr.Functions.Protocol.SpawnRequest do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
@@ -385,10 +391,12 @@ defmodule Eigr.Functions.Protocol.SpawnRequest do
     }
   end
 
-  field :actor_system, 2,
+  field(:actor_system, 2,
     type: Eigr.Functions.Protocol.Actors.ActorSystem,
     json_name: "actorSystem"
+  )
 end
+
 defmodule Eigr.Functions.Protocol.SpawnResponse do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
@@ -425,8 +433,9 @@ defmodule Eigr.Functions.Protocol.SpawnResponse do
     }
   end
 
-  field :status, 1, type: Eigr.Functions.Protocol.RequestStatus
+  field(:status, 1, type: Eigr.Functions.Protocol.RequestStatus)
 end
+
 defmodule Eigr.Functions.Protocol.ProxyInfo do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
@@ -505,11 +514,12 @@ defmodule Eigr.Functions.Protocol.ProxyInfo do
     }
   end
 
-  field :protocol_major_version, 1, type: :int32, json_name: "protocolMajorVersion"
-  field :protocol_minor_version, 2, type: :int32, json_name: "protocolMinorVersion"
-  field :proxy_name, 3, type: :string, json_name: "proxyName"
-  field :proxy_version, 4, type: :string, json_name: "proxyVersion"
+  field(:protocol_major_version, 1, type: :int32, json_name: "protocolMajorVersion")
+  field(:protocol_minor_version, 2, type: :int32, json_name: "protocolMinorVersion")
+  field(:proxy_name, 3, type: :string, json_name: "proxyName")
+  field(:proxy_version, 4, type: :string, json_name: "proxyVersion")
 end
+
 defmodule Eigr.Functions.Protocol.SideEffect do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
@@ -546,8 +556,9 @@ defmodule Eigr.Functions.Protocol.SideEffect do
     }
   end
 
-  field :request, 1, type: Eigr.Functions.Protocol.InvocationRequest
+  field(:request, 1, type: Eigr.Functions.Protocol.InvocationRequest)
 end
+
 defmodule Eigr.Functions.Protocol.Broadcast do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
@@ -612,10 +623,11 @@ defmodule Eigr.Functions.Protocol.Broadcast do
     }
   end
 
-  field :channel_group, 1, type: :string, json_name: "channelGroup"
-  field :command_name, 2, type: :string, json_name: "commandName"
-  field :value, 3, type: Google.Protobuf.Any
+  field(:channel_group, 1, type: :string, json_name: "channelGroup")
+  field(:command_name, 2, type: :string, json_name: "commandName")
+  field(:value, 3, type: Google.Protobuf.Any)
 end
+
 defmodule Eigr.Functions.Protocol.Pipe do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
@@ -666,9 +678,10 @@ defmodule Eigr.Functions.Protocol.Pipe do
     }
   end
 
-  field :actor, 1, type: :string
-  field :command_name, 2, type: :string, json_name: "commandName"
+  field(:actor, 1, type: :string)
+  field(:command_name, 2, type: :string, json_name: "commandName")
 end
+
 defmodule Eigr.Functions.Protocol.Forward do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
@@ -719,9 +732,10 @@ defmodule Eigr.Functions.Protocol.Forward do
     }
   end
 
-  field :actor, 1, type: :string
-  field :command_name, 2, type: :string, json_name: "commandName"
+  field(:actor, 1, type: :string)
+  field(:command_name, 2, type: :string, json_name: "commandName")
 end
+
 defmodule Eigr.Functions.Protocol.Workflow do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
@@ -806,13 +820,14 @@ defmodule Eigr.Functions.Protocol.Workflow do
     }
   end
 
-  oneof :routing, 0
+  oneof(:routing, 0)
 
-  field :broadcast, 2, type: Eigr.Functions.Protocol.Broadcast
-  field :effects, 1, repeated: true, type: Eigr.Functions.Protocol.SideEffect
-  field :pipe, 3, type: Eigr.Functions.Protocol.Pipe, oneof: 0
-  field :forward, 4, type: Eigr.Functions.Protocol.Forward, oneof: 0
+  field(:broadcast, 2, type: Eigr.Functions.Protocol.Broadcast)
+  field(:effects, 1, repeated: true, type: Eigr.Functions.Protocol.SideEffect)
+  field(:pipe, 3, type: Eigr.Functions.Protocol.Pipe, oneof: 0)
+  field(:forward, 4, type: Eigr.Functions.Protocol.Forward, oneof: 0)
 end
+
 defmodule Eigr.Functions.Protocol.InvocationRequest do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
@@ -919,13 +934,14 @@ defmodule Eigr.Functions.Protocol.InvocationRequest do
     }
   end
 
-  field :system, 1, type: Eigr.Functions.Protocol.Actors.ActorSystem
-  field :actor, 2, type: Eigr.Functions.Protocol.Actors.Actor
-  field :command_name, 3, type: :string, json_name: "commandName"
-  field :value, 4, type: Google.Protobuf.Any
-  field :async, 5, type: :bool
-  field :caller, 6, type: Eigr.Functions.Protocol.Actors.ActorId
+  field(:system, 1, type: Eigr.Functions.Protocol.Actors.ActorSystem)
+  field(:actor, 2, type: Eigr.Functions.Protocol.Actors.Actor)
+  field(:command_name, 3, type: :string, json_name: "commandName")
+  field(:value, 4, type: Google.Protobuf.Any)
+  field(:async, 5, type: :bool)
+  field(:caller, 6, type: Eigr.Functions.Protocol.Actors.ActorId)
 end
+
 defmodule Eigr.Functions.Protocol.ActorInvocation do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
@@ -1032,13 +1048,14 @@ defmodule Eigr.Functions.Protocol.ActorInvocation do
     }
   end
 
-  field :actor_name, 1, type: :string, json_name: "actorName"
-  field :actor_system, 2, type: :string, json_name: "actorSystem"
-  field :command_name, 3, type: :string, json_name: "commandName"
-  field :current_context, 4, type: Eigr.Functions.Protocol.Context, json_name: "currentContext"
-  field :value, 5, type: Google.Protobuf.Any
-  field :caller, 6, type: Eigr.Functions.Protocol.Actors.ActorId
+  field(:actor_name, 1, type: :string, json_name: "actorName")
+  field(:actor_system, 2, type: :string, json_name: "actorSystem")
+  field(:command_name, 3, type: :string, json_name: "commandName")
+  field(:current_context, 4, type: Eigr.Functions.Protocol.Context, json_name: "currentContext")
+  field(:value, 5, type: Google.Protobuf.Any)
+  field(:caller, 6, type: Eigr.Functions.Protocol.Actors.ActorId)
 end
+
 defmodule Eigr.Functions.Protocol.ActorInvocationResponse do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
@@ -1131,12 +1148,13 @@ defmodule Eigr.Functions.Protocol.ActorInvocationResponse do
     }
   end
 
-  field :actor_name, 1, type: :string, json_name: "actorName"
-  field :actor_system, 2, type: :string, json_name: "actorSystem"
-  field :updated_context, 3, type: Eigr.Functions.Protocol.Context, json_name: "updatedContext"
-  field :value, 4, type: Google.Protobuf.Any
-  field :workflow, 5, type: Eigr.Functions.Protocol.Workflow
+  field(:actor_name, 1, type: :string, json_name: "actorName")
+  field(:actor_system, 2, type: :string, json_name: "actorSystem")
+  field(:updated_context, 3, type: Eigr.Functions.Protocol.Context, json_name: "updatedContext")
+  field(:value, 4, type: Google.Protobuf.Any)
+  field(:workflow, 5, type: Eigr.Functions.Protocol.Workflow)
 end
+
 defmodule Eigr.Functions.Protocol.InvocationResponse do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
@@ -1215,11 +1233,12 @@ defmodule Eigr.Functions.Protocol.InvocationResponse do
     }
   end
 
-  field :status, 1, type: Eigr.Functions.Protocol.RequestStatus
-  field :system, 2, type: Eigr.Functions.Protocol.Actors.ActorSystem
-  field :actor, 3, type: Eigr.Functions.Protocol.Actors.Actor
-  field :value, 4, type: Google.Protobuf.Any
+  field(:status, 1, type: Eigr.Functions.Protocol.RequestStatus)
+  field(:system, 2, type: Eigr.Functions.Protocol.Actors.ActorSystem)
+  field(:actor, 3, type: Eigr.Functions.Protocol.Actors.Actor)
+  field(:value, 4, type: Google.Protobuf.Any)
 end
+
 defmodule Eigr.Functions.Protocol.RequestStatus do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
@@ -1270,6 +1289,6 @@ defmodule Eigr.Functions.Protocol.RequestStatus do
     }
   end
 
-  field :status, 1, type: Eigr.Functions.Protocol.Status, enum: true
-  field :message, 2, type: :string
+  field(:status, 1, type: Eigr.Functions.Protocol.Status, enum: true)
+  field(:message, 2, type: :string)
 end
