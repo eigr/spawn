@@ -162,12 +162,22 @@ import "google/protobuf/any.proto";
 option java_package = "io.eigr.functions.protocol";
 option go_package = "github.com/eigr/go-support/eigr/protocol;protocol";
 
-message SpawnRequest {
-    eigr.functions.protocol.actors.ActorSystem actor_system = 2;
-}
+// Context is where current and/or updated state is stored 
+// to be transmitted to/from proxy and user function
+//
+// Params:
+//   * state: Actor state passed back and forth between proxy and user function. 
+//   * caller: ActorId of who is calling target actor
+//   * self: ActorId of itself
+message Context {
 
-message SpawnResponse {
-    RequestStatus status = 1;
+    google.protobuf.Any state = 1;
+
+    // Who is calling target actor
+    eigr.functions.protocol.actors.ActorId caller = 2;
+
+    // The target actor itself
+    eigr.functions.protocol.actors.ActorId self = 3;
 }
 
 message RegistrationRequest {
@@ -175,6 +185,13 @@ message RegistrationRequest {
     ServiceInfo service_info = 1;
 
     eigr.functions.protocol.actors.ActorSystem actor_system = 2;
+}
+
+message RegistrationResponse {
+
+    RequestStatus status = 1;
+
+    ProxyInfo proxy_info = 2;
 }
 
 message ServiceInfo {
@@ -203,6 +220,14 @@ message ServiceInfo {
     int32 protocol_minor_version = 7;
 }
 
+message SpawnRequest {
+    eigr.functions.protocol.actors.ActorSystem actor_system = 2;
+}
+
+message SpawnResponse {
+    RequestStatus status = 1;
+}
+
 message ProxyInfo {
 
     int32 protocol_major_version = 1;
@@ -212,31 +237,6 @@ message ProxyInfo {
     string proxy_name = 3;
     
     string proxy_version = 4;
-}
-
-message RegistrationResponse {
-
-    RequestStatus status = 1;
-
-    ProxyInfo proxy_info = 2;
-}
-
-// Context is where current and/or updated state is stored 
-// to be transmitted to/from proxy and user function
-//
-// Params:
-//   * state: Actor state passed back and forth between proxy and user function. 
-//   * caller: ActorId of who is calling target actor
-//   * self: ActorId of itself
-message Context {
-
-    google.protobuf.Any state = 1;
-
-    // Who is calling target actor
-    eigr.functions.protocol.actors.ActorId caller = 2;
-
-    // The target actor itself
-    eigr.functions.protocol.actors.ActorId self = 3;
 }
 
 // When a Host Function is invoked it returns the updated state and return value to the call. 
@@ -306,6 +306,7 @@ message Workflow {
 // Params:
 //   * system: See ActorStstem message.
 //   * actor: The target Actor, i.e. the one that the user function is calling to perform some computation.
+//   * caller: The caller Actor
 //   * command_name: The function or method on the target Actor that will receive this request 
 //     and perform some useful computation with the sent data.
 //   * value: This is the value sent by the user function to be computed by the request's target Actor command.
