@@ -47,13 +47,13 @@ defmodule Proxy.Routes.API do
     with %InvocationRequest{system: system, actor: actor} = request <-
            get_body(conn.body_params, InvocationRequest),
          {:ok, response} <- Actors.invoke(request) do
-      value =
+      payload =
         case response do
           :async ->
             nil
 
-          %ActorInvocationResponse{value: value} ->
-            value
+          %ActorInvocationResponse{payload: payload} ->
+            payload
         end
 
       send!(
@@ -64,7 +64,7 @@ defmodule Proxy.Routes.API do
           InvocationResponse.new(
             system: system,
             actor: actor,
-            value: value,
+            payload: payload,
             status: RequestStatus.new(status: :OK)
           )
         ),

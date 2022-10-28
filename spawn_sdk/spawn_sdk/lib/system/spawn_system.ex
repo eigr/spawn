@@ -33,7 +33,8 @@ defmodule SpawnSdk.System.SpawnSystem do
     ServiceInfo,
     SpawnRequest,
     SpawnResponse,
-    Workflow
+    Workflow,
+    Noop
   }
 
   import Spawn.Utils.AnySerializer
@@ -107,12 +108,13 @@ defmodule SpawnSdk.System.SpawnSystem do
     end
 
     opts = [host_interface: SpawnSdk.Interface]
+    payload = if is_nil(payload), do: Noop.new(), else: any_pack!(payload)
 
     req =
       InvocationRequest.new(
         system: %Eigr.Functions.Protocol.Actors.ActorSystem{name: system},
         actor: %Eigr.Functions.Protocol.Actors.Actor{id: %ActorId{name: actor_name}},
-        value: any_pack!(payload),
+        payload: payload,
         command_name: parse_command_name(command),
         async: async,
         caller: nil
@@ -120,7 +122,7 @@ defmodule SpawnSdk.System.SpawnSystem do
 
     case Actors.invoke(req, opts) do
       {:ok, :async} -> {:ok, :async}
-      {:ok, %ActorInvocationResponse{value: value}} -> {:ok, unpack_unknown(value)}
+      {:ok, %ActorInvocationResponse{payload: payload}} -> {:ok, unpack_unknown(payload)}
       error -> error
     end
   end
@@ -130,7 +132,7 @@ defmodule SpawnSdk.System.SpawnSystem do
       actor_name: name,
       actor_system: system,
       command_name: command,
-      value: value,
+      payload: payload,
       caller: caller
     } = invocation
 
@@ -156,7 +158,7 @@ defmodule SpawnSdk.System.SpawnSystem do
             actor_name: name,
             actor_system: system,
             updated_context: context,
-            value: current_state
+            payload: current_state
           )
 
         {:ok, resp, entity_state}
@@ -171,15 +173,23 @@ defmodule SpawnSdk.System.SpawnSystem do
           state: unpack_unknown(current_state)
         }
 
-        case call_instance(actor_instance, command, value, new_ctx) do
+        case call_instance(actor_instance, command, payload, new_ctx) do
           {:reply,
            %SpawnSdk.Value{
              state: host_state,
              value: response
            } = decoded_value} ->
             pipe = handle_pipe(decoded_value)
+            forward = handle_forward(decoded_value)
             broadcast = handle_broadcast(decoded_value)
             side_effects = handle_side_effects(name, system, decoded_value)
+
+            payload_response =
+              case response do
+                nil -> Noop.new()
+                %Noop{} = noop -> noop
+                response -> any_pack!(response)
+              end
 
             resp = %ActorInvocationResponse{
               updated_context:
@@ -188,8 +198,12 @@ defmodule SpawnSdk.System.SpawnSystem do
                   self: self_actor_id,
                   state: any_pack!(host_state)
                 ),
-              value: any_pack!(response),
-              workflow: %Workflow{broadcast: broadcast, effects: side_effects, routing: pipe}
+              payload: payload_response,
+              workflow: %Workflow{
+                broadcast: broadcast,
+                effects: side_effects,
+                routing: pipe || forward
+              }
             }
 
             new_actor_state = %{actor_state | state: any_pack!(host_state)}
@@ -229,11 +243,12 @@ defmodule SpawnSdk.System.SpawnSystem do
          } = _value
        ) do
     cmd = if is_atom(command), do: Atom.to_string(command), else: command
+    payload = if is_nil(payload), do: Noop.new(), else: any_pack!(payload)
 
     Eigr.Functions.Protocol.Broadcast.new(
       channel_group: channel,
       command_name: cmd,
-      value: any_pack!(payload)
+      payload: payload
     )
   end
 
@@ -259,6 +274,30 @@ defmodule SpawnSdk.System.SpawnSystem do
       )
 
     {:pipe, pipe}
+  end
+
+  defp handle_forward(
+         %SpawnSdk.Value{
+           forward: forward
+         } = _value
+       )
+       when is_nil(forward) or forward == %{},
+       do: nil
+
+  defp handle_forward(
+         %SpawnSdk.Value{
+           forward: %SpawnSdk.Flow.Forward{actor_name: actor_name, command: command} = _forward
+         } = _value
+       ) do
+    cmd = if is_atom(command), do: Atom.to_string(command), else: command
+
+    forward =
+      Eigr.Functions.Protocol.Forward.new(
+        actor: actor_name,
+        command_name: cmd
+      )
+
+    {:forward, forward}
   end
 
   defp handle_side_effects(
@@ -306,6 +345,10 @@ defmodule SpawnSdk.System.SpawnSystem do
   defp get_cached_actor(system, name) do
     get_cached_actors(system)
     |> Map.get(name)
+  end
+
+  defp call_instance(instance, command, %Noop{} = noop, context) do
+    instance.handle_command({parse_command_name(command), noop}, context)
   end
 
   defp call_instance(instance, command, value, context) do

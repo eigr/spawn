@@ -9,15 +9,11 @@ defmodule SpawnSdkExample.Actors.ClockActor do
   alias Io.Eigr.Spawn.Example.MyState
 
   @set_timer 15_000
-  defact clock(_ignored_data, %Context{state: state} = ctx) do
+  defact clock(%Context{state: state} = ctx) do
     Logger.info("[clock] Clock Actor Received Request. Context: #{inspect(ctx)}")
 
-    new_state =
-      if is_nil(state) do
-        %MyState{value: 0}
-      else
-        state
-      end
+    new_value = if is_nil(state), do: 0, else: state.value + 1
+    new_state = MyState.new(value: new_value)
 
     Value.of()
     |> Value.state(new_state)

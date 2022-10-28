@@ -268,7 +268,10 @@ message Broadcast {
     string command_name = 2;
 
     // Payload
-    google.protobuf.Any value = 3;
+    oneof payload {
+        google.protobuf.Any value = 3;
+        Noop noop = 4;
+    }
 }
 
 // Sends the output of a command of an Actor to the input of another command of an Actor
@@ -325,7 +328,10 @@ message InvocationRequest {
 
     string command_name = 3;
 
-    google.protobuf.Any value = 4;
+    oneof payload {
+        google.protobuf.Any value = 4;
+        Noop noop = 7;
+    }
 
     bool async = 5;
 
@@ -354,7 +360,10 @@ message ActorInvocation {
 
     Context current_context = 4;
 
-    google.protobuf.Any value = 5;
+    oneof payload {
+        google.protobuf.Any value = 5;
+        Noop noop = 7;
+    }
 
     eigr.functions.protocol.actors.ActorId caller = 6;
 }
@@ -375,7 +384,10 @@ message ActorInvocationResponse {
 
     Context updated_context = 3;
 
-    google.protobuf.Any value = 4;
+    oneof payload {
+        google.protobuf.Any value = 4;
+        Noop noop = 6;
+    }
 
     Workflow workflow = 5;
 }
@@ -396,7 +408,10 @@ message InvocationResponse {
 
     eigr.functions.protocol.actors.Actor actor = 3;
 
-    google.protobuf.Any value = 4;
+    oneof payload {
+        google.protobuf.Any value = 4;
+        Noop noop = 5;
+    }
 }
 
 enum Status {

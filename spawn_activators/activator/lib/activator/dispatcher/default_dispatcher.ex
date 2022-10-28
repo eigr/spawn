@@ -41,7 +41,7 @@ defmodule Activator.Dispatcher.DefaultDispatcher do
         InvocationRequest.new(
           system: system_type,
           actor: actor_type,
-          value: payload,
+          payload: payload,
           command_name: command,
           async: false,
           caller: nil

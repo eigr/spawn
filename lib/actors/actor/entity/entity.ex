@@ -28,7 +28,8 @@ defmodule Actors.Actor.Entity do
     InvocationRequest,
     Pipe,
     SideEffect,
-    Workflow
+    Workflow,
+    Noop
   }
 
   alias Phoenix.PubSub
@@ -276,7 +277,7 @@ defmodule Actors.Actor.Entity do
                 id: %ActorId{name: actor_name} = _id
               } = _actor,
             command_name: command,
-            value: payload,
+            payload: payload,
             caller: caller
           } = _invocation, opts},
          _from,
@@ -303,7 +304,7 @@ defmodule Actors.Actor.Entity do
             actor_name: actor_name,
             actor_system: actor_system,
             command_name: command,
-            value: payload,
+            payload: payload,
             current_context:
               Context.new(
                 caller: caller,
@@ -338,7 +339,7 @@ defmodule Actors.Actor.Entity do
           %InvocationRequest{
             actor: %Actor{id: %ActorId{name: actor_name} = _id} = _actor,
             command_name: command,
-            value: payload,
+            payload: payload,
             caller: caller
           } = _invocation, opts},
          %EntityState{
@@ -364,7 +365,7 @@ defmodule Actors.Actor.Entity do
             actor_name: actor_name,
             actor_system: actor_system,
             command_name: command,
-            value: payload,
+            payload: payload,
             current_context:
               Context.new(
                 caller: caller,
@@ -403,15 +404,13 @@ defmodule Actors.Actor.Entity do
           %FixedTimerCommand{command: %Command{name: cmd} = _command} = timer},
          %EntityState{
            system: _actor_system,
-           actor: %Actor{id: caller_actor_id, state: actor_state} = actor
+           actor: %Actor{id: caller_actor_id} = actor
          } = state
        ) do
-    current_state = Map.get(actor_state || %{}, :state)
-
     invocation = %InvocationRequest{
       actor: actor,
       command_name: cmd,
-      value: current_state,
+      payload: Noop.new(),
       async: true,
       caller: caller_actor_id
     }
@@ -438,7 +437,7 @@ defmodule Actors.Actor.Entity do
     invocation = %InvocationRequest{
       actor: actor,
       command_name: cmd,
-      value: payload,
+      payload: payload,
       async: true,
       caller: ActorId.new(name: caller_actor_name, system: actor_system)
     }
@@ -666,7 +665,7 @@ defmodule Actors.Actor.Entity do
            actor_system: system_name
          },
          %ActorInvocationResponse{
-           value: value,
+           payload: payload,
            workflow:
              %Workflow{
                routing: {:pipe, %Pipe{actor: actor_name, command_name: cmd} = _pipe} = _workflow
@@ -677,7 +676,7 @@ defmodule Actors.Actor.Entity do
       system: %ActorSystem{name: system_name},
       actor: %Actor{id: ActorId.new(name: actor_name, system: system_name)},
       command_name: cmd,
-      value: value,
+      payload: payload,
       caller: ActorId.new(name: caller_actor_name, system: system_name)
     }
 
@@ -705,7 +704,7 @@ defmodule Actors.Actor.Entity do
   defp do_handle_routing(
          %ActorInvocation{
            actor_system: system_name,
-           value: value,
+           payload: payload,
            actor_name: caller_actor_name
          } = _request,
          %ActorInvocationResponse{
@@ -720,7 +719,7 @@ defmodule Actors.Actor.Entity do
       system: %ActorSystem{name: system_name},
       actor: %Actor{id: ActorId.new(name: actor_name, system: system_name)},
       command_name: cmd,
-      value: value,
+      payload: payload,
       caller: ActorId.new(name: caller_actor_name, system: system_name)
     }
 
@@ -751,7 +750,7 @@ defmodule Actors.Actor.Entity do
 
   def do_broadcast(
         request,
-        %Broadcast{channel_group: channel, command_name: command, value: payload} = _broadcast
+        %Broadcast{channel_group: channel, command_name: command, payload: payload} = _broadcast
       ) do
     publish(channel, command, payload, request)
   end

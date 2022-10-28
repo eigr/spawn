@@ -1,1024 +1,1044 @@
 defmodule Eigr.Functions.Protocol.Actors.Registry.ActorsEntry do
   @moduledoc false
-  use Protobuf, map: true, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
+  use Protobuf, map: true, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
     %Google.Protobuf.DescriptorProto{
-      __unknown_fields__: [],
-      enum_type: [],
-      extension: [],
-      extension_range: [],
+      name: "ActorsEntry",
       field: [
         %Google.Protobuf.FieldDescriptorProto{
-          __unknown_fields__: [],
-          default_value: nil,
-          extendee: nil,
-          json_name: "key",
-          label: :LABEL_OPTIONAL,
           name: "key",
+          extendee: nil,
           number: 1,
-          oneof_index: nil,
-          options: nil,
-          proto3_optional: nil,
+          label: :LABEL_OPTIONAL,
           type: :TYPE_STRING,
-          type_name: nil
+          type_name: nil,
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "key",
+          proto3_optional: nil,
+          __unknown_fields__: []
         },
         %Google.Protobuf.FieldDescriptorProto{
-          __unknown_fields__: [],
-          default_value: nil,
-          extendee: nil,
-          json_name: "value",
-          label: :LABEL_OPTIONAL,
           name: "value",
+          extendee: nil,
           number: 2,
-          oneof_index: nil,
-          options: nil,
-          proto3_optional: nil,
+          label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.Actor"
+          type_name: ".eigr.functions.protocol.actors.Actor",
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "value",
+          proto3_optional: nil,
+          __unknown_fields__: []
         }
       ],
-      name: "ActorsEntry",
       nested_type: [],
-      oneof_decl: [],
+      enum_type: [],
+      extension_range: [],
+      extension: [],
       options: %Google.Protobuf.MessageOptions{
-        __pb_extensions__: %{},
-        __unknown_fields__: [],
-        deprecated: false,
-        map_entry: true,
         message_set_wire_format: false,
         no_standard_descriptor_accessor: false,
-        uninterpreted_option: []
+        deprecated: false,
+        map_entry: true,
+        uninterpreted_option: [],
+        __pb_extensions__: %{},
+        __unknown_fields__: []
       },
+      oneof_decl: [],
+      reserved_range: [],
       reserved_name: [],
-      reserved_range: []
+      __unknown_fields__: []
     }
   end
 
-  field :key, 1, type: :string
-  field :value, 2, type: Eigr.Functions.Protocol.Actors.Actor
+  field(:key, 1, type: :string)
+  field(:value, 2, type: Eigr.Functions.Protocol.Actors.Actor)
 end
+
 defmodule Eigr.Functions.Protocol.Actors.Registry do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
     %Google.Protobuf.DescriptorProto{
-      __unknown_fields__: [],
-      enum_type: [],
-      extension: [],
-      extension_range: [],
+      name: "Registry",
       field: [
         %Google.Protobuf.FieldDescriptorProto{
-          __unknown_fields__: [],
-          default_value: nil,
-          extendee: nil,
-          json_name: "actors",
-          label: :LABEL_REPEATED,
           name: "actors",
+          extendee: nil,
           number: 1,
-          oneof_index: nil,
-          options: nil,
-          proto3_optional: nil,
+          label: :LABEL_REPEATED,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.Registry.ActorsEntry"
+          type_name: ".eigr.functions.protocol.actors.Registry.ActorsEntry",
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "actors",
+          proto3_optional: nil,
+          __unknown_fields__: []
         }
       ],
-      name: "Registry",
       nested_type: [
         %Google.Protobuf.DescriptorProto{
-          __unknown_fields__: [],
-          enum_type: [],
-          extension: [],
-          extension_range: [],
+          name: "ActorsEntry",
           field: [
             %Google.Protobuf.FieldDescriptorProto{
-              __unknown_fields__: [],
-              default_value: nil,
-              extendee: nil,
-              json_name: "key",
-              label: :LABEL_OPTIONAL,
               name: "key",
+              extendee: nil,
               number: 1,
-              oneof_index: nil,
-              options: nil,
-              proto3_optional: nil,
+              label: :LABEL_OPTIONAL,
               type: :TYPE_STRING,
-              type_name: nil
+              type_name: nil,
+              default_value: nil,
+              options: nil,
+              oneof_index: nil,
+              json_name: "key",
+              proto3_optional: nil,
+              __unknown_fields__: []
             },
             %Google.Protobuf.FieldDescriptorProto{
-              __unknown_fields__: [],
-              default_value: nil,
-              extendee: nil,
-              json_name: "value",
-              label: :LABEL_OPTIONAL,
               name: "value",
+              extendee: nil,
               number: 2,
-              oneof_index: nil,
-              options: nil,
-              proto3_optional: nil,
+              label: :LABEL_OPTIONAL,
               type: :TYPE_MESSAGE,
-              type_name: ".eigr.functions.protocol.actors.Actor"
+              type_name: ".eigr.functions.protocol.actors.Actor",
+              default_value: nil,
+              options: nil,
+              oneof_index: nil,
+              json_name: "value",
+              proto3_optional: nil,
+              __unknown_fields__: []
             }
           ],
-          name: "ActorsEntry",
           nested_type: [],
-          oneof_decl: [],
+          enum_type: [],
+          extension_range: [],
+          extension: [],
           options: %Google.Protobuf.MessageOptions{
-            __pb_extensions__: %{},
-            __unknown_fields__: [],
-            deprecated: false,
-            map_entry: true,
             message_set_wire_format: false,
             no_standard_descriptor_accessor: false,
-            uninterpreted_option: []
+            deprecated: false,
+            map_entry: true,
+            uninterpreted_option: [],
+            __pb_extensions__: %{},
+            __unknown_fields__: []
           },
+          oneof_decl: [],
+          reserved_range: [],
           reserved_name: [],
-          reserved_range: []
+          __unknown_fields__: []
         }
       ],
-      oneof_decl: [],
+      enum_type: [],
+      extension_range: [],
+      extension: [],
       options: nil,
+      oneof_decl: [],
+      reserved_range: [],
       reserved_name: [],
-      reserved_range: []
+      __unknown_fields__: []
     }
   end
 
-  field :actors, 1,
+  field(:actors, 1,
     repeated: true,
     type: Eigr.Functions.Protocol.Actors.Registry.ActorsEntry,
     map: true
+  )
 end
+
 defmodule Eigr.Functions.Protocol.Actors.ActorSystem do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
     %Google.Protobuf.DescriptorProto{
-      __unknown_fields__: [],
-      enum_type: [],
-      extension: [],
-      extension_range: [],
+      name: "ActorSystem",
       field: [
         %Google.Protobuf.FieldDescriptorProto{
-          __unknown_fields__: [],
-          default_value: nil,
-          extendee: nil,
-          json_name: "name",
-          label: :LABEL_OPTIONAL,
           name: "name",
+          extendee: nil,
           number: 1,
-          oneof_index: nil,
-          options: nil,
-          proto3_optional: nil,
+          label: :LABEL_OPTIONAL,
           type: :TYPE_STRING,
-          type_name: nil
+          type_name: nil,
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "name",
+          proto3_optional: nil,
+          __unknown_fields__: []
         },
         %Google.Protobuf.FieldDescriptorProto{
-          __unknown_fields__: [],
-          default_value: nil,
-          extendee: nil,
-          json_name: "registry",
-          label: :LABEL_OPTIONAL,
           name: "registry",
+          extendee: nil,
           number: 2,
-          oneof_index: nil,
-          options: nil,
-          proto3_optional: nil,
+          label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.Registry"
+          type_name: ".eigr.functions.protocol.actors.Registry",
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "registry",
+          proto3_optional: nil,
+          __unknown_fields__: []
         }
       ],
-      name: "ActorSystem",
       nested_type: [],
-      oneof_decl: [],
+      enum_type: [],
+      extension_range: [],
+      extension: [],
       options: nil,
+      oneof_decl: [],
+      reserved_range: [],
       reserved_name: [],
-      reserved_range: []
+      __unknown_fields__: []
     }
   end
 
-  field :name, 1, type: :string
-  field :registry, 2, type: Eigr.Functions.Protocol.Actors.Registry
+  field(:name, 1, type: :string)
+  field(:registry, 2, type: Eigr.Functions.Protocol.Actors.Registry)
 end
+
 defmodule Eigr.Functions.Protocol.Actors.ActorSnapshotStrategy do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
     %Google.Protobuf.DescriptorProto{
-      __unknown_fields__: [],
-      enum_type: [],
-      extension: [],
-      extension_range: [],
+      name: "ActorSnapshotStrategy",
       field: [
         %Google.Protobuf.FieldDescriptorProto{
-          __unknown_fields__: [],
-          default_value: nil,
-          extendee: nil,
-          json_name: "timeout",
-          label: :LABEL_OPTIONAL,
           name: "timeout",
+          extendee: nil,
           number: 1,
-          oneof_index: 0,
-          options: nil,
-          proto3_optional: nil,
+          label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.TimeoutStrategy"
+          type_name: ".eigr.functions.protocol.actors.TimeoutStrategy",
+          default_value: nil,
+          options: nil,
+          oneof_index: 0,
+          json_name: "timeout",
+          proto3_optional: nil,
+          __unknown_fields__: []
         }
       ],
-      name: "ActorSnapshotStrategy",
       nested_type: [],
+      enum_type: [],
+      extension_range: [],
+      extension: [],
+      options: nil,
       oneof_decl: [
         %Google.Protobuf.OneofDescriptorProto{
-          __unknown_fields__: [],
           name: "strategy",
-          options: nil
+          options: nil,
+          __unknown_fields__: []
         }
       ],
-      options: nil,
+      reserved_range: [],
       reserved_name: [],
-      reserved_range: []
+      __unknown_fields__: []
     }
   end
 
-  oneof :strategy, 0
+  oneof(:strategy, 0)
 
-  field :timeout, 1, type: Eigr.Functions.Protocol.Actors.TimeoutStrategy, oneof: 0
+  field(:timeout, 1, type: Eigr.Functions.Protocol.Actors.TimeoutStrategy, oneof: 0)
 end
+
 defmodule Eigr.Functions.Protocol.Actors.ActorDeactivationStrategy do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
     %Google.Protobuf.DescriptorProto{
-      __unknown_fields__: [],
-      enum_type: [],
-      extension: [],
-      extension_range: [],
+      name: "ActorDeactivationStrategy",
       field: [
         %Google.Protobuf.FieldDescriptorProto{
-          __unknown_fields__: [],
-          default_value: nil,
-          extendee: nil,
-          json_name: "timeout",
-          label: :LABEL_OPTIONAL,
           name: "timeout",
+          extendee: nil,
           number: 1,
-          oneof_index: 0,
-          options: nil,
-          proto3_optional: nil,
+          label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.TimeoutStrategy"
+          type_name: ".eigr.functions.protocol.actors.TimeoutStrategy",
+          default_value: nil,
+          options: nil,
+          oneof_index: 0,
+          json_name: "timeout",
+          proto3_optional: nil,
+          __unknown_fields__: []
         }
       ],
-      name: "ActorDeactivationStrategy",
       nested_type: [],
+      enum_type: [],
+      extension_range: [],
+      extension: [],
+      options: nil,
       oneof_decl: [
         %Google.Protobuf.OneofDescriptorProto{
-          __unknown_fields__: [],
           name: "strategy",
-          options: nil
+          options: nil,
+          __unknown_fields__: []
         }
       ],
-      options: nil,
+      reserved_range: [],
       reserved_name: [],
-      reserved_range: []
+      __unknown_fields__: []
     }
   end
 
-  oneof :strategy, 0
+  oneof(:strategy, 0)
 
-  field :timeout, 1, type: Eigr.Functions.Protocol.Actors.TimeoutStrategy, oneof: 0
+  field(:timeout, 1, type: Eigr.Functions.Protocol.Actors.TimeoutStrategy, oneof: 0)
 end
+
 defmodule Eigr.Functions.Protocol.Actors.TimeoutStrategy do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
     %Google.Protobuf.DescriptorProto{
-      __unknown_fields__: [],
-      enum_type: [],
-      extension: [],
-      extension_range: [],
+      name: "TimeoutStrategy",
       field: [
         %Google.Protobuf.FieldDescriptorProto{
-          __unknown_fields__: [],
-          default_value: nil,
-          extendee: nil,
-          json_name: "timeout",
-          label: :LABEL_OPTIONAL,
           name: "timeout",
+          extendee: nil,
           number: 1,
-          oneof_index: nil,
-          options: nil,
-          proto3_optional: nil,
+          label: :LABEL_OPTIONAL,
           type: :TYPE_INT64,
-          type_name: nil
+          type_name: nil,
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "timeout",
+          proto3_optional: nil,
+          __unknown_fields__: []
         }
       ],
-      name: "TimeoutStrategy",
       nested_type: [],
-      oneof_decl: [],
+      enum_type: [],
+      extension_range: [],
+      extension: [],
       options: nil,
+      oneof_decl: [],
+      reserved_range: [],
       reserved_name: [],
-      reserved_range: []
+      __unknown_fields__: []
     }
   end
 
-  field :timeout, 1, type: :int64
+  field(:timeout, 1, type: :int64)
 end
+
 defmodule Eigr.Functions.Protocol.Actors.Command do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
     %Google.Protobuf.DescriptorProto{
-      __unknown_fields__: [],
-      enum_type: [],
-      extension: [],
-      extension_range: [],
+      name: "Command",
       field: [
         %Google.Protobuf.FieldDescriptorProto{
-          __unknown_fields__: [],
-          default_value: nil,
-          extendee: nil,
-          json_name: "name",
-          label: :LABEL_OPTIONAL,
           name: "name",
+          extendee: nil,
           number: 1,
-          oneof_index: nil,
-          options: nil,
-          proto3_optional: nil,
+          label: :LABEL_OPTIONAL,
           type: :TYPE_STRING,
-          type_name: nil
+          type_name: nil,
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "name",
+          proto3_optional: nil,
+          __unknown_fields__: []
         }
       ],
-      name: "Command",
       nested_type: [],
-      oneof_decl: [],
+      enum_type: [],
+      extension_range: [],
+      extension: [],
       options: nil,
+      oneof_decl: [],
+      reserved_range: [],
       reserved_name: [],
-      reserved_range: []
+      __unknown_fields__: []
     }
   end
 
-  field :name, 1, type: :string
+  field(:name, 1, type: :string)
 end
+
 defmodule Eigr.Functions.Protocol.Actors.FixedTimerCommand do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
     %Google.Protobuf.DescriptorProto{
-      __unknown_fields__: [],
-      enum_type: [],
-      extension: [],
-      extension_range: [],
+      name: "FixedTimerCommand",
       field: [
         %Google.Protobuf.FieldDescriptorProto{
-          __unknown_fields__: [],
-          default_value: nil,
-          extendee: nil,
-          json_name: "seconds",
-          label: :LABEL_OPTIONAL,
           name: "seconds",
+          extendee: nil,
           number: 1,
-          oneof_index: nil,
-          options: nil,
-          proto3_optional: nil,
+          label: :LABEL_OPTIONAL,
           type: :TYPE_INT32,
-          type_name: nil
+          type_name: nil,
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "seconds",
+          proto3_optional: nil,
+          __unknown_fields__: []
         },
         %Google.Protobuf.FieldDescriptorProto{
-          __unknown_fields__: [],
-          default_value: nil,
-          extendee: nil,
-          json_name: "command",
-          label: :LABEL_OPTIONAL,
           name: "command",
+          extendee: nil,
           number: 2,
-          oneof_index: nil,
-          options: nil,
-          proto3_optional: nil,
+          label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.Command"
+          type_name: ".eigr.functions.protocol.actors.Command",
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "command",
+          proto3_optional: nil,
+          __unknown_fields__: []
         }
       ],
-      name: "FixedTimerCommand",
       nested_type: [],
-      oneof_decl: [],
+      enum_type: [],
+      extension_range: [],
+      extension: [],
       options: nil,
+      oneof_decl: [],
+      reserved_range: [],
       reserved_name: [],
-      reserved_range: []
+      __unknown_fields__: []
     }
   end
 
-  field :seconds, 1, type: :int32
-  field :command, 2, type: Eigr.Functions.Protocol.Actors.Command
+  field(:seconds, 1, type: :int32)
+  field(:command, 2, type: Eigr.Functions.Protocol.Actors.Command)
 end
+
 defmodule Eigr.Functions.Protocol.Actors.ActorState.TagsEntry do
   @moduledoc false
-  use Protobuf, map: true, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
+  use Protobuf, map: true, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
     %Google.Protobuf.DescriptorProto{
-      __unknown_fields__: [],
-      enum_type: [],
-      extension: [],
-      extension_range: [],
+      name: "TagsEntry",
       field: [
         %Google.Protobuf.FieldDescriptorProto{
-          __unknown_fields__: [],
-          default_value: nil,
-          extendee: nil,
-          json_name: "key",
-          label: :LABEL_OPTIONAL,
           name: "key",
+          extendee: nil,
           number: 1,
-          oneof_index: nil,
-          options: nil,
-          proto3_optional: nil,
+          label: :LABEL_OPTIONAL,
           type: :TYPE_STRING,
-          type_name: nil
+          type_name: nil,
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "key",
+          proto3_optional: nil,
+          __unknown_fields__: []
         },
         %Google.Protobuf.FieldDescriptorProto{
-          __unknown_fields__: [],
-          default_value: nil,
-          extendee: nil,
-          json_name: "value",
-          label: :LABEL_OPTIONAL,
           name: "value",
+          extendee: nil,
           number: 2,
-          oneof_index: nil,
-          options: nil,
-          proto3_optional: nil,
+          label: :LABEL_OPTIONAL,
           type: :TYPE_STRING,
-          type_name: nil
+          type_name: nil,
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "value",
+          proto3_optional: nil,
+          __unknown_fields__: []
         }
       ],
-      name: "TagsEntry",
       nested_type: [],
-      oneof_decl: [],
+      enum_type: [],
+      extension_range: [],
+      extension: [],
       options: %Google.Protobuf.MessageOptions{
-        __pb_extensions__: %{},
-        __unknown_fields__: [],
-        deprecated: false,
-        map_entry: true,
         message_set_wire_format: false,
         no_standard_descriptor_accessor: false,
-        uninterpreted_option: []
+        deprecated: false,
+        map_entry: true,
+        uninterpreted_option: [],
+        __pb_extensions__: %{},
+        __unknown_fields__: []
       },
+      oneof_decl: [],
+      reserved_range: [],
       reserved_name: [],
-      reserved_range: []
+      __unknown_fields__: []
     }
   end
 
-  field :key, 1, type: :string
-  field :value, 2, type: :string
+  field(:key, 1, type: :string)
+  field(:value, 2, type: :string)
 end
+
 defmodule Eigr.Functions.Protocol.Actors.ActorState do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
     %Google.Protobuf.DescriptorProto{
-      __unknown_fields__: [],
-      enum_type: [],
-      extension: [],
-      extension_range: [],
+      name: "ActorState",
       field: [
         %Google.Protobuf.FieldDescriptorProto{
-          __unknown_fields__: [],
-          default_value: nil,
-          extendee: nil,
-          json_name: "tags",
-          label: :LABEL_REPEATED,
           name: "tags",
+          extendee: nil,
           number: 1,
-          oneof_index: nil,
-          options: nil,
-          proto3_optional: nil,
+          label: :LABEL_REPEATED,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.ActorState.TagsEntry"
+          type_name: ".eigr.functions.protocol.actors.ActorState.TagsEntry",
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "tags",
+          proto3_optional: nil,
+          __unknown_fields__: []
         },
         %Google.Protobuf.FieldDescriptorProto{
-          __unknown_fields__: [],
-          default_value: nil,
-          extendee: nil,
-          json_name: "state",
-          label: :LABEL_OPTIONAL,
           name: "state",
+          extendee: nil,
           number: 2,
-          oneof_index: nil,
-          options: nil,
-          proto3_optional: nil,
+          label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".google.protobuf.Any"
+          type_name: ".google.protobuf.Any",
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "state",
+          proto3_optional: nil,
+          __unknown_fields__: []
         }
       ],
-      name: "ActorState",
       nested_type: [
         %Google.Protobuf.DescriptorProto{
-          __unknown_fields__: [],
-          enum_type: [],
-          extension: [],
-          extension_range: [],
+          name: "TagsEntry",
           field: [
             %Google.Protobuf.FieldDescriptorProto{
-              __unknown_fields__: [],
-              default_value: nil,
-              extendee: nil,
-              json_name: "key",
-              label: :LABEL_OPTIONAL,
               name: "key",
+              extendee: nil,
               number: 1,
-              oneof_index: nil,
-              options: nil,
-              proto3_optional: nil,
+              label: :LABEL_OPTIONAL,
               type: :TYPE_STRING,
-              type_name: nil
+              type_name: nil,
+              default_value: nil,
+              options: nil,
+              oneof_index: nil,
+              json_name: "key",
+              proto3_optional: nil,
+              __unknown_fields__: []
             },
             %Google.Protobuf.FieldDescriptorProto{
-              __unknown_fields__: [],
-              default_value: nil,
-              extendee: nil,
-              json_name: "value",
-              label: :LABEL_OPTIONAL,
               name: "value",
+              extendee: nil,
               number: 2,
-              oneof_index: nil,
-              options: nil,
-              proto3_optional: nil,
+              label: :LABEL_OPTIONAL,
               type: :TYPE_STRING,
-              type_name: nil
+              type_name: nil,
+              default_value: nil,
+              options: nil,
+              oneof_index: nil,
+              json_name: "value",
+              proto3_optional: nil,
+              __unknown_fields__: []
             }
           ],
-          name: "TagsEntry",
           nested_type: [],
-          oneof_decl: [],
+          enum_type: [],
+          extension_range: [],
+          extension: [],
           options: %Google.Protobuf.MessageOptions{
-            __pb_extensions__: %{},
-            __unknown_fields__: [],
-            deprecated: false,
-            map_entry: true,
             message_set_wire_format: false,
             no_standard_descriptor_accessor: false,
-            uninterpreted_option: []
+            deprecated: false,
+            map_entry: true,
+            uninterpreted_option: [],
+            __pb_extensions__: %{},
+            __unknown_fields__: []
           },
+          oneof_decl: [],
+          reserved_range: [],
           reserved_name: [],
-          reserved_range: []
+          __unknown_fields__: []
         }
       ],
-      oneof_decl: [],
+      enum_type: [],
+      extension_range: [],
+      extension: [],
       options: nil,
+      oneof_decl: [],
+      reserved_range: [],
       reserved_name: [],
-      reserved_range: []
+      __unknown_fields__: []
     }
   end
 
-  field :tags, 1,
+  field(:tags, 1,
     repeated: true,
     type: Eigr.Functions.Protocol.Actors.ActorState.TagsEntry,
     map: true
+  )
 
-  field :state, 2, type: Google.Protobuf.Any
+  field(:state, 2, type: Google.Protobuf.Any)
 end
+
 defmodule Eigr.Functions.Protocol.Actors.Metadata.TagsEntry do
   @moduledoc false
-  use Protobuf, map: true, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
+  use Protobuf, map: true, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
     %Google.Protobuf.DescriptorProto{
-      __unknown_fields__: [],
-      enum_type: [],
-      extension: [],
-      extension_range: [],
+      name: "TagsEntry",
       field: [
         %Google.Protobuf.FieldDescriptorProto{
-          __unknown_fields__: [],
-          default_value: nil,
-          extendee: nil,
-          json_name: "key",
-          label: :LABEL_OPTIONAL,
           name: "key",
+          extendee: nil,
           number: 1,
-          oneof_index: nil,
-          options: nil,
-          proto3_optional: nil,
+          label: :LABEL_OPTIONAL,
           type: :TYPE_STRING,
-          type_name: nil
+          type_name: nil,
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "key",
+          proto3_optional: nil,
+          __unknown_fields__: []
         },
         %Google.Protobuf.FieldDescriptorProto{
-          __unknown_fields__: [],
-          default_value: nil,
-          extendee: nil,
-          json_name: "value",
-          label: :LABEL_OPTIONAL,
           name: "value",
+          extendee: nil,
           number: 2,
-          oneof_index: nil,
-          options: nil,
-          proto3_optional: nil,
+          label: :LABEL_OPTIONAL,
           type: :TYPE_STRING,
-          type_name: nil
+          type_name: nil,
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "value",
+          proto3_optional: nil,
+          __unknown_fields__: []
         }
       ],
-      name: "TagsEntry",
       nested_type: [],
-      oneof_decl: [],
+      enum_type: [],
+      extension_range: [],
+      extension: [],
       options: %Google.Protobuf.MessageOptions{
-        __pb_extensions__: %{},
-        __unknown_fields__: [],
-        deprecated: false,
-        map_entry: true,
         message_set_wire_format: false,
         no_standard_descriptor_accessor: false,
-        uninterpreted_option: []
+        deprecated: false,
+        map_entry: true,
+        uninterpreted_option: [],
+        __pb_extensions__: %{},
+        __unknown_fields__: []
       },
+      oneof_decl: [],
+      reserved_range: [],
       reserved_name: [],
-      reserved_range: []
+      __unknown_fields__: []
     }
   end
 
-  field :key, 1, type: :string
-  field :value, 2, type: :string
+  field(:key, 1, type: :string)
+  field(:value, 2, type: :string)
 end
+
 defmodule Eigr.Functions.Protocol.Actors.Metadata do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
     %Google.Protobuf.DescriptorProto{
-      __unknown_fields__: [],
-      enum_type: [],
-      extension: [],
-      extension_range: [],
+      name: "Metadata",
       field: [
         %Google.Protobuf.FieldDescriptorProto{
-          __unknown_fields__: [],
-          default_value: nil,
-          extendee: nil,
-          json_name: "channelGroup",
-          label: :LABEL_OPTIONAL,
           name: "channel_group",
+          extendee: nil,
           number: 1,
-          oneof_index: nil,
-          options: nil,
-          proto3_optional: nil,
+          label: :LABEL_OPTIONAL,
           type: :TYPE_STRING,
-          type_name: nil
+          type_name: nil,
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "channelGroup",
+          proto3_optional: nil,
+          __unknown_fields__: []
         },
         %Google.Protobuf.FieldDescriptorProto{
-          __unknown_fields__: [],
-          default_value: nil,
-          extendee: nil,
-          json_name: "tags",
-          label: :LABEL_REPEATED,
           name: "tags",
+          extendee: nil,
           number: 2,
-          oneof_index: nil,
-          options: nil,
-          proto3_optional: nil,
+          label: :LABEL_REPEATED,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.Metadata.TagsEntry"
+          type_name: ".eigr.functions.protocol.actors.Metadata.TagsEntry",
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "tags",
+          proto3_optional: nil,
+          __unknown_fields__: []
         }
       ],
-      name: "Metadata",
       nested_type: [
         %Google.Protobuf.DescriptorProto{
-          __unknown_fields__: [],
-          enum_type: [],
-          extension: [],
-          extension_range: [],
+          name: "TagsEntry",
           field: [
             %Google.Protobuf.FieldDescriptorProto{
-              __unknown_fields__: [],
-              default_value: nil,
-              extendee: nil,
-              json_name: "key",
-              label: :LABEL_OPTIONAL,
               name: "key",
+              extendee: nil,
               number: 1,
-              oneof_index: nil,
-              options: nil,
-              proto3_optional: nil,
+              label: :LABEL_OPTIONAL,
               type: :TYPE_STRING,
-              type_name: nil
+              type_name: nil,
+              default_value: nil,
+              options: nil,
+              oneof_index: nil,
+              json_name: "key",
+              proto3_optional: nil,
+              __unknown_fields__: []
             },
             %Google.Protobuf.FieldDescriptorProto{
-              __unknown_fields__: [],
-              default_value: nil,
-              extendee: nil,
-              json_name: "value",
-              label: :LABEL_OPTIONAL,
               name: "value",
+              extendee: nil,
               number: 2,
-              oneof_index: nil,
-              options: nil,
-              proto3_optional: nil,
+              label: :LABEL_OPTIONAL,
               type: :TYPE_STRING,
-              type_name: nil
+              type_name: nil,
+              default_value: nil,
+              options: nil,
+              oneof_index: nil,
+              json_name: "value",
+              proto3_optional: nil,
+              __unknown_fields__: []
             }
           ],
-          name: "TagsEntry",
           nested_type: [],
-          oneof_decl: [],
+          enum_type: [],
+          extension_range: [],
+          extension: [],
           options: %Google.Protobuf.MessageOptions{
-            __pb_extensions__: %{},
-            __unknown_fields__: [],
-            deprecated: false,
-            map_entry: true,
             message_set_wire_format: false,
             no_standard_descriptor_accessor: false,
-            uninterpreted_option: []
+            deprecated: false,
+            map_entry: true,
+            uninterpreted_option: [],
+            __pb_extensions__: %{},
+            __unknown_fields__: []
           },
+          oneof_decl: [],
+          reserved_range: [],
           reserved_name: [],
-          reserved_range: []
+          __unknown_fields__: []
         }
       ],
-      oneof_decl: [],
+      enum_type: [],
+      extension_range: [],
+      extension: [],
       options: nil,
+      oneof_decl: [],
+      reserved_range: [],
       reserved_name: [],
-      reserved_range: []
+      __unknown_fields__: []
     }
   end
 
-  field :channel_group, 1, type: :string, json_name: "channelGroup"
+  field(:channel_group, 1, type: :string, json_name: "channelGroup")
 
-  field :tags, 2,
+  field(:tags, 2,
     repeated: true,
     type: Eigr.Functions.Protocol.Actors.Metadata.TagsEntry,
     map: true
+  )
 end
+
 defmodule Eigr.Functions.Protocol.Actors.ActorSettings do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
     %Google.Protobuf.DescriptorProto{
-      __unknown_fields__: [],
-      enum_type: [],
-      extension: [],
-      extension_range: [],
+      name: "ActorSettings",
       field: [
         %Google.Protobuf.FieldDescriptorProto{
-          __unknown_fields__: [],
-          default_value: nil,
-          extendee: nil,
-          json_name: "abstract",
-          label: :LABEL_OPTIONAL,
           name: "abstract",
+          extendee: nil,
           number: 1,
-          oneof_index: nil,
-          options: nil,
-          proto3_optional: nil,
+          label: :LABEL_OPTIONAL,
           type: :TYPE_BOOL,
-          type_name: nil
+          type_name: nil,
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "abstract",
+          proto3_optional: nil,
+          __unknown_fields__: []
         },
         %Google.Protobuf.FieldDescriptorProto{
-          __unknown_fields__: [],
-          default_value: nil,
-          extendee: nil,
-          json_name: "persistent",
-          label: :LABEL_OPTIONAL,
           name: "persistent",
+          extendee: nil,
           number: 2,
-          oneof_index: nil,
-          options: nil,
-          proto3_optional: nil,
+          label: :LABEL_OPTIONAL,
           type: :TYPE_BOOL,
-          type_name: nil
+          type_name: nil,
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "persistent",
+          proto3_optional: nil,
+          __unknown_fields__: []
         },
         %Google.Protobuf.FieldDescriptorProto{
-          __unknown_fields__: [],
-          default_value: nil,
-          extendee: nil,
-          json_name: "snapshotStrategy",
-          label: :LABEL_OPTIONAL,
           name: "snapshot_strategy",
+          extendee: nil,
           number: 3,
-          oneof_index: nil,
-          options: nil,
-          proto3_optional: nil,
+          label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.ActorSnapshotStrategy"
+          type_name: ".eigr.functions.protocol.actors.ActorSnapshotStrategy",
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "snapshotStrategy",
+          proto3_optional: nil,
+          __unknown_fields__: []
         },
         %Google.Protobuf.FieldDescriptorProto{
-          __unknown_fields__: [],
-          default_value: nil,
-          extendee: nil,
-          json_name: "deactivationStrategy",
-          label: :LABEL_OPTIONAL,
           name: "deactivation_strategy",
+          extendee: nil,
           number: 4,
-          oneof_index: nil,
-          options: nil,
-          proto3_optional: nil,
+          label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.ActorDeactivationStrategy"
+          type_name: ".eigr.functions.protocol.actors.ActorDeactivationStrategy",
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "deactivationStrategy",
+          proto3_optional: nil,
+          __unknown_fields__: []
         }
       ],
-      name: "ActorSettings",
       nested_type: [],
-      oneof_decl: [],
+      enum_type: [],
+      extension_range: [],
+      extension: [],
       options: nil,
+      oneof_decl: [],
+      reserved_range: [],
       reserved_name: [],
-      reserved_range: []
+      __unknown_fields__: []
     }
   end
 
-  field :abstract, 1, type: :bool
-  field :persistent, 2, type: :bool
+  field(:abstract, 1, type: :bool)
+  field(:persistent, 2, type: :bool)
 
-  field :snapshot_strategy, 3,
+  field(:snapshot_strategy, 3,
     type: Eigr.Functions.Protocol.Actors.ActorSnapshotStrategy,
     json_name: "snapshotStrategy"
+  )
 
-  field :deactivation_strategy, 4,
+  field(:deactivation_strategy, 4,
     type: Eigr.Functions.Protocol.Actors.ActorDeactivationStrategy,
     json_name: "deactivationStrategy"
+  )
 end
+
 defmodule Eigr.Functions.Protocol.Actors.ActorId do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
     %Google.Protobuf.DescriptorProto{
-      __unknown_fields__: [],
-      enum_type: [],
-      extension: [],
-      extension_range: [],
+      name: "ActorId",
       field: [
         %Google.Protobuf.FieldDescriptorProto{
-          __unknown_fields__: [],
-          default_value: nil,
-          extendee: nil,
-          json_name: "name",
-          label: :LABEL_OPTIONAL,
           name: "name",
+          extendee: nil,
           number: 1,
-          oneof_index: nil,
-          options: nil,
-          proto3_optional: nil,
+          label: :LABEL_OPTIONAL,
           type: :TYPE_STRING,
-          type_name: nil
+          type_name: nil,
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "name",
+          proto3_optional: nil,
+          __unknown_fields__: []
         },
         %Google.Protobuf.FieldDescriptorProto{
-          __unknown_fields__: [],
-          default_value: nil,
-          extendee: nil,
-          json_name: "system",
-          label: :LABEL_OPTIONAL,
           name: "system",
+          extendee: nil,
           number: 2,
-          oneof_index: nil,
-          options: nil,
-          proto3_optional: nil,
+          label: :LABEL_OPTIONAL,
           type: :TYPE_STRING,
-          type_name: nil
+          type_name: nil,
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "system",
+          proto3_optional: nil,
+          __unknown_fields__: []
         }
       ],
-      name: "ActorId",
       nested_type: [],
-      oneof_decl: [],
+      enum_type: [],
+      extension_range: [],
+      extension: [],
       options: nil,
+      oneof_decl: [],
+      reserved_range: [],
       reserved_name: [],
-      reserved_range: []
+      __unknown_fields__: []
     }
   end
 
-  field :name, 1, type: :string
-  field :system, 2, type: :string
+  field(:name, 1, type: :string)
+  field(:system, 2, type: :string)
 end
+
 defmodule Eigr.Functions.Protocol.Actors.Actor do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
     %Google.Protobuf.DescriptorProto{
-      __unknown_fields__: [],
-      enum_type: [],
-      extension: [],
-      extension_range: [],
+      name: "Actor",
       field: [
         %Google.Protobuf.FieldDescriptorProto{
-          __unknown_fields__: [],
-          default_value: nil,
-          extendee: nil,
-          json_name: "id",
-          label: :LABEL_OPTIONAL,
           name: "id",
+          extendee: nil,
           number: 1,
-          oneof_index: nil,
-          options: nil,
-          proto3_optional: nil,
+          label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.ActorId"
+          type_name: ".eigr.functions.protocol.actors.ActorId",
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "id",
+          proto3_optional: nil,
+          __unknown_fields__: []
         },
         %Google.Protobuf.FieldDescriptorProto{
-          __unknown_fields__: [],
-          default_value: nil,
-          extendee: nil,
-          json_name: "state",
-          label: :LABEL_OPTIONAL,
           name: "state",
+          extendee: nil,
           number: 2,
-          oneof_index: nil,
-          options: nil,
-          proto3_optional: nil,
+          label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.ActorState"
+          type_name: ".eigr.functions.protocol.actors.ActorState",
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "state",
+          proto3_optional: nil,
+          __unknown_fields__: []
         },
         %Google.Protobuf.FieldDescriptorProto{
-          __unknown_fields__: [],
-          default_value: nil,
-          extendee: nil,
-          json_name: "metadata",
-          label: :LABEL_OPTIONAL,
           name: "metadata",
+          extendee: nil,
           number: 6,
-          oneof_index: nil,
-          options: nil,
-          proto3_optional: nil,
-          type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.Metadata"
-        },
-        %Google.Protobuf.FieldDescriptorProto{
-          __unknown_fields__: [],
-          default_value: nil,
-          extendee: nil,
-          json_name: "settings",
           label: :LABEL_OPTIONAL,
+          type: :TYPE_MESSAGE,
+          type_name: ".eigr.functions.protocol.actors.Metadata",
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "metadata",
+          proto3_optional: nil,
+          __unknown_fields__: []
+        },
+        %Google.Protobuf.FieldDescriptorProto{
           name: "settings",
+          extendee: nil,
           number: 3,
-          oneof_index: nil,
-          options: nil,
-          proto3_optional: nil,
+          label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.ActorSettings"
+          type_name: ".eigr.functions.protocol.actors.ActorSettings",
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "settings",
+          proto3_optional: nil,
+          __unknown_fields__: []
         },
         %Google.Protobuf.FieldDescriptorProto{
-          __unknown_fields__: [],
-          default_value: nil,
-          extendee: nil,
-          json_name: "commands",
-          label: :LABEL_REPEATED,
           name: "commands",
+          extendee: nil,
           number: 4,
-          oneof_index: nil,
-          options: nil,
-          proto3_optional: nil,
+          label: :LABEL_REPEATED,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.Command"
+          type_name: ".eigr.functions.protocol.actors.Command",
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "commands",
+          proto3_optional: nil,
+          __unknown_fields__: []
         },
         %Google.Protobuf.FieldDescriptorProto{
-          __unknown_fields__: [],
-          default_value: nil,
-          extendee: nil,
-          json_name: "timerCommands",
-          label: :LABEL_REPEATED,
           name: "timer_commands",
+          extendee: nil,
           number: 5,
-          oneof_index: nil,
-          options: nil,
-          proto3_optional: nil,
+          label: :LABEL_REPEATED,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.FixedTimerCommand"
+          type_name: ".eigr.functions.protocol.actors.FixedTimerCommand",
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "timerCommands",
+          proto3_optional: nil,
+          __unknown_fields__: []
         }
       ],
-      name: "Actor",
       nested_type: [],
-      oneof_decl: [],
+      enum_type: [],
+      extension_range: [],
+      extension: [],
       options: nil,
+      oneof_decl: [],
+      reserved_range: [],
       reserved_name: [],
-      reserved_range: []
+      __unknown_fields__: []
     }
   end
 
-  field :id, 1, type: Eigr.Functions.Protocol.Actors.ActorId
-  field :state, 2, type: Eigr.Functions.Protocol.Actors.ActorState
-  field :metadata, 6, type: Eigr.Functions.Protocol.Actors.Metadata
-  field :settings, 3, type: Eigr.Functions.Protocol.Actors.ActorSettings
-  field :commands, 4, repeated: true, type: Eigr.Functions.Protocol.Actors.Command
+  field(:id, 1, type: Eigr.Functions.Protocol.Actors.ActorId)
+  field(:state, 2, type: Eigr.Functions.Protocol.Actors.ActorState)
+  field(:metadata, 6, type: Eigr.Functions.Protocol.Actors.Metadata)
+  field(:settings, 3, type: Eigr.Functions.Protocol.Actors.ActorSettings)
+  field(:commands, 4, repeated: true, type: Eigr.Functions.Protocol.Actors.Command)
 
-  field :timer_commands, 5,
+  field(:timer_commands, 5,
     repeated: true,
     type: Eigr.Functions.Protocol.Actors.FixedTimerCommand,
     json_name: "timerCommands"
+  )
 end

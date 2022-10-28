@@ -25,17 +25,36 @@ defmodule SpawnSdk.Defact do
 
   defp define_defact(kind, call, block, env) do
     {name, args} = decompose_call!(kind, call, env)
-    [first_arg, last_arg] = args
 
-    quote do
-      Module.put_attribute(
-        __MODULE__,
-        :defact_exports,
-        Macro.escape({unquote(name), %{timer: @set_timer}})
-      )
+    {payload, context} =
+      case args do
+        [payload, context] -> {payload, context}
+        [context] -> {nil, context}
+      end
 
-      def handle_command({unquote(name), unquote(first_arg)}, unquote(last_arg)) do
-        unquote(block)
+    if is_nil(payload) do
+      quote do
+        Module.put_attribute(
+          __MODULE__,
+          :defact_exports,
+          Macro.escape({unquote(name), %{timer: @set_timer}})
+        )
+
+        def handle_command({unquote(name), _}, unquote(context)) do
+          unquote(block)
+        end
+      end
+    else
+      quote do
+        Module.put_attribute(
+          __MODULE__,
+          :defact_exports,
+          Macro.escape({unquote(name), %{timer: @set_timer}})
+        )
+
+        def handle_command({unquote(name), unquote(payload)}, unquote(context)) do
+          unquote(block)
+        end
       end
     end
   end
