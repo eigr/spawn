@@ -1,9 +1,9 @@
-defmodule Statestores.Adapters.MySQL do
+defmodule Statestores.Adapters.Postgres do
   use Statestores.Adapters.Behaviour
 
   use Ecto.Repo,
     otp_app: :spawn_statestores,
-    adapter: Ecto.Adapters.MyXQL
+    adapter: Ecto.Adapters.Postgres
 
   alias Statestores.Schemas.{Event, ValueObjectSchema}
 
@@ -21,7 +21,8 @@ defmodule Statestores.Adapters.MySQL do
           data: data,
           updated_at: DateTime.utc_now()
         ]
-      ]
+      ],
+      conflict_target: :actor
     )
     |> case do
       {:ok, event} ->
@@ -33,5 +34,15 @@ defmodule Statestores.Adapters.MySQL do
       other ->
         {:error, other}
     end
+  end
+
+  def default_port, do: "5432"
+
+  def migrate() do
+    {:ok, _, _} = Ecto.Migrator.with_repo(__MODULE__, &Ecto.Migrator.run(&1, :up, all: true))
+  end
+
+  def rollback(version) do
+    {:ok, _, _} = Ecto.Migrator.with_repo(__MODULE__, &Ecto.Migrator.run(&1, :down, to: version))
   end
 end

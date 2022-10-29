@@ -34,4 +34,14 @@ defmodule Statestores.Adapters.SQLite3 do
         {:error, other}
     end
   end
+
+  def default_port, do: "0"
+
+  def migrate() do
+    {:ok, _, _} = Ecto.Migrator.with_repo(__MODULE__, &Ecto.Migrator.run(&1, :up, all: true))
+  end
+
+  def rollback(version) do
+    {:ok, _, _} = Ecto.Migrator.with_repo(__MODULE__, &Ecto.Migrator.run(&1, :down, to: version))
+  end
 end

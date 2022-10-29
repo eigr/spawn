@@ -1,10 +1,10 @@
-defmodule StatestoresTest.RepoTest do
+defmodule StatestoresPostgresTest.RepoTest do
   use Statestores.DataCase
   alias Statestores.Schemas.Event
-  import Statestores.Util, only: [load_repo: 0]
+  import Statestores.Util, only: [load_adapter: 0]
 
   test "insert! should persist an valid Event" do
-    repo = load_repo()
+    repo = load_adapter()
 
     event = %Event{
       system: "test-system",
@@ -22,7 +22,7 @@ defmodule StatestoresTest.RepoTest do
   end
 
   test "insert! should update when inserted before" do
-    repo = load_repo()
+    repo = load_adapter()
 
     actor = "mike"
 

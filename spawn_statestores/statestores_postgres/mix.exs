@@ -1,15 +1,15 @@
-defmodule Statestores.MixProject do
+defmodule StatestoresPostgres.MixProject do
   use Mix.Project
 
-  @app :spawn_statestores
-  @version "0.5.0"
-  @source_url "https://github.com/eigr/spawn/blob/main/spawn_statestores/statestores"
+  @app :spawn_statestores_postgres
+  @version "0.1.0"
+  @source_url "https://github.com/eigr/spawn/blob/main/spawn_statestores/statestores_postgres"
 
   def project do
     [
       app: @app,
       version: @version,
-      description: "Spawn Statestores is the storage lib for the Spawn Actors System",
+      description: "Spawn Statestores Postgres is a storage lib for the Spawn Actors System",
       source_url: @source_url,
       homepage_url: "https://eigr.io/",
       build_path: "../../_build",
@@ -34,7 +34,7 @@ defmodule Statestores.MixProject do
 
   defp package do
     [
-      files: ["lib", "mix.exs", "README.md", "LICENSE"],
+      files: ["lib", "mix.exs", "priv", "README.md", "LICENSE"],
       licenses: ["Apache-2.0"],
       links: %{GitHub: @source_url}
     ]
@@ -58,7 +58,9 @@ defmodule Statestores.MixProject do
       {:vapor, "~> 0.10"},
       {:cloak_ecto, "~> 1.2"},
       {:ecto_sql, "~> 3.8"},
-      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false}
+      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
+      {:spawn_statestores, path: "../statestores"},
+      {:postgrex, "~> 0.16"},
     ]
   end
 

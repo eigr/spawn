@@ -1,61 +1,44 @@
 defmodule Statestores.Util do
   @otp_app :spawn_statestores
 
+  @type adapter :: term()
+
   @spec load_app :: :ok | {:error, any}
   def load_app do
     Application.load(@otp_app)
   end
 
-  @spec get_database_type() :: :cockroachdb | :mysql | :postgres | :sqlite | :mssql | :mongodb
-  def get_database_type() do
-    String.to_existing_atom(System.get_env("PROXY_DATABASE_TYPE", "mysql"))
+  @spec load_adapter :: adapter()
+  def load_adapter() do
+    case Application.fetch_env(@otp_app, :database_adapter) do
+      {:ok, value} -> value
+      :error ->
+        type = String.to_existing_atom(System.get_env("PROXY_DATABASE_TYPE", default_database_type()))
+
+        load_adapter_by_type(type)
+    end
   end
 
-  @spec load_repo ::
-          Statestores.Adapters.MySQL
-          | Statestores.Adapters.Postgres
-          | Statestores.Adapters.SQLite3
-          | Statestores.Adapters.MSSQL
-          | Statestores.Adapters.MongoDB
-  def load_repo() do
-    type = String.to_existing_atom(System.get_env("PROXY_DATABASE_TYPE", "mysql"))
-    load_repo(type)
+  defp default_database_type do
+    cond do
+      Code.ensure_loaded?(Statestores.Adapters.MySQL) -> "mysql"
+      Code.ensure_loaded?(Statestores.Adapters.Postgres) -> "postgres"
+      Code.ensure_loaded?(Statestores.Adapters.SQLite3) -> "sqlite"
+      Code.ensure_loaded?(Statestores.Adapters.MSSQL) -> "mssql"
+      true -> nil
+    end
   end
 
-  @spec load_repo(:cockroachdb | :mysql | :postgres | :sqlite | :mssql | :mongodb) ::
-          Statestores.Adapters.MySQL
-          | Statestores.Adapters.Postgres
-          | Statestores.Adapters.SQLite3
-          | Statestores.Adapters.MSSQL
-          | Statestores.Adapters.MongoDB
-  def load_repo(:cockroachdb), do: Statestores.Adapters.Postgres
+  defp load_adapter_by_type(:mysql), do: Statestores.Adapters.MySQL
 
-  def load_repo(:mysql), do: Statestores.Adapters.MySQL
+  defp load_adapter_by_type(:postgres), do: Statestores.Adapters.Postgres
 
-  def load_repo(:postgres), do: Statestores.Adapters.Postgres
+  defp load_adapter_by_type(:sqlite), do: Statestores.Adapters.SQLite3
 
-  def load_repo(:sqlite), do: Statestores.Adapters.SQLite3
-
-  def load_repo(:mssql), do: Statestores.Adapters.MSSQL
-
-  def load_repo(:mongodb), do: Statestores.Adapters.MongoDB
+  defp load_adapter_by_type(:mssql), do: Statestores.Adapters.MSSQL
 
   @spec get_default_database_port :: <<_::32>>
   def get_default_database_port() do
-    String.to_existing_atom(System.get_env("PROXY_DATABASE_TYPE", "mysql"))
-    |> get_default_database_port()
+    load_adapter().default_port()
   end
-
-  @spec get_default_database_port(:mysql | :postgres) :: <<_::32>>
-  def get_default_database_port(:cockroachdb), do: "26257"
-
-  def get_default_database_port(:mysql), do: "3306"
-
-  def get_default_database_port(:postgres), do: "5432"
-
-  def get_default_database_port(:sqlite), do: "0"
-
-  def get_default_database_port(:mssql), do: "1433"
-
-  def get_default_database_port(:mongodb), do: "27017"
 end
