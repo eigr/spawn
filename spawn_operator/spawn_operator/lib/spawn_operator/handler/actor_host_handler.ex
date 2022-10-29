@@ -27,7 +27,7 @@ defmodule SpawnOperator.Handler.ActorHostHandler do
           - containerPort: 80
 
         sidecar: # Optional. If embedded true then this section will be ignored
-          image: docker.io/eigr/spawn-proxy:0.1.0
+          image: docker.io/eigr/spawn-proxy:0.5.0
 
   """
 

@@ -18,10 +18,10 @@ by adding `spawn_sdk` and `spawn_statestores` to your list of dependencies in `m
 ```elixir
 def deps do
   [
-    {:spawn_sdk, "~> 0.1.0"},
+    {:spawn_sdk, "~> 0.5.0"},
 
     # You can remove this if you will ONLY USE non-persistent actors
-    {:spawn_statestores, "~> 0.1.0"}
+    {:spawn_statestores, "~> 0.5.0"}
   ]
 end
 ```

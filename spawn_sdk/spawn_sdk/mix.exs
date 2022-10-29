@@ -2,7 +2,7 @@ defmodule SpawnSdk.MixProject do
   use Mix.Project
 
   @app :spawn_sdk
-  @version "0.1.0"
+  @version "0.5.0"
   @source_url "https://github.com/eigr/spawn/tree/main/spawn_sdk/spawn_sdk"
 
   def project do

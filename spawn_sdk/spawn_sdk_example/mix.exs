@@ -2,7 +2,7 @@ defmodule SpawnSdkExample.MixProject do
   use Mix.Project
 
   @app :spawn_sdk_example
-  @version "0.1.0"
+  @version "0.5.0"
 
   def project do
     [

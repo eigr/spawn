@@ -2,7 +2,7 @@ defmodule Proxy.MixProject do
   use Mix.Project
 
   @app :proxy
-  @version "0.1.0"
+  @version "0.5.0"
 
   def project do
     [

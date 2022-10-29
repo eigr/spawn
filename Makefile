@@ -1,4 +1,4 @@
-version=0.1.0
+version=0.5.0
 registry=eigr
 proxy-image=${registry}/spawn-proxy:${version}
 operator-image=${registry}/spawn-operator:${version}

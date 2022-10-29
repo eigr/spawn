@@ -65,7 +65,7 @@ defmodule Actors do
         protocol_major_version: 1,
         protocol_minor_version: 2,
         proxy_name: "spawn",
-        proxy_version: "0.1.0"
+        proxy_version: "0.5.0"
       )
 
     status = RequestStatus.new(status: :OK, message: "Accepted")
