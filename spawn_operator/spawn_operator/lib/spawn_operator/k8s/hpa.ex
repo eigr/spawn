@@ -1,5 +1,7 @@
-defmodule Eigr.FunctionsController.K8S.HPA do
+defmodule SpawnOperator.K8s.HPA do
   @moduledoc false
+
+  import Bonny.Config, only: [conn: 0]
 
   @behaviour SpawnOperator.K8s.Manifest
 
@@ -8,8 +10,8 @@ defmodule Eigr.FunctionsController.K8S.HPA do
   @default_autoscaler %{
     "min" => 1,
     "max" => 2,
-    "averageCpuUtilizationPercentage" =>  80,
-    "averageMemoryUtilizationValue"  =>  "250Mi",
+    "averageCpuUtilizationPercentage" => 80,
+    "averageMemoryUtilizationValue" => "250Mi"
   }
 
   @impl true
@@ -17,16 +19,30 @@ defmodule Eigr.FunctionsController.K8S.HPA do
 
   defp gen_autoscaler(system, ns, name, params) do
     autoscaler = Map.get(params, "autoscaler", @default_autoscaler)
+
+    {:ok, result} =
+      K8s.Client.list("v1", "nodes")
+      |> then(&K8s.Client.run(conn(), &1))
+
+    nodes = Map.get(result, "items")
+
+    autoscaler_max =
+      if nodes == 1 do
+        2
+      else
+        nodes
+      end
+
     replicas = Map.get(params, "replicas", @default_actor_host_function_replicas)
 
-    minReplicas = Map.get(autoscaler, "min", replicas)
-    maxReplicas = Map.get(autoscaler, "max")
+    max = if replicas > autoscaler_max, do: replicas, else: autoscaler_max
 
-    averageCpuUtilizationPercentage =
-      Map.get(autoscaler, "averageCpuUtilizationPercentage")
+    maxReplicas = Map.get(autoscaler, "max", max)
+    minReplicas = Map.get(autoscaler, "min", @default_actor_host_function_replicas)
 
-    averageMemoryUtilizationValue =
-      Map.get(autoscaler, "averageMemoryUtilizationValue")
+    averageCpuUtilizationPercentage = Map.get(autoscaler, "averageCpuUtilizationPercentage")
+
+    averageMemoryUtilizationValue = Map.get(autoscaler, "averageMemoryUtilizationValue")
 
     %{
       "apiVersion" => "autoscaling/v2",

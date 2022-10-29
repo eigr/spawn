@@ -32,7 +32,7 @@ defmodule SpawnOperator.Handler.ActorHostHandler do
   """
 
   alias SpawnOperator.K8s.ConfigMap.SidecarCM
-  alias SpawnOperator.K8s.Deployment
+  alias SpawnOperator.K8s.{Deployment, HPA}
 
   @behaviour Pluggable
 
@@ -44,10 +44,12 @@ defmodule SpawnOperator.Handler.ActorHostHandler do
     %Bonny.Axn{resource: resource} = axn
     host_resource = build_host_deploy(resource)
     host_config_map = build_host_configmap(resource)
+    host_hpa = build_host_hpa(resource)
 
     axn
     |> Bonny.Axn.register_descendant(host_resource)
     |> Bonny.Axn.register_descendant(host_config_map)
+    |> Bonny.Axn.register_descendant(host_hpa)
     |> Bonny.Axn.success_event()
   end
 
@@ -68,5 +70,12 @@ defmodule SpawnOperator.Handler.ActorHostHandler do
       SpawnOperator.get_args(resource)
 
     SidecarCM.manifest(system, ns, name, params)
+  end
+
+  defp build_host_hpa(resource) do
+    %{system: system, namespace: ns, name: name, params: params} =
+      SpawnOperator.get_args(resource)
+
+    HPA.manifest(system, ns, name, params)
   end
 end
