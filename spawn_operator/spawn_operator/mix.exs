@@ -31,7 +31,7 @@ defmodule Operator.MixProject do
     [
       {:bandit, "~> 0.5"},
       {:bakeware, ">= 0.0.0", runtime: false},
-      {:bonny, git: "https://github.com/coryodaniel/bonny.git", tag: "master"},
+      {:bonny, "~> 1.0.0-rc.0"},
       {:spawn, path: "../../"}
     ]
   end
