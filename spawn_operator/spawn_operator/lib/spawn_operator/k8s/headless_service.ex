@@ -19,7 +19,7 @@ defmodule SpawnOperator.K8s.HeadlessService do
       },
       "spec" => %{
         "clusterIP" => "None",
-        "selector" => %{"cluster-name" => system},
+        "selector" => %{"actor-system" => system},
         "ports" => [
           %{"port" => 4369, "name" => "epmd"}
         ]

@@ -10,6 +10,12 @@ defmodule SpawnOperator.Handler.ActorHostHandler do
         system: my-actor-system # mandatory. Name of the ActorSystem declared in ActorSystem CRD
         namespace: default # Optional. Default namespace is "default"
       spec:
+        autoscaler: # Optional
+          min: 1
+          max: 2
+          averageCpuUtilizationPercentage: 80
+          averageMemoryUtilizationValue: 250
+
         affinity: k8s_affinity_declaration_here # Optional
 
         replicas: 1 # Optional. If negative number than autoscaling is enable

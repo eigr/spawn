@@ -36,8 +36,14 @@ defmodule SpawnOperator.K8s.Deployment do
     host_params = Map.get(params, "host")
     sidecar_params = Map.get(params, "sidecar", %{})
 
-    # TODO: How to treat it? Autoscaling or user defined number of replicas?
     replicas = Map.get(params, "replicas", @default_actor_host_function_replicas)
+
+    replicas =
+      if replicas <= 1 do
+        1
+      else
+        replicas
+      end
 
     embedded = Map.get(host_params, "embedded", false)
 
