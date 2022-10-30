@@ -5,13 +5,13 @@ defmodule Statestores.Migrator do
   def migrate(adapter) do
     load_app()
 
-    adapter.migrate()
+    {:ok, _, _} = Ecto.Migrator.with_repo(adapter, &Ecto.Migrator.run(&1, :up, all: true))
   end
 
   @spec rollback(any, any) :: {:ok, any, any}
   def rollback(adapter, version) do
     load_app()
 
-    adapter.rollback_migration(version)
+    {:ok, _, _} = Ecto.Migrator.with_repo(adapter, &Ecto.Migrator.run(&1, :down, to: version))
   end
 end

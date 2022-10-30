@@ -41,12 +41,4 @@ defmodule Statestores.Adapters.MSSQL do
   end
 
   def default_port, do: "1433"
-
-  def migrate() do
-    {:ok, _, _} = Ecto.Migrator.with_repo(__MODULE__, &Ecto.Migrator.run(&1, :up, all: true))
-  end
-
-  def rollback_migration(version) do
-    {:ok, _, _} = Ecto.Migrator.with_repo(__MODULE__, &Ecto.Migrator.run(&1, :down, to: version))
-  end
 end
