@@ -8,7 +8,7 @@ defmodule Statestores.Config do
       %Env{
         bindings: [
           {:proxy_db_type, "PROXY_DATABASE_TYPE",
-           default: Statestores.Util.default_database_type(), required: false},
+           default: Statestores.Util.get_default_database_type(), required: false},
           {:proxy_db_name, "PROXY_DATABASE_NAME", default: "eigr-functions-db", required: false},
           {:proxy_db_username, "PROXY_DATABASE_USERNAME", default: "admin", required: false},
           {:proxy_db_secret, "PROXY_DATABASE_SECRET", default: "admin", required: false},

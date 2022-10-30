@@ -16,13 +16,15 @@ defmodule Statestores.Util do
 
       :error ->
         type =
-          String.to_existing_atom(System.get_env("PROXY_DATABASE_TYPE", default_database_type()))
+          String.to_existing_atom(
+            System.get_env("PROXY_DATABASE_TYPE", get_default_database_type())
+          )
 
         load_adapter_by_type(type)
     end
   end
 
-  def default_database_type do
+  def get_default_database_type do
     cond do
       Code.ensure_loaded?(Statestores.Adapters.MySQL) -> "mysql"
       Code.ensure_loaded?(Statestores.Adapters.CockroachDB) -> "cockroachdb"
