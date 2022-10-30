@@ -1,4 +1,4 @@
-defmodule StatestoresPostgres.MixProject do
+defmodule StatestoresCockroachDB.MixProject do
   use Mix.Project
 
   @app :spawn_statestores_cockroachdb

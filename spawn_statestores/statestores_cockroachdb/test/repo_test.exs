@@ -1,4 +1,4 @@
-defmodule StatestoresPostgresTest.RepoTest do
+defmodule StatestoresCockroachDBTest.RepoTest do
   use Statestores.DataCase
   alias Statestores.Schemas.Event
   import Statestores.Util, only: [load_adapter: 0]

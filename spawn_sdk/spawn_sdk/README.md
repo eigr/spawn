@@ -13,15 +13,19 @@ For a broader understanding of Spawn please consult its official [repository](ht
 ## Installation
 
 [Available in Hex](https://hex.pm/packages/spawn_sdk), the package can be installed
-by adding `spawn_sdk` and `spawn_statestores` to your list of dependencies in `mix.exs`:
+by adding `spawn_sdk` and `spawn_statestores_*` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
   [
     {:spawn_sdk, "~> 0.5.0"},
 
-    # You can remove this if you will ONLY USE non-persistent actors
-    {:spawn_statestores, "~> 0.5.0"}
+    # You can uncomment one of those dependencies if you are going to use Persistent Actors
+    #{:spawn_statestores_mysql, "~> 0.5.0"},
+    #{:spawn_statestores_postgres, "~> 0.5.0"},
+    #{:spawn_statestores_mssql, "~> 0.5.0"},
+    #{:spawn_statestores_cockroachdb, "~> 0.5.0"},
+    #{:spawn_statestores_sqlite, "~> 0.5.0"},
   ]
 end
 ```
@@ -77,12 +81,7 @@ defmodule SpawnSdkExample.Actors.MyActor do
          ) do
     Logger.info("Received Request: #{inspect(data)}. Context: #{inspect(ctx)}")
 
-    new_value =
-      if is_nil(state) do
-        0 + value
-      else
-        (state.value || 0) + value
-      end
+    new_value = if is_nil(state), do: value, else: (state.value || 0) + value
 
     %Value{}
     |> Value.of(%MyBusinessMessage{value: new_value}, %MyState{value: new_value})
@@ -111,12 +110,7 @@ defmodule SpawnSdkExample.Actors.AbstractActor do
          ) do
     Logger.info("Received Request: #{inspect(data)}. Context: #{inspect(ctx)}")
 
-    new_value =
-      if is_nil(state) do
-        0 + value
-      else
-        (state.value || 0) + value
-      end
+    new_value = if is_nil(state), do: value, else: (state.value || 0) + value
 
     %Value{}
     |> Value.of(%MyBusinessMessage{value: new_value}, %MyState{value: new_value})
@@ -149,12 +143,7 @@ defmodule SpawnSdkExample.Actors.AbstractActor do
   defact sum(%MyBusinessMessage{value: value} = data, %Context{state: state} = ctx) do
     Logger.info("Received Request: #{inspect(data)}. Context: #{inspect(ctx)}")
 
-    new_value =
-      if is_nil(state) do
-        0 + value
-      else
-        (state.value || 0) + value
-      end
+    new_value = if is_nil(state), do: value, else: (state.value || 0) + value
 
     result = %MyBusinessMessage{value: new_value}
     new_state = %MyState{value: new_value}
@@ -179,6 +168,83 @@ end
 In the example above we see that the Actor joe will receive a request as a side effect from the Actor who issued this effect.
 
 Side effects do not interfere with an actor's request-response flow. They will "always" be processed asynchronously and any response sent back from the Actor receiving the effect will be ignored by the effector.
+
+## Pipe and Forward
+
+Actors can also route some commands to other actors as part of their response. See an example:
+
+```elixir
+defmodule SpawnSdkExample.Actors.ForwardPipeActor do
+  use SpawnSdk.Actor,
+    name: "pipeforward",
+    abstract: false,
+    persistent: false,
+    state_type: Io.Eigr.Spawn.Example.MyState
+
+  require Logger
+
+  alias Io.Eigr.Spawn.Example.MyBusinessMessage
+
+  defact forward_example(%MyBusinessMessage{} = msg, _ctx) do
+    Logger.info("Received request with #{msg.value}")
+
+    Value.of()
+    |> Value.value(MyBusinessMessage.new(value: 999))
+    |> Value.forward(
+      Forward.to("second_actor", "sum_plus_one")
+    )
+    |> Value.void()
+  end
+
+  defact pipe_example(%MyBusinessMessage{} = msg, _ctx) do
+    Logger.info("Received request with #{msg.value}")
+
+    Value.of()
+    |> Value.value(MyBusinessMessage.new(value: 999))
+    |> Value.pipe(
+      Pipe.to("second_actor", "sum_plus_one")
+    )
+    |> Value.void()
+  end
+end
+
+defmodule SpawnSdkExample.Actors.SecondActorExample do
+  use SpawnSdk.Actor,
+    name: "second_actor",
+    abstract: false,
+    persistent: false,
+    state_type: Io.Eigr.Spawn.Example.MyState
+
+  require Logger
+
+  alias Io.Eigr.Spawn.Example.MyBusinessMessage
+
+  defact sum_plus_one(%MyBusinessMessage{} = msg, _ctx) do
+    Logger.info("Received request with #{msg.value}")
+
+    Value.of()
+    |> Value.value(MyBusinessMessage.new(value: msg.value + 1))
+    |> Value.void()
+  end
+end
+
+```
+
+We are returning void in both examples so we dont care about what is being stored in the actor state.
+
+In the case above, every time you call the `forward_example` the second_actor's `sum_plus_one` function will receive the value forwarded originally in the invocation as its input. The end result will be:
+
+```elixir
+iex> SpawnSdk.invoke("pipeforward", system: "spawn-system", command: "forward_example", payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1})
+{:ok, %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 2}}
+```
+
+For the Pipe example, the the second_actor's `sum_plus_one` function will always receive `%MyBusinessMessage{value: 999}` due to getting the value from the previous specification in the `pipe_example` command, the end result will be:
+
+```elixir
+iex> SpawnSdk.invoke("pipeforward", system: "spawn-system", command: "pipe_example", payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1})
+{:ok, %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1000}}
+```
 
 ## Broadcast
 
@@ -302,23 +368,14 @@ The full example of this application can be found [here](https://github.com/eigr
   To invoke Actors, use:
 
   ```elixir
-  iex> SpawnSdk.invoke(
-    "joe",
-    system: "spawn-system",
-    command: "sum",
-    payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1}
-  )
+  iex> SpawnSdk.invoke("joe", system: "spawn-system", command: "sum", payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1})
   {:ok, %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 12}}
   ```
 
   You can invoke actor default functions like "get" to get its current state
 
   ```elixir
-  SpawnSdk.invoke(
-    "joe",
-    system: "spawn-system",
-    command: "get"
-  )
+  SpawnSdk.invoke("joe", system: "spawn-system", command: "get")
   ```
 
   Spawning Actors:
@@ -331,25 +388,14 @@ The full example of this application can be found [here](https://github.com/eigr
   Invoke Spawned Actors:
 
   ```elixir
-  iex> SpawnSdk.invoke(
-    "robert",
-    system: "spawn-system",
-    command: "sum",
-    payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1}
-  )
+  iex> SpawnSdk.invoke("robert", system: "spawn-system", command: "sum", payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1})
   {:ok, %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 16}}
   ```
 
   Invoke Actors in a lazy way without having to spawn them before:
 
   ```elixir
-  iex> SpawnSdk.invoke(
-    "robert_lazy",
-    ref: SpawnSdkExample.Actors.AbstractActor,
-    system: "spawn-system",
-    command: "sum",
-    payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1}
-  )
+  iex> SpawnSdk.invoke("robert_lazy", ref: SpawnSdkExample.Actors.AbstractActor, system: "spawn-system", command: "sum", payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1})
   {:ok, %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1}}
   ```
 
