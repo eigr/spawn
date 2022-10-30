@@ -29,11 +29,11 @@ These are the main concepts:
 
 4. **Less Infrastructure More Domain Code**. This means that our platform will give the developer the tools to focus only on their business without worrying about issues such as:
 
-  * Resource allocation
-  * Definition of connections and Pools
-  * Service discovery
-  * Source/Sink of Events
-  * Other infrastructure issues
+   * Resource allocation
+   * Definition of connections and Pools
+   * Service discovery
+   * Source/Sink of Events
+   * Other infrastructure issues
 
 5. **The basic primitive is the Actor** (from the actors model) and not the Function (from the traditional serverless architectures).
 
