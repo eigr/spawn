@@ -1,7 +1,7 @@
 defmodule Statestores.Manager.StateManager do
-  import Statestores.Util, only: [load_repo: 0]
+  import Statestores.Util, only: [load_adapter: 0]
 
-  def load(key), do: load_repo().get_by_key(key)
+  def load(key), do: load_adapter().get_by_key(key)
 
-  def save(event), do: load_repo().save(event)
+  def save(event), do: load_adapter().save(event)
 end

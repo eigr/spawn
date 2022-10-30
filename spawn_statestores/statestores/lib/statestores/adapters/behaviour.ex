@@ -9,10 +9,12 @@ defmodule Statestores.Adapters.Behaviour do
 
   @callback save(event()) :: {:error, any} | {:ok, event()}
 
+  @callback default_port :: <<_::32>>
+
   defmacro __using__(_opts) do
     quote do
       alias Statestores.Adapters.Behaviour
-      import Statestores.Util, only: [get_default_database_port: 0, get_database_type: 0]
+      import Statestores.Util, only: [get_default_database_port: 0, get_default_database_type: 0]
 
       @behaviour Statestores.Adapters.Behaviour
 
@@ -31,8 +33,16 @@ defmodule Statestores.Adapters.Behaviour do
           )
 
         config =
-          case get_database_type() do
-            :cockroachdb ->
+          Keyword.put(config, :username, System.get_env("PROXY_DATABASE_USERNAME", "admin"))
+
+        config = Keyword.put(config, :password, System.get_env("PROXY_DATABASE_SECRET", "admin"))
+
+        config =
+          Keyword.put(config, :hostname, System.get_env("PROXY_DATABASE_HOST", "localhost"))
+
+        config =
+          case System.get_env("PROXY_DATABASE_TYPE", get_default_database_type()) do
+            "cockroachdb" ->
               Keyword.put(
                 config,
                 :migration_lock,
@@ -42,14 +52,6 @@ defmodule Statestores.Adapters.Behaviour do
             _ ->
               config
           end
-
-        config =
-          Keyword.put(config, :username, System.get_env("PROXY_DATABASE_USERNAME", "admin"))
-
-        config = Keyword.put(config, :password, System.get_env("PROXY_DATABASE_SECRET", "admin"))
-
-        config =
-          Keyword.put(config, :hostname, System.get_env("PROXY_DATABASE_HOST", "localhost"))
 
         config =
           Keyword.put(

@@ -1,9 +1,9 @@
-defmodule Statestores.Adapters.SQLite3 do
+defmodule Statestores.Adapters.CockroachDB do
   use Statestores.Adapters.Behaviour
 
   use Ecto.Repo,
     otp_app: :spawn_statestores,
-    adapter: Ecto.Adapters.SQLite3
+    adapter: Ecto.Adapters.Postgres
 
   alias Statestores.Schemas.{Event, ValueObjectSchema}
 
@@ -21,7 +21,8 @@ defmodule Statestores.Adapters.SQLite3 do
           data: data,
           updated_at: DateTime.utc_now()
         ]
-      ]
+      ],
+      conflict_target: :actor
     )
     |> case do
       {:ok, event} ->
@@ -34,4 +35,6 @@ defmodule Statestores.Adapters.SQLite3 do
         {:error, other}
     end
   end
+
+  def default_port, do: "26257"
 end

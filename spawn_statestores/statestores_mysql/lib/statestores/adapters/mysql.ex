@@ -34,4 +34,6 @@ defmodule Statestores.Adapters.MySQL do
         {:error, other}
     end
   end
+
+  def default_port, do: "3306"
 end

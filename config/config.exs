@@ -13,20 +13,7 @@ import Config
 #     tag: "AES.CTR.V1", key: Base.decode64!("o5IzV8xlunc0m0/8HNHzh+3MCBBvYZa0mv4CsZic5qI=")}
 #  ]
 
-config :spawn_statestores,
-  ecto_repos: [Statestores.Adapters.MySQL, Statestores.Adapters.Postgres]
-
-config :spawn_statestores, Statestores.Adapters.MySQL,
-  database: "statestores_my_sql",
-  username: "user",
-  password: "pass",
-  hostname: "localhost"
-
-config :spawn_statestores, Statestores.Adapters.Postgres,
-  database: "statestores_postgres",
-  username: "user",
-  password: "pass",
-  hostname: "localhost"
+System.put_env("SPAWN_STATESTORES_DEFAULT_REPO", "mysql")
 
 config :logger,
   backends: [:console],

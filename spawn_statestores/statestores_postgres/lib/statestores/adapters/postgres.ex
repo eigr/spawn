@@ -35,4 +35,6 @@ defmodule Statestores.Adapters.Postgres do
         {:error, other}
     end
   end
+
+  def default_port, do: "5432"
 end
