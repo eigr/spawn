@@ -12,6 +12,6 @@ defmodule Statestores.Migrator do
   def rollback(adapter, version) do
     load_app()
 
-    adapter.rollback(version)
+    adapter.rollback_migration(version)
   end
 end

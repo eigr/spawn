@@ -13,7 +13,7 @@ defmodule Statestores.Adapters.Behaviour do
 
   @callback migrate :: {:ok, any(), any()}
 
-  @callback rollback(term()) :: {:ok, any(), any()}
+  @callback rollback_migration(term()) :: {:ok, any(), any()}
 
   defmacro __using__(_opts) do
     quote do
