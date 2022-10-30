@@ -86,14 +86,18 @@ defmodule Spawn.MixProject do
         {:spawn_statestores_mssql, "~> 0.1", optional: true},
         {:spawn_statestores_mysql, "~> 0.1", optional: true},
         {:spawn_statestores_postgres, "~> 0.1", optional: true},
-        {:spawn_statestores_sqlite, "~> 0.1", optional: true},
+        {:spawn_statestores_sqlite, "~> 0.1", optional: true}
       ]
     else
       [
-        {:spawn_statestores_mssql, path: "./spawn_statestores/statestores_mssql", optional: Mix.env() != :test},
-        {:spawn_statestores_mysql, path: "./spawn_statestores/statestores_mysql", optional: Mix.env() != :test},
-        {:spawn_statestores_postgres, path: "./spawn_statestores/statestores_postgres", optional: Mix.env() != :test},
-        {:spawn_statestores_sqlite, path: "./spawn_statestores/statestores_sqlite", optional: Mix.env() != :test}
+        {:spawn_statestores_mssql,
+         path: "./spawn_statestores/statestores_mssql", optional: Mix.env() != :test},
+        {:spawn_statestores_mysql,
+         path: "./spawn_statestores/statestores_mysql", optional: Mix.env() != :test},
+        {:spawn_statestores_postgres,
+         path: "./spawn_statestores/statestores_postgres", optional: Mix.env() != :test},
+        {:spawn_statestores_sqlite,
+         path: "./spawn_statestores/statestores_sqlite", optional: Mix.env() != :test}
       ]
     end
   end

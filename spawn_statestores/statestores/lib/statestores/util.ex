@@ -11,17 +11,21 @@ defmodule Statestores.Util do
   @spec load_adapter :: adapter()
   def load_adapter() do
     case Application.fetch_env(@otp_app, :database_adapter) do
-      {:ok, value} -> value
+      {:ok, value} ->
+        value
+
       :error ->
-        type = String.to_existing_atom(System.get_env("PROXY_DATABASE_TYPE", default_database_type()))
+        type =
+          String.to_existing_atom(System.get_env("PROXY_DATABASE_TYPE", default_database_type()))
 
         load_adapter_by_type(type)
     end
   end
 
-  defp default_database_type do
+  def default_database_type do
     cond do
       Code.ensure_loaded?(Statestores.Adapters.MySQL) -> "mysql"
+      Code.ensure_loaded?(Statestores.Adapters.CockroachDB) -> "cockroachdb"
       Code.ensure_loaded?(Statestores.Adapters.Postgres) -> "postgres"
       Code.ensure_loaded?(Statestores.Adapters.SQLite3) -> "sqlite"
       Code.ensure_loaded?(Statestores.Adapters.MSSQL) -> "mssql"
@@ -30,6 +34,8 @@ defmodule Statestores.Util do
   end
 
   defp load_adapter_by_type(:mysql), do: Statestores.Adapters.MySQL
+
+  defp load_adapter_by_type(:cockroachdb), do: Statestores.Adapters.CockroachDB
 
   defp load_adapter_by_type(:postgres), do: Statestores.Adapters.Postgres
 

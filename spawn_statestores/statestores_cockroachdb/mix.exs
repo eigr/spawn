@@ -1,15 +1,15 @@
-defmodule StatestoresMysql.MixProject do
+defmodule StatestoresPostgres.MixProject do
   use Mix.Project
 
-  @app :spawn_statestores_mysql
+  @app :spawn_statestores_cockroachdb
   @version "0.1.0"
-  @source_url "https://github.com/eigr/spawn/blob/main/spawn_statestores/statestores_mysql"
+  @source_url "https://github.com/eigr/spawn/blob/main/spawn_statestores/statestores_cockroachdb"
 
   def project do
     [
       app: @app,
       version: @version,
-      description: "Spawn Statestores Mysql is a storage lib for the Spawn Actors System",
+      description: "Spawn Statestores CockroachDB is a storage lib for the Spawn Actors System",
       source_url: @source_url,
       homepage_url: "https://eigr.io/",
       build_path: "../../_build",
@@ -59,7 +59,7 @@ defmodule StatestoresMysql.MixProject do
       {:cloak_ecto, "~> 1.2"},
       {:ecto_sql, "~> 3.8"},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
-      {:myxql, "~> 0.6"}
+      {:postgrex, "~> 0.16"}
     ] ++ deps_for_release()
   end
 

@@ -59,9 +59,17 @@ defmodule StatestoresMssql.MixProject do
       {:cloak_ecto, "~> 1.2"},
       {:ecto_sql, "~> 3.8"},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
-      {:spawn_statestores, path: "../statestores"},
-      {:tds, "~> 2.3"},
-    ]
+      {:tds, "~> 2.3"}
+    ] ++ deps_for_release()
+  end
+
+  @is_release System.get_env("RELEASE")
+  defp deps_for_release do
+    if @is_release do
+      [{:spawn_statestores, "~> 0.1.0"}]
+    else
+      [{:spawn_statestores, path: "../statestores"}]
+    end
   end
 
   defp elixirc_paths(:test), do: ["lib", "test/support"]

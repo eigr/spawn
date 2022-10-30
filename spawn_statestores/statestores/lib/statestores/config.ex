@@ -7,13 +7,16 @@ defmodule Statestores.Config do
       %Dotenv{},
       %Env{
         bindings: [
-          {:proxy_db_type, "PROXY_DATABASE_TYPE", default: "postgres", required: false},
+          {:proxy_db_type, "PROXY_DATABASE_TYPE",
+           default: Statestores.Util.default_database_type(), required: false},
           {:proxy_db_name, "PROXY_DATABASE_NAME", default: "eigr-functions-db", required: false},
           {:proxy_db_username, "PROXY_DATABASE_USERNAME", default: "admin", required: false},
           {:proxy_db_secret, "PROXY_DATABASE_SECRET", default: "admin", required: false},
           {:proxy_db_host, "PROXY_DATABASE_HOST", default: "localhost", required: false},
           {:proxy_db_port, "PROXY_DATABASE_PORT",
-           default: 5432, map: &String.to_integer/1, required: false}
+           default: Statestores.Util.get_default_database_port(),
+           map: &String.to_integer/1,
+           required: false}
         ]
       }
     ]
