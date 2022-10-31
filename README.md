@@ -138,7 +138,7 @@ A good way to generate this key is using the openssl library present on most Lin
 openssl rand -base64 32
 ```
 
-> **_NOTE:_** To learn more about Statestores settings, see the [statestore section](#statestore).
+> **_NOTE:_** To learn more about Statestores settings, see the [statestore section](#statestores).
 
 Now in a directory of your choice, create a file called ***system.yaml*** with the following content:
 
@@ -214,30 +214,6 @@ abstract all the protocol specifics and expose an easy and intuitive API to deve
 |[Python SDK](https://github.com/eigr-labs/spawn-python-sdk)  	        | Python    |
 |[Rust SDK](https://github.com/eigr-labs/spawn-rust-sdk)  	            | Rust	    |
 
-## Custom Resources
-
-Spawn defines some custom Resources for the user to interact with the API for deploying Spawn artifacts in Kubernetes. We'll talk more about these CRDs in the Getting Started section but for now we'll list each of these resources below for a general understanding of the concepts:
-
-* **ActorSystem CRD:** The user must define the ActorSystem CRD before it attempts to
-deploy any other Spawn features. In it, the user defines some general parameters for the
-functioning of the actor cluster and the parameters of the persistent storage connection for a
-given system. Multiple ActorSystems can be defined but remember that they must be
-referenced equally in the Actor Host Functions. Examples of this CRD can be found in the
-[examples/k8s folder](examples/k8s/system.yaml).
-
-* **ActorHost CRD:** A ActorHost is a cluster member application. An ActorHost, by
-definition, is a Kubernetes Deployment and will contain two containers, one containing the
-Actor Host Function user application and another container for the Spawn proxy, which is
-responsible for connecting to the proxies cluster via Distributed Erlang and also for providing
-all the necessary abstractions for the functioning of the system such as state management,
-activation, and passivation of actors, among other infrastructure tasks. Examples of this CRD
-can be found in the [examples/k8s folder](examples/k8s/host.yaml).
-
-* **Activator CRD:** Activator CRD defines any means of inputting supported events such as
-queues, topics, HTTP, or grpc endpoints and maps these events to the appropriate actor to
-handle them. Examples of this CRD can be found in the [examples/k8s
-folder](examples/k8s/activators/amqp.yaml).
-
 
 ## Main Concepts
 
@@ -301,7 +277,31 @@ https://www.youtube.com/watch?v=j7JKkbAiWuI
 
 https://medium.com/nerd-for-tech/microservice-design-pattern-sidecar-sidekick-pattern-dbcea9bed783
 
-## Statestore
+### Custom Resources
+
+Spawn defines some custom Resources for the user to interact with the API for deploying Spawn artifacts in Kubernetes. We'll talk more about these CRDs in the Getting Started section but for now we'll list each of these resources below for a general understanding of the concepts:
+
+* **ActorSystem CRD:** The user must define the ActorSystem CRD before it attempts to
+deploy any other Spawn features. In it, the user defines some general parameters for the
+functioning of the actor cluster and the parameters of the persistent storage connection for a
+given system. Multiple ActorSystems can be defined but remember that they must be
+referenced equally in the Actor Host Functions. Examples of this CRD can be found in the
+[examples/k8s folder](examples/k8s/system.yaml).
+
+* **ActorHost CRD:** A ActorHost is a cluster member application. An ActorHost, by
+definition, is a Kubernetes Deployment and will contain two containers, one containing the
+Actor Host Function user application and another container for the Spawn proxy, which is
+responsible for connecting to the proxies cluster via Distributed Erlang and also for providing
+all the necessary abstractions for the functioning of the system such as state management,
+activation, and passivation of actors, among other infrastructure tasks. Examples of this CRD
+can be found in the [examples/k8s folder](examples/k8s/host.yaml).
+
+* **Activator CRD:** Activator CRD defines any means of inputting supported events such as
+queues, topics, HTTP, or grpc endpoints and maps these events to the appropriate actor to
+handle them. Examples of this CRD can be found in the [examples/k8s
+folder](examples/k8s/activators/amqp.yaml).
+
+## Statestores
 
 TODO
 
