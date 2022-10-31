@@ -4,11 +4,10 @@
 
 Spawn Elixir SDK is the support library for the Spawn Actors System.
 
-Spawn is based on the sidecar proxy pattern to provide the multi-language Actor Model framework.
-Spawn's technology stack on top of BEAM VM (Erlang's virtual machine) provides support for different languages from its 
-native Actor model.
-
+Spawn is a Stateful Serverless Platform for provide the multi-language Actor Model.
 For a broader understanding of Spawn please consult its official [repository](https://github.com/eigr/spawn).
+
+The advantage of the Elixir SDK over other SDKs is in Elixir's native ability to connect directly to an Erlang network. For this reason the Elixir SDK allows any valid Elixir application to be part of a Spawn network without the need for a sidecar attached.
 
 ## Installation
 

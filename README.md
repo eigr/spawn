@@ -9,8 +9,7 @@
 ## Overview
 
 Spawn is based on the sidecar proxy pattern to provide a polyglot Actor Model framework and platform.
-Spawn's technology stack, built on the BEAM VM (Erlang's virtual machine), provides support
-for different languages from its native Actor model.
+Spawn's technology stack, built on the [BEAM VM](https://www.erlang.org/blog/a-brief-beam-primer/) (Erlang's virtual machine) and [OTP](https://www.erlang.org/doc/design_principles/des_princ.html), provides support for different languages from its native Actor model.
 
 Spawn is made up of the following components:
 
