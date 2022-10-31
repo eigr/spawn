@@ -32,7 +32,7 @@ These are the main concepts:
    * Source/Sink of Events
    * Other infrastructure issues
 
-5. **The basic primitive is the Actor** (from the actors model) and not the Function (from the traditional serverless architectures).
+5. **The basic primitive is the Actor** (from the actors model) and ***not*** the Function (from the traditional serverless architectures).
 
 6. Horizontal scalability with automatic **Activation** and **Deactivation** of Actors on demand. 
 
