@@ -32,7 +32,7 @@ defmodule Operator.MixProject do
     [
       {:bandit, "~> 0.5"},
       {:bakeware, ">= 0.0.0", runtime: false},
-      {:bonny, "~> 1.0.0-rc.0"},
+      {:bonny, "~> 1.0.0-rc.1"},
       {:spawn, path: "../../"}
     ]
   end
