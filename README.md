@@ -119,7 +119,7 @@ First we must develop our HostFunction. Look for the documentation for each SDK 
 More complete guides or examples can be found on the official page or in the repositories of each SDK available.
 
 Having our container created and containing our Actor Host Function (following above SDK recommendations), we must deploy
-it in a Kubernetes cluster with the Eigr Functions Controller installed (See more about this
+it in a Kubernetes cluster with the Spawn Controller installed (See more about this
 process in the section on installation).
 
 In this tutorial we are going to use a MySql database. In this case, in order for Spawn to know how to connect to the database instance, it is first necessary to create a kubernetes secret with the connection data and other parameters. Example:
