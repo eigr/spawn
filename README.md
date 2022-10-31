@@ -109,7 +109,7 @@ Our proxy connects directly and transparently to all cluster members without nee
 
 ## Getting Started
 
-First we must develop our HostFunction. Look for the documentation for each SDK to know how to proceed but below are some examples:
+First we must develop our HostFunction. Look for the documentation for [each SDK](#sdks) to know how to proceed but below are some examples:
 
 - [Using Elixir SDK](./spawn_sdk/spawn_sdk#installation)
 - [Using Java SDK](https://github.com/eigr/spawn-springboot-sdk/blob/main/README.md#installation)
