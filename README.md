@@ -112,6 +112,8 @@ Our proxy connects directly and transparently to all cluster members without nee
 
 ## Getting Started
 
+First we must develop our HostFunction. Look for the documentation for each SDK to know how to proceed but below are some examples:
+
 - [Using Elixir SDK](./spawn_sdk/spawn_sdk#installation)
 - [Using Java SDK](https://github.com/eigr/spawn-springboot-sdk/blob/main/README.md#installation)
 
@@ -121,18 +123,43 @@ Having our container created and containing our Actor Host Function (following a
 it in a Kubernetes cluster with the Eigr Functions Controller installed (See more about this
 process in the section on installation).
 
-In a directory of your choice, create a file called ***system.yaml*** with the following content:
+In this tutorial we are going to use a MySql database. In this case, in order for Spawn to know how to connect to the database instance, it is first necessary to create a kubernetes secret with the connection data and other parameters. Example:
+
+```shell
+kubectl create secret generic mysql-connection-secret \
+  --from-literal=database=eigr-functions-db \
+  --from-literal=host='mysql' \
+  --from-literal=port='3306' \
+  --from-literal=username='admin' \
+  --from-literal=password='admin' \
+  --from-literal=encryptionKey='3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE='
+```
+
+Sapwn securely encrypts the Actors' State, so the ***encryptionKey*** item must be informed and must be a key of reasonable size and complexity to ensure the security of your data.
+
+A good way to generate this key is using the openssl library present on most Linux systems:
+
+```shell
+openssl rand -base64 32
+```
+
+> **_NOTE:_** To learn more about Statestores settings, see the [statestore section](#statestore).
+
+Now in a directory of your choice, create a file called ***system.yaml*** with the following content:
 
 ```yaml
 ---
-apiVersion: spawn.eigr.io/v1
+apiVersion: spawn-eigr.io/v1
 kind: ActorSystem
 metadata:
-  name: spawn-system
-  namespace: default
+  name: spawn-system # Mandatory. Name of the ActorSystem
+  namespace: default # Optional. Default namespace is "default"
 spec:
-  storage:
-    type: InMemory
+  statestore:
+    type: MySql # Valid are [MySql, Postgres, Sqlite, MSSQL, CockroachDB]
+    credentialsSecretRef: mysql-connection-secret # The secret containing connection params created in the previous step.
+    pool: # Optional
+      size: "10"
 ```
 
 This file will be responsible for creating a system of actors in the cluster.
@@ -141,15 +168,17 @@ Now create a new file called ***node.yaml*** with the following content:
 
 ```yaml
 ---
-apiVersion: spawn.eigr.io/v1
+apiVersion: spawn-eigr.io/v1
 kind: ActorHost
 metadata:
-  name: my-first-app
-  system: spawn-system
-  namespace: default
+  name: spawn-springboot-example # Mandatory. Name of the Node containing Actor Host Functions
+  system: spawn-system # mandatory. Name of the ActorSystem declared in ActorSystem CRD
+  namespace: default # Optional. Default namespace is "default"
 spec:
-  function:
-    image: my-dockerhub-repo/spawn-springboot-examples:latest
+  host:
+    image: eigr/spawn-springboot-examples:latest # Mandatory
+    ports:
+      - containerPort: 8091
 ```
 
 This file will be responsible for deploying your host function and actors in the cluster.
@@ -165,6 +194,15 @@ After that, just check your actors with:
 ```shell
 kubectl get actornodes
 ```
+
+### Examples
+
+You can find some examples of using Spawn in the links below:
+
+* **Hatch**: https://github.com/zblanco/hatch
+* **Federated Data Example**: https://github.com/eigr-labs/spawn-federated-data-example
+* **Fleet**: https://github.com/sleipnir/fleet-spawn-example
+* **Spawn Polyglot Example**: https://github.com/sleipnir/spawn-polyglot-ping-pong
 
 ## SDKs
 
@@ -268,6 +306,9 @@ https://www.youtube.com/watch?v=j7JKkbAiWuI
 
 https://medium.com/nerd-for-tech/microservice-design-pattern-sidecar-sidekick-pattern-dbcea9bed783
 
+## Statestore
+
+TODO
 
 ## Local Development
 
