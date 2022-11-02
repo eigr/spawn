@@ -5,6 +5,14 @@ defmodule SpawnOperator.K8s.Deployment do
 
   @default_actor_host_function_env [
     %{
+      "name" => "NAMESPACE",
+      "valueFrom" => %{"fieldRef" => %{"fieldPath" => "metadata.namespace"}}
+    },
+    %{
+      "name" => "POD_IP",
+      "valueFrom" => %{"fieldRef" => %{"fieldPath" => "status.podIP"}}
+    },
+    %{
       "name" => "SPAWN_PROXY_PORT",
       "value" => "9001"
     },
@@ -15,7 +23,7 @@ defmodule SpawnOperator.K8s.Deployment do
   ]
 
   @default_actor_host_function_ports [
-    %{"containerPort" => 3000}
+    %{"containerPort" => 4369}
   ]
 
   @default_actor_host_function_replicas 1
@@ -92,7 +100,8 @@ defmodule SpawnOperator.K8s.Deployment do
 
     actor_host_function_envs = Map.get(host_params, "env", []) ++ @default_actor_host_function_env
 
-    actor_host_function_ports = Map.get(host_params, "ports", @default_actor_host_function_ports)
+    actor_host_function_ports = Map.get(host_params, "ports", [])
+    actor_host_function_ports = actor_host_function_ports ++ @default_actor_host_function_ports
 
     actor_host_function_resources =
       Map.get(host_params, "resources", @default_actor_host_function_resources)
@@ -109,11 +118,6 @@ defmodule SpawnOperator.K8s.Deployment do
   end
 
   defp get_containers(false, system, name, host_params, _sidecar_params) do
-    actor_host_function_image = Map.get(host_params, "image")
-
-    actor_host_function_envs = Map.get(host_params, "env", []) ++ @default_actor_host_function_env
-
-    actor_host_function_ports = Map.get(host_params, "ports", @default_actor_host_function_ports)
 
     actor_host_function_resources =
       Map.get(host_params, "resources", @default_actor_host_function_resources)
@@ -122,12 +126,7 @@ defmodule SpawnOperator.K8s.Deployment do
       %{
         "name" => "spawn-sidecar",
         "image" => "#{resolve_proxy_image()}",
-        "env" => [
-          %{
-            "name" => "PROXY_POD_IP",
-            "valueFrom" => %{"fieldRef" => %{"fieldPath" => "status.podIP"}}
-          }
-        ],
+        "env" => @default_actor_host_function_env,
         "ports" => [
           %{"containerPort" => 9000},
           %{"containerPort" => 9001},

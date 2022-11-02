@@ -18,8 +18,26 @@ RUN mix local.rebar --force \
     && mix deps.get \
     && mix release.init
 
-RUN echo "-name proxy@${HOSTNAME}" >> ./rel/vm.args.eex \
-    && echo "-setcookie ${NODE_COOKIE}" >> ./rel/vm.args.eex
+
+ENV RELEASE_DISTRIBUTION="name"
+
+# Overriden at runtime
+ENV POD_IP="127.0.0.1"
+
+# This will be the basename of node
+ENV RELEASE_NAME="proxy"
+
+# This will be the full nodename
+ENV RELEASE_NODE="${RELEASE_NAME}@${POD_IP}"
+
+RUN echo "-setcookie ${NODE_COOKIE}" >> ./rel/vm.args.eex
+
+#RUN echo "-name proxy@${POD_IP}" >> ./rel/vm.args.eex \
+#    && echo "-setcookie ${NODE_COOKIE}" >> ./rel/vm.args.eex
+
+#RUN echo "export POD_A_RECORD=$(echo $POD_IP | sed 's/\./-/g')" >> ./rel/env.sh.eex \
+#    && echo "export RELEASE_DISTRIBUTION=name" >> ./rel/env.sh.eex \
+#    && echo "export RELEASE_NODE=<%= @release.name %>@${POD_A_RECORD}.${NAMESPACE}.pod.cluster.local" >> ./rel/env.sh.eex 
 
 RUN cd spawn_proxy/proxy \
     && mix deps.get \

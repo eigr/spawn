@@ -4,7 +4,7 @@ defmodule SpawnOperator.K8s.HeadlessService do
   @behaviour SpawnOperator.K8s.Manifest
 
   @impl true
-  def(manifest(system, ns, name, params),
+  def manifest(system, ns, name, params),
     do: %{
       "apiVersion" => "v1",
       "kind" => "Service",
@@ -25,5 +25,5 @@ defmodule SpawnOperator.K8s.HeadlessService do
         ]
       }
     }
-  )
+
 end
