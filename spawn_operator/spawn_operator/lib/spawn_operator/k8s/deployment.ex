@@ -18,7 +18,7 @@ defmodule SpawnOperator.K8s.Deployment do
     },
     %{
       "name" => "SPAWN_PROXY_INTERFACE",
-      "value" => "127.0.0.1"
+      "value" => "0.0.0.0"
     }
   ]
 
