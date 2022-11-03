@@ -1,8 +1,10 @@
 defmodule Statestores.MixProject do
   use Mix.Project
 
+  Code.require_file("internal_versions.exs", "../../priv/")
+
   @app :spawn_statestores
-  @version "0.5.0"
+  @version InternalVersions.get(@app)
   @source_url "https://github.com/eigr/spawn/blob/main/spawn_statestores/statestores"
 
   def project do
@@ -16,7 +18,7 @@ defmodule Statestores.MixProject do
       config_path: "../../config/config.exs",
       deps_path: "../../deps",
       lockfile: "../../mix.lock",
-      elixir: "~> 1.14",
+      elixir: InternalVersions.elixir_version(),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       elixirc_paths: elixirc_paths(Mix.env()),
@@ -34,7 +36,7 @@ defmodule Statestores.MixProject do
 
   defp package do
     [
-      files: ["lib", "mix.exs", "README.md", "LICENSE"],
+      files: ["lib", "mix.exs", "priv", "README.md", "LICENSE"],
       licenses: ["Apache-2.0"],
       links: %{GitHub: @source_url}
     ]

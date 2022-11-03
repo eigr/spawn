@@ -1,8 +1,10 @@
 defmodule Spawn.MixProject do
   use Mix.Project
 
+  Code.require_file("internal_versions.exs", "./priv/")
+
   @app :spawn
-  @version "0.1.0"
+  @version InternalVersions.get(@app)
   @site "https://eigr.io/"
   @source_url "https://github.com/eigr/spawn"
 
@@ -17,12 +19,13 @@ defmodule Spawn.MixProject do
       config_path: "config/config.exs",
       deps_path: "deps",
       lockfile: "mix.lock",
-      elixir: "~> 1.14",
+      elixir: InternalVersions.elixir_version(),
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       package: package(),
-      docs: docs()
+      docs: docs(),
+      aliases: [release_all: &InternalVersions.release_all/1]
     ]
   end
 
@@ -75,34 +78,32 @@ defmodule Spawn.MixProject do
       {:mimic, "~> 1.7", only: :test},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:pluggable, "~> 1.0.1", only: :dev, runtime: false}
-    ] ++ deps_for_release()
-  end
-
-  @is_release System.get_env("RELEASE")
-
-  defp deps_for_release do
-    if @is_release do
-      [
-        {:spawn_statestores_mssql, "~> 0.1", optional: true},
-        {:spawn_statestores_mysql, "~> 0.1", optional: true},
-        {:spawn_statestores_postgres, "~> 0.1", optional: true},
-        {:spawn_statestores_sqlite, "~> 0.1", optional: true},
-        {:spawn_statestores_cockroachdb, "~> 0.1", optional: true},
-      ]
-    else
-      [
-        {:spawn_statestores_mssql,
-         path: "./spawn_statestores/statestores_mssql", optional: false},
-        {:spawn_statestores_mysql,
-         path: "./spawn_statestores/statestores_mysql", optional: false},
-        {:spawn_statestores_postgres,
-         path: "./spawn_statestores/statestores_postgres", optional: false},
-        {:spawn_statestores_sqlite,
-         path: "./spawn_statestores/statestores_sqlite", optional: false},
-        {:spawn_statestores_cockroachdb,
-         path: "./spawn_statestores/statestores_cockroachdb", optional: false}
-      ]
-    end
+    ] ++
+      InternalVersions.internal_dep(
+        :spawn_statestores_mssql,
+        [path: "./spawn_statestores/statestores_mssql", optional: false],
+        optional: true
+      ) ++
+      InternalVersions.internal_dep(
+        :spawn_statestores_mysql,
+        [path: "./spawn_statestores/statestores_mysql", optional: false],
+        optional: true
+      ) ++
+      InternalVersions.internal_dep(
+        :spawn_statestores_postgres,
+        [path: "./spawn_statestores/statestores_postgres", optional: false],
+        optional: true
+      ) ++
+      InternalVersions.internal_dep(
+        :spawn_statestores_sqlite,
+        [path: "./spawn_statestores/statestores_sqlite", optional: false],
+        optional: true
+      ) ++
+      InternalVersions.internal_dep(
+        :spawn_statestores_cockroachdb,
+        [path: "./spawn_statestores/statestores_cockroachdb", optional: false],
+        optional: true
+      )
   end
 
   defp elixirc_paths(:test),

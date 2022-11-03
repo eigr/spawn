@@ -1,8 +1,10 @@
 defmodule StatestoresCockroachDB.MixProject do
   use Mix.Project
 
+  Code.require_file("internal_versions.exs", "../../priv/")
+
   @app :spawn_statestores_cockroachdb
-  @version "0.1.0"
+  @version InternalVersions.get(@app)
   @source_url "https://github.com/eigr/spawn/blob/main/spawn_statestores/statestores_cockroachdb"
 
   def project do
@@ -16,7 +18,7 @@ defmodule StatestoresCockroachDB.MixProject do
       config_path: "../../config/config.exs",
       deps_path: "../../deps",
       lockfile: "../../mix.lock",
-      elixir: "~> 1.14",
+      elixir: InternalVersions.elixir_version(),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       elixirc_paths: elixirc_paths(Mix.env()),
@@ -34,7 +36,7 @@ defmodule StatestoresCockroachDB.MixProject do
 
   defp package do
     [
-      files: ["lib", "mix.exs", "priv", "README.md", "LICENSE"],
+      files: ["lib", "mix.exs", "README.md", "LICENSE"],
       licenses: ["Apache-2.0"],
       links: %{GitHub: @source_url}
     ]
@@ -60,16 +62,8 @@ defmodule StatestoresCockroachDB.MixProject do
       {:ecto_sql, "~> 3.8"},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:postgrex, "~> 0.16"}
-    ] ++ deps_for_release()
-  end
-
-  @is_release System.get_env("RELEASE")
-  defp deps_for_release do
-    if @is_release do
-      [{:spawn_statestores, "~> 0.1.0"}]
-    else
-      [{:spawn_statestores, path: "../statestores"}]
-    end
+    ] ++
+      InternalVersions.internal_dep(:spawn_statestores, path: "../statestores")
   end
 
   defp elixirc_paths(:test), do: ["lib", "test/support"]

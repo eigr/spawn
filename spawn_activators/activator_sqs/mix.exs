@@ -1,8 +1,10 @@
 defmodule ActivatorSQS.MixProject do
   use Mix.Project
 
+  Code.require_file("internal_versions.exs", "../../priv/")
+
   @app :activator_sqs
-  @version "0.5.0"
+  @version InternalVersions.get(@app)
 
   def project do
     [
@@ -12,7 +14,7 @@ defmodule ActivatorSQS.MixProject do
       config_path: "../../config/config.exs",
       deps_path: "../../deps",
       lockfile: "../../mix.lock",
-      elixir: "~> 1.14",
+      elixir: InternalVersions.elixir_version(),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       releases: releases()

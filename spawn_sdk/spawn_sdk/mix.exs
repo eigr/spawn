@@ -1,8 +1,10 @@
 defmodule SpawnSdk.MixProject do
   use Mix.Project
 
+  Code.require_file("internal_versions.exs", "../../priv/")
+
   @app :spawn_sdk
-  @version "0.5.0"
+  @version InternalVersions.get(@app)
   @source_url "https://github.com/eigr/spawn/tree/main/spawn_sdk/spawn_sdk"
 
   def project do
@@ -16,7 +18,7 @@ defmodule SpawnSdk.MixProject do
       config_path: "../../config/config.exs",
       deps_path: "../../deps",
       lockfile: "../../mix.lock",
-      elixir: "~> 1.14",
+      elixir: InternalVersions.elixir_version(),
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
@@ -59,21 +61,8 @@ defmodule SpawnSdk.MixProject do
     [
       {:faker, "~> 0.17", only: :test},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false}
-    ] ++ deps_for_release()
-  end
-
-  @is_release System.get_env("RELEASE")
-
-  defp deps_for_release do
-    if @is_release do
-      [
-        {:spawn, "~> 0.1"}
-      ]
-    else
-      [
-        {:spawn, path: "../../"}
-      ]
-    end
+    ] ++
+      InternalVersions.internal_dep(:spawn, path: "../../")
   end
 
   defp elixirc_paths(:test), do: ["lib", "test/support"]
