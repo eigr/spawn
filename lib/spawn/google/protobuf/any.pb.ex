@@ -1,53 +1,53 @@
 defmodule Google.Protobuf.Any do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
     %Google.Protobuf.DescriptorProto{
-      name: "Any",
+      __unknown_fields__: [],
+      enum_type: [],
+      extension: [],
+      extension_range: [],
       field: [
         %Google.Protobuf.FieldDescriptorProto{
-          name: "type_url",
-          extendee: nil,
-          number: 1,
-          label: :LABEL_OPTIONAL,
-          type: :TYPE_STRING,
-          type_name: nil,
+          __unknown_fields__: [],
           default_value: nil,
-          options: nil,
-          oneof_index: nil,
+          extendee: nil,
           json_name: "typeUrl",
+          label: :LABEL_OPTIONAL,
+          name: "type_url",
+          number: 1,
+          oneof_index: nil,
+          options: nil,
           proto3_optional: nil,
-          __unknown_fields__: []
+          type: :TYPE_STRING,
+          type_name: nil
         },
         %Google.Protobuf.FieldDescriptorProto{
-          name: "value",
-          extendee: nil,
-          number: 2,
-          label: :LABEL_OPTIONAL,
-          type: :TYPE_BYTES,
-          type_name: nil,
+          __unknown_fields__: [],
           default_value: nil,
-          options: nil,
-          oneof_index: nil,
+          extendee: nil,
           json_name: "value",
+          label: :LABEL_OPTIONAL,
+          name: "value",
+          number: 2,
+          oneof_index: nil,
+          options: nil,
           proto3_optional: nil,
-          __unknown_fields__: []
+          type: :TYPE_BYTES,
+          type_name: nil
         }
       ],
+      name: "Any",
       nested_type: [],
-      enum_type: [],
-      extension_range: [],
-      extension: [],
-      options: nil,
       oneof_decl: [],
-      reserved_range: [],
+      options: nil,
       reserved_name: [],
-      __unknown_fields__: []
+      reserved_range: []
     }
   end
 
-  field(:type_url, 1, type: :string, json_name: "typeUrl")
-  field(:value, 2, type: :bytes)
+  field :type_url, 1, type: :string, json_name: "typeUrl"
+  field :value, 2, type: :bytes
 end
