@@ -59,9 +59,9 @@ defmodule StatestoresMssql.MixProject do
       {:cloak_ecto, "~> 1.2"},
       {:ecto_sql, "~> 3.8"},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
-      {:tds, "~> 2.3"}
-    ] ++
-      InternalVersions.internal_dep(:spawn_statestores, path: "../statestores")
+      {:tds, "~> 2.3"},
+      {:spawn_statestores, path: "../statestores"}
+    ]
   end
 
   defp elixirc_paths(:test), do: ["lib", "test/support"]

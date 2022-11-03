@@ -59,9 +59,9 @@ defmodule StatestoresSqlite.MixProject do
       {:cloak_ecto, "~> 1.2"},
       {:ecto_sql, "~> 3.8"},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
-      {:ecto_sqlite3, "~> 0.8.2"}
-    ] ++
-      InternalVersions.internal_dep(:spawn_statestores, path: "../statestores")
+      {:ecto_sqlite3, "~> 0.8.2"},
+      {:spawn_statestores, path: "../statestores"}
+    ]
   end
 
   defp elixirc_paths(:test), do: ["lib", "test/support"]

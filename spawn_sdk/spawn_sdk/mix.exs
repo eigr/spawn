@@ -58,9 +58,9 @@ defmodule SpawnSdk.MixProject do
   defp deps do
     [
       {:faker, "~> 0.17", only: :test},
-      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false}
-    ] ++
-      InternalVersions.internal_dep(:spawn, path: "../../")
+      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
+      {:spawn, path: "../.."}
+    ]
   end
 
   defp elixirc_paths(:test), do: ["lib", "test/support"]
