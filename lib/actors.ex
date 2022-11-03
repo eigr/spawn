@@ -99,7 +99,7 @@ defmodule Actors do
         %InvocationRequest{} = request,
         opts \\ []
       ) do
-    invoke_with_span(request)
+    invoke_with_span(request, opts)
   end
 
   defp invoke_with_span(
