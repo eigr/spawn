@@ -23,7 +23,9 @@ defmodule SpawnOperator.K8s.Deployment do
   ]
 
   @default_actor_host_function_ports [
-    %{"containerPort" => 4369}
+    %{"containerPort" => 9000, "name" => "proxy-http"},
+    %{"containerPort" => 9001, "name" => "proxy-https"},
+    %{"containerPort" => 4369, "name" => "epmd"}
   ]
 
   @default_actor_host_function_replicas 1
@@ -117,7 +119,13 @@ defmodule SpawnOperator.K8s.Deployment do
     ]
   end
 
-  defp get_containers(false, system, name, host_params, _sidecar_params) do
+  defp get_containers(false, system, name, host_params, sidecar_params) do
+    actor_host_function_image = Map.get(host_params, "image")
+
+    actor_host_function_envs = Map.get(host_params, "env", []) ++ @default_actor_host_function_env
+
+    actor_host_function_ports = Map.get(host_params, "ports", [])
+    actor_host_function_ports = actor_host_function_ports ++ @default_actor_host_function_ports
 
     actor_host_function_resources =
       Map.get(host_params, "resources", @default_actor_host_function_resources)
@@ -125,12 +133,12 @@ defmodule SpawnOperator.K8s.Deployment do
     [
       %{
         "name" => "spawn-sidecar",
-        "image" => "#{resolve_proxy_image()}",
+        "image" => "#{resolve_proxy_image(sidecar_params)}",
         "env" => @default_actor_host_function_env,
         "ports" => [
-          %{"containerPort" => 9000},
-          %{"containerPort" => 9001},
-          %{"containerPort" => 4369}
+          %{"containerPort" => 9000, "name" => "http"},
+          %{"containerPort" => 9001, "name" => "https"},
+          %{"containerPort" => 4369, "name" => "epmd"}
         ],
         "livenessProbe" => %{
           "failureThreshold" => 10,
@@ -175,7 +183,10 @@ defmodule SpawnOperator.K8s.Deployment do
     ]
   end
 
-  defp resolve_proxy_image(),
+  defp resolve_proxy_image(sidecar_params),
+    do: Map.get(sidecar_params, "image", get_sidecar_image_by_env())
+
+  defp get_sidecar_image_by_env(),
     do:
       Application.get_env(
         :spawn_operator,

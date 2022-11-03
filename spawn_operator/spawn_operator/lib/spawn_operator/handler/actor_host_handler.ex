@@ -51,6 +51,7 @@ defmodule SpawnOperator.Handler.ActorHostHandler do
     |> Bonny.Axn.register_descendant(host_config_map)
     |> Bonny.Axn.register_descendant(host_resource)
     |> Bonny.Axn.register_descendant(host_service)
+    |> IO.inspect(label: "Arhhhhhhhhhhhhhhhhhh")
     |> Bonny.Axn.register_descendant(host_hpa)
     |> Bonny.Axn.success_event()
   end

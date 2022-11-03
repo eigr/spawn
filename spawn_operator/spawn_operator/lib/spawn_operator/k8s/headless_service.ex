@@ -3,8 +3,12 @@ defmodule SpawnOperator.K8s.HeadlessService do
 
   @behaviour SpawnOperator.K8s.Manifest
 
+  @ports [
+    %{"name" => "epmd", "protocol" => "TCP", "port" => 4369, "targetPort" => "epmd"}
+  ]
+
   @impl true
-  def manifest(system, ns, name, params),
+  def manifest(system, ns, _name, _params),
     do: %{
       "apiVersion" => "v1",
       "kind" => "Service",
@@ -20,10 +24,7 @@ defmodule SpawnOperator.K8s.HeadlessService do
       "spec" => %{
         "clusterIP" => "None",
         "selector" => %{"actor-system" => system},
-        "ports" => [
-          %{"port" => 4369, "name" => "epmd"}
-        ]
+        "ports" => @ports
       }
     }
-
 end
