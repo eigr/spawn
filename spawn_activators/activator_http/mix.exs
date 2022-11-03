@@ -1,10 +1,8 @@
 defmodule ActivatorHTTP.MixProject do
   use Mix.Project
 
-  Code.require_file("internal_versions.exs", "../../priv/")
-
   @app :activator_http
-  @version InternalVersions.get(@app)
+  @version "local.dev"
 
   def project do
     [
@@ -14,7 +12,7 @@ defmodule ActivatorHTTP.MixProject do
       config_path: "../../config/config.exs",
       deps_path: "../../deps",
       lockfile: "../../mix.lock",
-      elixir: InternalVersions.elixir_version(),
+      elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       releases: releases()

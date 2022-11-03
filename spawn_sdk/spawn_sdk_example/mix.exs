@@ -1,8 +1,6 @@
 defmodule SpawnSdkExample.MixProject do
   use Mix.Project
 
-  Code.require_file("internal_versions.exs", "../../priv/")
-
   @app :spawn_sdk_example
   @version "0.1.0"
 
@@ -14,7 +12,7 @@ defmodule SpawnSdkExample.MixProject do
       config_path: "../../config/config.exs",
       deps_path: "deps",
       lockfile: "mix.lock",
-      elixir: InternalVersions.elixir_version(),
+      elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       releases: releases()

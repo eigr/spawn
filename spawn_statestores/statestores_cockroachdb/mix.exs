@@ -1,10 +1,8 @@
 defmodule StatestoresCockroachDB.MixProject do
   use Mix.Project
 
-  Code.require_file("internal_versions.exs", "../../priv/")
-
   @app :spawn_statestores_cockroachdb
-  @version InternalVersions.get(@app)
+  @version "0.0.0-local.dev"
   @source_url "https://github.com/eigr/spawn/blob/main/spawn_statestores/statestores_cockroachdb"
 
   def project do
@@ -18,7 +16,7 @@ defmodule StatestoresCockroachDB.MixProject do
       config_path: "../../config/config.exs",
       deps_path: "../../deps",
       lockfile: "../../mix.lock",
-      elixir: InternalVersions.elixir_version(),
+      elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       elixirc_paths: elixirc_paths(Mix.env()),

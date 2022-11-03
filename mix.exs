@@ -1,10 +1,8 @@
 defmodule Spawn.MixProject do
   use Mix.Project
 
-  Code.require_file("internal_versions.exs", "./priv/")
-
   @app :spawn
-  @version InternalVersions.get(@app)
+  @version "0.0.0-local.dev"
   @site "https://eigr.io/"
   @source_url "https://github.com/eigr/spawn"
 
@@ -19,7 +17,7 @@ defmodule Spawn.MixProject do
       config_path: "config/config.exs",
       deps_path: "deps",
       lockfile: "mix.lock",
-      elixir: InternalVersions.elixir_version(),
+      elixir: "~> 1.14",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
@@ -58,6 +56,8 @@ defmodule Spawn.MixProject do
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do
+    Code.compile_file("internal_versions.exs", "./priv/")
+
     [
       {:cowlib, "~> 2.9"},
       {:decimal, "~> 2.0"},

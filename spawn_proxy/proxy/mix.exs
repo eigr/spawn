@@ -1,10 +1,8 @@
 defmodule Proxy.MixProject do
   use Mix.Project
 
-  Code.require_file("internal_versions.exs", "../../priv/")
-
   @app :proxy
-  @version InternalVersions.get(@app)
+  @version "0.0.0-local.dev"
 
   def project do
     [
@@ -13,7 +11,7 @@ defmodule Proxy.MixProject do
       build_path: "../../_build",
       deps_path: "../../deps",
       lockfile: "../../mix.lock",
-      elixir: InternalVersions.elixir_version(),
+      elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       releases: releases()
