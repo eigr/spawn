@@ -46,11 +46,16 @@ defmodule InternalVersions do
     Opts:
     --replace - replace current version even if its the same in hexpm
     --dry-run - dry run
+    --all - publish all packages
+    --apps=app1,app2 - specific apps to publish
   """
-  def release_all(opts) do
+  def publish(opts) do
     key = List.first(opts)
     replace? = if "--replace" in opts, do: "--replace", else: ""
     dry_run? = if "--dry-run" in opts, do: "--dry-run", else: ""
+    all? = "--all" in opts
+    apps_to_publish = Enum.find(opts, "", & String.starts_with?(&1, "--apps")) |> String.replace("--apps=", "") |> String.split(",")
+    |> IO.inspect
 
     IO.warn("***** Make sure you have generated the correct key for publishing, using: mix hex.user key generate")
     IO.puts("***** Currently using key: #{key}")
@@ -58,6 +63,12 @@ defmodule InternalVersions do
 
     apps_to_release = @versions
     |> Enum.filter(& elem(&1, 0) |> Atom.to_string() |> String.starts_with?("spawn"))
+
+    apps_to_release = if all? do
+      apps_to_release
+    else
+      Enum.filter(apps_to_release, & Atom.to_string(elem(&1, 0)) in apps_to_publish)
+    end
 
     # print
     Enum.each(apps_to_release, & IO.puts("-- #{inspect(&1)}"))

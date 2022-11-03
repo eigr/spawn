@@ -25,7 +25,7 @@ defmodule Spawn.MixProject do
       deps: deps(),
       package: package(),
       docs: docs(),
-      aliases: [release_all: &InternalVersions.release_all/1]
+      aliases: [publish: &InternalVersions.publish/1]
     ]
   end
 
@@ -38,7 +38,7 @@ defmodule Spawn.MixProject do
 
   defp package do
     [
-      files: ["lib", "mix.exs", "README.md", "LICENSE"],
+      files: ["lib", "mix.exs", "priv", "README.md", "LICENSE"],
       licenses: ["Apache-2.0"],
       links: %{GitHub: @source_url, Site: @site}
     ]
