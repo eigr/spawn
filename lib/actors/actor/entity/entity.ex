@@ -276,6 +276,7 @@ defmodule Actors.Actor.Entity do
               %Actor{
                 id: %ActorId{name: actor_name} = _id
               } = _actor,
+              metadata: metadata,
             command_name: command,
             payload: payload,
             caller: caller
@@ -297,6 +298,8 @@ defmodule Actors.Actor.Entity do
            Enum.any?(all_commands, fn cmd -> cmd.name == command end) do
       true ->
         interface = get_interface(actor_system, actor_name, opts)
+
+        metadata = if is_nil(metadata), do: %{}, else: metadata
         current_state = Map.get(actor_state || %{}, :state)
 
         request =
@@ -307,11 +310,11 @@ defmodule Actors.Actor.Entity do
             payload: payload,
             current_context:
               Context.new(
+                metadata: metadata,
                 caller: caller,
                 self: ActorId.new(name: actor_name, system: actor_system),
                 state: current_state
-              ),
-            caller: caller
+              )
           )
 
         interface.invoke_host(request, state, @default_methods)

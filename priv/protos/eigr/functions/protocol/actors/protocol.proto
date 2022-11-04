@@ -356,7 +356,7 @@ message InvocationRequest {
 //   * current_context: The current Context with current state value of the target Actor. 
 //                    That is, the same as found via matching in %Actor{name: target_actor, state: %ActorState{state: value} = actor_state}. 
 //                    In this case, the Context type will contain in the value attribute the same `value` as the matching above.
-//   * value: The value to be passed to the function or method corresponding to command_name.
+//   * payload: The value to be passed to the function or method corresponding to command_name.
 message ActorInvocation {
 
     string actor_name = 1;
@@ -369,10 +369,8 @@ message ActorInvocation {
 
     oneof payload {
         google.protobuf.Any value = 5;
-        Noop noop = 7;
+        Noop noop = 6;
     }
-
-    eigr.functions.protocol.actors.ActorId caller = 6;
 }
 
 // The user function's response after executing the action originated by the local proxy request via ActorInvocation.
