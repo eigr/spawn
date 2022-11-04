@@ -89,7 +89,7 @@ defmodule SpawnSdk.Value do
     {:reply, value}
   end
 
-  @spec noreply_state!(state()) :: {:reply, value()}
+  @spec noreply_state!(new_state()) :: {:reply, value()}
   def noreply_state!(state) do
     %__MODULE__{}
     |> state(state)
