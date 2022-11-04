@@ -314,7 +314,8 @@ defmodule Actors.Actor.Entity do
                 caller: caller,
                 self: ActorId.new(name: actor_name, system: actor_system),
                 state: current_state
-              )
+              ),
+            caller: caller
           )
 
         interface.invoke_host(request, state, @default_methods)

@@ -1345,12 +1345,26 @@ defmodule Eigr.Functions.Protocol.ActorInvocation do
           json_name: "noop",
           label: :LABEL_OPTIONAL,
           name: "noop",
-          number: 6,
+          number: 7,
           oneof_index: 0,
           options: nil,
           proto3_optional: nil,
           type: :TYPE_MESSAGE,
           type_name: ".eigr.functions.protocol.Noop"
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          __unknown_fields__: [],
+          default_value: nil,
+          extendee: nil,
+          json_name: "caller",
+          label: :LABEL_OPTIONAL,
+          name: "caller",
+          number: 6,
+          oneof_index: nil,
+          options: nil,
+          proto3_optional: nil,
+          type: :TYPE_MESSAGE,
+          type_name: ".eigr.functions.protocol.actors.ActorId"
         }
       ],
       name: "ActorInvocation",
@@ -1375,7 +1389,8 @@ defmodule Eigr.Functions.Protocol.ActorInvocation do
   field :command_name, 3, type: :string, json_name: "commandName"
   field :current_context, 4, type: Eigr.Functions.Protocol.Context, json_name: "currentContext"
   field :value, 5, type: Google.Protobuf.Any, oneof: 0
-  field :noop, 6, type: Eigr.Functions.Protocol.Noop, oneof: 0
+  field :noop, 7, type: Eigr.Functions.Protocol.Noop, oneof: 0
+  field :caller, 6, type: Eigr.Functions.Protocol.Actors.ActorId
 end
 defmodule Eigr.Functions.Protocol.ActorInvocationResponse do
   @moduledoc false

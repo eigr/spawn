@@ -369,8 +369,10 @@ message ActorInvocation {
 
     oneof payload {
         google.protobuf.Any value = 5;
-        Noop noop = 6;
+        Noop noop = 7;
     }
+
+    eigr.functions.protocol.actors.ActorId caller = 6;
 }
 
 // The user function's response after executing the action originated by the local proxy request via ActorInvocation.

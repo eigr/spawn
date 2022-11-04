@@ -101,6 +101,7 @@ defmodule SpawnSdk.System.SpawnSystem do
     command = Keyword.get(invoke_opts, :command, nil)
     payload = Keyword.get(invoke_opts, :payload, nil)
     async = Keyword.get(invoke_opts, :async, false)
+    metadata = Keyword.get(invoke_opts, :metadata, %{})
     actor_reference = Keyword.get(invoke_opts, :ref, nil)
 
     if actor_reference do
@@ -114,6 +115,7 @@ defmodule SpawnSdk.System.SpawnSystem do
       InvocationRequest.new(
         system: %Eigr.Functions.Protocol.Actors.ActorSystem{name: system},
         actor: %Eigr.Functions.Protocol.Actors.Actor{id: %ActorId{name: actor_name}},
+        metadata: metadata,
         payload: payload,
         command_name: parse_command_name(command),
         async: async,
@@ -133,6 +135,7 @@ defmodule SpawnSdk.System.SpawnSystem do
       actor_system: system,
       command_name: command,
       payload: payload,
+      current_context: %Eigr.Functions.Protocol.Context{metadata: metadata}
       caller: caller
     } = invocation
 
@@ -149,6 +152,7 @@ defmodule SpawnSdk.System.SpawnSystem do
         context =
           Eigr.Functions.Protocol.Context.new(
             caller: caller,
+            metadata: metadata,
             self: self_actor_id,
             state: current_state
           )
@@ -169,6 +173,7 @@ defmodule SpawnSdk.System.SpawnSystem do
       true ->
         new_ctx = %SpawnSdk.Context{
           caller: caller,
+          metadata: metadata,
           self: self_actor_id,
           state: unpack_unknown(current_state)
         }
