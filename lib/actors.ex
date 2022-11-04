@@ -106,13 +106,18 @@ defmodule Actors do
          %InvocationRequest{
            actor: %Actor{} = actor,
            system: %ActorSystem{} = system,
-           async: async?
+           async: async?,
+           metadata: metadata
          } = request,
          opts \\ []
        ) do
+    metadata_attributes =
+      Enum.map(metadata, fn {key, value} -> {to_existing_atom_or_new(key), value} end) ++
+        [{:async, async?}]
+
     Tracer.with_span "invoke" do
       Tracer.add_event("invoke-actor", [{"target", actor.id.name}])
-      Tracer.set_attributes([{:async, async?}])
+      Tracer.set_attributes(metadata_attributes)
 
       retry with: exponential_backoff() |> randomize |> expiry(10_000),
             atoms: [:error, :exit, :noproc, :erpc, :noconnection],
@@ -292,5 +297,12 @@ defmodule Actors do
         Logger.debug("Failed to register Actor #{actor_name}")
         {:error, "Failed to register Actor #{actor_name}"}
     end
+  end
+
+  defp to_existing_atom_or_new(string) do
+    String.to_existing_atom(string)
+  rescue
+    _e ->
+      String.to_atom(string)
   end
 end

@@ -276,7 +276,7 @@ defmodule Actors.Actor.Entity do
               %Actor{
                 id: %ActorId{name: actor_name} = _id
               } = _actor,
-              metadata: metadata,
+            metadata: metadata,
             command_name: command,
             payload: payload,
             caller: caller

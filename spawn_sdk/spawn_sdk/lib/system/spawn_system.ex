@@ -135,7 +135,7 @@ defmodule SpawnSdk.System.SpawnSystem do
       actor_system: system,
       command_name: command,
       payload: payload,
-      current_context: %Eigr.Functions.Protocol.Context{metadata: metadata}
+      current_context: %Eigr.Functions.Protocol.Context{metadata: metadata},
       caller: caller
     } = invocation
 
