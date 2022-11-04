@@ -85,19 +85,19 @@ defmodule SpawnSdk.Flow do
 
     @type command :: String.t() | atom()
 
-    @type payload :: module()
+    @type payload :: module() | nil
 
     @spec of() :: list(SideEffect.t())
     def of(), do: []
 
     @spec effect(list(), actor_name(), command(), payload()) :: list(SideEffect.t())
-    def effect(list, actor_name, command, payload) do
+    def effect(list, actor_name, command, payload \\ nil) do
       effect = to(actor_name, command, payload)
       list ++ [effect]
     end
 
     @spec to(actor_name(), command(), payload()) :: SideEffect.t()
-    def to(actor_name, command, payload) do
+    def to(actor_name, command, payload \\ nil) do
       command_name = if is_atom(command), do: Atom.to_string(command), else: command
 
       %__MODULE__{

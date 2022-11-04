@@ -319,6 +319,8 @@ defmodule SpawnSdk.System.SpawnSystem do
          } = _value
        ) do
     Enum.map(effects, fn %SpawnSdk.Flow.SideEffect{} = effect ->
+      payload = if is_nil(effect.payload), do: Noop.new(), else: any_pack!(effect.payload)
+
       %Eigr.Functions.Protocol.SideEffect{
         request:
           InvocationRequest.new(
@@ -326,7 +328,7 @@ defmodule SpawnSdk.System.SpawnSystem do
             actor: %Eigr.Functions.Protocol.Actors.Actor{
               id: %ActorId{name: effect.actor_name}
             },
-            value: any_pack!(effect.payload),
+            payload: payload,
             command_name: effect.command,
             async: true,
             caller: ActorId.new(name: caller_name, system: system)

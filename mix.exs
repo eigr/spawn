@@ -56,8 +56,6 @@ defmodule Spawn.MixProject do
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do
-    Code.compile_file("internal_versions.exs", "./priv/")
-
     [
       {:cowlib, "~> 2.9"},
       {:decimal, "~> 2.0"},
