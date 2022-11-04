@@ -1,6 +1,8 @@
 defmodule Spawn.MixProject do
   use Mix.Project
 
+  Code.require_file("internal_versions.exs", "./priv")
+
   @app :spawn
   @version "0.0.0-local.dev"
   @site "https://eigr.io/"
