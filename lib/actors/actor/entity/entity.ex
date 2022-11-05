@@ -453,7 +453,7 @@ defmodule Actors.Actor.Entity do
          {:receive, payload},
          %EntityState{
            system: _actor_system,
-           actor: %Actor{id: %ActorId{name: actor_name} = _id} = actor
+           actor: %Actor{id: %ActorId{name: actor_name} = _id} = _actor
          } = state
        ) do
     Logger.debug(

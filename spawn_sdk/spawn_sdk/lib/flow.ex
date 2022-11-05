@@ -14,21 +14,21 @@ defmodule SpawnSdk.Flow do
 
     @type payload :: module() | nil
 
-    @spec to(channel(), payload()) :: Broadcast.t()
-    def to(channel, payload \\ nil) do
-      %__MODULE__{
-        channel: channel,
-        payload: payload
-      }
-    end
-
     @spec to(channel(), command(), payload()) :: Broadcast.t()
-    def to(channel, command, payload \\ nil) do
+    def to(channel, command, payload) do
       command_name = if is_atom(command), do: Atom.to_string(command), else: command
 
       %__MODULE__{
         channel: channel,
         command: command_name,
+        payload: payload
+      }
+    end
+
+    @spec to(channel(), payload()) :: Broadcast.t()
+    def to(channel, payload) do
+      %__MODULE__{
+        channel: channel,
         payload: payload
       }
     end
