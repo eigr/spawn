@@ -450,6 +450,20 @@ defmodule Actors.Actor.Entity do
   end
 
   defp do_handle_info(
+         {:receive, payload},
+         %EntityState{
+           system: _actor_system,
+           actor: %Actor{id: %ActorId{name: actor_name} = _id} = actor
+         } = state
+       ) do
+    Logger.debug(
+      "Actor [#{actor_name}] Received Broadcast Event [#{inspect(payload)}] without command. Just ignoring"
+    )
+
+    {:ok, state}
+  end
+
+  defp do_handle_info(
          :snapshot,
          %EntityState{
            actor:

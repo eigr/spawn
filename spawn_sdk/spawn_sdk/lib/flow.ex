@@ -16,7 +16,6 @@ defmodule SpawnSdk.Flow do
 
     @spec to(channel(), payload()) :: Broadcast.t()
     def to(channel, payload \\ nil) do
-
       %__MODULE__{
         channel: channel,
         payload: payload
