@@ -842,6 +842,14 @@ defmodule Actors.Actor.Entity do
     :ok
   end
 
+  defp publish(channel, command, payload, _request) when is_nil(command) do
+    PubSub.broadcast(
+      :actor_channel,
+      channel,
+      {:receive, payload}
+    )
+  end
+
   defp publish(channel, command, payload, request) do
     PubSub.broadcast(
       :actor_channel,
