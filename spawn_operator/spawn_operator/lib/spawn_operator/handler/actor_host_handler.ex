@@ -56,7 +56,14 @@ defmodule SpawnOperator.Handler.ActorHostHandler do
   end
 
   @impl Pluggable
-  def call(%Bonny.Axn{action: action} = axn, nil) when action in [:delete, :reconcile] do
+  def call(%Bonny.Axn{action: action} = axn, nil) when action in [:reconcile] do
+    # TODO: Reconcile hpa for rebalancing Nodes
+    # TODO: Recreate resources if not exists
+    Bonny.Axn.success_event(axn)
+  end
+
+  @impl Pluggable
+  def call(%Bonny.Axn{action: action} = axn, nil) when action in [:delete] do
     Bonny.Axn.success_event(axn)
   end
 
