@@ -13,9 +13,11 @@ defmodule Operator.MixProject do
       deps_path: "../../deps",
       lockfile: "../../mix.lock",
       elixir: "~> 1.14",
+      elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      releases: releases()
+      releases: releases(),
+      aliases: aliases(),
     ]
   end
 
@@ -26,6 +28,15 @@ defmodule Operator.MixProject do
       mod: {SpawnOperator.Application, [env: Mix.env()]}
     ]
   end
+
+  defp aliases do
+    [
+      test: "test --no-start"
+    ]
+  end
+
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do

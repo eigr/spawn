@@ -42,10 +42,18 @@ defmodule SpawnOperator.Handler.ActorHostHandler do
   @impl Pluggable
   def call(%Bonny.Axn{action: action} = axn, nil) when action in [:add, :modify] do
     %Bonny.Axn{resource: resource} = axn
+    IO.inspect(resource, label: "Resource ---")
     host_resource = build_host_deploy(resource)
+    IO.inspect(host_resource, label: "Host Resource ---")
+
     host_config_map = build_host_configmap(resource)
+    IO.inspect(host_config_map, label: "ConfigMap Resource ---")
+
     host_hpa = build_host_hpa(resource)
+    IO.inspect(host_hpa, label: "HPA Resource ---")
+
     host_service = build_host_service(resource)
+    IO.inspect(host_service, label: "Service Resource ---")
 
     axn
     |> Bonny.Axn.register_descendant(host_config_map)

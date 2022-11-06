@@ -1,10 +1,76 @@
 {
+  "spawn-eigr.io/v1": [
+    {
+      "kind": "Activator",
+      "name": "activators",
+      "namespaced": false,
+      "verbs": [
+        "create",
+        "delete",
+        "get",
+        "list",
+        "patch",
+        "update",
+        "watch"
+      ]
+    },
+    {
+      "kind": "ActorHost",
+      "name": "actorhosts",
+      "namespaced": false,
+      "verbs": [
+        "create",
+        "delete",
+        "get",
+        "list",
+        "patch",
+        "update",
+        "watch"
+      ]
+    },
+    {
+      "kind": "ActorSystem",
+      "name": "actorsystems",
+      "namespaced": false,
+      "verbs": [
+        "create",
+        "delete",
+        "get",
+        "list",
+        "patch",
+        "update",
+        "watch"
+      ]
+    }
+  ],
   "v1": [
     {
       "kind": "Namespace",
       "name": "namespaces",
       "namespaced": false,
-      "verbs": ["create", "delete", "get", "list", "patch", "update", "watch"]
+      "verbs": [
+        "create",
+        "delete",
+        "get",
+        "list",
+        "patch",
+        "update",
+        "watch"
+      ]
+    },
+    {
+      "kind": "Node",
+      "name": "nodes",
+      "namespaced": false,
+      "verbs": [
+        "create",
+        "delete",
+        "get",
+        "list",
+        "patch",
+        "update",
+        "watch"
+      ]
     },
     {
       "kind": "ConfigMap",
@@ -87,7 +153,11 @@
       "kind": "Deployment",
       "name": "deployments/status",
       "namespaced": true,
-      "verbs": ["get", "patch", "update"]
+      "verbs": [
+        "get",
+        "patch",
+        "update"
+      ]
     },
     {
       "kind": "StatefulSet",
@@ -110,7 +180,12 @@
       "kind": "Event",
       "name": "events",
       "namespaced": false,
-      "verbs": ["create", "get", "list", "watch"]
+      "verbs": [
+        "create",
+        "get",
+        "list",
+        "watch"
+      ]
     }
   ]
 }
