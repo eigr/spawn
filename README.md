@@ -4,8 +4,6 @@
 
 **Actor Mesh Platform**
 
-![Eigr](https://discordapp.com/api/guilds/825360651782193194/widget.png?style=banner2)
-
 ## Overview
 
 Spawn is based on the sidecar proxy pattern to provide a polyglot Actor Model framework and platform.
