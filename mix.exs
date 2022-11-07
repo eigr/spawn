@@ -74,6 +74,7 @@ defmodule Spawn.MixProject do
       {:opentelemetry_api, "~> 1.0"},
       {:opentelemetry, "~> 1.0"},
       {:opentelemetry_exporter, "~> 1.0"},
+      {:highlander, "~> 0.2.1"},
       {:faker, "~> 0.17", only: :test},
       {:mimic, "~> 1.7", only: :test},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
