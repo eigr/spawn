@@ -4,7 +4,7 @@
 
 **Actor Mesh Platform**
 
-![Discord Shield](https://discordapp.com/api/guilds/eigr.io/widget.png?style=shield)
+![Discord Shield](https://discordapp.com/api/guilds/825360651782193194/widget.png?style=shield)
 
 ## Overview
 
