@@ -303,7 +303,25 @@ folder](examples/k8s/activators/amqp.yaml).
 
 ## Statestores
 
-TODO
+Statestores are the interface between the downstream storage/database system and the actor.
+They are configured by the user via environment variables or by the ActorSystem CRD (see [Custom Resources section](#custom-resources)) and their sensitive data is [stored in kubernetes secrets](#getting-started).
+
+Below is a list of common global settings for all Statestores. For more details check the [documentation](docs/statestore.md) for each supported Statestore.
+
+|  Environment Variable       | CRD Attribute                         | Secret Property   | Default Env Value | Default CRD Value | Mandatory | Possible Values 
+|---	                        |---                                    |---                |---                |---                |---        |---
+|                             | spec.statestore.credentialsSecretRef  |                   |                   |                   | Yes       |
+| PROXY_DATABASE_TYPE         | spec.statestore.type                  |                   |                   |                   | Yes       | see [documentation](docs/statestore.md) 
+| PROXY_DATABASE_NAME         |                                       | database          | eigr-functions-db | eigr-functions-db |           |
+| PROXY_DATABASE_USERNAME     |                                       | username          | admin             | admin             |           |
+| PROXY_DATABASE_SECRET       |                                       | password          | admin             | admin             |           |
+| PROXY_DATABASE_HOST         |                                       | host              | localhost         | localhost         |           |
+| PROXY_DATABASE_PORT         |                                       | port              | adapter specific  | adapter specific  |           | see [documentation](docs/statestore.md) 
+| SPAWN_STATESTORE_KEY        |                                       | encryptionKey     |                   |                   | Yes       | openssl rand -base64 32
+| PROXY_DATABASE_POOL_SIZE    | spec.statestore.pool.size             |                   | 60                | 60                |           |
+| PROXY_DATABASE_QUEUE_TARGET | spec.statestore.pool.queue            |                   | 10000             | 10000             |           |
+
+> **_NOTE:_** When running on top of Kubernetes you only need to set the CRD attributes of ActorSystem and Kubernetes secrets. The Operator will set the values of the environment variables according to the settings of these two mentioned places.
 
 ## Local Development
 
