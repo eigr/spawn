@@ -3,18 +3,20 @@ defmodule Controller.ActorHostControllerTest do
   use Bonny.Axn.Test
 
   alias SpawnOperator.Controller.ActorHostController
+  alias SpawnOperator.Test.IntegrationHelper
 
   import SpawnOperator.FactoryTest
 
   setup do
+    conn = IntegrationHelper.conn()
     simple_host = build_simple_actor_host()
 
     [
-      axn: axn(:add, resource: simple_host, conn: %K8s.Conn{})
+      axn: axn(:add, resource: simple_host, conn: conn)
     ]
   end
 
-  @tag :skip
+  @tag :integration
   test "registers descending resources", %{axn: axn} do
     descendants =
       axn
