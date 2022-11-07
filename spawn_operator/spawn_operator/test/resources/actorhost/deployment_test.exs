@@ -99,7 +99,7 @@ defmodule DeploymentTest do
                          ],
                          "resources" => %{
                            "limits" => %{"memory" => "1024Mi"},
-                           "requests" => %{"memory" => "70Mi"}
+                           "requests" => %{"memory" => "80Mi"}
                          }
                        },
                        %{
@@ -126,7 +126,7 @@ defmodule DeploymentTest do
                          ],
                          "resources" => %{
                            "limits" => %{"memory" => "1024Mi"},
-                           "requests" => %{"memory" => "70Mi"}
+                           "requests" => %{"memory" => "80Mi"}
                          }
                        }
                      ],
