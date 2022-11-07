@@ -26,12 +26,7 @@ defmodule SpawnOperator.K8s.HPA do
 
     nodes = Map.get(result, "items")
 
-    autoscaler_max =
-      if nodes == 1 do
-        2
-      else
-        nodes
-      end
+    autoscaler_max = nodes * 2
 
     replicas = Map.get(params, "replicas", @default_actor_host_function_replicas)
 
