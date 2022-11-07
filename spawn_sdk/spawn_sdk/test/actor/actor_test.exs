@@ -26,7 +26,7 @@ defmodule Actor.ActorTest do
       |> Value.void()
     end
 
-    defact forward_caller(%MyMessageRequest{data: data}, %Context{} = _ctx) do
+    defact forward_caller(%MyMessageRequest{data: _data}, %Context{} = _ctx) do
       %Value{}
       |> Value.value(MyMessageResponse.new(data: "first_actor_value"))
       |> Value.forward(Forward.to("second_actor", "forward_caller_name"))
@@ -51,7 +51,7 @@ defmodule Actor.ActorTest do
       |> Value.void()
     end
 
-    defact forward_caller_name(%Context{} = ctx) do
+    defact forward_caller_name(%Context{} = _ctx) do
       %Value{}
       |> Value.value(MyMessageResponse.new(data: "second_caller"))
       |> Value.forward(Forward.to("third_actor", "forward_caller_name"))
@@ -77,7 +77,7 @@ defmodule Actor.ActorTest do
       |> Value.void()
     end
 
-    defact forward_caller_name(value, %Context{} = ctx) do
+    defact forward_caller_name(value, %Context{} = _ctx) do
       %Value{}
       |> Value.value(MyMessageResponse.new(id: value.data, data: "third forwarding"))
       |> Value.void()

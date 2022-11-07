@@ -17,7 +17,7 @@ defmodule Operator.MixProject do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       releases: releases(),
-      aliases: aliases(),
+      aliases: aliases()
     ]
   end
 
