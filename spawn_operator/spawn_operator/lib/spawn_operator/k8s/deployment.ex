@@ -35,7 +35,7 @@ defmodule SpawnOperator.K8s.Deployment do
       "memory" => "1024Mi"
     },
     "requests" => %{
-      "memory" => "70Mi"
+      "memory" => "80Mi"
     }
   }
 
@@ -152,14 +152,7 @@ defmodule SpawnOperator.K8s.Deployment do
           "successThreshold" => 1,
           "timeoutSeconds" => 1200
         },
-        "resources" => %{
-          "limits" => %{
-            "memory" => "1024Mi"
-          },
-          "requests" => %{
-            "memory" => "70Mi"
-          }
-        },
+        "resources" => actor_host_function_resources,
         "envFrom" => [
           %{
             "configMapRef" => %{

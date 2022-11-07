@@ -7,12 +7,11 @@ defmodule SpawnOperator.K8s.HPA do
 
   @default_actor_host_function_replicas 1
 
-  @default_autoscaler %{
-    "min" => 1,
-    "max" => 2,
-    "averageCpuUtilizationPercentage" => 80,
-    "averageMemoryUtilizationValue" => "250Mi"
-  }
+  @default_autoscaler %{}
+
+  @default_average_cpu_utilization_percentage 80
+
+  @default_average_memory_utilization_value 70
 
   @impl true
   def manifest(system, ns, name, params), do: gen_autoscaler(system, ns, name, params)
@@ -26,7 +25,7 @@ defmodule SpawnOperator.K8s.HPA do
 
     nodes = Map.get(result, "items")
 
-    autoscaler_max = nodes * 2
+    autoscaler_max = length(nodes) * 2
 
     replicas = Map.get(params, "replicas", @default_actor_host_function_replicas)
 
@@ -35,9 +34,19 @@ defmodule SpawnOperator.K8s.HPA do
     maxReplicas = Map.get(autoscaler, "max", max)
     minReplicas = Map.get(autoscaler, "min", @default_actor_host_function_replicas)
 
-    averageCpuUtilizationPercentage = Map.get(autoscaler, "averageCpuUtilizationPercentage")
+    averageCpuUtilizationPercentage =
+      Map.get(
+        autoscaler,
+        "averageCpuUtilizationPercentage",
+        @default_average_cpu_utilization_percentage
+      )
 
-    averageMemoryUtilizationValue = Map.get(autoscaler, "averageMemoryUtilizationValue")
+    averageMemoryUtilizationValue =
+      Map.get(
+        autoscaler,
+        "averageMemoryUtilizationValue",
+        @default_average_memory_utilization_value
+      )
 
     %{
       "apiVersion" => "autoscaling/v2",
@@ -72,7 +81,7 @@ defmodule SpawnOperator.K8s.HPA do
               "name" => "memory",
               "target" => %{
                 "type" => "AverageValue",
-                "averageValue" => averageMemoryUtilizationValue
+                "averageUtilization" => averageMemoryUtilizationValue
               }
             }
           }
