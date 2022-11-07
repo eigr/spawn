@@ -39,7 +39,7 @@ defmodule Actors.Actor.Entity do
   end
 
   defp do_handle_continue(action, state) do
-    Logger.debug("Unhandled handle_continue for action #{action}")
+    Logger.warning("Unhandled handle_continue for action #{action}")
 
     {:noreply, state, :hibernate}
   end
@@ -89,7 +89,7 @@ defmodule Actors.Actor.Entity do
   end
 
   defp do_handle_cast(action, state) do
-    Logger.debug("Unhandled handle_cast for action #{action}")
+    Logger.warning("Unhandled handle_cast for action #{action}")
 
     {:noreply, state, :hibernate}
   end
@@ -159,10 +159,7 @@ defmodule Actors.Actor.Entity do
       "No handled internal message for actor #{name}. Message: #{inspect(message)}. Actor state: #{inspect(state)}"
     )
 
-    if not is_nil(actor_state) do
-      # TODO: Remove this?
-      StateManager.save(name, actor_state)
-    end
+    if not is_nil(actor_state), do: StateManager.save(name, actor_state)
 
     {:noreply, state, :hibernate}
   end

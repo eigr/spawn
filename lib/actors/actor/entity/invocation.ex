@@ -33,6 +33,8 @@ defmodule Actors.Actor.Entity.Invocation do
 
   import Actors.Registry.ActorRegistry, only: [lookup: 2]
 
+  @default_host_interface Actors.Actor.Interface.Http
+
   @default_methods [
     "get",
     "Get",
@@ -40,7 +42,6 @@ defmodule Actors.Actor.Entity.Invocation do
     "getState",
     "GetState"
   ]
-  @default_host_interface Actors.Actor.Interface.Http
 
   def timer_invoke(
         %FixedTimerCommand{command: %Command{name: cmd} = _command} = timer,
