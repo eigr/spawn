@@ -4,43 +4,56 @@ defmodule Actors.Actor.InvocationScheduler do
 
   require Logger
 
-  alias Actors.Actor.StateManager
+  alias Actors.Registry.ActorRegistry
   alias Eigr.Functions.Protocol.InvocationRequest
 
   @impl true
   def init(_) do
-    # call statestore
+
 
     {:ok, %{}}
   end
 
   def handle_info({:invoke, request}, state) do
-
     retry with: exponential_backoff() |> randomize |> expiry(10_000),
-            atoms: [:error, :exit, :noproc, :erpc, :noconnection],
-            rescue_only: [ErlangError] do
-              StateManager.remove_invoke_request(request)
-            after
-              decoded_request = InvocationRequest.decode(request)
+          atoms: [:error, :exit, :noproc, :erpc, :noconnection],
+          rescue_only: [ErlangError] do
+      StateManager.remove_invoke_request(request)
+    after
+      decoded_request = InvocationRequest.decode(request)
 
-              spawn(fn ->
-                Actors.invoke(%{decoded_request | async: true})
-              end)
-            end
+      spawn(fn ->
+        Actors.invoke(%{decoded_request | async: true})
+      end)
 
-    {:noreply, Map.delete(state, request)}
+      {:noreply, Map.delete(state, request)}
+    else
+      {:noreply, state}
+    end
   end
 
   def handle_cast({:schedule, scheduled_to, encoded_request}, state) do
-    Process.send_after(self(), {:invoke, encoded_request}, )
+    call_invoke(scheduled_to, encoded_request)
 
     {:noreply, state}
   end
 
+  defp call_invoke(scheduled_to, encoded_request) do
+    delay_in_ms = DateTime.diff(scheduled_to, DateTime.utc_now(), :millisecond)
+
+    if delay_in_ms <= 0 do
+      Logger.warn("Received negative delayed invocation request (#{delay_in_ms}), invoking now")
+      Process.send(self(), {:invoke, encoded_request})
+    else
+      Process.send_after(self(), {:invoke, encoded_request}, delay_in_ms)
+    end
+  end
+
   # Client
 
-  def schedule_invoke(%InvocationRequest{} = invocation_request, delay_ms) when is_integer(delay_ms) do
-    scheduled_to = DateTime.utc_now() |> DateTime.add(delay_ms, :millisecond)
+  def schedule_invoke(%InvocationRequest{} = invocation_request, delay_ms)
+      when is_integer(delay_ms) do
+    scheduled_to = DateTime.add(DateTime.utc_now(), delay_ms, :millisecond)
     schedule_invoke(invocation_request, scheduled_to)
   end
 
