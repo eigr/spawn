@@ -4,4 +4,4 @@
 K8s.Sys.Logger.attach()
 Bonny.Sys.Logger.attach()
 
-ExUnit.start()
+ExUnit.start(exclude: [:integration])

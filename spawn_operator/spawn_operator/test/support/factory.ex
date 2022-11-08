@@ -8,7 +8,8 @@ defmodule SpawnOperator.FactoryTest do
       "metadata" => %{
         "name" => attrs[:name] || "spawn-test",
         "system" => "spawn-system",
-        "namespace" => "default"
+        "namespace" => "default",
+        "generation" => 1
       },
       "spec" => %{
         "host" => %{
@@ -24,7 +25,8 @@ defmodule SpawnOperator.FactoryTest do
       "kind" => "ActorHost",
       "metadata" => %{
         "name" => attrs[:name] || "spawn-test",
-        "namespace" => "default"
+        "namespace" => "default",
+        "generation" => 1
       },
       "spec" => %{
         "host" => %{
