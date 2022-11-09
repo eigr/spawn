@@ -2,7 +2,7 @@
 
 <!-- MDOC !-->
 
-**Actor Mesh Platform**
+**Actor Mesh Serverless Platform**
 
 ## Overview
 
