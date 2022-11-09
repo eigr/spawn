@@ -84,37 +84,45 @@ defmodule Actors.Registry.ActorRegistry do
 
   @impl true
   def handle_cast({:register_invocation_request, actor, request}, state) do
-    updated_hosts =
-      actor
-      |> StateHandoff.get()
-      |> Kernel.||([])
-      |> Enum.map(fn host ->
-        invocations = (host.opts[:invocations] || []) ++ [request]
+    actor
+    |> StateHandoff.get()
+    |> Kernel.||([])
+    |> Enum.map(fn host ->
+      invocations = (host.opts[:invocations] || []) ++ [request]
 
-        opts = Keyword.put(host.opts, :invocations, invocations)
-        %{host | opts: opts}
-      end)
+      opts = Keyword.put(host.opts, :invocations, invocations)
+      %{host | opts: opts}
+    end)
+    |> then(fn
+      [] ->
+        :nothing
 
-    StateHandoff.set(actor, updated_hosts)
+      updated_hosts ->
+        StateHandoff.set(actor, updated_hosts)
+    end)
 
     {:noreply, state}
   end
 
   def handle_cast({:remove_invocation_request, actor, request}, state) do
-    updated_hosts =
-      actor
-      |> StateHandoff.get()
-      |> Kernel.||([])
-      |> Enum.map(fn host ->
-        invocations = host.opts[:invocations] || []
-        invocation = Enum.find(invocations, &(&1 == request))
-        invocations = invocations -- [invocation]
+    actor
+    |> StateHandoff.get()
+    |> Kernel.||([])
+    |> Enum.map(fn host ->
+      invocations = host.opts[:invocations] || []
+      invocation = Enum.find(invocations, &(&1 == request))
+      invocations = invocations -- [invocation]
 
-        opts = Keyword.put(host.opts, :invocations, invocations)
-        %{host | opts: opts}
-      end)
+      opts = Keyword.put(host.opts, :invocations, invocations)
+      %{host | opts: opts}
+    end)
+    |> then(fn
+      [] ->
+        :nothing
 
-    StateHandoff.set(actor, updated_hosts)
+      updated_hosts ->
+        StateHandoff.set(actor, updated_hosts)
+    end)
 
     {:noreply, state}
   end
