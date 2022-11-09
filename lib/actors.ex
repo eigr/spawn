@@ -9,6 +9,7 @@ defmodule Actors do
 
   alias Actors.Actor.Entity, as: ActorEntity
   alias Actors.Actor.Entity.Supervisor, as: ActorEntitySupervisor
+  alias Actors.Actor.InvocationScheduler
 
   alias Actors.Registry.{ActorRegistry, HostActor}
 
@@ -123,7 +124,13 @@ defmodule Actors do
             atoms: [:error, :exit, :noproc, :erpc, :noconnection],
             rescue_only: [ErlangError] do
         do_lookup_action(system.name, actor.id.name, system, fn actor_ref ->
-          maybe_invoke_async(async?, actor_ref, request, opts)
+          if is_nil(request.scheduled_to) || request.scheduled_to == 0 do
+            maybe_invoke_async(async?, actor_ref, request, opts)
+          else
+            InvocationScheduler.schedule_invoke(request)
+
+            {:ok, :async}
+          end
         end)
       after
         result -> result

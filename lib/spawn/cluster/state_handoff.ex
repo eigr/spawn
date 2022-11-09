@@ -68,6 +68,20 @@ defmodule Spawn.Cluster.StateHandoff do
     {:reply, hosts, crdt_pid}
   end
 
+  def handle_call(:get_all_invocations, _from, crdt_pid) do
+    schedules =
+      crdt_pid
+      |> DeltaCrdt.to_map()
+      |> Map.values()
+      |> List.flatten()
+      |> Enum.map(& &1.opts[:invocations])
+      |> List.flatten()
+      |> Enum.reject(&is_nil/1)
+      |> Enum.uniq()
+
+    {:reply, schedules, crdt_pid}
+  end
+
   @impl true
   def handle_call({:clean, node}, _from, crdt_pid) do
     Logger.debug("Received cleanup action from Node #{inspect(node)}")
@@ -111,6 +125,10 @@ defmodule Spawn.Cluster.StateHandoff do
   # pickup the stored entity data for a actor
   def get(actor) do
     GenServer.call(__MODULE__, {:get, actor})
+  end
+
+  def get_all_invocations do
+    GenServer.call(__MODULE__, :get_all_invocations)
   end
 
   def clean(node) do

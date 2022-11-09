@@ -53,7 +53,7 @@ defmodule Actors.Actor.Entity.Invocation do
     invocation = %InvocationRequest{
       actor: actor,
       command_name: cmd,
-      payload: Noop.new(),
+      payload: {:noop, Noop.new()},
       async: true,
       caller: caller_actor_id
     }

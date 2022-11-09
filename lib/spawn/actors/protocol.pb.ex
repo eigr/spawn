@@ -1192,6 +1192,20 @@ defmodule Eigr.Functions.Protocol.InvocationRequest do
           proto3_optional: nil,
           type: :TYPE_MESSAGE,
           type_name: ".eigr.functions.protocol.InvocationRequest.MetadataEntry"
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          __unknown_fields__: [],
+          default_value: nil,
+          extendee: nil,
+          json_name: "scheduledTo",
+          label: :LABEL_OPTIONAL,
+          name: "scheduled_to",
+          number: 9,
+          oneof_index: nil,
+          options: nil,
+          proto3_optional: nil,
+          type: :TYPE_INT64,
+          type_name: nil
         }
       ],
       name: "InvocationRequest",
@@ -1275,6 +1289,8 @@ defmodule Eigr.Functions.Protocol.InvocationRequest do
     type: Eigr.Functions.Protocol.InvocationRequest.MetadataEntry,
     map: true
   )
+
+  field(:scheduled_to, 9, type: :int64, json_name: "scheduledTo")
 end
 
 defmodule Eigr.Functions.Protocol.ActorInvocation do

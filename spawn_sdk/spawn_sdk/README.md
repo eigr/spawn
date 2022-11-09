@@ -402,3 +402,17 @@ The full example of this application can be found [here](https://github.com/eigr
   iex> SpawnSdk.invoke("robert_lazy", ref: SpawnSdkExample.Actors.AbstractActor, system: "spawn-system", command: "sum", payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1})
   {:ok, %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1}}
   ```
+
+  Invoke Actors with a delay set in milliseconds:
+
+  ```elixir
+  iex> SpawnSdk.invoke("joe", system: "spawn-system", command: "ping", delay: 5_000)
+  {:ok, :async}
+  ```
+
+  Invoke Actors scheduled to a specific DateTime:
+
+  ```elixir
+  iex> SpawnSdk.invoke("joe", system: "spawn-system", command: "ping", scheduled_to: ~U[2023-01-01 00:32:00.145Z])
+  {:ok, :async}
+  ```

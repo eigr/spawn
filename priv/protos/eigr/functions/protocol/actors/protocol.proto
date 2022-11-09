@@ -343,6 +343,8 @@ message InvocationRequest {
     eigr.functions.protocol.actors.ActorId caller = 6;
 
     map<string, string> metadata = 8;
+
+    int64 scheduled_to = 9;
 }
 
 // ActorInvocation is a translation message between a local invocation made via InvocationRequest 
