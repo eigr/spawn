@@ -8,42 +8,56 @@ defmodule Actors.Actor.InvocationScheduler do
   alias Eigr.Functions.Protocol.InvocationRequest
 
   @impl true
-  def init(_) do
+  def init(_arg) do
+    stored_invocations = ActorRegistry.get_all_invocations()
 
+    Enum.each(stored_invocations, &call_invoke/1)
 
     {:ok, %{}}
   end
 
+  @impl true
   def handle_info({:invoke, request}, state) do
+    decoded_request = InvocationRequest.decode(request)
+
     retry with: exponential_backoff() |> randomize |> expiry(10_000),
           atoms: [:error, :exit, :noproc, :erpc, :noconnection],
           rescue_only: [ErlangError] do
-      StateManager.remove_invoke_request(request)
+      ActorRegistry.remove_invocation_request(decoded_request.actor.id.name, request)
     after
-      decoded_request = InvocationRequest.decode(request)
+      _ ->
+        spawn(fn ->
+          Actors.invoke(%{decoded_request | scheduled_to: nil, async: true})
+        end)
 
-      spawn(fn ->
-        Actors.invoke(%{decoded_request | async: true})
-      end)
-
-      {:noreply, Map.delete(state, request)}
+        {:noreply, state}
     else
-      {:noreply, state}
+      _ -> {:noreply, state}
     end
   end
 
-  def handle_cast({:schedule, scheduled_to, encoded_request}, state) do
-    call_invoke(scheduled_to, encoded_request)
+  @impl true
+  def handle_cast({:schedule, request}, state) do
+    encoded_request = InvocationRequest.encode(request)
+
+    ActorRegistry.register_invocation_request(request.actor.id.name, encoded_request)
+
+    call_invoke(encoded_request)
 
     {:noreply, state}
   end
 
-  defp call_invoke(scheduled_to, encoded_request) do
-    delay_in_ms = DateTime.diff(scheduled_to, DateTime.utc_now(), :millisecond)
+  defp call_invoke(encoded_request) do
+    decoded_request = InvocationRequest.decode(encoded_request)
+
+    delay_in_ms =
+      decoded_request.scheduled_to
+      |> DateTime.from_unix!(:millisecond)
+      |> DateTime.diff(DateTime.utc_now(), :millisecond)
 
     if delay_in_ms <= 0 do
       Logger.warn("Received negative delayed invocation request (#{delay_in_ms}), invoking now")
-      Process.send(self(), {:invoke, encoded_request})
+      Process.send(self(), {:invoke, encoded_request}, [:noconnect])
     else
       Process.send_after(self(), {:invoke, encoded_request}, delay_in_ms)
     end
@@ -51,16 +65,8 @@ defmodule Actors.Actor.InvocationScheduler do
 
   # Client
 
-  def schedule_invoke(%InvocationRequest{} = invocation_request, delay_ms)
-      when is_integer(delay_ms) do
-    scheduled_to = DateTime.add(DateTime.utc_now(), delay_ms, :millisecond)
-    schedule_invoke(invocation_request, scheduled_to)
-  end
-
-  def schedule_invoke(%InvocationRequest{} = invocation_request, scheduled_to) do
-    request = InvocationRequest.encode(invocation_request)
-
-    GenServer.cast(__MODULE__, {:schedule, scheduled_to, request})
+  def schedule_invoke(%InvocationRequest{} = invocation_request) do
+    GenServer.cast({:global, __MODULE__}, {:schedule, invocation_request})
   end
 
   def child_spec do
@@ -72,6 +78,6 @@ defmodule Actors.Actor.InvocationScheduler do
   end
 
   def start_link() do
-    GenServer.start_link(__MODULE__, [], name: __MODULE__)
+    GenServer.start_link(__MODULE__, [], name: {:global, __MODULE__})
   end
 end

@@ -44,12 +44,13 @@ defmodule Actors.Registry.ActorRegistry do
 
         hosts ->
           Enum.filter(hosts, fn ac -> ac.actor.id.name == actor_name end)
-          |> Enum.random()
           |> then(fn
-            nil ->
+            [] ->
               GenServer.reply(from, {:not_found, []})
 
-            node_host ->
+            hosts ->
+              node_host = Enum.random(hosts)
+
               GenServer.reply(from, {:ok, node_host})
           end)
       end
@@ -82,10 +83,46 @@ defmodule Actors.Registry.ActorRegistry do
   end
 
   @impl true
+  def handle_cast({:register_invocation_request, actor, request}, state) do
+    updated_hosts =
+      actor
+      |> StateHandoff.get()
+      |> Kernel.||([])
+      |> Enum.map(fn host ->
+        invocations = (host.opts[:invocations] || []) ++ [request]
+
+        opts = Keyword.put(host.opts, :invocations, invocations)
+        %{host | opts: opts}
+      end)
+
+    StateHandoff.set(actor, updated_hosts)
+
+    {:noreply, state}
+  end
+
+  def handle_cast({:remove_invocation_request, actor, request}, state) do
+    updated_hosts =
+      actor
+      |> StateHandoff.get()
+      |> Kernel.||([])
+      |> Enum.map(fn host ->
+        invocations = host.opts[:invocations] || []
+        invocation = Enum.find(invocations, &(&1 == request))
+        invocations = invocations -- [invocation]
+
+        opts = Keyword.put(host.opts, :invocations, invocations)
+        %{host | opts: opts}
+      end)
+
+    StateHandoff.set(actor, updated_hosts)
+
+    {:noreply, state}
+  end
+
+  @impl true
   def terminate(_reason, _state) do
     Logger.debug("Stopping ActorRegistry...")
-    _node = Node.self()
-    # StateHandoff.clean(node)
+    StateHandoff.clean(Node.self())
   end
 
   def start_link(args) do
@@ -104,6 +141,24 @@ defmodule Actors.Registry.ActorRegistry do
   @spec register(list(HostActor.t())) :: :ok
   def register(hosts) do
     GenServer.call(__MODULE__, {:register, hosts})
+  end
+
+  @doc """
+  Get all invocations stored for actor
+  ## Examples
+      iex> ActorRegistry.get_all_invocations()
+      [<<10, 14, 10, 12, 115, 112>>]
+  """
+  def get_all_invocations do
+    StateHandoff.get_all_invocations()
+  end
+
+  def remove_invocation_request(actor, invocation_request) do
+    GenServer.cast(__MODULE__, {:remove_invocation_request, actor, invocation_request})
+  end
+
+  def register_invocation_request(actor, invocation_request) do
+    GenServer.cast(__MODULE__, {:register_invocation_request, actor, invocation_request})
   end
 
   @doc """

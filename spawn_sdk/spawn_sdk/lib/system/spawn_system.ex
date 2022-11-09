@@ -48,7 +48,7 @@ defmodule SpawnSdk.System.SpawnSystem do
 
   @impl SpawnSdk.System
   def register(system, actors) do
-    opts = [host_interface: SpawnSdk.Interface]
+    opts = [invocations: [], host_interface: SpawnSdk.Interface]
 
     registration_request = build_registration_req(system, actors)
 
@@ -77,7 +77,7 @@ defmodule SpawnSdk.System.SpawnSystem do
     end
 
     new_state = state_to_map(actor_name, [actor_mod])
-    opts = [host_interface: SpawnSdk.Interface]
+    opts = [invocations: [], host_interface: SpawnSdk.Interface]
 
     spawn_request = build_spawn_req(system, actor_name, actor_mod)
 
@@ -103,13 +103,15 @@ defmodule SpawnSdk.System.SpawnSystem do
     async = Keyword.get(invoke_opts, :async, false)
     metadata = Keyword.get(invoke_opts, :metadata, %{})
     actor_reference = Keyword.get(invoke_opts, :ref, nil)
+    scheduled_to = Keyword.get(invoke_opts, :scheduled_to, nil)
+    delay_in_ms = Keyword.get(invoke_opts, :delay, nil)
 
     if actor_reference do
       spawn_actor(actor_name, system: system, actor: actor_reference)
     end
 
-    opts = [host_interface: SpawnSdk.Interface]
-    payload = if is_nil(payload), do: Noop.new(), else: any_pack!(payload)
+    opts = [invocations: [], host_interface: SpawnSdk.Interface]
+    payload = if is_nil(payload), do: {:noop, Noop.new()}, else: {:value, any_pack!(payload)}
 
     req =
       InvocationRequest.new(
@@ -119,7 +121,8 @@ defmodule SpawnSdk.System.SpawnSystem do
         payload: payload,
         command_name: parse_command_name(command),
         async: async,
-        caller: nil
+        caller: nil,
+        scheduled_to: parse_scheduled_to(delay_in_ms, scheduled_to)
       )
 
     case Actors.invoke(req, opts) do
@@ -191,9 +194,9 @@ defmodule SpawnSdk.System.SpawnSystem do
 
             payload_response =
               case response do
-                nil -> Noop.new()
-                %Noop{} = noop -> noop
-                response -> any_pack!(response)
+                nil -> {:noop, Noop.new()}
+                %Noop{} = noop -> {:noop, noop}
+                response -> {:value, any_pack!(response)}
               end
 
             resp = %ActorInvocationResponse{
@@ -248,7 +251,7 @@ defmodule SpawnSdk.System.SpawnSystem do
          } = _value
        ) do
     cmd = if is_atom(command), do: Atom.to_string(command), else: command
-    payload = if is_nil(payload), do: Noop.new(), else: any_pack!(payload)
+    payload = if is_nil(payload), do: {:noop, Noop.new()}, else: {:value, any_pack!(payload)}
 
     Eigr.Functions.Protocol.Broadcast.new(
       channel_group: channel,
@@ -324,7 +327,10 @@ defmodule SpawnSdk.System.SpawnSystem do
          } = _value
        ) do
     Enum.map(effects, fn %SpawnSdk.Flow.SideEffect{} = effect ->
-      payload = if is_nil(effect.payload), do: Noop.new(), else: any_pack!(effect.payload)
+      payload =
+        if is_nil(effect.payload),
+          do: {:noop, Noop.new()},
+          else: {:value, any_pack!(effect.payload)}
 
       %Eigr.Functions.Protocol.SideEffect{
         request:
@@ -495,4 +501,13 @@ defmodule SpawnSdk.System.SpawnSystem do
 
   defp parse_command_name(command) when is_atom(command), do: Atom.to_string(command)
   defp parse_command_name(command) when is_binary(command), do: command
+
+  defp parse_scheduled_to(delay_ms, _scheduled_to) when is_integer(delay_ms) do
+    scheduled_to = DateTime.add(DateTime.utc_now(), delay_ms, :millisecond)
+    parse_scheduled_to(nil, scheduled_to)
+  end
+
+  defp parse_scheduled_to(_delay_ms, scheduled_to) do
+    DateTime.to_unix(scheduled_to, :millisecond)
+  end
 end
