@@ -334,7 +334,8 @@ defmodule SpawnSdk.System.SpawnSystem do
             payload: payload,
             command_name: effect.command,
             async: true,
-            caller: ActorId.new(name: caller_name, system: system)
+            caller: ActorId.new(name: caller_name, system: system),
+            scheduled_to: effect.scheduled_to
           )
       }
     end)
