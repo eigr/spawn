@@ -9,31 +9,31 @@ defmodule Actors.Actor.InvocationScheduler do
 
   @impl true
   def init(_arg) do
+    {:ok, %{}, {:continue, :init_invocations}}
+  end
+
+  @impl true
+  def handle_continue(:init_invocations, state) do
     stored_invocations = ActorRegistry.get_all_invocations()
 
     Enum.each(stored_invocations, &call_invoke/1)
 
-    {:ok, %{}}
+    {:noreply, state}
   end
 
   @impl true
-  def handle_info({:invoke, request}, state) do
-    decoded_request = InvocationRequest.decode(request)
+  def handle_info({:invoke, decoded_request}, state) do
+    ActorRegistry.remove_invocation_request(
+      decoded_request.actor.id.name,
+      InvocationRequest.encode(decoded_request)
+    )
 
-    retry with: exponential_backoff() |> randomize |> expiry(10_000),
-          atoms: [:error, :exit, :noproc, :erpc, :noconnection],
-          rescue_only: [ErlangError] do
-      ActorRegistry.remove_invocation_request(decoded_request.actor.id.name, request)
-    after
-      _ ->
-        spawn(fn ->
-          Actors.invoke(%{decoded_request | scheduled_to: nil, async: true})
-        end)
+    spawn(fn ->
+      request_to_invoke = %InvocationRequest{decoded_request | scheduled_to: nil, async: true}
+      Actors.invoke(request_to_invoke)
+    end)
 
-        {:noreply, state}
-    else
-      _ -> {:noreply, state}
-    end
+    {:noreply, state}
   end
 
   @impl true
@@ -42,14 +42,16 @@ defmodule Actors.Actor.InvocationScheduler do
 
     ActorRegistry.register_invocation_request(request.actor.id.name, encoded_request)
 
-    call_invoke(encoded_request)
+    call_invoke(request)
 
     {:noreply, state}
   end
 
-  defp call_invoke(encoded_request) do
-    decoded_request = InvocationRequest.decode(encoded_request)
+  defp call_invoke(encoded_request) when is_binary(encoded_request) do
+    InvocationRequest.decode(encoded_request) |> call_invoke()
+  end
 
+  defp call_invoke(%InvocationRequest{} = decoded_request) do
     delay_in_ms =
       decoded_request.scheduled_to
       |> DateTime.from_unix!(:millisecond)
@@ -57,9 +59,9 @@ defmodule Actors.Actor.InvocationScheduler do
 
     if delay_in_ms <= 0 do
       Logger.warn("Received negative delayed invocation request (#{delay_in_ms}), invoking now")
-      Process.send(self(), {:invoke, encoded_request}, [:noconnect])
+      Process.send(self(), {:invoke, decoded_request}, [])
     else
-      Process.send_after(self(), {:invoke, encoded_request}, delay_in_ms)
+      Process.send_after(self(), {:invoke, decoded_request}, delay_in_ms)
     end
   end
 

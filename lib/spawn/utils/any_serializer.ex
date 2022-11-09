@@ -6,6 +6,9 @@ defmodule Spawn.Utils.AnySerializer do
       Any.decode(bin)
       |> unpack_unknown()
 
+  def unpack_unknown({:value, any}), do: unpack_unknown(any)
+  def unpack_unknown({:noop, any}), do: unpack_unknown(any)
+
   def unpack_unknown(%{type_url: type_url} = any) do
     package_name =
       type_url
@@ -21,6 +24,8 @@ defmodule Spawn.Utils.AnySerializer do
   def unpack_unknown(_), do: nil
 
   def any_pack!(nil), do: nil
+
+  def any_pack!(%Any{} = record), do: record
 
   def any_pack!(record) do
     Any.new(

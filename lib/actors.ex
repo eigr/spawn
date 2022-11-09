@@ -124,7 +124,7 @@ defmodule Actors do
             atoms: [:error, :exit, :noproc, :erpc, :noconnection],
             rescue_only: [ErlangError] do
         do_lookup_action(system.name, actor.id.name, system, fn actor_ref ->
-          if is_nil(request.scheduled_to) do
+          if is_nil(request.scheduled_to) || request.scheduled_to == 0 do
             maybe_invoke_async(async?, actor_ref, request, opts)
           else
             InvocationScheduler.schedule_invoke(request)

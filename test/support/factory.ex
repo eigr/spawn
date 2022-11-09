@@ -74,8 +74,10 @@ defmodule Actors.FactoryTest do
       actor: attrs[:actor] || build_actor(),
       async: attrs[:async] || false,
       command_name: attrs[:command_name] || "ChangeNameTest",
-      value: attrs[:value] || value,
-      caller: attrs[:caller] || nil
+      payload: {:value, attrs[:value] || value},
+      caller: attrs[:caller] || nil,
+      metadata: attrs[:metadata] || %{},
+      scheduled_to: attrs[:scheduled_to] || nil
     )
   end
 
@@ -156,7 +158,7 @@ defmodule Actors.FactoryTest do
       actor_name: attrs[:actor_name],
       system_name: attrs[:system_name],
       updated_context: attrs[:context] || context,
-      value: attrs[:value] || state
+      payload: {:value, attrs[:value] || state}
     )
   end
 

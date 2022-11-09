@@ -111,7 +111,7 @@ defmodule SpawnSdk.System.SpawnSystem do
     end
 
     opts = [host_interface: SpawnSdk.Interface]
-    payload = if is_nil(payload), do: {:noop, Noop.new()}, else: {:value, any_pack!(payload)}
+    payload = parse_payload(payload)
 
     req =
       InvocationRequest.new(
@@ -165,7 +165,7 @@ defmodule SpawnSdk.System.SpawnSystem do
             actor_name: name,
             actor_system: system,
             updated_context: context,
-            payload: current_state
+            payload: parse_payload(current_state)
           )
 
         {:ok, resp, entity_state}
@@ -192,12 +192,7 @@ defmodule SpawnSdk.System.SpawnSystem do
             broadcast = handle_broadcast(decoded_value)
             side_effects = handle_side_effects(name, system, decoded_value)
 
-            payload_response =
-              case response do
-                nil -> {:noop, Noop.new()}
-                %Noop{} = noop -> {:noop, noop}
-                response -> {:value, any_pack!(response)}
-              end
+            payload_response = parse_payload(response)
 
             resp = %ActorInvocationResponse{
               updated_context:
@@ -251,7 +246,7 @@ defmodule SpawnSdk.System.SpawnSystem do
          } = _value
        ) do
     cmd = if is_atom(command), do: Atom.to_string(command), else: command
-    payload = if is_nil(payload), do: {:noop, Noop.new()}, else: {:value, any_pack!(payload)}
+    payload = parse_payload(payload)
 
     Eigr.Functions.Protocol.Broadcast.new(
       channel_group: channel,
@@ -327,10 +322,7 @@ defmodule SpawnSdk.System.SpawnSystem do
          } = _value
        ) do
     Enum.map(effects, fn %SpawnSdk.Flow.SideEffect{} = effect ->
-      payload =
-        if is_nil(effect.payload),
-          do: {:noop, Noop.new()},
-          else: {:value, any_pack!(effect.payload)}
+      payload = parse_payload(effect.payload)
 
       %Eigr.Functions.Protocol.SideEffect{
         request:
@@ -362,6 +354,18 @@ defmodule SpawnSdk.System.SpawnSystem do
 
   defp call_instance(instance, command, %Noop{} = noop, context) do
     instance.handle_command({parse_command_name(command), noop}, context)
+  end
+
+  defp call_instance(instance, command, {:noop, %Noop{} = noop}, context) do
+    instance.handle_command({parse_command_name(command), noop}, context)
+  end
+
+  defp call_instance(instance, command, {:value, value}, context) do
+    instance.handle_command({parse_command_name(command), unpack_unknown(value)}, context)
+  end
+
+  defp call_instance(instance, command, nil, context) do
+    instance.handle_command({parse_command_name(command), Noop.new()}, context)
   end
 
   defp call_instance(instance, command, value, context) do
@@ -502,12 +506,27 @@ defmodule SpawnSdk.System.SpawnSystem do
   defp parse_command_name(command) when is_atom(command), do: Atom.to_string(command)
   defp parse_command_name(command) when is_binary(command), do: command
 
+  defp parse_scheduled_to(nil, nil), do: nil
+
   defp parse_scheduled_to(delay_ms, _scheduled_to) when is_integer(delay_ms) do
     scheduled_to = DateTime.add(DateTime.utc_now(), delay_ms, :millisecond)
     parse_scheduled_to(nil, scheduled_to)
   end
 
+  defp parse_scheduled_to(_delay_ms, nil), do: nil
+
   defp parse_scheduled_to(_delay_ms, scheduled_to) do
     DateTime.to_unix(scheduled_to, :millisecond)
+  end
+
+  defp parse_payload(response) do
+    case response do
+      nil -> {:noop, Noop.new()}
+      %Noop{} = noop -> {:noop, noop}
+      {:noop, %Noop{} = noop} -> {:noop, noop}
+      {_, nil} -> {:noop, Noop.new()}
+      {:value, response} -> {:value, any_pack!(response)}
+      response -> {:value, any_pack!(response)}
+    end
   end
 end
