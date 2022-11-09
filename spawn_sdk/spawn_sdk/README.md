@@ -158,10 +158,12 @@ defmodule SpawnSdkExample.Actors.AbstractActor do
     |> Value.effects(
       # This returns a list of side effects. In this case containing only one effect. However, multiple effects can be chained together,
       # just by calling the effect function as shown here.
+      # The delay means that it will be fired asynchronously after 5000 milliseconds (5 seconds)
       # If only one effect is desired, you can also choose to use the to/3 function together with Value.effect().
       # Example: Values.effect(SideEffect.to(name, func, payload))
       SideEffect.of()
-      |> SideEffect.effect("joe", :sum, result)
+      |> SideEffect.effect("joe", :sum, result, delay: 5_000, scheduled_to: ~U[2020-01-01 10:00:00.145Z])
+      # use delay or scheduled_to, not both
     )
     |> Value.reply!()
   end
