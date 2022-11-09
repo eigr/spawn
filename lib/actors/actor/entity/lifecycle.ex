@@ -23,7 +23,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
   @default_deactivate_timeout 10_000
   @default_snapshot_timeout 2_000
   @min_snapshot_threshold 500
-  @timeout_factor_range 9000
+  @timeout_jitter 9000
 
   def init(
         %EntityState{
@@ -49,7 +49,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
     :ok = handle_metadata(name, metadata)
     :ok = Invocation.handle_timers(timer_commands)
 
-    schedule_deactivate(deactivation_strategy, get_timeout_factor())
+    schedule_deactivate(deactivation_strategy, get_jitter())
     maybe_schedule_snapshot_advance(snapshot_strategy)
 
     {:ok, state, {:continue, :load_state}}
@@ -207,7 +207,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
   end
 
   defp maybe_schedule_snapshot_advance(%ActorSnapshotStrategy{}) do
-    timeout = @min_snapshot_threshold + get_timeout_factor()
+    timeout = @min_snapshot_threshold + get_jitter()
 
     Process.send_after(self(), :snapshot, timeout)
   end
@@ -244,7 +244,6 @@ defmodule Actors.Actor.Entity.Lifecycle do
        ),
        do: (timeout || @default_deactivate_timeout) + timeout_factor
 
-  defp get_timeout_factor(), do:
-    :rand.:rand.uniform(@timeout_factor_range)
+  defp get_jitter(), do: :rand.uniform(@timeout_jitter)
 
 end
