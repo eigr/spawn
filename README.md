@@ -200,6 +200,13 @@ You can find some examples of using Spawn in the links below:
 * **Fleet**: https://github.com/sleipnir/fleet-spawn-example
 * **Spawn Polyglot Example**: https://github.com/sleipnir/spawn-polyglot-ping-pong
 
+### Talks
+
+You can see some talks on Youtube about Eigr Community or Spawn in the links below:
+
+* **Marcel Lanz on Code Beam Europe 2022**: https://youtu.be/jgR7Oc_GXAg
+* **Adriano Santos on Code Beam BR 2022**: Link not yet released by the event organizers
+
 ## SDKs
 
 Another important part of Spawn is the SDKs implemented in different languages that aim to
