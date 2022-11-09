@@ -7,13 +7,18 @@ defmodule Actors.Actor.InvocationScheduler do
   alias Actors.Registry.ActorRegistry
   alias Eigr.Functions.Protocol.InvocationRequest
 
+  @hibernate_delay 20_000
+  @hibernate_jitter 30_000
+
   @impl true
   def init(_arg) do
+    Process.flag(:message_queue_data, :off_heap)
     {:ok, %{}, {:continue, :init_invocations}}
   end
 
   @impl true
   def handle_continue(:init_invocations, state) do
+    schedule_hibernate()
     stored_invocations = ActorRegistry.get_all_invocations()
 
     Enum.each(stored_invocations, &call_invoke/1)
@@ -34,6 +39,11 @@ defmodule Actors.Actor.InvocationScheduler do
     end)
 
     {:noreply, state}
+  end
+
+  def handle_info(:hibernate, state) do
+    schedule_hibernate()
+    {:noreply, state, :hibernate}
   end
 
   @impl true
@@ -64,6 +74,12 @@ defmodule Actors.Actor.InvocationScheduler do
       Process.send_after(self(), {:invoke, decoded_request}, delay_in_ms)
     end
   end
+
+  defp schedule_hibernate() do
+    Process.send_after(self(), :hibernate, next_hibernate_delay())
+  end
+
+  def next_hibernate_delay(), do: @hibernate_delay + :rand.uniform(@hibernate_jitter)
 
   # Client
 

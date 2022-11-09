@@ -19,6 +19,7 @@ defmodule Actors.Registry.ActorRegistry do
   @impl true
   def init(state) do
     Process.flag(:trap_exit, true)
+    Process.flag(:message_queue_data, :off_heap)
     :ok = :net_kernel.monitor_nodes(true, node_type: :visible)
     {:ok, state}
   end
