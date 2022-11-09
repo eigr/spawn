@@ -195,6 +195,7 @@ kubectl get actornodes
 You can find some examples of using Spawn in the links below:
 
 * **Hatch**: https://github.com/zblanco/hatch
+* **Distributed Image Processing**: https://github.com/eigr-labs/spawn-distributed-image-processing
 * **Federated Data Example**: https://github.com/eigr-labs/spawn-federated-data-example
 * **Fleet**: https://github.com/sleipnir/fleet-spawn-example
 * **Spawn Polyglot Example**: https://github.com/sleipnir/spawn-polyglot-ping-pong
