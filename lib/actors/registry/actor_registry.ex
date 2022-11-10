@@ -3,7 +3,7 @@ defmodule Actors.Registry.ActorRegistry do
   use GenServer
   require Logger
 
-  alias Actors.Registry.HostActor
+  alias Actors.Registry.{HostActor, LoadBalancer}
   alias Eigr.Functions.Protocol.Actors.{Actor, ActorId}
   alias Spawn.Cluster.StateHandoff
 
@@ -52,9 +52,17 @@ defmodule Actors.Registry.ActorRegistry do
               GenServer.reply(from, {:not_found, []})
 
             hosts ->
-              node_host = Enum.random(hosts)
+              # TODO: Switch to using the Round Robin strategy. In this case,
+              #       the list of hosts returned must be updated in the HostFunction
+              #       so that the algorithm succeeds in the next invocation.
+              case LoadBalance.next_host(hosts) do
+                {:ok, node_host, _hosts} ->
+                  # TODO: Update list of hosts of the HostFunction
+                  GenServer.reply(from, {:ok, node_host})
 
-              GenServer.reply(from, {:ok, node_host})
+                _ ->
+                  GenServer.reply(from, {:not_found, []})
+              end
           end)
       end
     end)
