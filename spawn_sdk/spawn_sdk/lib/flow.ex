@@ -87,7 +87,7 @@ defmodule SpawnSdk.Flow do
             actor_name: String.t(),
             command: String.t() | atom(),
             payload: module(),
-            scheduled_to: integer() | nil,
+            scheduled_to: integer() | nil
           }
 
     @type actor_name :: String.t()

@@ -3,6 +3,8 @@ defmodule Spawn.Cluster.StateHandoff do
   use GenServer
   require Logger
 
+  @call_timeout 15_000
+
   @default_sync_interval 5
   @default_ship_interval 5
   @default_ship_debounce 5
@@ -124,14 +126,14 @@ defmodule Spawn.Cluster.StateHandoff do
 
   # pickup the stored entity data for a actor
   def get(actor) do
-    GenServer.call(__MODULE__, {:get, actor})
+    GenServer.call(__MODULE__, {:get, actor}, @call_timeout)
   end
 
   def get_all_invocations do
-    GenServer.call(__MODULE__, :get_all_invocations)
+    GenServer.call(__MODULE__, :get_all_invocations, @call_timeout)
   end
 
   def clean(node) do
-    GenServer.call(__MODULE__, {:clean, node})
+    GenServer.call(__MODULE__, {:clean, node}, @call_timeout)
   end
 end

@@ -7,6 +7,8 @@ defmodule Actors.Registry.ActorRegistry do
   alias Eigr.Functions.Protocol.Actors.{Actor, ActorId}
   alias Spawn.Cluster.StateHandoff
 
+  @call_timeout 15_000
+
   def child_spec(state \\ []) do
     %{
       id: __MODULE__,
@@ -149,7 +151,7 @@ defmodule Actors.Registry.ActorRegistry do
   @doc since: "0.1.0"
   @spec register(list(HostActor.t())) :: :ok
   def register(hosts) do
-    GenServer.call(__MODULE__, {:register, hosts})
+    GenServer.call(__MODULE__, {:register, hosts}, @call_timeout)
   end
 
   @doc """

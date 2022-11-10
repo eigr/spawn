@@ -404,8 +404,11 @@ defmodule SpawnSdk.System.SpawnSystem do
   defp state_to_map(actors) do
     actors
     |> Enum.into(%{}, fn
-      {key, value} -> {key, value}
-      actor -> {actor.__meta__(:name), actor}
+      {key, value} ->
+        {key, value}
+
+      actor ->
+        {actor.__meta__(:name), actor}
     end)
   end
 

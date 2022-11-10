@@ -13,7 +13,14 @@ defmodule Actors do
 
   alias Actors.Registry.{ActorRegistry, HostActor}
 
-  alias Eigr.Functions.Protocol.Actors.{Actor, ActorId, ActorSettings, ActorSystem, Registry}
+  alias Eigr.Functions.Protocol.Actors.{
+    Actor,
+    ActorId,
+    Metadata,
+    ActorSettings,
+    ActorSystem,
+    Registry
+  }
 
   alias Eigr.Functions.Protocol.{
     InvocationRequest,
@@ -273,11 +280,19 @@ defmodule Actors do
     )
     |> Flow.filter(fn {_actor_name,
                        %Actor{
+                         metadata: %Metadata{channel_group: channel},
                          settings: %ActorSettings{persistent: persistent, abstract: abstract}
                        } = _actor} ->
-      is_boolean(persistent) and
-        match?(true, persistent) and
-        match?(false, abstract)
+      cond do
+        match?(true, persistent) and match?(false, abstract) ->
+          true
+
+        not is_nil(channel) and byte_size(channel) > 0 ->
+          true
+
+        true ->
+          false
+      end
     end)
     |> Flow.map(fn {actor_name, actor} ->
       Logger.debug("Registering #{actor_name} #{inspect(actor)} on Node: #{inspect(Node.self())}")

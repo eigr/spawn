@@ -245,5 +245,4 @@ defmodule Actors.Actor.Entity.Lifecycle do
        do: (timeout || @default_deactivate_timeout) + timeout_factor
 
   defp get_jitter(), do: :rand.uniform(@timeout_jitter)
-
 end

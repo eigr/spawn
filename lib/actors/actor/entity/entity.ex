@@ -126,14 +126,16 @@ defmodule Actors.Actor.Entity do
            actor: %Actor{id: %ActorId{} = id}
          } = state
        ) do
-    Logger.warning("A conflict has been detected for ActorId #{inspect(id)}. Possible NetSplit!
+    Logger.warning(
+      "A conflict has been detected for ActorId #{inspect(id)}. Possible Actor Rebalance or NetSplit!
       Trace Data: [
         from: #{inspect(from)},
         key: #{inspect(key)},
         value: #{inspect(value)},
         registry: #{inspect(registry)},
         pid: #{inspect(pid)}
-      ] ")
+      ] "
+    )
 
     {:stop, :normal, state}
   end
