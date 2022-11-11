@@ -6,7 +6,7 @@ defmodule Actors.Registry.LoadBalancer do
   @strategy Application.compile_env(
               :spawn,
               :load_blance_strategy,
-              Actors.Registry.LoadBalance.Strategies.Random
+              Actors.Registry.LoadBalance.Strategies.RoundRobin
             )
 
   defdelegate next_host(hosts), to: @strategy, as: :next_host

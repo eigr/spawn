@@ -52,12 +52,13 @@ defmodule Actors.Registry.ActorRegistry do
               GenServer.reply(from, {:not_found, []})
 
             hosts ->
-              # TODO: Switch to using the Round Robin strategy. In this case,
-              #       the list of hosts returned must be updated in the HostFunction
-              #       so that the algorithm succeeds in the next invocation.
+              IO.inspect(hosts, label: "Incoming Hosts _________________")
+
               case LoadBalancer.next_host(hosts) do
-                {:ok, node_host, _hosts} ->
-                  # TODO: Update list of hosts of the HostFunction
+                {:ok, node_host, updated_hosts} ->
+                  IO.inspect(updated_hosts, label: "Outcoming Hosts _________________")
+                  StateHandoff.set(actor_name, updated_hosts)
+                  IO.inspect(node_host, label: "Node Host _________________")
                   GenServer.reply(from, {:ok, node_host})
 
                 _ ->
