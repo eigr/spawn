@@ -105,6 +105,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
             %Actor{
               state: actor_state,
               settings: %ActorSettings{
+                persistent: true,
                 snapshot_strategy: %ActorSnapshotStrategy{
                   strategy: {:timeout, %TimeoutStrategy{timeout: _timeout}} = snapshot_strategy
                 }
@@ -125,6 +126,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
               id: %ActorId{name: name} = _id,
               state: %ActorState{} = actor_state,
               settings: %ActorSettings{
+                persistent: true,
                 snapshot_strategy: %ActorSnapshotStrategy{
                   strategy: {:timeout, %TimeoutStrategy{timeout: timeout}} = snapshot_strategy
                 }
