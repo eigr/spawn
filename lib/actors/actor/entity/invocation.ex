@@ -6,7 +6,6 @@ defmodule Actors.Actor.Entity.Invocation do
   require Logger
 
   alias Actors.Actor.Entity.EntityState
-  alias Actors.Registry.HostActor
 
   alias Eigr.Functions.Protocol.Actors.{
     Actor,
@@ -31,9 +30,12 @@ defmodule Actors.Actor.Entity.Invocation do
 
   alias Phoenix.PubSub
 
-  import Actors.Registry.ActorRegistry, only: [lookup: 2]
-
-  @default_host_interface Actors.Actor.Interface.Http
+  @http_host_interface Actors.Actor.Interface.Http
+  @host_interface_map %{
+    "sdk" => SpawnSdk.Interface,
+    "http" => @http_host_interface,
+    "default" => @http_host_interface
+  }
 
   @default_methods [
     "get",
@@ -140,7 +142,7 @@ defmodule Actors.Actor.Entity.Invocation do
            command_name: command,
            payload: payload,
            caller: caller
-         }, opts},
+         }, _opts},
         %EntityState{
           system: actor_system,
           actor: %Actor{state: actor_state, commands: commands, timer_commands: timers}
@@ -156,7 +158,7 @@ defmodule Actors.Actor.Entity.Invocation do
     case Enum.member?(@default_methods, command) or
            Enum.any?(all_commands, fn cmd -> cmd.name == command end) do
       true ->
-        interface = get_interface(actor_system, actor_name, opts)
+        interface = get_interface(actor_system)
 
         metadata = if is_nil(metadata), do: %{}, else: metadata
         current_state = Map.get(actor_state || %{}, :state)
@@ -246,15 +248,9 @@ defmodule Actors.Actor.Entity.Invocation do
     }
 
     try do
-      case lookup(system_name, actor_name) do
-        {:ok, %HostActor{opts: opts}} ->
-          case Actors.invoke(invocation, opts) do
-            {:ok, response} -> response
-            error -> error
-          end
-
-        _ ->
-          response
+      case Actors.invoke(invocation, []) do
+        {:ok, response} -> response
+        error -> error
       end
     catch
       error ->
@@ -289,15 +285,9 @@ defmodule Actors.Actor.Entity.Invocation do
     }
 
     try do
-      case lookup(system_name, actor_name) do
-        {:ok, %HostActor{opts: opts}} ->
-          case Actors.invoke(invocation, opts) do
-            {:ok, response} -> response
-            error -> error
-          end
-
-        _ ->
-          response
+      case Actors.invoke(invocation, []) do
+        {:ok, response} -> response
+        error -> error
       end
     catch
       error ->
@@ -352,13 +342,7 @@ defmodule Actors.Actor.Entity.Invocation do
                          } = invocation
                      } ->
         try do
-          case lookup(system_name, actor_name) do
-            {:ok, %HostActor{opts: opts}} ->
-              Actors.invoke(invocation, opts)
-
-            _ ->
-              :ok
-          end
+          Actors.invoke(invocation, [])
         catch
           error ->
             Logger.warning(
@@ -376,21 +360,11 @@ defmodule Actors.Actor.Entity.Invocation do
       :ok
   end
 
-  defp get_interface(system_name, actor_name, opts),
-    do:
-      Keyword.get(
-        opts,
-        :host_interface,
-        get_interface_by_actor_or_default(system_name, actor_name)
-      )
-
-  defp get_interface_by_actor_or_default(system_name, actor_name) do
-    case lookup(system_name, actor_name) do
-      {:ok, %HostActor{opts: opts}} ->
-        Keyword.get(opts, :host_interface, @default_host_interface)
-
-      _ ->
-        @default_host_interface
+  defp get_interface(system_name) do
+    if :persistent_term.get(system_name, false) do
+      @host_interface_map["sdk"]
+    else
+      System.get_env("PROXY_HOST_INTERFACE", @host_interface_map["default"])
     end
   end
 end

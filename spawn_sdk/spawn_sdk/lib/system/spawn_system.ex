@@ -48,7 +48,7 @@ defmodule SpawnSdk.System.SpawnSystem do
 
   @impl SpawnSdk.System
   def register(system, actors) do
-    opts = [host_interface: SpawnSdk.Interface]
+    opts = []
 
     registration_request = build_registration_req(system, actors)
 
@@ -77,7 +77,7 @@ defmodule SpawnSdk.System.SpawnSystem do
     end
 
     new_state = state_to_map(actor_name, [actor_mod])
-    opts = [host_interface: SpawnSdk.Interface]
+    opts = []
 
     spawn_request = build_spawn_req(system, actor_name, actor_mod)
 
@@ -110,7 +110,7 @@ defmodule SpawnSdk.System.SpawnSystem do
       spawn_actor(actor_name, system: system, actor: actor_reference)
     end
 
-    opts = [host_interface: SpawnSdk.Interface]
+    opts = []
     payload = parse_payload(payload)
 
     req =

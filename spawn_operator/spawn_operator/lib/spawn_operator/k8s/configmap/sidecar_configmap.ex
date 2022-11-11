@@ -46,6 +46,7 @@ defmodule SpawnOperator.K8s.ConfigMap.SidecarCM do
         "PROXY_HTTP_PORT" => "9001",
         "PROXY_PORT" => "9000",
         "PROXY_ROOT_TEMPLATE_PATH" => "/home/app",
+        "PROXY_HOST_INTERFACE" => "http",
         #        "PROXY_UDS_ADDRESS" => "#{socket_path}",
         #        "PROXY_UDS_MODE" => uds_mode,
         "USER_FUNCTION_HOST" => "127.0.0.1",

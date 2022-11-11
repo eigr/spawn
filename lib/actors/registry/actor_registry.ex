@@ -218,7 +218,7 @@ defmodule Actors.Registry.ActorRegistry do
                __unknown_fields__: []
              }
            ],
-           opts: [host_interface: SpawnSdk.Interface]
+           opts: []
          }
       }}
   """
