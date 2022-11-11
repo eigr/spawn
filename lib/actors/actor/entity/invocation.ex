@@ -37,12 +37,19 @@ defmodule Actors.Actor.Entity.Invocation do
     "default" => @http_host_interface
   }
 
-  @default_methods [
+  @default_functions [
     "get",
     "Get",
     "get_state",
     "getState",
     "GetState"
+  ]
+
+  @default_init_functions [
+    "init",
+    "Init",
+    "setup",
+    "Setup"
   ]
 
   def timer_invoke(
@@ -129,6 +136,62 @@ defmodule Actors.Actor.Entity.Invocation do
     {:noreply, state}
   end
 
+  def invoke_init(
+        %EntityState{
+          system: actor_system,
+          actor:
+            %Actor{
+              id: %ActorId{name: actor_name} = id,
+              state: actor_state,
+              commands: commands
+            } = _actor
+        } = state
+      ) do
+    if length(commands) <= 0 do
+      Logger.warning("Actor [#{actor_name}] has not registered any Actions")
+      {:noreply, state, :hibernate}
+    else
+      init_command =
+        Enum.filter(commands, fn cmd -> Enum.member?(@default_init_functions, cmd.name) end)
+        |> List.first()
+
+      case init_command do
+        nil ->
+          {:noreply, state, :hibernate}
+
+        _ ->
+          interface = get_interface(actor_system)
+
+          metadata = %{}
+
+          request =
+            ActorInvocation.new(
+              actor_name: actor_name,
+              actor_system: actor_system,
+              command_name: init_command.name,
+              payload: Noop.new(),
+              current_context:
+                Context.new(
+                  metadata: metadata,
+                  caller: id,
+                  self: ActorId.new(name: actor_name, system: actor_system),
+                  state: actor_state
+                ),
+              caller: id
+            )
+
+          interface.invoke_host(request, state, @default_functions)
+          |> case do
+            {:ok, _response, new_state} ->
+              {:noreply, new_state}
+
+            {:error, _reason, new_state} ->
+              {:noreply, new_state, :hibernate}
+          end
+      end
+    end
+  end
+
   @doc """
   Invoke function, receives a request and calls invoke host with the response
   """
@@ -155,7 +218,7 @@ defmodule Actors.Actor.Entity.Invocation do
     all_commands =
       commands ++ Enum.map(timers, fn %FixedTimerCommand{command: cmd} = _timer_cmd -> cmd end)
 
-    case Enum.member?(@default_methods, command) or
+    case Enum.member?(@default_functions, command) or
            Enum.any?(all_commands, fn cmd -> cmd.name == command end) do
       true ->
         interface = get_interface(actor_system)
@@ -179,7 +242,7 @@ defmodule Actors.Actor.Entity.Invocation do
             caller: caller
           )
 
-        interface.invoke_host(request, state, @default_methods)
+        interface.invoke_host(request, state, @default_functions)
         |> case do
           {:ok, response, state} -> {:reply, {:ok, do_response(request, response, state)}, state}
           {:error, reason, state} -> {:reply, {:error, reason}, state, :hibernate}

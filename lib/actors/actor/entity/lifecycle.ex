@@ -71,19 +71,20 @@ defmodule Actors.Actor.Entity.Lifecycle do
     case StateManager.load(name) do
       {:ok, current_state} ->
         # TODO: Merge current with old ?
-        {:noreply, %EntityState{state | actor: %Actor{actor | state: current_state}}}
+        {:noreply, %EntityState{state | actor: %Actor{actor | state: current_state}},
+         {:continue, :call_init_action}}
 
       {:not_found, %{}} ->
         Logger.debug("Not found initial state on statestore for Actor #{name}.")
-        {:noreply, state, :hibernate}
+        {:noreply, state, {:continue, :call_init_action}}
 
       error ->
         Logger.error("Error on load state for Actor #{name}. Error: #{inspect(error)}")
-        {:noreply, state, :hibernate}
+        {:noreply, state, {:continue, :call_init_action}}
     end
   end
 
-  def load_state(state), do: {:noreply, state}
+  def load_state(state), do: {:noreply, state, {:continue, :call_init_action}}
 
   def terminate(reason, %EntityState{
         actor: %Actor{

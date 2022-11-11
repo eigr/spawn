@@ -24,13 +24,16 @@ defmodule Actors.Actor.Entity do
   end
 
   @impl true
-  @spec handle_continue(:load_state, EntityState.t()) :: {:noreply, EntityState.t()}
+  @spec handle_continue(atom(), EntityState.t()) :: {:noreply, EntityState.t()}
   def handle_continue(action, state) do
     state = EntityState.unpack(state)
 
     case action do
       :load_state ->
         Lifecycle.load_state(state)
+
+      :call_init_action ->
+        Invocation.invoke_init(state)
 
       action ->
         do_handle_continue(action, state)
