@@ -8,7 +8,7 @@ defmodule SpawnSdkExample.Actors.JoeActor do
   require Logger
   alias Io.Eigr.Spawn.Example.{MyState, MyBusinessMessage}
 
-  defact init(_payload, %Context{state: state} = ctx) do
+  defact init(%Context{state: state} = ctx) do
     Logger.info("[joe] Received InitRequest. Context: #{inspect(ctx)}")
 
     %Value{}
