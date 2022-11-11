@@ -52,13 +52,9 @@ defmodule Actors.Registry.ActorRegistry do
               GenServer.reply(from, {:not_found, []})
 
             hosts ->
-              IO.inspect(hosts, label: "Incoming Hosts _________________")
-
               case LoadBalancer.next_host(hosts) do
                 {:ok, node_host, updated_hosts} ->
-                  IO.inspect(updated_hosts, label: "Outcoming Hosts _________________")
                   StateHandoff.set(actor_name, updated_hosts)
-                  IO.inspect(node_host, label: "Node Host _________________")
                   GenServer.reply(from, {:ok, node_host})
 
                 _ ->
