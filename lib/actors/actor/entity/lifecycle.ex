@@ -55,7 +55,12 @@ defmodule Actors.Actor.Entity.Lifecycle do
     {:ok, state, {:continue, :load_state}}
   end
 
-  def load_state(%EntityState{actor: %Actor{id: %ActorId{name: name}} = actor} = state) do
+  def load_state(
+        %EntityState{
+          actor:
+            %Actor{settings: %ActorSettings{persistent: true}, id: %ActorId{name: name}} = actor
+        } = state
+      ) do
     if is_nil(actor.state) do
       "Initial state is empty. Getting state from state manager."
     else
@@ -77,6 +82,8 @@ defmodule Actors.Actor.Entity.Lifecycle do
         {:noreply, state, :hibernate}
     end
   end
+
+  def load_state(state), do: {:noreply, state}
 
   def terminate(reason, %EntityState{
         actor: %Actor{
