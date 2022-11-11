@@ -483,7 +483,7 @@ defmodule SpawnSdk.System.SpawnSystem do
 
       {name,
        Actor.new(
-         id: %ActorId{system: system, name: name},
+         id: %ActorId{system: system, name: name, parent: actor.__meta__(:name)},
          metadata: %Metadata{channel_group: channel},
          settings: %ActorSettings{
            abstract: abstract,

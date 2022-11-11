@@ -86,15 +86,24 @@ defmodule Actors do
   def spawn_actor(
         %SpawnRequest{
           actor_system:
-            %ActorSystem{name: _name, registry: %Registry{actors: actors} = _registry} =
+            %ActorSystem{name: name, registry: %Registry{actors: actors} = _registry} =
               _actor_system
         } = _registration,
         opts
       ) do
     hosts =
       Enum.map(Map.values(actors), fn actor ->
-        %HostActor{node: Node.self(), actor: actor, opts: opts}
+        case ActorRegistry.get_hosts_by_actor(name, actor.id.parent) do
+          {:ok, actor_hosts} ->
+            Enum.map(actor_hosts, fn host ->
+              %HostActor{node: host.node, actor: actor, opts: opts}
+            end)
+
+          _ ->
+            %HostActor{node: Node.self(), actor: actor, opts: opts}
+        end
       end)
+      |> List.flatten()
 
     :ok = ActorRegistry.register(hosts)
 

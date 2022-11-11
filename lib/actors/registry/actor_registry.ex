@@ -67,6 +67,28 @@ defmodule Actors.Registry.ActorRegistry do
     {:noreply, state}
   end
 
+  @impl true
+  def handle_call({:get_hosts_by_actor, _system_name, actor_name}, from, state) do
+    spawn(fn ->
+      case StateHandoff.get(actor_name) do
+        nil ->
+          GenServer.reply(from, {:not_found, []})
+
+        hosts ->
+          Enum.filter(hosts, fn ac -> ac.actor.id.name == actor_name end)
+          |> then(fn
+            [] ->
+              GenServer.reply(from, {:not_found, []})
+
+            hosts ->
+              GenServer.reply(from, {:ok, hosts})
+          end)
+      end
+    end)
+
+    {:noreply, state}
+  end
+
   def handle_call({:register, hosts}, _from, state) do
     Enum.each(hosts, fn %HostActor{
                           node: node,
@@ -222,5 +244,10 @@ defmodule Actors.Registry.ActorRegistry do
   @spec lookup(String.t(), String.t()) :: {:ok, Member.t()} | {:not_found, []}
   def lookup(system_name, actor_name) do
     GenServer.call(__MODULE__, {:get, system_name, actor_name})
+  end
+
+  @spec get_hosts_by_actor(String.t(), String.t()) :: {:ok, Member.t()} | {:not_found, []}
+  def get_hosts_by_actor(system_name, actor_name) do
+    GenServer.call(__MODULE__, {:get_hosts_by_actor, system_name, actor_name})
   end
 end

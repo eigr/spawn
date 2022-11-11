@@ -96,6 +96,10 @@ message ActorId {
 
     // Name of a ActorSystem
     string system = 2;
+
+    // When the Actor is of the Abstract type, 
+    // the name of the parent Actor must be informed here.
+    string parent = 3;
 }
 
 message Actor {
