@@ -177,7 +177,6 @@ defmodule Actors do
                      [system, actor, opts],
                      @erpc_timeout
                    ) do
-              IO.inspect(node, label: "Porrrrrrrrrrrrrraaaaaaaaaaaaaaaaaaaaaaa")
               Tracer.set_attributes([{"actor-pid", "#{inspect(actor_ref)}"}])
 
               Tracer.add_event("try-reactivate-actor", [
