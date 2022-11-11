@@ -364,7 +364,7 @@ defmodule Actors.Actor.Entity.Invocation do
     if :persistent_term.get(system_name, false) do
       @host_interface_map["sdk"]
     else
-      System.get_env("PROXY_HOST_INTERFACE", @host_interface_map["default"])
+      @host_interface_map[System.get_env("PROXY_HOST_INTERFACE", "default")]
     end
   end
 end
