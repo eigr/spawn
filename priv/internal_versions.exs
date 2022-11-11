@@ -1,24 +1,24 @@
 defmodule InternalVersions do
   # The order here is also the deploy order, its important to keep this way
   @versions [
-    spawn_statestores: "0.5.0-alpha.6",
-    spawn_statestores_mysql: "0.5.0-alpha.6",
-    spawn_statestores_mssql: "0.5.0-alpha.6",
-    spawn_statestores_postgres: "0.5.0-alpha.6",
-    spawn_statestores_sqlite: "0.5.0-alpha.6",
-    spawn_statestores_cockroachdb: "0.5.0-alpha.6",
-    spawn: "0.5.0-alpha.8",
-    spawn_sdk: "0.5.0-alpha.8",
+    spawn_statestores: "0.5.0-alpha.9",
+    spawn_statestores_mysql: "0.5.0-alpha.9",
+    spawn_statestores_mssql: "0.5.0-alpha.9",
+    spawn_statestores_postgres: "0.5.0-alpha.9",
+    spawn_statestores_sqlite: "0.5.0-alpha.9",
+    spawn_statestores_cockroachdb: "0.5.0-alpha.9",
+    spawn: "0.5.0-alpha.9",
+    spawn_sdk: "0.5.0-alpha.9",
 
-    activator: "0.5.0-alpha.8",
-    activator_grpc: "0.5.0-alpha.8",
-    activator_http: "0.5.0-alpha.8",
-    activator_kafka: "0.5.0-alpha.8",
-    activator_pubsub: "0.5.0-alpha.8",
-    activator_rabbitmq: "0.5.0-alpha.8",
-    activator_sqs: "0.5.0-alpha.8",
+    activator: "0.5.0-alpha.9",
+    activator_grpc: "0.5.0-alpha.9",
+    activator_http: "0.5.0-alpha.9",
+    activator_kafka: "0.5.0-alpha.9",
+    activator_pubsub: "0.5.0-alpha.9",
+    activator_rabbitmq: "0.5.0-alpha.9",
+    activator_sqs: "0.5.0-alpha.9",
 
-    proxy: "0.5.0-alpha.8"
+    proxy: "0.5.0-alpha.9"
   ]
 
   @doc """
