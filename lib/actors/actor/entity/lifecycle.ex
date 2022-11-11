@@ -55,7 +55,12 @@ defmodule Actors.Actor.Entity.Lifecycle do
     {:ok, state, {:continue, :load_state}}
   end
 
-  def load_state(%EntityState{actor: %Actor{id: %ActorId{name: name}} = actor} = state) do
+  def load_state(
+        %EntityState{
+          actor:
+            %Actor{settings: %ActorSettings{persistent: true}, id: %ActorId{name: name}} = actor
+        } = state
+      ) do
     if is_nil(actor.state) do
       "Initial state is empty. Getting state from state manager."
     else
@@ -78,6 +83,8 @@ defmodule Actors.Actor.Entity.Lifecycle do
     end
   end
 
+  def load_state(state), do: {:noreply, state}
+
   def terminate(reason, %EntityState{
         actor: %Actor{
           id: %ActorId{name: name} = _id,
@@ -98,6 +105,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
             %Actor{
               state: actor_state,
               settings: %ActorSettings{
+                persistent: true,
                 snapshot_strategy: %ActorSnapshotStrategy{
                   strategy: {:timeout, %TimeoutStrategy{timeout: _timeout}} = snapshot_strategy
                 }
@@ -118,6 +126,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
               id: %ActorId{name: name} = _id,
               state: %ActorState{} = actor_state,
               settings: %ActorSettings{
+                persistent: true,
                 snapshot_strategy: %ActorSnapshotStrategy{
                   strategy: {:timeout, %TimeoutStrategy{timeout: timeout}} = snapshot_strategy
                 }
