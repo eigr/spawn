@@ -14,6 +14,7 @@ defmodule SpawnSdkExample.Application do
           SpawnSdkExample.Actors.AbstractActor
         ]
       },
+      # Start any external event subscriber after spawning spawn
       {SpawnSdkExample.Subscriber, []}
     ]
 
