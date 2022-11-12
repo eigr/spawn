@@ -20,11 +20,6 @@ defmodule SpawnSdkExample.Subscriber do
     {:noreply, state}
   end
 
-  def handle_info(any, state) do
-    Logger.info("Unknow event #{inspect(any)}")
-    {:noreply, state}
-  end
-
   def start_link(args) do
     GenServer.start_link(__MODULE__, args)
   end
