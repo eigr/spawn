@@ -37,7 +37,7 @@ defmodule Actors.Actor.Entity.Invocation do
     "default" => @http_host_interface
   }
 
-  @default_functions [
+  @default_actions [
     "get",
     "Get",
     "get_state",
@@ -45,7 +45,7 @@ defmodule Actors.Actor.Entity.Invocation do
     "GetState"
   ]
 
-  @default_init_functions [
+  @default_init_actions [
     "init",
     "Init",
     "setup",
@@ -152,7 +152,7 @@ defmodule Actors.Actor.Entity.Invocation do
       {:noreply, state, :hibernate}
     else
       init_command =
-        Enum.filter(commands, fn cmd -> Enum.member?(@default_init_functions, cmd.name) end)
+        Enum.filter(commands, fn cmd -> Enum.member?(@default_init_actions, cmd.name) end)
         |> List.first()
 
       case init_command do
@@ -180,7 +180,7 @@ defmodule Actors.Actor.Entity.Invocation do
               caller: id
             )
 
-          interface.invoke_host(request, state, @default_functions)
+          interface.invoke_host(request, state, @default_actions)
           |> case do
             {:ok, _response, new_state} ->
               {:noreply, new_state}
@@ -218,7 +218,7 @@ defmodule Actors.Actor.Entity.Invocation do
     all_commands =
       commands ++ Enum.map(timers, fn %FixedTimerCommand{command: cmd} = _timer_cmd -> cmd end)
 
-    case Enum.member?(@default_functions, command) or
+    case Enum.member?(@default_actions, command) or
            Enum.any?(all_commands, fn cmd -> cmd.name == command end) do
       true ->
         interface = get_interface(actor_system)
@@ -242,7 +242,7 @@ defmodule Actors.Actor.Entity.Invocation do
             caller: caller
           )
 
-        interface.invoke_host(request, state, @default_functions)
+        interface.invoke_host(request, state, @default_actions)
         |> case do
           {:ok, response, state} -> {:reply, {:ok, do_response(request, response, state)}, state}
           {:error, reason, state} -> {:reply, {:error, reason}, state, :hibernate}
