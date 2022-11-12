@@ -28,8 +28,16 @@ defmodule SpawnSdk.System.Supervisor do
   def init(opts) do
     config = Config.load(__MODULE__)
 
-    system = Keyword.fetch!(opts, :system)
-    actors = Keyword.fetch!(opts, :actors)
+    unless _system = opts[:system] do
+      raise ArgumentError, "expected :system option to be given"
+    end
+
+    unless _actors = opts[:actors] do
+      raise ArgumentError, "expected :actors option to be given"
+    end
+
+    system = Keyword.get(opts, :system)
+    actors = Keyword.get(opts, :actors)
 
     start_persisted_system(system)
 
