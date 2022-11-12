@@ -35,7 +35,7 @@ defmodule Actors.Actor.Interface.Http do
       ) do
     if Enum.member?(default_actions, command) and
          not Enum.any?(default_actions, fn action ->
-           Enum.any?(commands, fn c -> c == action end)
+           Enum.any?(commands, fn c -> c.name == action end)
          end) do
       current_state = Map.get(actor_state || %{}, :state)
 

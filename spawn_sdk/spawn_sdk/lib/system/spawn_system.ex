@@ -153,7 +153,7 @@ defmodule SpawnSdk.System.SpawnSystem do
     cond do
       Enum.member?(default_actions, command) and
           not Enum.any?(default_actions, fn action ->
-            Enum.any?(commands, fn c -> c == action end)
+            Enum.any?(commands, fn c -> c.name == action end)
           end) ->
         context =
           Eigr.Functions.Protocol.Context.new(
