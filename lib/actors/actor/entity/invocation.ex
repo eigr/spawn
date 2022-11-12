@@ -30,6 +30,8 @@ defmodule Actors.Actor.Entity.Invocation do
 
   alias Phoenix.PubSub
 
+  alias Spawn.Utils.AnySerializer
+
   @http_host_interface Actors.Actor.Interface.Http
   @host_interface_map %{
     "sdk" => SpawnSdk.Interface,
@@ -374,10 +376,12 @@ defmodule Actors.Actor.Entity.Invocation do
   end
 
   defp publish(channel, command, payload, _request) when is_nil(command) do
+    IO.puts("Passou por aqui certo. Command: #{inspect(command)} Payload: #{inspect(payload)}")
+
     PubSub.broadcast(
       :actor_channel,
       channel,
-      {:receive, payload}
+      {:receive, parse_external_broadcast_message(payload)}
     )
   end
 
@@ -388,6 +392,12 @@ defmodule Actors.Actor.Entity.Invocation do
       {:receive, command, payload, request}
     )
   end
+
+  defp parse_external_broadcast_message({:value, %Google.Protobuf.Any{} = any}) do
+    AnySerializer.unpack_unknown(any)
+  end
+
+  defp parse_external_broadcast_message(_any), do: %{}
 
   def do_side_effects(effects) when is_list(effects) and effects == [] do
     :ok

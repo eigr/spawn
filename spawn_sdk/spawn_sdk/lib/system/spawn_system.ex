@@ -248,7 +248,13 @@ defmodule SpawnSdk.System.SpawnSystem do
                _broadcast
          } = _value
        ) do
-    cmd = if is_atom(command), do: Atom.to_string(command), else: command
+    cmd =
+      cond do
+        is_nil(command) -> command
+        is_atom(command) -> Atom.to_string(command)
+        true -> command
+      end
+
     payload = parse_payload(payload)
 
     Eigr.Functions.Protocol.Broadcast.new(

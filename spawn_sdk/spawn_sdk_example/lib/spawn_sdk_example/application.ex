@@ -13,7 +13,8 @@ defmodule SpawnSdkExample.Application do
           # SpawnSdkExample.Actors.ClockActor,
           SpawnSdkExample.Actors.AbstractActor
         ]
-      }
+      },
+      {SpawnSdkExample.Subscriber, []}
     ]
 
     opts = [strategy: :one_for_one, name: SpawnSdkExample.Supervisor]

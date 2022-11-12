@@ -26,8 +26,11 @@ defmodule SpawnSdkExample.Actors.JoeActor do
         (state.value || 0) + value
       end
 
+    response = %MyBusinessMessage{value: new_value}
+
     %Value{}
-    |> Value.of(%MyBusinessMessage{value: new_value}, %MyState{value: new_value})
+    |> Value.of(response, %MyState{value: new_value})
+    |> Value.broadcast(Broadcast.to("external.channel", response))
     |> Value.reply!()
   end
 
