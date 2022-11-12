@@ -10,12 +10,13 @@ defmodule SpawnSdkExample.Application do
         system: "spawn-system",
         actors: [
           SpawnSdkExample.Actors.JoeActor,
-          # SpawnSdkExample.Actors.ClockActor,
+          SpawnSdkExample.Actors.ClockActor,
           SpawnSdkExample.Actors.AbstractActor
+        ],
+        extenal_subscribers: [
+          {SpawnSdkExample.Subscriber, []}
         ]
-      },
-      # Start any external event subscriber after spawning spawn
-      {SpawnSdkExample.Subscriber, []}
+      }
     ]
 
     opts = [strategy: :one_for_one, name: SpawnSdkExample.Supervisor]

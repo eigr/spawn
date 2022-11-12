@@ -22,6 +22,11 @@ defmodule Actors.Actor.Entity.Lifecycle do
 
   @default_deactivate_timeout 10_000
   @default_snapshot_timeout 2_000
+
+  @default_pubsub_group :actor_channel
+
+  @pubsub Application.compile_env(:spawn, :pubsub_group, @default_pubsub_group)
+
   @min_snapshot_threshold 500
   @timeout_jitter 9000
 
@@ -203,7 +208,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
 
   defp subscribe(actor, channel) do
     Logger.debug("Actor [#{actor}] is subscribing to channel [#{channel}]")
-    PubSub.subscribe(:actor_channel, channel)
+    PubSub.subscribe(@pubsub, channel)
   end
 
   # Timeout private functions

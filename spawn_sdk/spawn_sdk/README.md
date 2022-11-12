@@ -312,6 +312,114 @@ end
 
 In the case above, every time an Actor "driver" executes the update_position action it will send a message to all the actors participating in the channel called "fleet-controllers".
 
+### Broadcast to External Subscribers
+
+Sometimes you may want to send events out of ActorSystem using Phoenix.PubSub.
+One way to do this is to take advantage of the same Broadcast infrastructure that Spawn offers you but indicating an external channel. Below is an example:
+
+1. Create a Listener to receive the events using the `SpawnSdk.Channel.Subscriber` helper module.
+
+```elixir
+defmodule SpawnSdkExample.Subscriber do
+  @moduledoc """
+  This module exemplifies how to listen for pubsub events that were emitted by actors but that will be treated not by actors but as normal pubsub events.
+  This is particularly useful for integrations between Spawn and Phoenix LiveView.
+  """
+  use GenServer
+  require logger
+
+  alias SpawnSdk.Channel.Subscriber
+
+  @impl true
+  define init(state) do
+    Subscriber.subscribe("external.channel")
+    {:ok, state}
+  end
+
+  @impl true
+  def handle_info({:receive, payload}, state) do
+    Logger.info("Received pubsub event #{inspect(payload)}")
+    {:noreply, state}
+  end
+
+  def start_link(args) do
+    GenServer.start_link(__MODULE__, args)
+  end
+end
+```
+
+You need to match using the {:receive, payload} tuple in your handle_info.
+
+> **_NOTE:_** By default SpawnSdk.Channel.Subscriber will subscribe to pubsub using the atom :actor_channel as an argument. 
+    If you need to change this, just configure your configuration as follows:
+
+
+***config.exs***
+```elixir
+config :spawn,
+   pubsub_group: :your_channel_group_here
+```
+
+2. SpawnSdk.System.Supervisor.
+
+```elixir
+defmodule SpawnSdkExample.Application do
+  @moduledoc false
+  use Application
+
+  @impl true
+  def start(_type, _args) do
+    children = [
+      {
+        SpawnSdk.System.Supervisor,
+        system: "spawn-system",
+        actors: [
+          SpawnSdkExample.Actors.JoeActor
+        ],
+        extenal_subscribers: [
+          {SpawnSdkExample.Subscriber, []}
+        ]
+      }
+    ]
+
+    opts = [strategy: :one_for_one, name: SpawnSdkExample.Supervisor]
+    Supervisor.start_link(children, opts)
+  end
+end
+```
+
+The important thing here is to use the external_subscribers attribute. As seen above :external_subscribers accepts a list of specs as a parameter.
+
+3. Set your actor as you normally would and emit your broadcast events using Broadcast.to(channel, payload).
+
+```elixir
+defmodule SpawnSdkExample.Actors.JoeActor do
+  use SpawnSdk.Actor,
+    name: "joe",
+    state_type: Io.Eigr.Spawn.Example.MyState
+  require Logger
+  alias Io.Eigr.Spawn.Example.{MyState, MyBusinessMessage}
+
+  defact sum(%MyBusinessMessage{value: value} = data, %Context{state: state} = ctx) do
+    Logger.info("[joe] Received Request: #{inspect(data)}. Context: #{inspect(ctx)}")
+
+    new_value =
+      if is_nil(state) do
+        0 + value
+      else
+        (state.value || 0) + value
+      end
+
+    response = %MyBusinessMessage{value: new_value}
+
+    %Value{}
+    |> Value.of(response, %MyState{value: new_value})
+    |> Value.broadcast(Broadcast.to("my.channel", response))
+    |> Value.reply!()
+  end
+end
+```
+
 ## Timers
 
 Actors can also declare Actions that act recursively as timers. See an example below:

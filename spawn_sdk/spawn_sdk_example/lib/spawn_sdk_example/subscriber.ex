@@ -6,11 +6,11 @@ defmodule SpawnSdkExample.Subscriber do
   use GenServer
   require Logger
 
-  alias Phoenix.PubSub
+  alias SpawnSdk.Channel.Subscriber
 
   @impl true
   def init(state) do
-    PubSub.subscribe(:actor_channel, "external.channel")
+    Subscriber.subscribe("external.channel")
     {:ok, state}
   end
 

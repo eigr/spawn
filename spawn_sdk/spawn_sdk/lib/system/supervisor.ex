@@ -38,31 +38,33 @@ defmodule SpawnSdk.System.Supervisor do
 
     system = Keyword.get(opts, :system)
     actors = Keyword.get(opts, :actors)
+    extenal_subscribers = Keyword.get(opts, :extenal_subscribers, [])
 
     start_persisted_system(system)
 
-    children = [
-      {Sidecar.Supervisor, config},
-      %{
-        id: :spawn_system_register_task,
-        start:
-          {Task, :start_link,
-           [
-             fn ->
-               Process.flag(:trap_exit, true)
+    children =
+      [
+        {Sidecar.Supervisor, config},
+        %{
+          id: :spawn_system_register_task,
+          start:
+            {Task, :start_link,
+             [
+               fn ->
+                 Process.flag(:trap_exit, true)
 
-               SpawnSdk.System.SpawnSystem.register(system, actors)
+                 SpawnSdk.System.SpawnSystem.register(system, actors)
 
-               receive do
-                 {:EXIT, _pid, _reason} ->
-                   :persistent_term.erase(system)
+                 receive do
+                   {:EXIT, _pid, _reason} ->
+                     :persistent_term.erase(system)
 
-                   :ok
+                     :ok
+                 end
                end
-             end
-           ]}
-      }
-    ]
+             ]}
+        }
+      ] ++ extenal_subscribers
 
     Supervisor.init(children, strategy: :one_for_one)
   end
