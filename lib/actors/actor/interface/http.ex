@@ -29,11 +29,14 @@ defmodule Actors.Actor.Interface.Http do
           caller: caller
         } = payload,
         %EntityState{
-          actor: %Actor{state: actor_state, id: actor_id}
+          actor: %Actor{state: actor_state, id: actor_id, commands: commands}
         } = state,
-        default_methods
+        default_actions
       ) do
-    if Enum.member?(default_methods, command) do
+    if Enum.member?(default_actions, command) and
+         not Enum.any?(default_actions, fn action ->
+           Enum.any?(commands, fn c -> c == action end)
+         end) do
       current_state = Map.get(actor_state || %{}, :state)
 
       context =

@@ -132,7 +132,7 @@ defmodule SpawnSdk.System.SpawnSystem do
     end
   end
 
-  def call(invocation, entity_state, default_methods) do
+  def call(invocation, entity_state, default_actions) do
     %ActorInvocation{
       actor_name: name,
       actor_system: system,
@@ -143,7 +143,7 @@ defmodule SpawnSdk.System.SpawnSystem do
     } = invocation
 
     %EntityState{
-      actor: %Actor{state: actor_state, id: self_actor_id} = actor
+      actor: %Actor{state: actor_state, id: self_actor_id, commands: commands} = actor
     } = entity_state
 
     actor_state = actor_state || %{}
@@ -151,7 +151,10 @@ defmodule SpawnSdk.System.SpawnSystem do
     actor_instance = get_cached_actor(system, name)
 
     cond do
-      Enum.member?(default_methods, command) ->
+      Enum.member?(default_actions, command) and
+          not Enum.any?(default_actions, fn action ->
+            Enum.any?(commands, fn c -> c == action end)
+          end) ->
         context =
           Eigr.Functions.Protocol.Context.new(
             caller: caller,

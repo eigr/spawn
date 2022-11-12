@@ -385,6 +385,8 @@ Any invocations to actions with the following names will follow this rule: "**ge
     "**getState**",
     "**GetState**"
 
+> **_NOTE:_** You can override this behavior by defining your actor as an action with the same name as the default actions. In this case it will be the Action defined by you that will be called, implying perhaps another network roundtrip
+
 ## Running
 
 To run the application via iex we can use the following command:
