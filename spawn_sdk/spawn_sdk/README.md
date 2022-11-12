@@ -79,6 +79,14 @@ defmodule SpawnSdkExample.Actors.MyActor do
 
   alias Io.Eigr.Spawn.Example.{MyState, MyBusinessMessage}
 
+  defact init(%Context{state: state} = ctx) do
+    Logger.info("[joe] Received InitRequest. Context: #{inspect(ctx)}")
+
+    %Value{}
+    |> Value.state(state)
+    |> Value.reply!()
+  end
+
   defact sum(
            %MyBusinessMessage{value: value} = data,
            %Context{state: state} = ctx
@@ -95,7 +103,13 @@ end
 
 ```
 
-In this example we are creating an actor in an Named/Eager way ie it is a known actor at compile time. We can also create Unnamed Dyncamic/Lazy actors, that is, despite having its abstract behavior defined at compile time, a Lazy actor will only have a concrete instance when it is associated with an identifier/name at runtime. Below follows the same previous actor being defined as abstract.
+In this example we are creating an actor in a Named/Eager way, that is, it is a known actor at compile time. We can also create Unnamed Dynamic/Lazy actors, that is, despite having its abstract behavior defined at compile time, a Lazy actor will only have a concrete instance when it is associated with an identifier/name at runtime. Below follows the same previous actor being defined as abstract.
+
+We declare two actions that the Actor can do. An initialization action that will be called every time an Actor instance is created and an action that will be responsible for performing a simple sum.
+
+Note Keep in mind that any Action that has the names present in the list below will behave as an initialization Action and will be called when the Actor is started (if there is more than one Action with one of these names, only one will be called).
+
+Defaults inicialization Action names: "**init**", "**Init**", "**setup**", "**Setup**"
 
 ```elixir
 defmodule SpawnSdkExample.Actors.AbstractActor do
@@ -358,6 +372,20 @@ defmodule SpawnSdkExample.Application do
   end
 end
 ```
+
+## Default Actions
+
+Actors also have some standard actions that are not implemented by the user and that can be used as a way to get the state of an actor without the invocation requiring an extra trip to the host functions. You can think of them as a cache of their state, every time you invoke a default action on an actor it will return the value directly from the Sidecar process without this target process needing to invoke its equivalent host function.
+
+Let's take an example. Suppose Actor Joe wants to know the current state of Actor Robert. What Joe can do is invoke Actor Robert's default action called get_state. This will make Actor Joe's sidecar find Actor Robert's sidecar somewhere in the cluster and Actor Robert's sidecar will return its own state directly to Joe without having to resort to your host function, this in turn will save you a called over the network and therefore this type of invocation is faster than invocations of user-defined actions usually are.
+
+Any invocations to actions with the following names will follow this rule: "**get**",
+    "**Get**",
+    "**get_state**",
+    "**getState**",
+    "**GetState**"
+
+## Running
 
 To run the application via iex we can use the following command:
 
