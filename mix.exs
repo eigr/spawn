@@ -70,6 +70,7 @@ defmodule Spawn.MixProject do
       {:libcluster, "~> 3.3"},
       {:horde, "~> 0.8"},
       {:phoenix_pubsub, "~> 2.1"},
+      {:phoenix_pubsub_nats, "~> 0.1.0"},
       {:jason, "~> 1.3"},
       {:opentelemetry_api, "~> 1.0"},
       {:opentelemetry, "~> 1.0"},

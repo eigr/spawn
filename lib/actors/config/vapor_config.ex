@@ -44,7 +44,21 @@ defmodule Actors.Config.Vapor do
           {:proxy_host_interface, "PROXY_HOST_INTERFACE", default: "http", required: false},
           {:user_function_host, "USER_FUNCTION_HOST", default: "0.0.0.0", required: false},
           {:user_function_port, "USER_FUNCTION_PORT",
-           default: 8090, map: &String.to_integer/1, required: false}
+           default: 8090, map: &String.to_integer/1, required: false},
+          {:pubsub_adapter, "SPAWN_PUBSUB_ADAPTER", default: "native", required: false},
+          {:pubsub_adapter_nats_hosts, "SPAWN_PUBSUB_NATS_HOSTS",
+           default: "nats://127.0.0.1:4222", required: false},
+          {:pubsub_adapter_nats_tls, "SPAWN_PUBSUB_NATS_TLS", default: "false", required: false},
+          {:pubsub_adapter_nats_auth, "SPAWN_PUBSUB_NATS_AUTH",
+           default: "false", required: false},
+          {:pubsub_adapter_nats_auth_type, "SPAWN_PUBSUB_NATS_AUTH_TYPE",
+           default: "simple", required: false},
+          {:pubsub_adapter_nats_auth_user, "SPAWN_PUBSUB_NATS_AUTH_USER",
+           default: "admin", required: false},
+          {:pubsub_adapter_nats_auth_pass, "SPAWN_PUBSUB_NATS_AUTH_PASS",
+           default: "admin", required: false},
+          {:pubsub_adapter_nats_auth_jwt, "SPAWN_PUBSUB_NATS_AUTH_JWT",
+           default: "", required: false}
         ]
       }
     ]
