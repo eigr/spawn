@@ -129,7 +129,7 @@ Our proxy connects directly and transparently to all cluster members without nee
    - [x] Broadcast. Communicates with other actors through pubsub channel semantics.
       - [x] In Memory broadcast. Using [Phoenix.PubSub](https://github.com/phoenixframework/phoenix_pubsub) as transport.
       - [x] Nats broadcast. Using [Nats](https://nats.io/) as transport.
-   - [x] External Broadcast. Sends events with pubsub semantics outside the actor system using the same transport types as Broadcast.  
+   - [x] External Broadcast. Sends events with pubsub semantics outside the actor system using the same transport types as Broadcast.
    - [x] Forwards. Forwards the input parameter of an action of an actor as input to another action of another actor.
    - [x] Pipes. Forwards the output type of an action of one actor to the input of an action of another actor. Like Unix pipes.
    - [x] Side effects. Sends an effect as a result of your computation for other Actors to handle.
@@ -148,6 +148,9 @@ Our proxy connects directly and transparently to all cluster members without nee
    - [ ] Nats. On the Roadmap to version 1.0.0.
    - [ ] Amazon SQS. On the Roadmap to version 1.0.0.
    - [ ] Google PubSub. On the Roadmap to version 1.0.0.
+- [x] Observability
+   - [x] Tracing. Using OpenTelemetry.
+   - [ ] Prometheus Metrics. On the Roadmap to version 0.5.0
 
 ## Getting Started
 
