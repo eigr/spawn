@@ -107,6 +107,48 @@ Effects, Pipes, and in the future, other essential standards such as Saga, Aggre
 Gather, external invocations, and others.
 Our proxy connects directly and transparently to all cluster members without needing for a single point of failure, i.e., a true mesh network.
 
+## Features
+
+- [x] Distribution. Automatic and transparent cluster formation via Kubernetes Operator.
+   - [x] Erlang Distributed as transport.
+   - [ ] Quic as transport. Under research.
+   - [ ] Nats as transport. Under research.
+- [x] Configuration management via Kubernetes [CRDs](https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definitions/) and Envinronment Variables.
+- [x] Statestores. Adapters for persistent storage using multiple database providers.
+   - [x] Sqlite
+   - [x] MySql
+   - [x] Postgres 
+   - [x] CockroachDB
+   - [x] MSSQL
+- [x] Automatic activation and deactivation of Actors.
+- [x] Horizontal Scalability
+   - [x] automatically controlled by the Operator using Kubernetes HPA based on memory and cpu. 
+   - [ ] automatically controlled by the Operator via Internal Metrics.
+   - [ ] automatically controlled by the Operator via Custom Metrics.
+- [x] Workflows
+   - [x] Broadcast. Communicates with other actors through pubsub channel semantics.
+      - [x] In Memory broadcast. Using [Phoenix.PubSub](https://github.com/phoenixframework/phoenix_pubsub) as transport.
+      - [x] Nats broadcast. Using [Nats](https://nats.io/) as transport.
+   - [x] External Broadcast. Sends events with pubsub semantics outside the actor system using the same transport types as Broadcast.  
+   - [x] Forwards. Forwards the input parameter of an action of an actor as input to another action of another actor.
+   - [x] Pipes. Forwards the output type of an action of one actor to the input of an action of another actor. Like Unix pipes.
+   - [x] Side effects. Sends an effect as a result of your computation for other Actors to handle.
+   - [ ] Saga.
+- [X] SDKs
+   - [x] Elixir. All features implemented.
+   - [x] Java. Partially implemented.
+   - [x] Node/Typescript. Partially implemented.
+   - [ ] Go. Under development.
+   - [ ] Rust. Under development.
+   - [ ] .Net/C#. Under development.
+- [x] Activators
+   - [x] RabbitMQ.
+   - [ ] gRPC/HTTP. Under development.
+   - [ ] Kafka. Under development.
+   - [ ] Nats. On the Roadmap to version 1.0.0.
+   - [ ] Amazon SQS. On the Roadmap to version 1.0.0.
+   - [ ] Google PubSub. On the Roadmap to version 1.0.0.
+
 ## Getting Started
 
 First we must develop our HostFunction. Look for the documentation for [each SDK](#sdks) to know how to proceed but below are some examples:
