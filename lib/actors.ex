@@ -1,6 +1,8 @@
 defmodule Actors do
   @moduledoc """
-  Documentation for `Actors`.
+  `Actors` It's the client API for the Spawn actors.
+  Through this module we interact with the actors by creating,
+  invoking or configuring them.
   """
   use Retry
 
@@ -45,6 +47,13 @@ defmodule Actors do
     end)
   end
 
+  @doc """
+  Registers all actors defined in HostActor.
+
+    * `registration` - The RegistrationRequest
+    * `opts` - The options to create Actors
+  ##
+  """
   @spec register(RegistrationRequest.t(), any()) :: {:ok, RegistrationResponse.t()}
   def register(registration, opts \\ [])
 
@@ -80,6 +89,19 @@ defmodule Actors do
     {:ok, RegistrationResponse.new(proxy_info: proxy_info, status: status)}
   end
 
+  @doc """
+  Spawn actors defined in HostActor.
+
+    * `registration` - The SpawnRequest
+    * `opts` - The options to create Actors
+
+  spawn_actor must be used when you want to create a concrete instance of an actor
+  previously registered as abstract.
+  That is, when an Actorid is associated with an actor of abstract type.
+  This function only registers the metadata of the new actor, not activating it.
+  This will occur when the sprite is first invoked.
+  ##
+  """
   @spec spawn_actor(SpawnRequest.t(), any()) :: {:ok, SpawnResponse.t()}
   def spawn_actor(registration, opts \\ [])
 
@@ -111,6 +133,13 @@ defmodule Actors do
     {:ok, SpawnResponse.new(status: status)}
   end
 
+  @doc """
+  Makes a request to an actor.
+
+    * `request` - The InvocationRequest
+    * `opts` - The options to Invoke Actors
+  ##
+  """
   @spec invoke(%InvocationRequest{}) :: {:ok, :async} | {:ok, term()} | {:error, term()}
   def invoke(
         %InvocationRequest{} = request,
