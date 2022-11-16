@@ -409,8 +409,6 @@ defmodule Actors.Actor.Entity.Invocation do
         request,
         %Broadcast{channel_group: channel, command_name: command, payload: payload} = _broadcast
       ) do
-    source = self()
-
     Tracer.with_span "run-broadcast" do
       Tracer.add_event("publish", [{"channel", channel}])
       Tracer.set_attributes([{:command, command}])

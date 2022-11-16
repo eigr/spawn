@@ -195,7 +195,7 @@ defmodule Actors do
   end
 
   defp get_caller(nil), do: "external"
-  defp get_caller(name) when is_binary(name), do: name
+  defp get_caller(caller), do: caller.name
 
   defp do_lookup_action(system_name, actor_name, system, action_fun) do
     Tracer.with_span "actor-lookup" do
