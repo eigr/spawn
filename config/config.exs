@@ -25,7 +25,7 @@ config :logger,
 # Our Console Backend-specific configuration
 config :logger, :console,
   format: "$date $time [$node]:[$metadata]:[$level]:$message\n",
-  metadata: [:pid]
+  metadata: [:pid, :span_id, :trace_id]
 
 config :protobuf, extensions: :enabled
 
@@ -34,5 +34,18 @@ config :protobuf, extensions: :enabled
 #  format: :auto,
 #  registry: :default,
 #  auth: false
+
+config :opentelemetry, :resource, service: %{name: "spawn"}
+
+# config :opentelemetry,
+#   span_processor: :batch,
+#   traces_exporter: {:otel_exporter_stdout, []}
+#   #traces_exporter: {:otel_exporter_stdout, []}
+
+config :opentelemetry,
+       :processors,
+       otel_batch_processor: %{
+         exporter: {:opentelemetry_exporter, %{endpoints: [{:http, 'localhost', 55681, []}]}}
+       }
 
 import_config "#{config_env()}.exs"

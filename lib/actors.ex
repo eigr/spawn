@@ -153,21 +153,30 @@ defmodule Actors do
            actor: %Actor{} = actor,
            system: %ActorSystem{} = system,
            async: async?,
-           metadata: metadata
+           metadata: metadata,
+           caller: caller
          } = request,
          opts \\ []
        ) do
     metadata_attributes =
       Enum.map(metadata, fn {key, value} -> {to_existing_atom_or_new(key), value} end) ++
-        [{:async, async?}]
+        [{:async, async?}, {"from", get_caller(caller)}, {"target", actor.id.name}]
 
-    Tracer.with_span "invoke" do
-      Tracer.add_event("invoke-actor", [{"target", actor.id.name}])
+    {_current, opts} =
+      Keyword.get_and_update(opts, :span_ctx, fn v ->
+        if is_nil(v), do: {v, OpenTelemetry.Ctx.new()}, else: {v, v}
+      end)
+
+    IO.inspect(opts)
+
+    Tracer.with_span opts[:span_ctx], "client invoke", kind: :client do
       Tracer.set_attributes(metadata_attributes)
 
       retry with: exponential_backoff() |> randomize |> expiry(10_000),
             atoms: [:error, :exit, :noproc, :erpc, :noconnection],
             rescue_only: [ErlangError] do
+        Tracer.add_event("lookup", [{"target", actor.id.name}])
+
         do_lookup_action(system.name, actor.id.name, system, fn actor_ref ->
           if is_nil(request.scheduled_to) || request.scheduled_to == 0 do
             maybe_invoke_async(async?, actor_ref, request, opts)
@@ -184,6 +193,9 @@ defmodule Actors do
       end
     end
   end
+
+  defp get_caller(nil), do: "external"
+  defp get_caller(name) when is_binary(name), do: name
 
   defp do_lookup_action(system_name, actor_name, system, action_fun) do
     Tracer.with_span "actor-lookup" do

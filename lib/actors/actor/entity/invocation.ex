@@ -4,6 +4,7 @@ defmodule Actors.Actor.Entity.Invocation do
   All the public functions here assumes they are executing inside a GenServer
   """
   require Logger
+  require OpenTelemetry.Tracer, as: Tracer
 
   alias Actors.Actor.Entity.EntityState
 
@@ -207,56 +208,82 @@ defmodule Actors.Actor.Entity.Invocation do
            command_name: command,
            payload: payload,
            caller: caller
-         }, _opts},
+         }, opts},
         %EntityState{
           system: actor_system,
           actor: %Actor{state: actor_state, commands: commands, timer_commands: timers}
         } = state
       ) do
-    if length(commands) <= 0 do
-      Logger.warning("Actor [#{actor_name}] has not registered any Actions")
-    end
+    ctx = Keyword.get(opts, :span_ctx, OpenTelemetry.Ctx.new())
 
-    all_commands =
-      commands ++ Enum.map(timers, fn %FixedTimerCommand{command: cmd} = _timer_cmd -> cmd end)
+    Tracer.with_span ctx, "#{actor_name} invocation handler", kind: :server do
+      if length(commands) <= 0 do
+        Logger.warning("Actor [#{actor_name}] has not registered any Actions")
+      end
 
-    case Enum.member?(@default_actions, command) or
-           Enum.any?(all_commands, fn cmd -> cmd.name == command end) do
-      true ->
-        interface = get_interface(actor_system)
+      all_commands =
+        commands ++ Enum.map(timers, fn %FixedTimerCommand{command: cmd} = _timer_cmd -> cmd end)
 
-        metadata = if is_nil(metadata), do: %{}, else: metadata
-        current_state = Map.get(actor_state || %{}, :state)
+      Tracer.set_attributes([
+        {:invoked_command, command},
+        {:actor_declared_commands, length(all_commands)}
+      ])
 
-        request =
-          ActorInvocation.new(
-            actor_name: actor_name,
-            actor_system: actor_system,
-            command_name: command,
-            payload: payload,
-            current_context:
-              Context.new(
-                metadata: metadata,
-                caller: caller,
-                self: ActorId.new(name: actor_name, system: actor_system),
-                state: current_state
-              ),
-            caller: caller
-          )
+      case Enum.member?(@default_actions, command) or
+             Enum.any?(all_commands, fn cmd -> cmd.name == command end) do
+        true ->
+          interface = get_interface(actor_system)
 
-        interface.invoke_host(request, state, @default_actions)
-        |> case do
-          {:ok, response, state} -> {:reply, {:ok, do_response(request, response, state)}, state}
-          {:error, reason, state} -> {:reply, {:error, reason}, state, :hibernate}
-        end
+          metadata = if is_nil(metadata), do: %{}, else: metadata
+          current_state = Map.get(actor_state || %{}, :state)
 
-      false ->
-        {:reply, {:error, "Command [#{command}] not found for Actor [#{actor_name}]"}, state,
-         :hibernate}
+          request =
+            ActorInvocation.new(
+              actor_name: actor_name,
+              actor_system: actor_system,
+              command_name: command,
+              payload: payload,
+              current_context:
+                Context.new(
+                  metadata: metadata,
+                  caller: caller,
+                  self: ActorId.new(name: actor_name, system: actor_system),
+                  state: current_state
+                ),
+              caller: caller
+            )
+
+          Tracer.with_span "invoke-host" do
+            interface.invoke_host(request, state, @default_actions)
+            |> case do
+              {:ok, response, state} ->
+                Tracer.add_event("successful-invocation", [
+                  {:ok, "#{inspect(response.updated_context.metadata)}"}
+                ])
+
+                {:reply, {:ok, do_response(request, response, state)}, state}
+
+              {:error, reason, state} ->
+                Tracer.add_event("failure-invocation", [
+                  {:error, "#{inspect(reason)}"}
+                ])
+
+                {:reply, {:error, reason}, state, :hibernate}
+            end
+          end
+
+        false ->
+          {:reply, {:error, "Command [#{command}] not found for Actor [#{actor_name}]"}, state,
+           :hibernate}
+      end
     end
   end
 
-  defp do_response(_request, %ActorInvocationResponse{workflow: workflow} = response, _state)
+  defp do_response(
+         _request,
+         %ActorInvocationResponse{workflow: workflow} = response,
+         _state
+       )
        when is_nil(workflow) or workflow == %{} do
     response
   end
@@ -265,7 +292,11 @@ defmodule Actors.Actor.Entity.Invocation do
     do_run_workflow(request, response, state)
   end
 
-  defp do_run_workflow(_request, %ActorInvocationResponse{workflow: workflow} = response, _state)
+  defp do_run_workflow(
+         _request,
+         %ActorInvocationResponse{workflow: workflow} = response,
+         _state
+       )
        when is_nil(workflow) or workflow == %{} do
     response
   end
@@ -277,9 +308,11 @@ defmodule Actors.Actor.Entity.Invocation do
          } = response,
          _state
        ) do
-    do_side_effects(effects)
-    do_broadcast(request, broadcast)
-    do_handle_routing(request, response)
+    Tracer.with_span "run-workflow" do
+      do_side_effects(effects)
+      do_broadcast(request, broadcast)
+      do_handle_routing(request, response)
+    end
   end
 
   defp do_handle_routing(
@@ -304,26 +337,28 @@ defmodule Actors.Actor.Entity.Invocation do
              } = response
          }
        ) do
-    invocation = %InvocationRequest{
-      system: %ActorSystem{name: system_name},
-      actor: %Actor{id: ActorId.new(name: actor_name, system: system_name)},
-      command_name: cmd,
-      payload: payload,
-      caller: ActorId.new(name: caller_actor_name, system: system_name)
-    }
+    Tracer.with_span "run-pipe-routing" do
+      invocation = %InvocationRequest{
+        system: %ActorSystem{name: system_name},
+        actor: %Actor{id: ActorId.new(name: actor_name, system: system_name)},
+        command_name: cmd,
+        payload: payload,
+        caller: ActorId.new(name: caller_actor_name, system: system_name)
+      }
 
-    try do
-      case Actors.invoke(invocation, []) do
-        {:ok, response} -> response
-        error -> error
+      try do
+        case Actors.invoke(invocation, span_ctx: OpenTelemetry.Tracer.current_span_ctx()) do
+          {:ok, response} -> response
+          error -> error
+        end
+      catch
+        error ->
+          Logger.warning(
+            "Error during Pipe request to Actor #{system_name}:#{actor_name}. Error: #{inspect(error)}"
+          )
+
+          response
       end
-    catch
-      error ->
-        Logger.warning(
-          "Error during Pipe request to Actor #{system_name}:#{actor_name}. Error: #{inspect(error)}"
-        )
-
-        response
     end
   end
 
@@ -341,26 +376,28 @@ defmodule Actors.Actor.Entity.Invocation do
              } = response
          }
        ) do
-    invocation = %InvocationRequest{
-      system: %ActorSystem{name: system_name},
-      actor: %Actor{id: ActorId.new(name: actor_name, system: system_name)},
-      command_name: cmd,
-      payload: payload,
-      caller: ActorId.new(name: caller_actor_name, system: system_name)
-    }
+    Tracer.with_span "run-forward-routing" do
+      invocation = %InvocationRequest{
+        system: %ActorSystem{name: system_name},
+        actor: %Actor{id: ActorId.new(name: actor_name, system: system_name)},
+        command_name: cmd,
+        payload: payload,
+        caller: ActorId.new(name: caller_actor_name, system: system_name)
+      }
 
-    try do
-      case Actors.invoke(invocation, []) do
-        {:ok, response} -> response
-        error -> error
+      try do
+        case Actors.invoke(invocation, span_ctx: OpenTelemetry.Tracer.current_span_ctx()) do
+          {:ok, response} -> response
+          error -> error
+        end
+      catch
+        error ->
+          Logger.warning(
+            "Error during Forward request to Actor #{system_name}:#{actor_name}. Error: #{inspect(error)}"
+          )
+
+          response
       end
-    catch
-      error ->
-        Logger.warning(
-          "Error during Forward request to Actor #{system_name}:#{actor_name}. Error: #{inspect(error)}"
-        )
-
-        response
     end
   end
 
@@ -372,12 +409,17 @@ defmodule Actors.Actor.Entity.Invocation do
         request,
         %Broadcast{channel_group: channel, command_name: command, payload: payload} = _broadcast
       ) do
-    publish(channel, command, payload, request)
+    source = self()
+
+    Tracer.with_span "run-broadcast" do
+      Tracer.add_event("publish", [{"channel", channel}])
+      Tracer.set_attributes([{:command, command}])
+
+      spawn(fn -> publish(channel, command, payload, request) end)
+    end
   end
 
   defp publish(channel, command, payload, _request) when is_nil(command) do
-    IO.puts("Passou por aqui certo. Command: #{inspect(command)} Payload: #{inspect(payload)}")
-
     PubSub.broadcast(
       :actor_channel,
       channel,
@@ -403,34 +445,38 @@ defmodule Actors.Actor.Entity.Invocation do
     :ok
   end
 
-  def do_side_effects(effects) when is_list(effects) do
-    spawn(fn ->
-      effects
-      |> Flow.from_enumerable(min_demand: 1, max_demand: System.schedulers_online())
-      |> Flow.map(fn %SideEffect{
-                       request:
-                         %InvocationRequest{
-                           actor: %Actor{id: %ActorId{name: actor_name} = _id} = _actor,
-                           system: %ActorSystem{name: system_name}
-                         } = invocation
-                     } ->
-        try do
-          Actors.invoke(invocation, [])
-        catch
-          error ->
-            Logger.warning(
-              "Error during Side Effect request to Actor #{system_name}:#{actor_name}. Error: #{inspect(error)}"
-            )
+  def do_side_effects(effects, span_ctx) when is_list(effects) do
+    Tracer.with_span "handle-side-effects" do
+      try do
+        spawn(fn ->
+          effects
+          |> Flow.from_enumerable(min_demand: 1, max_demand: System.schedulers_online())
+          |> Flow.map(fn %SideEffect{
+                           request:
+                             %InvocationRequest{
+                               actor: %Actor{id: %ActorId{name: actor_name} = _id} = _actor,
+                               system: %ActorSystem{name: system_name}
+                             } = invocation
+                         } ->
+            try do
+              Actors.invoke(invocation, span_ctx: span_ctx)
+            catch
+              error ->
+                Logger.warning(
+                  "Error during Side Effect request to Actor #{system_name}:#{actor_name}. Error: #{inspect(error)}"
+                )
 
-            :ok
-        end
-      end)
-      |> Flow.run()
-    end)
-  catch
-    error ->
-      Logger.warning("Error during Side Effect request. Error: #{inspect(error)}")
-      :ok
+                :ok
+            end
+          end)
+          |> Flow.run()
+        end)
+      catch
+        error ->
+          Logger.warning("Error during Side Effect request. Error: #{inspect(error)}")
+          :ok
+      end
+    end
   end
 
   defp get_interface(system_name) do
