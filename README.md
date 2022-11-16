@@ -111,8 +111,6 @@ Our proxy connects directly and transparently to all cluster members without nee
 
 - [x] Distribution. Automatic and transparent cluster formation via Kubernetes Operator.
    - [x] Erlang Distributed as transport.
-   - [ ] Quic as transport. Under research.
-   - [ ] Nats as transport. Under research.
 - [x] Configuration management via Kubernetes [CRDs](https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definitions/) and Envinronment Variables.
 - [x] Statestores. Adapters for persistent storage using multiple database providers.
    - [x] Sqlite
