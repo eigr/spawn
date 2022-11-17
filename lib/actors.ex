@@ -167,8 +167,6 @@ defmodule Actors do
         if is_nil(v), do: {v, OpenTelemetry.Ctx.new()}, else: {v, v}
       end)
 
-    IO.inspect(opts)
-
     Tracer.with_span opts[:span_ctx], "client invoke", kind: :client do
       Tracer.set_attributes(metadata_attributes)
 

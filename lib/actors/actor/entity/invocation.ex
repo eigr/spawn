@@ -439,11 +439,11 @@ defmodule Actors.Actor.Entity.Invocation do
 
   defp parse_external_broadcast_message(_any), do: %{}
 
-  def do_side_effects(effects) when is_list(effects) and effects == [] do
+  def do_side_effects(effects) when effects == [] do
     :ok
   end
 
-  def do_side_effects(effects, span_ctx) when is_list(effects) do
+  def do_side_effects(effects) when is_list(effects) do
     Tracer.with_span "handle-side-effects" do
       try do
         spawn(fn ->
@@ -457,7 +457,7 @@ defmodule Actors.Actor.Entity.Invocation do
                              } = invocation
                          } ->
             try do
-              Actors.invoke(invocation, span_ctx: span_ctx)
+              Actors.invoke(invocation, span_ctx: Tracer.current_span_ctx())
             catch
               error ->
                 Logger.warning(

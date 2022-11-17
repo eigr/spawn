@@ -32,6 +32,19 @@ defmodule Actor.ActorTest do
       |> Value.forward(Forward.to("second_actor", "forward_caller_name"))
       |> Value.void()
     end
+
+    defact use_side_effect(_ctx) do
+      %Value{}
+      |> Value.effects([
+        SideEffect.to(
+          "second_actor",
+          "forward_caller_name",
+          MyMessageResponse.new(data: "first_actor_value")
+        )
+      ])
+      |> Value.value(MyMessageResponse.new(data: "worked_with_effects"))
+      |> Value.void()
+    end
   end
 
   defmodule Actor.OtherActor do
@@ -136,7 +149,7 @@ defmodule Actor.ActorTest do
     end
   end
 
-  describe "invoke with pipe" do
+  describe "invoke with routing" do
     test "simple call that goes through 3 actors piping each other", ctx do
       system = ctx.system
 
@@ -174,6 +187,26 @@ defmodule Actor.ActorTest do
       # gets the response value of the last forward (in data key)
       assert %Eigr.Spawn.Actor.MyMessageResponse{id: "initial_calling", data: "third forwarding"} =
                response
+    end
+  end
+
+  describe "invoke with side effect" do
+    test "simple call with a side effect", ctx do
+      system = ctx.system
+
+      payload = Eigr.Spawn.Actor.MyMessageRequest.new(data: "non_intended_data")
+
+      dynamic_actor_name = Faker.Pokemon.name() <> "_side_effect"
+
+      assert {:ok, response} =
+               SpawnSdk.invoke(dynamic_actor_name,
+                 ref: Actor.MyActor,
+                 system: system,
+                 command: "use_side_effect",
+                 payload: payload
+               )
+
+      assert %{data: "worked_with_effects"} = response
     end
   end
 end

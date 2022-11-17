@@ -19,4 +19,9 @@ defmodule SpawnSdk.Channel.Subscriber do
   def subscribe(channel, _opts) do
     PubSub.subscribe(@pubsub, channel)
   end
+
+  @spec unsubscribe(channel()) :: :ok
+  def unsubscribe(channel) do
+    PubSub.unsubscribe(@pubsub, channel)
+  end
 end
