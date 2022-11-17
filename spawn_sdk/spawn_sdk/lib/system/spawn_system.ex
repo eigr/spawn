@@ -70,7 +70,11 @@ defmodule SpawnSdk.System.SpawnSystem do
   @impl SpawnSdk.System
   def spawn_actor(actor_name, spawn_actor_opts) do
     system = Keyword.get(spawn_actor_opts, :system, nil)
-    actor_mod = Keyword.get(spawn_actor_opts, :actor, %{})
+    actor_mod = get_actor_module(spawn_actor_opts)
+
+    if is_nil(actor_mod) do
+      raise "Invalid Actor reference, actor not found registered in this instance"
+    end
 
     if not actor_mod.__meta__(:abstract) do
       raise "Invalid Actor reference. Only abstract Actor are permitted for spawning!"
@@ -233,6 +237,23 @@ defmodule SpawnSdk.System.SpawnSystem do
     :ets.insert(:"#{system}:actors", {"actors", actors})
 
     actors
+  end
+
+  defp get_actor_module(spawn_actor_opts) do
+    case Keyword.get(spawn_actor_opts, :actor, nil) do
+      nil ->
+        nil
+
+      actor when is_atom(actor) ->
+        if :code.module_status(actor) == :loaded do
+          actor
+        else
+          Atom.to_string(actor)
+        end
+
+      actor when is_binary(actor) ->
+        :persistent_term.get("actor:#{actor}", nil)
+    end
   end
 
   defp handle_broadcast(

@@ -1,5 +1,6 @@
 defmodule SpawnSdkExample.Actors.AbstractActor do
   use SpawnSdk.Actor,
+    name: "abs_actor",
     abstract: true,
     state_type: Io.Eigr.Spawn.Example.MyState
 
