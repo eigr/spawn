@@ -116,7 +116,9 @@ defmodule SpawnSdk.System.SpawnSystem do
     req =
       InvocationRequest.new(
         system: %Eigr.Functions.Protocol.Actors.ActorSystem{name: system},
-        actor: %Eigr.Functions.Protocol.Actors.Actor{id: %ActorId{name: actor_name}},
+        actor: %Eigr.Functions.Protocol.Actors.Actor{
+          id: %ActorId{name: actor_name, system: system}
+        },
         metadata: metadata,
         payload: payload,
         command_name: parse_command_name(command),
@@ -338,7 +340,7 @@ defmodule SpawnSdk.System.SpawnSystem do
           InvocationRequest.new(
             system: %Eigr.Functions.Protocol.Actors.ActorSystem{name: system},
             actor: %Eigr.Functions.Protocol.Actors.Actor{
-              id: %ActorId{name: effect.actor_name}
+              id: %ActorId{name: effect.actor_name, system: system}
             },
             payload: payload,
             command_name: effect.command,
