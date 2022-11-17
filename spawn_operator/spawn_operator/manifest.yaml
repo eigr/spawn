@@ -5,7 +5,7 @@ metadata:
   labels:
     k8s-app: spawn-operator
   name: spawn-operator
-  namespace: eigr-functions
+  namespace: eigr-labs
 spec:
   replicas: 1
   selector:
@@ -36,7 +36,7 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: spec.serviceAccountName
-          image: eigr/spawn-operator:0.1.0
+          image: eigr/spawn-operator:0.5.0
           name: spawn-operator
           resources:
             limits:
@@ -47,7 +47,7 @@ spec:
               memory: 200Mi
           securityContext:
             allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: true
+            readOnlyRootFilesystem: false
             runAsNonRoot: true
             runAsUser: 65534
       serviceAccountName: spawn-operator
@@ -291,7 +291,7 @@ metadata:
   labels:
     k8s-app: spawn-operator
   name: spawn-operator
-  namespace: eigr-functions
+  namespace: eigr-labs
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -307,4 +307,4 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: spawn-operator
-    namespace: eigr-functions
+    namespace: eigr-labs

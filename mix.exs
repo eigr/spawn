@@ -25,7 +25,10 @@ defmodule Spawn.MixProject do
       deps: deps(),
       package: package(),
       docs: docs(),
-      aliases: [publish: &InternalVersions.publish/1]
+      aliases: [
+        publish: &InternalVersions.publish/1,
+        rewrite_versions: &InternalVersions.rewrite_versions/1
+      ]
     ]
   end
 
