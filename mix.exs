@@ -66,7 +66,7 @@ defmodule Spawn.MixProject do
     [
       {:cowlib, "~> 2.9"},
       {:decimal, "~> 2.0"},
-      {:protobuf, "~> 0.10"},
+      {:protobuf, "~> 0.11"},
       {:finch, "~> 0.12"},
       {:retry, "~> 0.17"},
       {:tesla, "~> 1.4"},
