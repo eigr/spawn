@@ -27,12 +27,13 @@ jobs:
 
     env:
       MIX_ENV: test
+      ImageOS: ubuntu20 # equivalent to runs-on ubuntu-20.04
 
     steps:
       - uses: actions/checkout@v3
 
       - name: Set up Elixir
-        uses: erlef/setup-beam@988e02bfe678367a02564f65ca2e37726dc0268f
+        uses: erlef/setup-beam@v1
         with:
           elixir-version: ${{matrix.elixir}} # Define the elixir version [required]
           otp-version: ${{matrix.otp}} # Define the OTP version [required]

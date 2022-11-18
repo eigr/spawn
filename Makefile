@@ -140,7 +140,7 @@ run-sdk-local2:
 	cd spawn_sdk/spawn_sdk_example && PROXY_CLUSTER_STRATEGY=epmd PROXY_DATABASE_TYPE=$(database) SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= iex --name spawn_actors_node1@127.0.0.1 -S mix
 
 run-operator-local:
-	cd spawn_operator/operator && MIX_ENV=dev iex --name operator@127.0.0.1 -S mix
+	cd spawn_operator/spawn_operator && mix deps.get && MIX_ENV=dev iex --name operator@127.0.0.1 -S mix
 	
 run-proxy-image:
 	docker run --rm --name=spawn-proxy -e PROXY_DATABASE_TYPE=mysql -e SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= --net=host ${proxy-image}

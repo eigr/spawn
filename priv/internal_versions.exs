@@ -89,25 +89,7 @@ defmodule InternalVersions do
       IO.puts("- Releasing #{inspect(app)}")
 
       mix_file = File.read!("#{dir}/mix.exs")
-
-      match_spawn_with_path = ~r(\{:spawn,\s*path:.*\})
-      match_spawn_statestores_with_path = ~r(\{:spawn_statestores,\s*path:.*\})
-      match_spawn_mysql_with_path = ~r(\{:spawn_statestores_mysql,\s*path:.*\})
-      match_spawn_mssql_with_path = ~r(\{:spawn_statestores_mssql,\s*path:.*\})
-      match_spawn_postgres_with_path = ~r(\{:spawn_statestores_postgres,\s*path:.*\})
-      match_spawn_cockroachdb_with_path = ~r(\{:spawn_statestores_cockroachdb,\s*path:.*\})
-      match_spawn_sqlite_with_path = ~r(\{:spawn_statestores_sqlite,\s*path:.*\})
-
-      new_mix_exs = mix_file
-        |> String.replace(match_spawn_with_path, dep_for("spawn"), global: false)
-        |> String.replace(match_spawn_statestores_with_path, dep_for("spawn_statestores"), global: false)
-        |> String.replace(match_spawn_mysql_with_path, dep_for("spawn_statestores_mysql", true), global: false)
-        |> String.replace(match_spawn_mssql_with_path, dep_for("spawn_statestores_mssql", true), global: false)
-        |> String.replace(match_spawn_postgres_with_path, dep_for("spawn_statestores_postgres", true), global: false)
-        |> String.replace(match_spawn_cockroachdb_with_path, dep_for("spawn_statestores_cockroachdb", true), global: false)
-        |> String.replace(match_spawn_sqlite_with_path, dep_for("spawn_statestores_sqlite", true), global: false)
-        |> String.replace("0.0.0-local.dev", version)
-
+      new_mix_exs = get_new_mix_exs(mix_file, version)
       File.write!("#{dir}/mix.exs", new_mix_exs)
 
       System.shell(whole_command, into: IO.stream())
@@ -115,6 +97,63 @@ defmodule InternalVersions do
       IO.puts("-- Waiting some time to publish #{inspect(app)}...")
       Process.sleep(3_000)
     end)
+  end
+
+  def rewrite_versions(opts) do
+    all? = "--all" in opts
+    apps_to_publish = Enum.find(opts, "", & String.starts_with?(&1, "--apps")) |> String.replace("--apps=", "") |> String.split(",")
+
+    apps_to_release = @versions
+    |> Enum.filter(& elem(&1, 0) |> Atom.to_string() |> String.starts_with?("spawn"))
+
+    apps_to_release = if all? do
+      apps_to_release
+    else
+      Enum.filter(apps_to_release, & Atom.to_string(elem(&1, 0)) in apps_to_publish)
+    end
+
+    apps_to_release
+    |> Enum.filter(& elem(&1, 0) |> Atom.to_string() |> String.starts_with?("spawn"))
+    |> Enum.each(fn app ->
+      {name, version} = app
+
+      name = Atom.to_string(name)
+
+      {dir, _dir_back} = cond do
+        String.starts_with?(name, "spawn_statestores") ->
+          {"./spawn_statestores/#{String.replace(name, "spawn_", "")}", "../.."}
+
+        String.starts_with?(name, "spawn_sdk") ->
+          {"./spawn_sdk/#{name}", "../.."}
+
+        true ->
+          {"./", "."}
+      end
+
+      mix_file = File.read!("#{dir}/mix.exs")
+      new_mix_exs = get_new_mix_exs(mix_file, version)
+      File.write!("#{dir}/mix.exs", new_mix_exs)
+    end)
+  end
+
+  defp get_new_mix_exs(mix_file, version) do
+    match_spawn_with_path = ~r(\{:spawn,\s*path:.*\})
+    match_spawn_statestores_with_path = ~r(\{:spawn_statestores,\s*path:.*\})
+    match_spawn_mysql_with_path = ~r(\{:spawn_statestores_mysql,\s*path:.*\})
+    match_spawn_mssql_with_path = ~r(\{:spawn_statestores_mssql,\s*path:.*\})
+    match_spawn_postgres_with_path = ~r(\{:spawn_statestores_postgres,\s*path:.*\})
+    match_spawn_cockroachdb_with_path = ~r(\{:spawn_statestores_cockroachdb,\s*path:.*\})
+    match_spawn_sqlite_with_path = ~r(\{:spawn_statestores_sqlite,\s*path:.*\})
+
+    mix_file
+    |> String.replace(match_spawn_with_path, dep_for("spawn"), global: false)
+    |> String.replace(match_spawn_statestores_with_path, dep_for("spawn_statestores"), global: false)
+    |> String.replace(match_spawn_mysql_with_path, dep_for("spawn_statestores_mysql", true), global: false)
+    |> String.replace(match_spawn_mssql_with_path, dep_for("spawn_statestores_mssql", true), global: false)
+    |> String.replace(match_spawn_postgres_with_path, dep_for("spawn_statestores_postgres", true), global: false)
+    |> String.replace(match_spawn_cockroachdb_with_path, dep_for("spawn_statestores_cockroachdb", true), global: false)
+    |> String.replace(match_spawn_sqlite_with_path, dep_for("spawn_statestores_sqlite", true), global: false)
+    |> String.replace("0.0.0-local.dev", version)
   end
 
   defp get(app_name) do
