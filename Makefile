@@ -99,7 +99,7 @@ push-all-images:
 	#docker push ${activator-pubsub-image}
 	#docker push ${activator-rabbitmq-image}
 	#docker push ${activator-sqs-image}
-	docker push ${spawn-sdk-example-image}
+	#docker push ${spawn-sdk-example-image}
 
 create-minikube-cluster:
 	minikube start

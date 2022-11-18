@@ -36,7 +36,7 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: spec.serviceAccountName
-          image: eigr/spawn-operator:0.5.0
+          image: eigr/spawn-operator:0.5.0-alpha.12
           name: spawn-operator
           resources:
             limits:
@@ -47,7 +47,7 @@ spec:
               memory: 200Mi
           securityContext:
             allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: false
+            readOnlyRootFilesystem: true
             runAsNonRoot: true
             runAsUser: 65534
       serviceAccountName: spawn-operator
