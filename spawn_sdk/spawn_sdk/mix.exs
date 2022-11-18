@@ -2,7 +2,7 @@ defmodule SpawnSdk.MixProject do
   use Mix.Project
 
   @app :spawn_sdk
-  @version "0.5.0-alpha.12"
+  @version "0.0.0-local.dev"
   @source_url "https://github.com/eigr/spawn/tree/main/spawn_sdk/spawn_sdk"
 
   def project do
@@ -59,7 +59,7 @@ defmodule SpawnSdk.MixProject do
     [
       {:faker, "~> 0.17", only: :test},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
-      {:spawn, "~> 0.5.0-alpha.12"}
+      {:spawn, path: "../.."}
     ]
   end
 
