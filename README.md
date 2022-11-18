@@ -161,7 +161,7 @@ curl -L https://github.com/eigr/spawn/releases/download/{release-version}/manife
 > **_NOTE:_** You need to inform the desired release version. For example:
 
 ```shell
-curl -L https://github.com/eigr/spawn/releases/download/v0.5.0-alpha.12.1/manifest.yaml | kubectl apply -f -
+curl -L https://github.com/eigr/spawn/releases/download/v0.5.0-alpha.13/manifest.yaml | kubectl apply -f -
 ```
 
 ## Getting Started
