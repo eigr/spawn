@@ -150,6 +150,20 @@ Our proxy connects directly and transparently to all cluster members without nee
    - [x] Tracing. Using OpenTelemetry.
    - [ ] Prometheus Metrics. On the Roadmap to version 0.5.0
 
+## Install
+
+The recommended way to install Spawn is via our Kubernetes Operator, for that you need to download the Operator manifest file. The following command shows how this could be done directly via the command line:
+
+```shell
+curl -L https://github.com/eigr/spawn/releases/download/{release-version}/manifest.yaml | kubectl apply -f -
+```
+
+> **_NOTE:_** You need to inform the desired release version. For example:
+
+```shell
+curl -L https://github.com/eigr/spawn/releases/download/v0.5.0-alpha.12.1/manifest.yaml | kubectl apply -f -
+```
+
 ## Getting Started
 
 First we must develop our HostFunction. Look for the documentation for [each SDK](#sdks) to know how to proceed but below are some examples:
