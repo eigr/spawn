@@ -2,7 +2,7 @@ defmodule StatestoresSqlite.MixProject do
   use Mix.Project
 
   @app :spawn_statestores_sqlite
-  @version "0.0.0-local.dev"
+  @version "0.5.0-alpha.12"
   @source_url "https://github.com/eigr/spawn/blob/main/spawn_statestores/statestores_sqlite"
 
   def project do
@@ -60,7 +60,7 @@ defmodule StatestoresSqlite.MixProject do
       {:ecto_sql, "~> 3.8"},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:ecto_sqlite3, "~> 0.8.2"},
-      {:spawn_statestores, path: "../statestores"}
+      {:spawn_statestores, "~> 0.5.0-alpha.12"}
     ]
   end
 

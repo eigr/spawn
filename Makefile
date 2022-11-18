@@ -1,4 +1,4 @@
-version=0.5.0
+version=0.5.0-alpha.12
 registry=eigr
 
 CLUSTER_NAME=spawn-k8s
@@ -45,12 +45,12 @@ build-elixir-sdk-image:
 build-all-images:
 	docker build -f Dockerfile-proxy -t ${proxy-image} .
 	docker build -f Dockerfile-operator -t ${operator-image} .
-	docker build -f Dockerfile-activator-grpc -t ${activator-grpc-image} .
-	docker build -f Dockerfile-activator-http -t ${activator-http-image} .
-	docker build -f Dockerfile-activator-kafka -t ${activator-kafka-image} .
-	docker build -f Dockerfile-activator-pubsub -t ${activator-pubsub-image} .
-	docker build -f Dockerfile-activator-rabbitmq -t ${activator-rabbitmq-image} .
-	docker build -f Dockerfile-activator-sqs -t ${activator-sqs-image} .
+	#docker build -f Dockerfile-activator-grpc -t ${activator-grpc-image} .
+	#docker build -f Dockerfile-activator-http -t ${activator-http-image} .
+	#docker build -f Dockerfile-activator-kafka -t ${activator-kafka-image} .
+	#docker build -f Dockerfile-activator-pubsub -t ${activator-pubsub-image} .
+	#docker build -f Dockerfile-activator-rabbitmq -t ${activator-rabbitmq-image} .
+	#docker build -f Dockerfile-activator-sqs -t ${activator-sqs-image} .
 	docker build -f Dockerfile-elixir-example -t ${spawn-sdk-example-image} .
 
 test-spawn:
@@ -93,12 +93,12 @@ test.integration: ## Run integration tests using k3d `make cluster`
 push-all-images:
 	docker push ${proxy-image}
 	docker push ${operator-image}
-	docker push ${activator-grpc-image}
-	docker push ${activator-http-image}
-	docker push ${activator-kafka-image}
-	docker push ${activator-pubsub-image}
-	docker push ${activator-rabbitmq-image}
-	docker push ${activator-sqs-image}
+	#docker push ${activator-grpc-image}
+	#docker push ${activator-http-image}
+	#docker push ${activator-kafka-image}
+	#docker push ${activator-pubsub-image}
+	#docker push ${activator-rabbitmq-image}
+	#docker push ${activator-sqs-image}
 	docker push ${spawn-sdk-example-image}
 
 create-minikube-cluster:
