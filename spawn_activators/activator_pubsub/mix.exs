@@ -32,7 +32,7 @@ defmodule ActivatorPubSub.MixProject do
     [
       {:activator, path: "../activator"},
       {:spawn, path: "../../"},
-      {:bakeware, "~> 0.2"},
+      {:burrito, github: "burrito-elixir/burrito"},
       {:bandit, "~> 0.5"}
       # {:broadway_cloud_pub_sub, "~> 0.7"},
       # {:goth, "~> 1.0"}
@@ -46,9 +46,13 @@ defmodule ActivatorPubSub.MixProject do
         applications: [activator_pubsub: :permanent],
         steps: [
           :assemble,
-          &Bakeware.assemble/1
+          &Burrito.wrap/1
         ],
-        bakeware: [compression_level: 19]
+        burrito: [
+          targets: [
+            linux: [os: :linux, cpu: :x86_64]
+          ],
+        ]
       ]
     ]
   end

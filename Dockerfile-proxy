@@ -4,7 +4,10 @@ ENV MIX_ENV=prod
 
 WORKDIR /app
 
-RUN apk add --no-cache --update git build-base ca-certificates zstd
+RUN apk add --no-cache --update git build-base ca-certificates zstd xz
+RUN apk add zig --repository=http://dl-cdn.alpinelinux.org/alpine/edge/testing/
+RUN zig version
+
 
 RUN mkdir config
 COPY config/ ./config
@@ -47,7 +50,8 @@ RUN cd spawn_proxy/proxy \
 # ---- Application Stage ----
 FROM alpine:3
 #RUN apk add --no-cache --update bash openssl build-base ca-certificates zstd
-RUN apk add --no-cache --update zstd ncurses-libs libstdc++ libgcc
+RUN apk add --no-cache --update zstd ncurses-libs libstdc++ libgcc xz
+RUN apk add zig --repository=http://dl-cdn.alpinelinux.org/alpine/edge/testing/
 
 WORKDIR /app
 RUN chown nobody /app

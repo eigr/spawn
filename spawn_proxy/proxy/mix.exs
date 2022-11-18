@@ -30,7 +30,7 @@ defmodule Proxy.MixProject do
   defp deps do
     [
       {:spawn, path: "../../"},
-      {:bakeware, "~> 0.2"},
+      {:burrito, github: "burrito-elixir/burrito"},
       {:bandit, "~> 0.5"},
       {:observer_cli, "~> 1.7"}
     ]
@@ -43,9 +43,14 @@ defmodule Proxy.MixProject do
         applications: [proxy: :permanent],
         steps: [
           :assemble,
-          &Bakeware.assemble/1
+          &Burrito.wrap/1
         ],
-        bakeware: [compression_level: 19]
+        burrito: [
+          targets: [
+            #linux: [os: :linux, cpu: :x86_64],
+            linux: [os: :linux, cpu: :x86_64, libc: :musl],
+          ],
+        ]
       ]
     ]
   end

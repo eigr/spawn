@@ -42,7 +42,7 @@ defmodule Operator.MixProject do
   defp deps do
     [
       {:bandit, "~> 0.5"},
-      {:bakeware, ">= 0.0.0", runtime: false},
+      {:burrito, github: "burrito-elixir/burrito"},
       {:bonny, "~> 1.0.0-rc.1"},
       {:spawn, path: "../../"}
     ]
@@ -55,9 +55,18 @@ defmodule Operator.MixProject do
         applications: [spawn_operator: :permanent],
         steps: [
           :assemble,
-          &Bakeware.assemble/1
+          &Burrito.wrap/1
         ],
-        bakeware: [compression_level: 19]
+        burrito: [
+          targets: [
+            linux: [os: :linux, cpu: :x86_64],
+            linux_musl: [
+              os: :linux,
+              cpu: :x86_64,
+              libc: :musl
+            ]
+          ]
+        ]
       ]
     ]
   end

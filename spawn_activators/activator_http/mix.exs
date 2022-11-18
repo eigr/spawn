@@ -32,7 +32,7 @@ defmodule ActivatorHTTP.MixProject do
     [
       {:activator, path: "../activator"},
       {:spawn, path: "../../"},
-      {:bakeware, "~> 0.2"},
+      {:burrito, github: "burrito-elixir/burrito"}
       {:bandit, "~> 0.5"}
     ]
   end
@@ -44,9 +44,13 @@ defmodule ActivatorHTTP.MixProject do
         applications: [activator_http: :permanent],
         steps: [
           :assemble,
-          &Bakeware.assemble/1
+          &Burrito.wrap/1
         ],
-        bakeware: [compression_level: 19]
+        burrito: [
+          targets: [
+            linux: [os: :linux, cpu: :x86_64]
+          ],
+        ]
       ]
     ]
   end

@@ -36,7 +36,7 @@ defmodule SpawnSdkExample.MixProject do
       # remove spawn_statestores from _build and test running sdk locally to see its effect
       {:spawn_statestores, path: "../../spawn_statestores/statestores"},
       {:duration_tc, "~> 0.1.0"},
-      {:bakeware, "~> 0.2"}
+      {:burrito, github: "burrito-elixir/burrito"}
     ]
   end
 
@@ -47,9 +47,18 @@ defmodule SpawnSdkExample.MixProject do
         applications: [spawn_sdk_example: :permanent],
         steps: [
           :assemble,
-          &Bakeware.assemble/1
+          &Burrito.wrap/1
         ],
-        bakeware: [compression_level: 19]
+        burrito: [
+          targets: [
+            linux: [os: :linux, cpu: :x86_64],
+            linux_musl: [
+              os: :linux,
+              cpu: :x86_64,
+              libc: :musl
+            ]
+          ]
+        ]
       ]
     ]
   end

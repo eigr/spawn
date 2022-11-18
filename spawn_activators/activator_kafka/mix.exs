@@ -33,7 +33,7 @@ defmodule ActivatorKafka.MixProject do
       {:activator, path: "../activator"},
       {:spawn, path: "../../"},
       {:broadway_kafka, "~> 0.3"},
-      {:bakeware, "~> 0.2"},
+      {:burrito, github: "burrito-elixir/burrito"},
       {:bandit, "~> 0.5"}
     ]
   end
@@ -45,9 +45,13 @@ defmodule ActivatorKafka.MixProject do
         applications: [activator_kafka: :permanent],
         steps: [
           :assemble,
-          &Bakeware.assemble/1
+          &Burrito.wrap/1
         ],
-        bakeware: [compression_level: 19]
+        burrito: [
+          targets: [
+            linux: [os: :linux, cpu: :x86_64]
+          ],
+        ]
       ]
     ]
   end
