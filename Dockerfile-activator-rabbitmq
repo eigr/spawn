@@ -32,14 +32,19 @@ FROM alpine:3
 #RUN apk add --no-cache --update bash openssl build-base ca-certificates zstd
 RUN apk add --no-cache --update zstd ncurses-libs libstdc++ libgcc
 
-WORKDIR /home/app
-COPY --from=builder /app/_build/prod/rel/bakeware .
+WORKDIR /app
+RUN chown nobody /app
 
-RUN adduser app --disabled-password --home app
-RUN chown -R app: /home/app
-USER app
-RUN mkdir -p app/.cache/bakeware
-
+# Set runner ENV
 ENV MIX_ENV=prod
+ENV HOME=/app
+
+COPY --from=builder --chown=nobody:root /app/_build/${MIX_ENV}/rel/bakeware/ ./
+
+RUN mkdir -p /app/.cache/bakeware/ && chmod 777 /app/.cache/bakeware/
+RUN touch /.erlang.cookie && chmod 777 /.erlang.cookie
+RUN touch /app/.erlang.cookie && chmod 777 /app/.erlang.cookie
+
+USER nobody
 
 ENTRYPOINT ["./activator_rabbitmq", "start"]
