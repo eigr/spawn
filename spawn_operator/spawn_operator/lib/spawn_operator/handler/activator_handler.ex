@@ -11,5 +11,6 @@ defmodule SpawnOperator.Handler.ActivatorHandler do
   @impl Pluggable
   def call(axn, nil) do
     axn
+    |> Bonny.Axn.success_event()
   end
 end

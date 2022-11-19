@@ -12,7 +12,7 @@ defmodule SpawnOperator.Operator do
         names:
           Bonny.API.CRD.kind_to_names("Activator", ["act", "acts", "activator", "activators"]),
         group: "spawn-eigr.io",
-        scope: :Cluster,
+        scope: :Namespaced,
         versions: [SpawnOperator.Versions.Api.V1.Activator]
       ),
       Bonny.API.CRD.new!(
@@ -25,7 +25,7 @@ defmodule SpawnOperator.Operator do
             "actorhosts"
           ]),
         group: "spawn-eigr.io",
-        scope: :Cluster,
+        scope: :Namespaced,
         versions: [SpawnOperator.Versions.Api.V1.ActorHost]
       ),
       Bonny.API.CRD.new!(
@@ -38,24 +38,24 @@ defmodule SpawnOperator.Operator do
             "system"
           ]),
         group: "spawn-eigr.io",
-        scope: :Cluster,
+        scope: :Namespaced,
         versions: [SpawnOperator.Versions.Api.V1.ActorSystem]
       )
     ]
   end
 
-  def controllers(_watch_namespace, _opts) do
+  def controllers(watch_namespace, _opts) do
     [
       %{
-        query: K8s.Client.list("spawn-eigr.io/v1", "Activator"),
+        query: K8s.Client.list("spawn-eigr.io/v1", "Activator", namespace: watch_namespace),
         controller: SpawnOperator.Controller.ActivatorController
       },
       %{
-        query: K8s.Client.list("spawn-eigr.io/v1", "ActorHost"),
+        query: K8s.Client.list("spawn-eigr.io/v1", "ActorHost", namespace: watch_namespace),
         controller: SpawnOperator.Controller.ActorHostController
       },
       %{
-        query: K8s.Client.list("spawn-eigr.io/v1", "ActorSystem"),
+        query: K8s.Client.list("spawn-eigr.io/v1", "ActorSystem", namespace: watch_namespace),
         controller: SpawnOperator.Controller.ActorSystemController
       }
     ]
