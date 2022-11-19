@@ -181,101 +181,101 @@ rules:
     resources:
       - customresourcedefinitions
     verbs:
-      - '*'
+      - "*"
   - apiGroups:
       - events.k8s.io/v1
     resources:
       - events
     verbs:
-      - '*'
+      - "*"
   - apiGroups:
-      - spawn-eigr.io/v1
+      - spawn-eigr.io
     resources:
       - activators
     verbs:
-      - '*'
+      - "*"
   - apiGroups:
-      - spawn-eigr.io/v1
+      - spawn-eigr.io
     resources:
       - activators/status
     verbs:
-      - '*'
+      - "*"
   - apiGroups:
       - ""
     resources:
       - secrets
     verbs:
-      - '*'
+      - "*"
   - apiGroups:
       - v1
     resources:
       - pods
     verbs:
-      - '*'
+      - "*"
   - apiGroups:
       - apps
     resources:
       - deployments
       - daemonsets
     verbs:
-      - '*'
+      - "*"
   - apiGroups:
       - ""
     resources:
       - services
       - configmaps
     verbs:
-      - '*'
+      - "*"
   - apiGroups:
       - autoscaling
     resources:
       - horizontalpodautoscalers
     verbs:
-      - '*'
+      - "*"
   - apiGroups:
       - extensions
     resources:
       - ingresses
       - ingressclasses
     verbs:
-      - '*'
+      - "*"
   - apiGroups:
       - networking.k8s.io
     resources:
       - ingresses
       - ingressclasses
     verbs:
-      - '*'
+      - "*"
   - apiGroups:
-      - spawn-eigr.io/v1
+      - spawn-eigr.io
     resources:
       - actorhosts
     verbs:
-      - '*'
+      - "*"
   - apiGroups:
-      - spawn-eigr.io/v1
+      - spawn-eigr.io
     resources:
       - actorhosts/status
     verbs:
-      - '*'
+      - "*"
   - apiGroups:
       - apps
     resources:
       - deployments
     verbs:
-      - '*'
+      - "*"
   - apiGroups:
-      - spawn-eigr.io/v1
+      - spawn-eigr.io
     resources:
       - actorsystems
     verbs:
-      - '*'
+      - "*"
   - apiGroups:
-      - spawn-eigr.io/v1
+      - spawn-eigr.io
     resources:
       - actorsystems/status
     verbs:
-      - '*'
+      - "*"
   - apiGroups:
       - v1
     resources:
