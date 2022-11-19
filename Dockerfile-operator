@@ -30,11 +30,11 @@ RUN cd spawn_operator/spawn_operator \
 
 
 # Release Image
-FROM alpine:3.17
+FROM alpine:3
+
+RUN apk add --no-cache --update zstd ncurses-libs libstdc++ libgcc
 
 ENV MIX_ENV=prod
-
-RUN apk add --no-cache --update zstd build-base ca-certificates ncurses-libs libstdc++ libgcc 
 
 # elixir expects utf8.
 ENV LANG=C.UTF-8

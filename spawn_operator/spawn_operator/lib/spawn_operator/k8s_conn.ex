@@ -22,5 +22,11 @@ defmodule SpawnOperator.K8sConn do
       http_provider: K8s.Client.DynamicHTTPProvider
     }
 
-  def get(_), do: K8s.Conn.from_service_account()
+  def get(_) do
+    K8s.Conn.from_service_account()
+    |> then(fn
+      {:ok, conn} -> conn
+      other -> other
+    end)
+  end
 end
