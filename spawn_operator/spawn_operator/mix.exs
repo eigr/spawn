@@ -42,7 +42,7 @@ defmodule Operator.MixProject do
   defp deps do
     [
       {:bandit, "~> 0.5"},
-      {:bakeware, ">= 0.0.0", runtime: false},
+      #{:bakeware, ">= 0.0.0", runtime: false},
       {:bonny, "~> 1.0.0-rc.1"},
       {:spawn, path: "../../"}
     ]
@@ -53,11 +53,11 @@ defmodule Operator.MixProject do
       spawn_operator: [
         include_executables_for: [:unix],
         applications: [spawn_operator: :permanent],
-        steps: [
-          :assemble,
-          &Bakeware.assemble/1
-        ],
-        bakeware: [compression_level: 19]
+        # steps: [
+        #   :assemble,
+        #   &Bakeware.assemble/1
+        # ],
+        # bakeware: [compression_level: 19]
       ]
     ]
   end

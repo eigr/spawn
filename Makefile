@@ -1,4 +1,4 @@
-version=0.5.0-alpha.13
+version=0.5.0-alpha.20
 registry=eigr
 
 CLUSTER_NAME=spawn-k8s
@@ -91,7 +91,7 @@ test.integration: ## Run integration tests using k3d `make cluster`
 	cd spawn_operator/spawn_operator && PROXY_CLUSTER_STRATEGY=epmd PROXY_DATABASE_TYPE=mysql  PROXY_DATABASE_POOL_SIZE=10 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= TEST_KUBECONFIG=${K3D_KUBECONFIG_PATH} mix test --only integration
 
 push-all-images:
-	docker push ${proxy-image}
+	#docker push ${proxy-image}
 	docker push ${operator-image}
 	#docker push ${activator-grpc-image}
 	#docker push ${activator-http-image}
