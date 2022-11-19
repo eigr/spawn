@@ -152,16 +152,18 @@ Our proxy connects directly and transparently to all cluster members without nee
 
 ## Install
 
+> **_Important:_** Spawn uses Kubernetes as its container orchestration engine and therefore a configured and running Kubernetes cluster is a prerequisite for installing Spawn.
+
 The recommended way to install Spawn is via our Kubernetes Operator, for that you need to download the Operator manifest file. The following command shows how this could be done directly via the command line:
 
 ```shell
-curl -L https://github.com/eigr/spawn/releases/download/{release-version}/manifest.yaml | kubectl apply -f -
+kubectl create ns eigr-functions && curl -L https://github.com/eigr/spawn/releases/download/{release-version}/manifest.yaml | kubectl apply -f -
 ```
 
 > **_NOTE:_** You need to inform the desired release version. For example:
 
 ```shell
-curl -L https://github.com/eigr/spawn/releases/download/v0.5.0-rc.5/manifest.yaml | kubectl apply -f -
+kubectl create ns eigr-functions && curl -L https://github.com/eigr/spawn/releases/download/v0.5.0-rc.5/manifest.yaml | kubectl apply -f -
 ```
 
 ## Getting Started
