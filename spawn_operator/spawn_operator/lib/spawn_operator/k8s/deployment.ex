@@ -23,9 +23,9 @@ defmodule SpawnOperator.K8s.Deployment do
   ]
 
   @default_actor_host_function_ports [
+    %{"containerPort" => 4369, "name" => "epmd"},
     %{"containerPort" => 9000, "name" => "proxy-http"},
-    %{"containerPort" => 9001, "name" => "proxy-https"},
-    %{"containerPort" => 4369, "name" => "epmd"}
+    %{"containerPort" => 9001, "name" => "proxy-https"}
   ]
 
   @default_actor_host_function_replicas 1

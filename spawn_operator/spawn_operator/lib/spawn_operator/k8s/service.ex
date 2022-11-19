@@ -18,9 +18,10 @@ defmodule SpawnOperator.K8s.Service do
         if Map.has_key?(map, "containerPort") do
           port = Map.get(map, "containerPort")
           m = Map.delete(map, "containerPort")
-          Map.put(m, "port", port)
+          m = Map.put(m, "port", port)
+          Map.put(m, "targetPort", Map.get(m, "name"))
         else
-          map
+          Map.put(map, "targetPort", Map.get(map, "name"))
         end
       end)
 
