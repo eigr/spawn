@@ -97,7 +97,7 @@ defmodule SpawnOperator.K8s.Deployment do
     }
   end
 
-  defp get_containers(true, _system, _name, host_params, _sidecar_params) do
+  defp get_containers(true, system, name, host_params, _sidecar_params) do
     actor_host_function_image = Map.get(host_params, "image")
 
     actor_host_function_envs = Map.get(host_params, "env", []) ++ @default_actor_host_function_env
@@ -113,6 +113,18 @@ defmodule SpawnOperator.K8s.Deployment do
         "name" => "actor-host-function",
         "image" => actor_host_function_image,
         "env" => actor_host_function_envs,
+        "envFrom" => [
+          %{
+            "configMapRef" => %{
+              "name" => "#{name}-sidecar-cm"
+            }
+          },
+          %{
+            "secretRef" => %{
+              "name" => "#{system}-secret"
+            }
+          }
+        ],
         "ports" => actor_host_function_ports,
         "resources" => actor_host_function_resources
       }
