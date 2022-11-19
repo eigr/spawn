@@ -218,7 +218,7 @@ spec:
 
 This file will be responsible for creating a system of actors in the cluster.
 
-Now create a new file called ***node.yaml*** with the following content:
+Now create a new file called ***host.yaml*** with the following content:
 
 ```yaml
 ---
@@ -232,15 +232,35 @@ spec:
   host:
     image: eigr/spawn-springboot-examples:latest # Mandatory
     ports:
-      - containerPort: 8091
+      - name: "http"
+        containerPort: 8091
 ```
 
 This file will be responsible for deploying your host function and actors in the cluster.
+But if you are using the SDK for Elixir then your Yaml should look like this:
+
+```yaml
+---
+apiVersion: spawn-eigr.io/v1
+kind: ActorHost
+metadata:
+  name: spawn-dice-game
+  system: game-system
+  namespace: default
+spec:
+  host:
+    embedded: true # This indicates that it is a native BEAM application and therefore does not need a sidecar proxy attached.
+    image: eigr/dice-game-example:0.1.1
+    ports:
+      - name: "http"
+        containerPort: 8800
+```
+
 Now that the files have been defined, we can apply them to the cluster:
 
 ```shell
 kubectl apply -f system.yaml
-kubectl apply -f node.yaml
+kubectl apply -f host.yaml
 ```
 
 After that, just check your actors with:
@@ -254,6 +274,7 @@ kubectl get actornodes
 You can find some examples of using Spawn in the links below:
 
 * **Hatch**: https://github.com/zblanco/hatch
+* **Elixir Dice Game. Spawn with Phoenix app**: https://github.com/eigr-labs/spawn_game_example.git 
 * **Distributed Image Processing**: https://github.com/eigr-labs/spawn-distributed-image-processing
 * **Federated Data Example**: https://github.com/eigr-labs/spawn-federated-data-example
 * **Fleet**: https://github.com/sleipnir/fleet-spawn-example
