@@ -48,9 +48,7 @@ defmodule Spawn.Cluster.Node.Registry do
     |> Stream.map(&Horde.Registry.match(__MODULE__, &1, :_))
     |> Stream.scan([], fn [{pid, _}], acc -> [pid | acc] end)
     |> Stream.flat_map(& &1)
-    # This is a HUUUUGE work around MIAUUUU
     |> Stream.uniq()
-    # |> Stream.filter(&Process.alive?/1)
     |> Enum.to_list()
   end
 end
