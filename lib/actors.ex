@@ -71,8 +71,9 @@ defmodule Actors do
         %HostActor{node: Node.self(), actor: actor, opts: opts}
       end)
 
+    ActorRegistry.register(hosts)
+
     spawn(fn ->
-      ActorRegistry.register(hosts)
       create_actors(actor_system, actors, opts)
     end)
 
