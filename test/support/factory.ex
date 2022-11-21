@@ -16,7 +16,8 @@ defmodule Actors.FactoryTest do
     ActorSnapshotStrategy,
     ActorDeactivationStrategy,
     ActorState,
-    Command
+    Command,
+    Metadata
   }
 
   alias Google.Protobuf.Any
@@ -102,6 +103,7 @@ defmodule Actors.FactoryTest do
         deactivation_strategy:
           attrs[:deactivation_strategy] || build_actor_deactivation_strategy()
       },
+      metadata: attrs[:metadata] || %Metadata{},
       state: attrs[:state] || build_actor_state()
     )
   end
