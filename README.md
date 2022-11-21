@@ -245,7 +245,7 @@ apiVersion: spawn-eigr.io/v1
 kind: ActorHost
 metadata:
   name: spawn-dice-game
-  system: game-system
+  system: spawn-system
   namespace: default
 spec:
   host:
@@ -266,7 +266,7 @@ kubectl apply -f host.yaml
 After that, just check your actors with:
 
 ```shell
-kubectl get actornodes
+kubectl get actorhosts
 ```
 
 ### Examples
