@@ -20,7 +20,21 @@ defmodule Actors.Supervisors.EntitySupervisor do
     children = [
       get_pubsub_adapter(config),
       Actors.Actor.Entity.Supervisor.child_spec(),
-      Actors.Registry.ActorRegistry.child_spec(),
+      %{
+        id: :actor_registry_task,
+        start:
+          {Task, :start_link,
+           [
+             fn ->
+               Process.flag(:trap_exit, true)
+
+               receive do
+                 {:EXIT, _pid, _reason} ->
+                   Actors.Registry.ActorRegistry.node_cleanup(Node.self())
+               end
+             end
+           ]}
+      },
       {Highlander, Actors.Actor.InvocationScheduler.child_spec()}
     ]
 

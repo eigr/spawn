@@ -71,9 +71,8 @@ defmodule Actors do
         %HostActor{node: Node.self(), actor: actor, opts: opts}
       end)
 
-    :ok = ActorRegistry.register(hosts)
-
     spawn(fn ->
+      ActorRegistry.register(hosts)
       create_actors(actor_system, actors, opts)
     end)
 
@@ -127,7 +126,7 @@ defmodule Actors do
       end)
       |> List.flatten()
 
-    :ok = ActorRegistry.register(hosts)
+    ActorRegistry.register(hosts)
 
     status = RequestStatus.new(status: :OK, message: "Accepted")
     {:ok, SpawnResponse.new(status: status)}
