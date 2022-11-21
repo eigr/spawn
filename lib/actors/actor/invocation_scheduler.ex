@@ -50,7 +50,9 @@ defmodule Actors.Actor.InvocationScheduler do
   def handle_cast({:schedule, request}, state) do
     encoded_request = InvocationRequest.encode(request)
 
-    ActorRegistry.register_invocation_request(request.actor.id.name, encoded_request)
+    spawn(fn ->
+      ActorRegistry.register_invocation_request(request.actor.id.name, encoded_request)
+    end)
 
     call_invoke(request)
 

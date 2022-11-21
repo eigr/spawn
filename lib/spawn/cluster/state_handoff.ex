@@ -99,7 +99,7 @@ defmodule Spawn.Cluster.StateHandoff do
       end)
       |> Map.new()
 
-    drop_operations = actors |> Map.keys() |> Enum.map(& {:remove, [&1]})
+    drop_operations = actors |> Map.keys() |> Enum.map(&{:remove, [&1]})
     merge_operations = Enum.map(new_hosts, fn {key, value} -> {:add, [key, value]} end)
 
     # this is calling the internals of DeltaCrdt GenServer function (to keep atomicity in check)
