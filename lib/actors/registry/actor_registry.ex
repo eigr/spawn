@@ -1,95 +1,22 @@
 defmodule Actors.Registry.ActorRegistry do
   @moduledoc false
-  use GenServer
   require Logger
 
   alias Actors.Registry.{HostActor, LoadBalancer}
   alias Eigr.Functions.Protocol.Actors.{Actor, ActorId}
   alias Spawn.Cluster.StateHandoff
 
-  @call_timeout 15_000
-
-  def child_spec(state \\ []) do
-    %{
-      id: __MODULE__,
-      start: {__MODULE__, :start_link, [state]},
-      shutdown: 10_000,
-      restart: :transient
-    }
-  end
-
-  @impl true
-  def init(state) do
-    Process.flag(:trap_exit, true)
-    Process.flag(:message_queue_data, :off_heap)
-    :ok = :net_kernel.monitor_nodes(true, node_type: :visible)
-    {:ok, state}
-  end
-
-  @impl true
-  def handle_info({:nodeup, node, _node_type}, state) do
-    Logger.debug("Received :nodeup event from #{inspect(node)}")
-
-    {:noreply, state}
-  end
-
-  def handle_info({:nodedown, node, _node_type}, state) do
-    Logger.debug("Received :nodedown event from #{inspect(node)}")
-    {:noreply, state}
-  end
-
-  @impl true
-  def handle_call({:get, _system_name, actor_name}, from, state) do
-    spawn(fn ->
-      case StateHandoff.get(actor_name) do
-        nil ->
-          GenServer.reply(from, {:not_found, []})
-
-        hosts ->
-          Enum.filter(hosts, fn ac -> ac.actor.id.name == actor_name end)
-          |> then(fn
-            [] ->
-              GenServer.reply(from, {:not_found, []})
-
-            hosts ->
-              case LoadBalancer.next_host(hosts) do
-                {:ok, node_host, updated_hosts} ->
-                  StateHandoff.set(actor_name, updated_hosts)
-                  GenServer.reply(from, {:ok, node_host})
-
-                _ ->
-                  GenServer.reply(from, {:not_found, []})
-              end
-          end)
-      end
-    end)
-
-    {:noreply, state}
-  end
-
-  @impl true
-  def handle_call({:get_hosts_by_actor, _system_name, actor_name}, from, state) do
-    spawn(fn ->
-      case StateHandoff.get(actor_name) do
-        nil ->
-          GenServer.reply(from, {:not_found, []})
-
-        hosts ->
-          Enum.filter(hosts, fn ac -> ac.actor.id.name == actor_name end)
-          |> then(fn
-            [] ->
-              GenServer.reply(from, {:not_found, []})
-
-            hosts ->
-              GenServer.reply(from, {:ok, hosts})
-          end)
-      end
-    end)
-
-    {:noreply, state}
-  end
-
-  def handle_call({:register, hosts}, _from, state) do
+  @doc """
+  Register `member` entities to the ActorRegistry.
+  Returns `Cluster` with all Host members.
+  ## Examples
+      iex> hosts = [%HostActor{node: Node.self(), actor: actor, opts: []}}]
+      iex> ActorRegistry.register(hosts)
+      :ok
+  """
+  @doc since: "0.1.0"
+  @spec register(list(HostActor.t())) :: :ok
+  def register(hosts) do
     Enum.each(hosts, fn %HostActor{
                           node: node,
                           actor: %Actor{id: %ActorId{name: name} = _id} = _actor
@@ -108,33 +35,19 @@ defmodule Actors.Registry.ActorRegistry do
           end
       end
     end)
-
-    {:reply, :ok, state}
   end
 
-  @impl true
-  def handle_cast({:register_invocation_request, actor, request}, state) do
-    actor
-    |> StateHandoff.get()
-    |> Kernel.||([])
-    |> Enum.map(fn host ->
-      invocations = (host.opts[:invocations] || []) ++ [request]
-
-      opts = Keyword.put(host.opts, :invocations, invocations)
-      %{host | opts: opts}
-    end)
-    |> then(fn
-      [] ->
-        :nothing
-
-      updated_hosts ->
-        StateHandoff.set(actor, updated_hosts)
-    end)
-
-    {:noreply, state}
+  @doc """
+  Get all invocations stored for actor
+  ## Examples
+      iex> ActorRegistry.get_all_invocations()
+      [<<10, 14, 10, 12, 115, 112>>]
+  """
+  def get_all_invocations do
+    StateHandoff.get_all_invocations()
   end
 
-  def handle_cast({:remove_invocation_request, actor, request}, state) do
+  def remove_invocation_request(actor, request) do
     actor
     |> StateHandoff.get()
     |> Kernel.||([])
@@ -153,101 +66,78 @@ defmodule Actors.Registry.ActorRegistry do
       updated_hosts ->
         StateHandoff.set(actor, updated_hosts)
     end)
-
-    {:noreply, state}
   end
 
-  @impl true
-  def terminate(_reason, _state) do
-    Logger.debug("Stopping ActorRegistry...")
-    StateHandoff.clean(Node.self())
-  end
+  def register_invocation_request(actor, request) do
+    actor
+    |> StateHandoff.get()
+    |> Kernel.||([])
+    |> Enum.map(fn host ->
+      invocations = (host.opts[:invocations] || []) ++ [request]
 
-  def start_link(args) do
-    GenServer.start_link(__MODULE__, args, name: __MODULE__)
-  end
+      opts = Keyword.put(host.opts, :invocations, invocations)
+      %{host | opts: opts}
+    end)
+    |> then(fn
+      [] ->
+        :nothing
 
-  @doc """
-  Register `member` entities to the ActorRegistry.
-  Returns `Cluster` with all Host members.
-  ## Examples
-      iex> hosts = [%HostActor{node: Node.self(), actor: actor, opts: []}}]
-      iex> ActorRegistry.register(hosts)
-      :ok
-  """
-  @doc since: "0.1.0"
-  @spec register(list(HostActor.t())) :: :ok
-  def register(hosts) do
-    GenServer.call(__MODULE__, {:register, hosts}, @call_timeout)
-  end
-
-  @doc """
-  Get all invocations stored for actor
-  ## Examples
-      iex> ActorRegistry.get_all_invocations()
-      [<<10, 14, 10, 12, 115, 112>>]
-  """
-  def get_all_invocations do
-    StateHandoff.get_all_invocations()
-  end
-
-  def remove_invocation_request(actor, invocation_request) do
-    GenServer.cast(__MODULE__, {:remove_invocation_request, actor, invocation_request})
-  end
-
-  def register_invocation_request(actor, invocation_request) do
-    GenServer.cast(__MODULE__, {:register_invocation_request, actor, invocation_request})
+      updated_hosts ->
+        StateHandoff.set(actor, updated_hosts)
+    end)
   end
 
   @doc """
   Fetch current entities of the service.
-  Returns `Member` with Host and specific actor.
-  ## Examples
-      iex> ActorRegistry.lookup("spawn-system", "joe")
-      {:ok,
-       %Actors.Registry.Member{
-         id: :"spawn_a2@127.0.0.1",
-         host_function: %Actors.Registry.HostActor{
-           actors: [
-             %Eigr.Functions.Protocol.Actors.Actor{
-               name: "jose",
-               persistent: true,
-               state: %Eigr.Functions.Protocol.Actors.ActorState{
-                 tags: %{},
-                 state: nil,
-                 __unknown_fields__: []
-               },
-               snapshot_strategy: %Eigr.Functions.Protocol.Actors.ActorSnapshotStrategy{
-                 strategy: {:timeout,
-                   %Eigr.Functions.Protocol.Actors.TimeoutStrategy{
-                     timeout: 2000,
-                     __unknown_fields__: []
-                   }},
-                 __unknown_fields__: []
-               },
-               deactivation_strategy: %Eigr.Functions.Protocol.Actors.ActorDeactivationStrategy{
-                 strategy: {:timeout,
-                   %Eigr.Functions.Protocol.Actors.TimeoutStrategy{
-                     timeout: 30000,
-                     __unknown_fields__: []
-                   }},
-                 __unknown_fields__: []
-               },
-               __unknown_fields__: []
-             }
-           ],
-           opts: []
-         }
-      }}
+  Returns `HostActor` with Host and specific actor.
   """
   @doc since: "0.1.0"
-  @spec lookup(String.t(), String.t()) :: {:ok, Member.t()} | {:not_found, []}
-  def lookup(system_name, actor_name) do
-    GenServer.call(__MODULE__, {:get, system_name, actor_name})
+  @spec lookup(String.t(), String.t()) :: {:ok, HostActor.t()} | {:not_found, []}
+  def lookup(_system_name, actor_name) do
+    case StateHandoff.get(actor_name) do
+      nil ->
+        {:not_found, []}
+
+      hosts ->
+        Enum.filter(hosts, fn ac -> ac.actor.id.name == actor_name end)
+        |> then(fn
+          [] ->
+            {:not_found, []}
+
+          hosts ->
+            case LoadBalancer.next_host(hosts) do
+              {:ok, node_host, updated_hosts} ->
+                StateHandoff.set(actor_name, updated_hosts)
+                {:ok, node_host}
+
+              _ ->
+                {:not_found, []}
+            end
+        end)
+    end
   end
 
   @spec get_hosts_by_actor(String.t(), String.t()) :: {:ok, Member.t()} | {:not_found, []}
-  def get_hosts_by_actor(system_name, actor_name) do
-    GenServer.call(__MODULE__, {:get_hosts_by_actor, system_name, actor_name})
+  def get_hosts_by_actor(_system_name, actor_name) do
+    case StateHandoff.get(actor_name) do
+      nil ->
+        {:not_found, []}
+
+      hosts ->
+        Enum.filter(hosts, fn ac -> ac.actor.id.name == actor_name end)
+        |> then(fn
+          [] ->
+            {:not_found, []}
+
+          hosts ->
+            {:ok, hosts}
+        end)
+    end
+  end
+
+  def node_cleanup(node) do
+    Logger.info("Actor registry cleaning actors from node: #{inspect(node)}")
+
+    StateHandoff.clean(node)
   end
 end

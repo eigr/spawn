@@ -87,23 +87,26 @@ defmodule Spawn.Cluster.StateHandoff do
   @impl true
   def handle_call({:clean, node}, _from, crdt_pid) do
     Logger.debug("Received cleanup action from Node #{inspect(node)}")
+
     actors = DeltaCrdt.to_map(crdt_pid)
 
-    hosts = Map.values(actors)
+    new_hosts =
+      actors
+      |> Enum.map(fn {key, hosts} ->
+        hosts_not_in_node = Enum.reject(hosts, &(&1.node == node))
 
-    keys =
-      hosts
-      |> List.flatten()
-      |> Enum.filter(fn host ->
-        node == host.node
+        {key, hosts_not_in_node}
       end)
-      |> Enum.map(fn host -> host.actor.id.name end)
+      |> Map.new()
 
-    Logger.debug("Drop keys #{inspect(keys)} from #{inspect(node)}")
+    drop_operations = actors |> Map.keys() |> Enum.map(&{:remove, [&1]})
+    merge_operations = Enum.map(new_hosts, fn {key, value} -> {:add, [key, value]} end)
 
-    res = DeltaCrdt.drop(crdt_pid, keys)
+    # this is calling the internals of DeltaCrdt GenServer function (to keep atomicity in check)
+    GenServer.call(crdt_pid, {:bulk_operation, drop_operations ++ merge_operations})
 
-    Logger.debug("Drop keys result #{inspect(res)}")
+    Logger.debug("Hosts cleaned for node #{inspect(node)}")
+
     {:reply, :ok, crdt_pid}
   end
 

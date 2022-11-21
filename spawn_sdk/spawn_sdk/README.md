@@ -525,7 +525,7 @@ The full example of this application can be found [here](https://github.com/eigr
   Spawning Actors:
 
   ```elixir
-  iex> SpawnSdk.spawn_actor("robert", system: "spawn-system", actor: SpawnSdkExample.Actors.AbstractActor)
+  iex> SpawnSdk.spawn_actor("robert", system: "spawn-system", actor: "abs_actor")
   {:ok, %{"robert" => SpawnSdkExample.Actors.AbstractActor}}
   ```
 
