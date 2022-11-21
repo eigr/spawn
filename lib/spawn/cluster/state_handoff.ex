@@ -99,11 +99,11 @@ defmodule Spawn.Cluster.StateHandoff do
       end)
       |> Map.new()
 
-    # clean all actors
-    DeltaCrdt.drop(crdt_pid, Map.keys(actors))
+    drop_operations = actors |> Map.keys() |> Enum.map(& {:remove, [&1]})
+    merge_operations = Enum.map(new_hosts, fn {key, value} -> {:add, [key, value]} end)
 
-    # overwrite with correct set of hosts
-    DeltaCrdt.merge(crdt_pid, new_hosts)
+    # this is calling the internals of DeltaCrdt GenServer function (to keep atomicity in check)
+    GenServer.call(crdt_pid, {:bulk_operation, drop_operations ++ merge_operations})
 
     Logger.debug("Hosts cleaned for node #{inspect(node)}")
 
