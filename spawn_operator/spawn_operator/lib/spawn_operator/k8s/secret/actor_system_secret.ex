@@ -6,9 +6,18 @@ defmodule SpawnOperator.K8s.Secret.ActorSystemSecret do
   import Bonny.Config, only: [conn: 0]
 
   @impl true
-  def manifest(system, ns, name, params), do: gen_secret(system, ns, name, params)
+  def manifest(resource), do: gen_secret(resource)
 
-  defp gen_secret(system, ns, _name, params) do
+  defp gen_secret(
+         %{
+           system: system,
+           namespace: ns,
+           name: _name,
+           params: params,
+           labels: _labels,
+           annotations: _annotations
+         } = _resource
+       ) do
     mesh_params = Map.get(params, "mesh", %{})
     statestore_params = Map.get(params, "statestore", %{})
 

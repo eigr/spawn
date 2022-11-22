@@ -14,9 +14,18 @@ defmodule SpawnOperator.K8s.HPA do
   @default_average_memory_utilization_value 70
 
   @impl true
-  def manifest(system, ns, name, params), do: gen_autoscaler(system, ns, name, params)
+  def manifest(resource), do: gen_autoscaler(resource)
 
-  defp gen_autoscaler(system, ns, name, params) do
+  defp gen_autoscaler(
+         %{
+           system: system,
+           namespace: ns,
+           name: name,
+           params: params,
+           labels: _labels,
+           annotations: _annotations
+         } = _resource
+       ) do
     autoscaler = Map.get(params, "autoscaler", @default_autoscaler)
 
     {:ok, result} =

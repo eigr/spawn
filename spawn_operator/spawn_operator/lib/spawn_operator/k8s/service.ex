@@ -9,7 +9,16 @@ defmodule SpawnOperator.K8s.Service do
   ]
 
   @impl true
-  def manifest(_system, ns, name, params) do
+  def manifest(
+        %{
+          system: _system,
+          namespace: ns,
+          name: name,
+          params: params,
+          labels: _labels,
+          annotations: _annotations
+        } = _resource
+      ) do
     host_params = Map.get(params, "host")
     actor_host_function_ports = Map.get(host_params, "ports", [])
 

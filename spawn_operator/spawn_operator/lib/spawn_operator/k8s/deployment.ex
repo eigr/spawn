@@ -40,9 +40,18 @@ defmodule SpawnOperator.K8s.Deployment do
   }
 
   @impl true
-  def manifest(system, ns, name, params), do: gen_deployment(system, ns, name, params)
+  def manifest(resource), do: gen_deployment(resource)
 
-  defp gen_deployment(system, ns, name, params) do
+  defp gen_deployment(
+         %{
+           system: system,
+           namespace: ns,
+           name: name,
+           params: params,
+           labels: _labels,
+           annotations: _annotations
+         } = _resource
+       ) do
     host_params = Map.get(params, "host")
     sidecar_params = Map.get(params, "sidecar", %{})
 

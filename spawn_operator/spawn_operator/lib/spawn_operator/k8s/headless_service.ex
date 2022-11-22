@@ -8,23 +8,32 @@ defmodule SpawnOperator.K8s.HeadlessService do
   ]
 
   @impl true
-  def manifest(system, ns, _name, _params),
-    do: %{
-      "apiVersion" => "v1",
-      "kind" => "Service",
-      "metadata" => %{
-        "labels" => %{
-          "svc-cluster-name" => "system-#{system}-svc",
-          "spawn-eigr.io/controller.version" =>
-            "#{to_string(Application.spec(:spawn_operator, :vsn))}"
+  def manifest(
+        %{
+          system: system,
+          namespace: ns,
+          name: _name,
+          params: _params,
+          labels: _labels,
+          annotations: _annotations
+        } = _resource
+      ),
+      do: %{
+        "apiVersion" => "v1",
+        "kind" => "Service",
+        "metadata" => %{
+          "labels" => %{
+            "svc-cluster-name" => "system-#{system}-svc",
+            "spawn-eigr.io/controller.version" =>
+              "#{to_string(Application.spec(:spawn_operator, :vsn))}"
+          },
+          "name" => "system-#{system}-svc",
+          "namespace" => ns
         },
-        "name" => "system-#{system}-svc",
-        "namespace" => ns
-      },
-      "spec" => %{
-        "clusterIP" => "None",
-        "selector" => %{"actor-system" => system},
-        "ports" => @ports
+        "spec" => %{
+          "clusterIP" => "None",
+          "selector" => %{"actor-system" => system},
+          "ports" => @ports
+        }
       }
-    }
 end

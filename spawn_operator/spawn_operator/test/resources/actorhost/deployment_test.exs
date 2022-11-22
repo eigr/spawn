@@ -139,9 +139,7 @@ defmodule DeploymentTest do
   end
 
   defp build_host_deploy(resource) do
-    %{system: system, namespace: ns, name: name, params: params} =
-      SpawnOperator.get_args(resource)
-
-    Deployment.manifest(system, ns, name, params)
+    SpawnOperator.get_args(resource)
+    |> Deployment.manifest()
   end
 end

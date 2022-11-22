@@ -76,30 +76,22 @@ defmodule SpawnOperator.Handler.ActorHostHandler do
   end
 
   defp build_host_deploy(resource) do
-    %{system: system, namespace: ns, name: name, params: params} =
-      SpawnOperator.get_args(resource)
-
-    Deployment.manifest(system, ns, name, params)
+    SpawnOperator.get_args(resource)
+    |> Deployment.manifest()
   end
 
   defp build_host_service(resource) do
-    %{system: system, namespace: ns, name: name, params: params} =
-      SpawnOperator.get_args(resource)
-
-    Service.manifest(system, ns, name, params)
+    SpawnOperator.get_args(resource)
+    |> Service.manifest()
   end
 
   defp build_host_configmap(resource) do
-    %{system: system, namespace: ns, name: name, params: params} =
-      SpawnOperator.get_args(resource)
-
-    SidecarCM.manifest(system, ns, name, params)
+    SpawnOperator.get_args(resource)
+    |> SidecarCM.manifest()
   end
 
   defp build_host_hpa(resource) do
-    %{system: system, namespace: ns, name: name, params: params} =
-      SpawnOperator.get_args(resource)
-
-    HPA.manifest(system, ns, name, params)
+    SpawnOperator.get_args(resource)
+    |> HPA.manifest()
   end
 end

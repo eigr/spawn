@@ -47,16 +47,12 @@ defmodule SpawnOperator.Handler.ActorSystemHandler do
   end
 
   defp build_system_configmap(resource) do
-    %{system: system, namespace: ns, name: name, params: params} =
-      SpawnOperator.get_args(resource)
-
-    ActorSystemSecret.manifest(system, ns, name, params)
+    SpawnOperator.get_args(resource)
+    |> ActorSystemSecret.manifest()
   end
 
   defp build_system_service(resource) do
-    %{system: system, namespace: ns, name: name, params: params} =
-      SpawnOperator.get_args(resource)
-
-    HeadlessService.manifest(system, ns, name, params)
+    SpawnOperator.get_args(resource)
+    |> HeadlessService.manifest()
   end
 end
