@@ -69,29 +69,17 @@ defmodule SpawnSdk.System.SpawnSystem do
 
   @impl SpawnSdk.System
   def spawn_actor(actor_name, spawn_actor_opts) do
-    system = Keyword.get(spawn_actor_opts, :system, nil)
-    actor_mod = get_actor_module(spawn_actor_opts)
-
-    if is_nil(actor_mod) do
-      raise "Invalid Actor reference, actor not found registered in this instance"
-    end
-
-    if not actor_mod.__meta__(:abstract) do
-      raise "Invalid Actor reference. Only abstract Actor are permitted for spawning!"
-    end
-
-    new_state = state_to_map(actor_name, [actor_mod])
     opts = []
+    system = Keyword.get(spawn_actor_opts, :system, nil)
+    parent = get_parent_actor_name(spawn_actor_opts)
 
-    spawn_request = build_spawn_req(system, actor_name, actor_mod)
+    spawn_request = build_spawn_req(system, actor_name, parent)
 
     case Actors.spawn_actor(spawn_request, opts) do
       {:ok, %SpawnResponse{status: status}} ->
         Logger.debug("Actor Spawned successfully. Status: #{inspect(status)}")
 
-        merge_cache_actors(system, new_state)
-
-        {:ok, new_state}
+        :ok
 
       error ->
         {:error, "Actors Spawned failing. Error #{inspect(error)}"}
@@ -140,8 +128,7 @@ defmodule SpawnSdk.System.SpawnSystem do
 
   def call(invocation, entity_state, default_actions) do
     %ActorInvocation{
-      actor_name: name,
-      actor_system: system,
+      actor: %ActorId{name: name, system: system, parent: parent},
       command_name: command,
       payload: payload,
       current_context: %Eigr.Functions.Protocol.Context{metadata: metadata},
@@ -154,7 +141,7 @@ defmodule SpawnSdk.System.SpawnSystem do
 
     actor_state = actor_state || %{}
     current_state = Map.get(actor_state, :state)
-    actor_instance = get_cached_actor(system, name)
+    actor_instance = get_cached_actor(system, name, parent)
 
     cond do
       Enum.member?(default_actions, command) and
@@ -239,20 +226,16 @@ defmodule SpawnSdk.System.SpawnSystem do
     actors
   end
 
-  defp get_actor_module(spawn_actor_opts) do
+  defp get_parent_actor_name(spawn_actor_opts) do
     case Keyword.get(spawn_actor_opts, :actor, nil) do
       nil ->
         nil
 
       actor when is_atom(actor) ->
-        if :code.module_status(actor) == :loaded do
-          actor
-        else
-          Atom.to_string(actor)
-        end
+        actor.__meta__(:name)
 
       actor when is_binary(actor) ->
-        :persistent_term.get("actor:#{actor}", nil)
+        actor
     end
   end
 
@@ -373,16 +356,26 @@ defmodule SpawnSdk.System.SpawnSystem do
     end)
   end
 
-  defp get_cached_actors(system) do
-    case :ets.lookup(:"#{system}:actors", "actors") do
-      [{"actors", actors}] -> actors
-      _ -> %{}
+  defp get_cached_actor(system, name, parent) do
+    ref = get_cached_actor(system, name)
+
+    if is_nil(ref) do
+      get_cached_actor(system, parent)
+    else
+      ref
     end
   end
 
   defp get_cached_actor(system, name) do
     get_cached_actors(system)
     |> Map.get(name)
+  end
+
+  defp get_cached_actors(system) do
+    case :ets.lookup(:"#{system}:actors", "actors") do
+      [{"actors", actors}] -> actors
+      _ -> %{}
+    end
   end
 
   defp call_instance(instance, command, %Noop{} = noop, context) do
@@ -405,13 +398,9 @@ defmodule SpawnSdk.System.SpawnSystem do
     instance.handle_command({parse_command_name(command), unpack_unknown(value)}, context)
   end
 
-  defp build_spawn_req(system, actor_name, actor) do
+  defp build_spawn_req(system, actor_name, parent) do
     %SpawnRequest{
-      actor_system:
-        ActorSystem.new(
-          name: system,
-          registry: %Registry{actors: to_map(system, actor_name, [actor])}
-        )
+      actors: [ActorId.new(name: actor_name, system: system, parent: parent)]
     }
   end
 
@@ -444,13 +433,6 @@ defmodule SpawnSdk.System.SpawnSystem do
     end)
   end
 
-  defp state_to_map(actor_name, actors) do
-    actors
-    |> Enum.into(%{}, fn actor ->
-      {actor_name, actor}
-    end)
-  end
-
   defp to_map(system, actors) do
     actors
     |> Enum.into(%{}, fn actor ->
@@ -476,46 +458,6 @@ defmodule SpawnSdk.System.SpawnSystem do
       {name,
        Actor.new(
          id: %ActorId{system: system, name: name},
-         metadata: %Metadata{channel_group: channel},
-         settings: %ActorSettings{
-           abstract: abstract,
-           persistent: persistent,
-           snapshot_strategy: snapshot_strategy,
-           deactivation_strategy: deactivation_strategy
-         },
-         commands: Enum.map(actions, fn action -> get_action(action) end),
-         timer_commands:
-           Enum.map(timer_actions, fn {action, seconds} -> get_timer_action(action, seconds) end),
-         state: ActorState.new()
-       )}
-    end)
-  end
-
-  defp to_map(system, actor_name, actors) do
-    actors
-    |> Enum.into(%{}, fn actor ->
-      name = actor_name
-      channel = actor.__meta__(:channel)
-      abstract = actor.__meta__(:abstract)
-      actions = actor.__meta__(:actions)
-      persistent = actor.__meta__(:persistent)
-      snapshot_timeout = actor.__meta__(:snapshot_timeout)
-      deactivate_timeout = actor.__meta__(:deactivate_timeout)
-      timer_actions = actor.__meta__(:timers)
-
-      snapshot_strategy =
-        ActorSnapshotStrategy.new(
-          strategy: {:timeout, TimeoutStrategy.new(timeout: snapshot_timeout)}
-        )
-
-      deactivation_strategy =
-        ActorDeactivationStrategy.new(
-          strategy: {:timeout, TimeoutStrategy.new(timeout: deactivate_timeout)}
-        )
-
-      {name,
-       Actor.new(
-         id: %ActorId{system: system, name: name, parent: actor.__meta__(:name)},
          metadata: %Metadata{channel_group: channel},
          settings: %ActorSettings{
            abstract: abstract,

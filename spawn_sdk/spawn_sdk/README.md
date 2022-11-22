@@ -526,7 +526,7 @@ The full example of this application can be found [here](https://github.com/eigr
 
   ```elixir
   iex> SpawnSdk.spawn_actor("robert", system: "spawn-system", actor: "abs_actor")
-  {:ok, %{"robert" => SpawnSdkExample.Actors.AbstractActor}}
+  :ok
   ```
 
   Invoke Spawned Actors:

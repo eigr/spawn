@@ -230,7 +230,7 @@ message ServiceInfo {
 }
 
 message SpawnRequest {
-    eigr.functions.protocol.actors.ActorSystem actor_system = 2;
+    repeated eigr.functions.protocol.actors.ActorId actors = 1;
 }
 
 message SpawnResponse {
@@ -351,8 +351,7 @@ message InvocationRequest {
 // and the real Actor that intends to respond to this invocation and that can be located anywhere in the cluster.
 //
 // Params:
-//   * actor_name: The name of the Actor handling the InvocationRequest request, also called the target Actor.
-//   * actor_system: The name of ActorSystem registered in Registration step.
+//   * actor: The ActorId handling the InvocationRequest request, also called the target Actor.
 //   * command_name: The function or method on the target Actor that will receive this request 
 //                 and perform some useful computation with the sent data.
 //   * current_context: The current Context with current state value of the target Actor. 
@@ -361,17 +360,15 @@ message InvocationRequest {
 //   * payload: The value to be passed to the function or method corresponding to command_name.
 message ActorInvocation {
 
-    string actor_name = 1;
+    eigr.functions.protocol.actors.ActorId actor = 1;
 
-    string actor_system = 2;
+    string command_name = 2;
 
-    string command_name = 3;
-
-    Context current_context = 4;
+    Context current_context = 3;
 
     oneof payload {
-        google.protobuf.Any value = 5;
-        Noop noop = 7;
+        google.protobuf.Any value = 4;
+        Noop noop = 5;
     }
 
     eigr.functions.protocol.actors.ActorId caller = 6;

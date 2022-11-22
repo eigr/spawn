@@ -101,7 +101,7 @@ defmodule Actors.Actor.Entity.Invocation do
   def broadcast_invoke(
         command,
         payload,
-        %ActorInvocation{actor_name: caller_actor_name, actor_system: actor_system},
+        %ActorInvocation{actor: %ActorId{name: caller_actor_name, system: actor_system}},
         %EntityState{
           system: _actor_system,
           actor: %Actor{id: %ActorId{name: actor_name} = _id} = actor
@@ -144,7 +144,7 @@ defmodule Actors.Actor.Entity.Invocation do
           system: actor_system,
           actor:
             %Actor{
-              id: %ActorId{name: actor_name} = id,
+              id: %ActorId{name: actor_name, parent: parent} = id,
               state: actor_state,
               commands: commands
             } = _actor
@@ -169,8 +169,7 @@ defmodule Actors.Actor.Entity.Invocation do
 
           request =
             ActorInvocation.new(
-              actor_name: actor_name,
-              actor_system: actor_system,
+              actor: %ActorId{name: actor_name, system: actor_system, parent: parent},
               command_name: init_command.name,
               payload: Noop.new(),
               current_context:
@@ -202,7 +201,7 @@ defmodule Actors.Actor.Entity.Invocation do
         {%InvocationRequest{
            actor:
              %Actor{
-               id: %ActorId{name: actor_name} = _id
+               id: %ActorId{name: actor_name} = id
              } = _actor,
            metadata: metadata,
            command_name: command,
@@ -239,15 +238,14 @@ defmodule Actors.Actor.Entity.Invocation do
 
           request =
             ActorInvocation.new(
-              actor_name: actor_name,
-              actor_system: actor_system,
+              actor: id,
               command_name: command,
               payload: payload,
               current_context:
                 Context.new(
                   metadata: metadata,
                   caller: caller,
-                  self: ActorId.new(name: actor_name, system: actor_system),
+                  self: id,
                   state: current_state
                 ),
               caller: caller
@@ -326,8 +324,7 @@ defmodule Actors.Actor.Entity.Invocation do
 
   defp do_handle_routing(
          %ActorInvocation{
-           actor_name: caller_actor_name,
-           actor_system: system_name
+           actor: %ActorId{name: caller_actor_name, system: system_name}
          },
          %ActorInvocationResponse{
            payload: payload,
@@ -364,9 +361,8 @@ defmodule Actors.Actor.Entity.Invocation do
 
   defp do_handle_routing(
          %ActorInvocation{
-           actor_system: system_name,
-           payload: payload,
-           actor_name: caller_actor_name
+           actor: %ActorId{name: caller_actor_name, system: system_name},
+           payload: payload
          } = _request,
          %ActorInvocationResponse{
            workflow:

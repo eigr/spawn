@@ -10,6 +10,7 @@ defmodule Actors do
   require OpenTelemetry.Tracer, as: Tracer
 
   alias Actors.Actor.Entity, as: ActorEntity
+  alias Actors.Actor.Entity.EntityState
   alias Actors.Actor.Entity.Supervisor, as: ActorEntitySupervisor
   alias Actors.Actor.InvocationScheduler
 
@@ -42,7 +43,7 @@ defmodule Actors do
 
   @spec get_state(String.t(), String.t()) :: {:ok, term()} | {:error, term()}
   def get_state(system_name, actor_name) do
-    do_lookup_action(system_name, actor_name, nil, fn actor_ref ->
+    do_lookup_action(system_name, actor_name, nil, fn actor_ref, _actor_ref_id ->
       ActorEntity.get_state(actor_ref)
     end)
   end
@@ -103,26 +104,25 @@ defmodule Actors do
   ##
   """
   @spec spawn_actor(SpawnRequest.t(), any()) :: {:ok, SpawnResponse.t()}
-  def spawn_actor(registration, opts \\ [])
+  def spawn_actor(spawn, opts \\ [])
 
-  def spawn_actor(
-        %SpawnRequest{
-          actor_system:
-            %ActorSystem{name: name, registry: %Registry{actors: actors} = _registry} =
-              _actor_system
-        } = _registration,
-        opts
-      ) do
+  def spawn_actor(%SpawnRequest{actors: actors} = _spawn, opts) do
     hosts =
-      Enum.map(Map.values(actors), fn actor ->
-        case ActorRegistry.get_hosts_by_actor(name, actor.id.parent) do
+      Enum.map(actors, fn %ActorId{system: system, parent: parent, name: _name} = id ->
+        case ActorRegistry.get_hosts_by_actor(system, parent) do
           {:ok, actor_hosts} ->
-            Enum.map(actor_hosts, fn host ->
-              %HostActor{node: host.node, actor: actor, opts: opts}
+            Enum.map(actor_hosts, fn %HostActor{
+                                       node: node,
+                                       actor: %Actor{} = abstract_actor,
+                                       opts: _opts
+                                     } = _host ->
+              spawned_actor = %Actor{abstract_actor | id: id}
+              %HostActor{node: node, actor: spawned_actor, opts: opts}
             end)
 
           _ ->
-            %HostActor{node: Node.self(), actor: actor, opts: opts}
+            raise ArgumentError,
+                  "You are trying to create an actor from an Abstract actor that has never been registered before. ActorId: #{inspect(id)}"
         end
       end)
       |> List.flatten()
@@ -175,11 +175,17 @@ defmodule Actors do
             rescue_only: [ErlangError] do
         Tracer.add_event("lookup", [{"target", actor.id.name}])
 
-        do_lookup_action(system.name, actor.id.name, system, fn actor_ref ->
+        do_lookup_action(system.name, actor.id.name, system, fn actor_ref, actor_ref_id ->
+          %InvocationRequest{
+            actor: %Actor{} = actor
+          } = request
+
+          request_params = %InvocationRequest{request | actor: %Actor{actor | id: actor_ref_id}}
+
           if is_nil(request.scheduled_to) || request.scheduled_to == 0 do
-            maybe_invoke_async(async?, actor_ref, request, opts)
+            maybe_invoke_async(async?, actor_ref, request_params, opts)
           else
-            InvocationScheduler.schedule_invoke(request)
+            InvocationScheduler.schedule_invoke(request_params)
 
             {:ok, :async}
           end
@@ -206,7 +212,11 @@ defmodule Actors do
           Tracer.set_attributes([{"actor-pid", "#{inspect(actor_ref)}"}])
           Logger.debug("Lookup Actor #{actor_name}. PID: #{inspect(actor_ref)}")
 
-          action_fun.(actor_ref)
+          %EntityState{actor: %Actor{id: %ActorId{} = actor_ref_id}} =
+            :sys.get_state(actor_ref)
+            |> EntityState.unpack()
+
+          action_fun.(actor_ref, actor_ref_id)
 
         _ ->
           Tracer.add_event("actor-status", [{"alive", false}])
@@ -231,7 +241,7 @@ defmodule Actors do
                 {"reactivation-on-node", "#{inspect(node)}"}
               ])
 
-              action_fun.(actor_ref)
+              action_fun.(actor_ref, actor.id)
             else
               {:not_found, _} ->
                 Logger.error("Actor #{actor_name} not found on ActorSystem #{system_name}")
@@ -343,12 +353,10 @@ defmodule Actors do
       end
     end)
     |> Flow.map(fn {actor_name, actor} ->
-      Logger.debug("Registering #{actor_name} #{inspect(actor)} on Node: #{inspect(Node.self())}")
-
       {time, result} = :timer.tc(&lookup_actor/4, [actor_system, actor_name, actor, opts])
 
       Logger.info(
-        "Registered and Activated the #{actor_name} on Node #{inspect(Node.self())} in #{inspect(time)}ms"
+        "Actor #{actor_name} Activated on Node #{inspect(Node.self())} in #{inspect(time)}ms"
       )
 
       result

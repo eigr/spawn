@@ -9,6 +9,7 @@ defmodule Actors.Actor.Interface.Http do
 
   alias Eigr.Functions.Protocol.Actors.{
     Actor,
+    ActorId,
     ActorState
   }
 
@@ -23,8 +24,7 @@ defmodule Actors.Actor.Interface.Http do
   @impl true
   def invoke_host(
         %ActorInvocation{
-          actor_name: name,
-          actor_system: system,
+          actor: %ActorId{name: name, system: system},
           command_name: command,
           caller: caller
         } = payload,
