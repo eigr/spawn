@@ -212,15 +212,11 @@ defmodule Actors do
           Tracer.set_attributes([{"actor-pid", "#{inspect(actor_ref)}"}])
           Logger.debug("Lookup Actor #{actor_name}. PID: #{inspect(actor_ref)}")
 
-          try do
-            %EntityState{actor: %Actor{id: %ActorId{} = actor_ref_id}} =
-              :sys.get_state(actor_ref)
-              |> EntityState.unpack()
+          %EntityState{actor: %Actor{id: %ActorId{} = actor_ref_id}} =
+            :sys.get_state(actor_ref)
+            |> EntityState.unpack()
 
-            action_fun.(actor_ref, actor_ref_id)
-          catch
-            e -> Logger.error("Failure during call to actor #{actor_name}. Error #{inspect(e)}")
-          end
+          action_fun.(actor_ref, actor_ref_id)
 
         _ ->
           Tracer.add_event("actor-status", [{"alive", false}])

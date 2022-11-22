@@ -48,8 +48,9 @@ defmodule Actors.Actor.Entity.Supervisor do
       {:ok, pid} ->
         {:ok, pid}
 
-      {:error, {:name_conflict, {{Actors.Actor.Entity, name}, nil}, _registry, pid}} ->
-        Logger.warning("Name conflict on start Actor #{name} from PID #{inspect(pid)}")
+      {:error, {:name_conflict, {{Actors.Actor.Entity, name}, _f}, _registry, pid}} ->
+        Logger.warning("Name conflict on start Actor #{name} from PID #{inspect(pid)}.")
+
         if Process.alive?(pid), do: {:ok, pid}, else: {:error, :name_conflict}
     end
   end
@@ -74,8 +75,9 @@ defmodule Actors.Actor.Entity.Supervisor do
       {:ok, pid} ->
         {:ok, pid}
 
-      {:error, {:name_conflict, {{Actors.Actor.Entity, name}, nil}, _registry, pid}} ->
-        Logger.warning("Name conflict on start Actor #{name} from PID #{inspect(pid)}")
+      {:error, {:name_conflict, {{Actors.Actor.Entity, name}, _f}, _registry, pid}} ->
+        Logger.warning("Name conflict on start Actor #{name} from PID #{inspect(pid)}.")
+
         if Process.alive?(pid), do: {:ok, pid}, else: {:error, :name_conflict}
     end
   end
