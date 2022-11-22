@@ -1,5 +1,6 @@
 defmodule Actors.Actor.Entity.Supervisor do
   use DynamicSupervisor
+  require Logger
 
   alias Eigr.Functions.Protocol.Actors.{Actor, ActorSystem}
   alias Actors.Actor.Entity.EntityState
@@ -41,8 +42,15 @@ defmodule Actors.Actor.Entity.Supervisor do
     }
 
     case DynamicSupervisor.start_child(via(), child_spec) do
-      {:error, {:already_started, pid}} -> {:ok, pid}
-      {:ok, pid} -> {:ok, pid}
+      {:error, {:already_started, pid}} ->
+        {:ok, pid}
+
+      {:ok, pid} ->
+        {:ok, pid}
+
+      {:error, {:name_conflict, {{Actors.Actor.Entity, name}, nil}, _registry, pid}} ->
+        Logger.warning("Name conflict on start Actor #{name} from PID #{inspect(pid)}")
+        {:ok, pid}
     end
   end
 
@@ -60,8 +68,15 @@ defmodule Actors.Actor.Entity.Supervisor do
     }
 
     case DynamicSupervisor.start_child(via(), child_spec) do
-      {:error, {:already_started, pid}} -> {:ok, pid}
-      {:ok, pid} -> {:ok, pid}
+      {:error, {:already_started, pid}} ->
+        {:ok, pid}
+
+      {:ok, pid} ->
+        {:ok, pid}
+
+      {:error, {:name_conflict, {{Actors.Actor.Entity, name}, nil}, _registry, pid}} ->
+        Logger.warning("Name conflict on start Actor #{name} from PID #{inspect(pid)}")
+        {:ok, pid}
     end
   end
 
