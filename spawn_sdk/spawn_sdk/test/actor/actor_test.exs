@@ -3,8 +3,8 @@ defmodule Actor.ActorTest do
 
   defmodule Actor.MyActor do
     use SpawnSdk.Actor,
-      abstract: true,
-      persistent: false,
+      kind: :abstract,
+      stateful: false,
       state_type: Eigr.Spawn.Actor.MyState
 
     alias Eigr.Spawn.Actor.{MyMessageRequest, MyMessageResponse}
@@ -50,7 +50,7 @@ defmodule Actor.ActorTest do
   defmodule Actor.OtherActor do
     use SpawnSdk.Actor,
       name: "second_actor",
-      persistent: false,
+      stateful: false,
       state_type: Eigr.Spawn.Actor.MyState,
       deactivate_timeout: 30_000,
       snapshot_timeout: 2_000
@@ -75,7 +75,7 @@ defmodule Actor.ActorTest do
   defmodule Actor.ThirdActor do
     use SpawnSdk.Actor,
       name: "third_actor",
-      persistent: false,
+      stateful: false,
       state_type: Eigr.Spawn.Actor.MyState,
       deactivate_timeout: 30_000,
       snapshot_timeout: 2_000
@@ -104,13 +104,19 @@ defmodule Actor.ActorTest do
       [
         {
           SpawnSdk.System.Supervisor,
-          system: system, actors: [Actor.OtherActor, Actor.ThirdActor, Actor.MyActor]
+          system: system,
+          actors: [
+            Actor.MyActor,
+            Actor.OtherActor,
+            Actor.ThirdActor
+          ]
         }
       ],
       strategy: :one_for_one,
       name: :random_ass_supervisor
     )
 
+    Process.sleep(200)
     %{system: system}
   end
 
@@ -120,8 +126,8 @@ defmodule Actor.ActorTest do
     end
 
     test "get defaults" do
-      assert true == Actor.MyActor.__meta__(:abstract)
-      assert false == Actor.MyActor.__meta__(:persistent)
+      assert :abstract == Actor.MyActor.__meta__(:kind)
+      assert false == Actor.MyActor.__meta__(:stateful)
       assert 10_000 == Actor.MyActor.__meta__(:deactivate_timeout)
       assert 2_000 == Actor.MyActor.__meta__(:snapshot_timeout)
     end
