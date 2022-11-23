@@ -98,7 +98,7 @@ defmodule Actors.FactoryTest do
       id: %ActorId{name: actor_name},
       commands: attrs[:commands] || [build_actor_command()],
       settings: %ActorSettings{
-        persistent: Keyword.get(attrs, :persistent, true),
+        stateful: Keyword.get(attrs, :stateful, true),
         snapshot_strategy: attrs[:snapshot_strategy] || build_actor_snapshot_strategy(),
         deactivation_strategy:
           attrs[:deactivation_strategy] || build_actor_deactivation_strategy()

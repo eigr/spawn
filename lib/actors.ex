@@ -357,10 +357,10 @@ defmodule Actors do
     |> Flow.filter(fn {_actor_name,
                        %Actor{
                          metadata: %Metadata{channel_group: channel},
-                         settings: %ActorSettings{persistent: persistent, abstract: abstract}
+                         settings: %ActorSettings{stateful: stateful, kind: kind}
                        } = _actor} ->
       cond do
-        match?(true, persistent) and match?(false, abstract) ->
+        match?(true, stateful) and kind != :ABSTRACT ->
           true
 
         not is_nil(channel) and byte_size(channel) > 0 ->

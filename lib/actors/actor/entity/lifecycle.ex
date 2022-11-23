@@ -37,7 +37,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
             metadata: metadata,
             settings:
               %ActorSettings{
-                persistent: persistent?,
+                stateful: stateful?,
                 snapshot_strategy: snapshot_strategy,
                 deactivation_strategy: deactivation_strategy
               } = _settings,
@@ -48,7 +48,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
     Process.flag(:trap_exit, true)
 
     Logger.notice(
-      "Activating actor #{inspect(name)} in Node #{inspect(Node.self())}. Persistence #{persistent?}."
+      "Activating actor #{inspect(name)} in Node #{inspect(Node.self())}. Persistence #{stateful?}."
     )
 
     :ok = handle_metadata(name, metadata)
@@ -63,7 +63,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
   def load_state(
         %EntityState{
           actor:
-            %Actor{settings: %ActorSettings{persistent: true}, id: %ActorId{name: name}} = actor
+            %Actor{settings: %ActorSettings{stateful: true}, id: %ActorId{name: name}} = actor
         } = state
       ) do
     if is_nil(actor.state) do
@@ -94,11 +94,11 @@ defmodule Actors.Actor.Entity.Lifecycle do
   def terminate(reason, %EntityState{
         actor: %Actor{
           id: %ActorId{name: name} = _id,
-          settings: %ActorSettings{persistent: persistent},
+          settings: %ActorSettings{stateful: stateful},
           state: actor_state
         }
       }) do
-    if persistent && !is_nil(actor_state) do
+    if stateful && !is_nil(actor_state) do
       StateManager.save(name, actor_state)
     end
 
@@ -111,7 +111,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
             %Actor{
               state: actor_state,
               settings: %ActorSettings{
-                persistent: true,
+                stateful: true,
                 snapshot_strategy: %ActorSnapshotStrategy{
                   strategy: {:timeout, %TimeoutStrategy{timeout: _timeout}} = snapshot_strategy
                 }
@@ -132,7 +132,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
               id: %ActorId{name: name} = _id,
               state: %ActorState{} = actor_state,
               settings: %ActorSettings{
-                persistent: true,
+                stateful: true,
                 snapshot_strategy: %ActorSnapshotStrategy{
                   strategy: {:timeout, %TimeoutStrategy{timeout: timeout}} = snapshot_strategy
                 }

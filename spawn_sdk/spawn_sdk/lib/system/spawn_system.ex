@@ -438,9 +438,9 @@ defmodule SpawnSdk.System.SpawnSystem do
     |> Enum.into(%{}, fn actor ->
       name = actor.__meta__(:name)
       channel = actor.__meta__(:channel)
-      abstract = actor.__meta__(:abstract)
+      kind = actor.__meta__(:kind)
       actions = actor.__meta__(:actions)
-      persistent = actor.__meta__(:persistent)
+      stateful = actor.__meta__(:stateful)
       snapshot_timeout = actor.__meta__(:snapshot_timeout)
       deactivate_timeout = actor.__meta__(:deactivate_timeout)
       timer_actions = actor.__meta__(:timers)
@@ -460,8 +460,8 @@ defmodule SpawnSdk.System.SpawnSystem do
          id: %ActorId{system: system, name: name},
          metadata: %Metadata{channel_group: channel},
          settings: %ActorSettings{
-           abstract: abstract,
-           persistent: persistent,
+           kind: decode_kind(kind),
+           stateful: stateful,
            snapshot_strategy: snapshot_strategy,
            deactivation_strategy: deactivation_strategy
          },
@@ -472,6 +472,11 @@ defmodule SpawnSdk.System.SpawnSystem do
        )}
     end)
   end
+
+  defp decode_kind(:abstract), do: :ABSTRACT
+  defp decode_kind(:singleton), do: :SINGLETON
+  defp decode_kind(:pooled), do: :POOLED
+  defp decode_kind(_), do: :UNKNOW_KIND
 
   defp get_action(action_atom) do
     %Command{name: parse_command_name(action_atom)}

@@ -74,23 +74,23 @@ defmodule SpawnSdk.Actor do
     opts = Module.get_attribute(__CALLER__.module, :actor_opts)
     actions = Module.get_attribute(__CALLER__.module, :defact_exports)
 
-    abstract_actor = Keyword.get(opts, :abstract, false)
+    actor_kind = Keyword.get(opts, :kind, :SINGLETON)
     actor_name = Keyword.get(opts, :name, Atom.to_string(__CALLER__.module))
     caller_module = __CALLER__.module
     channel_group = Keyword.get(opts, :channel, nil)
 
     state_type = Keyword.get(opts, :state_type, nil)
-    persistent = Keyword.get(opts, :persistent, true)
+    stateful = Keyword.get(opts, :stateful, true)
 
-    if persistent and !Code.ensure_loaded?(Statestores.Supervisor) do
+    if stateful and !Code.ensure_loaded?(Statestores.Supervisor) do
       raise """
       ArgumentError. You need to add :spawn_statestores to your dependency if you are going to use persistent actors.
-      Otherwise, set `persistent: false` in your Actor attributes
+      Otherwise, set `stateful: false` in your Actor attributes
       """
     end
 
-    if state_type == nil and persistent do
-      raise "ArgumentError. State type is mandatory if persistent is true"
+    if state_type == nil and stateful do
+      raise "ArgumentError. State type is mandatory if stateful is true"
     end
 
     deactivate_timeout = Keyword.get(opts, :deactivate_timeout, 10_000)
@@ -113,9 +113,9 @@ defmodule SpawnSdk.Actor do
 
       def __meta__(:name) do
         actor_name = unquote(actor_name)
-        abstract? = unquote(abstract_actor)
+        kind = unquote(actor_kind)
 
-        if abstract? do
+        if kind == :ABSTRACT do
           unless :persistent_term.get("actor:#{actor_name}", false) do
             :persistent_term.put("actor:#{actor_name}", unquote(caller_module))
           end
@@ -126,8 +126,8 @@ defmodule SpawnSdk.Actor do
         end
       end
 
-      def __meta__(:persistent), do: unquote(persistent)
-      def __meta__(:abstract), do: unquote(abstract_actor)
+      def __meta__(:stateful), do: unquote(stateful)
+      def __meta__(:kind), do: unquote(actor_kind)
       def __meta__(:state_type), do: unquote(state_type)
       def __meta__(:snapshot_timeout), do: unquote(snapshot_timeout)
       def __meta__(:deactivate_timeout), do: unquote(deactivate_timeout)

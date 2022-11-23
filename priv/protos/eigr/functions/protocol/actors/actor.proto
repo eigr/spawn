@@ -75,13 +75,44 @@ message Metadata {
     map<string, string> tags = 2;
 }
 
+// The type that defines the runtime characteristics of the Actor.
+// Regardless of the type of actor it is important that 
+// all actors are registered during the proxy and host initialization phase.
+enum Kind {
+    // When no type is informed, the default to be assumed will be the Singleton pattern.
+    UNKNOW_KIND = 0;
+
+    // Abstract actors are used to create children of this based actor at runtime
+    ABSTRACT = 1;
+
+    // Singleton actors as the name suggests have only one real instance of themselves running 
+    // during their entire lifecycle. That is, they are the opposite of the Abstract type Actors.
+    SINGLETON = 2;
+    
+    // Pooled Actors are similar to abstract actors, but unlike them, 
+    // their identifying name will always be the one registered at the system initialization stage. 
+    // The great advantage of Pooled actors is that they have multiple instances of themselves 
+    // acting as a request service pool.
+    // Pooled actors are also stateless actors, that is, they will not have their 
+    // in-memory state persisted via Statesstore. This is done to avoid problems 
+    // with the correctness of the stored state.
+    // Pooled Actors are generally used for tasks where the Actor Model would perform worse 
+    // than other concurrency models and for tasks that do not require state concerns. 
+    // Integration flows, data caching, proxies are good examples of use cases 
+    // for this type of Actor.
+    POOLED = 3;
+    
+    // Reserved for future use
+    PROXY = 4;
+}
+
 message ActorSettings {
 
-    // Indicates if actor´s is abstract or non abstract.
-    bool abstract = 1;
+    // Indicates the type of Actor to be configured.
+    Kind kind = 1;
 
     // Indicates whether an actor's state should be persisted in a definitive store.
-    bool persistent = 2;
+    bool stateful = 2;
 
     // Snapshot strategy
     ActorSnapshotStrategy snapshot_strategy = 3;
