@@ -69,8 +69,9 @@ Now that the protobuf types have been created we can proceed with the code. Exam
 ```elixir
 defmodule SpawnSdkExample.Actors.MyActor do
   use SpawnSdk.Actor,
-    name: "jose",
-    persistent: true,
+    name: "jose", # Default is Full Qualified Module name a.k.a __MODULE__
+    kind: :singleton, # Default is already :singleton. Valid are :singleton | :abstract | :pooled
+    stateful: true, # Default is already true
     state_type: Io.Eigr.Spawn.Example.MyState,
     deactivate_timeout: 30_000,
     snapshot_timeout: 2_000
@@ -103,7 +104,7 @@ end
 
 ```
 
-In this example we are creating an actor in a Named/Eager way, that is, it is a known actor at compile time. We can also create Unnamed Dynamic/Lazy actors, that is, despite having its abstract behavior defined at compile time, a Lazy actor will only have a concrete instance when it is associated with an identifier/name at runtime. Below follows the same previous actor being defined as abstract.
+In this example we are creating an actor in a Singleton way, that is, it is a known actor at compile time. We can also create Unnamed Dynamic/Lazy actors, that is, despite having its abstract behavior defined at compile time, a Lazy actor will only have a concrete instance when it is associated with an identifier/name at runtime. Below follows the same previous actor being defined as abstract.
 
 We declare two actions that the Actor can do. An initialization action that will be called every time an Actor instance is created and an action that will be responsible for performing a simple sum.
 
@@ -114,8 +115,8 @@ Defaults inicialization Action names: "**init**", "**Init**", "**setup**", "**Se
 ```elixir
 defmodule SpawnSdkExample.Actors.AbstractActor do
   use SpawnSdk.Actor,
-    abstract: true,
-    persistent: true,
+    name: "abs_actor",
+    kind: :abstract,
     state_type: Io.Eigr.Spawn.Example.MyState
 
   require Logger
@@ -137,9 +138,9 @@ defmodule SpawnSdkExample.Actors.AbstractActor do
 end
 ```
 
-Notice that the only thing that has changed is the absence of the name argument definition and the abstract argument definition being set to true.
+Notice that the only thing that has changed is the the kind of actor, in this case the kind is set to :abstract.
 
-> **_NOTE:_** Can Elixir programmers think in terms of named vs abstract actors as more or less known at startup vs dynamically supervised/registered? That is, defining your actors directly in the supervision tree or using a Dynamic Supervisor for that.
+> **_NOTE:_** Can Elixir programmers think in terms of singleton vs abstract actors as more or less known at startup vs dynamically supervised/registered? That is, defining your actors directly in the supervision tree or using a Dynamic Supervisor for that.
 
 ## Side Effects
 
@@ -148,8 +149,8 @@ Actors can also emit side effects to other Actors as part of their response. See
 ```elixir
 defmodule SpawnSdkExample.Actors.AbstractActor do
   use SpawnSdk.Actor,
-    abstract: true,
-    persistent: false,
+    kind: :abstract,
+    stateful: false,
     state_type: Io.Eigr.Spawn.Example.MyState
 
   require Logger
@@ -197,9 +198,8 @@ Actors can also route some commands to other actors as part of their response. S
 defmodule SpawnSdkExample.Actors.ForwardPipeActor do
   use SpawnSdk.Actor,
     name: "pipeforward",
-    abstract: false,
-    persistent: false,
-    state_type: Io.Eigr.Spawn.Example.MyState
+    kind: :singleton,
+    stateful: false
 
   require Logger
 
@@ -231,9 +231,7 @@ end
 defmodule SpawnSdkExample.Actors.SecondActorExample do
   use SpawnSdk.Actor,
     name: "second_actor",
-    abstract: false,
-    persistent: false,
-    state_type: Io.Eigr.Spawn.Example.MyState
+    stateful: false
 
   require Logger
 
@@ -273,7 +271,7 @@ Actors can also send messages to a group of actors at once as an action callback
 ```elixir
 defmodule Fleet.Actors.Driver do
   use SpawnSdk.Actor,
-    abstract: true,
+    kind: :abstract,
     # Set ´driver´ channel for all actors of the same type (Fleet.Actors.Driver)
     channel: "drivers",
     state_type: Fleet.Domain.Driver
@@ -397,6 +395,7 @@ defmodule SpawnSdkExample.Actors.JoeActor do
   use SpawnSdk.Actor,
     name: "joe",
     state_type: Io.Eigr.Spawn.Example.MyState
+  
   require Logger
   alias Io.Eigr.Spawn.Example.{MyState, MyBusinessMessage}
 
