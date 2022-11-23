@@ -43,9 +43,17 @@ defmodule Actors do
 
   @spec get_state(String.t(), String.t()) :: {:ok, term()} | {:error, term()}
   def get_state(system_name, actor_name) do
-    do_lookup_action(system_name, actor_name, nil, fn actor_ref, _actor_ref_id ->
-      ActorEntity.get_state(actor_ref)
-    end)
+    retry with: exponential_backoff() |> randomize |> expiry(10_000),
+          atoms: [:error, :exit, :noproc, :erpc, :noconnection],
+          rescue_only: [ErlangError] do
+      do_lookup_action(system_name, actor_name, nil, fn actor_ref, _actor_ref_id ->
+        ActorEntity.get_state(actor_ref)
+      end)
+    after
+      result -> result
+    else
+      error -> error
+    end
   end
 
   @doc """
@@ -212,9 +220,19 @@ defmodule Actors do
           Tracer.set_attributes([{"actor-pid", "#{inspect(actor_ref)}"}])
           Logger.debug("Lookup Actor #{actor_name}. PID: #{inspect(actor_ref)}")
 
-          %EntityState{actor: %Actor{id: %ActorId{} = actor_ref_id}} =
-            :sys.get_state(actor_ref)
-            |> EntityState.unpack()
+          actor_ref_id =
+            try do
+              %EntityState{actor: %Actor{id: %ActorId{} = actor_ref_id}} =
+                :sys.get_state(actor_ref)
+                |> EntityState.unpack()
+
+              actor_ref_id
+            catch
+              e ->
+                Logger.warning(
+                  "Failure during get_state to actor #{actor_name}. Error #{inspect(e)}"
+                )
+            end
 
           action_fun.(actor_ref, actor_ref_id)
 
