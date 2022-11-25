@@ -456,7 +456,7 @@ In the example above the ´clock´ action will be called every 15 seconds.
 
 Sometimes we want a particular actor to be able to serve requests concurrently, 
 however actors will always serve one request at a time using buffering mechanisms to receive requests in their mailbox and serve each request one by one.
-For the above scenario, you can configure your Actor as a Pooled Actor, this way the system will generate a pool of actors to meet certain requests. See an example below:
+So to get around this behaviour you can configure your Actor as a Pooled Actor, this way the system will generate a pool of actors to meet certain requests. See an example below:
 
 ```elixir
 defmodule SpawnSdkExample.Actors.PooledActor do
