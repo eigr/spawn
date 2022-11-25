@@ -659,3 +659,10 @@ And links to other examples can be found in our github [readme page](https://git
   iex> SpawnSdk.invoke("joe", system: "spawn-system", command: "ping", scheduled_to: ~U[2023-01-01 00:32:00.145Z])
   {:ok, :async}
   ```
+
+  Invoke Pooled Actors:
+
+  ```elixir
+  iex> SpawnSdk.invoke("pooled_actor", system: "spawn-system", command: "ping", pooled: tru
+  {:ok, nil}
+  ```
