@@ -595,13 +595,16 @@ Any invocations to actions with the following names will follow this rule: "**ge
 
 ## Running
 
-To run the application via iex we can use the following command:
+To deploy your actors in a cluster you need to use our Controller for Kubernetes. Detailed information on how to proceed can be found [here](https://github.com/eigr/spawn#install) and [here](https://github.com/eigr/spawn#getting-started).
+But you can also run your Elixir application in the traditional way as follows:
 
 ```
 MIX_ENV=prod USER_FUNCTION_PORT=8092 PROXY_DATABASE_TYPE=mysql SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= iex --name spawn_a2@127.0.0.1 -S mix
 ```
 
-> **_NOTE:_** This example uses the MySQL database as persistent storage for its actors. And it is also expected that you have previously created a database called eigr-functions-db in the MySQL instance.
+> **_NOTE:_** For reasons of compatibility with our controller, it is necessary to configure your Spawn application using environment variables instead of the traditional Elixir configuration mechanism.
+
+> **_WARNING:_** This example uses the MySQL database as persistent storage for its actors. And it is also expected that you have previously created a database called eigr-functions-db in the MySQL instance.
 
 The full example of this application can be found [here](https://github.com/eigr/spawn/tree/main/spawn_sdk/spawn_sdk_example).
 
