@@ -566,7 +566,9 @@ defmodule SpawnSdkExample.Application do
         system: "spawn-system",
         actors: [
           SpawnSdkExample.Actors.MyActor,
-          SpawnSdkExample.Actors.AbstractActor
+          SpawnSdkExample.Actors.AbstractActor,
+          SpawnSdkExample.Actors.ClockActor,
+          SpawnSdkExample.Actors.PooledActor
         ]
       }
     ]
