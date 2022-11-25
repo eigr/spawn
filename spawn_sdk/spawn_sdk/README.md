@@ -547,7 +547,7 @@ defmodule SpawnSdkExample.Actors.PooledActor do
 end
 ```
 
-> **_ALERT:_** Keep in mind that a large pool size does not always mean better performance. It is interesting that you experiment with different pool sizes until you find the one that best suits your workload.
+> **_ALERT:_** Keep in mind that a large pool size does not always mean better performance. In fact, smaller pool sizes sometimes often have a much greater effect in this regard. It is interesting that you experiment with different pool sizes until you find the one that best suits your workload.
 
 ## Declaring the supervision tree
 
