@@ -608,6 +608,8 @@ MIX_ENV=prod USER_FUNCTION_PORT=8092 PROXY_DATABASE_TYPE=mysql SPAWN_STATESTORE_
 
 The full example of this application can be found [here](https://github.com/eigr/spawn/tree/main/spawn_sdk/spawn_sdk_example).
 
+And links to other examples can be found in our github [readme page](https://github.com/eigr/spawn#examples).
+
 ## Client API Examples
 
   To invoke Actors, use:
