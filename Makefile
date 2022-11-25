@@ -1,4 +1,4 @@
-version=0.5.0-rc.5
+version=0.5.0-rc.6
 registry=eigr
 
 CLUSTER_NAME=spawn-k8s
@@ -51,7 +51,7 @@ build-all-images:
 	#docker build -f Dockerfile-activator-pubsub -t ${activator-pubsub-image} .
 	#docker build -f Dockerfile-activator-rabbitmq -t ${activator-rabbitmq-image} .
 	#docker build -f Dockerfile-activator-sqs -t ${activator-sqs-image} .
-	docker build -f Dockerfile-elixir-example -t ${spawn-sdk-example-image} .
+	#docker build -f Dockerfile-elixir-example -t ${spawn-sdk-example-image} .
 
 test-spawn:
 	MIX_ENV=test PROXY_DATABASE_TYPE=mysql PROXY_CLUSTER_STRATEGY=epmd PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test

@@ -6,6 +6,9 @@
 
 ## Overview
 
+Spawn's main goal is to remove the complexity in developing microservices, providing simple and intuitive APIs, as well as a declarative deployment and configuration model and based on a Serverless architecture.
+This leaves the developer to focus on developing the business domain while the platform deals with the complexities and infrastructure needed to support the scalable, resilient, distributed, and event-driven architecture that microservices-driven architecture requires.
+
 Spawn is based on the sidecar proxy pattern to provide a polyglot Actor Model framework and platform.
 Spawn's technology stack, built on the [BEAM VM](https://www.erlang.org/blog/a-brief-beam-primer/) (Erlang's virtual machine) and [OTP](https://www.erlang.org/doc/design_principles/des_princ.html), provides support for different languages from its native Actor model.
 
