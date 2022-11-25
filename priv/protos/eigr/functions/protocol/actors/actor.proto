@@ -119,6 +119,12 @@ message ActorSettings {
 
     // Deactivate strategy
     ActorDeactivationStrategy deactivation_strategy = 4;
+
+    // When kind is POOLED this is used to define minimun actor instances
+    int32 min_pool_size = 5;
+
+    // When kind is POOLED this is used to define maximum actor instances
+    int32 max_pool_size = 6;
 }
 
 message ActorId {

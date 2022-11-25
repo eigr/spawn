@@ -345,6 +345,8 @@ message InvocationRequest {
     map<string, string> metadata = 8;
 
     int64 scheduled_to = 9;
+
+    bool pooled = 10;
 }
 
 // ActorInvocation is a translation message between a local invocation made via InvocationRequest 

@@ -33,7 +33,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
   def init(
         %EntityState{
           actor: %Actor{
-            id: %ActorId{name: name} = _id,
+            id: %ActorId{name: name, parent: parent} = _id,
             metadata: metadata,
             settings:
               %ActorSettings{
@@ -48,7 +48,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
     Process.flag(:trap_exit, true)
 
     Logger.notice(
-      "Activating actor #{inspect(name)} in Node #{inspect(Node.self())}. Persistence #{stateful?}."
+      "Activating Actor #{name} with Parent #{parent} in Node #{inspect(Node.self())}. Persistence #{stateful?}."
     )
 
     :ok = handle_metadata(name, metadata)

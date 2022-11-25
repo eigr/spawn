@@ -93,6 +93,7 @@ defmodule SpawnSdk.System.SpawnSystem do
     command = Keyword.get(invoke_opts, :command, nil)
     payload = Keyword.get(invoke_opts, :payload, nil)
     async = Keyword.get(invoke_opts, :async, false)
+    pooled = Keyword.get(invoke_opts, :pooled, false)
     metadata = Keyword.get(invoke_opts, :metadata, %{})
     actor_reference = Keyword.get(invoke_opts, :ref, nil)
     scheduled_to = Keyword.get(invoke_opts, :scheduled_to, nil)
@@ -116,6 +117,7 @@ defmodule SpawnSdk.System.SpawnSystem do
         command_name: parse_command_name(command),
         async: async,
         caller: nil,
+        pooled: pooled,
         scheduled_to: parse_scheduled_to(delay_in_ms, scheduled_to)
       )
 

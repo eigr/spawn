@@ -45,10 +45,10 @@ defmodule Spawn.Cluster.Node.Registry do
   def list_actor_pids(mod) do
     Horde.Registry.select(__MODULE__, [{{:"$1", :_, :_}, [], [:"$1"]}])
     |> Stream.filter(fn {mod_name, _} -> mod_name == mod end)
-    |> Stream.map(&Horde.Registry.match(__MODULE__, &1, :_))
-    |> Stream.scan([], fn [{pid, _}], acc -> [pid | acc] end)
-    |> Stream.flat_map(& &1)
-    |> Stream.uniq()
+    # |> Stream.map(&Horde.Registry.match(__MODULE__, &1, :_))
+    # |> Stream.scan([], fn [{pid, _}], acc -> [pid | acc] end)
+    # |> Stream.flat_map(& &1)
+    # |> Stream.uniq()
     |> Enum.to_list()
   end
 end

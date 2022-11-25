@@ -46,9 +46,14 @@ defmodule Actors do
     retry with: exponential_backoff() |> randomize |> expiry(10_000),
           atoms: [:error, :exit, :noproc, :erpc, :noconnection],
           rescue_only: [ErlangError] do
-      do_lookup_action(system_name, actor_name, nil, fn actor_ref, _actor_ref_id ->
-        ActorEntity.get_state(actor_ref)
-      end)
+      do_lookup_action(
+        system_name,
+        {false, system_name, actor_name, actor_name},
+        nil,
+        fn actor_ref, _actor_ref_id ->
+          ActorEntity.get_state(actor_ref)
+        end
+      )
     after
       result -> result
     else
@@ -76,9 +81,8 @@ defmodule Actors do
         opts
       ) do
     hosts =
-      Enum.map(Map.values(actors), fn actor ->
-        %HostActor{node: Node.self(), actor: actor, opts: opts}
-      end)
+      Enum.map(Map.values(actors), fn actor -> create_actor_host_pool(actor, opts) end)
+      |> List.flatten()
 
     ActorRegistry.register(hosts)
 
@@ -96,6 +100,67 @@ defmodule Actors do
 
     status = RequestStatus.new(status: :OK, message: "Accepted")
     {:ok, RegistrationResponse.new(proxy_info: proxy_info, status: status)}
+  end
+
+  defp create_actor_host_pool(
+         %Actor{
+           id: %ActorId{system: system, parent: _parent, name: name} = _id,
+           settings:
+             %ActorSettings{kind: :POOLED, min_pool_size: min_pool, max_pool_size: max_pool} =
+               _settings
+         } = actor,
+         opts
+       ) do
+    min_pool = if min_pool == 0, do: 1, else: min_pool
+    max_pool = if max_pool < min_pool, do: get_defaul_max_pool() + 1, else: max_pool
+
+    case ActorRegistry.get_hosts_by_actor(system, name) do
+      {:ok, actor_hosts} ->
+        Enum.into(
+          min_pool..max_pool,
+          [],
+          fn index ->
+            host = Enum.random(actor_hosts)
+            name_alias = "#{name}-#{index}"
+
+            pooled_actor = %Actor{
+              actor
+              | id: %ActorId{system: system, parent: name_alias, name: name}
+            }
+
+            Logger.debug("Creating Pooled Actor #{name} with Alias #{name_alias}")
+            %HostActor{node: host.node, actor: pooled_actor, opts: opts}
+          end
+        )
+
+      _ ->
+        Enum.into(
+          min_pool..max_pool,
+          [],
+          fn index ->
+            name_alias = "#{name}-#{index}"
+
+            pooled_actor = %Actor{
+              actor
+              | id: %ActorId{system: system, parent: name_alias, name: name}
+            }
+
+            Logger.debug("Creating Pooled Actor #{name} with Alias #{name_alias}")
+            %HostActor{node: Node.self(), actor: pooled_actor, opts: opts}
+          end
+        )
+    end
+  end
+
+  defp create_actor_host_pool(
+         %Actor{settings: %ActorSettings{kind: _kind} = _settings} = actor,
+         opts
+       ) do
+    [%HostActor{node: Node.self(), actor: actor, opts: opts}]
+  end
+
+  defp get_defaul_max_pool() do
+    length(Node.list() ++ [Node.self()]) * System.schedulers_online()
   end
 
   @doc """
@@ -162,7 +227,8 @@ defmodule Actors do
            system: %ActorSystem{} = system,
            async: async?,
            metadata: metadata,
-           caller: caller
+           caller: caller,
+           pooled: pooled?
          } = request,
          opts \\ []
        ) do
@@ -183,7 +249,21 @@ defmodule Actors do
             rescue_only: [ErlangError] do
         Tracer.add_event("lookup", [{"target", actor.id.name}])
 
-        do_lookup_action(system.name, actor.id.name, system, fn actor_ref, actor_ref_id ->
+        actor_fqdn =
+          unless pooled? do
+            {pooled?, system.name, actor.id.name, actor.id.name}
+          else
+            case ActorRegistry.get_hosts_by_actor(system.name, actor.id.name) do
+              {:ok, actor_hosts} ->
+                host = Enum.random(actor_hosts)
+                {pooled?, system.name, host.actor.id.parent, actor.id.name}
+
+              _ ->
+                {pooled?, system.name, "#{actor.id.name}-1", actor.id.name}
+            end
+          end
+
+        do_lookup_action(system.name, actor_fqdn, system, fn actor_ref, actor_ref_id ->
           %InvocationRequest{
             actor: %Actor{} = actor
           } = request
@@ -209,12 +289,16 @@ defmodule Actors do
   defp get_caller(nil), do: "external"
   defp get_caller(caller), do: caller.name
 
-  defp do_lookup_action(system_name, actor_name, system, action_fun) do
+  defp do_lookup_action(
+         system_name,
+         {pooled, system_name, parent, actor_name} = actor_fqdn,
+         system,
+         action_fun
+       ) do
     Tracer.with_span "actor-lookup" do
-      Tracer.set_attributes([{:system_name, system_name}])
-      Tracer.set_attributes([{:actor_name, actor_name}])
+      Tracer.set_attributes([{:actor_fqdn, actor_fqdn}])
 
-      case Spawn.Cluster.Node.Registry.lookup(Actors.Actor.Entity, actor_name) do
+      case Spawn.Cluster.Node.Registry.lookup(Actors.Actor.Entity, parent) do
         [{actor_ref, _}] ->
           Tracer.add_event("actor-status", [{"alive", true}])
           Tracer.set_attributes([{"actor-pid", "#{inspect(actor_ref)}"}])
@@ -234,7 +318,10 @@ defmodule Actors do
                 )
             end
 
-          action_fun.(actor_ref, actor_ref_id)
+          if pooled,
+            # Ensures that the name change will not affect the host function call
+            do: action_fun.(actor_ref, %ActorId{actor_ref_id | name: actor_name}),
+            else: action_fun.(actor_ref, actor_ref_id)
 
         _ ->
           Tracer.add_event("actor-status", [{"alive", false}])
@@ -244,7 +331,10 @@ defmodule Actors do
             Tracer.set_attributes([{:actor_name, actor_name}])
 
             with {:ok, %HostActor{node: node, actor: actor, opts: opts}} <-
-                   ActorRegistry.lookup(system_name, actor_name),
+                   ActorRegistry.lookup(system_name, actor_name,
+                     filter_by_parent: pooled,
+                     parent: parent
+                   ),
                  {:ok, actor_ref} =
                    :erpc.call(
                      node,
@@ -259,7 +349,10 @@ defmodule Actors do
                 {"reactivation-on-node", "#{inspect(node)}"}
               ])
 
-              action_fun.(actor_ref, actor.id)
+              if pooled,
+                # Ensures that the name change will not affect the host function call
+                do: action_fun.(actor_ref, %ActorId{actor.id | name: actor_name}),
+                else: action_fun.(actor_ref, actor.id)
             else
               {:not_found, _} ->
                 Logger.error("Actor #{actor_name} not found on ActorSystem #{system_name}")
@@ -360,6 +453,9 @@ defmodule Actors do
                          settings: %ActorSettings{stateful: stateful, kind: kind}
                        } = _actor} ->
       cond do
+        kind == :POOLED ->
+          false
+
         match?(true, stateful) and kind != :ABSTRACT ->
           true
 
