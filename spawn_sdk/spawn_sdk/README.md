@@ -448,7 +448,7 @@ defmodule SpawnSdkExample.Actors.ClockActor do
 end
 ```
 
-> **_NOTE:_** Timers Actions are ephemeral and only exist while the Actor is Enabled, ie running. Therefore Timers are not persistent and will not reactivate a timer's Actor after it is deactivated. Note that in the example above we set the value of deactivate timeout to an exceptionally high number, this is done to make the Actor remain active.
+> **_NOTE:_** Timers Actions are ephemeral and only exist while the some Spawn VM in the cluster exist.
 
 In the example above the ´clock´ action will be called every 15 seconds.
 
