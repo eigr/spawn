@@ -447,6 +447,9 @@ defmodule SpawnSdk.System.SpawnSystem do
       deactivate_timeout = actor.__meta__(:deactivate_timeout)
       timer_actions = actor.__meta__(:timers)
 
+      min_pool_size = actor.__meta__(:min_pool_size)
+      max_pool_size = actor.__meta__(:max_pool_size)
+
       snapshot_strategy =
         ActorSnapshotStrategy.new(
           strategy: {:timeout, TimeoutStrategy.new(timeout: snapshot_timeout)}
@@ -464,6 +467,8 @@ defmodule SpawnSdk.System.SpawnSystem do
          settings: %ActorSettings{
            kind: decode_kind(kind),
            stateful: stateful,
+           min_pool_size: min_pool_size,
+           max_pool_size: max_pool_size,
            snapshot_strategy: snapshot_strategy,
            deactivation_strategy: deactivation_strategy
          },

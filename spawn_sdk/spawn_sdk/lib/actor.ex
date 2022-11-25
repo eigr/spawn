@@ -74,10 +74,13 @@ defmodule SpawnSdk.Actor do
     opts = Module.get_attribute(__CALLER__.module, :actor_opts)
     actions = Module.get_attribute(__CALLER__.module, :defact_exports)
 
-    actor_kind = Keyword.get(opts, :kind, :SINGLETON)
     actor_name = Keyword.get(opts, :name, Atom.to_string(__CALLER__.module))
+    actor_kind = Keyword.get(opts, :kind, :SINGLETON)
     caller_module = __CALLER__.module
     channel_group = Keyword.get(opts, :channel, nil)
+
+    min_pool_size = Keyword.get(opts, :min_pool_size, 1)
+    max_pool_size = Keyword.get(opts, :max_pool_size, 0)
 
     state_type = Keyword.get(opts, :state_type, nil)
     stateful = Keyword.get(opts, :stateful, true)
@@ -91,6 +94,13 @@ defmodule SpawnSdk.Actor do
 
     if state_type == nil and stateful do
       raise "ArgumentError. State type is mandatory if stateful is true"
+    end
+
+    if stateful and actor_kind == :POOLED do
+      raise ArgumentError, """
+      Pooled Actors cannot be stateful.
+      Please set stateful attribute to false to be able to register Actor #{actor_name}
+      """
     end
 
     deactivate_timeout = Keyword.get(opts, :deactivate_timeout, 10_000)
@@ -126,9 +136,11 @@ defmodule SpawnSdk.Actor do
         end
       end
 
-      def __meta__(:stateful), do: unquote(stateful)
       def __meta__(:kind), do: unquote(actor_kind)
+      def __meta__(:stateful), do: unquote(stateful)
       def __meta__(:state_type), do: unquote(state_type)
+      def __meta__(:min_pool_size), do: unquote(min_pool_size)
+      def __meta__(:max_pool_size), do: unquote(max_pool_size)
       def __meta__(:snapshot_timeout), do: unquote(snapshot_timeout)
       def __meta__(:deactivate_timeout), do: unquote(deactivate_timeout)
     end

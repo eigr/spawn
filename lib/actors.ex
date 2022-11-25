@@ -307,7 +307,7 @@ defmodule Actors do
           actor_ref_id =
             try do
               %EntityState{actor: %Actor{id: %ActorId{} = actor_ref_id}} =
-                :sys.get_state(actor_ref)
+                :sys.get_state(actor_ref, 1000)
                 |> EntityState.unpack()
 
               actor_ref_id

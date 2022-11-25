@@ -2,6 +2,8 @@ defmodule SpawnSdkExample.Actors.PooledActor do
   use SpawnSdk.Actor,
     name: "pooled_actor",
     kind: :pooled,
+    min_pool_size: 1,
+    max_pool_size: 10,
     stateful: false
 
   require Logger
