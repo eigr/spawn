@@ -231,20 +231,16 @@ defmodule Actors do
   defp create_actor_host_pool(
          %Actor{
            id: %ActorId{system: system, parent: _parent, name: name} = _id,
-           settings:
-             %ActorSettings{kind: :POOLED, min_pool_size: min_pool, max_pool_size: max_pool} =
-               _settings
+           settings: %ActorSettings{kind: :POOLED} = _settings
          } = actor,
          opts
        ) do
-    max_pool = if max_pool < min_pool, do: get_defaul_max_pool(min_pool), else: max_pool
-
     case ActorRegistry.get_hosts_by_actor(system, name) do
       {:ok, actor_hosts} ->
-        build_pool(:distributed, actor_hosts, min_pool, max_pool)
+        build_pool(:distributed, actor, actor_hosts, opts)
 
       _ ->
-        build_pool(:local, nil, min_pool, max_pool)
+        build_pool(:local, actor, nil, opts)
     end
   end
 
@@ -255,9 +251,20 @@ defmodule Actors do
     [%HostActor{node: Node.self(), actor: actor, opts: opts}]
   end
 
-  defp build_pool(:local, actor_hosts, min, max) do
+  defp build_pool(
+         :local,
+         %Actor{
+           id: %ActorId{system: system, parent: _parent, name: name} = _id,
+           settings:
+             %ActorSettings{kind: :POOLED, min_pool_size: min, max_pool_size: max} = _settings
+         } = actor,
+         _hosts,
+         opts
+       ) do
+    max_pool = if max < min, do: get_defaul_max_pool(min), else: max
+
     Enum.into(
-      min_pool..max_pool,
+      min..max_pool,
       [],
       fn index ->
         name_alias = build_name_alias(name, index)
@@ -273,9 +280,20 @@ defmodule Actors do
     )
   end
 
-  defp build_pool(:distributed, hosts, min, max) do
+  defp build_pool(
+         :distributed,
+         %Actor{
+           id: %ActorId{system: system, parent: _parent, name: name} = _id,
+           settings:
+             %ActorSettings{kind: :POOLED, min_pool_size: min, max_pool_size: max} = _settings
+         } = actor,
+         hosts,
+         opts
+       ) do
+    max_pool = if max < min, do: get_defaul_max_pool(min), else: max
+
     Enum.into(
-      min_pool..max_pool,
+      min..max_pool,
       [],
       fn index ->
         host = Enum.random(hosts)

@@ -18,7 +18,7 @@ defmodule Actors.Registry.ActorRegistry do
   @spec register(list(HostActor.t())) :: :ok
   def register(hosts) do
     Enum.each(hosts, fn %HostActor{
-                          node: node,
+                          node: _node,
                           actor: %Actor{id: %ActorId{name: name} = _id} = _actor
                         } = host ->
       case StateHandoff.get(name) do
@@ -112,7 +112,7 @@ defmodule Actors.Registry.ActorRegistry do
 
           hosts ->
             if filter_by_parent? do
-              %HostActor{node: node, actor: actor, opts: opts} = host = Enum.random(hosts)
+              %HostActor{node: _node, actor: actor, opts: opts} = host = Enum.random(hosts)
               new_actor = %Actor{actor | id: %ActorId{actor.id | name: parent_name}}
               {:ok, %HostActor{host | actor: new_actor, opts: opts}}
             else

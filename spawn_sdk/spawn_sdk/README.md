@@ -663,6 +663,6 @@ And links to other examples can be found in our github [readme page](https://git
   Invoke Pooled Actors:
 
   ```elixir
-  iex> SpawnSdk.invoke("pooled_actor", system: "spawn-system", command: "ping", pooled: tru
+  iex> SpawnSdk.invoke("pooled_actor", system: "spawn-system", command: "ping", pooled: true)
   {:ok, nil}
   ```
