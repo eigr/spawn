@@ -1,8 +1,6 @@
 defmodule Proxy.Supervisor do
   use Supervisor
 
-  alias Actors.Config.Vapor, as: Config
-
   def start_link(config) do
     Supervisor.start_link(__MODULE__, config, name: __MODULE__)
   end
