@@ -102,67 +102,6 @@ defmodule Actors do
     {:ok, RegistrationResponse.new(proxy_info: proxy_info, status: status)}
   end
 
-  defp create_actor_host_pool(
-         %Actor{
-           id: %ActorId{system: system, parent: _parent, name: name} = _id,
-           settings:
-             %ActorSettings{kind: :POOLED, min_pool_size: min_pool, max_pool_size: max_pool} =
-               _settings
-         } = actor,
-         opts
-       ) do
-    min_pool = if min_pool == 0, do: 1, else: min_pool
-    max_pool = if max_pool < min_pool, do: get_defaul_max_pool() + 1, else: max_pool
-
-    case ActorRegistry.get_hosts_by_actor(system, name) do
-      {:ok, actor_hosts} ->
-        Enum.into(
-          min_pool..max_pool,
-          [],
-          fn index ->
-            host = Enum.random(actor_hosts)
-            name_alias = "#{name}-#{index}"
-
-            pooled_actor = %Actor{
-              actor
-              | id: %ActorId{system: system, parent: name_alias, name: name}
-            }
-
-            Logger.debug("Creating Pooled Actor #{name} with Alias #{name_alias}")
-            %HostActor{node: host.node, actor: pooled_actor, opts: opts}
-          end
-        )
-
-      _ ->
-        Enum.into(
-          min_pool..max_pool,
-          [],
-          fn index ->
-            name_alias = "#{name}-#{index}"
-
-            pooled_actor = %Actor{
-              actor
-              | id: %ActorId{system: system, parent: name_alias, name: name}
-            }
-
-            Logger.debug("Creating Pooled Actor #{name} with Alias #{name_alias}")
-            %HostActor{node: Node.self(), actor: pooled_actor, opts: opts}
-          end
-        )
-    end
-  end
-
-  defp create_actor_host_pool(
-         %Actor{settings: %ActorSettings{kind: _kind} = _settings} = actor,
-         opts
-       ) do
-    [%HostActor{node: Node.self(), actor: actor, opts: opts}]
-  end
-
-  defp get_defaul_max_pool() do
-    length(Node.list() ++ [Node.self()]) * System.schedulers_online()
-  end
-
   @doc """
   Spawn actors defined in HostActor.
 
@@ -288,6 +227,76 @@ defmodule Actors do
 
   defp get_caller(nil), do: "external"
   defp get_caller(caller), do: caller.name
+
+  defp create_actor_host_pool(
+         %Actor{
+           id: %ActorId{system: system, parent: _parent, name: name} = _id,
+           settings:
+             %ActorSettings{kind: :POOLED, min_pool_size: min_pool, max_pool_size: max_pool} =
+               _settings
+         } = actor,
+         opts
+       ) do
+    max_pool = if max_pool < min_pool, do: get_defaul_max_pool(min_pool), else: max_pool
+
+    case ActorRegistry.get_hosts_by_actor(system, name) do
+      {:ok, actor_hosts} ->
+        build_pool(:distributed, actor_hosts, min_pool, max_pool)
+
+      _ ->
+        build_pool(:local, nil, min_pool, max_pool)
+    end
+  end
+
+  defp create_actor_host_pool(
+         %Actor{settings: %ActorSettings{kind: _kind} = _settings} = actor,
+         opts
+       ) do
+    [%HostActor{node: Node.self(), actor: actor, opts: opts}]
+  end
+
+  defp build_pool(:local, actor_hosts, min, max) do
+    Enum.into(
+      min_pool..max_pool,
+      [],
+      fn index ->
+        name_alias = build_name_alias(name, index)
+
+        pooled_actor = %Actor{
+          actor
+          | id: %ActorId{system: system, parent: name_alias, name: name}
+        }
+
+        Logger.debug("Registering metadata for the Pooled Actor #{name} with Alias #{name_alias}")
+        %HostActor{node: Node.self(), actor: pooled_actor, opts: opts}
+      end
+    )
+  end
+
+  defp build_pool(:distributed, hosts, min, max) do
+    Enum.into(
+      min_pool..max_pool,
+      [],
+      fn index ->
+        host = Enum.random(hosts)
+        name_alias = build_name_alias(name, index)
+
+        pooled_actor = %Actor{
+          actor
+          | id: %ActorId{system: system, parent: name_alias, name: name}
+        }
+
+        Logger.debug("Registering metadata for the Pooled Actor #{name} with Alias #{name_alias}")
+        %HostActor{node: host.node, actor: pooled_actor, opts: opts}
+      end
+    )
+  end
+
+  defp build_name_alias(name, index), do: "#{name}-#{index}"
+
+  defp get_defaul_max_pool(min_pool) do
+    length(Node.list() ++ [Node.self()]) * (System.schedulers_online() + min_pool)
+  end
 
   defp do_lookup_action(
          system_name,
