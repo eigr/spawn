@@ -68,7 +68,8 @@ defmodule Actors do
     * `opts` - The options to create Actors
   ##
   """
-  @spec register(RegistrationRequest.t(), any()) :: {:ok, RegistrationResponse.t()}
+  @spec register(RegistrationRequest.t(), any()) ::
+          {:ok, RegistrationResponse.t()} | {:error, RegistrationResponse.t()}
   def register(registration, opts \\ [])
 
   def register(
@@ -80,26 +81,21 @@ defmodule Actors do
         } = _registration,
         opts
       ) do
-    hosts =
-      Enum.map(Map.values(actors), fn actor -> create_actor_host_pool(actor, opts) end)
-      |> List.flatten()
+    Enum.map(Map.values(actors), fn actor -> create_actor_host_pool(actor, opts) end)
+    |> List.flatten()
+    |> ActorRegistry.register()
+    |> tap(fn _sts -> warmup_actors(actor_system, actors, opts) end)
+    |> case do
+      :ok ->
+        status = RequestStatus.new(status: :OK, message: "Accepted")
+        {:ok, RegistrationResponse.new(proxy_info: get_proxy_info(), status: status)}
 
-    ActorRegistry.register(hosts)
+      _ ->
+        status =
+          RequestStatus.new(status: :ERROR, message: "Failed to register one or more Actors")
 
-    spawn(fn ->
-      create_actors(actor_system, actors, opts)
-    end)
-
-    proxy_info =
-      ProxyInfo.new(
-        protocol_major_version: 1,
-        protocol_minor_version: 2,
-        proxy_name: "spawn",
-        proxy_version: "0.5.0"
-      )
-
-    status = RequestStatus.new(status: :OK, message: "Accepted")
-    {:ok, RegistrationResponse.new(proxy_info: proxy_info, status: status)}
+        {:error, RegistrationResponse.new(proxy_info: get_proxy_info(), status: status)}
+    end
   end
 
   @doc """
@@ -426,6 +422,15 @@ defmodule Actors do
     end
   end
 
+  defp get_proxy_info() do
+    ProxyInfo.new(
+      protocol_major_version: 1,
+      protocol_minor_version: 2,
+      proxy_name: "spawn",
+      proxy_version: "0.5.0"
+    )
+  end
+
   defp maybe_invoke_async(true, actor_ref, request, opts) do
     ActorEntity.invoke_async(actor_ref, request, opts)
 
@@ -468,41 +473,43 @@ defmodule Actors do
     end
   end
 
-  defp create_actors(actor_system, actors, opts) when is_map(actors) do
-    actors
-    |> Flow.from_enumerable(
-      min_demand: @activate_actors_min_demand,
-      max_demand: @activate_actors_max_demand
-    )
-    |> Flow.filter(fn {_actor_name,
-                       %Actor{
-                         metadata: %Metadata{channel_group: channel},
-                         settings: %ActorSettings{stateful: stateful, kind: kind}
-                       } = _actor} ->
-      cond do
-        kind == :POOLED ->
-          false
-
-        match?(true, stateful) and kind != :ABSTRACT ->
-          true
-
-        not is_nil(channel) and byte_size(channel) > 0 ->
-          true
-
-        true ->
-          false
-      end
-    end)
-    |> Flow.map(fn {actor_name, actor} ->
-      {time, result} = :timer.tc(&lookup_actor/4, [actor_system, actor_name, actor, opts])
-
-      Logger.info(
-        "Actor #{actor_name} Activated on Node #{inspect(Node.self())} in #{inspect(time)}ms"
+  defp warmup_actors(actor_system, actors, opts) when is_map(actors) do
+    spawn(fn ->
+      actors
+      |> Flow.from_enumerable(
+        min_demand: @activate_actors_min_demand,
+        max_demand: @activate_actors_max_demand
       )
+      |> Flow.filter(fn {_actor_name,
+                         %Actor{
+                           metadata: %Metadata{channel_group: channel},
+                           settings: %ActorSettings{stateful: stateful, kind: kind}
+                         } = _actor} ->
+        cond do
+          kind == :POOLED ->
+            false
 
-      result
+          match?(true, stateful) and kind != :ABSTRACT ->
+            true
+
+          not is_nil(channel) and byte_size(channel) > 0 ->
+            true
+
+          true ->
+            false
+        end
+      end)
+      |> Flow.map(fn {actor_name, actor} ->
+        {time, result} = :timer.tc(&lookup_actor/4, [actor_system, actor_name, actor, opts])
+
+        Logger.info(
+          "Actor #{actor_name} Activated on Node #{inspect(Node.self())} in #{inspect(time)}ms"
+        )
+
+        result
+      end)
+      |> Flow.run()
     end)
-    |> Flow.run()
   end
 
   @spec lookup_actor(ActorSystem.t(), String.t(), Actor.t(), any()) ::
