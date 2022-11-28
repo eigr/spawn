@@ -70,6 +70,7 @@ defmodule ActivatorRabbitMQ.Sources.RabbitMQ do
            username: username,
            password: password
          ],
+         on_failure: :reject_and_requeue_once,
          qos: [
            prefetch_count: qos_prefetch_count
          ]},
