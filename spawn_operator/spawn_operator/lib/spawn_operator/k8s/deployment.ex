@@ -13,6 +13,10 @@ defmodule SpawnOperator.K8s.Deployment do
       "valueFrom" => %{"fieldRef" => %{"fieldPath" => "status.podIP"}}
     },
     %{
+      "name" => "NODE_IP",
+      "valueFrom" => %{"fieldRef" => %{"fieldPath" => "status.hostIP"}}
+    },
+    %{
       "name" => "SPAWN_PROXY_PORT",
       "value" => "9001"
     },
