@@ -185,7 +185,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
     case Process.info(self(), :message_queue_len) do
       {:message_queue_len, 0} ->
         Logger.debug("Deactivating actor #{name} for timeout")
-        {:stop, :normal, state}
+        {:stop, :shutdown, state}
 
       _ ->
         schedule_deactivate(deactivation_strategy)

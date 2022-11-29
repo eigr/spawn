@@ -140,7 +140,7 @@ defmodule Actors.Actor.Entity do
       ] "
     )
 
-    {:stop, :normal, state}
+    {:stop, :shutdown, state}
   end
 
   defp do_handle_info(
