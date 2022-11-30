@@ -20,8 +20,10 @@ defmodule Proxy.Routes.API do
   end
 
   post "/system" do
+    remote_ip = get_remote_ip(conn)
+
     with registration_payload <- get_body(conn.body_params, RegistrationRequest),
-         {:ok, response} <- Actors.register(registration_payload) do
+         {:ok, response} <- Actors.register(registration_payload, remote_ip: remote_ip) do
       send!(conn, 200, encode(RegistrationResponse, response), @content_type)
     else
       _ ->
@@ -32,8 +34,10 @@ defmodule Proxy.Routes.API do
   end
 
   post "/system/:name/actors/spawn" do
+    remote_ip = get_remote_ip(conn)
+
     with spawn_payload <- get_body(conn.body_params, SpawnRequest),
-         {:ok, response} <- Actors.spawn_actor(spawn_payload) do
+         {:ok, response} <- Actors.spawn_actor(spawn_payload, remote_ip: remote_ip) do
       send!(conn, 200, encode(SpawnResponse, response), @content_type)
     else
       _ ->
@@ -44,9 +48,11 @@ defmodule Proxy.Routes.API do
   end
 
   post "/system/:name/actors/:actor_name/invoke" do
+    remote_ip = get_remote_ip(conn)
+
     with %InvocationRequest{system: system, actor: actor} = request <-
            get_body(conn.body_params, InvocationRequest),
-         {:ok, response} <- Actors.invoke(request) do
+         {:ok, response} <- Actors.invoke(request, remote_ip: remote_ip) do
       payload =
         case response do
           :async ->
@@ -82,4 +88,6 @@ defmodule Proxy.Routes.API do
   defp get_body(body, _type), do: body
 
   defp encode(module, payload), do: module.encode(payload)
+
+  defp get_remote_ip(conn), do: to_string(:inet_parse.ntoa(conn.remote_ip))
 end

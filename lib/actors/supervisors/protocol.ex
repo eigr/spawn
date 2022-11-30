@@ -17,7 +17,7 @@ defmodule Actors.Supervisors.ProtocolSupervisor do
 
   @impl true
   def init(_config) do
-    _config = Config.load(Actors)
+    _actors_config = Config.load(Actors)
     Protobuf.load_extensions()
 
     children = [

@@ -36,6 +36,8 @@ defmodule Actors do
     SpawnResponse
   }
 
+  import Spawn.Utils.Common, only: [to_existing_atom_or_new: 1]
+
   @activate_actors_min_demand 0
   @activate_actors_max_demand 4
 
@@ -523,12 +525,5 @@ defmodule Actors do
         Logger.debug("Failed to register Actor #{actor_name}")
         {:error, "Failed to register Actor #{actor_name}"}
     end
-  end
-
-  defp to_existing_atom_or_new(string) do
-    String.to_existing_atom(string)
-  rescue
-    _e ->
-      String.to_atom(string)
   end
 end
