@@ -36,6 +36,8 @@ defmodule Actors do
     SpawnResponse
   }
 
+  alias Sidecar.Measurements
+
   import Spawn.Utils.Common, only: [to_existing_atom_or_new: 1]
 
   @activate_actors_min_demand 0
@@ -169,58 +171,67 @@ defmodule Actors do
          } = request,
          opts \\ []
        ) do
-    metadata_attributes =
-      Enum.map(metadata, fn {key, value} -> {to_existing_atom_or_new(key), value} end) ++
-        [{:async, async?}, {"from", get_caller(caller)}, {"target", actor.id.name}]
+    {time, result} =
+      :timer.tc(fn ->
+        metadata_attributes =
+          Enum.map(metadata, fn {key, value} -> {to_existing_atom_or_new(key), value} end) ++
+            [{:async, async?}, {"from", get_caller(caller)}, {"target", actor.id.name}]
 
-    {_current, opts} =
-      Keyword.get_and_update(opts, :span_ctx, fn v ->
-        if is_nil(v), do: {v, OpenTelemetry.Ctx.new()}, else: {v, v}
+        {_current, opts} =
+          Keyword.get_and_update(opts, :span_ctx, fn v ->
+            if is_nil(v), do: {v, OpenTelemetry.Ctx.new()}, else: {v, v}
+          end)
+
+        Tracer.with_span opts[:span_ctx], "client invoke", kind: :client do
+          Tracer.set_attributes(metadata_attributes)
+
+          retry with: exponential_backoff() |> randomize |> expiry(10_000),
+                atoms: [:error, :exit, :noproc, :erpc, :noconnection],
+                rescue_only: [ErlangError] do
+            Tracer.add_event("lookup", [{"target", actor.id.name}])
+
+            actor_fqdn =
+              unless pooled? do
+                {pooled?, system.name, actor.id.name, actor.id.name}
+              else
+                case ActorRegistry.get_hosts_by_actor(system.name, actor.id.name) do
+                  {:ok, actor_hosts} ->
+                    host = Enum.random(actor_hosts)
+                    {pooled?, system.name, host.actor.id.parent, actor.id.name}
+
+                  _ ->
+                    {pooled?, system.name, "#{actor.id.name}-1", actor.id.name}
+                end
+              end
+
+            do_lookup_action(system.name, actor_fqdn, system, fn actor_ref, actor_ref_id ->
+              %InvocationRequest{
+                actor: %Actor{} = actor
+              } = request
+
+              request_params = %InvocationRequest{
+                request
+                | actor: %Actor{actor | id: actor_ref_id}
+              }
+
+              if is_nil(request.scheduled_to) || request.scheduled_to == 0 do
+                maybe_invoke_async(async?, actor_ref, request_params, opts)
+              else
+                InvocationScheduler.schedule_invoke(request_params)
+
+                {:ok, :async}
+              end
+            end)
+          after
+            result -> result
+          else
+            error -> error
+          end
+        end
       end)
 
-    Tracer.with_span opts[:span_ctx], "client invoke", kind: :client do
-      Tracer.set_attributes(metadata_attributes)
-
-      retry with: exponential_backoff() |> randomize |> expiry(10_000),
-            atoms: [:error, :exit, :noproc, :erpc, :noconnection],
-            rescue_only: [ErlangError] do
-        Tracer.add_event("lookup", [{"target", actor.id.name}])
-
-        actor_fqdn =
-          unless pooled? do
-            {pooled?, system.name, actor.id.name, actor.id.name}
-          else
-            case ActorRegistry.get_hosts_by_actor(system.name, actor.id.name) do
-              {:ok, actor_hosts} ->
-                host = Enum.random(actor_hosts)
-                {pooled?, system.name, host.actor.id.parent, actor.id.name}
-
-              _ ->
-                {pooled?, system.name, "#{actor.id.name}-1", actor.id.name}
-            end
-          end
-
-        do_lookup_action(system.name, actor_fqdn, system, fn actor_ref, actor_ref_id ->
-          %InvocationRequest{
-            actor: %Actor{} = actor
-          } = request
-
-          request_params = %InvocationRequest{request | actor: %Actor{actor | id: actor_ref_id}}
-
-          if is_nil(request.scheduled_to) || request.scheduled_to == 0 do
-            maybe_invoke_async(async?, actor_ref, request_params, opts)
-          else
-            InvocationScheduler.schedule_invoke(request_params)
-
-            {:ok, :async}
-          end
-        end)
-      after
-        result -> result
-      else
-        error -> error
-      end
-    end
+    Measurements.emit_invoke_duration(system.name, actor.id.name, time)
+    result
   end
 
   defp get_caller(nil), do: "external"

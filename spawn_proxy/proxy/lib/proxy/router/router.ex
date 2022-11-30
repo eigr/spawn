@@ -14,6 +14,8 @@ defmodule Proxy.Router do
 
   forward("/health", to: Proxy.Routes.Health)
 
+  forward("/metrics", to: Proxy.Routes.Metrics)
+
   match _ do
     send_resp(conn, 404, "Not found!")
   end

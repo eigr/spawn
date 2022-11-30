@@ -7,6 +7,7 @@ defmodule Sidecar.Supervisor do
     children =
       [
         statestores(),
+        {Sidecar.MetricsSupervisor, []},
         Spawn.Supervisor.child_spec(config),
         Actors.Supervisors.ProtocolSupervisor.child_spec(config),
         Actors.Supervisors.EntitySupervisor.child_spec(config),

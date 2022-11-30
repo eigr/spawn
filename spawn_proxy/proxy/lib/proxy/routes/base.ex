@@ -9,6 +9,7 @@ defmodule Proxy.Routes.Base do
 
       plug(Plug.Parsers,
         parsers: [:json, Proxy.Parsers.Protobuf],
+        pass: ["text/*"],
         json_decoder: Jason
       )
 
@@ -23,7 +24,8 @@ defmodule Proxy.Routes.Base do
       end
 
       def send!(conn, code, data, content_type)
-          when is_integer(code) and content_type == "application/octet-stream" do
+          when (is_integer(code) and content_type == "application/octet-stream") or
+                 (is_integer(code) and content_type == "text/plain") do
         conn
         |> Plug.Conn.put_resp_content_type(content_type)
         |> Plug.Conn.put_resp_header("Connection", "Keep-Alive")

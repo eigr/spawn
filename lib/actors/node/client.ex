@@ -29,7 +29,7 @@ defmodule Actors.Node.Client do
 
       unknown ->
         raise ArgumentError,
-              "Unknown Deployment Mode. Valid :sidecar or :daemon found #{inspect(unknown)}"
+              "Unknown Deployment Mode. Valid :sidecar or :daemon, found #{inspect(unknown)}"
     end
   end
 
