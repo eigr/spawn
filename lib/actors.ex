@@ -164,6 +164,7 @@ defmodule Actors do
          %InvocationRequest{
            actor: %Actor{} = actor,
            system: %ActorSystem{} = system,
+           command_name: command_name,
            async: async?,
            metadata: metadata,
            caller: caller,
@@ -230,7 +231,7 @@ defmodule Actors do
         end
       end)
 
-    Measurements.emit_invoke_duration(system.name, actor.id.name, time)
+    Measurements.dispatch_invoke_duration(system.name, actor.id.name, command_name, time)
     result
   end
 

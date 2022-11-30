@@ -103,7 +103,7 @@ defmodule Actors.Actor.Entity.Invocation do
         payload,
         %ActorInvocation{actor: %ActorId{name: caller_actor_name, system: actor_system}},
         %EntityState{
-          system: _actor_system,
+          system: actor_system,
           actor: %Actor{id: %ActorId{name: actor_name} = _id} = actor
         } = state
       ) do
@@ -213,6 +213,7 @@ defmodule Actors.Actor.Entity.Invocation do
           actor: %Actor{state: actor_state, commands: commands, timer_commands: timers}
         } = state
       ) do
+
     ctx = Keyword.get(opts, :span_ctx, OpenTelemetry.Ctx.new())
 
     Tracer.with_span ctx, "#{actor_name} invocation handler", kind: :server do

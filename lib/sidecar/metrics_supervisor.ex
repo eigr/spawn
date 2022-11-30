@@ -20,19 +20,13 @@ defmodule Sidecar.MetricsSupervisor do
   defp metrics do
     [
       # VM Metrics
-      last_value("vm.system_info.system_version"),
-      last_value("vm.system_info.otp_release"),
       last_value("vm.system_info.process_count"),
-      # last_value("vm.system_info.schedulers"),
-      # last_value("vm.system_info.schedulers_online"),
-      # last_value("vm.system_info.dirty_cpu_schedulers"),
-      # last_value("vm.system_info.dirty_cpu_schedulers_online"),
-      # last_value("vm.system_info.multi_scheduling"),
-      # last_value("vm.system_info.threads"),
-      # last_value("vm.system_info.thread_pool_size"),
-      # last_value("vm.system_info.smp_support"),
-      # last_value("vm.system_info.dist_buf_busy_limit", unit: :byte),
-
+      last_value("vm.system_info.schedulers"),
+      last_value("vm.system_info.schedulers_online"),
+      last_value("vm.system_info.dirty_cpu_schedulers"),
+      last_value("vm.system_info.dirty_cpu_schedulers_online"),
+      last_value("vm.system_info.thread_pool_size"),
+      last_value("vm.system_info.dist_buf_busy_limit", unit: :byte),
       last_value("vm.memory.total", unit: :byte),
       last_value("vm.total_run_queue_lengths.total"),
       last_value("vm.total_run_queue_lengths.cpu"),
@@ -41,15 +35,9 @@ defmodule Sidecar.MetricsSupervisor do
       # Actor Metrics
       last_value("spawn.actor.memory", unit: :byte),
       last_value("spawn.actor.message_queue_len"),
+      last_value("spawn.actor.inflight_messages.messages"),
       counter("spawn.invoke.stop.duration"),
       summary("spawn.invoke.stop.duration", unit: {:native, :millisecond})
-
-      # Database Time Metrics
-      # summary("my_app.repo.query.total_time", unit: {:native, :millisecond}),
-      # summary("my_app.repo.query.decode_time", unit: {:native, :millisecond}),
-      # summary("my_app.repo.query.query_time", unit: {:native, :millisecond}),
-      # summary("my_app.repo.query.idle_time", unit: {:native, :millisecond}),
-      # summary("my_app.repo.query.queue_time", unit: {:native, :millisecond}),
     ]
   end
 
@@ -57,7 +45,7 @@ defmodule Sidecar.MetricsSupervisor do
     [
       {:process_info,
        event: [:spawn, :actor], name: Actors.Actor.Entity, keys: [:message_queue_len, :memory]},
-      {Sidecar.Measurements, :dispatch_system_info, []}
+      {Sidecar.Measurements, :stats, []}
     ]
   end
 end

@@ -20,6 +20,8 @@ defmodule Actors.Actor.Entity.Lifecycle do
 
   alias Phoenix.PubSub
 
+  alias Sidecar.Measurements
+
   @default_deactivate_timeout 10_000
   @default_snapshot_timeout 2_000
 
@@ -107,8 +109,10 @@ defmodule Actors.Actor.Entity.Lifecycle do
 
   def snapshot(
         %EntityState{
+          system: system,
           actor:
             %Actor{
+              id: %ActorId{name: name} = _id,
               state: actor_state,
               settings: %ActorSettings{
                 stateful: true,
@@ -120,12 +124,15 @@ defmodule Actors.Actor.Entity.Lifecycle do
         } = state
       )
       when is_nil(actor_state) or actor_state == %{} do
+    {:message_queue_len, size} = Process.info(self(), :message_queue_len)
+    Measurements.dispatch_actor_inflights(system, name, size)
     schedule_snapshot(snapshot_strategy)
     {:noreply, state, :hibernate}
   end
 
   def snapshot(
         %EntityState{
+          system: system,
           state_hash: old_hash,
           actor:
             %Actor{
@@ -140,6 +147,8 @@ defmodule Actors.Actor.Entity.Lifecycle do
             } = _actor
         } = state
       ) do
+    {:message_queue_len, size} = Process.info(self(), :message_queue_len)
+    Measurements.dispatch_actor_inflights(system, name, size)
     # Persist State only when necessary
     res =
       if StateManager.is_new?(old_hash, actor_state.state) do
@@ -171,6 +180,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
 
   def deactivate(
         %EntityState{
+          system: system,
           actor:
             %Actor{
               id: %ActorId{name: name} = _id,
@@ -182,7 +192,11 @@ defmodule Actors.Actor.Entity.Lifecycle do
             } = _actor
         } = state
       ) do
-    case Process.info(self(), :message_queue_len) do
+    queue_length = Process.info(self(), :message_queue_len)
+    {:message_queue_len, size} = queue_length
+    Measurements.dispatch_actor_inflights(system, name, size)
+
+    case queue_length do
       {:message_queue_len, 0} ->
         Logger.debug("Deactivating actor #{name} for timeout")
         {:stop, :shutdown, state}
