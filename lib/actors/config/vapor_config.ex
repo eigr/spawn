@@ -43,7 +43,7 @@ defmodule Actors.Config.Vapor do
           {:proxy_uds_enable, "PROXY_UDS_ENABLED", default: false, required: false},
           {:proxy_sock_addr, "PROXY_UDS_ADDRESS",
            default: "/var/run/spawn.sock", required: false},
-          {:proxy_host_interface, "PROXY_HOST_INTERFACE", default: "http", required: false},
+          {:proxy_host_interface, "POD_IP", default: "0.0.0.0", required: false},
           {:user_function_host, "USER_FUNCTION_HOST", default: "0.0.0.0", required: false},
           {:user_function_port, "USER_FUNCTION_PORT",
            default: 8090, map: &String.to_integer/1, required: false},

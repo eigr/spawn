@@ -1,7 +1,7 @@
 defmodule Sidecar.Measurements do
   @moduledoc false
 
-  def stats() do
+  def stats(config) do
     otp_release = :erlang.system_info(:otp_release)
     multi_scheduling = :erlang.system_info(:multi_scheduling)
     threads = :erlang.system_info(:threads)
@@ -27,7 +27,9 @@ defmodule Sidecar.Measurements do
         thread_pool_size: thread_pool_size
       },
       %{
-        otp_release: otp_release,
+        host_ip: config.node_host_interface,
+        proxy_ip: config.proxy_host_interface,
+        otp_release: "#{otp_release}",
         smp_support: smp_support,
         multi_scheduling: multi_scheduling,
         threads: threads

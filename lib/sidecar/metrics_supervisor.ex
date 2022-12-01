@@ -3,13 +3,13 @@ defmodule Sidecar.MetricsSupervisor do
   use Supervisor
   import Telemetry.Metrics
 
-  def start_link(arg) do
-    Supervisor.start_link(__MODULE__, arg, name: __MODULE__)
+  def start_link(config) do
+    Supervisor.start_link(__MODULE__, config, name: __MODULE__)
   end
 
-  def init(_arg) do
+  def init(config) do
     children = [
-      {:telemetry_poller, measurements: periodic_measurements()},
+      {:telemetry_poller, measurements: periodic_measurements(config)},
       {TelemetryMetricsPrometheus.Core, name: :spawm_metrics, metrics: metrics()},
       {Telemetry.Metrics.ConsoleReporter, metrics: metrics()}
     ]
@@ -41,11 +41,11 @@ defmodule Sidecar.MetricsSupervisor do
     ]
   end
 
-  defp periodic_measurements do
+  defp periodic_measurements(config) do
     [
       {:process_info,
        event: [:spawn, :actor], name: Actors.Actor.Entity, keys: [:message_queue_len, :memory]},
-      {Sidecar.Measurements, :stats, []}
+      {Sidecar.Measurements, :stats, [config]}
     ]
   end
 end
