@@ -64,7 +64,11 @@ Now that we have defined our input and output types as Protobuf types we will ne
 
 > **_NOTE:_** You need to have installed the elixir plugin for protoc. More information on how to obtain and install the necessary tools can be found here [here](https://github.com/elixir-protobuf/protobuf#usage) 
 
-Now that the protobuf types have been created we can proceed with the code. Example definition of an Actor:
+Now that the protobuf types have been created we can proceed with the code. Example definition of an Actor.
+
+## Singleton Actors
+
+In this example we are creating an actor in a Singleton way, that is, it is a known actor at compile time.
 
 ```elixir
 defmodule SpawnSdkExample.Actors.MyActor do
@@ -104,13 +108,15 @@ end
 
 ```
 
-In this example we are creating an actor in a Singleton way, that is, it is a known actor at compile time. We can also create Unnamed Dynamic/Lazy actors, that is, despite having its abstract behavior defined at compile time, a Lazy actor will only have a concrete instance when it is associated with an identifier/name at runtime. Below follows the same previous actor being defined as abstract.
-
 We declare two actions that the Actor can do. An initialization action that will be called every time an Actor instance is created and an action that will be responsible for performing a simple sum.
 
 Note Keep in mind that any Action that has the names present in the list below will behave as an initialization Action and will be called when the Actor is started (if there is more than one Action with one of these names, only one will be called).
 
 Defaults inicialization Action names: "**init**", "**Init**", "**setup**", "**Setup**"
+
+## Abstract Actor
+
+We can also create Unnamed Dynamic/Lazy actors, that is, despite having its abstract behavior defined at compile time, a Lazy actor will only have a concrete instance when it is associated with an identifier/name at runtime. Below follows the same previous actor being defined as abstract.
 
 ```elixir
 defmodule SpawnSdkExample.Actors.AbstractActor do
