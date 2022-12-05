@@ -151,7 +151,7 @@ Our proxy connects directly and transparently to all cluster members without nee
    - [ ] Google PubSub. On the Roadmap to version 1.0.0.
 - [x] Observability
    - [x] Tracing. Using OpenTelemetry.
-   - [x] Prometheus Metrics. On the Roadmap to version 0.5.0
+   - [x] Prometheus Metrics.
 
 ## Install
 
