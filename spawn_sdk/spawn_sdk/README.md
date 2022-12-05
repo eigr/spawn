@@ -551,7 +551,7 @@ defmodule SpawnSdkExample.Actors.ClockActor do
 end
 ```
 
-> **_NOTE:_** Timers Actions are ephemeral and only exist while the some Spawn VM in the cluster exist.
+> **_NOTE:_** Timers Actions are recorded as Actor metadata. Where in turn we use a synchronization mechanism via CRDTs to keep the metadata alive in the cluster while there is an active Spawn VM. That is, Timers Actions are ephemeral and therefore only exist while there is at least one active VM in the cluster.
 
 In the example above the ´clock´ action will be called every 15 seconds.
 
