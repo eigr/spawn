@@ -35,7 +35,7 @@ Following the steps below, you will have a valid Elixir application to use in a 
 
 ## How to use
 
-After creating an elixir application project, create the protobuf files for your business domain.
+After creating an Elixir application project, create the protobuf files for your business domain.
 It is common practice to do this under the **priv/** folder. Let's demonstrate an example:
 
 ```protobuf
