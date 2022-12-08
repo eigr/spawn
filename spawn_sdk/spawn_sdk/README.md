@@ -31,8 +31,7 @@ end
 
 ### Deploy
 
-Following steps below you will have a valid Elixir application to use in a Spawn cluster.
-However, you will still need to generate a container image with your application so that you can use it together with the [Spawn Operator for Kubernetes](https://github.com/eigr/spawn/tree/main/spawn_operator/spawn_operator).
+Following the steps below, you will have a valid Elixir application to use in a Spawn cluster. However, you will still need to generate a container image with your application to use it together with the [Spawn Operator for Kubernetes](https://github.com/eigr/spawn/tree/main/spawn_operator/spawn_operator).
 
 ## How to use
 
