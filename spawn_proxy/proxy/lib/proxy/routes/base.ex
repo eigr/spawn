@@ -41,6 +41,7 @@ defmodule Proxy.Routes.Base do
             :non_authenticated -> 401
             :forbidden_access -> 403
             :server_error -> 500
+            :service_unavailable -> 503
             :error -> 504
           end
 

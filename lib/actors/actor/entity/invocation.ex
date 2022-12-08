@@ -156,7 +156,7 @@ defmodule Actors.Actor.Entity.Invocation do
     else
       init_command =
         Enum.filter(commands, fn cmd -> Enum.member?(@default_init_actions, cmd.name) end)
-        |> List.first()
+        |> Enum.at(0)
 
       case init_command do
         nil ->
@@ -213,7 +213,6 @@ defmodule Actors.Actor.Entity.Invocation do
           actor: %Actor{state: actor_state, commands: commands, timer_commands: timers}
         } = state
       ) do
-
     ctx = Keyword.get(opts, :span_ctx, OpenTelemetry.Ctx.new())
 
     Tracer.with_span ctx, "#{actor_name} invocation handler", kind: :server do

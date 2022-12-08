@@ -56,7 +56,7 @@ defmodule SpawnSdk.System.Supervisor do
                  SpawnSdk.System.SpawnSystem.register(system, actors)
 
                  receive do
-                   {:EXIT, _pid, _reason} ->
+                   {:EXIT, pid, _reason} ->
                      :persistent_term.erase(system)
 
                      :ok

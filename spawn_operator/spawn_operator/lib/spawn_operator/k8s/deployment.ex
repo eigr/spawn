@@ -39,6 +39,8 @@ defmodule SpawnOperator.K8s.Deployment do
     }
   }
 
+  @default_termination_period_seconds 140
+
   @impl true
   def manifest(resource), do: gen_deployment(resource)
 
@@ -99,7 +101,7 @@ defmodule SpawnOperator.K8s.Deployment do
           },
           "spec" => %{
             "containers" => get_containers(embedded, system, name, host_params, sidecar_params),
-            "terminationGracePeriodSeconds" => 120
+            "terminationGracePeriodSeconds" => @default_termination_period_seconds
           }
         }
       }
