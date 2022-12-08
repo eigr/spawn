@@ -4,10 +4,10 @@
 
 Spawn Elixir SDK is the support library for the Spawn Actors System.
 
-Spawn is a Stateful Serverless Platform for provide the multi-language Actor Model.
-For a broader understanding of Spawn please consult its official [repository](https://github.com/eigr/spawn).
+Spawn Elixir SDK is the support library for the Spawn Actors System.
+Spawn is a Stateful Serverless Platform for providing the multi-language Actor Model. For a broader understanding of Spawn, please consult its official [repository](https://github.com/eigr/spawn).
 
-The advantage of the Elixir SDK over other SDKs is in Elixir's native ability to connect directly to an Erlang network. For this reason the Elixir SDK allows any valid Elixir application to be part of a Spawn network without the need for a sidecar attached.
+The advantage of the Elixir SDK over other SDKs is in Elixir's native ability to connect directly to an Erlang network. For this reason, the Elixir SDK allows any valid Elixir application to be part of a Spawn network without needing a sidecar attached.
 
 ## Installation
 
@@ -31,12 +31,11 @@ end
 
 ### Deploy
 
-Following steps below you will have a valid Elixir application to use in a Spawn cluster.
-However, you will still need to generate a container image with your application so that you can use it together with the [Spawn Operator for Kubernetes](https://github.com/eigr/spawn/tree/main/spawn_operator/spawn_operator).
+Following the steps below, you will have a valid Elixir application to use in a Spawn cluster. However, you will still need to generate a container image with your application to use it together with the [Spawn Operator for Kubernetes](https://github.com/eigr/spawn/tree/main/spawn_operator/spawn_operator).
 
 ## How to use
 
-After creating an elixir application project create the protobuf files for your business domain.
+After creating an Elixir application project, create the protobuf files for your business domain.
 It is common practice to do this under the **priv/** folder. Let's demonstrate an example:
 
 ```protobuf
