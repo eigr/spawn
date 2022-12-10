@@ -19,6 +19,14 @@ defmodule SpawnOperator.K8s.Deployment do
     %{
       "name" => "SPAWN_PROXY_INTERFACE",
       "value" => "0.0.0.0"
+    },
+    %{
+      "name" => "RELEASE_DISTRIBUTION",
+      "value" => "name"
+    },
+    %{
+      "name" => "RELEASE_NODE",
+      "value" => "$(RELEASE_NAME)@$(POD_IP)"
     }
   ]
 
@@ -111,7 +119,15 @@ defmodule SpawnOperator.K8s.Deployment do
   defp get_containers(true, system, name, host_params, _sidecar_params) do
     actor_host_function_image = Map.get(host_params, "image")
 
-    actor_host_function_envs = Map.get(host_params, "env", []) ++ @default_actor_host_function_env
+    actor_host_function_envs =
+      Map.get(host_params, "env", []) ++
+        [
+          %{
+            "name" => "RELEASE_NAME",
+            "value" => name
+          }
+        ] ++
+        @default_actor_host_function_env
 
     actor_host_function_ports = Map.get(host_params, "ports", [])
     actor_host_function_ports = actor_host_function_ports ++ @default_actor_host_function_ports
@@ -145,7 +161,18 @@ defmodule SpawnOperator.K8s.Deployment do
   defp get_containers(false, system, name, host_params, sidecar_params) do
     actor_host_function_image = Map.get(host_params, "image")
 
-    actor_host_function_envs = Map.get(host_params, "env", []) ++ @default_actor_host_function_env
+    actor_host_function_envs =
+      Map.get(host_params, "env", []) ++
+        @default_actor_host_function_env
+
+    proxy_envs =
+      [
+        %{
+          "name" => "RELEASE_NAME",
+          "value" => name
+        }
+      ] ++
+        @default_actor_host_function_env
 
     actor_host_function_ports = Map.get(host_params, "ports", [])
     actor_host_function_ports = actor_host_function_ports ++ @default_actor_host_function_ports
@@ -157,7 +184,7 @@ defmodule SpawnOperator.K8s.Deployment do
       %{
         "name" => "spawn-sidecar",
         "image" => "#{resolve_proxy_image(sidecar_params)}",
-        "env" => @default_actor_host_function_env,
+        "env" => proxy_envs,
         "ports" => [
           %{"containerPort" => 9000, "name" => "http"},
           %{"containerPort" => 9001, "name" => "https"},
@@ -207,6 +234,6 @@ defmodule SpawnOperator.K8s.Deployment do
       Application.get_env(
         :spawn_operator,
         :proxy_image,
-        "docker.io/eigr/spawn-proxy:0.5.0-rc.6"
+        "docker.io/eigr/spawn-proxy:0.5.0-rc.7"
       )
 end

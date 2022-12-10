@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    actor-system: spawn-system
+    app: spawn-proxy-test
+  name: spawn-proxy-test
+  namespace: default
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 2
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      actor-system: spawn-system
+      app: spawn-proxy-test
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        prometheus.io/port: "9001"
+        prometheus.io/scrape: "true"
+      labels:
+        actor-system: spawn-system
+        app: spawn-proxy-test
+    spec:
+      containers:
+        - env:
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.namespace
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: status.podIP
+            - name: SPAWN_PROXY_PORT
+              value: "9001"
+            - name: SPAWN_PROXY_INTERFACE
+              value: 0.0.0.0
+            - name: RELEASE_NAME
+              value: "spawn-proxy-test"
+            - name: RELEASE_DISTRIBUTION
+              value: "name"
+            - name: RELEASE_NODE
+              value: "$(RELEASE_NAME)@$(POD_IP)"
+          envFrom:
+            - configMapRef:
+                name: spawn-dice-game-sidecar-cm
+            - secretRef:
+                name: spawn-system-secret
+          name: actor-host-function
+          image: eigr/spawn-proxy:0.5.0-rc.7
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8800
+              name: http
+              protocol: TCP
+            - containerPort: 4369
+              name: epmd
+              protocol: TCP
+            - containerPort: 9000
+              name: proxy-http
+              protocol: TCP
+            - containerPort: 9001
+              name: proxy-https
+              protocol: TCP
+          resources:
+            limits:
+              memory: 1Gi
+            requests:
+              memory: 80Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 120

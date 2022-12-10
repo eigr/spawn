@@ -33,20 +33,12 @@ ENV RELEASE_NODE="${RELEASE_NAME}@${POD_IP}"
 
 RUN echo "-setcookie ${NODE_COOKIE}" >> ./rel/vm.args.eex
 
-#RUN echo "-name proxy@${POD_IP}" >> ./rel/vm.args.eex \
-#    && echo "-setcookie ${NODE_COOKIE}" >> ./rel/vm.args.eex
-
-#RUN echo "export POD_A_RECORD=$(echo $POD_IP | sed 's/\./-/g')" >> ./rel/env.sh.eex \
-#    && echo "export RELEASE_DISTRIBUTION=name" >> ./rel/env.sh.eex \
-#    && echo "export RELEASE_NODE=<%= @release.name %>@${POD_A_RECORD}.${NAMESPACE}.pod.cluster.local" >> ./rel/env.sh.eex 
-
 RUN cd spawn_proxy/proxy \
     && mix deps.get \
     && mix release proxy
 
 # ---- Application Stage ----
-FROM alpine:3
-#RUN apk add --no-cache --update bash openssl build-base ca-certificates zstd
+FROM alpine:3.16
 RUN apk add --no-cache --update zstd ncurses-libs libstdc++ libgcc
 
 WORKDIR /app

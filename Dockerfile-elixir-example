@@ -28,7 +28,7 @@ RUN cd spawn_sdk/spawn_sdk_example \
     && mix release spawn_sdk_example
 
 # ---- Application Stage ----
-FROM alpine:3
+FROM alpine:3.16
 RUN apk add --no-cache --update zstd ncurses-libs libstdc++ libgcc
 
 WORKDIR /app

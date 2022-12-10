@@ -1,0 +1,47 @@
+# Build Image
+FROM elixir:1.14-alpine as builder
+
+ENV MIX_ENV=prod
+
+WORKDIR /app
+
+RUN apk add --no-cache --update git build-base ca-certificates zstd openssl
+
+RUN mkdir config
+COPY config/ ./config
+COPY spawn_operator/ ./spawn_operator
+COPY lib/ ./lib
+COPY priv/ ./priv
+COPY mix.exs .
+COPY mix.lock .
+
+RUN mix local.rebar --force \
+  && mix local.hex --force \
+  && mix deps.get \
+  && mix release.init \
+  && mix rewrite_versions --apps=spawn
+
+RUN echo "-name spawn_operator@${HOSTNAME}" >> ./rel/vm.args.eex \
+  && echo "-setcookie ${NODE_COOKIE}" >> ./rel/vm.args.eex
+
+RUN cd spawn_operator/spawn_operator \
+  && mix deps.get \
+  && mix release spawn_operator
+
+
+# Release Image
+FROM elixir:1.14-alpine
+
+ENV MIX_ENV=prod
+
+RUN apk add --no-cache --update zstd build-base ca-certificates ncurses-libs libstdc++ libgcc openssl
+
+# elixir expects utf8.
+ENV LANG=C.UTF-8
+
+WORKDIR /app
+RUN chown -R nobody: /app
+COPY --from=builder --chown=nobody:root /app/_build/${MIX_ENV}/rel/spawn_operator ./
+
+ENTRYPOINT ["/app/bin/spawn_operator"]
+CMD ["start"]

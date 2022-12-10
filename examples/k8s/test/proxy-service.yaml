@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    spawn-eigr.io/controller.version: 0.5.0-rc.7
+  name: spawn-proxy-test-svc
+  namespace: default
+spec:
+  ports:
+    - name: proxy-http
+      port: 9001
+      protocol: TCP
+      targetPort: proxy-https
+  selector:
+    app: spawn-proxy-test
+  sessionAffinity: None
+  type: ClusterIP
