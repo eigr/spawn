@@ -70,6 +70,7 @@ defmodule Spawn.MixProject do
       # Core deps
       {:cowlib, "~> 2.9"},
       {:decimal, "~> 2.0"},
+      {:duration_tc, "~> 0.1.0"},
       {:protobuf, "~> 0.11"},
       {:finch, "~> 0.12"},
       {:retry, "~> 0.17"},
