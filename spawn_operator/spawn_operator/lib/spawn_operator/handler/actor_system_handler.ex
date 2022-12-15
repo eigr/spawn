@@ -9,9 +9,15 @@ defmodule SpawnOperator.Handler.ActorSystemHandler do
         name: spawn-system # Mandatory. Name of the state store
         namespace: default # Optional. Default namespace is "default"
       spec:
-        mesh: # Optional
+        cluster: # Optional
           kind: erlang # Optional. Default erlang. Possible values [erlang | quic]
           cookie: default-c21f969b5f03d33d43e04f8f136e7682 # Optional. Only used if kind is erlang
+          tls:
+            secretName: spawn-system-tls-secret
+            certManager:
+              enabled: true # Default false
+              issuerName: spawn-system-issuer # You must create an Issuer previously according to certmanager documentation
+
         statestore:
           type: Postgres
           credentialsSecretRef: postgres-connection-secret # The secret containing connection params

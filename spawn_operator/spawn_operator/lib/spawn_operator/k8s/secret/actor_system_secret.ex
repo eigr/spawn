@@ -18,10 +18,10 @@ defmodule SpawnOperator.K8s.Secret.ActorSystemSecret do
            annotations: _annotations
          } = _resource
        ) do
-    mesh_params = Map.get(params, "mesh", %{})
+    cluster_params = Map.get(params, "cluster", %{})
     statestore_params = Map.get(params, "statestore", %{})
 
-    distributed_options = get_dist_options(system, ns, mesh_params)
+    distributed_options = get_dist_options(system, ns, cluster_params)
     storage_options = get_storage_options(system, ns, statestore_params)
 
     %{
