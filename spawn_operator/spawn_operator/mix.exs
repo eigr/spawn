@@ -52,12 +52,12 @@ defmodule Operator.MixProject do
     [
       spawn_operator: [
         include_executables_for: [:unix],
-        applications: [spawn_operator: :permanent]
-         steps: [
-           :assemble,
-           &Bakeware.assemble/1
-         ],
-         bakeware: [compression_level: 19]
+        applications: [spawn_operator: :permanent],
+        steps: [
+          :assemble,
+          &Bakeware.assemble/1
+        ],
+        bakeware: [compression_level: 19]
       ]
     ]
   end
