@@ -2,7 +2,6 @@
 
 <!-- MDOC !-->
 
-Spawn Elixir SDK is the support library for the Spawn Actors System.
 
 Spawn Elixir SDK is the support library for the Spawn Actors System.
 Spawn is a Stateful Serverless Platform for providing the multi-language Actor Model. For a broader understanding of Spawn, please consult its official [repository](https://github.com/eigr/spawn).
