@@ -105,5 +105,5 @@ defmodule SpawnOperator.K8s.Secret.ActorSystemSecret do
   end
 
   defp default_cookie(ns),
-    do: "#{ns}-#{:crypto.hash(:md5, ns) |> Base.encode16(case: :lower)}"
+    do: "cookie-#{:crypto.hash(:md5, ns) |> Base.encode16(case: :lower)}-#{:crypto.strong_rand_bytes(32) |> Base.encode64(case: :lower)}"
 end
