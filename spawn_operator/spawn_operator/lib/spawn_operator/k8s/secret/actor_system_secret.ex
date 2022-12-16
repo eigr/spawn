@@ -6,7 +6,7 @@ defmodule SpawnOperator.K8s.Secret.ActorSystemSecret do
   import Bonny.Config, only: [conn: 0]
 
   @impl true
-  def manifest(resource), do: gen_secret(resource)
+  def manifest(resource, _opts \\ []), do: gen_secret(resource)
 
   defp gen_secret(
          %{
@@ -78,7 +78,6 @@ defmodule SpawnOperator.K8s.Secret.ActorSystemSecret do
         cluster_strategy = "kubernetes-dns" |> Base.encode64()
         cluster_service = "system-#{system}-svc" |> Base.encode64()
         cluster_heartbeat = "240000" |> Base.encode64()
-        cluster_poolling = "3000" |> Base.encode64()
 
         %{
           "NODE_COOKIE" => cookie,

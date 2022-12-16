@@ -50,7 +50,7 @@ defmodule SpawnOperator.K8s.Deployment do
   @default_termination_period_seconds 140
 
   @impl true
-  def manifest(resource), do: gen_deployment(resource)
+  def manifest(resource, _opts \\ []), do: gen_deployment(resource)
 
   defp gen_deployment(
          %{

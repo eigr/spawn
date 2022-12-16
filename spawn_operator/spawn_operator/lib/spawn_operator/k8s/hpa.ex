@@ -14,7 +14,7 @@ defmodule SpawnOperator.K8s.HPA do
   @default_average_memory_utilization_value 70
 
   @impl true
-  def manifest(resource), do: gen_autoscaler(resource)
+  def manifest(resource, _opts \\ []), do: gen_autoscaler(resource)
 
   defp gen_autoscaler(
          %{

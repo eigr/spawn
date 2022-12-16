@@ -4,7 +4,7 @@ defmodule SpawnOperator.K8s.ConfigMap.SidecarCM do
   @behaviour SpawnOperator.K8s.Manifest
 
   @impl true
-  def manifest(resource), do: gen_configmap(resource)
+  def manifest(resource, _opts \\ []), do: gen_configmap(resource)
 
   defp gen_configmap(
          %{

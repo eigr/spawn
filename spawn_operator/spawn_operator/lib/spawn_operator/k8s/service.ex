@@ -17,7 +17,8 @@ defmodule SpawnOperator.K8s.Service do
           params: params,
           labels: _labels,
           annotations: _annotations
-        } = _resource
+        } = _resource,
+        _opts \\ []
       ) do
     host_params = Map.get(params, "host")
     actor_host_function_ports = Map.get(host_params, "ports", [])

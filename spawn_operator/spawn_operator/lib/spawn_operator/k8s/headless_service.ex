@@ -16,7 +16,8 @@ defmodule SpawnOperator.K8s.HeadlessService do
           params: _params,
           labels: _labels,
           annotations: _annotations
-        } = _resource
+        } = _resource,
+        _opts \\ []
       ),
       do: %{
         "apiVersion" => "v1",
