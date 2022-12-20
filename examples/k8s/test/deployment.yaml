@@ -76,8 +76,34 @@ spec:
               memory: 1Gi
             requests:
               memory: 80Mi
+          volumeMounts:
+            - mountPath: /app/certs
+              name: volume-certs
+              readOnly: true
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
+      initContainers:
+        - name: setup-proxy
+          image: alpine/openssl
+          command:
+            [
+              "sh",
+              "-c",
+              "openssl x509 -noout -pubkey -in /etc/certs/tls.crt > /app/certs/cert.pem;openssl rsa -in /etc/certs/tls.key -text > /app/certs/key.pem",
+            ]
+          volumeMounts:
+            - mountPath: /etc/certs
+              name: system-certs
+              readOnly: true
+            - mountPath: /app/certs
+              name: volume-certs
+      volumes:
+        - name: system-certs
+          secret:
+            optional: false
+            secretName: spawn-system-tls-secret
+        - name: volume-certs
+          emptyDir: {}
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler

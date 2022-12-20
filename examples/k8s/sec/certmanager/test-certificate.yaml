@@ -1,0 +1,17 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: spawn-system-cert
+spec:
+  secretName: spawn-system-tls-secret
+  duration: 360h
+  dnsNames:
+    - system-spawn-system-svc.svc.cluster.local
+  subject:
+    organizations:
+      - eigr
+  encodeUsagesInRequest: false
+  isCA: false
+  issuerRef:
+    name: kubernetes-example

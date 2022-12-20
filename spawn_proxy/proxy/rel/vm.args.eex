@@ -1,0 +1,2 @@
+## Enable TLS for distribution
+-proto_dist inet_tls -ssl_dist_optfile <%= Path.join(@release.path, "ssl.conf")%>
