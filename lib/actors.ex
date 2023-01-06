@@ -132,9 +132,9 @@ defmodule Actors do
               %HostActor{node: node, actor: spawned_actor, opts: opts}
             end)
 
-          _ ->
+          error ->
             raise ArgumentError,
-                  "You are trying to create an actor from an Abstract actor that has never been registered before. ActorId: #{inspect(id)}"
+                  "You are trying to create an actor from an Abstract actor that has never been registered before. ActorId: #{inspect(id)}. Details. #{inspect(error)}"
         end
       end)
       |> List.flatten()

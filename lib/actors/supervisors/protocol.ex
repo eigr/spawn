@@ -4,6 +4,10 @@ defmodule Actors.Supervisors.ProtocolSupervisor do
 
   alias Actors.Config.Vapor, as: Config
 
+  @default_finch_pool_count System.schedulers_online()
+  @default_finch_pool_max_idle_timeout 30000
+  @default_finch_pool_size 32
+
   def start_link(config) do
     Supervisor.start_link(__MODULE__, config, name: __MODULE__)
   end
@@ -25,7 +29,11 @@ defmodule Actors.Supervisors.ProtocolSupervisor do
       {Finch,
        name: SpawnHTTPClient,
        pools: %{
-         :default => [size: 32, count: 8]
+         :default => [
+           size: @default_finch_pool_size,
+           count: @default_finch_pool_count,
+           pool_max_idle_time: @default_finch_pool_max_idle_timeout
+         ]
        }}
     ]
 
