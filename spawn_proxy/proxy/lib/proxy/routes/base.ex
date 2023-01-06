@@ -3,8 +3,6 @@ defmodule Proxy.Routes.Base do
     quote do
       use Plug.Router
 
-      plug(Plug.Logger)
-
       plug(:match)
 
       plug(Plug.Parsers,

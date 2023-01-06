@@ -53,29 +53,16 @@ defmodule Proxy.Routes.API do
     with %InvocationRequest{system: system, actor: actor} = request <-
            get_body(conn.body_params, InvocationRequest),
          {:ok, response} <- Actors.invoke(request, remote_ip: remote_ip) do
-      payload =
+      resp =
         case response do
           :async ->
             nil
 
           %ActorInvocationResponse{payload: payload} ->
-            payload
+            build_response(system, actor, payload)
         end
 
-      send!(
-        conn,
-        200,
-        encode(
-          InvocationResponse,
-          InvocationResponse.new(
-            system: system,
-            actor: actor,
-            payload: payload,
-            status: RequestStatus.new(status: :OK)
-          )
-        ),
-        @content_type
-      )
+      send!(conn, 200, encode(InvocationResponse, resp), @content_type)
     else
       _ ->
         status = RequestStatus.new(status: :ERROR, message: "Error on invoke Actor")
@@ -90,4 +77,27 @@ defmodule Proxy.Routes.API do
   defp encode(module, payload), do: module.encode(payload)
 
   defp get_remote_ip(conn), do: to_string(:inet_parse.ntoa(conn.remote_ip))
+
+  defp build_response(system, actor, response) do
+    # This case is necessary because the plug has a strange behavior and seems to execute the handler twice however,
+    # the second time the payload is incorrect. Open to future investigations.
+    resp =
+      case response do
+        {:value, %Google.Protobuf.Any{} = value} ->
+          {:value, value}
+
+        %Google.Protobuf.Any{} ->
+          {:value, response}
+
+        _ ->
+          response
+      end
+
+    InvocationResponse.new(
+      system: system,
+      actor: actor,
+      payload: resp,
+      status: RequestStatus.new(status: :OK)
+    )
+  end
 end
