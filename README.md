@@ -1,10 +1,10 @@
 # Spawn
 
-### **[Website](https:/eigr.io)** • **[Getting Started](#getting-started)** • **[SDKs](#sdks)** • **[Documentation](https://eigr.io/docs/projects-spawn/spawn-introduction/)** • **[Blog](https://eigr.io/blog/)** • **[Twitter](https://twitter.com/eigr_io)**
-
 <!-- MDOC !-->
 
 **Actor Mesh Serverless Platform**
+
+### **[Website](https://eigr.io)** • **[Getting Started](#getting-started)** • **[SDKs](#sdks)** • **[Documentation](https://eigr.io/docs/projects-spawn/spawn-introduction/)** • **[Blog](https://eigr.io/blog/)** • **[Twitter](https://twitter.com/eigr_io)**
 
 ## Overview
 
