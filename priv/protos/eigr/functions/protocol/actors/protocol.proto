@@ -316,7 +316,7 @@ message Workflow {
 // The user function when it wants to send a message to an Actor uses the InvocationRequest message type.
 //
 // Params:
-//   * system: See ActorStstem message.
+//   * system: See ActorSystem message.
 //   * actor: The target Actor, i.e. the one that the user function is calling to perform some computation.
 //   * caller: The caller Actor
 //   * command_name: The function or method on the target Actor that will receive this request 
