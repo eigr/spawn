@@ -53,14 +53,7 @@ defmodule Proxy.Routes.API do
     with %InvocationRequest{system: system, actor: actor} = request <-
            get_body(conn.body_params, InvocationRequest),
          {:ok, response} <- Actors.invoke(request, remote_ip: remote_ip) do
-      resp =
-        case response do
-          :async ->
-            nil
-
-          %ActorInvocationResponse{payload: payload} ->
-            build_response(system, actor, payload)
-        end
+      resp = build_response(system, actor, response)
 
       send!(conn, 200, encode(InvocationResponse, resp), @content_type)
     else
@@ -83,11 +76,17 @@ defmodule Proxy.Routes.API do
     # the second time the payload is incorrect. Open to future investigations.
     resp =
       case response do
-        {:value, %Google.Protobuf.Any{} = value} ->
+        %ActorInvocationResponse{payload: {:value, %Google.Protobuf.Any{} = value}} ->
           {:value, value}
 
-        %Google.Protobuf.Any{} ->
+        %ActorInvocationResponse{payload: %Google.Protobuf.Any{} = response} ->
           {:value, response}
+
+        %ActorInvocationResponse{payload: response} ->
+          response
+
+        :async ->
+          nil
 
         _ ->
           response
