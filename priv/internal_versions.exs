@@ -6,7 +6,7 @@ defmodule InternalVersions do
     spawn_statestores_mssql: "0.5.0-rc.8",
     spawn_statestores_postgres: "0.5.0-rc.8",
     spawn_statestores_sqlite: "0.5.0-rc.8",
-    spawn_statestores_cockroachdb: "0.5.0-rc.8",\\\
+    spawn_statestores_cockroachdb: "0.5.0-rc.8",
     spawn: "0.5.0-rc.8",
     spawn_sdk: "0.5.0-rc.8",
 
