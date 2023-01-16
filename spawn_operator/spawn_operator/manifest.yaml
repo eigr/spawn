@@ -45,11 +45,17 @@ spec:
             requests:
               cpu: 200m
               memory: 200Mi
+          volumeMounts:
+            - mountPath: /app/.cache/bakeware/
+              name: bakeware-cache
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
             runAsNonRoot: true
             runAsUser: 65534
+      volumes:
+        - name: bakeware-cache
+          emptyDir: {}
       serviceAccountName: spawn-operator
 
 ---

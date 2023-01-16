@@ -1,0 +1,59 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    k8s-app: spawn-operator
+  name: spawn-operator
+  namespace: eigr-functions
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: spawn-operator
+  template:
+    metadata:
+      labels:
+        k8s-app: spawn-operator
+    spec:
+      containers:
+        - env:
+            - name: MIX_ENV
+              value: prod
+            - name: BONNY_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: BONNY_POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: BONNY_POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: BONNY_POD_SERVICE_ACCOUNT
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.serviceAccountName
+          image: eigr/spawn-operator:0.5.0-rc.8
+          name: spawn-operator
+          resources:
+            limits:
+              cpu: 200m
+              memory: 200Mi
+            requests:
+              cpu: 200m
+              memory: 200Mi
+          volumeMounts:
+            - mountPath: /app/.cache/bakeware/
+              name: bakeware-cache
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 65534
+      volumes:
+        - name: bakeware-cache
+          emptyDir: {}
+      serviceAccountName: spawn-operator
