@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    spawn-eigr.io/controller.version: 0.5.0-rc.7
+    spawn-eigr.io/controller.version: 0.5.0-rc.8
   name: spawn-proxy-test-svc
   namespace: default
 spec:
