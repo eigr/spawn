@@ -30,6 +30,11 @@ defmodule Proxy.MixProject do
   defp deps do
     [
       {:spawn, path: "../../"},
+      {:spawn_statestores_mssql, path: "./spawn_statestores/statestores_mssql"},
+      {:spawn_statestores_mysql, path: "./spawn_statestores/statestores_mysql"},
+      {:spawn_statestores_postgres, path: "./spawn_statestores/statestores_postgres"},
+      {:spawn_statestores_sqlite, path: "./spawn_statestores/statestores_sqlite"},
+      {:spawn_statestores_cockroachdb, path: "./spawn_statestores/statestores_cockroachdb"},
       {:bakeware, "~> 0.2"},
       {:bandit, "~> 0.5"},
       {:observer_cli, "~> 1.7"}
