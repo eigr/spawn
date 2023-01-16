@@ -47,7 +47,7 @@ defmodule InternalVersions do
     IO.puts("- Starting release all with: #{replace?} #{dry_run?} for Versions:")
 
     apps_to_release = @versions
-    |> Enum.filter(& elem(&1, 0) |> Atom.to_string() |> String.starts_with?("spawn"))
+    |> Enum.filter(& elem(&1, 0) |> Atom.to_string() |> String.starts_with?(["spawn", "proxy"]))
 
     apps_to_release = if all? do
       apps_to_release
@@ -77,6 +77,9 @@ defmodule InternalVersions do
         String.starts_with?(name, "spawn_sdk") ->
           {"./spawn_sdk/#{name}", "../.."}
 
+        String.starts_with?(name, "proxy") ->
+          {"./spawn_proxy/#{name}", "../.."}
+
         true ->
           {"./", "."}
       end
@@ -89,13 +92,16 @@ defmodule InternalVersions do
       IO.puts("- Releasing #{inspect(app)}")
 
       mix_file = File.read!("#{dir}/mix.exs")
-      new_mix_exs = get_new_mix_exs(mix_file, version)
+      new_mix_exs = get_new_mix_exs(mix_file, version, name)
       File.write!("#{dir}/mix.exs", new_mix_exs)
 
-      System.shell(whole_command, into: IO.stream())
-
-      IO.puts("-- Waiting some time to publish #{inspect(app)}...")
-      Process.sleep(3_000)
+      if name === "proxy" do
+        IO.puts("-- Skipping publish of #{inspect(app)}...")
+      else
+        System.shell(whole_command, into: IO.stream())
+        IO.puts("-- Waiting some time to publish #{inspect(app)}...")
+        Process.sleep(3_000)
+      end
     end)
   end
 
@@ -104,7 +110,7 @@ defmodule InternalVersions do
     apps_to_publish = Enum.find(opts, "", & String.starts_with?(&1, "--apps")) |> String.replace("--apps=", "") |> String.split(",")
 
     apps_to_release = @versions
-    |> Enum.filter(& elem(&1, 0) |> Atom.to_string() |> String.starts_with?("spawn"))
+    |> Enum.filter(& elem(&1, 0) |> Atom.to_string() |> String.starts_with?(["spawn", "proxy"]))
 
     apps_to_release = if all? do
       apps_to_release
@@ -126,17 +132,20 @@ defmodule InternalVersions do
         String.starts_with?(name, "spawn_sdk") ->
           {"./spawn_sdk/#{name}", "../.."}
 
+        String.starts_with?(name, "proxy") ->
+          {"./spawn_proxy/#{name}", "../.."}
+
         true ->
           {"./", "."}
       end
 
       mix_file = File.read!("#{dir}/mix.exs")
-      new_mix_exs = get_new_mix_exs(mix_file, version)
+      new_mix_exs = get_new_mix_exs(mix_file, version, name)
       File.write!("#{dir}/mix.exs", new_mix_exs)
     end)
   end
 
-  defp get_new_mix_exs(mix_file, version) do
+  defp get_new_mix_exs(mix_file, version, name) do
     match_spawn_with_path = ~r(\{:spawn,\s*path:.*\})
     match_spawn_statestores_with_path = ~r(\{:spawn_statestores,\s*path:.*\})
     match_spawn_mysql_with_path = ~r(\{:spawn_statestores_mysql,\s*path:.*\})
@@ -148,11 +157,11 @@ defmodule InternalVersions do
     mix_file
     |> String.replace(match_spawn_with_path, dep_for("spawn"), global: false)
     |> String.replace(match_spawn_statestores_with_path, dep_for("spawn_statestores"), global: false)
-    |> String.replace(match_spawn_mysql_with_path, dep_for("spawn_statestores_mysql", true), global: false)
-    |> String.replace(match_spawn_mssql_with_path, dep_for("spawn_statestores_mssql", true), global: false)
-    |> String.replace(match_spawn_postgres_with_path, dep_for("spawn_statestores_postgres", true), global: false)
-    |> String.replace(match_spawn_cockroachdb_with_path, dep_for("spawn_statestores_cockroachdb", true), global: false)
-    |> String.replace(match_spawn_sqlite_with_path, dep_for("spawn_statestores_sqlite", true), global: false)
+    |> String.replace(match_spawn_mysql_with_path, dep_for("spawn_statestores_mysql", name !== "proxy"), global: false)
+    |> String.replace(match_spawn_mssql_with_path, dep_for("spawn_statestores_mssql", name !== "proxy"), global: false)
+    |> String.replace(match_spawn_postgres_with_path, dep_for("spawn_statestores_postgres", name !== "proxy"), global: false)
+    |> String.replace(match_spawn_cockroachdb_with_path, dep_for("spawn_statestores_cockroachdb", name !== "proxy"), global: false)
+    |> String.replace(match_spawn_sqlite_with_path, dep_for("spawn_statestores_sqlite", name !== "proxy"), global: false)
     |> String.replace("0.0.0-local.dev", version)
   end
 
