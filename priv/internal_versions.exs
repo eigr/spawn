@@ -167,7 +167,7 @@ defmodule InternalVersions do
     end)
   end
 
-  defp get_new_mix_exs(mix_file, version, optional? \\ true) do
+  defp get_new_mix_exs(mix_file, version, optional?) do
     match_spawn_with_path = ~r(\{:spawn,\s*path:.*\})
     match_spawn_statestores_with_path = ~r(\{:spawn_statestores,\s*path:.*\})
     match_spawn_mysql_with_path = ~r(\{:spawn_statestores_mysql,\s*path:.*\})
