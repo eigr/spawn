@@ -54,5 +54,6 @@ defmodule Sidecar.MetricsSupervisor do
     ]
   end
 
-  defp metrics_disabled?, do: !!System.get_env("SPAWN_DISABLE_METRICS", false)
+  # TODO: Add this env var to Config
+  defp metrics_disabled?, do: System.get_env("SPAWN_DISABLE_METRICS", "false") !== "false"
 end
