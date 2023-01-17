@@ -139,8 +139,8 @@ Our proxy connects directly and transparently to all cluster members without nee
    - [ ] Saga.
 - [X] SDKs
    - [x] Elixir. All features implemented.
+   - [x] Node/Typescript. All features implemented.
    - [x] Java. Partially implemented.
-   - [x] Node/Typescript. Partially implemented.
    - [ ] Go. Under development.
    - [ ] Rust. Under development.
    - [ ] .Net/C#. Under development.
@@ -177,6 +177,7 @@ First we must develop our HostFunction. Look for the documentation for [each SDK
 
 - [Using Elixir SDK](./spawn_sdk/spawn_sdk#installation)
 - [Using Java SDK](https://github.com/eigr/spawn-springboot-sdk/blob/main/README.md#installation)
+- [Using NodeJS SDK](https://github.com/eigr/spawn-node-sdk#installation)
 
 Having our container created and containing our Actor Host Function (following above SDK recommendations), we must deploy
 it in a Kubernetes cluster with the Spawn Controller installed (See more about this
