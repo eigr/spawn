@@ -1,8 +1,8 @@
 .vscode
 .idea
 .elixir_ls
-sdks/jvm/spawn-jvm/.idea
-sdks/jvm/spawn-jvm/target
+
+spawn-cli/target/
 
 # The directory Mix will write compiled artifacts to.
 /_build/
