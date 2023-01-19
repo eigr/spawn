@@ -3,8 +3,9 @@ apiVersion: spawn-eigr.io/v1
 kind: ActorHost
 metadata:
   name: spawn-springboot-example # Mandatory. Name of the Node containing Actor Host Functions
-  system: test-1 # mandatory. Name of the ActorSystem declared in ActorSystem CRD
   namespace: default # Optional. Default namespace is "default"
+  labels:
+    spawn-eigr.io.actor-system: spawn-system
 spec:
   # sidecar:
   #  image: docker.io/eigr/spawn-proxy:0.5.0
