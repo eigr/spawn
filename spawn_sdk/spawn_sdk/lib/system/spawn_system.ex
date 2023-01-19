@@ -143,6 +143,7 @@ defmodule SpawnSdk.System.SpawnSystem do
 
     actor_state = actor_state || %{}
     current_state = Map.get(actor_state, :state)
+    current_tags = Map.get(actor_state, :tags, %{})
     actor_instance = get_cached_actor(system, name, parent)
 
     cond do
@@ -150,13 +151,13 @@ defmodule SpawnSdk.System.SpawnSystem do
           not Enum.any?(default_actions, fn action ->
             Enum.any?(commands, fn c -> c.name == action end)
           end) ->
-        context =
-          Eigr.Functions.Protocol.Context.new(
-            caller: caller,
-            metadata: metadata,
-            self: self_actor_id,
-            state: current_state
-          )
+        context = %Eigr.Functions.Protocol.Context{
+          caller: caller,
+          metadata: metadata,
+          self: self_actor_id,
+          state: current_state,
+          tags: current_tags
+        }
 
         resp =
           ActorInvocationResponse.new(
@@ -176,14 +177,16 @@ defmodule SpawnSdk.System.SpawnSystem do
           caller: caller,
           metadata: metadata,
           self: self_actor_id,
-          state: unpack_unknown(current_state)
+          state: unpack_unknown(current_state),
+          tags: current_tags
         }
 
         case call_instance(actor_instance, command, payload, new_ctx) do
           {:reply,
            %SpawnSdk.Value{
              state: host_state,
-             value: response
+             value: response,
+             tags: tags
            } = decoded_value} ->
             pipe = handle_pipe(decoded_value)
             forward = handle_forward(decoded_value)
@@ -193,12 +196,12 @@ defmodule SpawnSdk.System.SpawnSystem do
             payload_response = parse_payload(response)
 
             resp = %ActorInvocationResponse{
-              updated_context:
-                Eigr.Functions.Protocol.Context.new(
-                  caller: caller,
-                  self: self_actor_id,
-                  state: any_pack!(host_state)
-                ),
+              updated_context: %Eigr.Functions.Protocol.Context{
+                caller: caller,
+                self: self_actor_id,
+                state: any_pack!(host_state),
+                tags: tags || current_tags
+              },
               payload: payload_response,
               workflow: %Workflow{
                 broadcast: broadcast,
@@ -207,7 +210,10 @@ defmodule SpawnSdk.System.SpawnSystem do
               }
             }
 
-            new_actor_state = %{actor_state | state: any_pack!(host_state)}
+            new_actor_state =
+              actor_state
+              |> Map.put(:state, any_pack!(host_state))
+              |> Map.put(:tags, tags || current_tags)
 
             {:ok, resp, %{entity_state | actor: %{actor | state: new_actor_state}}}
 
@@ -449,6 +455,7 @@ defmodule SpawnSdk.System.SpawnSystem do
 
       min_pool_size = actor.__meta__(:min_pool_size)
       max_pool_size = actor.__meta__(:max_pool_size)
+      tags = actor.__meta__(:tags)
 
       snapshot_strategy =
         ActorSnapshotStrategy.new(
@@ -475,7 +482,7 @@ defmodule SpawnSdk.System.SpawnSystem do
          commands: Enum.map(actions, fn action -> get_action(action) end),
          timer_commands:
            Enum.map(timer_actions, fn {action, seconds} -> get_timer_action(action, seconds) end),
-         state: ActorState.new()
+         state: ActorState.new(tags: tags)
        )}
     end)
   end

@@ -9,8 +9,7 @@ defmodule Actors.Actor.Interface.Http do
 
   alias Eigr.Functions.Protocol.Actors.{
     Actor,
-    ActorId,
-    ActorState
+    ActorId
   }
 
   alias Eigr.Functions.Protocol.{
@@ -38,11 +37,12 @@ defmodule Actors.Actor.Interface.Http do
            Enum.any?(commands, fn c -> c.name == action end)
          end) do
       current_state = Map.get(actor_state || %{}, :state)
+      current_tags = Map.get(actor_state || %{}, :tags, %{})
 
       context =
         if is_nil(current_state),
-          do: Context.new(caller: caller, self: actor_id, state: Any.new()),
-          else: Context.new(caller: caller, self: actor_id, state: current_state)
+          do: %Context{caller: caller, self: actor_id, state: Any.new(), tags: current_tags},
+          else: %Context{caller: caller, self: actor_id, state: current_state, tags: current_tags}
 
       resp =
         ActorInvocationResponse.new(
@@ -84,31 +84,21 @@ defmodule Actors.Actor.Interface.Http do
     end
   end
 
-  defp update_state(
-         %EntityState{
-           actor: %Actor{} = _actor
-         } = state,
-         %Context{state: updated_state} = _user_ctx
-       )
-       when is_nil(updated_state),
-       do: state
+  defp update_state(%EntityState{} = state, %Context{} = ctx) do
+    actor = state.actor
+    actor_state = actor.state
 
-  defp update_state(
-         %EntityState{
-           actor: %Actor{state: actor_state} = _actor
-         } = state,
-         %Context{state: _updated_state} = _user_ctx
-       )
-       when is_nil(actor_state),
-       do: state
+    cond do
+      is_nil(actor_state) ->
+        state
 
-  defp update_state(
-         %EntityState{
-           actor: %Actor{state: %ActorState{} = actor_state} = actor
-         } = state,
-         %Context{state: updated_state} = _user_ctx
-       ) do
-    new_state = %{actor_state | state: updated_state}
-    %{state | actor: %{actor | state: new_state}}
+      true ->
+        new_actor_state =
+          actor_state
+          |> Map.put(:state, ctx.state || actor_state.state)
+          |> Map.put(:tags, ctx.tags || actor_state.tags || %{})
+
+        %{state | actor: %{actor | state: new_actor_state}}
+    end
   end
 end

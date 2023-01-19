@@ -167,7 +167,8 @@ option go_package = "github.com/eigr/go-support/eigr/protocol;protocol";
 //
 // Params:
 //   * state: Actor state passed back and forth between proxy and user function. 
-//   * metadata: Meta information or headers
+//   * metadata: Meta information that comes in invocations
+//   * tags: Meta information stored in the actor
 //   * caller: ActorId of who is calling target actor
 //   * self: ActorId of itself
 message Context {
@@ -175,6 +176,8 @@ message Context {
     google.protobuf.Any state = 1;
 
     map<string, string> metadata = 4;
+
+    map<string, string> tags = 5;
 
     // Who is calling target actor
     eigr.functions.protocol.actors.ActorId caller = 2;
@@ -439,5 +442,3 @@ message RequestStatus {
 
     string message = 2;
 }
-
-  

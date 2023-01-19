@@ -85,6 +85,8 @@ defmodule SpawnSdk.Actor do
     state_type = Keyword.get(opts, :state_type, nil)
     stateful = Keyword.get(opts, :stateful, true)
 
+    tags = Keyword.get(opts, :tags, nil)
+
     if stateful and !Code.ensure_loaded?(Statestores.Supervisor) do
       raise """
       ArgumentError. You need to add :spawn_statestores to your dependency if you are going to use persistent actors.
@@ -143,6 +145,7 @@ defmodule SpawnSdk.Actor do
       def __meta__(:max_pool_size), do: unquote(max_pool_size)
       def __meta__(:snapshot_timeout), do: unquote(snapshot_timeout)
       def __meta__(:deactivate_timeout), do: unquote(deactivate_timeout)
+      def __meta__(:tags), do: Map.new(unquote(tags) || %{})
     end
   end
 end

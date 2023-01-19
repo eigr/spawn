@@ -149,12 +149,12 @@ defmodule Actors.FactoryTest do
     state =
       Actors.Protos.ChangeNameResponseTest.new(status: :OK, new_name: "new_name") |> any_pack!
 
-    context =
-      Eigr.Functions.Protocol.Context.new(
-        self: ActorId.new(name: attrs[:actor_name], system: attrs[:system_name]),
-        caller: attrs[:state] || nil,
-        state: attrs[:state] || state
-      )
+    context = %Eigr.Functions.Protocol.Context{
+      self: ActorId.new(name: attrs[:actor_name], system: attrs[:system_name]),
+      caller: attrs[:state] || nil,
+      state: attrs[:state] || state,
+      tags: attrs[:tags] || %{}
+    }
 
     ActorInvocationResponse.new(
       actor_name: attrs[:actor_name],

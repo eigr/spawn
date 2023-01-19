@@ -5,9 +5,16 @@ defmodule Actor.ActorTest do
     use SpawnSdk.Actor,
       kind: :abstract,
       stateful: false,
-      state_type: Eigr.Spawn.Actor.MyState
+      state_type: Eigr.Spawn.Actor.MyState,
+      tags: [{"foo", "none"}, {"bar", "unchanged"}]
 
     alias Eigr.Spawn.Actor.{MyMessageRequest, MyMessageResponse}
+
+    defact init(%Context{} = ctx) do
+      %Value{}
+      |> Value.tags(Map.put(ctx.tags, "foo", "initial"))
+      |> Value.void()
+    end
 
     defact sum(%MyMessageRequest{id: id, data: data}, %Context{} = ctx) do
       current_state = ctx.state
@@ -17,6 +24,15 @@ defmodule Actor.ActorTest do
       result = %Value{state: new_state, value: response}
 
       {:ok, result}
+    end
+
+    defact change_tags(%Context{} = ctx) do
+      %{"bar" => "unchanged"} = ctx.tags
+
+      %Value{}
+      |> Value.value(MyMessageResponse.new(data: ctx.tags["foo"]))
+      |> Value.tags(Map.put(ctx.tags, "foo", "changed"))
+      |> Value.void()
     end
 
     defact pipe_caller(%MyMessageRequest{data: data}, %Context{} = _ctx) do
@@ -213,6 +229,32 @@ defmodule Actor.ActorTest do
                )
 
       assert %{data: "worked_with_effects"} = response
+    end
+  end
+
+  describe "tags" do
+    test "simple call verifying that tags is changed", ctx do
+      system = ctx.system
+
+      dynamic_actor_name = Faker.Pokemon.name() <> "_tags"
+
+      assert {:ok, response} =
+               SpawnSdk.invoke(dynamic_actor_name,
+                 ref: Actor.MyActor,
+                 system: system,
+                 command: "change_tags"
+               )
+
+      assert %{data: "initial"} = response
+
+      assert {:ok, response} =
+               SpawnSdk.invoke(dynamic_actor_name,
+                 ref: Actor.MyActor,
+                 system: system,
+                 command: "change_tags"
+               )
+
+      assert %{data: "changed"} = response
     end
   end
 end
