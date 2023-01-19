@@ -253,6 +253,8 @@ defmodule Actors.Actor.Entity.Lifecycle do
     )
   end
 
+  defp maybe_get_default_deactivation_strategy({type, strategy}), do: {type, strategy}
+
   defp maybe_get_default_deactivation_strategy(deactivation_strategy) do
     Map.get(
       deactivation_strategy || %{},

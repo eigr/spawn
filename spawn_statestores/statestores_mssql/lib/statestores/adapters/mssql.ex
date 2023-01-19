@@ -12,7 +12,7 @@ defmodule Statestores.Adapters.MSSQL do
   def save(%Event{actor: actor} = event) do
     %Event{}
     |> Event.changeset(ValueObjectSchema.to_map(event))
-    |> insert!()
+    |> insert()
     |> case do
       {:ok, event} ->
         {:ok, event}

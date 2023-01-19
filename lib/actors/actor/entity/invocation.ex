@@ -166,19 +166,21 @@ defmodule Actors.Actor.Entity.Invocation do
           interface = get_interface(actor_system)
 
           metadata = %{}
+          current_state = Map.get(actor_state || %{}, :state)
+          current_tags = Map.get(actor_state || %{}, :tags, %{})
 
           request =
             ActorInvocation.new(
               actor: %ActorId{name: actor_name, system: actor_system, parent: parent},
               command_name: init_command.name,
-              payload: Noop.new(),
-              current_context:
-                Context.new(
-                  metadata: metadata,
-                  caller: id,
-                  self: ActorId.new(name: actor_name, system: actor_system),
-                  state: actor_state
-                ),
+              payload: {:noop, Noop.new()},
+              current_context: %Context{
+                metadata: metadata,
+                caller: id,
+                self: ActorId.new(name: actor_name, system: actor_system),
+                state: current_state,
+                tags: current_tags
+              },
               caller: id
             )
 
@@ -235,19 +237,20 @@ defmodule Actors.Actor.Entity.Invocation do
 
           metadata = if is_nil(metadata), do: %{}, else: metadata
           current_state = Map.get(actor_state || %{}, :state)
+          current_tags = Map.get(actor_state || %{}, :tags, %{})
 
           request =
             ActorInvocation.new(
               actor: id,
               command_name: command,
               payload: payload,
-              current_context:
-                Context.new(
-                  metadata: metadata,
-                  caller: caller,
-                  self: id,
-                  state: current_state
-                ),
+              current_context: %Context{
+                metadata: metadata,
+                caller: caller,
+                self: id,
+                state: current_state,
+                tags: current_tags
+              },
               caller: caller
             )
 

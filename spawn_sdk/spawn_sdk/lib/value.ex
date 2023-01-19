@@ -1,11 +1,18 @@
 defmodule SpawnSdk.Value do
   alias SpawnSdk.Flow.{Broadcast, Pipe, Forward, SideEffect}
 
-  defstruct state: nil, value: nil, broadcast: nil, pipe: nil, forward: nil, effects: nil
+  defstruct state: nil,
+            value: nil,
+            broadcast: nil,
+            pipe: nil,
+            forward: nil,
+            effects: nil,
+            tags: nil
 
   @type t :: %__MODULE__{
           state: module(),
           value: module(),
+          tags: map(),
           broadcast: Broadcast.t(),
           pipe: Pipe.t(),
           forward: Forward.t(),
@@ -25,6 +32,8 @@ defmodule SpawnSdk.Value do
   @type response :: module()
 
   @type new_state :: module()
+
+  @type tags :: map()
 
   @spec of() :: value()
   def of(), do: %SpawnSdk.Value{}
@@ -67,6 +76,11 @@ defmodule SpawnSdk.Value do
   @spec forward(value(), forward()) :: value()
   def forward(%SpawnSdk.Value{} = value, forward) do
     struct(value, forward: forward)
+  end
+
+  @spec tags(value(), tags()) :: value()
+  def tags(%SpawnSdk.Value{} = value, tags) do
+    struct(value, tags: tags)
   end
 
   @spec reply!(value()) :: {:reply, value()}

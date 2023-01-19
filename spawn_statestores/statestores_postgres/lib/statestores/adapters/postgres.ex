@@ -12,7 +12,7 @@ defmodule Statestores.Adapters.Postgres do
   def save(%Event{revision: revision, tags: tags, data_type: type, data: data} = event) do
     %Event{}
     |> Event.changeset(ValueObjectSchema.to_map(event))
-    |> insert_or_update!(
+    |> insert_or_update(
       on_conflict: [
         set: [
           revision: revision,
