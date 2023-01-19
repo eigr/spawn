@@ -37,7 +37,7 @@ defmodule Actors.Config.Vapor do
           {:node_host_interface, "NODE_IP", default: "0.0.0.0", required: false},
           {:proxy_cluster_strategy, "PROXY_CLUSTER_STRATEGY", default: "gossip", required: false},
           {:proxy_headless_service, "PROXY_HEADLESS_SERVICE",
-           default: "proxy-headless-svc", required: false},
+           default: "proxy-headless", required: false},
           {:proxy_cluster_poling_interval, "PROXY_CLUSTER_POLLING",
            default: 3_000, map: &String.to_integer/1, required: false},
           {:proxy_uds_enable, "PROXY_UDS_ENABLED", default: false, required: false},

@@ -10,9 +10,9 @@ defmodule SpawnOperator.K8s.Secret.ActorSystemSecret do
 
   defp gen_secret(
          %{
-           system: system,
+           system: _system,
            namespace: ns,
-           name: _name,
+           name: name,
            params: params,
            labels: _labels,
            annotations: _annotations
@@ -21,14 +21,14 @@ defmodule SpawnOperator.K8s.Secret.ActorSystemSecret do
     cluster_params = Map.get(params, "cluster", %{})
     statestore_params = Map.get(params, "statestore", %{})
 
-    distributed_options = get_dist_options(system, ns, cluster_params)
-    storage_options = get_storage_options(system, ns, statestore_params)
+    distributed_options = get_dist_options(name, ns, cluster_params)
+    storage_options = get_storage_options(name, ns, statestore_params)
 
     %{
       "apiVersion" => "v1",
       "kind" => "Secret",
       "metadata" => %{
-        "name" => "#{system}-secret",
+        "name" => "#{name}-secret",
         "namespace" => ns
       },
       "data" => Map.merge(distributed_options, storage_options)
@@ -76,7 +76,7 @@ defmodule SpawnOperator.K8s.Secret.ActorSystemSecret do
         cookie = Map.get(params, "cookie", default_cookie(ns)) |> Base.encode64()
         cluster_poolling = "3000" |> Base.encode64()
         cluster_strategy = "kubernetes-dns" |> Base.encode64()
-        cluster_service = "system-#{system}-svc" |> Base.encode64()
+        cluster_service = "system-#{system}" |> Base.encode64()
         cluster_heartbeat = "240000" |> Base.encode64()
 
         %{
@@ -88,7 +88,7 @@ defmodule SpawnOperator.K8s.Secret.ActorSystemSecret do
         }
 
       :quic ->
-        cluster_service = "system-#{system}-svc" |> Base.encode64()
+        cluster_service = "system-#{system}" |> Base.encode64()
         cluster_strategy = "quic_dist" |> Base.encode64()
 
         %{

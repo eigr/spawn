@@ -7,7 +7,7 @@ spec:
   secretName: spawn-system-tls-secret
   duration: 360h
   dnsNames:
-    - system-spawn-system-svc.svc.cluster.local
+    - system-spawn-system.svc.cluster.local
   subject:
     organizations:
       - eigr

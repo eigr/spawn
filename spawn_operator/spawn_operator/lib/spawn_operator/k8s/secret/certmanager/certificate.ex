@@ -44,7 +44,7 @@ defmodule SpawnOperator.K8s.Secret.CertManager.Certificate do
       organizations:
         - eigr
     dnsNames:
-      - system-spawn-system-svc.svc.cluster.local
+      - system-spawn-system.svc.cluster.local
     issuerRef:
       name: spawn-system-issuer
       kind: Issuer
@@ -85,7 +85,7 @@ defmodule SpawnOperator.K8s.Secret.CertManager.Certificate do
   end
 
   defp build_certificate(system, ns, certmanager, opts) do
-    dns_names = Keyword.get(opts, :dns_names, ["system-#{system}-svc.svc.cluster.local"])
+    dns_names = Keyword.get(opts, :dns_names, ["system-#{system}.svc.cluster.local"])
     duration = Map.get(certmanager, "duration", @default_duration)
     group = Map.get(certmanager, "group", @default_group)
     issuer_kind = Map.get(certmanager, "kind", @default_issuer_kind)

@@ -48,7 +48,7 @@ defmodule SpawnOperator.K8s.Service do
           "spawn-eigr.io/controller.version" =>
             "#{to_string(Application.spec(:spawn_operator, :vsn))}"
         },
-        "name" => "#{name}-svc",
+        "name" => "#{name}",
         "namespace" => ns
       },
       "spec" => %{
