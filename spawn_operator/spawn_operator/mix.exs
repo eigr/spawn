@@ -43,7 +43,7 @@ defmodule Operator.MixProject do
     [
       {:bandit, "~> 0.5"},
       {:bakeware, ">= 0.0.0", runtime: false},
-      {:bonny, "~> 1.0.0-rc.3"},
+      {:bonny, "~> 1.0.0"},
       {:spawn, path: "../../"}
     ]
   end

@@ -43,7 +43,7 @@ defmodule SpawnOperator.K8s.Secret.ActorSystemSecret do
 
     {:ok, secret} =
       K8s.Client.get("v1", :secret,
-        namespace: ns,
+        namespace: "eigr-functions",
         name: statestore_credentials_secret_ref
       )
       |> then(&K8s.Client.run(conn(), &1))

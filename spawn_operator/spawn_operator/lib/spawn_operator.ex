@@ -13,7 +13,7 @@ defmodule SpawnOperator do
     annotations = K8s.Resource.annotations(resource)
 
     name = K8s.Resource.name(resource)
-    ns = K8s.Resource.name(resource) || "default"
+    ns = K8s.Resource.namespace(resource) || "default"
 
     system =
       if K8s.Resource.has_label?(resource, @actorsystem_label),

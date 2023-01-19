@@ -1,0 +1,1 @@
+k3d cluster create eigr-spawn --agents 3

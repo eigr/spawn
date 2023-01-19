@@ -37,13 +37,14 @@ defmodule SpawnOperator.Handler.ActorSystemHandler do
   @impl Pluggable
   def call(%Bonny.Axn{action: action} = axn, nil) when action in [:add, :modify] do
     %Bonny.Axn{resource: resource} = axn
+    IO.inspect(resource, label: "Resource ---")
 
     system_configmap = build_system_configmap(resource)
-    system_cluster_serve = build_system_service(resource)
+    system_cluster_svc = build_system_service(resource)
 
     axn
     |> Bonny.Axn.register_descendant(system_configmap)
-    |> Bonny.Axn.register_descendant(system_cluster_serve)
+    |> Bonny.Axn.register_descendant(system_cluster_svc)
     |> Bonny.Axn.success_event()
   end
 
