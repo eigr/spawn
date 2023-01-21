@@ -28,4 +28,14 @@ defmodule Proxy.Application do
         raise RuntimeError, "Failed to start Proxy Application: #{inspect(result)}"
     end
   end
+
+  @impl true
+  def prep_stop(_args) do
+    Logger.info("Proxy Application stopping...")
+  end
+
+  @impl true
+  def stop(_args) do
+    Logger.info("Proxy Application stopped")
+  end
 end
