@@ -183,7 +183,7 @@ Having our container created and containing our Actor Host Function (following a
 it in a Kubernetes cluster with the Spawn Controller installed (See more about this
 process in the section on installation).
 
-In this tutorial we are going to use a MySql database. In this case, in order for Spawn to know how to connect to the database instance, it is first necessary to create a kubernetes secret with the connection data and other parameters. Example:
+In this tutorial we are going to use a MySql database. In this case, in order for Spawn to know how to connect to the database instance, it is first necessary to create a kubernetes secret in same namespace you installed the Spawn Operator with the connection data and other parameters. Example:
 
 ```shell
 kubectl create secret generic mysql-connection-secret \
@@ -226,8 +226,10 @@ apiVersion: spawn-eigr.io/v1
 kind: ActorHost
 metadata:
   name: spawn-springboot-example # Mandatory. Name of the Node containing Actor Host Functions
-  system: spawn-system # mandatory. Name of the ActorSystem declared in ActorSystem CRD
   namespace: default # Optional. Default namespace is "default"
+  annotations:
+    # Mandatory. Name of the ActorSystem declared in ActorSystem CRD
+    spawn-eigr.io/actor-system: spawn-system
 spec:
   host:
     image: eigr/spawn-springboot-examples:latest # Mandatory
@@ -245,12 +247,12 @@ apiVersion: spawn-eigr.io/v1
 kind: ActorHost
 metadata:
   name: spawn-dice-game
-  system: spawn-system
   namespace: default
+    spawn-eigr.io/actor-system: spawn-system
 spec:
   host:
     embedded: true # This indicates that it is a native BEAM application and therefore does not need a sidecar proxy attached.
-    image: eigr/dice-game-example:0.1.1
+    image: eigr/dice-game-example:0.5.4
     ports:
       - name: "http"
         containerPort: 8800
