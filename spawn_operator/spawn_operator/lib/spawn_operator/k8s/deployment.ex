@@ -92,8 +92,8 @@ defmodule SpawnOperator.K8s.Deployment do
         "strategy" => %{
           "type" => "RollingUpdate",
           "rollingUpdate" => %{
-            "maxSurge" => 1,
-            "maxUnavailable" => 1
+            "maxSurge" => "50%",
+            "maxUnavailable" => "50%"
           }
         },
         "template" => %{
