@@ -2,7 +2,7 @@
 apiVersion: spawn-eigr.io/v1
 kind: ActorSystem
 metadata:
-  name: test-1 # Mandatory. Name of the state store
+  name: spawn-system # Mandatory. Name of the state store
   namespace: default # Optional. Default namespace is "default"
 spec:
   cluster: # Optional

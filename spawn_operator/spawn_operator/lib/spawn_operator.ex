@@ -10,15 +10,12 @@ defmodule SpawnOperator do
   def get_args(resource) do
     _metadata = K8s.Resource.metadata(resource)
     labels = K8s.Resource.labels(resource)
-    annotations = K8s.Resource.annotations(resource)
+    resource_annotations = K8s.Resource.annotations(resource)
+    annotations = get_annotations_or_defaults(resource_annotations)
 
-    name = K8s.Resource.name(resource)
     ns = K8s.Resource.namespace(resource) || "default"
-
-    system =
-      if K8s.Resource.has_label?(resource, @actorsystem_label),
-        do: K8s.Resource.label(resource, @actorsystem_label),
-        else: @actorsystem_default_name
+    name = K8s.Resource.name(resource)
+    system = annotations.actor_system
 
     spec = Map.get(resource, "spec")
 
@@ -29,6 +26,44 @@ defmodule SpawnOperator do
       params: spec,
       labels: labels,
       annotations: annotations
+    }
+  end
+
+  def get_annotations_or_defaults(annotations) do
+    %{
+      actor_system: Map.get(annotations, "spawn-eigr.io/actor-system", @actorsystem_default_name),
+      user_function_host: Map.get(annotations, "spawn-eigr.io/app-host", "0.0.0.0"),
+      user_function_port: Map.get(annotations, "spawn-eigr.io/app-port", "8090"),
+      cluster_poling_interval:
+        Map.get(annotations, "spawn-eigr.io/cluster-poling-interval", "3000"),
+      proxy_mode: Map.get(annotations, "spawn-eigr.io/sidecar-mode", "sidecar"),
+      proxy_http_port: Map.get(annotations, "spawn-eigr.io/sidecar-http-port", "9001"),
+      proxy_image_tag:
+        Map.get(
+          annotations,
+          "spawn-eigr.io/sidecar-image-tag",
+          "docker.io/eigr/spawn-proxy:0.5.0"
+        ),
+      proxy_uds_enabled: Map.get(annotations, "spawn-eigr.io/sidecar-uds-enabled", "false"),
+      proxy_uds_address:
+        Map.get(annotations, "spawn-eigr.io/sidecar-uds-socket-path", "/var/run/spawn.sock"),
+      metrics_port: Map.get(annotations, "spawn-eigr.io/sidecar-metrics-port", "9090"),
+      metrics_disabled: Map.get(annotations, "spawn-eigr.io/sidecar-metrics-disabled", "false"),
+      metrics_log_console:
+        Map.get(annotations, "spawn-eigr.io/sidecar-metrics-log-console", "true"),
+      pubsub_adapter: Map.get(annotations, "spawn-eigr.io/sidecar-pubsub-adapter", "native"),
+      pubsub_nats_hosts:
+        Map.get(annotations, "spawn-eigr.io/sidecar-pubsub-nats-hosts", "nats://127.0.0.1:4222"),
+      pubsub_nats_tls: Map.get(annotations, "spawn-eigr.io/sidecar-pubsub-nats-tls", "false"),
+      pubsub_nats_auth_type:
+        Map.get(annotations, "spawn-eigr.io/sidecar-pubsub-nats-auth-type", "simple"),
+      pubsub_nats_auth: Map.get(annotations, "spawn-eigr.io/sidecar-pubsub-nats-auth", "false"),
+      pubsub_nats_auth_jwt:
+        Map.get(annotations, "spawn-eigr.io/sidecar-pubsub-nats-auth-jwt", ""),
+      pubsub_nats_auth_user:
+        Map.get(annotations, "spawn-eigr.io/sidecar-pubsub-nats-auth-user", "admin"),
+      pubsub_nats_auth_pass:
+        Map.get(annotations, "spawn-eigr.io/sidecar-pubsub-nats-auth-pass", "admin")
     }
   end
 end

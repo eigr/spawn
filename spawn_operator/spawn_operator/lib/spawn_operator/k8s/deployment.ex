@@ -92,8 +92,8 @@ defmodule SpawnOperator.K8s.Deployment do
         "strategy" => %{
           "type" => "RollingUpdate",
           "rollingUpdate" => %{
-            "maxSurge" => 1,
-            "maxUnavailable" => 1
+            "maxSurge" => "50%",
+            "maxUnavailable" => "50%"
           }
         },
         "template" => %{
@@ -180,6 +180,7 @@ defmodule SpawnOperator.K8s.Deployment do
     actor_host_function_resources =
       Map.get(host_params, "resources", @default_actor_host_function_resources)
 
+    # TODO set ports from configuration
     [
       %{
         "name" => "spawn-sidecar",
@@ -193,14 +194,25 @@ defmodule SpawnOperator.K8s.Deployment do
         "livenessProbe" => %{
           "failureThreshold" => 10,
           "httpGet" => %{
-            "path" => "/health",
+            "path" => "/health/liveness",
             "port" => 9001,
             "scheme" => "HTTP"
           },
-          "initialDelaySeconds" => 300,
-          "periodSeconds" => 3600,
+          "initialDelaySeconds" => 5,
+          "periodSeconds" => 60,
           "successThreshold" => 1,
-          "timeoutSeconds" => 1200
+          "timeoutSeconds" => 30
+        },
+        "readinessProbe" => %{
+          "httpGet" => %{
+            "path" => "/health/readiness",
+            "port" => 9001,
+            "scheme" => "HTTP"
+          },
+          "initialDelaySeconds" => 5,
+          "periodSeconds" => 5,
+          "successThreshold" => 1,
+          "timeoutSeconds" => 5
         },
         "resources" => actor_host_function_resources,
         "envFrom" => [
@@ -234,6 +246,6 @@ defmodule SpawnOperator.K8s.Deployment do
       Application.get_env(
         :spawn_operator,
         :proxy_image,
-        "docker.io/eigr/spawn-proxy:0.5.0-rc.12"
+        "docker.io/eigr/spawn-proxy:0.5.0-rc.13"
       )
 end
