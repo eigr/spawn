@@ -21,11 +21,11 @@ defmodule Proxy.Application do
       end)
 
     with {:ok, pid} <- reply do
-      Logger.info("Proxy started successfully in #{humanized_duration}")
+      Logger.info("Proxy Application started successfully in #{humanized_duration}")
       {:ok, pid}
     else
       result ->
-        raise RuntimeError, "Failed to start proxy. #{inspect(result)}"
+        raise RuntimeError, "Failed to start Proxy Application: #{inspect(result)}"
     end
   end
 end

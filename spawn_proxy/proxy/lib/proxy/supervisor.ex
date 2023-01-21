@@ -2,7 +2,7 @@ defmodule Proxy.Supervisor do
   use Supervisor
 
   def start_link(config) do
-    Supervisor.start_link(__MODULE__, config, name: __MODULE__)
+    Supervisor.start_link(__MODULE__, config, name: __MODULE__, shutdown: 120_000)
   end
 
   def child_spec(config) do

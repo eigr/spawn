@@ -8,18 +8,24 @@ defmodule Sidecar.MetricsSupervisor do
   end
 
   def init(config) do
-    children =
-      if metrics_disabled? do
-        []
-      else
-        [
-          {:telemetry_poller, measurements: periodic_measurements(config)},
-          {TelemetryMetricsPrometheus.Core, name: :spawm_metrics, metrics: metrics()},
-          {Telemetry.Metrics.ConsoleReporter, metrics: metrics()}
-        ]
-      end
+    children = if metrics_disabled?, do: [], else: get_metrics_supervisor_tree(config)
 
     Supervisor.init(children, strategy: :one_for_one)
+  end
+
+  defp get_metrics_supervisor_tree(config) do
+    if console_metrics_disabled? do
+      [
+        {:telemetry_poller, measurements: periodic_measurements(config)},
+        {TelemetryMetricsPrometheus.Core, name: :spawm_metrics, metrics: metrics()}
+      ]
+    else
+      [
+        {:telemetry_poller, measurements: periodic_measurements(config)},
+        {TelemetryMetricsPrometheus.Core, name: :spawm_metrics, metrics: metrics()},
+        {Telemetry.Metrics.ConsoleReporter, metrics: metrics()}
+      ]
+    end
   end
 
   defp metrics do
@@ -54,6 +60,8 @@ defmodule Sidecar.MetricsSupervisor do
     ]
   end
 
-  # TODO: Add this env var to Config
   defp metrics_disabled?, do: System.get_env("SPAWN_DISABLE_METRICS", "false") !== "false"
+
+  defp console_metrics_disabled?,
+    do: System.get_env("SPAWN_CONSOLE_DISABLE_METRICS", "true") == "true"
 end
