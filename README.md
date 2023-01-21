@@ -192,16 +192,10 @@ kubectl create secret generic mysql-connection-secret \
   --from-literal=port='3306' \
   --from-literal=username='admin' \
   --from-literal=password='admin' \
-  --from-literal=encryptionKey='3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE='
+  --from-literal=encryptionKey=$(openssl rand -base64 32)
 ```
 
 Sapwn securely encrypts the Actors' State, so the ***encryptionKey*** item must be informed and must be a key of reasonable size and complexity to ensure the security of your data.
-
-A good way to generate this key is using the openssl library present on most Linux systems:
-
-```shell
-openssl rand -base64 32
-```
 
 > **_NOTE:_** To learn more about Statestores settings, see the [statestore section](#statestores).
 

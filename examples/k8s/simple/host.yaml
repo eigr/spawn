@@ -2,15 +2,15 @@
 apiVersion: spawn-eigr.io/v1
 kind: ActorHost
 metadata:
-  name: spawn-springboot-example-2 # Mandatory. Name of the Node containing Actor Host Functions
+  name: spawn-springboot-example-1 # Mandatory. Name of the Node containing Actor Host Functions
   namespace: default # Optional. Default namespace is "default"
   labels:
-    spawn-eigr.io.actor-system: test-2
+    spawn-eigr.io.actor-system: test-1
 spec:
   # sidecar:
   #  image: docker.io/eigr/spawn-proxy:0.5.0
   host:
-    image: eigr/spawn-springboot-examples:latest # Mandatory
+    image: eigr/spawn-springboot-examples:0.5.0 # Mandatory
     ports:
       - name: http
         containerPort: 8090
