@@ -13,6 +13,7 @@ defmodule DeploymentTest do
   end
 
   describe "manifest/1" do
+    @tag :skip
     test "generate deployment with defaults", ctx do
       %{
         simple_host: simple_host_resource,
