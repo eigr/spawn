@@ -2,10 +2,53 @@
 apiVersion: spawn-eigr.io/v1
 kind: ActorHost
 metadata:
-  name: spawn-springboot-example-1 # Mandatory. Name of the Node containing Actor Host Functions
+  name: spawn-springboot-example # Mandatory. Name of the Node containing Actor Host Functions
   namespace: default # Optional. Default namespace is "default"
-  labels:
-    spawn-eigr.io.actor-system: test-1
+  annotations:
+    # Mandatory. Name of the ActorSystem declared in ActorSystem CRD
+    spawn-eigr.io/actor-system: spawn-system
+
+    # Optional. User Function Host Address
+    spawn-eigr.io/app-host: "0.0.0.0"
+
+    # Optional. User Function Host Port
+    spawn-eigr.io/app-port:
+      "8090"
+
+      # Optional
+    spawn-eigr.io/cluster-poling-interval: "3000"
+
+    # Optional. Default "sidecar". Possible values are "sidecar" | "daemon"
+    spawn-eigr.io/sidecar-mode: "sidecar"
+
+    # Optional
+    spawn-eigr.io/sidecar-image-tag: "docker.io/eigr/spawn-proxy:0.5.0-rc.13"
+
+    # Optional. Default 9001
+    spawn-eigr.io/sidecar-http-port: "9001"
+
+    # Optional. Default false
+    spawn-eigr.io/sidecar-uds-enabled: "false"
+
+    # Optional. Default "/var/run/spawn.sock"
+    spawn-eigr.io/sidecar-uds-socket-path: "/var/run/sidecar.sock"
+
+    # Optional. Default false
+    spawn-eigr.io/sidecar-metrics-disabled: "false"
+
+    # Optional. Default "9090"
+    spawn-eigr.io/sidecar-metrics-port: "9090"
+
+    # Optional. Default false
+    spawn-eigr.io/sidecar-metrics-log-console: "false"
+
+    # Optional. Default "native".
+    # Using Phoenix PubSub Adapter.
+    # Possible values: "native" | "nats"
+    spawn-eigr.io/sidecar-pubsub-adapter: "native"
+
+    # Optional. Default "nats://127.0.0.1:4222"
+    spawn-eigr.io/sidecar-pubsub-nats-hosts: "nats://127.0.0.1:4222"
 spec:
   # sidecar:
   #  image: docker.io/eigr/spawn-proxy:0.5.0

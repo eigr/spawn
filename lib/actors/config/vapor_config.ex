@@ -32,7 +32,7 @@ defmodule Actors.Config.Vapor do
         bindings: [
           {:app_name, "PROXY_APP_NAME", default: Config.Name.generate(), required: false},
           {:http_port, "PROXY_HTTP_PORT",
-           default: 4000, map: &String.to_integer/1, required: false},
+           default: 9001, map: &String.to_integer/1, required: false},
           {:deployment_mode, "PROXY_DEPLOYMENT_MODE", default: "sidecar", required: false},
           {:node_host_interface, "NODE_IP", default: "0.0.0.0", required: false},
           {:proxy_cluster_strategy, "PROXY_CLUSTER_STRATEGY", default: "gossip", required: false},
@@ -44,6 +44,8 @@ defmodule Actors.Config.Vapor do
           {:proxy_sock_addr, "PROXY_UDS_ADDRESS",
            default: "/var/run/spawn.sock", required: false},
           {:proxy_host_interface, "POD_IP", default: "0.0.0.0", required: false},
+          {:proxy_disable_metrics, "SPAWN_DISABLE_METRICS", default: "false", required: false},
+          {:proxy_console_metrics, "SPAWN_CONSOLE_METRICS", default: "false", required: false},
           {:user_function_host, "USER_FUNCTION_HOST", default: "0.0.0.0", required: false},
           {:user_function_port, "USER_FUNCTION_PORT",
            default: 8090, map: &String.to_integer/1, required: false},

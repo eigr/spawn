@@ -7,8 +7,69 @@ defmodule SpawnOperator.Handler.ActorHostHandler do
       kind: ActorHost
       metadata:
         name: my-node-app # Mandatory. Name of the Node containing Actor Host Functions
-        system: my-actor-system # mandatory. Name of the ActorSystem declared in ActorSystem CRD
         namespace: default # Optional. Default namespace is "default"
+        labels:
+          # Mandatory. Name of the ActorSystem declared in ActorSystem CRD
+          spawn-eigr.io.actor-system: my-actor-system
+
+          # Optional
+          spawn-eigr.io.cluser.polingInterval: 3000
+
+          # Optional. Default "sidecar". Possible values are "sidecar" | "daemon"
+          spawn-eigr.io.sidecar.deploymentMode: "sidecar"
+
+          # Optional
+          spawn-eigr.io.sidecar.containerImage: "docker.io/eigr/spawn-proxy"
+
+          # Optional
+          spawn-eigr.io.sidecar.containerVersion: "0.5.0"
+
+          # Optional. Default 9001
+          spawn-eigr.io.sidecar.httpPort: 9001
+
+          # Optional. Default false
+          spawn-eigr.io.sidecar.udsEnable: false
+
+          # Optional. Default "/var/run/spawn.sock"
+          spawn-eigr.io.sidecar.udsAddress: "/var/run/sidecar.sock"
+
+          # Optional. Default false
+          spawn-eigr.io.sidecar.disableMetrics: false
+
+          # Optional. Default true
+          spawn-eigr.io.sidecar.consoleDisableMetrics: true
+
+          # Optional
+          spawn-eigr.io.sidecar.userFunctionHost: "0.0.0.0"
+
+          # Optional
+          spawn-eigr.io.sidecar.userFunctionPort: 8090
+
+          # Optional. Default "native".
+          # Using Phoenix PubSub Adapter.
+          # Possible values: "native" | "nats"
+          spawn-eigr.io.sidecar.pubsub.adapter: "native"
+
+          # Optional. Default "nats://127.0.0.1:4222"
+          spawn-eigr.io.sidecar.pubsub.nats.hosts: "nats://127.0.0.1:4222"
+
+          # Optional. Default false
+          spawn-eigr.io.sidecar.pubsub.nats.tls: "false"
+
+          # Optional. Default false
+          spawn-eigr.io.sidecar.pubsub.nats.auth: false
+
+          # Optioal. Default "simple"
+          spawn-eigr.io.sidecar.pubsub.nats.authType: "simple"
+
+          # Optional. Default "admin"
+          spawn-eigr.io.sidecar.pubsub.nats.authUser: "admin"
+
+          # Optional. Default "admin"
+          spawn-eigr.io.sidecar.pubsub.nats.authPass: "admin"
+
+          # Optional. Default ""
+          spawn-eigr.io.sidecar.pubsub.nats.authJwt: ""
       spec:
         autoscaler: # Optional
           min: 1
@@ -26,9 +87,6 @@ defmodule SpawnOperator.Handler.ActorHostHandler do
           ports:
           - containerPort: 80
 
-        sidecar: # Optional. If embedded true then this section will be ignored
-          image: docker.io/eigr/spawn-proxy:0.5.0
-
   """
 
   alias SpawnOperator.K8s.ConfigMap.SidecarCM
@@ -42,7 +100,6 @@ defmodule SpawnOperator.Handler.ActorHostHandler do
   @impl Pluggable
   def call(%Bonny.Axn{action: action} = axn, nil) when action in [:add, :modify] do
     %Bonny.Axn{resource: resource} = axn
-    IO.inspect(resource, label: "Resource ---")
     host_resource = build_host_deploy(resource)
 
     host_config_map = build_host_configmap(resource)
