@@ -22,7 +22,6 @@ defmodule Controller.ActorHostControllerTest do
       axn
       |> ActorHostController.call(nil)
       |> descendants()
-      |> IO.inspect(label: "Descending resources")
 
     assert length(descendants) > 0
   end
