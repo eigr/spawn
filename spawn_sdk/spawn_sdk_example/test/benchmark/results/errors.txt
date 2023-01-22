@@ -1,0 +1,38 @@
+2023-01-22 11:54:08.023 [nonode@nohost]:[pid=<0.21056.1> ]:[notice]:Activating Actor pooled_actor-6 with Parent pooled_actor-6 in Node :nonode@nohost. Persistence false.
+2023-01-22 11:54:08.023 [nonode@nohost]:[pid=<0.21054.1> ]:[debug]:Actor pooled_actor-3 reactivated. ActorRef PID: #PID<0.21058.1>
+2023-01-22 11:54:08.023 [nonode@nohost]:[pid=<0.21060.1> ]:[notice]:Activating Actor pooled_actor-10 with Parent pooled_actor-10 in Node :nonode@nohost. Persistence false.
+2023-01-22 11:54:08.023 [nonode@nohost]:[pid=<0.21047.1> ]:[debug]:Actor pooled_actor-6 reactivated. ActorRef PID: #PID<0.21056.1>
+2023-01-22 11:54:08.023 [nonode@nohost]:[pid=<0.21061.1> ]:[notice]:Activating Actor pooled_actor-9 with Parent pooled_actor-9 in Node :nonode@nohost. Persistence false.
+2023-01-22 11:54:08.024 [nonode@nohost]:[pid=<0.21048.1> ]:[debug]:Actor pooled_actor-10 reactivated. ActorRef PID: #PID<0.21060.1>
+2023-01-22 11:54:08.024 [nonode@nohost]:[pid=<0.21046.1> ]:[debug]:Actor pooled_actor-9 reactivated. ActorRef PID: #PID<0.21061.1>
+2023-01-22 11:54:08.024 [nonode@nohost]:[pid=<0.21062.1> ]:[notice]:Activating Actor pooled_actor-6 with Parent pooled_actor-6 in Node :nonode@nohost. Persistence false.
+2023-01-22 11:54:08.024 [nonode@nohost]:[pid=<0.21058.1> ]:[warning]:A conflict has been detected for ActorId %Eigr.Functions.Protocol.Actors.ActorId{name: "pooled_actor-3", system: "spawn-system", parent: "pooled_actor-3", __unknown_fields__: []}. Possible Actor Rebalance or NetSplit!
+      Trace Data: [
+        from: #PID<0.1169.0>,
+        key: {Actors.Actor.Entity, "pooled_actor-3"},
+        value: nil,
+        registry: Spawn.Cluster.Node.Registry,
+        pid: #PID<0.21057.1>
+      ] 
+2023-01-22 11:54:08.024 [nonode@nohost]:[pid=<0.21059.1> ]:[debug]:Actor pooled_actor-6 reactivated. ActorRef PID: #PID<0.21062.1>
+2023-01-22 11:54:08.024 [nonode@nohost]:[pid=<0.21058.1> ]:[debug]:Terminating actor pooled_actor-3 with reason :shutdown
+2023-01-22 11:54:08.024 [nonode@nohost]:[pid=<0.21063.1> ]:[notice]:Activating Actor pooled_actor-5 with Parent pooled_actor-5 in Node :nonode@nohost. Persistence false.
+2023-01-22 11:54:08.024 [nonode@nohost]:[pid=<0.21055.1> ]:[debug]:Actor pooled_actor-5 reactivated. ActorRef PID: #PID<0.21063.1>
+2023-01-22 11:54:08.024 [nonode@nohost]:[pid=<0.21053.1> ]:[info]:Received Request. Context: %SpawnSdk.Context{state: nil, caller: nil, self: %Eigr.Functions.Protocol.Actors.ActorId{name: "pooled_actor-4", system: "spawn-system", parent: "pooled_actor-4", __unknown_fields__: []}, metadata: %{}, tags: %{}}
+2023-01-22 11:54:08.024 [nonode@nohost]:[pid=<0.21062.1> ]:[info]:Received Request. Context: %SpawnSdk.Context{state: nil, caller: nil, self: %Eigr.Functions.Protocol.Actors.ActorId{name: "pooled_actor-6", system: "spawn-system", parent: "pooled_actor-6", __unknown_fields__: []}, metadata: %{}, tags: %{}}
+2023-01-22 11:54:08.024 [nonode@nohost]:[pid=<0.21061.1> ]:[info]:Received Request. Context: %SpawnSdk.Context{state: nil, caller: nil, self: %Eigr.Functions.Protocol.Actors.ActorId{name: "pooled_actor-9", system: "spawn-system", parent: "pooled_actor-9", __unknown_fields__: []}, metadata: %{}, tags: %{}}
+2023-01-22 11:54:08.024 [nonode@nohost]:[pid=<0.21057.1> ]:[warning]:A conflict has been detected for ActorId %Eigr.Functions.Protocol.Actors.ActorId{name: "pooled_actor-3", system: "spawn-system", parent: "pooled_actor-3", __unknown_fields__: []}. Possible Actor Rebalance or NetSplit!
+      Trace Data: [
+        from: #PID<0.1169.0>,
+        key: {Actors.Actor.Entity, "pooled_actor-3"},
+        value: nil,
+        registry: Spawn.Cluster.Node.Registry,
+        pid: #PID<0.21058.1>
+      ] 
+2023-01-22 11:54:08.024 [nonode@nohost]:[pid=<0.21060.1> ]:[info]:Received Request. Context: %SpawnSdk.Context{state: nil, caller: nil, self: %Eigr.Functions.Protocol.Actors.ActorId{name: "pooled_actor-10", system: "spawn-system", parent: "pooled_actor-10", __unknown_fields__: []}, metadata: %{}, tags: %{}}
+2023-01-22 11:54:08.024 [nonode@nohost]:[pid=<0.21057.1> ]:[debug]:Terminating actor pooled_actor-3 with reason :shutdown
+2023-01-22 11:54:08.024 [nonode@nohost]:[pid=<0.21045.1> ]:[info]:Received Request. Context: %SpawnSdk.Context{state: nil, caller: nil, self: %Eigr.Functions.Protocol.Actors.ActorId{name: "pooled_actor-2", system: "spawn-system", parent: "pooled_actor-2", __unknown_fields__: []}, metadata: %{}, tags: %{}}
+2023-01-22 11:54:08.024 [nonode@nohost]:[pid=<0.21051.1> ]:[info]:Received Request. Context: %SpawnSdk.Context{state: nil, caller: nil, self: %Eigr.Functions.Protocol.Actors.ActorId{name: "pooled_actor-7", system: "spawn-system", parent: "pooled_actor-7", __unknown_fields__: []}, metadata: %{}, tags: %{}}
+2023-01-22 11:54:08.024 [nonode@nohost]:[pid=<0.21056.1> ]:[info]:Received Request. Context: %SpawnSdk.Context{state: nil, caller: nil, self: %Eigr.Functions.Protocol.Actors.ActorId{name: "pooled_actor-6", system: "spawn-system", parent: "pooled_actor-6", __unknown_fields__: []}, metadata: %{}, tags: %{}}
+** (EXIT from #PID<0.96.0>) exited in: GenServer.call(#PID<0.21058.1>, {:invocation_request, %Eigr.Functions.Protocol.InvocationRequest{system: %Eigr.Functions.Protocol.Actors.ActorSystem{name: "spawn-system", registry: nil, __unknown_fields__: []}, actor: %Eigr.Functions.Protocol.Actors.Actor{id: %Eigr.Functions.Protocol.Actors.ActorId{name: "pooled_actor", system: "spawn-system", parent: "pooled_actor-3", __unknown_fields__: []}, state: nil, settings: nil, commands: [], timer_commands: [], metadata: nil, __unknown_fields__: []}, command_name: "ping", async: false, caller: nil, metadata: %{}, scheduled_to: nil, pooled: true, payload: {:noop, %Eigr.Functions.Protocol.Noop{__unknown_fields__: []}}, __unknown_fields__: []}, [span_ctx: %{}]}, 30000)
+
