@@ -10,7 +10,6 @@ defmodule Actors do
   require OpenTelemetry.Tracer, as: Tracer
 
   alias Actors.Actor.Entity, as: ActorEntity
-  alias Actors.Actor.Entity.EntityState
   alias Actors.Actor.Entity.Supervisor, as: ActorEntitySupervisor
   alias Actors.Actor.InvocationScheduler
 
@@ -171,7 +170,7 @@ defmodule Actors do
            caller: caller,
            pooled: pooled?
          } = request,
-         opts \\ []
+         opts
        ) do
     {time, result} =
       :timer.tc(fn ->
