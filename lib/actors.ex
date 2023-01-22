@@ -91,6 +91,7 @@ defmodule Actors do
     |> tap(fn _sts -> warmup_actors(actor_system, actors, opts) end)
     |> case do
       :ok ->
+        Process.sleep(100)
         status = RequestStatus.new(status: :OK, message: "Accepted")
         {:ok, RegistrationResponse.new(proxy_info: get_proxy_info(), status: status)}
 
