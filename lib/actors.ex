@@ -337,24 +337,10 @@ defmodule Actors do
       Tracer.set_attributes([{:actor_fqdn, actor_fqdn}])
 
       case Spawn.Cluster.Node.Registry.lookup(Actors.Actor.Entity, parent) do
-        [{actor_ref, _}] ->
+        [{actor_ref, actor_ref_id}] ->
           Tracer.add_event("actor-status", [{"alive", true}])
           Tracer.set_attributes([{"actor-pid", "#{inspect(actor_ref)}"}])
           Logger.debug("Lookup Actor #{actor_name}. PID: #{inspect(actor_ref)}")
-
-          actor_ref_id =
-            try do
-              %EntityState{actor: %Actor{id: %ActorId{} = actor_ref_id}} =
-                :sys.get_state(actor_ref, 1000)
-                |> EntityState.unpack()
-
-              actor_ref_id
-            catch
-              e ->
-                Logger.warning(
-                  "Failure during get_state to actor #{actor_name}. Error #{inspect(e)}"
-                )
-            end
 
           if pooled,
             # Ensures that the name change will not affect the host function call

@@ -29,6 +29,13 @@ defmodule Spawn.Cluster.Node.Registry do
   end
 
   @doc """
+  Update value meta inside registry
+  """
+  def update_entry_value(mod, actor_name, pid, value) do
+    GenServer.call(__MODULE__, {:update_value, {mod, actor_name}, pid, value})
+  end
+
+  @doc """
   Check if Process is alive.
   """
   def isAlive(mod, actor_name) do
