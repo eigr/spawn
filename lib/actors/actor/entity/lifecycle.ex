@@ -15,8 +15,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
     ActorState,
     ActorSnapshotStrategy,
     Metadata,
-    TimeoutStrategy,
-    Kind
+    TimeoutStrategy
   }
 
   alias Phoenix.PubSub
@@ -44,7 +43,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
                 snapshot_strategy: snapshot_strategy,
                 deactivation_strategy: deactivation_strategy,
                 kind: kind
-              } = settings,
+              } = _settings,
             timer_commands: timer_commands
           }
         } = state
