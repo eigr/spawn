@@ -63,6 +63,23 @@ defmodule Actor.ActorTest do
     end
   end
 
+  defmodule Actor.PooledActor do
+    use SpawnSdk.Actor,
+      name: "pooledActor",
+      kind: :pooled,
+      stateful: false,
+      min_pool_size: 10,
+      max_pool_size: 15
+
+    alias Eigr.Spawn.Actor.MyMessageResponse
+
+    defact something(%Context{} = ctx) do
+      %Value{}
+      |> Value.value(MyMessageResponse.new(data: "something"))
+      |> Value.void()
+    end
+  end
+
   defmodule Actor.OtherActor do
     use SpawnSdk.Actor,
       name: "second_actor",
@@ -124,7 +141,8 @@ defmodule Actor.ActorTest do
           actors: [
             Actor.MyActor,
             Actor.OtherActor,
-            Actor.ThirdActor
+            Actor.ThirdActor,
+            Actor.PooledActor
           ]
         }
       ],
@@ -255,6 +273,21 @@ defmodule Actor.ActorTest do
                )
 
       assert %{data: "changed"} = response
+    end
+  end
+
+  describe "pooled" do
+    test "simple call in pooled actor", ctx do
+      system = ctx.system
+
+      assert {:ok, response} =
+               SpawnSdk.invoke("pooledActor",
+                 system: system,
+                 pooled: true,
+                 command: "something"
+               )
+
+      assert %{data: "something"} = response
     end
   end
 end

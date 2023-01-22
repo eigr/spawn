@@ -41,7 +41,8 @@ defmodule Actors.Actor.Entity.Lifecycle do
               %ActorSettings{
                 stateful: stateful?,
                 snapshot_strategy: snapshot_strategy,
-                deactivation_strategy: deactivation_strategy
+                deactivation_strategy: deactivation_strategy,
+                kind: kind
               } = _settings,
             timer_commands: timer_commands
           }
@@ -53,8 +54,22 @@ defmodule Actors.Actor.Entity.Lifecycle do
       "Activating Actor #{name} with Parent #{parent} in Node #{inspect(Node.self())}. Persistence #{stateful?}."
     )
 
+    actor_name_key =
+      cond do
+        kind == :POOLED -> parent
+        true -> name
+      end
+
     :ok = handle_metadata(name, metadata)
     :ok = Invocation.handle_timers(timer_commands)
+
+    :ok =
+      Spawn.Cluster.Node.Registry.update_entry_value(
+        Actors.Actor.Entity,
+        actor_name_key,
+        self(),
+        state.actor.id
+      )
 
     schedule_deactivate(deactivation_strategy, get_jitter())
     maybe_schedule_snapshot_advance(snapshot_strategy)
