@@ -17,9 +17,8 @@ config :logger,
   backends: [:console],
   truncate: 65536
 
-# ,
 # compile_time_purge_matching: [
-#  [level_lower_than: :debug]
+#   [level_lower_than: :info]
 # ]
 
 # Our Console Backend-specific configuration
