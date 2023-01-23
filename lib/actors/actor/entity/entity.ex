@@ -52,8 +52,12 @@ defmodule Actors.Actor.Entity do
     state = EntityState.unpack(state)
 
     case action do
-      {:invocation_request, invocation, opts} -> Invocation.invoke({invocation, opts}, state)
-      action -> do_handle_call(action, from, state)
+      {:invocation_request, invocation, opts} ->
+        opts = Keyword.merge(opts, from_pid: from)
+        Invocation.invoke({invocation, opts}, state)
+
+      action ->
+        do_handle_call(action, from, state)
     end
     |> parse_packed_response()
   end
@@ -83,7 +87,8 @@ defmodule Actors.Actor.Entity do
 
     case action do
       {:invocation_request, invocation, opts} ->
-        Invocation.invoke({invocation, opts}, state) |> reply_to_noreply()
+        Invocation.invoke({invocation, opts}, state)
+        |> reply_to_noreply()
 
       action ->
         do_handle_cast(action, state)
@@ -225,6 +230,9 @@ defmodule Actors.Actor.Entity do
 
   defp reply_to_noreply({:reply, _response, state}), do: {:noreply, state}
   defp reply_to_noreply({:reply, _response, state, opts}), do: {:noreply, state, opts}
+  defp reply_to_noreply({:noreply, state}), do: {:noreply, state}
+  defp reply_to_noreply({:noreply, _response, state}), do: {:noreply, state}
+  defp reply_to_noreply({:noreply, _response, state, opts}), do: {:noreply, state, opts}
 
   defp via(name) do
     {:via, Horde.Registry, {Spawn.Cluster.Node.Registry, {__MODULE__, name}}}
