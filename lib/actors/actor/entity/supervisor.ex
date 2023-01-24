@@ -43,7 +43,7 @@ defmodule Actors.Actor.Entity.Supervisor do
 
     case DynamicSupervisor.start_child(via(child_spec), child_spec) do
       {:error, {:already_started, pid}} ->
-        pid
+        {:ok, pid}
 
       {:ok, pid} ->
         {:ok, pid}
@@ -70,7 +70,7 @@ defmodule Actors.Actor.Entity.Supervisor do
 
     case DynamicSupervisor.start_child(via(child_spec), child_spec) do
       {:error, {:already_started, pid}} ->
-        pid
+        {:ok, pid}
 
       {:ok, pid} ->
         {:ok, pid}
