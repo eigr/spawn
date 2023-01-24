@@ -46,17 +46,24 @@ defmodule Actors do
 
   @spec get_state(String.t(), String.t()) :: {:ok, term()} | {:error, term()}
   def get_state(system_name, actor_name) do
-    retry with: exponential_backoff() |> randomize |> expiry(10_000),
-          atoms: [:error, :exit, :noproc, :erpc, :noconnection],
+    retry with: exponential_backoff() |> randomize |> expiry(30_000),
+          atoms: [:error, :exit, :noproc, :erpc, :noconnection, :timeout],
           rescue_only: [ErlangError] do
-      do_lookup_action(
-        system_name,
-        {false, system_name, actor_name, actor_name},
-        nil,
-        fn actor_ref, _actor_ref_id ->
-          ActorEntity.get_state(actor_ref)
-        end
-      )
+      try do
+        do_lookup_action(
+          system_name,
+          {false, system_name, actor_name, actor_name},
+          nil,
+          fn actor_ref, _actor_ref_id ->
+            ActorEntity.get_state(actor_ref)
+          end
+        )
+      rescue
+        e ->
+          Logger.error("Failure to make a call to actor #{inspect(actor_name)} #{inspect(e)}")
+
+          raise ErlangError
+      end
     after
       result -> result
     else
@@ -186,43 +193,52 @@ defmodule Actors do
         Tracer.with_span opts[:span_ctx], "client invoke", kind: :client do
           Tracer.set_attributes(metadata_attributes)
 
-          retry with: exponential_backoff() |> randomize |> expiry(10_000),
-                atoms: [:error, :exit, :noproc, :erpc, :noconnection],
+          retry with: exponential_backoff() |> randomize |> expiry(60_000),
+                atoms: [:error, :exit, :noproc, :erpc, :noconnection, :timeout],
                 rescue_only: [ErlangError] do
-            Tracer.add_event("lookup", [{"target", actor.id.name}])
+            try do
+              Tracer.add_event("lookup", [{"target", actor.id.name}])
 
-            actor_fqdn =
-              unless pooled? do
-                {pooled?, system.name, actor.id.name, actor.id.name}
-              else
-                case ActorRegistry.get_hosts_by_actor(system.name, actor.id.name) do
-                  {:ok, actor_hosts} ->
-                    host = Enum.random(actor_hosts)
-                    {pooled?, system.name, host.actor.id.parent, actor.id.name}
+              actor_fqdn =
+                unless pooled? do
+                  {pooled?, system.name, actor.id.name, actor.id.name}
+                else
+                  case ActorRegistry.get_hosts_by_actor(system.name, actor.id.name) do
+                    {:ok, actor_hosts} ->
+                      host = Enum.random(actor_hosts)
+                      {pooled?, system.name, host.actor.id.parent, actor.id.name}
 
-                  _ ->
-                    {pooled?, system.name, "#{actor.id.name}-1", actor.id.name}
+                    _ ->
+                      {pooled?, system.name, "#{actor.id.name}-1", actor.id.name}
+                  end
                 end
-              end
 
-            do_lookup_action(system.name, actor_fqdn, system, fn actor_ref, actor_ref_id ->
-              %InvocationRequest{
-                actor: %Actor{} = actor
-              } = request
+              do_lookup_action(system.name, actor_fqdn, system, fn actor_ref, actor_ref_id ->
+                %InvocationRequest{
+                  actor: %Actor{} = actor
+                } = request
 
-              request_params = %InvocationRequest{
-                request
-                | actor: %Actor{actor | id: actor_ref_id}
-              }
+                request_params = %InvocationRequest{
+                  request
+                  | actor: %Actor{actor | id: actor_ref_id}
+                }
 
-              if is_nil(request.scheduled_to) || request.scheduled_to == 0 do
-                maybe_invoke_async(async?, actor_ref, request_params, opts)
-              else
-                InvocationScheduler.schedule_invoke(request_params)
+                if is_nil(request.scheduled_to) || request.scheduled_to == 0 do
+                  maybe_invoke_async(async?, actor_ref, request_params, opts)
+                else
+                  InvocationScheduler.schedule_invoke(request_params)
 
-                {:ok, :async}
-              end
-            end)
+                  {:ok, :async}
+                end
+              end)
+            rescue
+              e ->
+                Logger.error(
+                  "Failure to make a call to actor #{inspect(actor.id.name)} #{inspect(e)}"
+                )
+
+                raise ErlangError
+            end
           after
             result -> result
           else
@@ -357,25 +373,29 @@ defmodule Actors do
                    ActorRegistry.lookup(system_name, actor_name,
                      filter_by_parent: pooled,
                      parent: parent
-                   ),
-                 {:ok, actor_ref} =
-                   :erpc.call(
+                   ) do
+              case :erpc.call(
                      node,
                      __MODULE__,
                      :try_reactivate_actor,
                      [system, actor, opts],
                      @erpc_timeout
                    ) do
-              Tracer.set_attributes([{"actor-pid", "#{inspect(actor_ref)}"}])
+                {:ok, actor_ref} ->
+                  Tracer.set_attributes([{"actor-pid", "#{inspect(actor_ref)}"}])
 
-              Tracer.add_event("try-reactivate-actor", [
-                {"reactivation-on-node", "#{inspect(node)}"}
-              ])
+                  Tracer.add_event("try-reactivate-actor", [
+                    {"reactivation-on-node", "#{inspect(node)}"}
+                  ])
 
-              if pooled,
-                # Ensures that the name change will not affect the host function call
-                do: action_fun.(actor_ref, %ActorId{actor.id | name: actor_name}),
-                else: action_fun.(actor_ref, actor.id)
+                  if pooled,
+                    # Ensures that the name change will not affect the host function call
+                    do: action_fun.(actor_ref, %ActorId{actor.id | name: actor_name}),
+                    else: action_fun.(actor_ref, actor.id)
+
+                _ ->
+                  raise ErlangError
+              end
             else
               {:not_found, _} ->
                 Logger.error("Actor #{actor_name} not found on ActorSystem #{system_name}")

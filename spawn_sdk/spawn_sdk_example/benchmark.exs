@@ -84,12 +84,14 @@ Benchee.run(
 # #Process.sleep(10000)
 # Benchee.run(%{
 #   "Parallel Stateful Singleton Actor                  - Get State   " => fn -> invok_get_state() end,
+#   "Parallel Stateful Abstract Spawn and Invoke Actor  - Update State" => fn -> spawn_and_invoke() end,
 #   "Parallel Stateful Singleton Actor                  - Update State" => fn -> invoke_update_state() end,
-#   #"Parallel Stateful Abstract Spawn and Invoke Actor  - Update State" => fn -> spawn_and_invoke() end,
+#   "Async Non Parallel Stateful Singleton Actor        - Update State" => fn -> async_invoke_update_state() end,
 #   "Parallel Stateless Pooled Actor                    - Call Action " => fn -> spawn_invoke_pooled_actors() end
 #   },
 #   warmup: 10,
 #   parallel: 10,
+#   after_scenario: fn _ctx -> Process.sleep(5000) end,
 #   formatters: [
 #   {
 #     Benchee.Formatters.HTML,

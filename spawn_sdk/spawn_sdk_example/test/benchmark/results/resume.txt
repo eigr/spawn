@@ -1,3 +1,5 @@
+##############       Single         ##############################################
+
 Running Non Parallel Simple Invoke on Singleton Actor - 05s
 
 Operating System: Linux
@@ -16,18 +18,37 @@ parallel: 1
 inputs: none specified
 
 Name                                                                            ips        average  deviation         median         99th %
-Non Parallel Stateful Singleton Actor                  - Get State           3.98 K      251.55 μs    ±81.75%      236.45 μs      392.37 μs
-Non Parallel Stateless Pooled Actor                    - Call Action         2.28 K      438.04 μs    ±96.17%      406.06 μs      712.61 μs
-Non Parallel Stateful Singleton Actor                  - Update State        1.68 K      595.36 μs    ±33.73%      549.79 μs     1001.94 μs
-Non Parallel Stateful Abstract Spawn and Invoke Actor  - Update State       0.124 K     8048.61 μs    ±27.11%     7752.93 μs    13802.78 μs
+Async Non Parallel Stateful Singleton Actor            - Update State        8.05 K      124.21 μs    ±47.98%      123.45 μs      203.94 μs
+Non Parallel Stateful Singleton Actor                  - Get State           3.58 K      279.69 μs    ±52.21%      250.32 μs      471.31 μs
+Non Parallel Stateless Pooled Actor                    - Call Action         2.17 K      461.40 μs    ±23.07%      435.55 μs      758.90 μs
+Non Parallel Stateful Singleton Actor                  - Update State        1.08 K      926.51 μs    ±51.85%      922.03 μs     2553.46 μs
+Non Parallel Stateful Abstract Spawn and Invoke Actor  - Update State       0.100 K     9976.34 μs    ±35.19%     9135.70 μs    22864.33 μs
 
 Comparison: 
-Non Parallel Stateful Singleton Actor                  - Get State           3.98 K
-Non Parallel Stateless Pooled Actor                    - Call Action         2.28 K - 1.74x slower +186.49 μs
-Non Parallel Stateful Singleton Actor                  - Update State        1.68 K - 2.37x slower +343.82 μs
-Non Parallel Stateful Abstract Spawn and Invoke Actor  - Update State       0.124 K - 32.00x slower +7797.06 μs
+Async Non Parallel Stateful Singleton Actor            - Update State        8.05 K
+Non Parallel Stateful Singleton Actor                  - Get State           3.58 K - 2.25x slower +155.47 μs
+Non Parallel Stateless Pooled Actor                    - Call Action         2.17 K - 3.71x slower +337.18 μs
+Non Parallel Stateful Singleton Actor                  - Update State        1.08 K - 7.46x slower +802.30 μs
+Non Parallel Stateful Abstract Spawn and Invoke Actor  - Update State       0.100 K - 80.32x slower +9852.12 μs
 
-############## With Profile Enable ##############################################
+##############       Parallel         ##############################################
+
+Name                                                                        ips        average  deviation         median         99th %
+Async Non Parallel Stateful Singleton Actor        - Update State      21212.61      0.0471 ms   ±628.56%      0.0270 ms        0.30 ms
+Parallel Stateful Singleton Actor                  - Get State           821.27        1.22 ms    ±22.91%        1.14 ms        1.98 ms
+Parallel Stateless Pooled Actor                    - Call Action         433.66        2.31 ms   ±145.13%        1.19 ms       17.79 ms
+Parallel Stateful Singleton Actor                  - Update State        284.54        3.51 ms    ±27.61%        3.35 ms        5.53 ms
+Parallel Stateful Abstract Spawn and Invoke Actor  - Update State         15.45       64.73 ms    ±31.15%       62.91 ms      223.74 ms
+
+Comparison: 
+Async Non Parallel Stateful Singleton Actor        - Update State      21212.61
+Parallel Stateful Singleton Actor                  - Get State           821.27 - 25.83x slower +1.17 ms
+Parallel Stateless Pooled Actor                    - Call Action         433.66 - 48.91x slower +2.26 ms
+Parallel Stateful Singleton Actor                  - Update State        284.54 - 74.55x slower +3.47 ms
+Parallel Stateful Abstract Spawn and Invoke Actor  - Update State         15.45 - 1373.18x slower +64.69 ms
+
+############## Non Parallel With Profile Enable #############################################
+
 Name                                                                            ips        average  deviation         median         99th %
 Non Parallel Stateful Singleton Actor                  - Get State           2.59 K      385.74 μs    ±90.78%      392.66 μs      592.79 μs
 Non Parallel Stateless Pooled Actor                    - Call Action         2.15 K      464.97 μs    ±98.83%      428.17 μs      784.55 μs

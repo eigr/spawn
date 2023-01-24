@@ -11,6 +11,7 @@ defmodule Actors.Actor.Entity do
     ActorState
   }
 
+  @default_call_timeout :infinity
   @fullsweep_after 10
 
   @impl true
@@ -137,6 +138,7 @@ defmodule Actors.Actor.Entity do
     Logger.warning(
       "A conflict has been detected for ActorId #{inspect(id)}. Possible Actor Rebalance or NetSplit!
       Trace Data: [
+        self: #{inspect(self())},
         from: #{inspect(from)},
         key: #{inspect(key)},
         value: #{inspect(value)},
@@ -145,7 +147,7 @@ defmodule Actors.Actor.Entity do
       ] "
     )
 
-    {:stop, :shutdown, state}
+    {:stop, :conflict, state}
   end
 
   defp do_handle_info(
@@ -181,8 +183,9 @@ defmodule Actors.Actor.Entity do
     Lifecycle.terminate(action, state)
   end
 
+  ## Client APIs
   def start_link(%EntityState{actor: %Actor{id: %ActorId{name: name} = _id}} = state) do
-    GenServer.start(__MODULE__, state,
+    GenServer.start_link(__MODULE__, state,
       name: via(name),
       spawn_opt: [fullsweep_after: @fullsweep_after]
     )
@@ -190,20 +193,22 @@ defmodule Actors.Actor.Entity do
 
   @spec get_state(any) :: {:error, term()} | {:ok, term()}
   def get_state(ref) when is_pid(ref) do
-    GenServer.call(ref, :get_state, 20_000)
+    GenServer.call(ref, :get_state, 30_000)
   end
 
   def get_state(ref) do
-    GenServer.call(via(ref), :get_state, 20_000)
+    GenServer.call(via(ref), :get_state, 30_000)
   end
 
   @spec invoke(any, any, any) :: any
   def invoke(ref, request, opts) when is_pid(ref) do
-    GenServer.call(ref, {:invocation_request, request, opts}, 30_000)
+    timeout = Keyword.get(opts, :timeout, @default_call_timeout)
+    GenServer.call(ref, {:invocation_request, request, opts}, timeout)
   end
 
   def invoke(ref, request, opts) do
-    GenServer.call(via(ref), {:invocation_request, request, opts}, 30_000)
+    timeout = Keyword.get(opts, :timeout, @default_call_timeout)
+    GenServer.call(via(ref), {:invocation_request, request, opts}, timeout)
   end
 
   @spec invoke_async(any, any, any) :: :ok
@@ -214,6 +219,8 @@ defmodule Actors.Actor.Entity do
   def invoke_async(ref, request, opts) do
     GenServer.cast(via(ref), {:invocation_request, request, opts})
   end
+
+  ## Private Functions
 
   defp parse_packed_response(response) do
     case response do

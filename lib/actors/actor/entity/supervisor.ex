@@ -8,7 +8,7 @@ defmodule Actors.Actor.Entity.Supervisor do
   def child_spec() do
     {
       PartitionSupervisor,
-      child_spec: DynamicSupervisor, name: __MODULE__
+      child_spec: DynamicSupervisor, name: __MODULE__, max_restarts: 100
     }
   end
 
@@ -41,9 +41,9 @@ defmodule Actors.Actor.Entity.Supervisor do
       restart: :transient
     }
 
-    case DynamicSupervisor.start_child(via(), child_spec) do
+    case DynamicSupervisor.start_child(via(child_spec), child_spec) do
       {:error, {:already_started, pid}} ->
-        {:ok, pid}
+        pid
 
       {:ok, pid} ->
         {:ok, pid}
@@ -51,7 +51,7 @@ defmodule Actors.Actor.Entity.Supervisor do
       {:error, {:name_conflict, {{Actors.Actor.Entity, name}, _f}, _registry, pid}} ->
         Logger.warning("Name conflict on start Actor #{name} from PID #{inspect(pid)}.")
 
-        if Process.alive?(pid), do: {:ok, pid}, else: {:error, :name_conflict}
+        :ignore
     end
   end
 
@@ -68,9 +68,9 @@ defmodule Actors.Actor.Entity.Supervisor do
       restart: :transient
     }
 
-    case DynamicSupervisor.start_child(via(), child_spec) do
+    case DynamicSupervisor.start_child(via(child_spec), child_spec) do
       {:error, {:already_started, pid}} ->
-        {:ok, pid}
+        pid
 
       {:ok, pid} ->
         {:ok, pid}
@@ -78,9 +78,11 @@ defmodule Actors.Actor.Entity.Supervisor do
       {:error, {:name_conflict, {{Actors.Actor.Entity, name}, _f}, _registry, pid}} ->
         Logger.warning("Name conflict on start Actor #{name} from PID #{inspect(pid)}.")
 
-        if Process.alive?(pid), do: {:ok, pid}, else: {:error, :name_conflict}
+        :ignore
     end
   end
 
-  defp via(), do: {:via, PartitionSupervisor, {__MODULE__, self()}}
+  defp get_key(spec), do: :erlang.phash2(Map.drop(spec, [:id]))
+
+  defp via(spec), do: {:via, PartitionSupervisor, {__MODULE__, get_key(spec)}}
 end

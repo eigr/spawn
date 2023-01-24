@@ -2,6 +2,7 @@ defmodule SpawnSdkExample.Actors.AbstractActor do
   use SpawnSdk.Actor,
     name: "abs_actor",
     kind: :abstract,
+    deactivate_timeout: 60_000,
     state_type: Io.Eigr.Spawn.Example.MyState
 
   require Logger
