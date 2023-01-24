@@ -16,6 +16,9 @@ Benchee.run(
     "Non Parallel Stateful Singleton Actor                  - Update State" => fn ->
       invoke_update_state()
     end,
+    "Async Non Parallel Stateful Singleton Actor            - Update State" => fn ->
+      async_invoke_update_state()
+    end,
     "Non Parallel Stateful Abstract Spawn and Invoke Actor  - Update State" => fn ->
       spawn_and_invoke()
     end,
@@ -38,7 +41,7 @@ Benchee.run(
     configuration: true,
     fast_warning: true
   ],
-  profile_after: true
+  profile_after: false
 )
 
 # Logger.info("Running Non Parallel Invoke - 30s")

@@ -262,7 +262,13 @@ defmodule Actors.Actor.Entity.Invocation do
                   {:ok, "#{inspect(response.updated_context.metadata)}"}
                 ])
 
-                {:reply, {:ok, do_response(request, response, state)}, state}
+                case do_response(request, response, state, opts) do
+                  :noreply ->
+                    {:noreply, state}
+
+                  response ->
+                    {:reply, {:ok, response}, state}
+                end
 
               {:error, reason, state} ->
                 Tracer.add_event("failure-invocation", [
@@ -280,23 +286,27 @@ defmodule Actors.Actor.Entity.Invocation do
     end
   end
 
+  defp do_response(request, response, state, opts \\ [])
+
   defp do_response(
          _request,
          %ActorInvocationResponse{workflow: workflow} = response,
-         _state
+         _state,
+         _opts
        )
        when is_nil(workflow) or workflow == %{} do
     response
   end
 
-  defp do_response(request, response, state) do
-    do_run_workflow(request, response, state)
+  defp do_response(request, response, state, opts) do
+    do_run_workflow(request, response, state, opts)
   end
 
   defp do_run_workflow(
          _request,
          %ActorInvocationResponse{workflow: workflow} = response,
-         _state
+         _state,
+         _opts
        )
        when is_nil(workflow) or workflow == %{} do
     response
@@ -307,12 +317,13 @@ defmodule Actors.Actor.Entity.Invocation do
          %ActorInvocationResponse{
            workflow: %Workflow{broadcast: broadcast, effects: effects} = _workflow
          } = response,
-         _state
+         _state,
+         opts
        ) do
     Tracer.with_span "run-workflow" do
-      do_side_effects(effects)
-      do_broadcast(request, broadcast)
-      do_handle_routing(request, response)
+      do_side_effects(effects, opts)
+      do_broadcast(request, broadcast, opts)
+      do_handle_routing(request, response, opts)
     end
   end
 
@@ -320,7 +331,8 @@ defmodule Actors.Actor.Entity.Invocation do
          _request,
          %ActorInvocationResponse{
            workflow: %Workflow{routing: routing} = _workflow
-         } = response
+         } = response,
+         _opts
        )
        when is_nil(routing),
        do: response
@@ -335,31 +347,41 @@ defmodule Actors.Actor.Entity.Invocation do
              %Workflow{
                routing: {:pipe, %Pipe{actor: actor_name, command_name: cmd} = _pipe} = _workflow
              } = response
-         }
+         },
+         opts
        ) do
-    Tracer.with_span "run-pipe-routing" do
-      invocation = %InvocationRequest{
-        system: %ActorSystem{name: system_name},
-        actor: %Actor{id: ActorId.new(name: actor_name, system: system_name)},
-        command_name: cmd,
-        payload: payload,
-        caller: ActorId.new(name: caller_actor_name, system: system_name)
-      }
+    from_pid = Keyword.get(opts, :from_pid)
 
-      try do
-        case Actors.invoke(invocation, span_ctx: OpenTelemetry.Tracer.current_span_ctx()) do
-          {:ok, response} -> response
-          error -> error
+    spawn(fn ->
+      Tracer.with_span "run-pipe-routing" do
+        invocation = %InvocationRequest{
+          system: %ActorSystem{name: system_name},
+          actor: %Actor{id: ActorId.new(name: actor_name, system: system_name)},
+          command_name: cmd,
+          payload: payload,
+          caller: ActorId.new(name: caller_actor_name, system: system_name)
+        }
+
+        try do
+          case Actors.invoke(invocation, span_ctx: OpenTelemetry.Tracer.current_span_ctx()) do
+            {:ok, response} ->
+              GenServer.reply(from_pid, {:ok, response})
+
+            error ->
+              GenServer.reply(from_pid, error)
+          end
+        catch
+          error ->
+            Logger.warning(
+              "Error during Pipe request to Actor #{system_name}:#{actor_name}. Error: #{inspect(error)}"
+            )
+
+            GenServer.reply(from_pid, {:ok, response})
         end
-      catch
-        error ->
-          Logger.warning(
-            "Error during Pipe request to Actor #{system_name}:#{actor_name}. Error: #{inspect(error)}"
-          )
-
-          response
       end
-    end
+    end)
+
+    :noreply
   end
 
   defp do_handle_routing(
@@ -373,40 +395,53 @@ defmodule Actors.Actor.Entity.Invocation do
                routing:
                  {:forward, %Forward{actor: actor_name, command_name: cmd} = _pipe} = _workflow
              } = response
-         }
+         },
+         opts
        ) do
-    Tracer.with_span "run-forward-routing" do
-      invocation = %InvocationRequest{
-        system: %ActorSystem{name: system_name},
-        actor: %Actor{id: ActorId.new(name: actor_name, system: system_name)},
-        command_name: cmd,
-        payload: payload,
-        caller: ActorId.new(name: caller_actor_name, system: system_name)
-      }
+    from_pid = Keyword.get(opts, :from_pid)
 
-      try do
-        case Actors.invoke(invocation, span_ctx: OpenTelemetry.Tracer.current_span_ctx()) do
-          {:ok, response} -> response
-          error -> error
+    spawn(fn ->
+      Tracer.with_span "run-forward-routing" do
+        invocation = %InvocationRequest{
+          system: %ActorSystem{name: system_name},
+          actor: %Actor{id: ActorId.new(name: actor_name, system: system_name)},
+          command_name: cmd,
+          payload: payload,
+          caller: ActorId.new(name: caller_actor_name, system: system_name)
+        }
+
+        try do
+          case Actors.invoke(invocation, span_ctx: OpenTelemetry.Tracer.current_span_ctx()) do
+            {:ok, response} ->
+              GenServer.reply(from_pid, {:ok, response})
+
+            error ->
+              GenServer.reply(from_pid, error)
+          end
+        catch
+          error ->
+            Logger.warning(
+              "Error during Forward request to Actor #{system_name}:#{actor_name}. Error: #{inspect(error)}"
+            )
+
+            GenServer.reply(from_pid, {:ok, response})
         end
-      catch
-        error ->
-          Logger.warning(
-            "Error during Forward request to Actor #{system_name}:#{actor_name}. Error: #{inspect(error)}"
-          )
-
-          response
       end
-    end
+    end)
+
+    :noreply
   end
 
-  def do_broadcast(_request, broadcast) when is_nil(broadcast) or broadcast == %{} do
+  def do_broadcast(_request, broadcast, _opts \\ [])
+
+  def do_broadcast(_request, broadcast, _opts) when is_nil(broadcast) or broadcast == %{} do
     :ok
   end
 
   def do_broadcast(
         request,
-        %Broadcast{channel_group: channel, command_name: command, payload: payload} = _broadcast
+        %Broadcast{channel_group: channel, command_name: command, payload: payload} = _broadcast,
+        _opts
       ) do
     Tracer.with_span "run-broadcast" do
       Tracer.add_event("publish", [{"channel", channel}])
@@ -438,11 +473,13 @@ defmodule Actors.Actor.Entity.Invocation do
 
   defp parse_external_broadcast_message(_any), do: %{}
 
-  def do_side_effects(effects) when effects == [] do
+  def do_side_effects(effects, opts \\ [])
+
+  def do_side_effects(effects, _opts) when effects == [] do
     :ok
   end
 
-  def do_side_effects(effects) when is_list(effects) do
+  def do_side_effects(effects, _opts) when is_list(effects) do
     Tracer.with_span "handle-side-effects" do
       try do
         spawn(fn ->

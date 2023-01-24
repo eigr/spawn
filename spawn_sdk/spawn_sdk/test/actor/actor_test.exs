@@ -73,7 +73,7 @@ defmodule Actor.ActorTest do
 
     alias Eigr.Spawn.Actor.MyMessageResponse
 
-    defact something(%Context{} = ctx) do
+    defact something(%Context{} = _ctx) do
       %Value{}
       |> Value.value(MyMessageResponse.new(data: "something"))
       |> Value.void()

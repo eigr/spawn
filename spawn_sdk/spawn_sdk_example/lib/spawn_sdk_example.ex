@@ -20,6 +20,20 @@ defmodule SpawnSdkExample do
     end
   end
 
+  def async_invoke_update_state() do
+    try do
+      SpawnSdk.invoke("joe",
+        system: "spawn-system",
+        command: "sum",
+        payload: %MyBusinessMessage{value: 1},
+        async: true
+      )
+    catch
+      e ->
+        Logger.error("Error on invoke Actor: #{inspect(e)}")
+    end
+  end
+
   def invok_get_state() do
     try do
       SpawnSdk.invoke("joe", system: "spawn-system", command: "get")
