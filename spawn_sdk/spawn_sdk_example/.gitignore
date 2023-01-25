@@ -24,3 +24,7 @@ spawn_sdk_example-*.tar
 
 # Temporary files, for example, from tests.
 /tmp/
+
+spawn_sdk/spawn_sdk_example/test/benchmark/results/assets
+
+spawn_sdk/spawn_sdk_example/test/benchmark/results/*.html
