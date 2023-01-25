@@ -35,10 +35,10 @@ defmodule Spawn.Supervisor do
     topologies =
       case cluster_strategy do
         "epmd" ->
-          get_epmd_strategy()
+          get_epmd_strategy(config)
 
         "gossip" ->
-          get_gossip_strategy()
+          get_gossip_strategy(config)
 
         "kubernetes-dns" ->
           get_dns_strategy(config)
@@ -55,7 +55,7 @@ defmodule Spawn.Supervisor do
     end
   end
 
-  defp get_epmd_strategy do
+  defp get_epmd_strategy(_config) do
     [
       proxy: [
         strategy: Cluster.Strategy.Epmd,
@@ -74,10 +74,15 @@ defmodule Spawn.Supervisor do
     ]
   end
 
-  defp get_gossip_strategy do
+  defp get_gossip_strategy(_config) do
     [
       proxy: [
-        strategy: Cluster.Strategy.Gossip
+        strategy: Cluster.Strategy.Gossip,
+        config: [
+          reuseaddr: true,
+          multicast_addr: "255.255.255.255",
+          broadcast_only: true
+        ]
       ]
     ]
   end
