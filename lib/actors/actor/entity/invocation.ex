@@ -33,13 +33,6 @@ defmodule Actors.Actor.Entity.Invocation do
 
   alias Spawn.Utils.AnySerializer
 
-  @http_host_interface Actors.Actor.Interface.Http
-  @host_interface_map %{
-    "sdk" => SpawnSdk.Interface,
-    "http" => @http_host_interface,
-    "default" => @http_host_interface
-  }
-
   @default_actions [
     "get",
     "Get",
@@ -54,6 +47,14 @@ defmodule Actors.Actor.Entity.Invocation do
     "setup",
     "Setup"
   ]
+
+  @http_host_interface Actors.Actor.Interface.Http
+
+  @host_interface_map %{
+    "sdk" => SpawnSdk.Interface,
+    "http" => @http_host_interface,
+    "default" => @http_host_interface
+  }
 
   def timer_invoke(
         %FixedTimerCommand{command: %Command{name: cmd} = _command} = timer,
@@ -286,7 +287,7 @@ defmodule Actors.Actor.Entity.Invocation do
     end
   end
 
-  defp do_response(request, response, state, opts \\ [])
+  defp do_response(request, response, state, _opts \\ [])
 
   defp do_response(
          _request,
