@@ -353,7 +353,7 @@ defmodule Actors.Actor.Entity.Invocation do
        ) do
     from_pid = Keyword.get(opts, :from_pid)
 
-    spawn(fn ->
+    dispatch_routing_to_caller(from_pid, fn ->
       Tracer.with_span "run-pipe-routing" do
         invocation = %InvocationRequest{
           system: %ActorSystem{name: system_name},
@@ -366,10 +366,10 @@ defmodule Actors.Actor.Entity.Invocation do
         try do
           case Actors.invoke(invocation, span_ctx: OpenTelemetry.Tracer.current_span_ctx()) do
             {:ok, response} ->
-              GenServer.reply(from_pid, {:ok, response})
+              {:ok, response}
 
             error ->
-              GenServer.reply(from_pid, error)
+              error
           end
         catch
           error ->
@@ -377,12 +377,10 @@ defmodule Actors.Actor.Entity.Invocation do
               "Error during Pipe request to Actor #{system_name}:#{actor_name}. Error: #{inspect(error)}"
             )
 
-            GenServer.reply(from_pid, {:ok, response})
+            {:ok, response}
         end
       end
     end)
-
-    :noreply
   end
 
   defp do_handle_routing(
@@ -431,15 +429,6 @@ defmodule Actors.Actor.Entity.Invocation do
     end)
   end
 
-  defp dispatch_routing_to_caller(from, callback)
-       when is_function(callback) and is_nil(from),
-       do: callback.()
-
-  defp dispatch_routing_to_caller(from, callback) when is_function(callback) do
-    spawn(fn -> GenServer.reply(from, callback.()) end)
-    :noreply
-  end
-
   def do_broadcast(_request, broadcast, _opts \\ [])
 
   def do_broadcast(_request, broadcast, _opts) when is_nil(broadcast) or broadcast == %{} do
@@ -457,6 +446,15 @@ defmodule Actors.Actor.Entity.Invocation do
 
       spawn(fn -> publish(channel, command, payload, request) end)
     end
+  end
+
+  defp dispatch_routing_to_caller(from, callback)
+       when is_function(callback) and is_nil(from),
+       do: callback.()
+
+  defp dispatch_routing_to_caller(from, callback) when is_function(callback) do
+    spawn(fn -> GenServer.reply(from, callback.()) end)
+    :noreply
   end
 
   defp publish(channel, command, payload, _request) when is_nil(command) do
