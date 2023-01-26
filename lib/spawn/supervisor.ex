@@ -41,7 +41,7 @@ defmodule Spawn.Supervisor do
           get_gossip_strategy(config)
 
         "kubernetes-dns" ->
-          get_dns_strategy(config)
+          get_k8s_dns_strategy(config)
 
         _ ->
           Logger.warning("Invalid Topology")
@@ -74,27 +74,27 @@ defmodule Spawn.Supervisor do
     ]
   end
 
-  defp get_gossip_strategy(_config) do
+  defp get_gossip_strategy(config) do
     [
       proxy: [
         strategy: Cluster.Strategy.Gossip,
         config: [
-          reuseaddr: true,
-          multicast_addr: "255.255.255.255",
-          broadcast_only: true
+          reuseaddr: config.proxy_cluster_gossip_reuseaddr_address,
+          multicast_addr: config.proxy_cluster_gossip_multicast_address,
+          broadcast_only: config.proxy_cluster_gossip_broadcast_only
         ]
       ]
     ]
   end
 
-  defp get_dns_strategy(config),
+  defp get_k8s_dns_strategy(config),
     do: [
       proxy: [
         strategy: Elixir.Cluster.Strategy.Kubernetes.DNS,
         config: [
           service: config.proxy_headless_service,
           application_name: config.app_name,
-          polling_interval: config.proxy_cluster_poling_interval
+          polling_interval: config.proxy_cluster_polling_interval
         ]
       ]
     ]
