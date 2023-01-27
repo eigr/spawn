@@ -287,8 +287,6 @@ defmodule Actors.Actor.Entity.Invocation do
     end
   end
 
-  defp do_response(request, response, state, _opts \\ [])
-
   defp do_response(
          _request,
          %ActorInvocationResponse{workflow: workflow} = response,

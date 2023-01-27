@@ -12,6 +12,7 @@ defmodule Actors do
   alias Actors.Actor.Entity, as: ActorEntity
   alias Actors.Actor.Entity.Supervisor, as: ActorEntitySupervisor
   alias Actors.Actor.InvocationScheduler
+  alias Actors.HostsPooler
 
   alias Actors.Registry.{ActorRegistry, HostActor}
 
@@ -91,7 +92,9 @@ defmodule Actors do
         } = _registration,
         opts
       ) do
-    Enum.map(Map.values(actors), fn actor -> create_actor_host_pool(actor, opts) end)
+    actors
+    |> Map.values()
+    |> Enum.map(fn actor -> HostsPooler.create_actor_host_pool(actor, opts) end)
     |> List.flatten()
     |> ActorRegistry.register()
     |> tap(fn _sts -> warmup_actors(actor_system, actors, opts) end)
@@ -107,6 +110,15 @@ defmodule Actors do
 
         {:error, RegistrationResponse.new(proxy_info: get_proxy_info(), status: status)}
     end
+  end
+
+  defp get_proxy_info() do
+    ProxyInfo.new(
+      protocol_major_version: 1,
+      protocol_minor_version: 2,
+      proxy_name: "spawn",
+      proxy_version: "0.5.0"
+    )
   end
 
   @doc """
@@ -254,94 +266,6 @@ defmodule Actors do
   defp get_caller(nil), do: "external"
   defp get_caller(caller), do: caller.name
 
-  defp create_actor_host_pool(
-         %Actor{
-           id: %ActorId{system: system, parent: _parent, name: name} = _id,
-           settings: %ActorSettings{kind: :POOLED} = _settings
-         } = actor,
-         opts
-       ) do
-    case ActorRegistry.get_hosts_by_actor(system, name) do
-      {:ok, actor_hosts} ->
-        build_pool(:distributed, actor, actor_hosts, opts)
-
-      _ ->
-        build_pool(:local, actor, nil, opts)
-    end
-  end
-
-  defp create_actor_host_pool(
-         %Actor{settings: %ActorSettings{kind: _kind} = _settings} = actor,
-         opts
-       ) do
-    [%HostActor{node: Node.self(), actor: actor, opts: opts}]
-  end
-
-  defp build_pool(
-         :local,
-         %Actor{
-           id: %ActorId{system: system, parent: _parent, name: name} = _id,
-           settings:
-             %ActorSettings{kind: :POOLED, min_pool_size: min, max_pool_size: max} = _settings
-         } = actor,
-         _hosts,
-         opts
-       ) do
-    max_pool = if max < min, do: get_defaul_max_pool(min), else: max
-
-    Enum.into(
-      min..max_pool,
-      [],
-      fn index ->
-        name_alias = build_name_alias(name, index)
-
-        pooled_actor = %Actor{
-          actor
-          | id: %ActorId{system: system, parent: name_alias, name: name}
-        }
-
-        Logger.debug("Registering metadata for the Pooled Actor #{name} with Alias #{name_alias}")
-        %HostActor{node: Node.self(), actor: pooled_actor, opts: opts}
-      end
-    )
-  end
-
-  defp build_pool(
-         :distributed,
-         %Actor{
-           id: %ActorId{system: system, parent: _parent, name: name} = _id,
-           settings:
-             %ActorSettings{kind: :POOLED, min_pool_size: min, max_pool_size: max} = _settings
-         } = actor,
-         hosts,
-         opts
-       ) do
-    max_pool = if max < min, do: get_defaul_max_pool(min), else: max
-
-    Enum.into(
-      min..max_pool,
-      [],
-      fn index ->
-        host = Enum.random(hosts)
-        name_alias = build_name_alias(name, index)
-
-        pooled_actor = %Actor{
-          actor
-          | id: %ActorId{system: system, parent: name_alias, name: name}
-        }
-
-        Logger.debug("Registering metadata for the Pooled Actor #{name} with Alias #{name_alias}")
-        %HostActor{node: host.node, actor: pooled_actor, opts: opts}
-      end
-    )
-  end
-
-  defp build_name_alias(name, index), do: "#{name}-#{index}"
-
-  defp get_defaul_max_pool(min_pool) do
-    length(Node.list() ++ [Node.self()]) * (System.schedulers_online() + min_pool)
-  end
-
   defp do_lookup_action(
          system_name,
          {pooled, system_name, parent, actor_name} = actor_fqdn,
@@ -442,15 +366,6 @@ defmodule Actors do
     end
   end
 
-  defp get_proxy_info() do
-    ProxyInfo.new(
-      protocol_major_version: 1,
-      protocol_minor_version: 2,
-      proxy_name: "spawn",
-      proxy_version: "0.5.0"
-    )
-  end
-
   defp maybe_invoke_async(true, actor_ref, request, opts) do
     ActorEntity.invoke_async(actor_ref, request, opts)
 
@@ -520,7 +435,8 @@ defmodule Actors do
         end
       end)
       |> Flow.map(fn {actor_name, actor} ->
-        {time, result} = :timer.tc(&lookup_actor/4, [actor_system, actor_name, actor, opts])
+        {time, result} =
+          :timer.tc(&lookup_or_create_actor/4, [actor_system, actor_name, actor, opts])
 
         Logger.info(
           "Actor #{actor_name} Activated on Node #{inspect(Node.self())} in #{inspect(time)}ms"
@@ -532,9 +448,9 @@ defmodule Actors do
     end)
   end
 
-  @spec lookup_actor(ActorSystem.t(), String.t(), Actor.t(), any()) ::
+  @spec lookup_or_create_actor(ActorSystem.t(), String.t(), Actor.t(), any()) ::
           {:ok, pid()} | {:error, String.t()}
-  defp lookup_actor(actor_system, actor_name, actor, opts) do
+  defp lookup_or_create_actor(actor_system, actor_name, actor, opts) do
     case ActorEntitySupervisor.lookup_or_create_actor(actor_system, actor, opts) do
       {:ok, pid} ->
         {:ok, pid}

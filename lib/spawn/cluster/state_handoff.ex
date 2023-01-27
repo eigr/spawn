@@ -1,5 +1,15 @@
 defmodule Spawn.Cluster.StateHandoff do
-  @moduledoc false
+  @moduledoc """
+  This handles state handoff in a cluster.
+
+  It uses the DeltaCrdt library to handle a distributed state, which is an eventually consistent replicated data type.
+  The module starts a GenServer that monitors nodes in the cluster, and when a new node comes up it sends a "set_neighbours"
+  message to that node's GenServer process with its own DeltaCrdt process ID. This is done to ensure that changes in either node's
+  state are reflected across both.
+
+  The module also handles other messages like "handoff" and "get" to put and retrieve data from the DeltaCrdt state, respectively.
+  """
+
   use GenServer
   require Logger
 
@@ -76,7 +86,7 @@ defmodule Spawn.Cluster.StateHandoff do
   end
 
   def handle_call(:get_all_invocations, _from, crdt_pid) do
-    schedules =
+    invocations =
       crdt_pid
       |> DeltaCrdt.to_map()
       |> Map.values()
@@ -86,7 +96,7 @@ defmodule Spawn.Cluster.StateHandoff do
       |> Enum.reject(&is_nil/1)
       |> Enum.uniq()
 
-    {:reply, schedules, crdt_pid}
+    {:reply, invocations, crdt_pid}
   end
 
   @impl true

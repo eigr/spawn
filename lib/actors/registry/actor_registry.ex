@@ -1,5 +1,11 @@
 defmodule Actors.Registry.ActorRegistry do
-  @moduledoc false
+  @moduledoc """
+  The `ActorRegistry` module provides a registry for actor entities.
+
+  It allows for registering and looking up actors and also provides
+  methods for adding and removing invocation requests for actors.
+  """
+
   require Logger
 
   alias Actors.Registry.{HostActor, LoadBalancer}
@@ -42,6 +48,10 @@ defmodule Actors.Registry.ActorRegistry do
     StateHandoff.get_all_invocations()
   end
 
+  @doc """
+  Removes a invocation request in CRDT Database
+  Usually used for invocation schedulings
+  """
   def remove_invocation_request(actor, request) do
     actor
     |> StateHandoff.get()
@@ -63,6 +73,10 @@ defmodule Actors.Registry.ActorRegistry do
     end)
   end
 
+  @doc """
+  Registers a invocation request in CRDT Database
+  Usually used for invocation schedulings
+  """
   def register_invocation_request(actor, request) do
     actor
     |> StateHandoff.get()
