@@ -4,7 +4,8 @@ defmodule Spawn.Cluster.Epmd.Client do
   It will return a port from `Caravan.Epmd.dist_port/1` as opposed to calling
   out to the `epmd` daemon and having it assign us one.
   """
-  alias Caravan.Epmd
+  alias Spawn.Cluster.Epmd
+
   # erl_distribution wants us to start a worker process.  We don't
   # need one, though.
   def start_link do
