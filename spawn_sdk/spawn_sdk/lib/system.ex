@@ -1,4 +1,9 @@
 defmodule SpawnSdk.System do
+  @moduledoc """
+  `System` defines the general behavior of the Spawn actor system.
+  It is through System implementations that the user can register, invoke,
+  and perform other activities with their Actors.
+  """
   @type actor_name :: String.t()
 
   @type actor_mod :: module()

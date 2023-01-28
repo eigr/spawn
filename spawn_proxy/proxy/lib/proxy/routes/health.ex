@@ -1,4 +1,7 @@
 defmodule Proxy.Routes.Health do
+  @moduledoc """
+  Health Endpoint.
+  """
   use Proxy.Routes.Base
 
   alias Plug.Conn

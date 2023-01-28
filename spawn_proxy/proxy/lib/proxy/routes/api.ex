@@ -1,4 +1,7 @@
 defmodule Proxy.Routes.API do
+  @moduledoc """
+  Spawn HTTP Endpoints
+  """
   use Proxy.Routes.Base
   require Logger
 

@@ -1,4 +1,7 @@
 defmodule Proxy.Routes.Metrics do
+  @moduledoc """
+  Prometheus Metrics Endpoint
+  """
   use Proxy.Routes.Base
 
   alias TelemetryMetricsPrometheus.Core, as: Prometheus

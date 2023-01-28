@@ -1,4 +1,7 @@
 defmodule Proxy.Parsers.Protobuf do
+  @moduledoc """
+  Parser for Protobuf format
+  """
   @behaviour Plug.Parsers
 
   @impl true

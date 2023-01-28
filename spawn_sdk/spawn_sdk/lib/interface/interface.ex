@@ -1,4 +1,7 @@
 defmodule SpawnSdk.Interface do
+  @moduledoc """
+  Implements the communication protocol between Elixir SDK and Sidecar.
+  """
   use Actors.Actor.Interface
 
   import SpawnSdk.System.SpawnSystem, only: [call: 3]

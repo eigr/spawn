@@ -1,4 +1,7 @@
 defmodule Proxy.Routes.Base do
+  @moduledoc """
+  Base Plug Router for all other plugs
+  """
   defmacro __using__([]) do
     quote do
       use Plug.Router

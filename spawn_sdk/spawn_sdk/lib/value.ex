@@ -1,4 +1,9 @@
 defmodule SpawnSdk.Value do
+  @moduledoc """
+  `Value` is a declarative DSL that provides the Domain Driven aspect of the Spawn technology.
+  It is through a Value that the user can configure the proxy to carry out
+  the infrastructure tasks and from which it provides all the Worflows.
+  """
   alias SpawnSdk.Flow.{Broadcast, Pipe, Forward, SideEffect}
 
   defstruct state: nil,

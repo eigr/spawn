@@ -1,4 +1,7 @@
 defmodule Proxy.Supervisor do
+  @moduledoc """
+  Proxy Application Root Supervisor.
+  """
   use Supervisor
 
   def child_spec(config) do

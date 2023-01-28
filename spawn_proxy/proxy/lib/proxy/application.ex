@@ -20,12 +20,13 @@ defmodule Proxy.Application do
         Supervisor.start_link(children, opts)
       end)
 
-    with {:ok, pid} <- reply do
-      Logger.info("Proxy Application started successfully in #{humanized_duration}")
-      {:ok, pid}
-    else
-      result ->
-        raise RuntimeError, "Failed to start Proxy Application: #{inspect(result)}"
+    case reply do
+      {:ok, pid} ->
+        Logger.info("Proxy Application started successfully in #{humanized_duration}")
+        {:ok, pid}
+
+      failure ->
+        raise RuntimeError, "Failed to start Proxy Application: #{inspect(failure)}"
     end
   end
 
