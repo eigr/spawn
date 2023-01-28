@@ -108,13 +108,16 @@ defmodule Actors.Registry.ActorRegistry do
         {:not_found, []}
 
       state_hosts ->
-        filter(state_hosts, opts)
+        parent_name = Keyword.fetch!(opts, :parent)
+        filter_by_parent? = Keyword.get(opts, :filter_by_parent, false)
+
+        filter(state_hosts, filter_by_parent?, actor_name, parent_name)
         |> then(fn
           [] ->
             {:not_found, []}
 
           hosts ->
-            choose_hosts(hosts)
+            choose_hosts(hosts, filter_by_parent?, actor_name, parent_name)
         end)
     end
   end
@@ -161,22 +164,19 @@ defmodule Actors.Registry.ActorRegistry do
     StateHandoff.clean(node)
   end
 
-  defp filter(hosts, opts) do
-    filter_by_parent? = Keyword.get(opts, :filter_by_parent, false)
-    parent_name = Keyword.fetch!(opts, :parent)
-
+  defp filter(hosts, filter_by_parent?, actor_name, parent_name) do
     case filter_by_parent? do
       true ->
-        Enum.filter(state_hosts, fn ac ->
+        Enum.filter(hosts, fn ac ->
           ac.actor.id.parent == parent_name
         end)
 
       _ ->
-        Enum.filter(state_hosts, fn ac -> ac.actor.id.name == actor_name end)
+        Enum.filter(hosts, fn ac -> ac.actor.id.name == actor_name end)
     end
   end
 
-  defp choose_hosts(hosts) do
+  defp choose_hosts(hosts, filter_by_parent?, actor_name, parent_name) do
     if filter_by_parent? do
       %HostActor{node: _node, actor: actor, opts: opts} = host = Enum.random(hosts)
       new_actor = %Actor{actor | id: %ActorId{actor.id | name: parent_name}}

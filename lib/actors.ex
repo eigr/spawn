@@ -63,7 +63,7 @@ defmodule Actors do
         e ->
           Logger.error("Failure to make a call to actor #{inspect(actor_name)} #{inspect(e)}")
 
-          reraise e, System.stacktrace()
+          reraise e, __STACKTRACE__
       end
     after
       result -> result
@@ -137,7 +137,7 @@ defmodule Actors do
   @spec spawn_actor(SpawnRequest.t(), any()) :: {:ok, SpawnResponse.t()}
   def spawn_actor(spawn, opts \\ [])
 
-  def spawn_actor(%SpawnRequest{actors: actors} = _spawn, opts) do
+  def spawn_actor(%SpawnRequest{actors: actors} = _spawn, _opts) do
     hosts =
       Enum.map(actors, fn %ActorId{system: system, parent: parent, name: _name} = id ->
         case ActorRegistry.get_hosts_by_actor(system, parent) do
@@ -161,7 +161,7 @@ defmodule Actors do
     Enum.map(actor_hosts, fn %HostActor{
                                node: node,
                                actor: %Actor{} = abstract_actor,
-                               opts: _opts
+                               opts: opts
                              } = _host ->
       spawned_actor = %Actor{abstract_actor | id: id}
       %HostActor{node: node, actor: spawned_actor, opts: opts}
@@ -202,7 +202,7 @@ defmodule Actors do
             [{:async, async?}, {"from", get_caller(caller)}, {"target", actor.id.name}]
 
         {_current, opts} =
-          Keyword.get_and_update(opts, :span_ctx, fn v ->
+          Keyword.get_and_update(opts, :span_ctx, fn span_ctx ->
             maybe_include_span(span_ctx)
           end)
 
@@ -253,7 +253,7 @@ defmodule Actors do
                   "Failure to make a call to actor #{inspect(actor.id.name)} #{inspect(e)}"
                 )
 
-                reraise e, System.stacktrace()
+                reraise e, __STACKTRACE__
             end
           after
             result -> result
