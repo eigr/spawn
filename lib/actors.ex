@@ -63,7 +63,7 @@ defmodule Actors do
         e ->
           Logger.error("Failure to make a call to actor #{inspect(actor_name)} #{inspect(e)}")
 
-          raise ErlangError
+          reraise e, System.stacktrace()
       end
     after
       result -> result
@@ -142,14 +142,7 @@ defmodule Actors do
       Enum.map(actors, fn %ActorId{system: system, parent: parent, name: _name} = id ->
         case ActorRegistry.get_hosts_by_actor(system, parent) do
           {:ok, actor_hosts} ->
-            Enum.map(actor_hosts, fn %HostActor{
-                                       node: node,
-                                       actor: %Actor{} = abstract_actor,
-                                       opts: _opts
-                                     } = _host ->
-              spawned_actor = %Actor{abstract_actor | id: id}
-              %HostActor{node: node, actor: spawned_actor, opts: opts}
-            end)
+            to_spawn_hosts(id, actor_hosts)
 
           error ->
             raise ArgumentError,
@@ -164,6 +157,17 @@ defmodule Actors do
     {:ok, SpawnResponse.new(status: status)}
   end
 
+  defp to_spawn_hosts(id, actor_hosts) do
+    Enum.map(actor_hosts, fn %HostActor{
+                               node: node,
+                               actor: %Actor{} = abstract_actor,
+                               opts: _opts
+                             } = _host ->
+      spawned_actor = %Actor{abstract_actor | id: id}
+      %HostActor{node: node, actor: spawned_actor, opts: opts}
+    end)
+  end
+
   @doc """
   Makes a request to an actor.
 
@@ -171,7 +175,7 @@ defmodule Actors do
     * `opts` - The options to Invoke Actors
   ##
   """
-  @spec invoke(%InvocationRequest{}) :: {:ok, :async} | {:ok, term()} | {:error, term()}
+  @spec invoke(InvocationRequest.t()) :: {:ok, :async} | {:ok, term()} | {:error, term()}
   def invoke(
         %InvocationRequest{} = request,
         opts \\ []
@@ -199,7 +203,7 @@ defmodule Actors do
 
         {_current, opts} =
           Keyword.get_and_update(opts, :span_ctx, fn v ->
-            if is_nil(v), do: {v, OpenTelemetry.Ctx.new()}, else: {v, v}
+            maybe_include_span(span_ctx)
           end)
 
         Tracer.with_span opts[:span_ctx], "client invoke", kind: :client do
@@ -212,9 +216,7 @@ defmodule Actors do
               Tracer.add_event("lookup", [{"target", actor.id.name}])
 
               actor_fqdn =
-                unless pooled? do
-                  {pooled?, system.name, actor.id.name, actor.id.name}
-                else
+                if pooled? do
                   case ActorRegistry.get_hosts_by_actor(system.name, actor.id.name) do
                     {:ok, actor_hosts} ->
                       host = Enum.random(actor_hosts)
@@ -223,6 +225,8 @@ defmodule Actors do
                     _ ->
                       {pooled?, system.name, "#{actor.id.name}-1", actor.id.name}
                   end
+                else
+                  {pooled?, system.name, actor.id.name, actor.id.name}
                 end
 
               do_lookup_action(system.name, actor_fqdn, system, fn actor_ref, actor_ref_id ->
@@ -249,7 +253,7 @@ defmodule Actors do
                   "Failure to make a call to actor #{inspect(actor.id.name)} #{inspect(e)}"
                 )
 
-                raise ErlangError
+                reraise e, System.stacktrace()
             end
           after
             result -> result
@@ -261,6 +265,10 @@ defmodule Actors do
 
     Measurements.dispatch_invoke_duration(system.name, actor.id.name, command_name, time)
     result
+  end
+
+  defp maybe_include_span(span_ctx) do
+    if is_nil(span_ctx), do: {span_ctx, OpenTelemetry.Ctx.new()}, else: {span_ctx, span_ctx}
   end
 
   defp get_caller(nil), do: "external"
@@ -438,19 +446,7 @@ defmodule Actors do
                            metadata: %Metadata{channel_group: channel},
                            settings: %ActorSettings{stateful: stateful, kind: kind}
                          } = _actor} ->
-        cond do
-          kind == :POOLED ->
-            false
-
-          match?(true, stateful) and kind != :ABSTRACT ->
-            true
-
-          not is_nil(channel) and byte_size(channel) > 0 ->
-            true
-
-          true ->
-            false
-        end
+        is_selectable?(kind, stateful, channel)
       end)
       |> Flow.map(fn {actor_name, actor} ->
         {time, result} =
@@ -476,6 +472,22 @@ defmodule Actors do
       _ ->
         Logger.debug("Failed to register Actor #{actor_name}")
         {:error, "Failed to register Actor #{actor_name}"}
+    end
+  end
+
+  defp is_selectable?(kind, stateful, channel) do
+    cond do
+      kind == :POOLED ->
+        false
+
+      match?(true, stateful) and kind != :ABSTRACT ->
+        true
+
+      not is_nil(channel) and byte_size(channel) > 0 ->
+        true
+
+      true ->
+        false
     end
   end
 end

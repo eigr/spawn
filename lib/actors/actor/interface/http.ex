@@ -37,9 +37,7 @@ defmodule Actors.Actor.Interface.Http do
         default_actions
       ) do
     if Enum.member?(default_actions, command) and
-         not Enum.any?(default_actions, fn action ->
-           Enum.any?(commands, fn c -> c.name == action end)
-         end) do
+         not Enum.any?(default_actions, fn action -> contains_action?(commands, action) end) do
       current_state = Map.get(actor_state || %{}, :state)
       current_tags = Map.get(actor_state || %{}, :tags, %{})
 
@@ -88,6 +86,8 @@ defmodule Actors.Actor.Interface.Http do
       end
     end
   end
+
+  defp contains_action?(commands, action), do: Enum.any?(commands, fn c -> c.name == action end)
 
   defp update_state(%EntityState{} = state, %Context{} = ctx) do
     actor = state.actor

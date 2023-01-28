@@ -263,13 +263,7 @@ defmodule Actors.Actor.Entity.Invocation do
                   {:ok, "#{inspect(response.updated_context.metadata)}"}
                 ])
 
-                case do_response(request, response, state, opts) do
-                  :noreply ->
-                    {:noreply, state}
-
-                  response ->
-                    {:reply, {:ok, response}, state}
-                end
+                build_response(request, response, state, opts)
 
               {:error, reason, state} ->
                 Tracer.add_event("failure-invocation", [
@@ -284,6 +278,16 @@ defmodule Actors.Actor.Entity.Invocation do
           {:reply, {:error, "Command [#{command}] not found for Actor [#{actor_name}]"}, state,
            :hibernate}
       end
+    end
+  end
+
+  defp build_response(request, response, state, opts) do
+    case do_response(request, response, state, opts) do
+      :noreply ->
+        {:noreply, state}
+
+      response ->
+        {:reply, {:ok, response}, state}
     end
   end
 

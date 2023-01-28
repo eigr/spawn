@@ -108,37 +108,13 @@ defmodule Actors.Registry.ActorRegistry do
         {:not_found, []}
 
       state_hosts ->
-        filter_by_parent? = Keyword.get(opts, :filter_by_parent, false)
-        parent_name = Keyword.fetch!(opts, :parent)
-
-        case filter_by_parent? do
-          true ->
-            Enum.filter(state_hosts, fn ac ->
-              ac.actor.id.parent == parent_name
-            end)
-
-          _ ->
-            Enum.filter(state_hosts, fn ac -> ac.actor.id.name == actor_name end)
-        end
+        filter(state_hosts, opts)
         |> then(fn
           [] ->
             {:not_found, []}
 
           hosts ->
-            if filter_by_parent? do
-              %HostActor{node: _node, actor: actor, opts: opts} = host = Enum.random(hosts)
-              new_actor = %Actor{actor | id: %ActorId{actor.id | name: parent_name}}
-              {:ok, %HostActor{host | actor: new_actor, opts: opts}}
-            else
-              case LoadBalancer.next_host(hosts) do
-                {:ok, node_host, updated_hosts} ->
-                  StateHandoff.set(actor_name, updated_hosts)
-                  {:ok, node_host}
-
-                _ ->
-                  {:not_found, []}
-              end
-            end
+            choose_hosts(hosts)
         end)
     end
   end
@@ -183,5 +159,37 @@ defmodule Actors.Registry.ActorRegistry do
     Logger.info("Actor registry cleaning actors from node: #{inspect(node)}")
 
     StateHandoff.clean(node)
+  end
+
+  defp filter(hosts, opts) do
+    filter_by_parent? = Keyword.get(opts, :filter_by_parent, false)
+    parent_name = Keyword.fetch!(opts, :parent)
+
+    case filter_by_parent? do
+      true ->
+        Enum.filter(state_hosts, fn ac ->
+          ac.actor.id.parent == parent_name
+        end)
+
+      _ ->
+        Enum.filter(state_hosts, fn ac -> ac.actor.id.name == actor_name end)
+    end
+  end
+
+  defp choose_hosts(hosts) do
+    if filter_by_parent? do
+      %HostActor{node: _node, actor: actor, opts: opts} = host = Enum.random(hosts)
+      new_actor = %Actor{actor | id: %ActorId{actor.id | name: parent_name}}
+      {:ok, %HostActor{host | actor: new_actor, opts: opts}}
+    else
+      case LoadBalancer.next_host(hosts) do
+        {:ok, node_host, updated_hosts} ->
+          StateHandoff.set(actor_name, updated_hosts)
+          {:ok, node_host}
+
+        _ ->
+          {:not_found, []}
+      end
+    end
   end
 end

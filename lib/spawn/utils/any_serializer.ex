@@ -19,8 +19,7 @@ defmodule Spawn.Utils.AnySerializer do
       type_url
       |> String.replace("type.googleapis.com/", "")
       |> String.split(".")
-      |> Enum.map(&upcase_first(&1))
-      |> Enum.join(".")
+      |> Enum.map_join(".", &upcase_first/1)
       |> then(fn package -> Enum.join(["Elixir", package], ".") end)
 
     any_unpack!(any, String.to_existing_atom(package_name))
@@ -52,7 +51,7 @@ defmodule Spawn.Utils.AnySerializer do
 
     package_name =
       with {_, list} <- parts |> List.pop_at(-1),
-           do: list |> Enum.map(&String.downcase(&1)) |> Enum.join(".")
+           do: Enum.map_join(list, ", ", &String.downcase/1)
 
     type_name = parts |> List.last()
 
