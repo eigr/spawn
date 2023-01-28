@@ -1,4 +1,11 @@
 defmodule Actors.Actor.Entity.Supervisor do
+  @moduledoc """
+  `Entity.Supervisor` is the Supervisor of all Host Actors in the system.
+  This in turn is Partitioned using a PartitionSupervisor.
+  We use a hash function based on each Actor's child_spec to partition the actors
+  so that the entire Supervisor is not overloaded and
+  lessening the possibility of cascading failures.
+  """
   use DynamicSupervisor
   require Logger
 

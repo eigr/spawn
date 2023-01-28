@@ -1,4 +1,8 @@
 defmodule Actors.Node.Client do
+  @moduledoc """
+  `Node.Client` Uses the HTTP interface to communicate with the application
+  that owns the ActorHosts.
+  """
   use Tesla
 
   alias Actors.Config.Vapor, as: Config

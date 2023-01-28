@@ -1,4 +1,13 @@
 defmodule Actors.Registry.LoadBalance.Strategies.Random do
+  @moduledoc """
+  `Random` implements the `Actors.Registry.LoadBalance.Strategy` behavior
+  by searching the actors randomly, that is,
+  if you have registered the same actor in N nodes and try to invoke it,
+  the Registry can, if configured,
+  use the random strategy to locate one of them in any of the nodes in a random way,
+  as the name suggests.
+  """
+
   @behaviour Actors.Registry.LoadBalance.Strategy
 
   @impl Actors.Registry.LoadBalance.Strategy

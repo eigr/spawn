@@ -10,7 +10,7 @@ defmodule Sidecar.ProcessSupervisor do
         {Sidecar.MetricsSupervisor, config},
         Spawn.Supervisor.child_spec(config),
         Actors.Supervisors.ProtocolSupervisor.child_spec(config),
-        Actors.Supervisors.EntitySupervisor.child_spec(config),
+        Actors.Supervisors.ActorSupervisor.child_spec(config),
         %{
           id: StateHandoffJoinTask,
           restart: :transient,

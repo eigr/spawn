@@ -1,5 +1,10 @@
 if Code.ensure_loaded?(Statestores.Supervisor) do
   defmodule Actors.Actor.StateManager do
+    @moduledoc """
+    `StateManager` Implements behavior that allows an Actor's state to be saved
+    to persistent storage using database drivers.
+    """
+
     @behaviour Actors.Actor.StateManager.Behaviour
 
     require Logger
@@ -145,6 +150,8 @@ if Code.ensure_loaded?(Statestores.Supervisor) do
   end
 else
   defmodule Actors.Actor.StateManager do
+    @moduledoc false
+
     @behaviour Actors.Actor.StateManager.Behaviour
 
     @not_loaded_message """

@@ -38,7 +38,7 @@ defmodule Spawn.Cluster.Node.Registry do
   @doc """
   Check if Process is alive.
   """
-  def isAlive(mod, actor_name) do
+  def is_alive?(mod, actor_name) do
     case Horde.Registry.lookup(__MODULE__, {mod, actor_name}) do
       [] -> false
       _ -> true

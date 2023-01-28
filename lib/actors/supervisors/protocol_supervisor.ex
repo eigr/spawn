@@ -1,11 +1,12 @@
 defmodule Actors.Supervisors.ProtocolSupervisor do
+  @moduledoc false
   use Supervisor
   require Logger
 
   alias Actors.Config.Vapor, as: Config
 
   @default_finch_pool_count System.schedulers_online()
-  @default_finch_pool_max_idle_timeout 30000
+  @default_finch_pool_max_idle_timeout 30_000
   @default_finch_pool_size 32
 
   def start_link(config) do

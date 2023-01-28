@@ -293,34 +293,20 @@ defmodule Actors do
             Tracer.set_attributes([{:system_name, system_name}])
             Tracer.set_attributes([{:actor_name, actor_name}])
 
-            with {:ok, %HostActor{node: node, actor: actor, opts: opts}} <-
-                   ActorRegistry.lookup(system_name, actor_name,
-                     filter_by_parent: pooled,
-                     parent: parent
-                   ) do
-              case :erpc.call(
-                     node,
-                     __MODULE__,
-                     :try_reactivate_actor,
-                     [system, actor, opts],
-                     @erpc_timeout
-                   ) do
-                {:ok, actor_ref} ->
-                  Tracer.set_attributes([{"actor-pid", "#{inspect(actor_ref)}"}])
+            case ActorRegistry.lookup(system_name, actor_name,
+                   filter_by_parent: pooled,
+                   parent: parent
+                 ) do
+              {:ok, %HostActor{node: node, actor: actor, opts: opts}} ->
+                do_call(
+                  system,
+                  node,
+                  actor,
+                  actor_fqdn,
+                  action_fun,
+                  opts
+                )
 
-                  Tracer.add_event("try-reactivate-actor", [
-                    {"reactivation-on-node", "#{inspect(node)}"}
-                  ])
-
-                  if pooled,
-                    # Ensures that the name change will not affect the host function call
-                    do: action_fun.(actor_ref, %ActorId{actor.id | name: actor_name}),
-                    else: action_fun.(actor_ref, actor.id)
-
-                _ ->
-                  raise ErlangError
-              end
-            else
               {:not_found, _} ->
                 Logger.error("Actor #{actor_name} not found on ActorSystem #{system_name}")
 
@@ -363,6 +349,38 @@ defmodule Actors do
             end
           end
       end
+    end
+  end
+
+  defp do_call(
+         system,
+         node,
+         actor,
+         {pooled, _system_name, _parent, actor_name} = _actor_fqdn,
+         action_fun,
+         opts
+       ) do
+    case :erpc.call(
+           node,
+           __MODULE__,
+           :try_reactivate_actor,
+           [system, actor, opts],
+           @erpc_timeout
+         ) do
+      {:ok, actor_ref} ->
+        Tracer.set_attributes([{"actor-pid", "#{inspect(actor_ref)}"}])
+
+        Tracer.add_event("try-reactivate-actor", [
+          {"reactivation-on-node", "#{inspect(node)}"}
+        ])
+
+        if pooled,
+          # Ensures that the name change will not affect the host function call
+          do: action_fun.(actor_ref, %ActorId{actor.id | name: actor_name}),
+          else: action_fun.(actor_ref, actor.id)
+
+      _ ->
+        raise ErlangError
     end
   end
 

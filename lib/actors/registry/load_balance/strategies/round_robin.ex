@@ -1,4 +1,10 @@
 defmodule Actors.Registry.LoadBalance.Strategies.RoundRobin do
+  @moduledoc """
+  `RoundRobin` implements the `Actors.Registry.LoadBalance.Strategy` behavior
+  by searching the actors using a RoundRobin strategy,
+  that is, it will try to distribute the load equally among the nodes.
+  """
+
   @behaviour Actors.Registry.LoadBalance.Strategy
 
   @impl Actors.Registry.LoadBalance.Strategy

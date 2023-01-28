@@ -1,4 +1,8 @@
 defmodule Actors.Actor.Entity do
+  @moduledoc """
+  `Entity` controls the entire lifecycle of the Host Actor.
+  """
+
   use GenServer, restart: :transient
   require Logger
 

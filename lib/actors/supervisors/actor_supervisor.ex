@@ -1,4 +1,5 @@
-defmodule Actors.Supervisors.EntitySupervisor do
+defmodule Actors.Supervisors.ActorSupervisor do
+  @moduledoc false
   use Supervisor
   require Logger
 

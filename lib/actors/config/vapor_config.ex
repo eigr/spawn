@@ -1,4 +1,10 @@
 defmodule Actors.Config.Vapor do
+  @moduledoc """
+  `Config.Vapor` Implements the `Config` behavior
+  to allow the retrieval of system variables
+  that will be included in the system configuration.
+  """
+
   @behaviour Actors.Config
 
   require Logger

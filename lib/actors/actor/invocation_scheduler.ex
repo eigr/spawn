@@ -1,4 +1,11 @@
 defmodule Actors.Actor.InvocationScheduler do
+  @moduledoc """
+  `InvocationScheduler` is a global process for the cluster that controls
+  all Actions of type Schedule.
+  This process is global to allow that even after restarts of a process or restart
+  of an application we will still be able to perform invocations to actors,
+  without the need for persistent storage such as a database.
+  """
   use GenServer, restart: :transient
   use Retry
 

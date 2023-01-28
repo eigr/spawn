@@ -1,4 +1,9 @@
 defmodule Spawn.Utils.AnySerializer do
+  @moduledoc """
+  `AnySerializer` is responsible for serializing the protobuf type Any to Elixir
+  structures and vice versa.
+  """
+
   alias Google.Protobuf.Any
 
   def unpack_any_bin(bin),

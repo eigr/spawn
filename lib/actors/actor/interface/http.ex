@@ -1,4 +1,8 @@
 defmodule Actors.Actor.Interface.Http do
+  @moduledoc """
+  `Http` is responsible for the communication between the Proxy and the Host application
+  when using the HTTP protocol.
+  """
   use Actors.Actor.Interface
   require Logger
 
@@ -67,11 +71,12 @@ defmodule Actors.Actor.Interface.Http do
           {:error, :no_content, state}
 
         {:ok, %Tesla.Env{body: body}} ->
-          with %ActorInvocationResponse{
-                 updated_context: %Context{} = user_ctx
-               } = resp <- ActorInvocationResponse.decode(body) do
-            {:ok, resp, update_state(state, user_ctx)}
-          else
+          case ActorInvocationResponse.decode(body) do
+            %ActorInvocationResponse{
+              updated_context: %Context{} = user_ctx
+            } = resp ->
+              {:ok, resp, update_state(state, user_ctx)}
+
             error ->
               Logger.error("Error on parse response #{inspect(error)}")
               {:error, :invalid_content, state}

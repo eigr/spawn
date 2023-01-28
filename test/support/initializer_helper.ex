@@ -1,4 +1,6 @@
 defmodule Spawn.InitializerHelper do
+  @moduledoc false
+
   def setup do
     config = Actors.Config.Vapor.load(__MODULE__)
     Sidecar.Supervisor.start_link(config)

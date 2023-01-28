@@ -1,4 +1,6 @@
 defmodule Actors.FactoryTest do
+  @moduledoc false
+
   alias Eigr.Functions.Protocol.{
     RegistrationRequest,
     InvocationRequest,

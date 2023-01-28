@@ -1,4 +1,6 @@
 defmodule Actors.MockTest do
+  @moduledoc false
+
   @doc false
   defmacro __using__(_opts \\ []) do
     quote do

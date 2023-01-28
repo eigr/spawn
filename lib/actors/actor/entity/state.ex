@@ -1,4 +1,7 @@
 defmodule Actors.Actor.Entity.EntityState do
+  @moduledoc """
+  `EntityState` Represents the internal state of an Actor.
+  """
   alias Eigr.Functions.Protocol.Actors.Actor
 
   defstruct system: nil, actor: nil, state_hash: nil, opts: []
