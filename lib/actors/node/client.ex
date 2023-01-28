@@ -52,7 +52,7 @@ defmodule Actors.Node.Client do
     |> to_existing_atom_or_new()
   end
 
-  defp get_host_address(deployment_mode, opts \\ [])
+  defp get_host_address(deployment_mode, _opts \\ [])
 
   defp get_host_address(:sidecar, _opts) do
     "#{get_protocol()}://#{Config.get(Actors, :user_function_host)}:#{Config.get(Actors, :user_function_port)}"
