@@ -15,12 +15,7 @@ defmodule Actors.Config.Vapor do
     case Agent.start_link(fn -> %{} end, name: mod) do
       {:ok, _pid} ->
         Agent.get_and_update(mod, fn state ->
-          if state == %{} do
-            config = load_system_env()
-            {config, config}
-          else
-            {state, state}
-          end
+          update_state(state)
         end)
 
       {:error, {:already_started, _pid}} ->
@@ -90,5 +85,14 @@ defmodule Actors.Config.Vapor do
     end)
 
     config
+  end
+
+  defp update_state(state) do
+    if state == %{} do
+      config = load_system_env()
+      {config, config}
+    else
+      {state, state}
+    end
   end
 end

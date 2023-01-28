@@ -55,9 +55,10 @@ defmodule Actors.Actor.Entity.Lifecycle do
     )
 
     actor_name_key =
-      cond do
-        kind == :POOLED -> parent
-        true -> name
+      if kind == :POOLED do
+        parent
+      else
+        name
       end
 
     :ok = handle_metadata(name, metadata)
@@ -92,7 +93,6 @@ defmodule Actors.Actor.Entity.Lifecycle do
 
     case StateManager.load(name) do
       {:ok, current_state} ->
-        # TODO: Merge current with old ?
         {:noreply, %EntityState{state | actor: %Actor{actor | state: current_state}},
          {:continue, :call_init_action}}
 

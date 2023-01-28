@@ -204,13 +204,10 @@ defmodule Actors.Actor.Entity.Invocation do
         {%InvocationRequest{
            actor:
              %Actor{
-               id: %ActorId{name: actor_name} = id
+               id: %ActorId{name: actor_name} = _id
              } = _actor,
-           metadata: metadata,
-           command_name: command,
-           payload: payload,
-           caller: caller
-         }, opts},
+           command_name: command
+         } = invocation, opts},
         %EntityState{
           system: actor_system,
           actor: %Actor{state: actor_state, commands: commands, timer_commands: timers}
@@ -236,24 +233,7 @@ defmodule Actors.Actor.Entity.Invocation do
         true ->
           interface = get_interface(actor_system)
 
-          metadata = if is_nil(metadata), do: %{}, else: metadata
-          current_state = Map.get(actor_state || %{}, :state)
-          current_tags = Map.get(actor_state || %{}, :tags, %{})
-
-          request =
-            ActorInvocation.new(
-              actor: id,
-              command_name: command,
-              payload: payload,
-              current_context: %Context{
-                metadata: metadata,
-                caller: caller,
-                self: id,
-                state: current_state,
-                tags: current_tags
-              },
-              caller: caller
-            )
+          request = build_request(invocation, actor_state, opts)
 
           Tracer.with_span "invoke-host" do
             interface.invoke_host(request, state, @default_actions)
@@ -279,6 +259,39 @@ defmodule Actors.Actor.Entity.Invocation do
            :hibernate}
       end
     end
+  end
+
+  defp build_request(
+         %InvocationRequest{
+           actor:
+             %Actor{
+               id: %ActorId{} = id
+             } = _actor,
+           metadata: metadata,
+           command_name: command,
+           payload: payload,
+           caller: caller
+         },
+         actor_state,
+         _opts
+       ) do
+    metadata = if is_nil(metadata), do: %{}, else: metadata
+    current_state = Map.get(actor_state || %{}, :state)
+    current_tags = Map.get(actor_state || %{}, :tags, %{})
+
+    ActorInvocation.new(
+      actor: id,
+      command_name: command,
+      payload: payload,
+      current_context: %Context{
+        caller: caller,
+        self: id,
+        state: current_state,
+        metadata: metadata,
+        tags: current_tags
+      },
+      caller: caller
+    )
   end
 
   defp build_response(request, response, state, opts) do
