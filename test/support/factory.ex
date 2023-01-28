@@ -186,7 +186,7 @@ defmodule Actors.FactoryTest do
 
     package_name =
       with {_, list} <- parts |> List.pop_at(-1),
-           do: Enum.map_join(list, ", ", &String.downcase/1)
+           do: Enum.map_join(list, ",", &String.downcase/1)
 
     type_name = parts |> List.last()
 
