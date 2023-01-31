@@ -1,4 +1,7 @@
 defmodule Statestores.Adapters.MSSQL do
+  @moduledoc """
+  Implements the behavior defined in `Statestores.Adapters.Behaviour` for MSSQL databases.
+  """
   use Statestores.Adapters.Behaviour
 
   use Ecto.Repo,

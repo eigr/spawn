@@ -132,13 +132,12 @@ defmodule SpawnSdk.System.SpawnSystem do
     %ActorInvocation{
       actor: %ActorId{name: name, system: system, parent: parent},
       command_name: command,
-      payload: payload,
       current_context: %Eigr.Functions.Protocol.Context{metadata: metadata},
       caller: caller
     } = invocation
 
     %EntityState{
-      actor: %Actor{state: actor_state, id: self_actor_id, commands: commands} = actor
+      actor: %Actor{state: actor_state, id: self_actor_id, commands: commands} = _actor
     } = entity_state
 
     actor_state = actor_state || %{}
@@ -146,92 +145,135 @@ defmodule SpawnSdk.System.SpawnSystem do
     current_tags = Map.get(actor_state, :tags, %{})
     actor_instance = get_cached_actor(system, name, parent)
 
-    cond do
-      Enum.member?(default_actions, command) and
-          not Enum.any?(default_actions, fn action ->
-            Enum.any?(commands, fn c -> c.name == action end)
-          end) ->
-        context = %Eigr.Functions.Protocol.Context{
-          caller: caller,
-          metadata: metadata,
-          self: self_actor_id,
-          state: current_state,
-          tags: current_tags
-        }
+    if Enum.member?(default_actions, command) and
+         not Enum.any?(default_actions, fn action -> contains_action?(commands, action) end) do
+      context = %Eigr.Functions.Protocol.Context{
+        caller: caller,
+        metadata: metadata,
+        self: self_actor_id,
+        state: current_state,
+        tags: current_tags
+      }
 
-        resp =
-          ActorInvocationResponse.new(
-            actor_name: name,
-            actor_system: system,
-            updated_context: context,
-            payload: parse_payload(current_state)
-          )
+      do_call(:default_call, actor_instance, entity_state, invocation, context)
+    else
+      context = %SpawnSdk.Context{
+        caller: caller,
+        metadata: metadata,
+        self: self_actor_id,
+        state: unpack_unknown(current_state),
+        tags: current_tags
+      }
 
-        {:ok, resp, entity_state}
-
-      is_nil(actor_instance) ->
-        {:error, :not_found, entity_state}
-
-      true ->
-        new_ctx = %SpawnSdk.Context{
-          caller: caller,
-          metadata: metadata,
-          self: self_actor_id,
-          state: unpack_unknown(current_state),
-          tags: current_tags
-        }
-
-        case call_instance(actor_instance, command, payload, new_ctx) do
-          {:reply,
-           %SpawnSdk.Value{
-             state: host_state,
-             value: response,
-             tags: tags
-           } = decoded_value} ->
-            pipe = handle_pipe(decoded_value)
-            forward = handle_forward(decoded_value)
-            broadcast = handle_broadcast(decoded_value)
-            side_effects = handle_side_effects(name, system, decoded_value)
-
-            payload_response = parse_payload(response)
-
-            resp = %ActorInvocationResponse{
-              updated_context: %Eigr.Functions.Protocol.Context{
-                caller: caller,
-                self: self_actor_id,
-                state: any_pack!(host_state),
-                tags: tags || current_tags
-              },
-              payload: payload_response,
-              workflow: %Workflow{
-                broadcast: broadcast,
-                effects: side_effects,
-                routing: pipe || forward
-              }
-            }
-
-            new_actor_state =
-              actor_state
-              |> Map.put(:state, any_pack!(host_state))
-              |> Map.put(:tags, tags || current_tags)
-
-            {:ok, resp, %{entity_state | actor: %{actor | state: new_actor_state}}}
-
-          {:error, error} ->
-            {:error, error, entity_state}
-
-          {:error, error, %SpawnSdk.Value{state: _new_state, value: _response} = _value} ->
-            {:error, error, entity_state}
-        end
+      do_call(:host_call, actor_instance, entity_state, invocation, context)
     end
   end
 
   def merge_cache_actors(system, actors) do
     actors = Map.merge(get_cached_actors(system), state_to_map(actors))
-
     :ets.insert(:"#{system}:actors", {"actors", actors})
-
     actors
+  end
+
+  defp contains_action?(commands, action) do
+    Enum.any?(commands, fn c -> c.name == action end)
+  end
+
+  defp do_call(_call_type, actor_instance, entity_state, _invocation, _ctx)
+       when is_nil(actor_instance) do
+    {:error, :not_found, entity_state}
+  end
+
+  defp do_call(
+         :default_call,
+         _actor_instance,
+         %EntityState{
+           actor: %Actor{state: actor_state} = _actor
+         } = entity_state,
+         %ActorInvocation{
+           actor: %ActorId{name: name, system: system, parent: _parent},
+           command_name: _command,
+           payload: _payload,
+           current_context: %Eigr.Functions.Protocol.Context{metadata: _metadata},
+           caller: _caller
+         } = _invocation,
+         ctx
+       ) do
+    actor_state = actor_state || %{}
+    current_state = Map.get(actor_state, :state)
+
+    resp =
+      ActorInvocationResponse.new(
+        actor_name: name,
+        actor_system: system,
+        updated_context: ctx,
+        payload: parse_payload(current_state)
+      )
+
+    {:ok, resp, entity_state}
+  end
+
+  defp do_call(
+         :host_call,
+         actor_instance,
+         %EntityState{
+           actor: %Actor{state: actor_state, id: self_actor_id} = actor
+         } = entity_state,
+         %ActorInvocation{
+           actor: %ActorId{name: name, system: system, parent: _parent},
+           command_name: command,
+           payload: payload,
+           current_context: %Eigr.Functions.Protocol.Context{metadata: _metadata},
+           caller: caller
+         } = _invocation,
+         ctx
+       ) do
+    actor_state = actor_state || %{}
+    _current_state = Map.get(actor_state, :state)
+    current_tags = Map.get(actor_state, :tags, %{})
+
+    case call_instance(actor_instance, command, payload, ctx) do
+      {:reply,
+       %SpawnSdk.Value{
+         state: host_state,
+         value: response,
+         tags: tags
+       } = decoded_value} ->
+        pipe = handle_pipe(decoded_value)
+        forward = handle_forward(decoded_value)
+        broadcast = handle_broadcast(decoded_value)
+        side_effects = handle_side_effects(name, system, decoded_value)
+
+        payload_response = parse_payload(response)
+
+        resp = %ActorInvocationResponse{
+          updated_context: %Eigr.Functions.Protocol.Context{
+            caller: caller,
+            self: self_actor_id,
+            state: any_pack!(host_state),
+            tags: tags || current_tags
+          },
+          payload: payload_response,
+          workflow: %Workflow{
+            broadcast: broadcast,
+            effects: side_effects,
+            routing: pipe || forward
+          }
+        }
+
+        new_actor_state =
+          actor_state
+          |> Map.put(:state, any_pack!(host_state))
+          |> Map.put(:tags, tags || current_tags)
+
+        {:ok, resp, %{entity_state | actor: %{actor | state: new_actor_state}}}
+
+      {:error, error} ->
+        {:error, error, entity_state}
+
+      {:error, error, %SpawnSdk.Value{state: _new_state, value: _response} = _value} ->
+        {:error, error, entity_state}
+    end
   end
 
   defp get_parent_actor_name(spawn_actor_opts) do

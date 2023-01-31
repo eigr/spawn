@@ -1,4 +1,7 @@
 defmodule Statestores.Migrator do
+  @moduledoc """
+  Run database migrations
+  """
   import Statestores.Util, only: [load_app: 0]
 
   @spec migrate(module()) :: {:ok, any, any}

@@ -1,4 +1,5 @@
 defmodule Statestores.Util do
+  @moduledoc false
   @otp_app :spawn_statestores
 
   @type adapter :: term()

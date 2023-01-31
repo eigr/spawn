@@ -1,4 +1,7 @@
 defmodule Statestores.Adapters.Postgres do
+  @moduledoc """
+  Implements the behavior defined in `Statestores.Adapters.Behaviour` for Postgres databases.
+  """
   use Statestores.Adapters.Behaviour
 
   use Ecto.Repo,

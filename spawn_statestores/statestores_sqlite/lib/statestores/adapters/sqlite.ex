@@ -1,4 +1,7 @@
 defmodule Statestores.Adapters.SQLite3 do
+  @moduledoc """
+  Implements the behavior defined in `Statestores.Adapters.Behaviour` for SQLite3 databases.
+  """
   use Statestores.Adapters.Behaviour
 
   use Ecto.Repo,

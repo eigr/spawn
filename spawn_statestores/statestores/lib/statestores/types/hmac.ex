@@ -1,4 +1,5 @@
 defmodule Statestores.Types.HMAC do
+  @moduledoc false
   use Cloak.Ecto.HMAC, otp_app: :spawn_statestores
 
   def init(_config) do

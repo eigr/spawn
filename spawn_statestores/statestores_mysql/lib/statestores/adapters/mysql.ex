@@ -1,4 +1,7 @@
 defmodule Statestores.Adapters.MySQL do
+  @moduledoc """
+  Implements the behavior defined in `Statestores.Adapters.Behaviour` for MySql databases.
+  """
   use Statestores.Adapters.Behaviour
 
   use Ecto.Repo,

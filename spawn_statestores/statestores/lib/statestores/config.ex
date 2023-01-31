@@ -1,4 +1,5 @@
 defmodule Statestores.Config do
+  @moduledoc false
   require Logger
   alias Vapor.Provider.{Env, Dotenv}
 

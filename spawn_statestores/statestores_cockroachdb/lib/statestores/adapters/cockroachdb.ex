@@ -1,4 +1,7 @@
 defmodule Statestores.Adapters.CockroachDB do
+  @moduledoc """
+  Implements the behavior defined in `Statestores.Adapters.Behaviour` for CockroachDB databases.
+  """
   use Statestores.Adapters.Behaviour
 
   use Ecto.Repo,
