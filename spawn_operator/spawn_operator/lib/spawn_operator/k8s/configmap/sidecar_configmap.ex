@@ -26,7 +26,7 @@ defmodule SpawnOperator.K8s.ConfigMap.SidecarCM do
     spawn-eigr.io/sidecar-mode: "sidecar"
 
     # Optional
-    spawn-eigr.io/sidecar-image-tag: "docker.io/eigr/spawn-proxy:0.5.0-rc.13"
+    spawn-eigr.io/sidecar-image-tag: "docker.io/eigr/spawn-proxy:0.5.0"
 
     # Optional. Default 9001
     spawn-eigr.io/sidecar-http-port: "9001"

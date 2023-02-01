@@ -246,6 +246,6 @@ defmodule SpawnOperator.K8s.Deployment do
       Application.get_env(
         :spawn_operator,
         :proxy_image,
-        "docker.io/eigr/spawn-proxy:0.5.0-rc.13"
+        "docker.io/eigr/spawn-proxy:0.5.0"
       )
 end
