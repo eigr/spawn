@@ -6,8 +6,8 @@ defmodule Actors.Supervisors.ProtocolSupervisor do
   alias Actors.Config.Vapor, as: Config
 
   @default_finch_pool_count System.schedulers_online()
-  @default_finch_pool_max_idle_timeout 30_000
-  @default_finch_pool_size 32
+  @default_finch_pool_max_idle_timeout 1_000
+  @default_finch_pool_size 10
 
   def start_link(config) do
     Supervisor.start_link(__MODULE__, config, name: __MODULE__)
