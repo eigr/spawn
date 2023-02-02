@@ -69,6 +69,7 @@ defmodule Spawn.MixProject do
     [
       # Core deps
       {:decimal, "~> 2.0"},
+      {:erqwest, "~> 0.2.3"},
       {:duration_tc, "~> 0.1.0"},
       {:protobuf, "~> 0.11"},
       {:finch, "~> 0.12"},
@@ -101,7 +102,6 @@ defmodule Spawn.MixProject do
       {:mimic, "~> 1.7", only: :test},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:pluggable, "~> 1.0.1", only: :dev, runtime: false}
-
     ]
   end
 

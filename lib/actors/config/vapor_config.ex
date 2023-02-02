@@ -34,6 +34,8 @@ defmodule Actors.Config.Vapor do
           {:app_name, "PROXY_APP_NAME", default: Config.Name.generate(), required: false},
           {:http_port, "PROXY_HTTP_PORT",
            default: 9001, map: &String.to_integer/1, required: false},
+          {:proxy_http_client_adapter, "PROXY_HTTP_CLIENT_ADAPTER",
+           default: "erqwest", required: false},
           {:deployment_mode, "PROXY_DEPLOYMENT_MODE", default: "sidecar", required: false},
           {:node_host_interface, "NODE_IP", default: "0.0.0.0", required: false},
           {:proxy_cluster_strategy, "PROXY_CLUSTER_STRATEGY", default: "gossip", required: false},
@@ -84,7 +86,26 @@ defmodule Actors.Config.Vapor do
       Application.put_env(:spawn, key, value, persistent: true)
     end)
 
+    set_http_client_adapter(config)
+
     config
+  end
+
+  defp set_http_client_adapter(config) do
+    case config.proxy_http_client_adapter do
+      "finch" ->
+        Application.put_env(:tesla, :adapter, {Tesla.Adapter.Finch, [name: SpawnHTTPClient]},
+          persistent: true
+        )
+
+      _ ->
+        Application.put_env(
+          :tesla,
+          :adapter,
+          {Actors.Node.Adapters.ErqwestAdapter, [name: SpawnHTTPClient]},
+          persistent: true
+        )
+    end
   end
 
   defp update_state(state) do
