@@ -1,4 +1,4 @@
-defmodule Actors.HostsPooler do
+defmodule Actors.Actor.Pool do
   @moduledoc """
   This module provides functions for creating actor host pools for pooled actors.
   """

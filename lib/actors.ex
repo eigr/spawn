@@ -12,7 +12,7 @@ defmodule Actors do
   alias Actors.Actor.Entity, as: ActorEntity
   alias Actors.Actor.Entity.Supervisor, as: ActorEntitySupervisor
   alias Actors.Actor.InvocationScheduler
-  alias Actors.HostsPooler
+  alias Actors.Actor.Pool, as: ActorPool
 
   alias Actors.Registry.{ActorRegistry, HostActor}
 
@@ -94,7 +94,7 @@ defmodule Actors do
       ) do
     actors
     |> Map.values()
-    |> Enum.map(fn actor -> HostsPooler.create_actor_host_pool(actor, opts) end)
+    |> Enum.map(fn actor -> ActorPool.create_actor_host_pool(actor, opts) end)
     |> List.flatten()
     |> ActorRegistry.register()
     |> tap(fn _sts -> warmup_actors(actor_system, actors, opts) end)
