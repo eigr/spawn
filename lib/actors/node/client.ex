@@ -11,8 +11,6 @@ defmodule Actors.Node.Client do
 
   @actor_invoke_uri "/api/v1/actors/actions"
 
-  adapter(Tesla.Adapter.Finch, name: SpawnHTTPClient)
-
   plug(
     Tesla.Middleware.BaseUrl,
     "http://#{Config.get(Actors, :user_function_host)}:#{Config.get(Actors, :user_function_port)}"

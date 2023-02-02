@@ -69,6 +69,7 @@ defmodule Spawn.MixProject do
     [
       # Core deps
       {:decimal, "~> 2.0"},
+      {:erqwest, "~> 0.2.3"},
       {:duration_tc, "~> 0.1.0"},
       {:protobuf, "~> 0.11"},
       {:finch, "~> 0.12"},
@@ -92,16 +93,18 @@ defmodule Spawn.MixProject do
       # Statestores deps
       {:spawn_statestores_mssql, path: "./spawn_statestores/statestores_mssql", optional: false},
       {:spawn_statestores_mysql, path: "./spawn_statestores/statestores_mysql", optional: false},
-      {:spawn_statestores_postgres, path: "./spawn_statestores/statestores_postgres", optional: false},
-      {:spawn_statestores_sqlite, path: "./spawn_statestores/statestores_sqlite", optional: false},
-      {:spawn_statestores_cockroachdb, path: "./spawn_statestores/statestores_cockroachdb", optional: false},
+      {:spawn_statestores_postgres,
+       path: "./spawn_statestores/statestores_postgres", optional: false},
+      {:spawn_statestores_sqlite,
+       path: "./spawn_statestores/statestores_sqlite", optional: false},
+      {:spawn_statestores_cockroachdb,
+       path: "./spawn_statestores/statestores_cockroachdb", optional: false},
       # Non runtime deps
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
       {:faker, "~> 0.17", only: :test},
       {:mimic, "~> 1.7", only: :test},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:pluggable, "~> 1.0.1", only: :dev, runtime: false}
-
     ]
   end
 

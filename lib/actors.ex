@@ -441,12 +441,20 @@ defmodule Actors do
         min_demand: @activate_actors_min_demand,
         max_demand: @activate_actors_max_demand
       )
-      |> Flow.filter(fn {_actor_name,
-                         %Actor{
-                           metadata: %Metadata{channel_group: channel},
-                           settings: %ActorSettings{stateful: stateful, kind: kind}
-                         } = _actor} ->
-        is_selectable?(kind, stateful, channel)
+      |> Flow.filter(fn
+        {_actor_name,
+         %Actor{
+           metadata: %Metadata{channel_group: channel},
+           settings: %ActorSettings{stateful: stateful, kind: kind}
+         } = _actor} ->
+          is_selectable?(kind, stateful, channel)
+
+        {_actor_name,
+         %Actor{
+           metadata: nil,
+           settings: %ActorSettings{stateful: stateful, kind: kind}
+         } = _actor} ->
+          is_selectable?(kind, stateful, nil)
       end)
       |> Flow.map(fn {actor_name, actor} ->
         {time, result} =
