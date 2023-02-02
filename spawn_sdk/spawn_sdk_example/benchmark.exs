@@ -41,6 +41,7 @@ Benchee.run(
     configuration: true,
     fast_warning: true
   ],
+  # unit_scaling: :largest,
   profile_after: false
 )
 
