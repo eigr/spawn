@@ -92,7 +92,8 @@ defmodule Spawn.Cluster.StateHandoff do
       |> Map.values()
       |> List.flatten()
       |> Enum.map(& &1.opts[:invocations])
-      |> List.flatten()
+      # TODO check if this is necessary
+      # |> List.flatten()
       |> Enum.reject(&is_nil/1)
       |> Enum.uniq()
 
