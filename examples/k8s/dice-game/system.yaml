@@ -1,0 +1,12 @@
+---
+apiVersion: spawn-eigr.io/v1
+kind: ActorSystem
+metadata:
+  name: game-system
+  namespace: default
+spec:
+  statestore:
+    type: MySql
+    credentialsSecretRef: mysql-connection-secret
+    pool:
+      size: "10"
