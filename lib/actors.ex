@@ -441,13 +441,7 @@ defmodule Actors do
         min_demand: @activate_actors_min_demand,
         max_demand: @activate_actors_max_demand
       )
-      |> Flow.filter(fn {_actor_name,
-                         %Actor{
-                           metadata: %Metadata{channel_group: channel},
-                           settings: %ActorSettings{stateful: stateful, kind: kind}
-                         } = _actor} ->
-        is_selectable?(kind, stateful, channel)
-      end)
+      |> Flow.filter(&is_selectable?/1)
       |> Flow.map(fn {actor_name, actor} ->
         {time, result} =
           :timer.tc(&lookup_or_create_actor/4, [actor_system, actor_name, actor, opts])
@@ -475,7 +469,13 @@ defmodule Actors do
     end
   end
 
-  defp is_selectable?(kind, stateful, channel) do
+  defp is_selectable?(
+         {_actor_name,
+          %Actor{
+            metadata: %Metadata{channel_group: channel},
+            settings: %ActorSettings{stateful: stateful, kind: kind}
+          } = _actor}
+       ) do
     cond do
       kind == :POOLED ->
         false
@@ -490,4 +490,7 @@ defmodule Actors do
         false
     end
   end
+
+  defp is_selectable?({_actor_name, %Actor{} = _actor}),
+    do: false
 end
