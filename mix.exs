@@ -69,7 +69,7 @@ defmodule Spawn.MixProject do
     [
       # Core deps
       {:decimal, "~> 2.0"},
-      {:erqwest, "~> 0.2.3"},
+      {:erqwest, github: "dlesl/erqwest"},
       {:duration_tc, "~> 0.1.0"},
       {:protobuf, "~> 0.11"},
       {:finch, "~> 0.12"},
