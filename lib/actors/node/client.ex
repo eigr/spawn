@@ -16,7 +16,11 @@ defmodule Actors.Node.Client do
     "http://#{Config.get(Actors, :user_function_host)}:#{Config.get(Actors, :user_function_port)}"
   )
 
-  plug(Tesla.Middleware.Headers, [{"content-type", "application/octet-stream"}])
+  plug(Tesla.Middleware.Headers, [
+    {"Connection", "keep-alive"},
+    {"content-type", "application/octet-stream"}
+  ])
+
   plug(Tesla.Middleware.Logger)
 
   def invoke_host_actor(req, opts \\ [])
