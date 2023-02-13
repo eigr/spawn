@@ -14,8 +14,6 @@ defmodule Actors do
   alias Actors.Actor.InvocationScheduler
   alias Actors.Actor.Pool, as: ActorPool
 
-  alias Actors.Config.Vapor, as: Config
-
   alias Actors.Registry.{ActorRegistry, HostActor}
 
   alias Eigr.Functions.Protocol.Actors.{
@@ -182,75 +180,7 @@ defmodule Actors do
         %InvocationRequest{} = request,
         opts \\ []
       ) do
-    case Config.get(__MODULE__, :proxy_disable_metrics) do
-      "false" ->
-        invoke_with_span(request, opts)
-
-      _ ->
-        invoke_without_span(request, opts)
-    end
-  end
-
-  defp invoke_without_span(
-         %InvocationRequest{
-           actor: %Actor{} = actor,
-           system: %ActorSystem{} = system,
-           command_name: command_name,
-           async: async?,
-           metadata: metadata,
-           caller: caller,
-           pooled: pooled?
-         } = request,
-         opts
-       ) do
-    retry with: exponential_backoff() |> randomize |> expiry(60_000),
-          atoms: [:error, :exit, :noproc, :erpc, :noconnection, :timeout],
-          rescue_only: [ErlangError] do
-      try do
-        actor_fqdn =
-          if pooled? do
-            case ActorRegistry.get_hosts_by_actor(system.name, actor.id.name) do
-              {:ok, actor_hosts} ->
-                host = Enum.random(actor_hosts)
-                {pooled?, system.name, host.actor.id.parent, actor.id.name}
-
-              _ ->
-                {pooled?, system.name, "#{actor.id.name}-1", actor.id.name}
-            end
-          else
-            {pooled?, system.name, actor.id.name, actor.id.name}
-          end
-
-        do_lookup_action_without_span(system.name, actor_fqdn, system, fn actor_ref,
-                                                                          actor_ref_id ->
-          %InvocationRequest{
-            actor: %Actor{} = actor
-          } = request
-
-          request_params = %InvocationRequest{
-            request
-            | actor: %Actor{actor | id: actor_ref_id}
-          }
-
-          if is_nil(request.scheduled_to) || request.scheduled_to == 0 do
-            maybe_invoke_async(async?, actor_ref, request_params, opts)
-          else
-            InvocationScheduler.schedule_invoke(request_params)
-
-            {:ok, :async}
-          end
-        end)
-      rescue
-        e ->
-          Logger.error("Failure to make a call to actor #{inspect(actor.id.name)} #{inspect(e)}")
-
-          reraise e, __STACKTRACE__
-      end
-    after
-      result -> result
-    else
-      error -> error
-    end
+    invoke_with_span(request, opts)
   end
 
   defp invoke_with_span(
@@ -343,63 +273,6 @@ defmodule Actors do
 
   defp get_caller(nil), do: "external"
   defp get_caller(caller), do: caller.name
-
-  defp do_lookup_action_without_span(
-         system_name,
-         {pooled, system_name, parent, actor_name} = actor_fqdn,
-         system,
-         action_fun
-       ) do
-    case Spawn.Cluster.Node.Registry.lookup(Actors.Actor.Entity, parent) do
-      [{actor_ref, actor_ref_id}] ->
-        Logger.debug("Lookup Actor #{actor_name}. PID: #{inspect(actor_ref)}")
-
-        if pooled,
-          # Ensures that the name change will not affect the host function call
-          do: action_fun.(actor_ref, %ActorId{actor_ref_id | name: actor_name}),
-          else: action_fun.(actor_ref, actor_ref_id)
-
-      _ ->
-        case ActorRegistry.lookup(system_name, actor_name,
-               filter_by_parent: pooled,
-               parent: parent
-             ) do
-          {:ok, %HostActor{node: node, actor: actor, opts: opts}} ->
-            do_call_without_span(
-              system,
-              node,
-              actor,
-              actor_fqdn,
-              action_fun,
-              opts
-            )
-
-          {:not_found, _} ->
-            Logger.error("Actor #{actor_name} not found on ActorSystem #{system_name}")
-
-            {:error, "Actor #{actor_name} not found on ActorSystem #{system_name}"}
-
-          {:erpc, :timeout} ->
-            Logger.error(
-              "Failed to invoke Actor #{actor_name} on ActorSystem #{system_name}: Node connection timeout"
-            )
-
-            {:error, "Node connection timeout"}
-
-          {:error, reason} ->
-            Logger.error(
-              "Failed to invoke Actor #{actor_name} on ActorSystem #{system_name}: #{inspect(reason)}"
-            )
-
-            {:error, reason}
-
-          _ ->
-            Logger.error("Failed to invoke Actor #{actor_name} on ActorSystem #{system_name}")
-
-            {:error, "Failed to invoke Actor #{actor_name} on ActorSystem #{system_name}"}
-        end
-    end
-  end
 
   defp do_lookup_action(
          system_name,
@@ -509,32 +382,6 @@ defmodule Actors do
           {"reactivation-on-node", "#{inspect(node)}"}
         ])
 
-        if pooled,
-          # Ensures that the name change will not affect the host function call
-          do: action_fun.(actor_ref, %ActorId{actor.id | name: actor_name}),
-          else: action_fun.(actor_ref, actor.id)
-
-      _ ->
-        raise ErlangError
-    end
-  end
-
-  defp do_call_without_span(
-         system,
-         node,
-         actor,
-         {pooled, _system_name, _parent, actor_name} = _actor_fqdn,
-         action_fun,
-         opts
-       ) do
-    case :erpc.call(
-           node,
-           __MODULE__,
-           :try_reactivate_actor,
-           [system, actor, opts],
-           @erpc_timeout
-         ) do
-      {:ok, actor_ref} ->
         if pooled,
           # Ensures that the name change will not affect the host function call
           do: action_fun.(actor_ref, %ActorId{actor.id | name: actor_name}),
