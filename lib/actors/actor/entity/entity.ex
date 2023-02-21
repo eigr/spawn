@@ -195,16 +195,28 @@ defmodule Actors.Actor.Entity do
     )
   end
 
-  @spec get_state(any) :: {:error, term()} | {:ok, term()}
-  def get_state(ref) when is_pid(ref) do
-    GenServer.call(ref, :get_state, 30_000)
+  @doc """
+  Retrieve the Actor state direct from memory.
+  """
+  @spec get_state(any, any) :: {:error, term()} | {:ok, term()}
+  def get_state(ref, opts \\ [])
+
+  def get_state(ref, opts) when is_pid(ref) do
+    timeout = Keyword.get(opts, :timeout, @default_call_timeout)
+    GenServer.call(ref, :get_state, timeout)
   end
 
-  def get_state(ref) do
-    GenServer.call(via(ref), :get_state, 30_000)
+  def get_state(ref, opts) do
+    timeout = Keyword.get(opts, :timeout, @default_call_timeout)
+    GenServer.call(via(ref), :get_state, timeout)
   end
 
+  @doc """
+  Synchronously invokes an Action on an Actor.
+  """
   @spec invoke(any, any, any) :: any
+  def invoke(ref, request, opts \\ [])
+
   def invoke(ref, request, opts) when is_pid(ref) do
     timeout = Keyword.get(opts, :timeout, @default_call_timeout)
     GenServer.call(ref, {:invocation_request, request, opts}, timeout)
@@ -215,7 +227,12 @@ defmodule Actors.Actor.Entity do
     GenServer.call(via(ref), {:invocation_request, request, opts}, timeout)
   end
 
+  @doc """
+  Asynchronously invokes an Action on an Actor.
+  """
   @spec invoke_async(any, any, any) :: :ok
+  def invoke_async(ref, request, opts \\ [])
+
   def invoke_async(ref, request, opts) when is_pid(ref) do
     GenServer.cast(ref, {:invocation_request, request, opts})
   end
