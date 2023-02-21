@@ -1,5 +1,5 @@
 # Spawn
-![ci](https://github.com/eigr/spawn/actions/workflows/ci.yml/badge.svg) • ![release](https://github.com/eigr/spawn/actions/workflows/release.yml/badge.svg)
+![ci](https://github.com/eigr/spawn/actions/workflows/ci.yaml/badge.svg) • ![release](https://github.com/eigr/spawn/actions/workflows/release.yaml/badge.svg)
 
 <!-- MDOC !-->
 
