@@ -1,4 +1,5 @@
 # Spawn
+![ci](https://github.com/github/docs/actions/workflows/ci.yml/badge.svg) • ![release](https://github.com/github/docs/actions/workflows/release.yml/badge.svg)
 
 <!-- MDOC !-->
 
