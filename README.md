@@ -1,5 +1,5 @@
 # Spawn
-![ci](https://github.com/eigr/spawn/actions/workflows/ci.yaml/badge.svg) • ![release](https://github.com/eigr/spawn/actions/workflows/release.yaml/badge.svg)
+![last commit](https://img.shields.io/github/last-commit/eigr/spawn?style=plastic) • ![ci](https://github.com/eigr/spawn/actions/workflows/ci.yaml/badge.svg) • ![release](https://github.com/eigr/spawn/actions/workflows/release.yaml/badge.svg)
 
 <!-- MDOC !-->
 
