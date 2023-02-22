@@ -15,12 +15,8 @@ defmodule Mix.Tasks.Bonny.Gen.Manifest.SpawnOperatorCustomizer do
   def override(%{kind: "ServiceAccount"} = resource) do
     put_in(resource, ~w(metadata labels foo)a, "bar")
   end
-  """
 
-  @spec override(Bonny.Resource.t()) :: Bonny.Resource.t()
-
-  @doc """
-  This function generated Deployment manifest like bellow:
+  If kind is equal to Deployment then this function generated Deployment manifest like bellow:
 
   ```yaml
   %{
@@ -83,9 +79,9 @@ defmodule Mix.Tasks.Bonny.Gen.Manifest.SpawnOperatorCustomizer do
         }
       }
     }
-  }
-  ```
   """
+
+  @spec override(Bonny.Resource.t()) :: Bonny.Resource.t()
   def override(%{kind: "Deployment"} = resource) do
     %{resource | spec: %{resource.spec | template: update_template(resource)}}
   end

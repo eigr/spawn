@@ -35,7 +35,7 @@ defmodule SpawnOperator.K8s.Secret.ActorSystemSecret do
     }
   end
 
-  defp get_storage_options(_system, ns, params) do
+  defp get_storage_options(_system, _ns, params) do
     statestore = String.downcase(Map.get(params, "type", "native")) |> Base.encode64()
     pool_params = Map.get(params, "pool", %{})
     pool_size = Map.get(pool_params, "size", "10") |> Base.encode64()
