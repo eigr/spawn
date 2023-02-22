@@ -12,15 +12,18 @@ defmodule SpawnOperator.K8sConn do
   @spec get(atom()) :: K8s.Conn.t()
   def get(:dev) do
     {:ok, conn} = K8s.Conn.from_file("~/.kube/config", context: "k3d-eigr-spawn")
-    conn
+    struct!(conn, insecure_skip_tls_verify: true)
   end
 
-  def get(:test),
-    do: %K8s.Conn{
+  def get(:test) do
+    conn = %K8s.Conn{
       discovery_driver: K8s.Discovery.Driver.File,
       discovery_opts: [config: "test/support/discovery.json"],
       http_provider: K8s.Client.DynamicHTTPProvider
     }
+
+    struct!(conn, insecure_skip_tls_verify: true)
+  end
 
   def get(_) do
     K8s.Conn.from_service_account()

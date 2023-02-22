@@ -3,9 +3,6 @@ defmodule SpawnOperator.K8s.ConfigMap.SidecarCM do
 
   @behaviour SpawnOperator.K8s.Manifest
 
-  @impl true
-  def manifest(resource, _opts \\ []), do: gen_configmap(resource)
-
   @doc """
   ConfigMap is generated using following CRD labels:
 
@@ -72,6 +69,9 @@ defmodule SpawnOperator.K8s.ConfigMap.SidecarCM do
     # Optional. Default ""
     spawn-eigr.io/sidecar-pubsub-nats-auth-jwt: ""
   """
+  @impl true
+  def manifest(resource, _opts \\ []), do: gen_configmap(resource)
+
   defp gen_configmap(
          %{
            system: system,

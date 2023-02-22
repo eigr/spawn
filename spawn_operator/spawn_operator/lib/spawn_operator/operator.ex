@@ -47,15 +47,15 @@ defmodule SpawnOperator.Operator do
   def controllers(watch_namespace, _opts) do
     [
       %{
-        query: K8s.Client.list("spawn-eigr.io/v1", "Activator", namespace: watch_namespace),
+        query: K8s.Client.watch("spawn-eigr.io/v1", "Activator", namespace: watch_namespace),
         controller: SpawnOperator.Controller.ActivatorController
       },
       %{
-        query: K8s.Client.list("spawn-eigr.io/v1", "ActorHost", namespace: watch_namespace),
+        query: K8s.Client.watch("spawn-eigr.io/v1", "ActorHost", namespace: watch_namespace),
         controller: SpawnOperator.Controller.ActorHostController
       },
       %{
-        query: K8s.Client.list("spawn-eigr.io/v1", "ActorSystem", namespace: watch_namespace),
+        query: K8s.Client.watch("spawn-eigr.io/v1", "ActorSystem", namespace: watch_namespace),
         controller: SpawnOperator.Controller.ActorSystemController
       }
     ]
