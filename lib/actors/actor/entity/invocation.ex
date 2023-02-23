@@ -170,22 +170,20 @@ defmodule Actors.Actor.Entity.Invocation do
           current_state = Map.get(actor_state || %{}, :state)
           current_tags = Map.get(actor_state || %{}, :tags, %{})
 
-          request =
-            ActorInvocation.new(
-              actor: %ActorId{name: actor_name, system: actor_system, parent: parent},
-              command_name: init_command.name,
-              payload: {:noop, Noop.new()},
-              current_context: %Context{
-                metadata: metadata,
-                caller: id,
-                self: ActorId.new(name: actor_name, system: actor_system),
-                state: current_state,
-                tags: current_tags
-              },
-              caller: id
-            )
-
-          interface.invoke_host(request, state, @default_actions)
+          ActorInvocation.new(
+            actor: %ActorId{name: actor_name, system: actor_system, parent: parent},
+            command_name: init_command.name,
+            payload: {:noop, Noop.new()},
+            current_context: %Context{
+              metadata: metadata,
+              caller: id,
+              self: ActorId.new(name: actor_name, system: actor_system),
+              state: current_state,
+              tags: current_tags
+            },
+            caller: id
+          )
+          |> interface.invoke_host(state, @default_actions)
           |> case do
             {:ok, _response, new_state} ->
               {:noreply, new_state}
