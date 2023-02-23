@@ -22,7 +22,7 @@ jobs:
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
     strategy:
       matrix:
-        otp: [23]
+        otp: [23, 24, 25]
         elixir: [1.14]
 
     env:
