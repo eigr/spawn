@@ -12,10 +12,15 @@ defmodule Actors.Actor.Entity.Supervisor do
   alias Eigr.Functions.Protocol.Actors.{Actor, ActorSystem}
   alias Actors.Actor.Entity.EntityState
 
+  @default_number_of_partitions 8
+
   def child_spec() do
     {
       PartitionSupervisor,
-      child_spec: DynamicSupervisor, name: __MODULE__, max_restarts: 100
+      child_spec: DynamicSupervisor,
+      name: __MODULE__,
+      max_restarts: 100,
+      partitions: get_number_of_partitions()
     }
   end
 
@@ -92,4 +97,12 @@ defmodule Actors.Actor.Entity.Supervisor do
   defp get_key(spec), do: :erlang.phash2(Map.drop(spec, [:id]))
 
   defp via(spec), do: {:via, PartitionSupervisor, {__MODULE__, get_key(spec)}}
+
+  defp get_number_of_partitions() do
+    if System.schedulers_online() > 1 do
+      System.schedulers_online()
+    else
+      @default_number_of_partitions
+    end
+  end
 end
