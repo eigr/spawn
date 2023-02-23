@@ -6,6 +6,8 @@ defmodule Spawn.Utils.AnySerializer do
 
   alias Google.Protobuf.Any
 
+  import Spawn.Utils.Common, only: [to_existing_atom_or_new: 1]
+
   def unpack_any_bin(bin),
     do:
       Any.decode(bin)
@@ -22,7 +24,7 @@ defmodule Spawn.Utils.AnySerializer do
       |> Enum.map_join(".", &upcase_first/1)
       |> then(fn package -> Enum.join(["Elixir", package], ".") end)
 
-    any_unpack!(any, String.to_existing_atom(package_name))
+    any_unpack!(any, to_existing_atom_or_new(package_name))
   end
 
   def unpack_unknown(_), do: nil
