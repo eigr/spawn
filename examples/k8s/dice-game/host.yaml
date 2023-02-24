@@ -14,4 +14,4 @@ spec:
       - name: "http"
         containerPort: 8800
   autoscaler:
-    max: 1
+    max: 2
