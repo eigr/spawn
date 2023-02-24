@@ -125,10 +125,10 @@ create-k8s-namespace:
 	kubectl create ns eigr-functions
 
 generate-k8s-manifests:
-	cd spawn_operator/operator && MIX_ENV=dev mix bonny.gen.manifest --image ${operator-image} --namespace eigr-functions
+	cd spawn_operator/spawn_operator && MIX_ENV=dev mix bonny.gen.manifest --image ${operator-image} --namespace eigr-functions
 
 apply-k8s-manifests:
-	kubectl -n eigr-functions apply -f spawn_operator/operator/manifest.yaml
+	kubectl -n eigr-functions apply -f spawn_operator/spawn_operator/manifest.yaml
 
 run-proxy-local:
 	cd spawn_proxy/proxy && mix deps.get && PROXY_DATABASE_TYPE=$(database) SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= iex --name spawn_a2@127.0.0.1 -S mix
