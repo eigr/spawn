@@ -4,7 +4,7 @@ defmodule SpawnOperator do
   """
   require Logger
 
-  @actorsystem_label "spawn-eigr.io.actor-system"
+  @actorsystem_apiversion_key "spawn-eigr.io/actor-system"
   @actorsystem_default_name "spawn-system"
 
   def get_args(resource) do
@@ -31,7 +31,7 @@ defmodule SpawnOperator do
 
   def get_annotations_or_defaults(annotations) do
     %{
-      actor_system: Map.get(annotations, "spawn-eigr.io/actor-system", @actorsystem_default_name),
+      actor_system: Map.get(annotations, @actorsystem_apiversion_key, @actorsystem_default_name),
       user_function_host: Map.get(annotations, "spawn-eigr.io/app-host", "0.0.0.0"),
       user_function_port: Map.get(annotations, "spawn-eigr.io/app-port", "8090"),
       cluster_poling_interval:
