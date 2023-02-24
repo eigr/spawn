@@ -4,8 +4,7 @@ defmodule SpawnOperator.K8s.Service do
   @behaviour SpawnOperator.K8s.Manifest
 
   @default_actor_host_function_ports [
-    %{"name" => "proxy-http", "protocol" => "TCP", "port" => 9000, "targetPort" => "proxy-http"},
-    %{"name" => "proxy-https", "protocol" => "TCP", "port" => 9001, "targetPort" => "proxy-https"}
+    %{"name" => "proxy-http", "protocol" => "TCP", "port" => 9000, "targetPort" => "proxy-http"}
   ]
 
   @impl true
