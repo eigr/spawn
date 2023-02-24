@@ -100,17 +100,19 @@ defmodule SpawnOperator.Handler.ActorHostHandler do
   @impl Pluggable
   def call(%Bonny.Axn{action: action} = axn, nil) when action in [:add, :modify] do
     %Bonny.Axn{resource: resource} = axn
-    host_resource = build_host_deploy(resource)
-
     host_config_map = build_host_configmap(resource)
+    host_resource = build_host_deploy(resource)
     host_hpa = build_host_hpa(resource)
     host_service = build_host_service(resource)
 
     axn
+    |> Bonny.Axn.register_descendant(host_hpa)
+    |> Bonny.Axn.register_descendant(host_service)
     |> Bonny.Axn.register_descendant(host_config_map)
     |> Bonny.Axn.register_descendant(host_resource)
-    |> Bonny.Axn.register_descendant(host_service)
-    |> Bonny.Axn.register_descendant(host_hpa)
+    # |> Bonny.Axn.update_status(fn status ->
+    #  put_in(status, [Access.key(:some, %{}), :field], "foo")
+    # end)
     |> Bonny.Axn.success_event()
   end
 
