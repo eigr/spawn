@@ -5,7 +5,7 @@ defmodule Activator.Encoder.CloudEvent do
   @behaviour Activator.Encoder
 
   alias Google.Protobuf.Any
-  alias Io.Cloudevents.V1.CloudEvent, as: CloudEventType
+  alias Io.Cloudevents.V1.CloudEvent
 
   def encode(data) do
     {:ok, data}
@@ -13,16 +13,16 @@ defmodule Activator.Encoder.CloudEvent do
 
   @spec decode(any) :: {:error, any} | {:ok, any}
   def decode(data) when is_binary(data) do
-    case CloudEventType.decode(data) do
+    case CloudEvent.decode(data) do
       %Io.Cloudevents.V1.CloudEvent{
         attributes: _attributes,
-        data: {:binary_data, event_data},
-        id: _id,
-        source: _source,
+        data: {:binary_data, payload},
+        id: id,
+        source: source,
         spec_version: _spec,
         type: _type
       } = _decoded_data ->
-        {:ok, Any.decode(event_data)}
+        {:ok, source, id, Any.decode(payload)}
 
       error ->
         {:error, "Error on try decode data. Error #{inspect(error)}"}

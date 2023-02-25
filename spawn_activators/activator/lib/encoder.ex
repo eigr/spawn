@@ -3,7 +3,11 @@ defmodule Activator.Encoder do
   Encoder convert one type to another
   """
 
-  @type data :: any()
+  @type data :: binary()
+
+  @type source :: String.t()
+
+  @type id :: String.t()
 
   @doc """
   Encode data to certain type.
@@ -13,5 +17,5 @@ defmodule Activator.Encoder do
   @doc """
   Decode data to certain type.
   """
-  @callback decode(data) :: {:ok, term()} | {:error, any()}
+  @callback decode(data) :: {:ok, source(), id(), term()} | {:error, any()}
 end

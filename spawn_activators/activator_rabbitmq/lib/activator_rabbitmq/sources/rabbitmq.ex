@@ -14,14 +14,9 @@ defmodule ActivatorRabbitMQ.Sources.RabbitMQ do
 
   @impl true
   def handle_message(_, message, context) do
-    encoder = Keyword.fetch!(context, :encoder)
-    system = Keyword.fetch!(context, :system)
-    actors = Keyword.fetch!(context, :targets)
-
     message
     |> Message.update_data(fn data ->
-      Logger.debug("Received message #{inspect(data)}")
-      Dispatcher.dispatch(encoder, data, system, actors)
+      Dispatcher.dispatch(data, context)
     end)
   rescue
     e ->
@@ -30,17 +25,17 @@ defmodule ActivatorRabbitMQ.Sources.RabbitMQ do
   end
 
   defp start_source(opts) do
-    encoder = Keyword.get(opts, :encoder, Activator.Encoder.Base64)
+    encoder = Keyword.get(opts, :encoder, Activator.Encoder.CloudEvent)
     actor_concurrency = Keyword.get(opts, :actor_concurrency, 1)
     actor_system = Keyword.fetch!(opts, :actor_system)
-    target_actors = Keyword.fetch!(opts, :targets)
+    kind = Keyword.fetch!(opts, :kind)
 
     Broadway.start_link(__MODULE__,
       name: __MODULE__,
       context: [
         encoder: encoder,
         system: actor_system,
-        targets: target_actors
+        kind: kind
       ],
       producer: get_producer_settings(opts),
       processors: [
