@@ -61,8 +61,7 @@ defmodule SpawnOperator.K8s.Service do
           "prometheus.io/scrape" => "true"
         },
         "labels" => %{
-          "spawn-eigr.io/controller.version" =>
-            "#{to_string(Application.spec(:spawn_operator, :vsn))}"
+          "spawn-eigr.io/controller.version" => "0.5.0"
         },
         "name" => "#{name}",
         "namespace" => ns

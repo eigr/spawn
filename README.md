@@ -170,7 +170,7 @@ kubectl create ns eigr-functions && curl -L https://github.com/eigr/spawn/releas
 > **_NOTE:_** You need to inform the desired release version. For example:
 
 ```shell
-kubectl create ns eigr-functions && curl -L https://github.com/eigr/spawn/releases/download/v0.5.0-rc.6/manifest.yaml | kubectl apply -f -
+kubectl create ns eigr-functions && curl -L https://github.com/eigr/spawn/releases/download/v0.5.0/manifest.yaml | kubectl apply -f -
 ```
 
 ## Getting Started
