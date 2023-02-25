@@ -96,8 +96,6 @@ defmodule SpawnOperator.K8s.ConfigMap.SidecarCM do
         "PROXY_CLUSTER_POLLING" => annotations.cluster_poling_interval,
         "PROXY_CLUSTER_STRATEGY" => "kubernetes-dns",
         "PROXY_HEADLESS_SERVICE" => "system-#{system}",
-        "PROXY_HEARTBEAT_INTERVAL" => "240000",
-        "PROXY_ROOT_TEMPLATE_PATH" => "/home/app",
         "PROXY_HOST_INTERFACE" => "http",
         "PROXY_UDS_ENABLED" => annotations.proxy_uds_enabled,
         "PROXY_UDS_ADDRESS" => annotations.proxy_uds_address,
@@ -106,6 +104,8 @@ defmodule SpawnOperator.K8s.ConfigMap.SidecarCM do
         # TODO use secrets to storage nats configuration
         "SPAWN_DISABLE_METRICS" => annotations.metrics_disabled,
         "SPAWN_CONSOLE_METRICS" => annotations.metrics_log_console,
+        "SPAWN_PUBSUB_ADAPTER" => annotations.pubsub_adapter,
+        "SPAWN_PUBSUB_NATS_HOSTS" => annotations.pubsub_nats_hosts,
         "SPAWN_PUBSUB_NATS_AUTH" => annotations.pubsub_nats_auth,
         "SPAWN_PUBSUB_NATS_AUTH_TYPE" => annotations.pubsub_nats_auth_type,
         "SPAWN_PUBSUB_NATS_TLS" => annotations.pubsub_nats_tls,
