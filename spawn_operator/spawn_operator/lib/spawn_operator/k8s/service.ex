@@ -3,10 +3,6 @@ defmodule SpawnOperator.K8s.Service do
 
   @behaviour SpawnOperator.K8s.Manifest
 
-  @default_actor_host_function_ports [
-    %{"name" => "proxy-http", "protocol" => "TCP", "port" => 9000, "targetPort" => "proxy-http"}
-  ]
-
   @impl true
   def manifest(
         %{
@@ -15,10 +11,21 @@ defmodule SpawnOperator.K8s.Service do
           name: name,
           params: params,
           labels: _labels,
-          annotations: _annotations
+          annotations: annotations
         } = _resource,
         _opts \\ []
       ) do
+    proxy_http_port = String.to_integer(annotations.proxy_http_port)
+
+    default_actor_host_function_ports = [
+      %{
+        "name" => "proxy-http",
+        "protocol" => "TCP",
+        "port" => proxy_http_port,
+        "targetPort" => proxy_http_port
+      }
+    ]
+
     host_params = Map.get(params, "host")
     actor_host_function_ports = Map.get(host_params, "ports", [])
 
@@ -28,16 +35,21 @@ defmodule SpawnOperator.K8s.Service do
           port = Map.get(map, "containerPort")
           m = Map.delete(map, "containerPort")
           m = Map.put(m, "port", port)
-          Map.put(m, "targetPort", Map.get(m, "name"))
+          Map.put(m, "targetPort", port)
         else
-          Map.put(map, "targetPort", Map.get(map, "name"))
+          []
         end
       end)
+      |> List.flatten()
 
     actor_host_function_ports =
-      (actor_host_function_ports ++
-         @default_actor_host_function_ports)
-      |> Enum.uniq()
+      if length(actor_host_function_ports) > 0 do
+        (actor_host_function_ports ++
+           default_actor_host_function_ports)
+        |> Enum.uniq()
+      else
+        default_actor_host_function_ports
+      end
 
     %{
       "apiVersion" => "v1",
