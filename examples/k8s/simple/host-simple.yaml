@@ -10,11 +10,15 @@ metadata:
 
     # Optional. Default 9001
     spawn-eigr.io/sidecar-http-port: "9001"
+
+    # Optional. Here I`m using Nats Broker without authentication
+    spawn-eigr.io/sidecar-pubsub-adapter: "nats"
+    spawn-eigr.io/sidecar-pubsub-nats-hosts: "nats://nats-cluster:4222"
 spec:
   host:
     image: eigr/spawn-springboot-examples:0.5.3 # Mandatory
     ports:
       - name: http
         containerPort: 8090
-      - name: https
-        containerPort: 8091
+  autoscaler:
+    max: 3

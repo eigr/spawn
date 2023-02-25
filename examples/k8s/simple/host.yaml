@@ -50,12 +50,8 @@ metadata:
     # Optional. Default "nats://127.0.0.1:4222"
     spawn-eigr.io/sidecar-pubsub-nats-hosts: "nats://127.0.0.1:4222"
 spec:
-  # sidecar:
-  #  image: docker.io/eigr/spawn-proxy:0.5.0
   host:
     image: eigr/spawn-springboot-examples:0.5.0 # Mandatory
     ports:
       - name: http
         containerPort: 8090
-      - name: https
-        containerPort: 8091
