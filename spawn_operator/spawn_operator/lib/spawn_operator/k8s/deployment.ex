@@ -93,6 +93,7 @@ defmodule SpawnOperator.K8s.Deployment do
           "metadata" => %{
             "annotations" => %{
               "prometheus.io/port" => "#{annotations.proxy_http_port}",
+              "prometheus.io/path" => "/metrics",
               "prometheus.io/scrape" => "true"
             },
             "labels" => %{

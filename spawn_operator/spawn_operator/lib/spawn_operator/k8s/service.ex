@@ -55,6 +55,11 @@ defmodule SpawnOperator.K8s.Service do
       "apiVersion" => "v1",
       "kind" => "Service",
       "metadata" => %{
+        "annotations" => %{
+          "prometheus.io/port" => "#{annotations.proxy_http_port}",
+          "prometheus.io/path" => "/metrics",
+          "prometheus.io/scrape" => "true"
+        },
         "labels" => %{
           "spawn-eigr.io/controller.version" =>
             "#{to_string(Application.spec(:spawn_operator, :vsn))}"
