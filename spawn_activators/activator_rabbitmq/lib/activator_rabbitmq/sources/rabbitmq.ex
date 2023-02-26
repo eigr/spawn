@@ -20,8 +20,24 @@ defmodule ActivatorRabbitMQ.Sources.RabbitMQ do
     end)
   rescue
     e ->
-      Logger.error(Exception.format(:error, e, __STACKTRACE__))
-      # reraise e, __STACKTRACE__
+      msg =
+        Message.update_data(message, fn data ->
+          {e, __STACKTRACE__, data}
+        end)
+
+      Message.put_batcher(msg, :dispatch_err)
+  end
+
+  def handle_batch(:dispatch_err, messages, _, _) do
+    Enum.map(messages, fn msg ->
+      {error, stack_trace, data} = msg.data
+
+      Logger.error(
+        "Error on process Message: #{inspect(data)}. Error #{Exception.format(:error, error, stack_trace)}"
+      )
+    end)
+
+    messages
   end
 
   defp start_source(opts) do
@@ -42,6 +58,9 @@ defmodule ActivatorRabbitMQ.Sources.RabbitMQ do
         default: [
           concurrency: actor_concurrency
         ]
+      ],
+      batchers: [
+        dispatch_err: [batch_size: 10, concurrency: 2, batch_timeout: 1500]
       ]
     )
   end
