@@ -6,7 +6,7 @@
 
 ![ci](https://github.com/eigr/spawn/actions/workflows/ci.yaml/badge.svg) ![release](https://github.com/eigr/spawn/actions/workflows/release.yaml/badge.svg) ![last commit](https://img.shields.io/github/last-commit/eigr/spawn?style=social)
 
-### **[Website](https://eigr.io)** • **[Getting Started](#getting-started)** • **[SDKs](#sdks)** • **[Documentation](https://eigr.io/docs/projects-spawn/spawn-introduction/)** • **[Blog](https://eigr.io/blog/)** • **[Twitter](https://twitter.com/eigr_io)**
+### **[Website](https://eigr.io)** • **[Getting Started](#getting-started)** • **[SDKs](#sdks)** • **[Documentation](https://eigr.io/docs/projects-spawn/spawn-introduction/)** • **[Blog](https://eigr.io/blog/)** • **[Twitter](https://twitter.com/eigr_io)** • **[Discord](https://discord.gg/2PcshvfS93)**
 
 ## Overview
 
