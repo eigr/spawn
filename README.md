@@ -10,6 +10,14 @@
 
 ## Overview
 
+***What is Spawn?***
+
+There are two ways to answer this question, the short form would be something like:
+
+>  "Spawn is an Actor Model framework, which does a lot, really lot, of cool stuff that allows you to quickly deliver software oriented to your business domain."
+
+Well since this answer doesn't say much, let's go the long way.
+
 Spawn's main goal is to remove the complexity in developing microservices, providing simple and intuitive APIs, as well as a declarative deployment and configuration model and based on a Serverless architecture and Actor Model.
 This leaves the developer to focus on developing the business domain while the platform deals with the complexities and infrastructure needed to support the scalable, resilient, distributed, and event-driven architecture that microservices-driven systems requires.
 
@@ -27,11 +35,11 @@ These are the main concepts:
 
 1. **A Stateful Serverless Platform** running on top of Kubernetes, based on the Sidecar pattern and built on top of the BEAM VM.
 
-2. **Inversion of State**. This means that unlike conventional Serverless architectures where the developer fetches state from persistent storage we on the other hand send the state as the context of the event the function is receiving.
+2. **Inversion of State**. This means that unlike conventional Serverless architectures where the developer fetches state from persistent storage we on the other hand send the state as the context of the event the function is receiving. Bringing state closer to computing.
 
 3. **Polyglot**. The platform must embrace as many software communities as possible. That's why the polyglot language model is adopted with SDK development for various programming languages.
 
-4. **Less Infrastructure More Domain Code**. This means that our platform will give the developer the tools to focus only on their business without worrying about issues such as:
+4. **Less Infrastructure**. This means that our platform will give the developer the tools to focus only on their business without worrying about issues such as:
 
    * Resource allocation
    * Definition of connections and Pools
@@ -42,8 +50,6 @@ These are the main concepts:
 5. **The basic primitive is the Actor** (from the actors model) and ***not*** the Function (from the traditional serverless architectures).
 
 6. Horizontal scalability with automatic **Activation** and **Deactivation** of Actors on demand. 
-
-7. **Embracing Edge** and Less Conventional Hardware Architectures.
 
 Watch the video explaining how it works:
 
@@ -63,7 +69,7 @@ knowledge or time to create such systems satisfactorily.
 
 When studying this scenario, we realize that many of these current problems belong to the following groups:
 
-- Fast delivery and business oriented.
+- Fast business oriented software delivery.
 - State management.
 - Scalability.
 - Resilience and fault tolerance.
