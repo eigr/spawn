@@ -11,7 +11,8 @@ defmodule SpawnOperator.Application do
     Logger.info("Starting Eigr Spawn Operator Controller...")
 
     children = [
-      {SpawnOperator.Controller.Supervisor, conn: SpawnOperator.K8sConn.get(env)},
+      {SpawnOperator.Controller.Supervisor,
+       conn: SpawnOperator.K8sConn.get(env), enable_leader_election: true},
       {Bandit, plug: SpawnOperator.Router, scheme: :http, options: [port: @port]}
     ]
 
