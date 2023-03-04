@@ -14,6 +14,11 @@ COPY priv/ ./priv
 COPY mix.exs .
 COPY mix.lock .
 
+RUN set -eux && \
+    curl https://sh.rustup.rs -sSf | sh -s -- --profile minimal --default-toolchain 1.67.1 --default-host aarch64-unknown-linux-musl
+
+ENV RUSTFLAGS="-C target-feature=-crt-static"
+
 RUN mix local.rebar --force \
     && mix local.hex --force \
     && mix deps.get \
