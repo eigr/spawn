@@ -14,7 +14,7 @@
 
 There are two ways to answer this question, the short form would be something like:
 
->  "Spawn is an Actor Model framework, which does a lot, really lot, of cool stuff that allows you to quickly deliver software oriented to your business domain."
+>  "Spawn is an Actor Model framework and Serverless Platform, which does a lot, really lot, of cool stuff that allows you to quickly deliver software oriented to your business domain."
 
 Well since this answer doesn't say much, let's go the long way.
 
