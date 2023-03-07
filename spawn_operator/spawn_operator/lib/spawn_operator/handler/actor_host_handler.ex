@@ -98,8 +98,8 @@ defmodule SpawnOperator.Handler.ActorHostHandler do
   def init(_opts), do: nil
 
   @impl Pluggable
-  def call(%Bonny.Axn{action: action} = axn, nil) when action in [:add, :modify] do
-    %Bonny.Axn{resource: resource} = axn
+  def call(%Bonny.Axn{action: action, resource: resource} = axn, nil)
+      when action in [:add, :modify] do
     host_config_map = build_host_configmap(resource)
     host_resource = build_host_deploy(resource)
     host_hpa = build_host_hpa(resource)

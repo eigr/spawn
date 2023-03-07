@@ -6,11 +6,16 @@ defmodule Activator.Dispatcher.DefaultDispatcher do
   alias Eigr.Functions.Protocol.Actors.{Actor, ActorId, ActorSystem}
 
   alias Eigr.Functions.Protocol.{
-    InvocationRequest
+    InvocationRequest,
+    Noop
   }
 
   @impl Activator.Dispatcher
   @spec dispatch(any, Activator.Dispatcher.options()) :: :ok | {:error, any()}
+  def dispatch(data, options) when is_nil(data) do
+    do_dispatch(nil, options)
+  end
+
   def dispatch(data, options) do
     encoder = Keyword.get(options, :encoder, Activator.Encoder.CloudEvent)
 
@@ -23,6 +28,33 @@ defmodule Activator.Dispatcher.DefaultDispatcher do
         Logger.error("Failure on decode event. Error: #{inspect(error)}")
         {:error, error}
     end
+  end
+
+  defp do_dispatch(payload, opts) when is_nil(payload) do
+    actor_name = Keyword.fetch!(opts, :actor)
+    command = Keyword.fetch!(opts, :command)
+    system_name = Keyword.fetch!(opts, :system)
+
+    actor = Actor.new(id: ActorId.new(name: actor_name, system: system_name))
+    system = ActorSystem.new(name: system_name)
+
+    Logger.info("Dispaching message to Actor #{inspect(actor_name)}")
+
+    Logger.debug(
+      "Request for Activate Actor [#{actor_name}] using command [#{command}] without payload"
+    )
+
+    res =
+      InvocationRequest.new(
+        system: system,
+        actor: actor,
+        payload: {:noop, Noop.new()},
+        command_name: command,
+        async: true,
+        caller: nil
+      )
+
+    Actors.invoke(res)
   end
 
   defp do_dispatch(payload, opts) do
