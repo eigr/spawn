@@ -1,4 +1,4 @@
-defmodule SpawnOperator.K8s.Deployment do
+defmodule SpawnOperator.K8s.Proxy.Deployment do
   @moduledoc false
 
   @behaviour SpawnOperator.K8s.Manifest

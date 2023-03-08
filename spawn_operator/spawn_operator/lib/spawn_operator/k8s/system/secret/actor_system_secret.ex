@@ -1,4 +1,4 @@
-defmodule SpawnOperator.K8s.Secret.ActorSystemSecret do
+defmodule SpawnOperator.K8s.System.Secret.ActorSystemSecret do
   @moduledoc false
 
   @behaviour SpawnOperator.K8s.Manifest

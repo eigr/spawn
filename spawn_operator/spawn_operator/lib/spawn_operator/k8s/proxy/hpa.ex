@@ -1,4 +1,4 @@
-defmodule SpawnOperator.K8s.HPA do
+defmodule SpawnOperator.K8s.Proxy.HPA do
   @moduledoc false
 
   import Bonny.Config, only: [conn: 0]

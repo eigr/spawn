@@ -89,8 +89,7 @@ defmodule SpawnOperator.Handler.ActorHostHandler do
 
   """
 
-  alias SpawnOperator.K8s.ConfigMap.SidecarCM
-  alias SpawnOperator.K8s.{Deployment, HPA, Service}
+  alias SpawnOperator.K8s.Proxy.{CM.Configmap, Deployment, HPA, Service}
 
   @behaviour Pluggable
 
@@ -140,7 +139,7 @@ defmodule SpawnOperator.Handler.ActorHostHandler do
 
   defp build_host_configmap(resource) do
     SpawnOperator.get_args(resource)
-    |> SidecarCM.manifest()
+    |> Configmap.manifest()
   end
 
   defp build_host_hpa(resource) do

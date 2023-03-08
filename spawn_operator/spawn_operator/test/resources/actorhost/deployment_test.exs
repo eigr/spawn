@@ -2,7 +2,7 @@ defmodule DeploymentTest do
   use ExUnit.Case
   use Bonny.Axn.Test
 
-  alias SpawnOperator.K8s.Deployment
+  alias SpawnOperator.K8s.Proxy.Deployment
 
   import SpawnOperator.FactoryTest
 

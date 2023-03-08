@@ -1,4 +1,4 @@
-defmodule SpawnOperator.K8s.HeadlessService do
+defmodule SpawnOperator.K8s.System.HeadlessService do
   @moduledoc false
 
   @behaviour SpawnOperator.K8s.Manifest

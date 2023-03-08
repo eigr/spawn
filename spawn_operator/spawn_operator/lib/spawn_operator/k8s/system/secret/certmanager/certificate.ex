@@ -1,4 +1,4 @@
-defmodule SpawnOperator.K8s.Secret.CertManager.Certificate do
+defmodule SpawnOperator.K8s.System.Secret.CertManager.Certificate do
   @moduledoc """
   This module generates CertManager Certificate to use with Erlang Dist in tls mode.
 

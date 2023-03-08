@@ -1,4 +1,4 @@
-defmodule SpawnOperator.K8s.ConfigMap.SidecarCM do
+defmodule SpawnOperator.K8s.Proxy.CM.Configmap do
   @moduledoc false
 
   @behaviour SpawnOperator.K8s.Manifest
