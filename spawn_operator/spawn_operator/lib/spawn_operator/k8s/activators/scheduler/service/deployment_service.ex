@@ -1,4 +1,6 @@
-defmodule SpawnOperator.K8s.Activators.Simple.Deployment do
+defmodule SpawnOperator.K8s.Activators.Scheduler.DeploymentService do
+  @moduledoc false
+
   @behaviour SpawnOperator.K8s.Manifest
 
   @impl true

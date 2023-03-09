@@ -1,4 +1,6 @@
-defmodule SpawnOperator.K8s.Activators.Simple.Daemonset do
+defmodule SpawnOperator.K8s.Activators.Scheduler.CronJob do
+  @moduledoc false
+
   @behaviour SpawnOperator.K8s.Manifest
 
   @impl true
