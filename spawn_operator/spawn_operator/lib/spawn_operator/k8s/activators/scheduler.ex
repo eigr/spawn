@@ -11,9 +11,13 @@ defmodule SpawnOperator.K8s.Activators.Scheduler do
   metadata:
     name: cron-activator # Mandatory. Name of the activator
     namespace: default # Optional. Default namespace is "default"
+    annotations:
+      # Mandatory. Name of the ActorSystem declared in ActorSystem CRD
+      spawn-eigr.io/actor-system: spawn-system
   spec:
     activator:
       type: Cron
+      kind: Deployment # DaemonSet
     bindings:
       sources:
         - name: joe-scheduler
@@ -35,19 +39,43 @@ defmodule SpawnOperator.K8s.Activators.Scheduler do
   """
   alias SpawnOperator.K8s.Activators.Scheduler.{
     Cm.Configmap,
+    CronJob,
     DaemonSet,
     DaemonSetService,
     Deployment,
     DeploymentService
   }
 
+  import Spawn.Utils.Common, only: [to_existing_atom_or_new: 1]
+
   @spec apply(map(), Bonny.Axn.t(), atom()) :: Bonny.Axn.t()
   def apply(args, axn, action) when action in [:add, :modify] do
+    cron_job = CronJob.manifest(args)
+    configmap = Configmap.manifest(args)
+
+    {resource, service} =
+      case get_activator_kind(args.params) do
+        :daemonset ->
+          {
+            DaemonSet.manifest(args),
+            DaemonSetService.manifest(args)
+          }
+
+        :deployment ->
+          {
+            Deployment.manifest(args),
+            DeploymentService.manifest(args)
+          }
+
+        _ ->
+          raise ArgumentError, "Invalid Activator Kind. Valids are [DaemonSet, Deployment]"
+      end
+
     axn
-    |> Bonny.Axn.register_descendant(build_service(args))
-    |> Bonny.Axn.register_descendant(build_config_map(args))
-    |> Bonny.Axn.register_descendant(build_resource(args))
-    |> Bonny.Axn.register_descendant(build_cron_job(args))
+    |> Bonny.Axn.register_descendant(configmap)
+    |> Bonny.Axn.register_descendant(service)
+    |> Bonny.Axn.register_descendant(resource)
+    |> Bonny.Axn.register_descendant(cron_job)
     # |> Bonny.Axn.update_status(fn status ->
     #  put_in(status, [Access.key(:some, %{}), :field], "foo")
     # end)
@@ -60,15 +88,8 @@ defmodule SpawnOperator.K8s.Activators.Scheduler do
 
   def apply(args, axn, action) when action in [:delete], do: Bonny.Axn.success_event(axn)
 
-  defp build_service(args) do
-  end
-
-  defp build_config_map(args) do
-  end
-
-  defp build_resource(args) do
-  end
-
-  defp build_cron_job(args) do
+  defp get_activator_kind(params) do
+    String.downcase(params.activator.kind)
+    |> to_existing_atom_or_new()
   end
 end
