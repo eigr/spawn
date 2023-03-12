@@ -12,7 +12,26 @@ defmodule ActivatorGRPC.Application do
   @impl true
   def start(_type, _args) do
     config = Config.load(__MODULE__)
-    entities = [%{service_name: "io.eigr.spawn.example.TestService"}]
+
+    entities = [
+      %{
+        service_name: "io.eigr.spawn.example.TestService",
+        protocol: grpc,
+        system: system_name,
+        actor: actor_name,
+        options: [
+          pooled: false,
+          timeout: 30_000
+          async: false,
+          stream_out_from_channel: "my-channel"
+        ],
+        authentication: %{
+          # valids are :none, :basic, :token
+          kind: :basic,
+          secret_key: ""
+        }
+      }
+    ]
 
     route_config = %{
       entities: entities,
@@ -20,8 +39,14 @@ defmodule ActivatorGRPC.Application do
       proto: nil
     }
 
-    {:ok, descriptors, endpoints} = Discovery.discover(route_config)
-    grpc_server_spec = Server.child_spec(descriptors, endpoints)
+    grpc_server_spec =
+      case Discover.discover(route_config) do
+        {:ok, descriptors, endpoints} ->
+          Server.child_spec(descriptors, endpoints)
+
+        error ->
+          raise ArgumentError, "Unable to start the application #{inpsect(error)}"
+      end
 
     children = [
       Spawn.Supervisor.child_spec(config),
