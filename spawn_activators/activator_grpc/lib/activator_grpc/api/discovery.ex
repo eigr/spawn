@@ -5,7 +5,7 @@ defmodule ActivatorGrpc.Api.Discovery do
   alias Google.Protobuf.FileDescriptorSet
   alias ActivatorGrpc.GrpcUtils, as: Util
 
-  def discover(%{entities: _entities, proto_file_path: path} = args) do
+  def discover(%{endpoint_builders: _builders, proto_file_path: path} = args) do
     with {:load_file, {:ok, proto}} <- {:load_file, File.read(path)},
          {:parse, {:ok, descriptors, endpoints}} <-
            {:parse, parse(%{args | proto: proto})} do
@@ -28,11 +28,11 @@ defmodule ActivatorGrpc.Api.Discovery do
   end
 
   defp validate(args) do
-    entities = args.entities
+    builders = args.endpoint_builders
 
-    if Enum.empty?(entities) do
-      Logger.error("No entities were reported by the discover call!")
-      raise "No entities were reported by the discover call!"
+    if Enum.empty?(builders) do
+      Logger.error("No endpoint were reported by the discover call!")
+      raise "No endpoints were reported by the discover call!"
     end
 
     if !is_binary(args.proto) do
@@ -44,12 +44,12 @@ defmodule ActivatorGrpc.Api.Discovery do
   end
 
   defp to_endpoints({:ok, args}) do
-    entities = args.entities
+    builders = args.endpoint_builders
     descriptor = FileDescriptorSet.decode(args.proto)
     file_descriptors = descriptor.file
 
     endpoints =
-      entities
+      builders
       |> Flow.from_enumerable()
       |> Flow.map(&build_endpoint(&1, file_descriptors))
       |> Enum.to_list()
@@ -58,7 +58,7 @@ defmodule ActivatorGrpc.Api.Discovery do
     {:ok, file_descriptors, endpoints}
   end
 
-  defp build_endpoint(entity, file_descriptors) do
+  defp build_endpoint(endpoint, file_descriptors) do
     messages =
       file_descriptors
       |> Flow.from_enumerable()
@@ -71,14 +71,15 @@ defmodule ActivatorGrpc.Api.Discovery do
     services =
       file_descriptors
       |> Flow.from_enumerable()
-      |> Flow.map(&extract_services(&1, entity.service_name))
+      |> Flow.map(&extract_services(&1, endpoint.service_name))
       |> Enum.reduce([], fn elem, acc ->
         acc ++ [elem]
       end)
       |> List.flatten()
 
     %{
-      service_name: entity.service_name,
+      service_name: endpoint.service_name,
+      dispatcher_options: endpoint,
       messages: Enum.filter(messages, fn x -> x != [] end),
       services: Enum.filter(services, fn x -> x != [] end)
     }

@@ -13,39 +13,41 @@ defmodule ActivatorGRPC.Application do
   def start(_type, _args) do
     config = Config.load(__MODULE__)
 
-    entities = [
+    builders = [
       %{
         service_name: "io.eigr.spawn.example.TestService",
-        protocol: grpc,
-        system: system_name,
-        actor: actor_name,
-        options: [
+        protocol: "grpc",
+        system: "spawn-system",
+        actor: "joe",
+        options: %{
+          # valids are: "invoke", "spawn-invoke"
+          invocation_type: "invoke",
           pooled: false,
-          timeout: 30_000
+          timeout: 30_000,
           async: false,
-          stream_out_from_channel: "my-channel"
-        ],
-        authentication: %{
-          # valids are :none, :basic, :token
-          kind: :basic,
-          secret_key: ""
+          stream_out_from_channel: "my-channel",
+          authentication: %{
+            # valids are :none, basic, token
+            kind: "basic",
+            secret_key: ""
+          }
         }
       }
     ]
 
     route_config = %{
-      entities: entities,
+      endpoint_builders: builders,
       proto_file_path: "priv/example/out/user-api.desc",
       proto: nil
     }
 
     grpc_server_spec =
-      case Discover.discover(route_config) do
+      case Discovery.discover(route_config) do
         {:ok, descriptors, endpoints} ->
           Server.child_spec(descriptors, endpoints)
 
         error ->
-          raise ArgumentError, "Unable to start the application #{inpsect(error)}"
+          raise ArgumentError, "Unable to start the application #{inspect(error)}"
       end
 
     children = [
