@@ -6,7 +6,7 @@ defmodule <%= mod_name %>.ProxyService do
   @moduledoc since: "0.5.1"
   use GRPC.Server, service: <%= name %>
 
-  alias ActivatorGrpc.Api.Dispatcher
+  alias ActivatorGrpc.Api.RouterDispatcher, as: Dispatcher
 <%= Enum.map methods, fn(method) -> %>
   @spec <%= method %>(<%= Map.get(input_types, method) %>.t(), GRPC.Server.Stream.t()) :: <%= Map.get(output_types, method) %>.t()
   def <%= method %>(message, stream) do
