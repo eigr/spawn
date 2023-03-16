@@ -99,10 +99,6 @@ defmodule ActivatorGrpc.Api.Dispatcher.UnaryDispatcher do
   end
 
   defp build_spawn_req(system, actor_name, parent) do
-    IO.inspect(system, label: "System")
-    IO.inspect(actor_name, label: "Actor")
-    IO.inspect(parent, label: "Parent")
-
     %SpawnRequest{
       actors: [ActorId.new(name: actor_name, system: system, parent: parent)]
     }
