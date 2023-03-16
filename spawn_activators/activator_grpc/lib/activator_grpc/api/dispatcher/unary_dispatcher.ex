@@ -24,31 +24,26 @@ defmodule ActivatorGrpc.Api.Dispatcher.UnaryDispatcher do
   import Spawn.Utils.AnySerializer
 
   @impl true
-  def dispatch(message, stream, opts \\ []) do
-  end
+  def dispatch(message, stream, opts \\ []), do: handle_unary(message, stream, opts)
 
-  defp handle_unary(message, stream, opts \\ []) do
-    invocation_type = Keyword.get(opts, :invocation_type, "invoke")
+  defp handle_unary(message, _stream, opts) do
     actor_name = Keyword.fetch!(opts, :actor_name)
     system = Keyword.fetch!(opts, :system_name)
-    pooled = Keyword.get(opts, :pooled, false)
-    async = Keyword.get(opts, :async, false)
-    timeout = Keyword.get(opts, :timeout, 30_000)
-
-    system = Keyword.get(opts, :system)
+    invocation_type = Keyword.get(opts, :invocation_type, "invoke")
+    actor_reference = Keyword.get(opts, :parent_actor)
     action = Keyword.get(opts, :action)
-    payload = Keyword.get(opts, :payload)
     async = Keyword.get(opts, :async, false)
     pooled = Keyword.get(opts, :pooled, false)
+    _timeout = Keyword.get(opts, :timeout, 30_000)
     metadata = Keyword.get(opts, :metadata, %{})
-    actor_reference = Keyword.get(opts, :ref)
+    _authentication_kind = Keyword.get(opts, :authentication_kind, "none")
 
-    if actor_reference do
+    if invocation_type == "spawn-invoke" do
       spawn_actor(actor_name, system: system, actor: actor_reference)
     end
 
     opts = []
-    payload = parse_payload(payload)
+    payload = parse_payload(message)
 
     req =
       InvocationRequest.new(
@@ -58,18 +53,32 @@ defmodule ActivatorGrpc.Api.Dispatcher.UnaryDispatcher do
         },
         metadata: metadata,
         payload: payload,
-        action_name: action,
-        async: async,
+        command_name: action,
+        async: cast(async, :boolean),
         caller: nil,
-        pooled: pooled
+        pooled: cast(pooled, :boolean)
       )
 
     case Actors.invoke(req, opts) do
-      {:ok, :async} -> {:ok, :async}
-      {:ok, %ActorInvocationResponse{payload: payload}} -> {:ok, unpack_unknown(payload)}
-      error -> error
+      {:ok, :async} ->
+        Logger.debug("Asynchronous Request ok. Send response to caller")
+        :ok
+
+      {:ok, %ActorInvocationResponse{payload: payload}} ->
+        Logger.debug("Synchronous Request ok. Send response to caller")
+        unpack_unknown(payload)
+
+      error ->
+        Logger.debug("Error on send Request. #{inspect(error)}")
+        error
     end
   end
+
+  defp cast(value, :boolean), do: to_boolean(value)
+
+  defp to_boolean("false"), do: false
+  defp to_boolean("true"), do: true
+  defp to_boolean(value) when is_boolean(value), do: value
 
   defp spawn_actor(actor_name, spawn_actor_opts) do
     opts = []
@@ -90,6 +99,10 @@ defmodule ActivatorGrpc.Api.Dispatcher.UnaryDispatcher do
   end
 
   defp build_spawn_req(system, actor_name, parent) do
+    IO.inspect(system, label: "System")
+    IO.inspect(actor_name, label: "Actor")
+    IO.inspect(parent, label: "Parent")
+
     %SpawnRequest{
       actors: [ActorId.new(name: actor_name, system: system, parent: parent)]
     }
@@ -108,14 +121,14 @@ defmodule ActivatorGrpc.Api.Dispatcher.UnaryDispatcher do
     end
   end
 
-  defp parse_payload(response) do
-    case response do
+  defp parse_payload(message) do
+    case message do
       nil -> {:noop, Noop.new()}
       %Noop{} = noop -> {:noop, noop}
       {:noop, %Noop{} = noop} -> {:noop, noop}
       {_, nil} -> {:noop, Noop.new()}
-      {:value, response} -> {:value, any_pack!(response)}
-      response -> {:value, any_pack!(response)}
+      {:value, message} -> {:value, any_pack!(message)}
+      message -> {:value, any_pack!(message)}
     end
   end
 end

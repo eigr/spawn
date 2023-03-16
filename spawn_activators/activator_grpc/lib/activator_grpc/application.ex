@@ -19,6 +19,8 @@ defmodule ActivatorGRPC.Application do
         protocol: "grpc",
         system: "spawn-system",
         actor: "joe",
+        action: "sum",
+        parent_actor: nil,
         options: %{
           # valids are: "invoke", "spawn-invoke"
           invocation_type: "invoke",
@@ -33,6 +35,27 @@ defmodule ActivatorGRPC.Application do
           }
         }
       }
+      # %{
+      #   service_name: "io.eigr.spawn.example.TestService",
+      #   protocol: "grpc",
+      #   system: "spawn-system",
+      #   actor: "robert",
+      #   action: "sum",
+      #   parent_actor: "abs_actor",
+      #   options: %{
+      #     # valids are: "invoke", "spawn-invoke"
+      #     invocation_type: "spawn-invoke",
+      #     pooled: false,
+      #     timeout: 30_000,
+      #     async: false,
+      #     stream_out_from_channel: "my-channel",
+      #     authentication: %{
+      #       # valids are :none, basic, token
+      #       kind: "basic",
+      #       secret_key: ""
+      #     }
+      #   }
+      # }
     ]
 
     route_config = %{

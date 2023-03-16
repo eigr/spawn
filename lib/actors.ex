@@ -394,7 +394,6 @@ defmodule Actors do
 
   defp maybe_invoke_async(true, actor_ref, request, opts) do
     ActorEntity.invoke_async(actor_ref, request, opts)
-
     {:ok, :async}
   end
 
