@@ -89,14 +89,14 @@ defmodule SpawnSdk.System.SpawnSystem do
   @impl SpawnSdk.System
   @doc "hey"
   def invoke(actor_name, invoke_opts \\ []) do
-    system = Keyword.get(invoke_opts, :system, nil)
-    command = Keyword.get(invoke_opts, :command, nil)
-    payload = Keyword.get(invoke_opts, :payload, nil)
+    system = Keyword.get(invoke_opts, :system)
+    command = Keyword.get(invoke_opts, :command)
+    payload = Keyword.get(invoke_opts, :payload)
     async = Keyword.get(invoke_opts, :async, false)
     pooled = Keyword.get(invoke_opts, :pooled, false)
     metadata = Keyword.get(invoke_opts, :metadata, %{})
-    actor_reference = Keyword.get(invoke_opts, :ref, nil)
-    scheduled_to = Keyword.get(invoke_opts, :scheduled_to, nil)
+    actor_reference = Keyword.get(invoke_opts, :ref)
+    scheduled_to = Keyword.get(invoke_opts, :scheduled_to)
     delay_in_ms = Keyword.get(invoke_opts, :delay, nil)
 
     if actor_reference do

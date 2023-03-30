@@ -25,9 +25,8 @@ defmodule SpawnOperator.Handler.ActorSystemHandler do
             size: 10
 
   """
-  alias SpawnOperator.K8s.ConfigMap.ActorSystemSecret
-  alias SpawnOperator.K8s.HeadlessService
-  alias SpawnOperator.K8s.Secret.ActorSystemSecret
+  alias SpawnOperator.K8s.System.HeadlessService
+  alias SpawnOperator.K8s.System.Secret.ActorSystemSecret
 
   @behaviour Pluggable
 
@@ -38,12 +37,12 @@ defmodule SpawnOperator.Handler.ActorSystemHandler do
   def call(%Bonny.Axn{action: action} = axn, nil) when action in [:add, :modify] do
     %Bonny.Axn{resource: resource} = axn
 
-    system_configmap = build_system_configmap(resource)
-    system_cluster_svc = build_system_service(resource)
+    cluster_secret = build_system_secret(resource)
+    cluster_service = build_system_service(resource)
 
     axn
-    |> Bonny.Axn.register_descendant(system_configmap)
-    |> Bonny.Axn.register_descendant(system_cluster_svc)
+    |> Bonny.Axn.register_descendant(cluster_secret)
+    |> Bonny.Axn.register_descendant(cluster_service)
     |> Bonny.Axn.success_event()
   end
 
@@ -52,7 +51,7 @@ defmodule SpawnOperator.Handler.ActorSystemHandler do
     Bonny.Axn.success_event(axn)
   end
 
-  defp build_system_configmap(resource) do
+  defp build_system_secret(resource) do
     SpawnOperator.get_args(resource)
     |> ActorSystemSecret.manifest()
   end

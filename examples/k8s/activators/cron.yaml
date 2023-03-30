@@ -1,0 +1,26 @@
+---
+apiVersion: spawn.eigr.io/v1
+kind: Activator
+metadata:
+  name: cron-activator # Mandatory. Name of the activator
+  namespace: default # Optional. Default namespace is "default"
+spec:
+  activator:
+    type: Cron
+  bindings:
+    sources:
+      - name: joe-scheduler
+        expr: "* * * * *"
+      - name: robert-scheduler
+        expr: "* * * * *"
+    sinks:
+      - name: joe-sink
+        actor: joe # Name of an Actor
+        command: setLanguage # Name of an Actor Action to call
+        binding:
+          - name: robert-scheduler
+      - name: robert-sink
+        actor: robert
+        command: setLanguage
+        binding:
+          - name: robert-scheduler

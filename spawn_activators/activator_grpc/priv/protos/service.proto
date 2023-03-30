@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+
+package io.eigr.spawn.example;
+
+option java_multiple_files = true;
+option java_package = "io.eigr.spawn.example";
+option java_outer_classname = "ExampleProtos";
+
+message MyState {
+  int32 value = 1;
+}
+
+message MyBusinessMessage {
+  int32 value = 1;
+}
+
+service TestService {
+  rpc Sum (MyBusinessMessage) returns (MyBusinessMessage) {
+    option (google.api.http) = {
+      post: "/v1/sum"
+      body: "*"
+    };
+  }
+}
