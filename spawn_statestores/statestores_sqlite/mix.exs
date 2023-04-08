@@ -60,7 +60,7 @@ defmodule StatestoresSqlite.MixProject do
       {:ecto_sql, "~> 3.8"},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:ecto_sqlite3, "~> 0.9.0"},
-      {:spawn_statestores, "~> 0.5.3"}
+      {:spawn_statestores, "~> 0.5"}
     ]
   end
 

@@ -60,7 +60,7 @@ defmodule StatestoresMssql.MixProject do
       {:ecto_sql, "~> 3.8"},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:tds, "~> 2.3"},
-      {:spawn_statestores, "~> 0.5.3"}
+      {:spawn_statestores, "~> 0.5"}
     ]
   end
 

@@ -60,7 +60,7 @@ defmodule StatestoresPostgres.MixProject do
       {:ecto_sql, "~> 3.8"},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:postgrex, "~> 0.16"},
-      {:spawn_statestores, "~> 0.5.3"}
+      {:spawn_statestores, "~> 0.5"}
     ]
   end
 
