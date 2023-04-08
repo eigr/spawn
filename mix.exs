@@ -4,7 +4,7 @@ defmodule Spawn.MixProject do
   Code.require_file("internal_versions.exs", "./priv")
 
   @app :spawn
-  @version "0.0.0-local.dev"
+  @version "0.5.1"
   @site "https://eigr.io/"
   @source_url "https://github.com/eigr/spawn"
 
@@ -92,11 +92,11 @@ defmodule Spawn.MixProject do
       {:opentelemetry, "~> 1.0"},
       {:opentelemetry_exporter, "~> 1.0"},
       # Statestores deps
-      {:spawn_statestores_mssql, path: "./spawn_statestores/statestores_mssql", optional: false},
-      {:spawn_statestores_mysql, path: "./spawn_statestores/statestores_mysql", optional: false},
-      {:spawn_statestores_postgres, path: "./spawn_statestores/statestores_postgres", optional: false},
-      {:spawn_statestores_sqlite, path: "./spawn_statestores/statestores_sqlite", optional: false},
-      {:spawn_statestores_cockroachdb, path: "./spawn_statestores/statestores_cockroachdb", optional: false},
+      {:spawn_statestores_mssql, "~> 0.5.1", optional: true},
+      {:spawn_statestores_mysql, "~> 0.5.1", optional: true},
+      {:spawn_statestores_postgres, "~> 0.5.1", optional: true},
+      {:spawn_statestores_sqlite, "~> 0.5.1", optional: true},
+      {:spawn_statestores_cockroachdb, "~> 0.5.1", optional: true},
       # Non runtime deps
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
       {:faker, "~> 0.17", only: :test},

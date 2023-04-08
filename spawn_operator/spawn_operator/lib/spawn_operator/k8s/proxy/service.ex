@@ -61,7 +61,7 @@ defmodule SpawnOperator.K8s.Proxy.Service do
           "prometheus.io/scrape" => "true"
         },
         "labels" => %{
-          "spawn-eigr.io/controller.version" => "0.5.0"
+          "spawn-eigr.io/controller.version" => "0.5.1"
         },
         "name" => "#{name}",
         "namespace" => ns

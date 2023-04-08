@@ -2,7 +2,7 @@ defmodule Proxy.MixProject do
   use Mix.Project
 
   @app :proxy
-  @version "0.0.0-local.dev"
+  @version "0.5.1"
 
   def project do
     [
@@ -29,16 +29,16 @@ defmodule Proxy.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:spawn, path: "../../"},
+      {:spawn, "~> 0.5.1"},
       {:bakeware, "~> 0.2"},
       {:bandit, "~> 0.5"},
       {:observer_cli, "~> 1.7"},
-      {:spawn_statestores, path: "../../spawn_statestores/statestores"},
-      {:spawn_statestores_mssql, path: "../../spawn_statestores/statestores_mssql"},
-      {:spawn_statestores_mysql, path: "../../spawn_statestores/statestores_mysql"},
-      {:spawn_statestores_postgres, path: "../../spawn_statestores/statestores_postgres"},
-      {:spawn_statestores_sqlite, path: "../../spawn_statestores/statestores_sqlite"},
-      {:spawn_statestores_cockroachdb, path: "../../spawn_statestores/statestores_cockroachdb"}
+      {:spawn_statestores, "~> 0.5.1"},
+      {:spawn_statestores_mssql, "~> 0.5.1", optional: true},
+      {:spawn_statestores_mysql, "~> 0.5.1", optional: true},
+      {:spawn_statestores_postgres, "~> 0.5.1", optional: true},
+      {:spawn_statestores_sqlite, "~> 0.5.1", optional: true},
+      {:spawn_statestores_cockroachdb, "~> 0.5.1", optional: true}
     ]
   end
 

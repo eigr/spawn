@@ -54,7 +54,7 @@ services:
       - mysql-compose-network
 
   spawn-proxy:
-    image: eigr/spawn-proxy:0.5.0
+    image: eigr/spawn-proxy:0.5.1
     restart: always
     environment:
       PROXY_APP_NAME: spawn

@@ -10,7 +10,7 @@ by adding `activator_grpc` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:activator_grpc, "~> 0.5.0"}
+    {:activator_grpc, "~> 0.5.1"}
   ]
 end
 ```
