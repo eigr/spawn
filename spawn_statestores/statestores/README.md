@@ -12,7 +12,7 @@ by adding `statestores` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:spawn_statestores, "~> 0.5.1"}
+    {:spawn_statestores, "~> 0.5.3"}
   ]
 end
 ```

@@ -4,7 +4,7 @@ defmodule Spawn.MixProject do
   Code.require_file("internal_versions.exs", "./priv")
 
   @app :spawn
-  @version "0.5.1"
+  @version "0.5.3"
   @site "https://eigr.io/"
   @source_url "https://github.com/eigr/spawn"
 
@@ -70,6 +70,7 @@ defmodule Spawn.MixProject do
       # Core deps
       {:decimal, "~> 2.0"},
       # {:erqwest, github: "dlesl/erqwest"},
+      {:castore, "~> 1.0", override: true},
       {:erqwest, "~> 0.2.3"},
       {:duration_tc, "~> 0.1.0"},
       {:protobuf, "~> 0.11"},
@@ -84,6 +85,7 @@ defmodule Spawn.MixProject do
       {:phoenix_pubsub, "~> 2.1"},
       {:phoenix_pubsub_nats, "~> 0.1.0"},
       {:jason, "~> 1.3"},
+      {:nimble_parsec, "~> 1.0", override: true},
       # Metrics & Tracing deps
       {:telemetry_poller, "~> 1.0"},
       {:telemetry_metrics, "~> 0.6.1"},

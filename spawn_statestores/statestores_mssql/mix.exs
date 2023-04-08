@@ -2,7 +2,7 @@ defmodule StatestoresMssql.MixProject do
   use Mix.Project
 
   @app :spawn_statestores_mssql
-  @version "0.5.1"
+  @version "0.5.3"
   @source_url "https://github.com/eigr/spawn/blob/main/spawn_statestores/statestores_mssql"
 
   def project do
@@ -60,7 +60,7 @@ defmodule StatestoresMssql.MixProject do
       {:ecto_sql, "~> 3.8"},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:tds, "~> 2.3"},
-      {:spawn_statestores, "~> 0.5.1"}
+      {:spawn_statestores, "~> 0.5.3"}
     ]
   end
 

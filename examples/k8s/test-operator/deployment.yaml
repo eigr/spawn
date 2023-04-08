@@ -36,7 +36,7 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: spec.serviceAccountName
-          image: eigr/spawn-operator:0.5.1
+          image: eigr/spawn-operator:0.5.3
           name: spawn-operator
           resources:
             limits:

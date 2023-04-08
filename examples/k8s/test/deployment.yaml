@@ -56,7 +56,7 @@ spec:
             - secretRef:
                 name: spawn-system-secret
           name: actor-host-function
-          image: eigr/spawn-proxy:0.5.1
+          image: eigr/spawn-proxy:0.5.3
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8800

@@ -2,7 +2,7 @@ defmodule StatestoresMysql.MixProject do
   use Mix.Project
 
   @app :spawn_statestores_mysql
-  @version "0.5.1"
+  @version "0.5.3"
   @source_url "https://github.com/eigr/spawn/blob/main/spawn_statestores/statestores_mysql"
 
   def project do
@@ -60,7 +60,7 @@ defmodule StatestoresMysql.MixProject do
       {:ecto_sql, "~> 3.8"},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:myxql, "~> 0.6"},
-      {:spawn_statestores, "~> 0.5.1"}
+      {:spawn_statestores, "~> 0.5.3"}
     ]
   end
 

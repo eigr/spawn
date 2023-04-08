@@ -2,7 +2,7 @@ defmodule Proxy.MixProject do
   use Mix.Project
 
   @app :proxy
-  @version "0.5.1"
+  @version "0.5.3"
 
   def project do
     [
@@ -29,16 +29,16 @@ defmodule Proxy.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:spawn, "~> 0.5.1"},
+      {:spawn, "~> 0.5"},
       {:bakeware, "~> 0.2"},
       {:bandit, "~> 0.5"},
       {:observer_cli, "~> 1.7"},
-      {:spawn_statestores, "~> 0.5.1"},
-      {:spawn_statestores_mssql, "~> 0.5.1", optional: true},
-      {:spawn_statestores_mysql, "~> 0.5.1", optional: true},
-      {:spawn_statestores_postgres, "~> 0.5.1", optional: true},
-      {:spawn_statestores_sqlite, "~> 0.5.1", optional: true},
-      {:spawn_statestores_cockroachdb, "~> 0.5.1", optional: true}
+      {:spawn_statestores, "~> 0.5"},
+      {:spawn_statestores_mssql, "~> 0.5", optional: true},
+      {:spawn_statestores_mysql, "~> 0.5", optional: true},
+      {:spawn_statestores_postgres, "~> 0.5", optional: true},
+      {:spawn_statestores_sqlite, "~> 0.5", optional: true},
+      {:spawn_statestores_cockroachdb, "~> 0.5", optional: true}
     ]
   end
 

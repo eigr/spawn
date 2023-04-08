@@ -44,6 +44,7 @@ defmodule Operator.MixProject do
       {:bandit, "~> 0.5"},
       {:bakeware, ">= 0.0.0", runtime: false},
       {:bonny, "~> 1.1.2"},
+      {:castore, "~> 1.0", override: true},
       {:spawn, path: "../../"}
     ]
   end

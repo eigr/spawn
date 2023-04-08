@@ -2,7 +2,7 @@ defmodule ActivatorHTTP.MixProject do
   use Mix.Project
 
   @app :activator_http
-  @version "local.dev"
+  @version "0.0.0-local.dev"
 
   def project do
     [

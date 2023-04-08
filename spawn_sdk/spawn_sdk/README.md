@@ -16,14 +16,14 @@ by adding `spawn_sdk` and `spawn_statestores_*` to your list of dependencies in 
 ```elixir
 def deps do
   [
-    {:spawn_sdk, "~> 0.5.1"},
+    {:spawn_sdk, "~> 0.5.3"},
 
     # You can uncomment one of those dependencies if you are going to use Persistent Actors
-    #{:spawn_statestores_mysql, "~> 0.5.1"},
-    #{:spawn_statestores_postgres, "~> 0.5.1"},
-    #{:spawn_statestores_mssql, "~> 0.5.1"},
-    #{:spawn_statestores_cockroachdb, "~> 0.5.1"},
-    #{:spawn_statestores_sqlite, "~> 0.5.1"},
+    #{:spawn_statestores_mysql, "~> 0.5.3"},
+    #{:spawn_statestores_postgres, "~> 0.5.3"},
+    #{:spawn_statestores_mssql, "~> 0.5.3"},
+    #{:spawn_statestores_cockroachdb, "~> 0.5.3"},
+    #{:spawn_statestores_sqlite, "~> 0.5.3"},
   ]
 end
 ```
