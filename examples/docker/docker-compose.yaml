@@ -1,0 +1,83 @@
+version: "3.8"
+
+services:
+  otel:
+    image: otel/opentelemetry-collector-contrib:0.60.0
+    command: [ "--config=/conf/otel-collector-config.yaml" ]
+    privileged: true
+    ports:
+      - 4317:4317
+      - 4318:4318
+    volumes:
+      - ./config/otel-collector-config.yaml:/conf/otel-collector-config.yaml
+    links:
+      - zipkin
+
+  zipkin:
+    image: openzipkin/zipkin-slim
+    ports:
+      - 9411:9411
+    privileged: true
+
+  postgres:
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DATABASE=eigr-functions-db
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres:/var/lib/postgresql/data
+
+  adminer:
+    image: adminer
+    ports:
+      - 8080:8080
+    networks:
+      - postgres-compose-network
+
+  spawn-proxy-1:
+    image: eigr/spawn-proxy:0.5.0
+    restart: always
+    environment:
+      PROXY_APP_NAME: spawn_1
+      PROXY_HTTP_PORT: 9001
+      PROXY_DATABASE_TYPE: postgres
+      PROXY_DATABASE_NAME: eigr-functions-db
+      PROXY_DATABASE_USERNAME: postgres
+      PROXY_DATABASE_SECRET: password
+      PROXY_DATABASE_HOST: localhost
+      PROXY_DATABASE_PORT: 5432
+      SPAWN_STATESTORE_KEY: 3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE=
+      USER_FUNCTION_HOST: 0.0.0.0
+      USER_FUNCTION_PORT: 8090
+    ports:
+      - "9001:9001"
+
+  spawn-proxy-2:
+    image: eigr/spawn-proxy:0.5.0
+    restart: always
+    environment:
+      PROXY_APP_NAME: spawn_2
+      PROXY_HTTP_PORT: 9002
+      PROXY_DATABASE_TYPE: postgres
+      PROXY_DATABASE_NAME: eigr-functions-db
+      PROXY_DATABASE_USERNAME: postgres
+      PROXY_DATABASE_SECRET: password
+      PROXY_DATABASE_HOST: localhost
+      PROXY_DATABASE_PORT: 5432
+      SPAWN_STATESTORE_KEY: 3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE=
+      USER_FUNCTION_HOST: 0.0.0.0
+      USER_FUNCTION_PORT: 8090
+    ports:
+      - "9002:9002"
+
+networks:
+  postgres-compose-network:
+    driver: bridge
+
+volumes:
+  postgres:
