@@ -98,7 +98,7 @@ defmodule Spawn.MixProject do
       {:spawn_statestores_mysql, path: "../../spawn_statestores/statestores_mysql", optional: true},
       {:spawn_statestores_postgres, path: "../../spawn_statestores/statestores_postgres", optional: true},
       {:spawn_statestores_sqlite, path: "../../spawn_statestores/statestores_sqlite", optional: true},
-      {:spawn_statestores_cockroachdb, path: "../../spawn_statestores/statestores_cockroachdb", optional: true}
+      {:spawn_statestores_cockroachdb, path: "../../spawn_statestores/statestores_cockroachdb", optional: true},
       # Non runtime deps
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
       {:faker, "~> 0.17", only: :test},
