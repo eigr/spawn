@@ -2,9 +2,8 @@ name: Release
 
 on:
   push:
-    branches: [release]
-  pull_request:
-    branches: [release]
+    tags:
+      - "*"
 
 jobs:
   build:
@@ -76,6 +75,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: docker.pkg.github.com
-          repository: https://ghcr.io/eigr-labs/spawn
+          repository: https://ghcr.io/eigr/spawn
           tag_with_sha: true
           tag_with_ref: true
