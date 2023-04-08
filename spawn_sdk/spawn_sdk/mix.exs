@@ -59,7 +59,7 @@ defmodule SpawnSdk.MixProject do
     [
       {:faker, "~> 0.17", only: :test},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
-      {:spawn, "~> 0.5.3"}
+      {:spawn, "~> 0.5"}
     ]
   end
 
