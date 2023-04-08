@@ -2,7 +2,7 @@ defmodule Statestores.MixProject do
   use Mix.Project
 
   @app :spawn_statestores
-  @version "0.5.3"
+  @version "0.0.0-local.dev"
   @source_url "https://github.com/eigr/spawn/blob/main/spawn_statestores/statestores"
 
   def project do
@@ -58,7 +58,7 @@ defmodule Statestores.MixProject do
       {:vapor, "~> 0.10"},
       {:cloak_ecto, "~> 1.2"},
       {:ecto_sql, "~> 3.8"},
-      {:nimble_parsec, "~> 1.0", override: true},
+      {:nimble_parsec, "~> 1.2.3"},
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false}
     ]
