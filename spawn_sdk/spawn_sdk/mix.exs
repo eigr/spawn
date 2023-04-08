@@ -59,7 +59,8 @@ defmodule SpawnSdk.MixProject do
     [
       {:faker, "~> 0.17", only: :test},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
-      {:spawn, "~> 0.5"}
+      {:spawn, "~> 0.5"},
+      {:nimble_parsec, "~> 1.0", override: true}
     ]
   end
 
