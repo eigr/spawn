@@ -136,7 +136,7 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
     actor_host_function_resources =
       Map.get(host_params, "resources", @default_actor_host_function_resources)
 
-    [
+    host_and_proxy_container =
       %{
         "name" => "actor-host-function",
         "image" => actor_host_function_image,
@@ -156,6 +156,10 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
         "ports" => actor_host_function_ports,
         "resources" => actor_host_function_resources
       }
+      |> maybe_put_volume_mounts_to_host_container(host_params)
+
+    [
+      host_and_proxy_container
     ]
   end
 
@@ -228,25 +232,39 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
       ]
     }
 
-    actor_host_function_ports = Map.get(host_params, "ports", [])
-
-    host_container = %{
-      "name" => "actor-host-function",
-      "image" => actor_host_function_image,
-      "env" => actor_host_function_envs,
-      "resources" => actor_host_function_resources
-    }
-
     host_container =
-      if length(actor_host_function_ports) > 0 do
-        Map.put(host_container, "ports", actor_host_function_ports)
-      else
-        host_container
-      end
+      %{
+        "name" => "actor-host-function",
+        "image" => actor_host_function_image,
+        "env" => actor_host_function_envs,
+        "resources" => actor_host_function_resources
+      }
+      |> maybe_put_ports_to_host_container(host_params)
+      |> maybe_put_volume_mounts_to_host_container(host_params)
 
     [
       proxy_container,
       host_container
     ]
+  end
+
+  defp maybe_put_ports_to_host_container(result, host_params) do
+    actor_host_function_ports = Map.get(host_params, "ports", [])
+
+    if length(actor_host_function_ports) > 0 do
+      Map.put(result, "ports", actor_host_function_ports)
+    else
+      result
+    end
+  end
+
+  defp maybe_put_volume_mounts_to_host_container(result, host_params) do
+    actor_host_volume_mounts = Map.get(host_params, "volumeMounts", [])
+
+    if length(actor_host_volume_mounts) > 0 do
+      Map.put(result, "volumeMounts", actor_host_volume_mounts)
+    else
+      result
+    end
   end
 end
