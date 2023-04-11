@@ -167,7 +167,8 @@ defmodule DeploymentTest do
                          ]
                        }
                      ],
-                     "terminationGracePeriodSeconds" => 140
+                     "terminationGracePeriodSeconds" => 140,
+                     "volumes" => [%{"emptyDir" => "{}", "name" => "volume-name"}]
                    }
                  }
                }
@@ -349,7 +350,8 @@ defmodule DeploymentTest do
                "spec" => %{
                  "template" => %{
                    "spec" => %{
-                     "containers" => containers
+                     "containers" => containers,
+                     "volumes" => [%{"emptyDir" => "{}", "name" => "volume-name"}]
                    }
                  }
                }

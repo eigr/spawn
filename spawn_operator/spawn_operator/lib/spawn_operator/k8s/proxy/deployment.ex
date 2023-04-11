@@ -101,10 +101,12 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
               "actor-system" => system
             }
           },
-          "spec" => %{
-            "containers" => get_containers(embedded, system, name, host_params, annotations),
-            "terminationGracePeriodSeconds" => @default_termination_period_seconds
-          }
+          "spec" =>
+            %{
+              "containers" => get_containers(embedded, system, name, host_params, annotations),
+              "terminationGracePeriodSeconds" => @default_termination_period_seconds
+            }
+            |> maybe_put_volumes(params)
         }
       }
     }
@@ -248,23 +250,21 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
     ]
   end
 
-  defp maybe_put_ports_to_host_container(result, host_params) do
-    actor_host_function_ports = Map.get(host_params, "ports", [])
-
-    if length(actor_host_function_ports) > 0 do
-      Map.put(result, "ports", actor_host_function_ports)
-    else
-      result
-    end
+  defp maybe_put_ports_to_host_container(spec, %{"ports" => ports}) do
+    Map.put(spec, "ports", ports)
   end
 
-  defp maybe_put_volume_mounts_to_host_container(result, host_params) do
-    actor_host_volume_mounts = Map.get(host_params, "volumeMounts", [])
+  defp maybe_put_ports_to_host_container(spec, _), do: spec
 
-    if length(actor_host_volume_mounts) > 0 do
-      Map.put(result, "volumeMounts", actor_host_volume_mounts)
-    else
-      result
-    end
+  defp maybe_put_volumes(spec, %{"volumes" => volumes}) do
+    Map.put(spec, "volumes", volumes)
   end
+
+  defp maybe_put_volumes(spec, _), do: spec
+
+  defp maybe_put_volume_mounts_to_host_container(spec, %{"volumeMounts" => volumeMounts}) do
+    Map.put(spec, "volumeMounts", volumeMounts)
+  end
+
+  defp maybe_put_volume_mounts_to_host_container(spec, _), do: spec
 end

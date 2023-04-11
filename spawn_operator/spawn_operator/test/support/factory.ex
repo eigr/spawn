@@ -40,7 +40,13 @@ defmodule SpawnOperator.FactoryTest do
               "name" => "volume-name"
             }
           ]
-        }
+        },
+        "volumes" => [
+          %{
+            "name" => "volume-name",
+            "emptyDir" => "{}"
+          }
+        ]
       }
     }
   end
@@ -103,7 +109,13 @@ defmodule SpawnOperator.FactoryTest do
               "name" => "volume-name"
             }
           ]
-        }
+        },
+        "volumes" => [
+          %{
+            "name" => "volume-name",
+            "emptyDir" => "{}"
+          }
+        ]
       }
     }
   end
