@@ -31,7 +31,9 @@ defmodule SpawnOperator.K8sConn do
       {:ok, conn} ->
         # TODO It is a workaround and needed to be removed
         struct!(conn, insecure_skip_tls_verify: true)
-      other -> other
+
+      other ->
+        other
     end)
   end
 

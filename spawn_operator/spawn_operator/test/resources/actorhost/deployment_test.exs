@@ -9,55 +9,56 @@ defmodule DeploymentTest do
   setup do
     simple_host = build_simple_actor_host()
     simple_host_with_ports = build_simple_actor_host_with_ports()
-    %{simple_host: simple_host, simple_host_with_ports: simple_host_with_ports}
+    simple_actor_host_with_volume_mounts = build_simple_actor_host_with_volume_mounts()
+    embedded_actor_host = build_embedded_actor_host()
+    embedded_actor_host_with_volume_mounts = build_embedded_actor_host_with_volume_mounts()
+
+    %{
+      simple_host: simple_host,
+      simple_host_with_ports: simple_host_with_ports,
+      simple_actor_host_with_volume_mounts: simple_actor_host_with_volume_mounts,
+      embedded_actor_host: embedded_actor_host,
+      embedded_actor_host_with_volume_mounts: embedded_actor_host_with_volume_mounts
+    }
   end
 
   describe "manifest/1" do
-    @tag :skip
-    test "generate deployment with defaults", ctx do
+    test "generate embedded deployment with defaults", ctx do
       %{
-        simple_host: simple_host_resource,
-        simple_host_with_ports: _simple_host_with_ports_resource
+        embedded_actor_host: embedded_actor_host
       } = ctx
 
       assert %{
                "apiVersion" => "apps/v1",
                "kind" => "Deployment",
                "metadata" => %{
-                 "labels" => %{
-                   "actor-system" => "spawn-system",
-                   "app" => "spawn-test"
-                 },
+                 "labels" => %{"actor-system" => "spawn-system", "app" => "spawn-test"},
                  "name" => "spawn-test",
                  "namespace" => "default"
                },
                "spec" => %{
                  "replicas" => 1,
                  "selector" => %{
-                   "matchLabels" => %{
-                     "actor-system" => "spawn-system",
-                     "app" => "spawn-test"
-                   }
+                   "matchLabels" => %{"actor-system" => "spawn-system", "app" => "spawn-test"}
                  },
                  "strategy" => %{
-                   "rollingUpdate" => %{"maxSurge" => 1, "maxUnavailable" => 1},
+                   "rollingUpdate" => %{"maxSurge" => "50%", "maxUnavailable" => "50%"},
                    "type" => "RollingUpdate"
                  },
                  "template" => %{
                    "metadata" => %{
                      "annotations" => %{
+                       "prometheus.io/path" => "/metrics",
                        "prometheus.io/port" => "9001",
                        "prometheus.io/scrape" => "true"
                      },
-                     "labels" => %{
-                       "actor-system" => "spawn-system",
-                       "app" => "spawn-test"
-                     }
+                     "labels" => %{"actor-system" => "spawn-system", "app" => "spawn-test"}
                    },
                    "spec" => %{
                      "containers" => [
                        %{
                          "env" => [
+                           %{"name" => "RELEASE_NAME", "value" => "spawn-test"},
                            %{
                              "name" => "NAMESPACE",
                              "valueFrom" => %{
@@ -69,38 +70,198 @@ defmodule DeploymentTest do
                              "valueFrom" => %{"fieldRef" => %{"fieldPath" => "status.podIP"}}
                            },
                            %{"name" => "SPAWN_PROXY_PORT", "value" => "9001"},
-                           %{"name" => "SPAWN_PROXY_INTERFACE", "value" => "0.0.0.0"}
+                           %{"name" => "SPAWN_PROXY_INTERFACE", "value" => "0.0.0.0"},
+                           %{"name" => "RELEASE_DISTRIBUTION", "value" => "name"},
+                           %{"name" => "RELEASE_NODE", "value" => "$(RELEASE_NAME)@$(POD_IP)"}
                          ],
                          "envFrom" => [
-                           %{
-                             "configMapRef" => %{
-                               "name" => "spawn-test-sidecar-cm"
-                             }
-                           },
+                           %{"configMapRef" => %{"name" => "spawn-test-sidecar-cm"}},
                            %{"secretRef" => %{"name" => "spawn-system-secret"}}
                          ],
-                         "image" => "docker.io/eigr/spawn-proxy:0.1.0",
-                         "livenessProbe" => %{
-                           "failureThreshold" => 10,
-                           "httpGet" => %{
-                             "path" => "/health",
-                             "port" => 9001,
-                             "scheme" => "HTTP"
-                           },
-                           "initialDelaySeconds" => 300,
-                           "periodSeconds" => 3600,
-                           "successThreshold" => 1,
-                           "timeoutSeconds" => 1200
-                         },
-                         "name" => "spawn-sidecar",
+                         "image" => "eigr/spawn-test:latest",
+                         "name" => "actor-host-function",
                          "ports" => [
-                           %{"containerPort" => 9000, "name" => "http"},
-                           %{"containerPort" => 9001, "name" => "https"},
-                           %{"containerPort" => 4369, "name" => "epmd"}
+                           %{"containerPort" => 4369, "name" => "epmd"},
+                           %{"containerPort" => 9001, "name" => "proxy-http"}
                          ],
                          "resources" => %{
                            "limits" => %{"memory" => "1024Mi"},
                            "requests" => %{"memory" => "80Mi"}
+                         }
+                       }
+                     ],
+                     "terminationGracePeriodSeconds" => 140
+                   }
+                 }
+               }
+             } == build_host_deploy(embedded_actor_host)
+    end
+
+    test "generate embedded deployment with volumeMount", ctx do
+      %{
+        embedded_actor_host_with_volume_mounts: embedded_actor_host_with_volume_mounts
+      } = ctx
+
+      assert %{
+               "apiVersion" => "apps/v1",
+               "kind" => "Deployment",
+               "metadata" => %{
+                 "labels" => %{"actor-system" => "spawn-system", "app" => "spawn-test"},
+                 "name" => "spawn-test",
+                 "namespace" => "default"
+               },
+               "spec" => %{
+                 "replicas" => 1,
+                 "selector" => %{
+                   "matchLabels" => %{"actor-system" => "spawn-system", "app" => "spawn-test"}
+                 },
+                 "strategy" => %{
+                   "rollingUpdate" => %{"maxSurge" => "50%", "maxUnavailable" => "50%"},
+                   "type" => "RollingUpdate"
+                 },
+                 "template" => %{
+                   "metadata" => %{
+                     "annotations" => %{
+                       "prometheus.io/path" => "/metrics",
+                       "prometheus.io/port" => "9001",
+                       "prometheus.io/scrape" => "true"
+                     },
+                     "labels" => %{"actor-system" => "spawn-system", "app" => "spawn-test"}
+                   },
+                   "spec" => %{
+                     "containers" => [
+                       %{
+                         "env" => [
+                           %{"name" => "RELEASE_NAME", "value" => "spawn-test"},
+                           %{
+                             "name" => "NAMESPACE",
+                             "valueFrom" => %{
+                               "fieldRef" => %{"fieldPath" => "metadata.namespace"}
+                             }
+                           },
+                           %{
+                             "name" => "POD_IP",
+                             "valueFrom" => %{"fieldRef" => %{"fieldPath" => "status.podIP"}}
+                           },
+                           %{"name" => "SPAWN_PROXY_PORT", "value" => "9001"},
+                           %{"name" => "SPAWN_PROXY_INTERFACE", "value" => "0.0.0.0"},
+                           %{"name" => "RELEASE_DISTRIBUTION", "value" => "name"},
+                           %{"name" => "RELEASE_NODE", "value" => "$(RELEASE_NAME)@$(POD_IP)"}
+                         ],
+                         "envFrom" => [
+                           %{"configMapRef" => %{"name" => "spawn-test-sidecar-cm"}},
+                           %{"secretRef" => %{"name" => "spawn-system-secret"}}
+                         ],
+                         "image" => "eigr/spawn-test:latest",
+                         "name" => "actor-host-function",
+                         "ports" => [
+                           %{"containerPort" => 4369, "name" => "epmd"},
+                           %{"containerPort" => 9001, "name" => "proxy-http"}
+                         ],
+                         "resources" => %{
+                           "limits" => %{"memory" => "1024Mi"},
+                           "requests" => %{"memory" => "80Mi"}
+                         },
+                         "volumeMounts" => [
+                           %{"mountPath" => "/home/example", "name" => "volume-name"}
+                         ]
+                       }
+                     ],
+                     "terminationGracePeriodSeconds" => 140,
+                     "volumes" => [%{"emptyDir" => "{}", "name" => "volume-name"}]
+                   }
+                 }
+               }
+             } == build_host_deploy(embedded_actor_host_with_volume_mounts)
+    end
+
+    test "generate deployment with defaults", ctx do
+      %{
+        simple_host: simple_host_resource
+      } = ctx
+
+      assert %{
+               "apiVersion" => "apps/v1",
+               "kind" => "Deployment",
+               "metadata" => %{
+                 "labels" => %{"actor-system" => "spawn-system", "app" => "spawn-test"},
+                 "name" => "spawn-test",
+                 "namespace" => "default"
+               },
+               "spec" => %{
+                 "replicas" => 1,
+                 "selector" => %{
+                   "matchLabels" => %{"actor-system" => "spawn-system", "app" => "spawn-test"}
+                 },
+                 "strategy" => %{
+                   "rollingUpdate" => %{"maxSurge" => "50%", "maxUnavailable" => "50%"},
+                   "type" => "RollingUpdate"
+                 },
+                 "template" => %{
+                   "metadata" => %{
+                     "annotations" => %{
+                       "prometheus.io/port" => "9001",
+                       "prometheus.io/scrape" => "true",
+                       "prometheus.io/path" => "/metrics"
+                     },
+                     "labels" => %{"actor-system" => "spawn-system", "app" => "spawn-test"}
+                   },
+                   "spec" => %{
+                     "containers" => [
+                       %{
+                         "env" => [
+                           %{"name" => "RELEASE_NAME", "value" => "spawn-test"},
+                           %{
+                             "name" => "NAMESPACE",
+                             "valueFrom" => %{
+                               "fieldRef" => %{"fieldPath" => "metadata.namespace"}
+                             }
+                           },
+                           %{
+                             "name" => "POD_IP",
+                             "valueFrom" => %{"fieldRef" => %{"fieldPath" => "status.podIP"}}
+                           },
+                           %{"name" => "SPAWN_PROXY_PORT", "value" => "9001"},
+                           %{"name" => "SPAWN_PROXY_INTERFACE", "value" => "0.0.0.0"},
+                           %{"name" => "RELEASE_DISTRIBUTION", "value" => "name"},
+                           %{"name" => "RELEASE_NODE", "value" => "$(RELEASE_NAME)@$(POD_IP)"}
+                         ],
+                         "envFrom" => [
+                           %{"configMapRef" => %{"name" => "spawn-test-sidecar-cm"}},
+                           %{"secretRef" => %{"name" => "spawn-system-secret"}}
+                         ],
+                         "image" => "docker.io/eigr/spawn-proxy:0.5.3",
+                         "livenessProbe" => %{
+                           "failureThreshold" => 10,
+                           "httpGet" => %{
+                             "path" => "/health/liveness",
+                             "port" => 9001,
+                             "scheme" => "HTTP"
+                           },
+                           "initialDelaySeconds" => 5,
+                           "periodSeconds" => 60,
+                           "successThreshold" => 1,
+                           "timeoutSeconds" => 30
+                         },
+                         "name" => "spawn-sidecar",
+                         "ports" => [
+                           %{"containerPort" => 4369, "name" => "epmd"},
+                           %{"containerPort" => 9001, "name" => "proxy-http"}
+                         ],
+                         "resources" => %{
+                           "limits" => %{"memory" => "1024Mi"},
+                           "requests" => %{"memory" => "80Mi"}
+                         },
+                         "readinessProbe" => %{
+                           "httpGet" => %{
+                             "path" => "/health/readiness",
+                             "port" => 9001,
+                             "scheme" => "HTTP"
+                           },
+                           "initialDelaySeconds" => 5,
+                           "periodSeconds" => 5,
+                           "successThreshold" => 1,
+                           "timeoutSeconds" => 5
                          }
                        },
                        %{
@@ -116,26 +277,111 @@ defmodule DeploymentTest do
                              "valueFrom" => %{"fieldRef" => %{"fieldPath" => "status.podIP"}}
                            },
                            %{"name" => "SPAWN_PROXY_PORT", "value" => "9001"},
-                           %{"name" => "SPAWN_PROXY_INTERFACE", "value" => "0.0.0.0"}
+                           %{"name" => "SPAWN_PROXY_INTERFACE", "value" => "0.0.0.0"},
+                           %{"name" => "RELEASE_DISTRIBUTION", "value" => "name"},
+                           %{"name" => "RELEASE_NODE", "value" => "$(RELEASE_NAME)@$(POD_IP)"}
                          ],
                          "image" => "eigr/spawn-test:latest",
                          "name" => "actor-host-function",
-                         "ports" => [
-                           %{"containerPort" => 9000, "name" => "proxy-http"},
-                           %{"containerPort" => 9001, "name" => "proxy-https"},
-                           %{"containerPort" => 4369, "name" => "epmd"}
-                         ],
                          "resources" => %{
                            "limits" => %{"memory" => "1024Mi"},
                            "requests" => %{"memory" => "80Mi"}
                          }
                        }
                      ],
-                     "terminationGracePeriodSeconds" => 120
+                     "terminationGracePeriodSeconds" => 140
                    }
                  }
                }
              } = build_host_deploy(simple_host_resource)
+    end
+
+    test "generate deployment with host ports", ctx do
+      %{
+        simple_host_with_ports: simple_host_with_ports_resource
+      } = ctx
+
+      assert %{
+               "spec" => %{
+                 "template" => %{
+                   "spec" => %{
+                     "containers" => containers
+                   }
+                 }
+               }
+             } = build_host_deploy(simple_host_with_ports_resource)
+
+      assert List.last(containers) == %{
+               "env" => [
+                 %{
+                   "name" => "NAMESPACE",
+                   "valueFrom" => %{
+                     "fieldRef" => %{"fieldPath" => "metadata.namespace"}
+                   }
+                 },
+                 %{
+                   "name" => "POD_IP",
+                   "valueFrom" => %{"fieldRef" => %{"fieldPath" => "status.podIP"}}
+                 },
+                 %{"name" => "SPAWN_PROXY_PORT", "value" => "9001"},
+                 %{"name" => "SPAWN_PROXY_INTERFACE", "value" => "0.0.0.0"},
+                 %{"name" => "RELEASE_DISTRIBUTION", "value" => "name"},
+                 %{"name" => "RELEASE_NODE", "value" => "$(RELEASE_NAME)@$(POD_IP)"}
+               ],
+               "image" => "eigr/spawn-test:latest",
+               "name" => "actor-host-function",
+               "resources" => %{
+                 "limits" => %{"memory" => "1024Mi"},
+                 "requests" => %{"memory" => "80Mi"}
+               },
+               "ports" => [
+                 %{"containerPort" => 8090, "name" => "http"},
+                 %{"containerPort" => 8091, "name" => "https"}
+               ]
+             }
+    end
+
+    test "generate deployment with host volumeMount", ctx do
+      %{
+        simple_actor_host_with_volume_mounts: simple_actor_host_with_volume_mounts
+      } = ctx
+
+      assert %{
+               "spec" => %{
+                 "template" => %{
+                   "spec" => %{
+                     "containers" => containers,
+                     "volumes" => [%{"emptyDir" => "{}", "name" => "volume-name"}]
+                   }
+                 }
+               }
+             } = build_host_deploy(simple_actor_host_with_volume_mounts)
+
+      assert List.last(containers) == %{
+               "env" => [
+                 %{
+                   "name" => "NAMESPACE",
+                   "valueFrom" => %{
+                     "fieldRef" => %{"fieldPath" => "metadata.namespace"}
+                   }
+                 },
+                 %{
+                   "name" => "POD_IP",
+                   "valueFrom" => %{"fieldRef" => %{"fieldPath" => "status.podIP"}}
+                 },
+                 %{"name" => "SPAWN_PROXY_PORT", "value" => "9001"},
+                 %{"name" => "SPAWN_PROXY_INTERFACE", "value" => "0.0.0.0"},
+                 %{"name" => "RELEASE_DISTRIBUTION", "value" => "name"},
+                 %{"name" => "RELEASE_NODE", "value" => "$(RELEASE_NAME)@$(POD_IP)"}
+               ],
+               "image" => "eigr/spawn-test:latest",
+               "name" => "actor-host-function",
+               "resources" => %{
+                 "limits" => %{"memory" => "1024Mi"},
+                 "requests" => %{"memory" => "80Mi"}
+               },
+               "volumeMounts" => [%{"mountPath" => "/home/example", "name" => "volume-name"}]
+             }
     end
   end
 

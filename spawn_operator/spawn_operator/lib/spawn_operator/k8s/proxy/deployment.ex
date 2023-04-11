@@ -1,6 +1,8 @@
 defmodule SpawnOperator.K8s.Proxy.Deployment do
   @moduledoc false
 
+  require Logger
+
   @behaviour SpawnOperator.K8s.Manifest
 
   @default_actor_host_function_env [
@@ -57,17 +59,10 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
          } = _resource
        ) do
     host_params = Map.get(params, "host")
-
-    replicas = Map.get(params, "replicas", @default_actor_host_function_replicas)
-
-    replicas =
-      if replicas <= 1 do
-        1
-      else
-        replicas
-      end
-
+    replicas = max(1, Map.get(params, "replicas", @default_actor_host_function_replicas))
     embedded = Map.get(host_params, "embedded", false)
+
+    maybe_warn_wrong_volumes(params, host_params)
 
     %{
       "apiVersion" => "apps/v1",
@@ -101,10 +96,12 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
               "actor-system" => system
             }
           },
-          "spec" => %{
-            "containers" => get_containers(embedded, system, name, host_params, annotations),
-            "terminationGracePeriodSeconds" => @default_termination_period_seconds
-          }
+          "spec" =>
+            %{
+              "containers" => get_containers(embedded, system, name, host_params, annotations),
+              "terminationGracePeriodSeconds" => @default_termination_period_seconds
+            }
+            |> maybe_put_volumes(params)
         }
       }
     }
@@ -136,7 +133,7 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
     actor_host_function_resources =
       Map.get(host_params, "resources", @default_actor_host_function_resources)
 
-    [
+    host_and_proxy_container =
       %{
         "name" => "actor-host-function",
         "image" => actor_host_function_image,
@@ -156,6 +153,10 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
         "ports" => actor_host_function_ports,
         "resources" => actor_host_function_resources
       }
+      |> maybe_put_volume_mounts_to_host_container(host_params)
+
+    [
+      host_and_proxy_container
     ]
   end
 
@@ -228,25 +229,49 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
       ]
     }
 
-    actor_host_function_ports = Map.get(host_params, "ports", [])
-
-    host_container = %{
-      "name" => "actor-host-function",
-      "image" => actor_host_function_image,
-      "env" => actor_host_function_envs,
-      "resources" => actor_host_function_resources
-    }
-
     host_container =
-      if length(actor_host_function_ports) > 0 do
-        Map.put(host_container, "ports", actor_host_function_ports)
-      else
-        host_container
-      end
+      %{
+        "name" => "actor-host-function",
+        "image" => actor_host_function_image,
+        "env" => actor_host_function_envs,
+        "resources" => actor_host_function_resources
+      }
+      |> maybe_put_ports_to_host_container(host_params)
+      |> maybe_put_volume_mounts_to_host_container(host_params)
 
     [
       proxy_container,
       host_container
     ]
+  end
+
+  defp maybe_put_ports_to_host_container(spec, %{"ports" => ports}) do
+    Map.put(spec, "ports", ports)
+  end
+
+  defp maybe_put_ports_to_host_container(spec, _), do: spec
+
+  defp maybe_put_volumes(spec, %{"volumes" => volumes}) do
+    Map.put(spec, "volumes", volumes)
+  end
+
+  defp maybe_put_volumes(spec, _), do: spec
+
+  defp maybe_put_volume_mounts_to_host_container(spec, %{"volumeMounts" => volumeMounts}) do
+    Map.put(spec, "volumeMounts", volumeMounts)
+  end
+
+  defp maybe_put_volume_mounts_to_host_container(spec, _), do: spec
+
+  defp maybe_warn_wrong_volumes(params, host_params) do
+    volumes = Map.get(params, "volumes", [])
+
+    host_params
+    |> Map.get("volumeMounts", [])
+    |> Enum.each(fn mount ->
+      if not !!Enum.find(volumes, & &1["name"] == mount["name"]) do
+        Logger.warn("Not found volume registered for #{mount["name"]}")
+      end
+    end)
   end
 end

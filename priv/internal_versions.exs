@@ -16,7 +16,8 @@ defmodule InternalVersions do
     activator_pubsub: "0.5.3",
     activator_rabbitmq: "0.5.3",
     activator_sqs: "0.5.3",
-    proxy: "0.5.3"
+    proxy: "0.5.3",
+    spawn_operator: "0.5.3"
   ]
 
   @doc """
@@ -56,6 +57,7 @@ defmodule InternalVersions do
       |> Enum.filter(
         &(elem(&1, 0)
           |> Atom.to_string()
+          |> String.replace("spawn_operator", "")
           |> String.starts_with?(["spawn", "proxy"]))
       )
 
@@ -156,6 +158,9 @@ defmodule InternalVersions do
 
           String.starts_with?(name, "proxy") ->
             {"./spawn_proxy/#{name}", "../.."}
+
+          String.starts_with?(name, "spawn_operator") ->
+            {"./spawn_operator/#{name}", "../.."}
 
           true ->
             {"./", "."}
