@@ -1,6 +1,8 @@
 defmodule SpawnOperator.K8s.Proxy.Deployment do
   @moduledoc false
 
+  require Logger
+
   @behaviour SpawnOperator.K8s.Manifest
 
   @default_actor_host_function_env [
@@ -57,17 +59,10 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
          } = _resource
        ) do
     host_params = Map.get(params, "host")
-
-    replicas = Map.get(params, "replicas", @default_actor_host_function_replicas)
-
-    replicas =
-      if replicas <= 1 do
-        1
-      else
-        replicas
-      end
-
+    replicas = max(1, Map.get(params, "replicas", @default_actor_host_function_replicas))
     embedded = Map.get(host_params, "embedded", false)
+
+    maybe_warn_wrong_volumes(params, host_params)
 
     %{
       "apiVersion" => "apps/v1",
@@ -267,4 +262,16 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
   end
 
   defp maybe_put_volume_mounts_to_host_container(spec, _), do: spec
+
+  defp maybe_warn_wrong_volumes(params, host_params) do
+    volumes = Map.get(params, "volumes", [])
+
+    host_params
+    |> Map.get("volumeMounts", [])
+    |> Enum.each(fn mount ->
+      if not !!Enum.find(volumes, & &1["name"] == mount["name"]) do
+        Logger.warn("Not found volume registered for #{mount["name"]}")
+      end
+    end)
+  end
 end
