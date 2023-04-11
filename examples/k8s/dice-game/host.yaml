@@ -8,7 +8,7 @@ metadata:
     spawn-eigr.io/actor-system: game-system
 spec:
   host:
-    image: eigr/dice-game-example:0.5.3
+    image: eigr/dice-game-example:0.5.4
     embedded: true
     ports:
       - name: "http"

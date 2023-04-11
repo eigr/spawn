@@ -16,7 +16,7 @@ metadata:
     spawn-eigr.io/sidecar-pubsub-nats-hosts: "nats://nats-cluster:4222"
 spec:
   host:
-    image: eigr/spawn-springboot-examples:0.5.3 # Mandatory
+    image: eigr/spawn-springboot-examples:0.5.4 # Mandatory
     ports:
       - name: http
         containerPort: 8090
