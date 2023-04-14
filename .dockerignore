@@ -1,0 +1,36 @@
+.dockerignore
+# there are valid reasons to keep the .git, namely so that you can get the 
+# current commit hash
+#.git
+.log
+tmp
+
+# we don't need our docker directory
+docker
+
+# Mix artifacts
+_build
+deps
+*.ez
+
+# don't include our release builds
+releases
+
+# Generate on crash by the VM
+erl_crash.dump
+
+# Static artifacts
+node_modules
+
+# Others
+doc
+docs
+deps
+.vscode
+.github
+.elixir_ls
+_build
+eigr-functions-db-db
+k3d-cluster-create.txt
+kind-cluster-create.txt
+compile-pb.sh

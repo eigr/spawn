@@ -7,6 +7,10 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
 
   @default_actor_host_function_env [
     %{
+      "name" => "RELEASE_NAME",
+      "value" => "spawn"
+    },
+    %{
       "name" => "NAMESPACE",
       "valueFrom" => %{"fieldRef" => %{"fieldPath" => "metadata.namespace"}}
     },
@@ -111,14 +115,7 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
     actor_host_function_image = Map.get(host_params, "image")
 
     actor_host_function_envs =
-      Map.get(host_params, "env", []) ++
-        [
-          %{
-            "name" => "RELEASE_NAME",
-            "value" => name
-          }
-        ] ++
-        @default_actor_host_function_env
+      Map.get(host_params, "env", []) ++ @default_actor_host_function_env
 
     proxy_http_port = String.to_integer(annotations.proxy_http_port)
 
@@ -167,15 +164,6 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
       Map.get(host_params, "env", []) ++
         @default_actor_host_function_env
 
-    proxy_envs =
-      [
-        %{
-          "name" => "RELEASE_NAME",
-          "value" => name
-        }
-      ] ++
-        @default_actor_host_function_env
-
     actor_host_function_resources =
       Map.get(host_params, "resources", @default_actor_host_function_resources)
 
@@ -189,7 +177,7 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
     proxy_container = %{
       "name" => "spawn-sidecar",
       "image" => "#{annotations.proxy_image_tag}",
-      "env" => proxy_envs,
+      "env" => @default_actor_host_function_env,
       "ports" => proxy_actor_host_function_ports,
       "livenessProbe" => %{
         "failureThreshold" => 10,

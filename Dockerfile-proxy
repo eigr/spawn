@@ -44,6 +44,7 @@ RUN cd spawn_proxy/proxy \
 
 # ---- Application Stage ----
 FROM alpine:3.16
+
 RUN apk add --no-cache --update zstd ncurses-libs libstdc++ libgcc
 
 WORKDIR /app

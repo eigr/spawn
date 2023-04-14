@@ -8,10 +8,11 @@ metadata:
     spawn-eigr.io/actor-system: game-system
 spec:
   host:
-    image: eigr/dice-game-example:0.5.4
+    image: eigr/dice-game-example:0.5.3
     embedded: true
     ports:
       - name: "http"
         containerPort: 8800
   autoscaler:
-    max: 2
+    min: 2
+    max: 3

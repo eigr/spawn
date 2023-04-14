@@ -6,7 +6,7 @@ metadata:
   namespace: default # Optional. Default namespace is "default"
   annotations:
     # Mandatory. Name of the ActorSystem declared in ActorSystem CRD
-    spawn-eigr.io/actor-system: spawn-system
+    spawn-eigr.io/actor-system: game-system
 
     # Optional. Default 9001
     spawn-eigr.io/sidecar-http-port: "9001"
@@ -16,7 +16,7 @@ metadata:
     spawn-eigr.io/sidecar-pubsub-nats-hosts: "nats://nats-cluster:4222"
 spec:
   host:
-    image: eigr/spawn-springboot-examples:0.5.4 # Mandatory
+    image: eigr/spawn-springboot-examples:0.5.3 # Mandatory
     ports:
       - name: http
         containerPort: 8090
