@@ -10,7 +10,7 @@ by adding `activator_http` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:activator_http, "~> 0.5.4"}
+    {:activator_http, "~> 0.5.5"}
   ]
 end
 ```
