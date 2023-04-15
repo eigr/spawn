@@ -1,4 +1,4 @@
-version=0.5.6
+version=0.5.5
 registry=eigr
 
 CLUSTER_NAME=spawn-k8s
@@ -34,24 +34,24 @@ build:
 	mix deps.get && mix compile
 
 build-proxy-image:
-	docker build -f Dockerfile-proxy -t ${proxy-image} .
+	docker build --no-cache -f Dockerfile-proxy -t ${proxy-image} .
 
 build-operator-image:
-	docker build -f Dockerfile-operator -t ${operator-image} .
+	docker build --no-cache -f Dockerfile-operator -t ${operator-image} .
 
 build-elixir-sdk-image:
-	docker build -f Dockerfile-elixir-example -t ${spawn-sdk-example-image} .
+	docker build --no-cache -f Dockerfile-elixir-example -t ${spawn-sdk-example-image} .
 
 build-all-images:
-	docker build -f Dockerfile-proxy -t ${proxy-image} .
-	docker build -f Dockerfile-operator -t ${operator-image} .
-	#docker build -f Dockerfile-activator-grpc -t ${activator-grpc-image} .
-	#docker build -f Dockerfile-activator-http -t ${activator-http-image} .
-	#docker build -f Dockerfile-activator-kafka -t ${activator-kafka-image} .
-	#docker build -f Dockerfile-activator-pubsub -t ${activator-pubsub-image} .
-	#docker build -f Dockerfile-activator-rabbitmq -t ${activator-rabbitmq-image} .
-	#docker build -f Dockerfile-activator-sqs -t ${activator-sqs-image} .
-	#docker build -f Dockerfile-elixir-example -t ${spawn-sdk-example-image} .
+	docker build --no-cache -f Dockerfile-proxy -t ${proxy-image} .
+	docker build --no-cache -f Dockerfile-operator -t ${operator-image} .
+	#docker build --no-cache -f Dockerfile-activator-grpc -t ${activator-grpc-image} .
+	#docker build --no-cache -f Dockerfile-activator-http -t ${activator-http-image} .
+	#docker build --no-cache -f Dockerfile-activator-kafka -t ${activator-kafka-image} .
+	#docker build --no-cache -f Dockerfile-activator-pubsub -t ${activator-pubsub-image} .
+	#docker build --no-cache -f Dockerfile-activator-rabbitmq -t ${activator-rabbitmq-image} .
+	#docker build --no-cache -f Dockerfile-activator-sqs -t ${activator-sqs-image} .
+	#docker build --no-cache -f Dockerfile-elixir-example -t ${spawn-sdk-example-image} .
 
 test-spawn:
 	MIX_ENV=test PROXY_DATABASE_TYPE=mysql PROXY_CLUSTER_STRATEGY=gossip PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
