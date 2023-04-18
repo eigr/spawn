@@ -40,7 +40,7 @@ defmodule SpawnOperator.K8s.System.Secret.ActorSystemSecret do
     pool_params = Map.get(params, "pool", %{})
     pool_size = Map.get(pool_params, "size", "10") |> Base.encode64()
     statestore_credentials_secret_ref = Map.fetch!(params, "credentialsSecretRef")
-    statestore_ssl = Map.fetch!(params, "ssl", "false")
+    statestore_ssl = Map.get(params, "ssl", "false")
 
     {:ok, secret} =
       K8s.Client.get("v1", :secret,
