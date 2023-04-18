@@ -77,6 +77,13 @@ defmodule Statestores.Adapters.Behaviour do
             String.to_integer(System.get_env("PROXY_DATABASE_QUEUE_TARGET", "10000"))
           )
 
+        config =
+          Keyword.put(
+            config,
+            :ssl,
+            System.get_env("PROXY_DATABASE_SSL", "false") == "true"
+          )
+
         {:ok, config}
       end
     end

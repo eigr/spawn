@@ -10,11 +10,11 @@
 
 ## Overview
 
-***What is Spawn?***
+**_What is Spawn?_**
 
 There are two ways to answer this question, the short form would be something like:
 
->  "Spawn is an Actor Model framework and Serverless Platform, which does a lot, really lot, of cool stuff that allows you to quickly deliver software oriented to your business domain."
+> "Spawn is an Actor Model framework and Serverless Platform, which does a lot, really lot, of cool stuff that allows you to quickly deliver software oriented to your business domain."
 
 Well since this answer doesn't say much, let's go the long way.
 
@@ -26,10 +26,10 @@ Spawn's technology stack, built on the [BEAM VM](https://www.erlang.org/blog/a-b
 
 Spawn is made up of the following components:
 
-* A semantic protocol based on Protocol Buffers
-* A Sidecar Proxy, written in Elixir, that implements this protocol and persistent storage
-adapters.
-* Support libraries in different programming languages.
+- A semantic protocol based on Protocol Buffers
+- A Sidecar Proxy, written in Elixir, that implements this protocol and persistent storage
+  adapters.
+- Support libraries in different programming languages.
 
 These are the main concepts:
 
@@ -41,22 +41,21 @@ These are the main concepts:
 
 4. **Less Infrastructure**. This means that our platform will give the developer the tools to focus only on their business without worrying about issues such as:
 
-   * Resource allocation
-   * Definition of connections and Pools
-   * Service discovery
-   * Source/Sink of Events
-   * Other infrastructure issues
+   - Resource allocation
+   - Definition of connections and Pools
+   - Service discovery
+   - Source/Sink of Events
+   - Other infrastructure issues
 
-5. **The basic primitive is the Actor** (from the actors model) and ***not*** the Function (from the traditional serverless architectures).
+5. **The basic primitive is the Actor** (from the actors model) and **_not_** the Function (from the traditional serverless architectures).
 
-6. Horizontal scalability with automatic **Activation** and **Deactivation** of Actors on demand. 
+6. Horizontal scalability with automatic **Activation** and **Deactivation** of Actors on demand.
 
 Watch the video explaining how it works:
 
 [![asciicast](https://asciinema.org/a/V2zUGsRmOjs0kI7swVTsKg7BQ.svg)](https://asciinema.org/a/V2zUGsRmOjs0kI7swVTsKg7BQ)
 
-> **_NOTE:_** This video was recorded with an old version of the SDK for Java. That's why errors are seen in Deployment 
-
+> **_NOTE:_** This video was recorded with an old version of the SDK for Java. That's why errors are seen in Deployment
 
 ## What problem Spawn solves
 
@@ -107,61 +106,61 @@ To achieve these goals, the Eigr Functions Spawn architecture is composed of the
 
 As seen above, the Eigr Functions Spawn platform architecture is separated into different components, each with its responsibility. We will detail the components below.
 
-* **k8s Operator:** Responsible for interacting with the Kubernetes API and coordinating the deployments of the other components. The user interacts with it using our specific CRDs ([Custom Resource Definitions](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/)). We'll talk more about our CRDs later.
+- **k8s Operator:** Responsible for interacting with the Kubernetes API and coordinating the deployments of the other components. The user interacts with it using our specific CRDs ([Custom Resource Definitions](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/)). We'll talk more about our CRDs later.
 
-* **Cloud Storage:** Despite not being directly part of the platform, it is worth mentioning here that Spawn uses user-defined persistent storage to store the state of its Actors. Different types of persistent storage can be used, such as relational databases such as MySQL, Postgres, among others. In the future, we will support other types of databases, both relational and non-relational.
+- **Cloud Storage:** Despite not being directly part of the platform, it is worth mentioning here that Spawn uses user-defined persistent storage to store the state of its Actors. Different types of persistent storage can be used, such as relational databases such as MySQL, Postgres, among others. In the future, we will support other types of databases, both relational and non-relational.
 
-* **Activators:** Activators are applications responsible for ingesting data from external sources for certain user-defined actors and are configured through their own CRD. They are responsible for listening to a user-configured event and forward this event through a direct invocation to a specific target actor. Different types of Activators exist to consume events from other providers such as Google PubSub, RabbitMQ, Amazon SQS, etc.
+- **Activators:** Activators are applications responsible for ingesting data from external sources for certain user-defined actors and are configured through their own CRD. They are responsible for listening to a user-configured event and forward this event through a direct invocation to a specific target actor. Different types of Activators exist to consume events from other providers such as Google PubSub, RabbitMQ, Amazon SQS, etc.
 
-* **Actor Host Function:** The container where the user defines his actors and all the business logic of his actors around the state of these actors through a specific SDK for each supported programming language.
+- **Actor Host Function:** The container where the user defines his actors and all the business logic of his actors around the state of these actors through a specific SDK for each supported programming language.
 
-* **Spawn Sidecar Proxy:** The centerpiece of the gear is our sidecar proxy; in turn it is responsible for managing the entire lifecycle of user-defined actors through our SDKs and also responsible for managing the state of these actors in persistent storage. The Spawn proxy can also allow the user to develop different integration flows between its actors such as Forwards,
-Effects, Pipes, and in the future, other essential standards such as Saga, Aggregators, Scatter-
-Gather, external invocations, and others.
-Our proxy connects directly and transparently to all cluster members without needing for a single point of failure, i.e., a true mesh network.
+- **Spawn Sidecar Proxy:** The centerpiece of the gear is our sidecar proxy; in turn it is responsible for managing the entire lifecycle of user-defined actors through our SDKs and also responsible for managing the state of these actors in persistent storage. The Spawn proxy can also allow the user to develop different integration flows between its actors such as Forwards,
+  Effects, Pipes, and in the future, other essential standards such as Saga, Aggregators, Scatter-
+  Gather, external invocations, and others.
+  Our proxy connects directly and transparently to all cluster members without needing for a single point of failure, i.e., a true mesh network.
 
 ## Features
 
 - [x] Distribution. Automatic and transparent cluster formation via Kubernetes Operator.
-   - [x] Erlang Distributed as transport.
+  - [x] Erlang Distributed as transport.
 - [x] Configuration management via Kubernetes [CRDs](https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definitions/) and Envinronment Variables.
 - [x] Statestores. Adapters for persistent storage using multiple database providers.
-   - [x] Sqlite
-   - [x] MySql
-   - [x] Postgres 
-   - [x] CockroachDB
-   - [x] MSSQL
+  - [x] Sqlite
+  - [x] MySql
+  - [x] Postgres
+  - [x] CockroachDB
+  - [x] MSSQL
 - [x] Automatic activation and deactivation of Actors.
 - [x] Horizontal Scalability
-   - [x] automatically controlled by the Operator using Kubernetes HPA based on memory and cpu. 
-   - [ ] automatically controlled by the Operator via Internal Metrics.
-   - [ ] automatically controlled by the Operator via Custom Metrics.
+  - [x] automatically controlled by the Operator using Kubernetes HPA based on memory and cpu.
+  - [ ] automatically controlled by the Operator via Internal Metrics.
+  - [ ] automatically controlled by the Operator via Custom Metrics.
 - [x] Workflows
-   - [x] Broadcast. Communicates with other actors through pubsub channel semantics.
-      - [x] In Memory broadcast. Using [Phoenix.PubSub](https://github.com/phoenixframework/phoenix_pubsub) as transport.
-      - [x] Nats broadcast. Using [Nats](https://nats.io/) as transport.
-   - [x] External Broadcast. Sends events with pubsub semantics outside the actor system using the same transport types as Broadcast.
-   - [x] Forwards. Forwards the input parameter of an action of an actor as input to another action of another actor.
-   - [x] Pipes. Forwards the output type of an action of one actor to the input of an action of another actor. Like Unix pipes.
-   - [x] Side effects. Sends an effect as a result of your computation for other Actors to handle.
-   - [ ] Saga.
-- [X] SDKs
-   - [x] Elixir. All features implemented.
-   - [x] Node/Typescript. All features implemented.
-   - [x] Java. Partially implemented.
-   - [ ] Go. Under development.
-   - [ ] Rust. Under development.
-   - [ ] .Net/C#. Under development.
+  - [x] Broadcast. Communicates with other actors through pubsub channel semantics.
+    - [x] In Memory broadcast. Using [Phoenix.PubSub](https://github.com/phoenixframework/phoenix_pubsub) as transport.
+    - [x] Nats broadcast. Using [Nats](https://nats.io/) as transport.
+  - [x] External Broadcast. Sends events with pubsub semantics outside the actor system using the same transport types as Broadcast.
+  - [x] Forwards. Forwards the input parameter of an action of an actor as input to another action of another actor.
+  - [x] Pipes. Forwards the output type of an action of one actor to the input of an action of another actor. Like Unix pipes.
+  - [x] Side effects. Sends an effect as a result of your computation for other Actors to handle.
+  - [ ] Saga.
+- [x] SDKs
+  - [x] Elixir. All features implemented.
+  - [x] Node/Typescript. All features implemented.
+  - [x] Java. Partially implemented.
+  - [ ] Go. Under development.
+  - [ ] Rust. Under development.
+  - [ ] .Net/C#. Under development.
 - [x] Activators
-   - [x] RabbitMQ.
-   - [ ] gRPC/HTTP. Under development.
-   - [ ] Kafka. Under development.
-   - [ ] Nats. On the Roadmap to version 1.0.0.
-   - [ ] Amazon SQS. On the Roadmap to version 1.0.0.
-   - [ ] Google PubSub. On the Roadmap to version 1.0.0.
+  - [x] RabbitMQ.
+  - [ ] gRPC/HTTP. Under development.
+  - [ ] Kafka. Under development.
+  - [ ] Nats. On the Roadmap to version 1.0.0.
+  - [ ] Amazon SQS. On the Roadmap to version 1.0.0.
+  - [ ] Google PubSub. On the Roadmap to version 1.0.0.
 - [x] Observability
-   - [x] Tracing. Using OpenTelemetry.
-   - [x] Prometheus Metrics.
+  - [x] Tracing. Using OpenTelemetry.
+  - [x] Prometheus Metrics.
 
 ## Install
 
@@ -203,11 +202,11 @@ kubectl create secret generic mysql-connection-secret \
   --from-literal=encryptionKey=$(openssl rand -base64 32)
 ```
 
-Sapwn securely encrypts the Actors' State, so the ***encryptionKey*** item must be informed and must be a key of reasonable size and complexity to ensure the security of your data.
+Sapwn securely encrypts the Actors' State, so the **_encryptionKey_** item must be informed and must be a key of reasonable size and complexity to ensure the security of your data.
 
 > **_NOTE:_** To learn more about Statestores settings, see the [statestore section](#statestores).
 
-Now in a directory of your choice, create a file called ***system.yaml*** with the following content:
+Now in a directory of your choice, create a file called **_system.yaml_** with the following content:
 
 ```yaml
 ---
@@ -226,7 +225,7 @@ spec:
 
 This file will be responsible for creating a system of actors in the cluster.
 
-Now create a new file called ***host.yaml*** with the following content:
+Now create a new file called **_host.yaml_** with the following content:
 
 ```yaml
 ---
@@ -283,59 +282,58 @@ kubectl get actorhosts
 
 You can find some examples of using Spawn in the links below:
 
-* **Hatch**: https://github.com/zblanco/hatch
-* **Elixir Dice Game. Spawn with Phoenix app**: https://github.com/eigr-labs/spawn_game_example.git 
-* **Distributed Image Processing**: https://github.com/eigr-labs/spawn-distributed-image-processing
-* **Federated Data Example**: https://github.com/eigr-labs/spawn-federated-data-example
-* **Fleet**: https://github.com/sleipnir/fleet-spawn-example
-* **Spawn Polyglot Example**: https://github.com/sleipnir/spawn-polyglot-ping-pong
+- **Hatch**: https://github.com/zblanco/hatch
+- **Elixir Dice Game. Spawn with Phoenix app**: https://github.com/eigr-labs/spawn_game_example.git
+- **Distributed Image Processing**: https://github.com/eigr-labs/spawn-distributed-image-processing
+- **Federated Data Example**: https://github.com/eigr-labs/spawn-federated-data-example
+- **Fleet**: https://github.com/sleipnir/fleet-spawn-example
+- **Spawn Polyglot Example**: https://github.com/sleipnir/spawn-polyglot-ping-pong
 
 ### Talks
 
 You can see some talks on Youtube about Eigr Community or Spawn in the links below:
 
-* **Marcel Lanz on Code Beam Europe 2022**: https://youtu.be/jgR7Oc_GXAg
-* **Adriano Santos on Code Beam BR 2022**: Link not yet released by the event organizers
+- **Marcel Lanz on Code Beam Europe 2022**: https://youtu.be/jgR7Oc_GXAg
+- **Adriano Santos on Code Beam BR 2022**: Link not yet released by the event organizers
 
 ## SDKs
 
 Another important part of Spawn is the SDKs implemented in different languages that aim to
 abstract all the protocol specifics and expose an easy and intuitive API to developers.
 
-|  SDK 	                                                                | Language  |
-|---	                                                                  |---        |
-|[C# SDK](https://github.com/eigr-labs/spawn-dotnet-sdk)                | C#	      |
-|[Elixir](https://github.com/eigr/spawn/tree/main/spawn_sdk/spawn_sdk)  | Elixir    |
-|[Go SDK](https://github.com/eigr/spawn-go-sdk)       	                | Go  	    |
-|[Spring Boot SDK](https://github.com/eigr/spawn-springboot-sdk)     	  | Java	    |
-|[NodeJS/Typescript SDK](https://github.com/eigr/spawn-node-sdk)        | Node	    |
-|[Python SDK](https://github.com/eigr-labs/spawn-python-sdk)  	        | Python    |
-|[Rust SDK](https://github.com/eigr-labs/spawn-rust-sdk)  	            | Rust	    |
-
+| SDK                                                                   | Language |
+| --------------------------------------------------------------------- | -------- |
+| [C# SDK](https://github.com/eigr-labs/spawn-dotnet-sdk)               | C#       |
+| [Elixir](https://github.com/eigr/spawn/tree/main/spawn_sdk/spawn_sdk) | Elixir   |
+| [Go SDK](https://github.com/eigr/spawn-go-sdk)                        | Go       |
+| [Spring Boot SDK](https://github.com/eigr/spawn-springboot-sdk)       | Java     |
+| [NodeJS/Typescript SDK](https://github.com/eigr/spawn-node-sdk)       | Node     |
+| [Python SDK](https://github.com/eigr-labs/spawn-python-sdk)           | Python   |
+| [Rust SDK](https://github.com/eigr-labs/spawn-rust-sdk)               | Rust     |
 
 ### Custom Resources
 
 Spawn defines some custom Resources for the user to interact with the API for deploying Spawn artifacts in Kubernetes. We'll talk more about these CRDs in the Getting Started section but for now we'll list each of these resources below for a general understanding of the concepts:
 
-* **ActorSystem CRD:** The user must define the ActorSystem CRD before it attempts to
-deploy any other Spawn features. In it, the user defines some general parameters for the
-functioning of the actor cluster and the parameters of the persistent storage connection for a
-given system. Multiple ActorSystems can be defined but remember that they must be
-referenced equally in the Actor Host Functions. Examples of this CRD can be found in the
-[examples/k8s folder](examples/k8s/simple/system.yaml).
+- **ActorSystem CRD:** The user must define the ActorSystem CRD before it attempts to
+  deploy any other Spawn features. In it, the user defines some general parameters for the
+  functioning of the actor cluster and the parameters of the persistent storage connection for a
+  given system. Multiple ActorSystems can be defined but remember that they must be
+  referenced equally in the Actor Host Functions. Examples of this CRD can be found in the
+  [examples/k8s folder](examples/k8s/simple/system.yaml).
 
-* **ActorHost CRD:** A ActorHost is a cluster member application. An ActorHost, by
-definition, is a Kubernetes Deployment and will contain two containers, one containing the
-Actor Host Function user application and another container for the Spawn proxy, which is
-responsible for connecting to the proxies cluster via Distributed Erlang and also for providing
-all the necessary abstractions for the functioning of the system such as state management,
-activation, and passivation of actors, among other infrastructure tasks. Examples of this CRD
-can be found in the [examples/k8s folder](examples/k8s/simple/host.yaml).
+- **ActorHost CRD:** A ActorHost is a cluster member application. An ActorHost, by
+  definition, is a Kubernetes Deployment and will contain two containers, one containing the
+  Actor Host Function user application and another container for the Spawn proxy, which is
+  responsible for connecting to the proxies cluster via Distributed Erlang and also for providing
+  all the necessary abstractions for the functioning of the system such as state management,
+  activation, and passivation of actors, among other infrastructure tasks. Examples of this CRD
+  can be found in the [examples/k8s folder](examples/k8s/simple/host.yaml).
 
-* **Activator CRD:** Activator CRD defines any means of inputting supported events such as
-queues, topics, HTTP, or grpc endpoints and maps these events to the appropriate actor to
-handle them. Examples of this CRD can be found in the [examples/k8s
-folder](examples/k8s/activators/amqp.yaml).
+- **Activator CRD:** Activator CRD defines any means of inputting supported events such as
+  queues, topics, HTTP, or grpc endpoints and maps these events to the appropriate actor to
+  handle them. Examples of this CRD can be found in the [examples/k8s
+  folder](examples/k8s/activators/amqp.yaml).
 
 ## Statestores
 
@@ -344,18 +342,19 @@ They are configured by the user via environment variables or by the ActorSystem 
 
 Below is a list of common global settings for all Statestores. For more details check the [documentation](docs/statestore.md) for each supported Statestore.
 
-|  Environment Variable       | CRD Attribute                         | Secret Property   | Default Env Value | Default CRD Value | Mandatory | Possible Values 
-|---	                        |---                                    |---                |---                |---                |---        |---
-|                             | spec.statestore.credentialsSecretRef  |                   |                   |                   | Yes       |
-| PROXY_DATABASE_TYPE         | spec.statestore.type                  |                   |                   |                   | Yes       | see [documentation](docs/statestore.md) 
-| PROXY_DATABASE_NAME         |                                       | database          | eigr-functions-db | eigr-functions-db |           |
-| PROXY_DATABASE_USERNAME     |                                       | username          | admin             | admin             |           |
-| PROXY_DATABASE_SECRET       |                                       | password          | admin             | admin             |           |
-| PROXY_DATABASE_HOST         |                                       | host              | localhost         | localhost         |           |
-| PROXY_DATABASE_PORT         |                                       | port              | adapter specific  | adapter specific  |           | see [documentation](docs/statestore.md) 
-| SPAWN_STATESTORE_KEY        |                                       | encryptionKey     |                   |                   | Yes       | openssl rand -base64 32
-| PROXY_DATABASE_POOL_SIZE    | spec.statestore.pool.size             |                   | 60                | 60                |           |
-| PROXY_DATABASE_QUEUE_TARGET | spec.statestore.pool.queue            |                   | 10000             | 10000             |           |
+| Environment Variable        | CRD Attribute                        | Secret Property | Default Env Value | Default CRD Value | Mandatory | Possible Values                         |
+| --------------------------- | ------------------------------------ | --------------- | ----------------- | ----------------- | --------- | --------------------------------------- |
+|                             | spec.statestore.credentialsSecretRef |                 |                   |                   | Yes       |
+| PROXY_DATABASE_TYPE         | spec.statestore.type                 |                 |                   |                   | Yes       | see [documentation](docs/statestore.md) |
+| PROXY_DATABASE_NAME         |                                      | database        | eigr-functions-db | eigr-functions-db |           |
+| PROXY_DATABASE_USERNAME     |                                      | username        | admin             | admin             |           |
+| PROXY_DATABASE_SECRET       |                                      | password        | admin             | admin             |           |
+| PROXY_DATABASE_HOST         |                                      | host            | localhost         | localhost         |           |
+| PROXY_DATABASE_PORT         |                                      | port            | adapter specific  | adapter specific  |           | see [documentation](docs/statestore.md) |
+| SPAWN_STATESTORE_KEY        |                                      | encryptionKey   |                   |                   | Yes       | openssl rand -base64 32                 |
+| PROXY_DATABASE_POOL_SIZE    | spec.statestore.pool.size            |                 | 60                | 60                |           |
+| PROXY_DATABASE_QUEUE_TARGET | spec.statestore.pool.queue           |                 | 10000             | 10000             |           |
+| PROXY_DATABASE_SSL          | spec.statestore.ssl                  |                 | false             | false             |           |
 
 > **_NOTE:_** When running on top of Kubernetes you only need to set the CRD attributes of ActorSystem and Kubernetes secrets. The Operator will set the values of the environment variables according to the settings of these two mentioned places.
 
@@ -415,7 +414,6 @@ https://codesync.global/media/almost-actors-comparing-pony-language-to-beam-lang
 https://www.infoworld.com/article/2077999/understanding-actor-concurrency--part-1--actors-in-erlang.html
 
 https://doc.akka.io/docs/akka/current/general/actors.html
-
 
 ### The Sidecar Pattern
 
