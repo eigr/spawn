@@ -114,8 +114,7 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
   defp get_containers(true, system, name, host_params, annotations) do
     actor_host_function_image = Map.get(host_params, "image")
 
-    actor_host_function_envs =
-      Map.get(host_params, "env", []) ++ @default_actor_host_function_env
+    actor_host_function_envs = Map.get(host_params, "env", []) ++ @default_actor_host_function_env
 
     proxy_http_port = String.to_integer(annotations.proxy_http_port)
 
@@ -257,7 +256,7 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
     host_params
     |> Map.get("volumeMounts", [])
     |> Enum.each(fn mount ->
-      if not !!Enum.find(volumes, & &1["name"] == mount["name"]) do
+      if !Enum.find(volumes, &(&1["name"] == mount["name"])) do
         Logger.warn("Not found volume registered for #{mount["name"]}")
       end
     end)

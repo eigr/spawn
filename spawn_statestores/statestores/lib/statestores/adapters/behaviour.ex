@@ -86,11 +86,12 @@ defmodule Statestores.Adapters.Behaviour do
             use_ssl?
           )
 
-        config = if use_ssl? do
-          Keyword.put(config, :ssl_opts, [verify: :verify_none])
-        else
-          config
-        end
+        config =
+          if use_ssl? do
+            Keyword.put(config, :ssl_opts, verify: :verify_none)
+          else
+            config
+          end
 
         {:ok, config}
       end
