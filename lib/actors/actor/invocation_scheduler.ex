@@ -19,6 +19,7 @@ defmodule Actors.Actor.InvocationScheduler do
 
   @impl true
   def init(_arg) do
+    Process.flag(:trap_exit, true)
     Process.flag(:message_queue_data, :off_heap)
     {:ok, %{}, {:continue, :init_invocations}}
   end
@@ -31,6 +32,11 @@ defmodule Actors.Actor.InvocationScheduler do
     Enum.each(stored_invocations, &call_invoke/1)
 
     {:noreply, state}
+  end
+
+  @impl true
+  def terminate(reason, _state) do
+    Logger.debug("InvocationScheduler down with reason (#{inspect(reason)})")
   end
 
   @impl true
