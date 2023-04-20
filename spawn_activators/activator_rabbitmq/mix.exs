@@ -33,8 +33,9 @@ defmodule ActivatorRabbitMQ.MixProject do
       {:activator, path: "../activator"},
       {:spawn, path: "../../"},
       {:bakeware, "~> 0.2"},
-      {:bandit, "~> 0.5"},
-      {:broadway_rabbitmq, "~> 0.7"}
+      {:bandit, "~> 0.7.7"},
+      {:broadway_rabbitmq, "~> 0.7"},
+      {:nimble_options, "~> 0.5.2", override: true}
     ]
   end
 

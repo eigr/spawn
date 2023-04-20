@@ -72,7 +72,7 @@ defmodule Spawn.MixProject do
       {:castore, "~> 1.0"},
       {:duration_tc, "~> 0.1.0"},
       {:protobuf, "~> 0.11"},
-      {:finch, "~> 0.15"},
+      {:finch, "~> 0.16"},
       {:retry, "~> 0.17"},
       {:tesla, "~> 1.6"},
       {:k8s, "~> 2.2"},

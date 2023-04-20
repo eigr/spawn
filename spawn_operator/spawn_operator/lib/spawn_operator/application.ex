@@ -13,7 +13,7 @@ defmodule SpawnOperator.Application do
     children = [
       {SpawnOperator.Controller.Supervisor,
        conn: SpawnOperator.K8sConn.get(env), enable_leader_election: true},
-      {Bandit, plug: SpawnOperator.Router, scheme: :http, options: [port: @port]}
+      {Bandit, plug: SpawnOperator.Router, scheme: :http, port: @port}
     ]
 
     opts = [strategy: :one_for_one, name: SpawnOperator.Supervisor]
