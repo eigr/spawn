@@ -33,7 +33,7 @@ defmodule ActivatorPubSub.MixProject do
       {:activator, path: "../activator"},
       {:spawn, path: "../../"},
       {:bakeware, "~> 0.2"},
-      {:bandit, "~> 0.5"}
+      {:bandit, "~> 0.7.7"}
       # {:broadway_cloud_pub_sub, "~> 0.7"},
       # {:goth, "~> 1.0"}
     ]

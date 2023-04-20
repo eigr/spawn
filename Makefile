@@ -137,11 +137,44 @@ run-sdk-local:
 	cd spawn_sdk/spawn_sdk_example && mix deps.get && PROXY_CLUSTER_STRATEGY=gossip PROXY_DATABASE_TYPE=$(database) SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= iex --name spawn_actors_node@127.0.0.1 -S mix
 
 run-sdk-local2:
-	cd spawn_sdk/spawn_sdk_example && PROXY_CLUSTER_STRATEGY=gossip PROXY_DATABASE_TYPE=$(database) SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= iex --name spawn_actors_node1@127.0.0.1 -S mix
+	cd spawn_sdk/spawn_sdk_example && PROXY_CLUSTER_STRATEGY=gossip PROXY_DATABASE_TYPE=$(database) SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= iex --name spawn_actors_node3@127.0.0.1 -S mix
 
 run-operator-local:
 	cd spawn_operator/spawn_operator && mix deps.get && MIX_ENV=dev iex --name operator@127.0.0.1 -S mix
 	
+run-activator-local:
+	cd spawn_activators/activator && mix deps.get && MIX_ENV=dev iex --name activator@127.0.0.1 -S mix
+
+run-activator-grpc-local:
+	cd spawn_activators/activator_grpc && mix deps.get && MIX_ENV=dev iex --name activator_grpc@127.0.0.1 -S mix
+
+run-activator-http-local:
+	cd spawn_activators/activator_http && mix deps.get && MIX_ENV=dev iex --name activator_http@127.0.0.1 -S mix
+
+run-activator-kafka-local:
+	cd spawn_activators/activator_kafka && mix deps.get && MIX_ENV=dev iex --name activator_kafka@127.0.0.1 -S mix
+
+run-activator-pubsub-local:
+	cd spawn_activators/activator_pubsub && mix deps.get && MIX_ENV=dev iex --name activator_pubsub@127.0.0.1 -S mix
+
+run-activator-rabbitmq-local:
+	cd spawn_activators/activator_rabbitmq && mix deps.get && MIX_ENV=dev iex --name activator_rabbitmq@127.0.0.1 -S mix
+
+run-activator-sqs-local:
+	cd spawn_activators/activator_sqs && mix deps.get && MIX_ENV=dev iex --name activator_sqs@127.0.0.1 -S mix
+
+run-deps-get-all:
+	cd spawn_operator/spawn_operator && mix deps.get
+	cd spawn_sdk/spawn_sdk && mix deps.get
+	cd spawn_proxy/proxy && mix deps.get
+	cd spawn_activators/activator && mix deps.get
+	cd spawn_activators/activator_pubsub && mix deps.get
+	cd spawn_activators/activator_http && mix deps.get
+	cd spawn_activators/activator_grpc && mix deps.get
+	cd spawn_activators/activator_kafka && mix deps.get
+	cd spawn_activators/activator_sqs && mix deps.get
+	cd spawn_activators/activator_rabbitmq && mix deps.get
+
 run-proxy-image:
 	docker run --rm --name=spawn-proxy -e PROXY_DATABASE_TYPE=mysql -e SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= --net=host ${proxy-image}
 

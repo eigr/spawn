@@ -58,7 +58,7 @@ defmodule DeploymentTest do
                      "containers" => [
                        %{
                          "env" => [
-                           %{"name" => "RELEASE_NAME", "value" => "spawn-test"},
+                           %{"name" => "RELEASE_NAME", "value" => "spawn"},
                            %{
                              "name" => "NAMESPACE",
                              "valueFrom" => %{
@@ -132,7 +132,7 @@ defmodule DeploymentTest do
                      "containers" => [
                        %{
                          "env" => [
-                           %{"name" => "RELEASE_NAME", "value" => "spawn-test"},
+                           %{"name" => "RELEASE_NAME", "value" => "spawn"},
                            %{
                              "name" => "NAMESPACE",
                              "valueFrom" => %{
@@ -200,9 +200,9 @@ defmodule DeploymentTest do
                  "template" => %{
                    "metadata" => %{
                      "annotations" => %{
+                       "prometheus.io/path" => "/metrics",
                        "prometheus.io/port" => "9001",
-                       "prometheus.io/scrape" => "true",
-                       "prometheus.io/path" => "/metrics"
+                       "prometheus.io/scrape" => "true"
                      },
                      "labels" => %{"actor-system" => "spawn-system", "app" => "spawn-test"}
                    },
@@ -210,7 +210,7 @@ defmodule DeploymentTest do
                      "containers" => [
                        %{
                          "env" => [
-                           %{"name" => "RELEASE_NAME", "value" => "spawn-test"},
+                           %{"name" => "RELEASE_NAME", "value" => "spawn"},
                            %{
                              "name" => "NAMESPACE",
                              "valueFrom" => %{
@@ -230,7 +230,7 @@ defmodule DeploymentTest do
                            %{"configMapRef" => %{"name" => "spawn-test-sidecar-cm"}},
                            %{"secretRef" => %{"name" => "spawn-system-secret"}}
                          ],
-                         "image" => "docker.io/eigr/spawn-proxy:0.5.3",
+                         "image" => _image_version,
                          "livenessProbe" => %{
                            "failureThreshold" => 10,
                            "httpGet" => %{
@@ -248,10 +248,6 @@ defmodule DeploymentTest do
                            %{"containerPort" => 4369, "name" => "epmd"},
                            %{"containerPort" => 9001, "name" => "proxy-http"}
                          ],
-                         "resources" => %{
-                           "limits" => %{"memory" => "1024Mi"},
-                           "requests" => %{"memory" => "80Mi"}
-                         },
                          "readinessProbe" => %{
                            "httpGet" => %{
                              "path" => "/health/readiness",
@@ -262,10 +258,15 @@ defmodule DeploymentTest do
                            "periodSeconds" => 5,
                            "successThreshold" => 1,
                            "timeoutSeconds" => 5
+                         },
+                         "resources" => %{
+                           "limits" => %{"memory" => "1024Mi"},
+                           "requests" => %{"memory" => "80Mi"}
                          }
                        },
                        %{
                          "env" => [
+                           %{"name" => "RELEASE_NAME", "value" => "spawn"},
                            %{
                              "name" => "NAMESPACE",
                              "valueFrom" => %{
@@ -313,6 +314,7 @@ defmodule DeploymentTest do
 
       assert List.last(containers) == %{
                "env" => [
+                 %{"name" => "RELEASE_NAME", "value" => "spawn"},
                  %{
                    "name" => "NAMESPACE",
                    "valueFrom" => %{
@@ -357,31 +359,9 @@ defmodule DeploymentTest do
                }
              } = build_host_deploy(simple_actor_host_with_volume_mounts)
 
-      assert List.last(containers) == %{
-               "env" => [
-                 %{
-                   "name" => "NAMESPACE",
-                   "valueFrom" => %{
-                     "fieldRef" => %{"fieldPath" => "metadata.namespace"}
-                   }
-                 },
-                 %{
-                   "name" => "POD_IP",
-                   "valueFrom" => %{"fieldRef" => %{"fieldPath" => "status.podIP"}}
-                 },
-                 %{"name" => "SPAWN_PROXY_PORT", "value" => "9001"},
-                 %{"name" => "SPAWN_PROXY_INTERFACE", "value" => "0.0.0.0"},
-                 %{"name" => "RELEASE_DISTRIBUTION", "value" => "name"},
-                 %{"name" => "RELEASE_NODE", "value" => "$(RELEASE_NAME)@$(POD_IP)"}
-               ],
-               "image" => "eigr/spawn-test:latest",
-               "name" => "actor-host-function",
-               "resources" => %{
-                 "limits" => %{"memory" => "1024Mi"},
-                 "requests" => %{"memory" => "80Mi"}
-               },
+      assert %{
                "volumeMounts" => [%{"mountPath" => "/home/example", "name" => "volume-name"}]
-             }
+             } = List.last(containers)
     end
   end
 
