@@ -6,8 +6,7 @@ defmodule ActivatorRabbitmq.Supervisor do
   @impl true
   def init(config) do
     children = [
-      {Bandit,
-       plug: ActivatorRabbitMQ.Router, scheme: :http, options: [port: get_http_port(config)]},
+      {Bandit, plug: ActivatorRabbitMQ.Router, scheme: :http, port: get_http_port(config)},
       {Sidecar.Supervisor, config},
       ActivatorRabbitmq.Sources.SourceSupervisor.child_spec()
     ]

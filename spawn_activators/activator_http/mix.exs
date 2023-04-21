@@ -2,7 +2,7 @@ defmodule ActivatorHTTP.MixProject do
   use Mix.Project
 
   @app :activator_http
-  @version "local.dev"
+  @version "0.0.0-local.dev"
 
   def project do
     [
@@ -33,7 +33,7 @@ defmodule ActivatorHTTP.MixProject do
       {:activator, path: "../activator"},
       {:spawn, path: "../../"},
       {:bakeware, "~> 0.2"},
-      {:bandit, "~> 0.5"}
+      {:bandit, "~> 0.7.7"}
     ]
   end
 

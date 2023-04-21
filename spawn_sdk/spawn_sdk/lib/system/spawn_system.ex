@@ -51,6 +51,7 @@ defmodule SpawnSdk.System.SpawnSystem do
     opts = []
 
     registration_request = build_registration_req(system, actors)
+    all_actors = merge_cache_actors(system, state_to_map(actors))
 
     case Actors.register(registration_request, opts) do
       {:ok, %RegistrationResponse{proxy_info: proxy_info, status: status}} ->
@@ -58,11 +59,10 @@ defmodule SpawnSdk.System.SpawnSystem do
           "Actors registration succeed. Proxy info: #{inspect(proxy_info)}. Status: #{inspect(status)}"
         )
 
-        all_actors = merge_cache_actors(system, state_to_map(actors))
-
         {:ok, all_actors}
 
       error ->
+        delete_cached_actors(system, state_to_map(actors))
         {:error, "Actors registration failed. Error #{inspect(error)}"}
     end
   end
@@ -89,14 +89,14 @@ defmodule SpawnSdk.System.SpawnSystem do
   @impl SpawnSdk.System
   @doc "hey"
   def invoke(actor_name, invoke_opts \\ []) do
-    system = Keyword.get(invoke_opts, :system, nil)
-    command = Keyword.get(invoke_opts, :command, nil)
-    payload = Keyword.get(invoke_opts, :payload, nil)
+    system = Keyword.get(invoke_opts, :system)
+    command = Keyword.get(invoke_opts, :command)
+    payload = Keyword.get(invoke_opts, :payload)
     async = Keyword.get(invoke_opts, :async, false)
     pooled = Keyword.get(invoke_opts, :pooled, false)
     metadata = Keyword.get(invoke_opts, :metadata, %{})
-    actor_reference = Keyword.get(invoke_opts, :ref, nil)
-    scheduled_to = Keyword.get(invoke_opts, :scheduled_to, nil)
+    actor_reference = Keyword.get(invoke_opts, :ref)
+    scheduled_to = Keyword.get(invoke_opts, :scheduled_to)
     delay_in_ms = Keyword.get(invoke_opts, :delay, nil)
 
     if actor_reference do
@@ -172,6 +172,11 @@ defmodule SpawnSdk.System.SpawnSystem do
   def merge_cache_actors(system, actors) do
     actors = Map.merge(get_cached_actors(system), state_to_map(actors))
     :ets.insert(:"#{system}:actors", {"actors", actors})
+    actors
+  end
+
+  def delete_cached_actors(system, actors) do
+    :ets.delete(:"#{system}:actors", {"actors", actors})
     actors
   end
 

@@ -1,22 +1,23 @@
 defmodule InternalVersions do
   # The order here is also the deploy order, its important to keep this way
   @versions [
-    spawn_statestores: "0.5.0",
-    spawn_statestores_mysql: "0.5.0",
-    spawn_statestores_mssql: "0.5.0",
-    spawn_statestores_postgres: "0.5.0",
-    spawn_statestores_sqlite: "0.5.0",
-    spawn_statestores_cockroachdb: "0.5.0",
-    spawn: "0.5.0",
-    spawn_sdk: "0.5.0",
-    activator: "0.5.0",
-    activator_grpc: "0.5.0",
-    activator_http: "0.5.0",
-    activator_kafka: "0.5.0",
-    activator_pubsub: "0.5.0",
-    activator_rabbitmq: "0.5.0",
-    activator_sqs: "0.5.0",
-    proxy: "0.5.0"
+    spawn_statestores: "0.5.5",
+    spawn_statestores_mysql: "0.5.5",
+    spawn_statestores_mssql: "0.5.5",
+    spawn_statestores_postgres: "0.5.5",
+    spawn_statestores_sqlite: "0.5.5",
+    spawn_statestores_cockroachdb: "0.5.5",
+    spawn: "0.5.5",
+    spawn_sdk: "0.5.5",
+    activator: "0.5.5",
+    activator_grpc: "0.5.5",
+    activator_http: "0.5.5",
+    activator_kafka: "0.5.5",
+    activator_pubsub: "0.5.5",
+    activator_rabbitmq: "0.5.5",
+    activator_sqs: "0.5.5",
+    proxy: "0.5.5",
+    spawn_operator: "0.5.5"
   ]
 
   @doc """
@@ -56,6 +57,7 @@ defmodule InternalVersions do
       |> Enum.filter(
         &(elem(&1, 0)
           |> Atom.to_string()
+          |> String.replace("spawn_operator", "")
           |> String.starts_with?(["spawn", "proxy"]))
       )
 
@@ -156,6 +158,9 @@ defmodule InternalVersions do
 
           String.starts_with?(name, "proxy") ->
             {"./spawn_proxy/#{name}", "../.."}
+
+          String.starts_with?(name, "spawn_operator") ->
+            {"./spawn_operator/#{name}", "../.."}
 
           true ->
             {"./", "."}

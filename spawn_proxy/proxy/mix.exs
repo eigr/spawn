@@ -31,7 +31,7 @@ defmodule Proxy.MixProject do
     [
       {:spawn, path: "../../"},
       {:bakeware, "~> 0.2"},
-      {:bandit, "~> 0.5"},
+      {:bandit, "~> 0.7.7"},
       {:observer_cli, "~> 1.7"},
       {:spawn_statestores, path: "../../spawn_statestores/statestores"},
       {:spawn_statestores_mssql, path: "../../spawn_statestores/statestores_mssql"},

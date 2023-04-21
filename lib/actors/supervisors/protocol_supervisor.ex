@@ -35,37 +35,12 @@ defmodule Actors.Supervisors.ProtocolSupervisor do
 
   defp http_client_adapter(config) do
     case config.proxy_http_client_adapter do
-      "erqwest" ->
-        build_erqwest_http_client_adapter(config)
-
       "finch" ->
         build_finch_http_client_adapter(config)
 
       adapter ->
         raise ArgumentError, "Unknown Proxy HTTP Client Adapter #{inspect(adapter)}"
     end
-  end
-
-  defp build_erqwest_http_client_adapter(_config) do
-    %{
-      id: :erqwest_http_client_adapter,
-      start:
-        {Task, :start_link,
-         [
-           fn ->
-             Process.flag(:trap_exit, true)
-
-             :erqwest.start_client(SpawnHTTPClient)
-
-             receive do
-               {:EXIT, _pid, _reason} ->
-                 :erqwest.stop_client(SpawnHTTPClient)
-
-                 :ok
-             end
-           end
-         ]}
-    }
   end
 
   defp build_finch_http_client_adapter(_config) do

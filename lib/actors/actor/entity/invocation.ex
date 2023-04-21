@@ -12,6 +12,7 @@ defmodule Actors.Actor.Entity.Invocation do
     Actor,
     ActorId,
     ActorSystem,
+    ActorState,
     Command,
     FixedTimerCommand
   }
@@ -167,7 +168,7 @@ defmodule Actors.Actor.Entity.Invocation do
           interface = get_interface(actor_system)
 
           metadata = %{}
-          current_state = Map.get(actor_state || %{}, :state)
+          current_state = Map.get(actor_state || %{}, :state) || ActorState.new()
           current_tags = Map.get(actor_state || %{}, :tags, %{})
 
           ActorInvocation.new(

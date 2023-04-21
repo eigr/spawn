@@ -25,6 +25,18 @@ defmodule SpawnOperator.K8sConn do
     struct!(conn, insecure_skip_tls_verify: true)
   end
 
+  def get(:prod) do
+    K8s.Conn.from_service_account()
+    |> then(fn
+      {:ok, conn} ->
+        # TODO It is a workaround and needed to be removed
+        struct!(conn, insecure_skip_tls_verify: true)
+
+      other ->
+        other
+    end)
+  end
+
   def get(_) do
     K8s.Conn.from_service_account()
     |> then(fn

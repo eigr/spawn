@@ -117,7 +117,7 @@ defmodule Actors do
       protocol_major_version: 1,
       protocol_minor_version: 2,
       proxy_name: "spawn",
-      proxy_version: "0.5.0"
+      proxy_version: "0.5.5"
     )
   end
 
@@ -394,7 +394,6 @@ defmodule Actors do
 
   defp maybe_invoke_async(true, actor_ref, request, opts) do
     ActorEntity.invoke_async(actor_ref, request, opts)
-
     {:ok, :async}
   end
 

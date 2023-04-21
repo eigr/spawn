@@ -33,7 +33,7 @@ defmodule ActivatorRabbitMQ.MixProject do
       {:activator, path: "../activator"},
       {:spawn, path: "../../"},
       {:bakeware, "~> 0.2"},
-      {:bandit, "~> 0.5"}
+      {:bandit, "~> 0.7.7"}
     ]
   end
 

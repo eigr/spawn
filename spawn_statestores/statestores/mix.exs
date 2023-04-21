@@ -58,6 +58,7 @@ defmodule Statestores.MixProject do
       {:vapor, "~> 0.10"},
       {:cloak_ecto, "~> 1.2"},
       {:ecto_sql, "~> 3.8"},
+      {:nimble_parsec, "~> 1.2.3"},
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false}
     ]

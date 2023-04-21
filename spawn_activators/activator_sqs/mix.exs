@@ -33,8 +33,9 @@ defmodule ActivatorSQS.MixProject do
       {:activator, path: "../activator"},
       {:spawn, path: "../../"},
       {:bakeware, "~> 0.2"},
-      {:bandit, "~> 0.5"},
-      {:broadway_sqs, "~> 0.7"}
+      {:bandit, "~> 0.7.7"},
+      {:broadway_sqs, "~> 0.7"},
+      {:nimble_options, "~> 0.5.2", override: true}
     ]
   end
 
