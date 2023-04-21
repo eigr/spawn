@@ -81,7 +81,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
             %Actor{settings: %ActorSettings{stateful: true}, id: %ActorId{name: name}} = actor
         } = state
       ) do
-    if is_nil(actor.state) do
+    if is_nil(actor.state) or (!is_nil(actor.state) and is_nil(actor.state.state)) do
       "Initial state is empty. Getting state from state manager."
     else
       "Initial state is not empty. Trying to reconcile the state with state manager."

@@ -11,8 +11,15 @@ defmodule SpawnSdkExample.Actors.JoeActor do
   defact init(%Context{state: state} = ctx) do
     Logger.info("[joe] Received InitRequest. Context: #{inspect(ctx)}")
 
+    new_state =
+      if is_nil(state) do
+        %MyState{value: 0}
+      else
+        state
+      end
+
     %Value{}
-    |> Value.state(state)
+    |> Value.state(new_state)
     |> Value.reply!()
   end
 
