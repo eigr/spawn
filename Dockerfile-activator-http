@@ -38,7 +38,7 @@ RUN cd spawn_activators/activator_http \
     && mix release activator_http
 
 # ---- Application Stage ----
-FROM alpine:3.16
+FROM alpine:3.17.3
 #RUN apk add --no-cache --update bash openssl build-base ca-certificates zstd
 RUN apk add --no-cache --update zstd ncurses-libs libstdc++ libgcc
 

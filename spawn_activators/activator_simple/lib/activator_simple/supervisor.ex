@@ -6,8 +6,7 @@ defmodule ActivatorSimple.Supervisor do
   @impl true
   def init(config) do
     children = [
-      {Bandit,
-       plug: ActivatorSimple.Router, scheme: :http, options: [port: get_http_port(config)]},
+      {Bandit, plug: ActivatorSimple.Router, scheme: :http, port: get_http_port(config)},
       {Sidecar.Supervisor, config}
     ]
 

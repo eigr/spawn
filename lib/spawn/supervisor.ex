@@ -93,7 +93,7 @@ defmodule Spawn.Supervisor do
         strategy: Elixir.Cluster.Strategy.Kubernetes.DNS,
         config: [
           service: config.proxy_headless_service,
-          application_name: config.app_name,
+          application_name: "spawn",
           polling_interval: config.proxy_cluster_polling_interval
         ]
       ]

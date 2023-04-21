@@ -40,6 +40,7 @@ defmodule SpawnOperator.K8s.System.Secret.ActorSystemSecret do
     pool_params = Map.get(params, "pool", %{})
     pool_size = Map.get(pool_params, "size", "10") |> Base.encode64()
     statestore_credentials_secret_ref = Map.fetch!(params, "credentialsSecretRef")
+    statestore_ssl = Map.get(params, "ssl", "false")
 
     {:ok, secret} =
       K8s.Client.get("v1", :secret,
@@ -64,7 +65,8 @@ defmodule SpawnOperator.K8s.System.Secret.ActorSystemSecret do
       "PROXY_DATABASE_USERNAME" => statestore_db_user,
       "PROXY_DATABASE_SECRET" => statestore_db_secret,
       "PROXY_DATABASE_POOL_SIZE" => pool_size,
-      "SPAWN_STATESTORE_KEY" => statestore_key
+      "SPAWN_STATESTORE_KEY" => statestore_key,
+      "PROXY_DATABASE_SSL" => statestore_ssl
     }
   end
 

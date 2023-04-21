@@ -69,13 +69,13 @@ defmodule Spawn.MixProject do
     [
       # Core deps
       {:decimal, "~> 2.0"},
-      # {:erqwest, github: "dlesl/erqwest"},
-      {:erqwest, "~> 0.2.3"},
+      {:castore, "~> 1.0"},
       {:duration_tc, "~> 0.1.0"},
       {:protobuf, "~> 0.11"},
-      {:finch, "~> 0.12"},
+      {:finch, "~> 0.16"},
       {:retry, "~> 0.17"},
-      {:tesla, "~> 1.4"},
+      {:tesla, "~> 1.6"},
+      {:k8s, "~> 2.2"},
       {:flow, "~> 1.2"},
       {:vapor, "~> 0.10"},
       {:libcluster, "~> 3.3"},
@@ -84,6 +84,7 @@ defmodule Spawn.MixProject do
       {:phoenix_pubsub, "~> 2.1"},
       {:phoenix_pubsub_nats, "~> 0.1.0"},
       {:jason, "~> 1.3"},
+      {:nimble_parsec, "~> 1.2.3"},
       # Metrics & Tracing deps
       {:telemetry_poller, "~> 1.0"},
       {:telemetry_metrics, "~> 0.6.1"},

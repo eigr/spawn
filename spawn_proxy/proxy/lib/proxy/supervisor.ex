@@ -20,24 +20,27 @@ defmodule Proxy.Supervisor do
   def init(config) do
     children = [
       {Sidecar.Supervisor, config},
-      {Bandit, plug: Proxy.Router, scheme: :http, options: get_http_options(config)}
+      {Bandit, get_bandit_options(config)}
     ]
 
     Supervisor.init(children, strategy: :one_for_one)
   end
 
-  defp get_http_options(config) do
+  defp get_bandit_options(config) do
     if config.proxy_uds_enable == "true" do
       get_uds_options(config)
     else
       get_tcp_options(config)
     end
+    |> Keyword.merge(plug: Proxy.Router, scheme: :http)
   end
 
   defp get_uds_options(config) do
     [
       port: 0,
-      transport_options: [ip: {:local, config.proxy_sock_addr}]
+      thousand_island_options: [
+        transport_options: [ip: {:local, config.proxy_sock_addr}]
+      ]
     ]
   end
 

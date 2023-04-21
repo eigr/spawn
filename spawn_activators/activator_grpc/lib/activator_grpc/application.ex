@@ -75,7 +75,7 @@ defmodule ActivatorGRPC.Application do
 
     children = [
       Spawn.Supervisor.child_spec(config),
-      {Bandit, plug: ActivatorGRPC.Router, scheme: :http, options: [port: get_http_port(config)]},
+      {Bandit, plug: ActivatorGRPC.Router, scheme: :http, port: get_http_port(config)},
       Actors.Supervisors.ActorSupervisor.child_spec(config),
       grpc_server_spec
     ]
