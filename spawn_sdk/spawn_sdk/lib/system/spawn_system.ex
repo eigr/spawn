@@ -176,7 +176,7 @@ defmodule SpawnSdk.System.SpawnSystem do
   end
 
   def delete_cached_actors(system, actors) do
-    :ets.delete(:"#{system}:actors", {"actors", state_to_map(actors)})
+    :ets.delete(:"#{system}:actors", {"actors", actors})
     actors
   end
 
