@@ -39,8 +39,7 @@ RUN cd spawn_activators/activator_rabbitmq \
 
 # ---- Application Stage ----
 FROM alpine:3.17.3
-#RUN apk add --no-cache --update bash openssl build-base ca-certificates zstd
-RUN apk add --no-cache --update zstd ncurses-libs libstdc++ libgcc
+RUN apk add --no-cache --update zstd ncurses-libs libstdc++ libgcc libcrypto1.1
 
 WORKDIR /app
 RUN chown nobody /app

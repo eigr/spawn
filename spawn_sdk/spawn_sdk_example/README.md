@@ -10,7 +10,7 @@ by adding `spawn_sdk_example` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:spawn_sdk_example, "~> 0.5.5"}
+    {:spawn_sdk_example, "~> 0.6.0"}
   ]
 end
 ```
