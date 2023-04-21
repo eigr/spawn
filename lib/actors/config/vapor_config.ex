@@ -4,11 +4,12 @@ defmodule Actors.Config.Vapor do
   to allow the retrieval of system variables
   that will be included in the system configuration.
   """
+  require Logger
+  alias Vapor.Provider.{Env, Dotenv}
 
   @behaviour Actors.Config
 
-  require Logger
-  alias Vapor.Provider.{Env, Dotenv}
+  @default_actor_system_name "spawn-system"
 
   @impl true
   def load(mod) do
@@ -32,6 +33,7 @@ defmodule Actors.Config.Vapor do
       %Env{
         bindings: [
           {:app_name, "PROXY_APP_NAME", default: Config.Name.generate(), required: false},
+          {:actor_system_name, "PROXY_ACTOR_SYSTEM_NAME", default: @default_actor_system_name, required: false},
           {:http_port, "PROXY_HTTP_PORT",
            default: 9001, map: &String.to_integer/1, required: false},
           {:proxy_http_client_adapter, "PROXY_HTTP_CLIENT_ADAPTER",
