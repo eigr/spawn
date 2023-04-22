@@ -55,6 +55,27 @@ defmodule DeploymentTest do
                      "labels" => %{"actor-system" => "spawn-system", "app" => "spawn-test"}
                    },
                    "spec" => %{
+                     "affinity" => %{
+                       "podAntiAffinity" => %{
+                         "preferredDuringSchedulingIgnoredDuringExecution" => [
+                           %{
+                             "podAffinityTerm" => %{
+                               "labelSelector" => %{
+                                 "matchExpressions" => [
+                                   %{
+                                     "key" => "app",
+                                     "operator" => "In",
+                                     "values" => ["spawn-test"]
+                                   }
+                                 ]
+                               },
+                               "topologyKey" => "kubernetes.io/hostname"
+                             },
+                             "weight" => 100
+                           }
+                         ]
+                       }
+                     },
                      "containers" => [
                        %{
                          "env" => [
@@ -129,6 +150,27 @@ defmodule DeploymentTest do
                      "labels" => %{"actor-system" => "spawn-system", "app" => "spawn-test"}
                    },
                    "spec" => %{
+                     "affinity" => %{
+                       "podAntiAffinity" => %{
+                         "preferredDuringSchedulingIgnoredDuringExecution" => [
+                           %{
+                             "podAffinityTerm" => %{
+                               "labelSelector" => %{
+                                 "matchExpressions" => [
+                                   %{
+                                     "key" => "app",
+                                     "operator" => "In",
+                                     "values" => ["spawn-test"]
+                                   }
+                                 ]
+                               },
+                               "topologyKey" => "kubernetes.io/hostname"
+                             },
+                             "weight" => 100
+                           }
+                         ]
+                       }
+                     },
                      "containers" => [
                        %{
                          "env" => [
@@ -207,6 +249,27 @@ defmodule DeploymentTest do
                      "labels" => %{"actor-system" => "spawn-system", "app" => "spawn-test"}
                    },
                    "spec" => %{
+                     "affinity" => %{
+                       "podAntiAffinity" => %{
+                         "preferredDuringSchedulingIgnoredDuringExecution" => [
+                           %{
+                             "podAffinityTerm" => %{
+                               "labelSelector" => %{
+                                 "matchExpressions" => [
+                                   %{
+                                     "key" => "app",
+                                     "operator" => "In",
+                                     "values" => ["spawn-test"]
+                                   }
+                                 ]
+                               },
+                               "topologyKey" => "kubernetes.io/hostname"
+                             },
+                             "weight" => 100
+                           }
+                         ]
+                       }
+                     },
                      "containers" => [
                        %{
                          "env" => [
@@ -306,6 +369,27 @@ defmodule DeploymentTest do
                "spec" => %{
                  "template" => %{
                    "spec" => %{
+                     "affinity" => %{
+                       "podAntiAffinity" => %{
+                         "preferredDuringSchedulingIgnoredDuringExecution" => [
+                           %{
+                             "podAffinityTerm" => %{
+                               "labelSelector" => %{
+                                 "matchExpressions" => [
+                                   %{
+                                     "key" => "app",
+                                     "operator" => "In",
+                                     "values" => ["spawn-test"]
+                                   }
+                                 ]
+                               },
+                               "topologyKey" => "kubernetes.io/hostname"
+                             },
+                             "weight" => 100
+                           }
+                         ]
+                       }
+                     },
                      "containers" => containers
                    }
                  }
@@ -352,6 +436,27 @@ defmodule DeploymentTest do
                "spec" => %{
                  "template" => %{
                    "spec" => %{
+                     "affinity" => %{
+                       "podAntiAffinity" => %{
+                         "preferredDuringSchedulingIgnoredDuringExecution" => [
+                           %{
+                             "podAffinityTerm" => %{
+                               "labelSelector" => %{
+                                 "matchExpressions" => [
+                                   %{
+                                     "key" => "app",
+                                     "operator" => "In",
+                                     "values" => ["spawn-test"]
+                                   }
+                                 ]
+                               },
+                               "topologyKey" => "kubernetes.io/hostname"
+                             },
+                             "weight" => 100
+                           }
+                         ]
+                       }
+                     },
                      "containers" => containers,
                      "volumes" => [%{"emptyDir" => "{}", "name" => "volume-name"}]
                    }
