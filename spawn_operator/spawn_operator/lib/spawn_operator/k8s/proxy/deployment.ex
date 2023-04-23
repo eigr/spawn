@@ -102,11 +102,38 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
           },
           "spec" =>
             %{
+              "affinity" => Map.get(host_params, "antiAffinity", build_anti_affinity(name)),
               "containers" => get_containers(embedded, system, name, host_params, annotations),
               "terminationGracePeriodSeconds" => @default_termination_period_seconds
             }
             |> maybe_put_volumes(params)
         }
+      }
+    }
+  end
+
+  defp build_anti_affinity(app_name) do
+    %{
+      "podAntiAffinity" => %{
+        "preferredDuringSchedulingIgnoredDuringExecution" => [
+          %{
+            "podAffinityTerm" => %{
+              "labelSelector" => %{
+                "matchExpressions" => [
+                  %{
+                    "key" => "app",
+                    "operator" => "In",
+                    "values" => [
+                      app_name
+                    ]
+                  }
+                ]
+              },
+              "topologyKey" => "kubernetes.io/hostname"
+            },
+            "weight" => 100
+          }
+        ]
       }
     }
   end
