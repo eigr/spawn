@@ -355,6 +355,7 @@ Below is a list of common global settings for all Statestores. For more details 
 | PROXY_DATABASE_POOL_SIZE    | spec.statestore.pool.size            |                 | 60                | 60                |           |
 | PROXY_DATABASE_QUEUE_TARGET | spec.statestore.pool.queue           |                 | 10000             | 10000             |           |
 | PROXY_DATABASE_SSL          | spec.statestore.ssl                  |                 | false             | false             |           |
+| PROXY_DATABASE_SSL_VERIFY   | spec.statestore.ssl_verify           |                 | false             | false             |           |
 
 > **_NOTE:_** When running on top of Kubernetes you only need to set the CRD attributes of ActorSystem and Kubernetes secrets. The Operator will set the values of the environment variables according to the settings of these two mentioned places.
 
