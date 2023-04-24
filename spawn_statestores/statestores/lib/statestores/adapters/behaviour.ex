@@ -40,8 +40,9 @@ defmodule Statestores.Adapters.Behaviour do
 
         config = Keyword.put(config, :password, System.get_env("PROXY_DATABASE_SECRET", "admin"))
 
-        config =
-          Keyword.put(config, :hostname, System.get_env("PROXY_DATABASE_HOST", "localhost"))
+        hostname = System.get_env("PROXY_DATABASE_HOST", "localhost")
+
+        config = Keyword.put(config, :hostname, hostname)
 
         config =
           case System.get_env("PROXY_DATABASE_TYPE", get_default_database_type()) do
@@ -78,6 +79,7 @@ defmodule Statestores.Adapters.Behaviour do
           )
 
         use_ssl? = System.get_env("PROXY_DATABASE_SSL", "false") == "true"
+        ssl_verify_peer? = System.get_env("PROXY_DATABASE_SSL_VERIFY", "false") == "true"
 
         config =
           Keyword.put(
@@ -87,10 +89,22 @@ defmodule Statestores.Adapters.Behaviour do
           )
 
         config =
-          if use_ssl? do
-            Keyword.put(config, :ssl_opts, verify: :verify_none)
-          else
-            config
+          cond do
+            use_ssl? and ssl_verify_peer? ->
+              Keyword.put(config, :ssl_opts,
+                verify: :verify_peer,
+                cacertfile: CAStore.file_path(),
+                server_name_indication: String.to_charlist(hostname),
+                customize_hostname_check: [
+                  match_fun: :public_key.pkix_verify_hostname_match_fun(:https)
+                ]
+              )
+
+            use_ssl? ->
+              Keyword.put(config, :ssl_opts, verify: :verify_none)
+
+            true ->
+              config
           end
 
         {:ok, config}
