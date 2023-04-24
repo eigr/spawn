@@ -10,7 +10,7 @@ by adding `spawn_sdk_example` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:spawn_sdk_example, "~> 0.6.0"}
+    {:spawn_sdk_example, "~> 0.6.1"}
   ]
 end
 ```
@@ -18,4 +18,3 @@ end
 Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
 and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
 be found at <https://hexdocs.pm/spawn_sdk_example>.
-

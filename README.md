@@ -175,7 +175,7 @@ kubectl create ns eigr-functions && curl -L https://github.com/eigr/spawn/releas
 > **_NOTE:_** You need to inform the desired release version. For example:
 
 ```shell
-kubectl create ns eigr-functions && curl -L https://github.com/eigr/spawn/releases/download/v0.6.0/manifest.yaml | kubectl apply -f -
+kubectl create ns eigr-functions && curl -L https://github.com/eigr/spawn/releases/download/v0.6.1/manifest.yaml | kubectl apply -f -
 ```
 
 ## Getting Started
@@ -259,7 +259,7 @@ metadata:
 spec:
   host:
     embedded: true # This indicates that it is a native BEAM application and therefore does not need a sidecar proxy attached.
-    image: eigr/dice-game-example:0.6.0
+    image: eigr/dice-game-example:0.5.3
     ports:
       - name: "http"
         containerPort: 8800

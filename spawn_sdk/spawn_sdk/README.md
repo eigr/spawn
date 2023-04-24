@@ -2,7 +2,6 @@
 
 <!-- MDOC !-->
 
-
 Spawn Elixir SDK is the support library for the Spawn Actors System.
 Spawn is a Stateful Serverless Platform for providing the multi-language Actor Model. For a broader understanding of Spawn, please consult its official [repository](https://github.com/eigr/spawn).
 
@@ -16,14 +15,14 @@ by adding `spawn_sdk` and `spawn_statestores_*` to your list of dependencies in 
 ```elixir
 def deps do
   [
-    {:spawn_sdk, "~> 0.6.0"},
+    {:spawn_sdk, "~> 0.6.1"},
 
     # You can uncomment one of those dependencies if you are going to use Persistent Actors
-    #{:spawn_statestores_mysql, "~> 0.6.0"},
-    #{:spawn_statestores_postgres, "~> 0.6.0"},
-    #{:spawn_statestores_mssql, "~> 0.6.0"},
-    #{:spawn_statestores_cockroachdb, "~> 0.6.0"},
-    #{:spawn_statestores_sqlite, "~> 0.6.0"},
+    #{:spawn_statestores_mysql, "~> 0.6.1"},
+    #{:spawn_statestores_postgres, "~> 0.6.1"},
+    #{:spawn_statestores_mssql, "~> 0.6.1"},
+    #{:spawn_statestores_cockroachdb, "~> 0.6.1"},
+    #{:spawn_statestores_sqlite, "~> 0.6.1"},
   ]
 end
 ```
@@ -51,16 +50,16 @@ message MyBusinessMessage {
 }
 ```
 
-It is important to try to separate the type of message that must be stored as the actors' state from the type of messages 
-that will be exchanged between their actors' operations calls. In other words, the Actor's internal state is also represented 
+It is important to try to separate the type of message that must be stored as the actors' state from the type of messages
+that will be exchanged between their actors' operations calls. In other words, the Actor's internal state is also represented
 as a protobuf type, and it is a good practice to separate these types of messages from the others in its business domain.
 
-In the above case `MyState` is the type protobuf that represents the state of the Actor that we will create later 
+In the above case `MyState` is the type protobuf that represents the state of the Actor that we will create later
 while `MyBusiness` is the type of message that we will send and receive from this Actor.
 
 Now that we have defined our input and output types as Protobuf types we will need to compile these files to generate their respective Elixir modules. An example of how to do this can be found [here](https://github.com/eigr/spawn/blob/main/spawn_sdk/spawn_sdk_example/compile-example-pb.sh)
 
-> **_NOTE:_** You need to have installed the elixir plugin for protoc. More information on how to obtain and install the necessary tools can be found here [here](https://github.com/elixir-protobuf/protobuf#usage) 
+> **_NOTE:_** You need to have installed the elixir plugin for protoc. More information on how to obtain and install the necessary tools can be found here [here](https://github.com/elixir-protobuf/protobuf#usage)
 
 Now that the protobuf types have been created we can proceed with the code. Example definition of an Actor.
 
@@ -148,7 +147,7 @@ Notice that the only thing that has changed is the the kind of actor, in this ca
 
 ## Pooled Actors
 
-Sometimes we want a particular actor to be able to serve requests concurrently, 
+Sometimes we want a particular actor to be able to serve requests concurrently,
 however actors will always serve one request at a time using buffering mechanisms to receive requests in their mailbox and serve each request one by one.
 So to get around this behaviour you can configure your Actor as a Pooled Actor, this way the system will generate a pool of actors to meet certain requests. See an example below:
 
@@ -449,11 +448,12 @@ end
 
 You need to match using the {:receive, payload} tuple in your handle_info.
 
-> **_NOTE:_** By default SpawnSdk.Channel.Subscriber will subscribe to pubsub using the atom :actor_channel as an argument. 
+> **_NOTE:_** By default SpawnSdk.Channel.Subscriber will subscribe to pubsub using the atom :actor_channel as an argument.
+
     If you need to change this, just configure your configuration as follows:
 
+**_config.exs_**
 
-***config.exs***
 ```elixir
 config :spawn,
    pubsub_group: :your_channel_group_here
@@ -496,7 +496,7 @@ defmodule SpawnSdkExample.Actors.JoeActor do
   use SpawnSdk.Actor,
     name: "joe",
     state_type: Io.Eigr.Spawn.Example.MyState
-  
+
   require Logger
   alias Io.Eigr.Spawn.Example.{MyState, MyBusinessMessage}
 
@@ -590,10 +590,10 @@ Actors also have some standard actions that are not implemented by the user and 
 Let's take an example. Suppose Actor Joe wants to know the current state of Actor Robert. What Joe can do is invoke Actor Robert's default action called get_state. This will make Actor Joe's sidecar find Actor Robert's sidecar somewhere in the cluster and Actor Robert's sidecar will return its own state directly to Joe without having to resort to your host function, this in turn will save you a called over the network and therefore this type of invocation is faster than invocations of user-defined actions usually are.
 
 Any invocations to actions with the following names will follow this rule: "**get**",
-    "**Get**",
-    "**get_state**",
-    "**getState**",
-    "**GetState**"
+"**Get**",
+"**get_state**",
+"**getState**",
+"**GetState**"
 
 > **_NOTE:_** You can override this behavior by defining your actor as an action with the same name as the default actions. In this case it will be the Action defined by you that will be called, implying perhaps another network roundtrip
 
@@ -616,57 +616,57 @@ And links to other examples can be found in our github [readme page](https://git
 
 ## Client API Examples
 
-  To invoke Actors, use:
+To invoke Actors, use:
 
-  ```elixir
-  iex> SpawnSdk.invoke("joe", system: "spawn-system", command: "sum", payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1})
-  {:ok, %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 12}}
-  ```
+```elixir
+iex> SpawnSdk.invoke("joe", system: "spawn-system", command: "sum", payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1})
+{:ok, %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 12}}
+```
 
-  You can invoke actor default functions like "get" to get its current state
+You can invoke actor default functions like "get" to get its current state
 
-  ```elixir
-  SpawnSdk.invoke("joe", system: "spawn-system", command: "get")
-  ```
+```elixir
+SpawnSdk.invoke("joe", system: "spawn-system", command: "get")
+```
 
-  Spawning Actors:
+Spawning Actors:
 
-  ```elixir
-  iex> SpawnSdk.spawn_actor("robert", system: "spawn-system", actor: "abs_actor")
-  :ok
-  ```
+```elixir
+iex> SpawnSdk.spawn_actor("robert", system: "spawn-system", actor: "abs_actor")
+:ok
+```
 
-  Invoke Spawned Actors:
+Invoke Spawned Actors:
 
-  ```elixir
-  iex> SpawnSdk.invoke("robert", system: "spawn-system", command: "sum", payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1})
-  {:ok, %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 16}}
-  ```
+```elixir
+iex> SpawnSdk.invoke("robert", system: "spawn-system", command: "sum", payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1})
+{:ok, %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 16}}
+```
 
-  Invoke Actors in a lazy way without having to spawn them before:
+Invoke Actors in a lazy way without having to spawn them before:
 
-  ```elixir
-  iex> SpawnSdk.invoke("robert_lazy", ref: SpawnSdkExample.Actors.AbstractActor, system: "spawn-system", command: "sum", payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1})
-  {:ok, %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1}}
-  ```
+```elixir
+iex> SpawnSdk.invoke("robert_lazy", ref: SpawnSdkExample.Actors.AbstractActor, system: "spawn-system", command: "sum", payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1})
+{:ok, %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1}}
+```
 
-  Invoke Actors with a delay set in milliseconds:
+Invoke Actors with a delay set in milliseconds:
 
-  ```elixir
-  iex> SpawnSdk.invoke("joe", system: "spawn-system", command: "ping", delay: 5_000)
-  {:ok, :async}
-  ```
+```elixir
+iex> SpawnSdk.invoke("joe", system: "spawn-system", command: "ping", delay: 5_000)
+{:ok, :async}
+```
 
-  Invoke Actors scheduled to a specific DateTime:
+Invoke Actors scheduled to a specific DateTime:
 
-  ```elixir
-  iex> SpawnSdk.invoke("joe", system: "spawn-system", command: "ping", scheduled_to: ~U[2023-01-01 00:32:00.145Z])
-  {:ok, :async}
-  ```
+```elixir
+iex> SpawnSdk.invoke("joe", system: "spawn-system", command: "ping", scheduled_to: ~U[2023-01-01 00:32:00.145Z])
+{:ok, :async}
+```
 
-  Invoke Pooled Actors:
+Invoke Pooled Actors:
 
-  ```elixir
-  iex> SpawnSdk.invoke("pooled_actor", system: "spawn-system", command: "ping", pooled: true)
-  {:ok, nil}
-  ```
+```elixir
+iex> SpawnSdk.invoke("pooled_actor", system: "spawn-system", command: "ping", pooled: true)
+{:ok, nil}
+```
