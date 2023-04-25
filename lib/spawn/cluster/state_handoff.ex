@@ -73,8 +73,10 @@ defmodule Spawn.Cluster.StateHandoff do
         {:ok, crdt_pid} ->
           crdt_pid
 
-        _ ->
-          Logger.warning("Couldn't reach one of the nodes when calling for neighbors")
+        error ->
+          Logger.warning(
+            "Couldn't reach one of the nodes when calling for neighbors -> #{inspect(error)}"
+          )
 
           nil
       end)
