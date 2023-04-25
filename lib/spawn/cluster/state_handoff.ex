@@ -65,20 +65,20 @@ defmodule Spawn.Cluster.StateHandoff do
   def handle_info(:set_neighbours, this_crdt_pid) do
     nodes = Node.list()
 
-    Logger.debug(
-      "Sending :set_neighbours to #{inspect(nodes)} for #{inspect(this_crdt_pid)}"
-    )
+    Logger.debug("Sending :set_neighbours to #{inspect(nodes)} for #{inspect(this_crdt_pid)}")
 
-    neighbours = :erpc.multicall(nodes, __MODULE__, :get_crdt_pid, [])
-    |> Enum.map(fn
-      {:ok, crdt_pid} -> crdt_pid
+    neighbours =
+      :erpc.multicall(nodes, __MODULE__, :get_crdt_pid, [])
+      |> Enum.map(fn
+        {:ok, crdt_pid} ->
+          crdt_pid
 
-      _ ->
-        Logger.warning("Couldn't reach one of the nodes when calling for neighbors")
+        _ ->
+          Logger.warning("Couldn't reach one of the nodes when calling for neighbors")
 
-        nil
-    end)
-    |> Enum.reject(&is_nil/1)
+          nil
+      end)
+      |> Enum.reject(&is_nil/1)
 
     # add other_node's crdt_pid as a neighbour
     # we are not adding both ways and letting them sync with eachother
