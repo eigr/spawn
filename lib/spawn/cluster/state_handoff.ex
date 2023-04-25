@@ -18,7 +18,7 @@ defmodule Spawn.Cluster.StateHandoff do
   @default_sync_interval 5
   @default_ship_interval 5
   @default_ship_debounce 5
-  @default_neighbours_sync_interval 5_000
+  @default_neighbours_sync_interval 30_000
 
   def child_spec(opts \\ []) do
     %{
@@ -39,7 +39,7 @@ defmodule Spawn.Cluster.StateHandoff do
         ship_debounce: Keyword.get(opts, :ship_debounce, @default_ship_debounce)
       )
 
-    Process.send(self(), {:set_neighbours, Node.list()}, [:noconnect])
+    Process.send(self(), :set_neighbours, [:noconnect])
 
     {:ok, crdt_pid}
   end
@@ -48,16 +48,23 @@ defmodule Spawn.Cluster.StateHandoff do
   def handle_info({:nodeup, node, _node_type}, state) do
     Logger.debug("Received :nodeup event from #{inspect(node)}")
 
+    Process.send(self(), :set_neighbours, [:noconnect])
+
     {:noreply, state}
   end
 
   def handle_info({:nodedown, node, _node_type}, state) do
     Logger.debug("Received :nodedown event from #{inspect(node)}")
+
+    Process.send(self(), :set_neighbours, [:noconnect])
+
     {:noreply, state}
   end
 
   @impl true
-  def handle_info({:set_neighbours, nodes}, this_crdt_pid) do
+  def handle_info(:set_neighbours, this_crdt_pid) do
+    nodes = Node.list()
+
     Logger.debug(
       "Sending :set_neighbours to #{inspect(nodes)} for #{inspect(this_crdt_pid)}"
     )
@@ -78,7 +85,7 @@ defmodule Spawn.Cluster.StateHandoff do
     # based on current Node.list() of each node
     DeltaCrdt.set_neighbours(this_crdt_pid, neighbours)
 
-    Process.send_after(self(), {:set_neighbours, Node.list()}, @default_neighbours_sync_interval)
+    Process.send_after(self(), :set_neighbours, @default_neighbours_sync_interval)
 
     {:noreply, this_crdt_pid}
   end
