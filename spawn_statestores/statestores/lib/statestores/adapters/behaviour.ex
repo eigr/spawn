@@ -43,19 +43,7 @@ defmodule Statestores.Adapters.Behaviour do
         hostname = System.get_env("PROXY_DATABASE_HOST", "localhost")
 
         config = Keyword.put(config, :hostname, hostname)
-
-        config =
-          case System.get_env("PROXY_DATABASE_TYPE", get_default_database_type()) do
-            "cockroachdb" ->
-              Keyword.put(
-                config,
-                :migration_lock,
-                nil
-              )
-
-            _ ->
-              config
-          end
+        config = Keyword.put(config, :migration_lock, nil)
 
         config =
           Keyword.put(
