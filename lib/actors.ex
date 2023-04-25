@@ -11,7 +11,6 @@ defmodule Actors do
 
   alias Actors.Actor.Entity, as: ActorEntity
   alias Actors.Actor.Entity.Supervisor, as: ActorEntitySupervisor
-  alias Actors.Actor.InvocationScheduler
   alias Actors.Actor.Pool, as: ActorPool
 
   alias Actors.Registry.{ActorRegistry, HostActor}
@@ -242,7 +241,7 @@ defmodule Actors do
                 if is_nil(request.scheduled_to) || request.scheduled_to == 0 do
                   maybe_invoke_async(async?, actor_ref, request_params, opts)
                 else
-                  InvocationScheduler.schedule_invoke(request_params)
+                  Logger.warning("Scheduled invoke is currently not supported")
 
                   {:ok, :async}
                 end

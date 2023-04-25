@@ -35,8 +35,7 @@ defmodule Actors.Supervisors.ActorSupervisor do
                end
              end
            ]}
-      },
-      {Highlander, Actors.Actor.InvocationScheduler.child_spec()}
+      }
     ]
 
     Supervisor.init(children, strategy: :one_for_one)

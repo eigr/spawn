@@ -80,7 +80,6 @@ defmodule Spawn.MixProject do
       {:vapor, "~> 0.10"},
       {:libcluster, "~> 3.3"},
       {:horde, "~> 0.8"},
-      {:highlander, "~> 0.2.1"},
       {:phoenix_pubsub, "~> 2.1"},
       {:phoenix_pubsub_nats, "~> 0.1.0"},
       {:jason, "~> 1.3"},
