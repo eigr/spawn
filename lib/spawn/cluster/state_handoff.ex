@@ -18,7 +18,7 @@ defmodule Spawn.Cluster.StateHandoff do
   @default_sync_interval 5
   @default_ship_interval 5
   @default_ship_debounce 5
-  @default_neighbours_sync_interval 30_000
+  @default_neighbours_sync_interval 60_000
 
   def child_spec(opts \\ []) do
     %{
