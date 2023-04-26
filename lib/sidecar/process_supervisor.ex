@@ -10,23 +10,7 @@ defmodule Sidecar.ProcessSupervisor do
         {Sidecar.MetricsSupervisor, config},
         Spawn.Supervisor.child_spec(config),
         Actors.Supervisors.ProtocolSupervisor.child_spec(config),
-        Actors.Supervisors.ActorSupervisor.child_spec(config),
-        %{
-          id: StateHandoffJoinTask,
-          restart: :transient,
-          start: {
-            Task,
-            :start_link,
-            [
-              fn ->
-                Node.list()
-                |> Enum.each(fn node ->
-                  Spawn.Cluster.StateHandoff.join(node)
-                end)
-              end
-            ]
-          }
-        }
+        Actors.Supervisors.ActorSupervisor.child_spec(config)
       ]
       |> Enum.reject(&is_nil/1)
 

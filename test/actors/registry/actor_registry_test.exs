@@ -20,8 +20,6 @@ defmodule Actors.ActorRegistryTest do
 
     peer_node_name = :"spawn_actors_node@127.0.0.1"
 
-    assert :ok == Spawn.Cluster.StateHandoff.join(peer_node_name)
-
     assert {:ok, %RegistrationResponse{}} =
              Spawn.NodeHelper.rpc(peer_node_name, Actors, :register, [
                request

@@ -18,6 +18,7 @@ defmodule Spawn.Cluster.StateHandoff do
   @default_sync_interval 5
   @default_ship_interval 5
   @default_ship_debounce 5
+  @default_neighbours_sync_interval 60_000
 
   def child_spec(opts \\ []) do
     %{
@@ -38,6 +39,8 @@ defmodule Spawn.Cluster.StateHandoff do
         ship_debounce: Keyword.get(opts, :ship_debounce, @default_ship_debounce)
       )
 
+    Process.send(self(), :set_neighbours, [:noconnect])
+
     {:ok, crdt_pid}
   end
 
@@ -45,33 +48,51 @@ defmodule Spawn.Cluster.StateHandoff do
   def handle_info({:nodeup, node, _node_type}, state) do
     Logger.debug("Received :nodeup event from #{inspect(node)}")
 
+    Process.send(self(), :set_neighbours, [:noconnect])
+
     {:noreply, state}
   end
 
   def handle_info({:nodedown, node, _node_type}, state) do
     Logger.debug("Received :nodedown event from #{inspect(node)}")
+
+    Process.send(self(), :set_neighbours, [:noconnect])
+
     {:noreply, state}
   end
 
   @impl true
-  def handle_call({:set_neighbours, other_node}, _from, this_crdt_pid) do
-    Logger.debug(
-      "Sending :set_neighbours to #{inspect(other_node)} with #{inspect(this_crdt_pid)}"
-    )
+  def handle_info(:set_neighbours, this_crdt_pid) do
+    nodes = Node.list()
 
-    other_crdt_pid = GenServer.call(other_node, {:fulfill_set_neighbours, this_crdt_pid})
+    Logger.debug("Sending :set_neighbours to #{inspect(nodes)} for #{inspect(this_crdt_pid)}")
 
-    # add other_node's crdt_pid as a neighbour, we need to add both ways so changes in either
-    # are reflected across, otherwise it would be one way only
-    DeltaCrdt.set_neighbours(this_crdt_pid, [other_crdt_pid])
+    neighbours =
+      :erpc.multicall(nodes, __MODULE__, :get_crdt_pid, [], @call_timeout + 1000)
+      |> Enum.map(fn
+        {:ok, crdt_pid} ->
+          crdt_pid
 
-    {:reply, :ok, this_crdt_pid}
+        error ->
+          Logger.warning(
+            "Couldn't reach one of the nodes when calling for neighbors -> #{inspect(error)}"
+          )
+
+          nil
+      end)
+      |> Enum.reject(&is_nil/1)
+
+    # add other_node's crdt_pid as a neighbour
+    # we are not adding both ways and letting them sync with eachother
+    # based on current Node.list() of each node
+    DeltaCrdt.set_neighbours(this_crdt_pid, neighbours)
+
+    Process.send_after(self(), :set_neighbours, @default_neighbours_sync_interval)
+
+    {:noreply, this_crdt_pid}
   end
 
-  def handle_call({:fulfill_set_neighbours, other_crdt_pid}, _from, this_crdt_pid) do
-    Logger.debug("Adding neighbour #{inspect(other_crdt_pid)} to this #{inspect(this_crdt_pid)}")
-
-    DeltaCrdt.set_neighbours(this_crdt_pid, [other_crdt_pid])
+  def handle_call(:get_crdt_pid, _from, this_crdt_pid) do
     {:reply, this_crdt_pid, this_crdt_pid}
   end
 
@@ -131,14 +152,6 @@ defmodule Spawn.Cluster.StateHandoff do
   end
 
   @doc """
-  Join this crdt with one on another node by adding it as a neighbour
-  """
-  def join(other_node) do
-    Logger.debug("Joining StateHandoff at #{inspect(other_node)}")
-    GenServer.call(__MODULE__, {:set_neighbours, {__MODULE__, other_node}})
-  end
-
-  @doc """
   Store a actor and entity in the handoff crdt
   """
   def set(actor, hosts) do
@@ -150,6 +163,10 @@ defmodule Spawn.Cluster.StateHandoff do
   """
   def get(actor) do
     GenServer.call(__MODULE__, {:get, actor}, @call_timeout)
+  end
+
+  def get_crdt_pid do
+    GenServer.call(__MODULE__, :get_crdt_pid, @call_timeout)
   end
 
   def get_all_invocations do
