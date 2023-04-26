@@ -68,7 +68,7 @@ defmodule Spawn.Cluster.StateHandoff do
     Logger.debug("Sending :set_neighbours to #{inspect(nodes)} for #{inspect(this_crdt_pid)}")
 
     neighbours =
-      :erpc.multicall(nodes, __MODULE__, :get_crdt_pid, [])
+      :erpc.multicall(nodes, __MODULE__, :get_crdt_pid, [], @call_timeout + 1000)
       |> Enum.map(fn
         {:ok, crdt_pid} ->
           crdt_pid
