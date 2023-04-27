@@ -157,7 +157,7 @@ defmodule Spawn.Cluster.StateHandoff do
     Logger.debug("Sending :set_neighbours to #{inspect(nodes)} for #{inspect(this_crdt_pid)}")
 
     neighbours =
-      :erpc.multicall(nodes, __MODULE__, :get_crdt_pid, [], @call_timeout + 1000)
+      :erpc.multicall(nodes, __MODULE__, :get_crdt_pid, [], @call_timeout)
       |> Enum.map(fn
         {:ok, {:error, node}} ->
           Logger.warning("The node failed to retrieve DeltaCrdt pid -> #{inspect(node)}")
