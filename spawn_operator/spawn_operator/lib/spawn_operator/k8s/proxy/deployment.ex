@@ -89,8 +89,8 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
         "strategy" => %{
           "type" => "RollingUpdate",
           "rollingUpdate" => %{
-            "maxSurge" => "50%",
-            "maxUnavailable" => "50%"
+            "maxSurge" => "0",
+            "maxUnavailable" => "20%"
           }
         },
         "template" => %{
