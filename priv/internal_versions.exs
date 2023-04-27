@@ -1,23 +1,23 @@
 defmodule InternalVersions do
-  # The order here is also the deploy order, its important to keep this way
+  # The order here is also the deploy order, its important to keep this way0.6.2
   @versions [
-    spawn_statestores: "0.6.1",
-    spawn_statestores_mysql: "0.6.1",
-    spawn_statestores_mssql: "0.6.1",
-    spawn_statestores_postgres: "0.6.1",
-    spawn_statestores_sqlite: "0.6.1",
-    spawn_statestores_cockroachdb: "0.6.1",
-    spawn: "0.6.1",
-    spawn_sdk: "0.6.1",
-    activator: "0.6.1",
-    activator_grpc: "0.6.1",
-    activator_http: "0.6.1",
-    activator_kafka: "0.6.1",
-    activator_pubsub: "0.6.1",
-    activator_rabbitmq: "0.6.1",
-    activator_sqs: "0.6.1",
-    proxy: "0.6.1",
-    spawn_operator: "0.6.1"
+    spawn_statestores: "0.6.2",
+    spawn_statestores_mysql: "0.6.2",
+    spawn_statestores_mssql: "0.6.2",
+    spawn_statestores_postgres: "0.6.2",
+    spawn_statestores_sqlite: "0.6.2",
+    spawn_statestores_cockroachdb: "0.6.2",
+    spawn: "0.6.2",
+    spawn_sdk: "0.6.2",
+    activator: "0.6.2",
+    activator_grpc: "0.6.2",
+    activator_http: "0.6.2",
+    activator_kafka: "0.6.2",
+    activator_pubsub: "0.6.2",
+    activator_rabbitmq: "0.6.2",
+    activator_sqs: "0.6.2",
+    proxy: "0.6.2",
+    spawn_operator: "0.6.2"
   ]
 
   @doc """
