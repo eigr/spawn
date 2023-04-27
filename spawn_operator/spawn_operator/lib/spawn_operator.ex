@@ -63,7 +63,13 @@ defmodule SpawnOperator do
       pubsub_nats_auth_user:
         Map.get(annotations, "spawn-eigr.io/sidecar-pubsub-nats-auth-user", "admin"),
       pubsub_nats_auth_pass:
-        Map.get(annotations, "spawn-eigr.io/sidecar-pubsub-nats-auth-pass", "admin")
+        Map.get(annotations, "spawn-eigr.io/sidecar-pubsub-nats-auth-pass", "admin"),
+      delayed_invokes: Map.get(annotations, "spawn-eigr.io/sidecar-delayed-invokes", "true"),
+      sync_interval: Map.get(annotations, "spawn-eigr.io/sidecar-crdt-sync-interval", "2"),
+      ship_interval: Map.get(annotations, "spawn-eigr.io/sidecar-crdt-ship-interval", "2"),
+      ship_debounce: Map.get(annotations, "spawn-eigr.io/sidecar-crdt-ship-debounce", "2"),
+      neighbours_sync_interval:
+        Map.get(annotations, "spawn-eigr.io/sidecar-state-handoff-sync-interval", "60")
     }
   end
 end

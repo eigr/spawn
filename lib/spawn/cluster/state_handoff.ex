@@ -30,7 +30,6 @@ defmodule Spawn.Cluster.StateHandoff do
 
   @impl true
   def init(config) do
-    Process.flag(:message_queue_data, :off_heap)
     Process.flag(:trap_exit, true)
     :net_kernel.monitor_nodes(true, node_type: :visible)
 
@@ -86,42 +85,52 @@ defmodule Spawn.Cluster.StateHandoff do
     {:noreply, this_crdt_pid}
   end
 
-  @impl true
-  def handle_cast(:set_neighbours, this_crdt_pid) do
-    do_set_neighbours(this_crdt_pid)
-
-    {:noreply, this_crdt_pid}
+  def start_link(opts) do
+    GenServer.start_link(__MODULE__, opts, name: __MODULE__)
   end
 
-  def handle_call({:handoff, actor, hosts}, _from, crdt_pid) do
-    DeltaCrdt.put(crdt_pid, actor, hosts)
-    {:reply, :ok, crdt_pid}
+  @doc """
+  Store a actor and entity in the handoff crdt
+  """
+  def set(actor, hosts) do
+    get_crdt_pid()
+    |> DeltaCrdt.put(actor, hosts)
   end
 
-  def handle_call({:get, actor}, _from, crdt_pid) do
-    hosts = DeltaCrdt.get(crdt_pid, actor)
-    {:reply, hosts, crdt_pid}
+  @doc """
+  Pickup the stored entity data for a actor
+  """
+  def get(actor) do
+    get_crdt_pid()
+    |> DeltaCrdt.get(actor)
   end
 
-  def handle_call(:get_all_invocations, _from, crdt_pid) do
-    invocations =
-      crdt_pid
-      |> DeltaCrdt.to_map()
-      |> Map.values()
-      |> List.flatten()
-      |> Enum.map(& &1.opts[:invocations])
-      # TODO check if this is necessary
-      # |> List.flatten()
-      |> Enum.reject(&is_nil/1)
-      |> Enum.uniq()
-
-    {:reply, invocations, crdt_pid}
+  def get_crdt_pid do
+    :persistent_term.get(__MODULE__, {:error, Node.self()})
   end
 
-  @impl true
-  def handle_call({:clean, node}, _from, crdt_pid) do
+  def set_neighbours do
+    get_crdt_pid() |> do_set_neighbours()
+  end
+
+  def get_all_invocations do
+    get_crdt_pid()
+    |> DeltaCrdt.to_map()
+    |> Map.values()
+    |> List.flatten()
+    |> Enum.map(& &1.opts[:invocations])
+    |> List.flatten()
+    |> Enum.reject(&is_nil/1)
+    |> Enum.uniq()
+  end
+
+  @doc """
+  Cluster HostActor cleanup
+  """
+  def clean(node) do
     Logger.debug("Received cleanup action from Node #{inspect(node)}")
 
+    crdt_pid = get_crdt_pid()
     actors = DeltaCrdt.to_map(crdt_pid)
 
     new_hosts =
@@ -140,8 +149,6 @@ defmodule Spawn.Cluster.StateHandoff do
     GenServer.call(crdt_pid, {:bulk_operation, drop_operations ++ merge_operations})
 
     Logger.debug("Hosts cleaned for node #{inspect(node)}")
-
-    {:reply, :ok, crdt_pid}
   end
 
   defp do_set_neighbours(this_crdt_pid) do
@@ -173,42 +180,5 @@ defmodule Spawn.Cluster.StateHandoff do
     # we are not adding both ways and letting them sync with eachother
     # based on current Node.list() of each node
     DeltaCrdt.set_neighbours(this_crdt_pid, neighbours)
-  end
-
-  def start_link(opts) do
-    GenServer.start_link(__MODULE__, opts, name: __MODULE__)
-  end
-
-  @doc """
-  Store a actor and entity in the handoff crdt
-  """
-  def set(actor, hosts) do
-    GenServer.call(__MODULE__, {:handoff, actor, hosts})
-  end
-
-  @doc """
-  Pickup the stored entity data for a actor
-  """
-  def get(actor) do
-    GenServer.call(__MODULE__, {:get, actor}, @call_timeout)
-  end
-
-  def get_crdt_pid do
-    :persistent_term.get(__MODULE__, {:error, Node.self()})
-  end
-
-  def set_neighbours do
-    GenServer.cast(__MODULE__, :set_neighbours)
-  end
-
-  def get_all_invocations do
-    GenServer.call(__MODULE__, :get_all_invocations, @call_timeout)
-  end
-
-  @doc """
-  Cluster HostActor cleanup
-  """
-  def clean(node) do
-    GenServer.call(__MODULE__, {:clean, node}, @call_timeout)
   end
 end

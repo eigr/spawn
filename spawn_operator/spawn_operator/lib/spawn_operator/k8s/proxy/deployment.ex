@@ -203,7 +203,7 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
     proxy_container = %{
       "name" => "spawn-sidecar",
       "image" => "#{annotations.proxy_image_tag}",
-      "env" => actor_host_function_envs,
+      "env" => @default_actor_host_function_env,
       "ports" => proxy_actor_host_function_ports,
       "livenessProbe" => %{
         "failureThreshold" => 10,
