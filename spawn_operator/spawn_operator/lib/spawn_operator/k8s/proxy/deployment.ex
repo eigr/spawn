@@ -108,10 +108,10 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
           "spec" =>
             %{
               "affinity" => Map.get(host_params, "antiAffinity", build_anti_affinity(name)),
-              "containers" => get_containers(embedded, system, name, host_params, annotations),
-              "terminationGracePeriodSeconds" => @default_termination_period_seconds
+              "containers" => get_containers(embedded, system, name, host_params, annotations)
             }
             |> maybe_put_volumes(params)
+            |> maybe_set_termination_period(params)
         }
       }
     }
@@ -269,6 +269,20 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
   end
 
   defp maybe_put_ports_to_host_container(spec, _), do: spec
+
+  defp maybe_set_termination_period(spec, %{
+         "terminationGracePeriodSeconds" => terminationGracePeriodSeconds
+       }) do
+    Map.put(
+      spec,
+      "terminationGracePeriodSeconds",
+      terminationGracePeriodSeconds || @default_termination_period_seconds
+    )
+  end
+
+  defp maybe_set_termination_period(spec, _) do
+    Map.put(spec, "terminationGracePeriodSeconds", @default_termination_period_seconds)
+  end
 
   defp maybe_put_volumes(spec, %{"volumes" => volumes}) do
     Map.put(spec, "volumes", volumes)
