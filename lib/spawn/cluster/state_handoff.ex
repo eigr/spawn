@@ -48,7 +48,14 @@ defmodule Spawn.Cluster.StateHandoff do
       Map.get(config, :neighbours_sync_interval, @default_neighbours_sync_interval)
     )
 
-    {:ok, crdt_pid}
+    {:ok, crdt_pid, {:continue, :after_init}}
+  end
+
+  @impl true
+  def handle_continue(:after_init, crdt_pid) do
+    do_set_neighbours(crdt_pid)
+
+    {:noreply, crdt_pid}
   end
 
   @impl true
@@ -107,10 +114,6 @@ defmodule Spawn.Cluster.StateHandoff do
 
   def get_crdt_pid do
     :persistent_term.get(__MODULE__, {:error, Node.self()})
-  end
-
-  def set_neighbours do
-    get_crdt_pid() |> do_set_neighbours()
   end
 
   def get_all_invocations do
