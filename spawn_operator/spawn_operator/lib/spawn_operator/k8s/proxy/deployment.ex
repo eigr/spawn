@@ -38,11 +38,16 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
 
   @default_actor_host_function_replicas 1
 
-  @default_actor_host_function_resources %{
-    "limits" => %{
-      "memory" => "1024Mi"
-    },
+  @default_actor_host_resources %{
     "requests" => %{
+      "cpu" => "10m",
+      "memory" => "80Mi"
+    }
+  }
+
+  @default_proxy_resources %{
+    "requests" => %{
+      "cpu" => "10m",
       "memory" => "80Mi"
     }
   }
@@ -154,7 +159,7 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
     actor_host_function_ports = actor_host_function_ports ++ proxy_actor_host_function_ports
 
     actor_host_function_resources =
-      Map.get(host_params, "resources", @default_actor_host_function_resources)
+      Map.get(host_params, "resources", @default_actor_host_resources)
 
     host_and_proxy_container =
       %{
@@ -191,7 +196,7 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
         @default_actor_host_function_env
 
     actor_host_function_resources =
-      Map.get(host_params, "resources", @default_actor_host_function_resources)
+      Map.get(host_params, "resources", @default_actor_host_resources)
 
     proxy_http_port = String.to_integer(annotations.proxy_http_port)
 
@@ -228,7 +233,7 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
         "successThreshold" => 1,
         "timeoutSeconds" => 5
       },
-      "resources" => actor_host_function_resources,
+      "resources" => @default_proxy_resources,
       "envFrom" => [
         %{
           "configMapRef" => %{

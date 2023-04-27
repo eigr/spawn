@@ -9,7 +9,7 @@ defmodule SpawnOperator.K8s.Proxy.HPA do
 
   @default_autoscaler %{}
 
-  @default_average_cpu_utilization_percentage 80
+  @default_average_cpu_utilization_percentage 700
 
   @default_average_memory_utilization_value 70
 

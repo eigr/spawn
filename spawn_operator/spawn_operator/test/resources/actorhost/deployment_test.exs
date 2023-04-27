@@ -106,8 +106,7 @@ defmodule DeploymentTest do
                            %{"containerPort" => 9001, "name" => "proxy-http"}
                          ],
                          "resources" => %{
-                           "limits" => %{"memory" => "1024Mi"},
-                           "requests" => %{"memory" => "80Mi"}
+                           "requests" => %{"memory" => "80Mi", "cpu" => "10m"}
                          }
                        }
                      ],
@@ -201,8 +200,7 @@ defmodule DeploymentTest do
                            %{"containerPort" => 9001, "name" => "proxy-http"}
                          ],
                          "resources" => %{
-                           "limits" => %{"memory" => "1024Mi"},
-                           "requests" => %{"memory" => "80Mi"}
+                           "requests" => %{"memory" => "80Mi", "cpu" => "10m"}
                          },
                          "volumeMounts" => [
                            %{"mountPath" => "/home/example", "name" => "volume-name"}
@@ -323,8 +321,7 @@ defmodule DeploymentTest do
                            "timeoutSeconds" => 5
                          },
                          "resources" => %{
-                           "limits" => %{"memory" => "1024Mi"},
-                           "requests" => %{"memory" => "80Mi"}
+                           "requests" => %{"memory" => "80Mi", "cpu" => "10m"}
                          }
                        },
                        %{
@@ -348,8 +345,7 @@ defmodule DeploymentTest do
                          "image" => "eigr/spawn-test:latest",
                          "name" => "actor-host-function",
                          "resources" => %{
-                           "limits" => %{"memory" => "1024Mi"},
-                           "requests" => %{"memory" => "80Mi"}
+                           "requests" => %{"memory" => "80Mi", "cpu" => "10m"}
                          }
                        }
                      ],
@@ -417,8 +413,7 @@ defmodule DeploymentTest do
                "image" => "eigr/spawn-test:latest",
                "name" => "actor-host-function",
                "resources" => %{
-                 "limits" => %{"memory" => "1024Mi"},
-                 "requests" => %{"memory" => "80Mi"}
+                 "requests" => %{"memory" => "80Mi", "cpu" => "10m"}
                },
                "ports" => [
                  %{"containerPort" => 8090, "name" => "http"},
