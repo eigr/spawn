@@ -18,28 +18,36 @@ defmodule Actors.Supervisors.ActorSupervisor do
   def init(config) do
     Protobuf.load_extensions()
 
-    children = [
-      get_pubsub_adapter(config),
-      Actors.Actor.Entity.Supervisor.child_spec(),
-      %{
-        id: :actor_registry_task,
-        start:
-          {Task, :start_link,
-           [
-             fn ->
-               Process.flag(:trap_exit, true)
+    children =
+      [
+        get_pubsub_adapter(config),
+        Actors.Actor.Entity.Supervisor.child_spec(),
+        %{
+          id: :actor_registry_task,
+          start:
+            {Task, :start_link,
+             [
+               fn ->
+                 Process.flag(:trap_exit, true)
 
-               receive do
-                 {:EXIT, _pid, _reason} ->
-                   Actors.Registry.ActorRegistry.node_cleanup(Node.self())
+                 receive do
+                   {:EXIT, _pid, _reason} ->
+                     Actors.Registry.ActorRegistry.node_cleanup(Node.self())
+                 end
                end
-             end
-           ]}
-      },
-      {Highlander, Actors.Actor.InvocationScheduler.child_spec()}
-    ]
+             ]}
+        }
+      ] ++ maybe_add_invocation_scheduler(config)
 
     Supervisor.init(children, strategy: :one_for_one)
+  end
+
+  defp maybe_add_invocation_scheduler(config) do
+    if config.delayed_invokes == "true" do
+      [{Highlander, Actors.Actor.InvocationScheduler.child_spec()}]
+    else
+      []
+    end
   end
 
   defp get_pubsub_adapter(config) do

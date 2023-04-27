@@ -21,7 +21,7 @@ defmodule Spawn.Supervisor do
   @impl true
   def init(config) do
     children = [
-      Spawn.Cluster.StateHandoff.Supervisor,
+      Spawn.Cluster.StateHandoff.Supervisor.child_spec(config),
       cluster_supervisor(config),
       Spawn.Cluster.Node.Registry.child_spec()
     ]
