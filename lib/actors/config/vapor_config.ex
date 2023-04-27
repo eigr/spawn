@@ -71,7 +71,13 @@ defmodule Actors.Config.Vapor do
           {:pubsub_adapter_nats_auth_pass, "SPAWN_PUBSUB_NATS_AUTH_PASS",
            default: "admin", required: false},
           {:pubsub_adapter_nats_auth_jwt, "SPAWN_PUBSUB_NATS_AUTH_JWT",
-           default: "", required: false}
+           default: "", required: false},
+          {:delayed_invokes, "SPAWN_DELAYED_INVOKES", default: "true", required: false},
+          {:sync_interval, "SPAWN_CRDT_SYNC_INTERVAL", default: 2, required: false},
+          {:ship_interval, "SPAWN_CRDT_SHIP_INTERVAL", default: 2, required: false},
+          {:ship_debounce, "SPAWN_CRDT_SHIP_DEBOUNCE", default: 2, required: false},
+          {:neighbours_sync_interval, "SPAWN_STATE_HANDOFF_SYNC_INTERVAL",
+           default: 60, required: false}
         ]
       }
     ]

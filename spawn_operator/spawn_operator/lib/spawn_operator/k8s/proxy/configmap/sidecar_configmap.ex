@@ -68,6 +68,21 @@ defmodule SpawnOperator.K8s.Proxy.CM.Configmap do
 
     # Optional. Default ""
     spawn-eigr.io/sidecar-pubsub-nats-auth-jwt: ""
+
+    # Optional. Default "true"
+    spawn-eigr.io/sidecar-delayed-invokes: "true"
+
+    # Optional. Default "2"
+    spawn-eigr.io/sidecar-crdt-sync-interval: "2"
+
+    # Optional. Default "2"
+    spawn-eigr.io/sidecar-crdt-ship-interval: "2"
+
+    # Optional. Default "2"
+    spawn-eigr.io/sidecar-crdt-ship-debounce: "2"
+
+    # Optional. Default "60"
+    spawn-eigr-io/sidecar-state-handoff-sync-interval: "60"
   """
   @impl true
   def manifest(resource, _opts \\ []), do: gen_configmap(resource)
@@ -111,7 +126,12 @@ defmodule SpawnOperator.K8s.Proxy.CM.Configmap do
         "SPAWN_PUBSUB_NATS_TLS" => annotations.pubsub_nats_tls,
         "SPAWN_PUBSUB_NATS_AUTH_USER" => annotations.pubsub_nats_auth_user,
         "SPAWN_PUBSUB_NATS_AUTH_PASS" => annotations.pubsub_nats_auth_pass,
-        "SPAWN_PUBSUB_NATS_AUTH_JWT" => annotations.pubsub_nats_auth_jwt
+        "SPAWN_PUBSUB_NATS_AUTH_JWT" => annotations.pubsub_nats_auth_jwt,
+        "SPAWN_DELAYED_INVOKES" => annotations.delayed_invokes,
+        "SPAWN_CRDT_SYNC_INTERVAL" => annotations.sync_interval,
+        "SPAWN_CRDT_SHIP_INTERVAL" => annotations.ship_interval,
+        "SPAWN_CRDT_SHIP_DEBOUNCE" => annotations.ship_debounce,
+        "SPAWN_STATE_HANDOFF_SYNC_INTERVAL" => annotations.neighbours_sync_interval
       }
     }
   end
