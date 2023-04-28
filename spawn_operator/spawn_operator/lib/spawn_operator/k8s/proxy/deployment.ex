@@ -40,14 +40,14 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
 
   @default_actor_host_resources %{
     "requests" => %{
-      "cpu" => "10m",
+      "cpu" => "100m",
       "memory" => "80Mi"
     }
   }
 
   @default_proxy_resources %{
     "requests" => %{
-      "cpu" => "10m",
+      "cpu" => "50m",
       "memory" => "80Mi"
     }
   }
@@ -89,7 +89,7 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
         "strategy" => %{
           "type" => "RollingUpdate",
           "rollingUpdate" => %{
-            "maxSurge" => "0",
+            "maxSurge" => 0,
             "maxUnavailable" => "20%"
           }
         },

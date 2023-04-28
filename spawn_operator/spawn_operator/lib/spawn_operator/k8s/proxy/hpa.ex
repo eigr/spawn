@@ -11,7 +11,7 @@ defmodule SpawnOperator.K8s.Proxy.HPA do
 
   @default_average_cpu_utilization_percentage 700
 
-  @default_average_memory_utilization_value 70
+  @default_average_memory_utilization_value 200
 
   @impl true
   def manifest(resource, _opts \\ []), do: gen_autoscaler(resource)
