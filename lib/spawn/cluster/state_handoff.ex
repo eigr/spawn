@@ -100,8 +100,16 @@ defmodule Spawn.Cluster.StateHandoff do
   Store a actor and entity in the handoff crdt
   """
   def set(actor, hosts) do
-    get_crdt_pid()
-    |> DeltaCrdt.put(actor, hosts)
+    pid = get_crdt_pid()
+
+    hosts
+    |> Enum.group_by(& &1.node)
+    |> Enum.each(fn {node, hosts} ->
+      actors_map = DeltaCrdt.get(pid, node) || %{}
+
+      updated_actors_map = Map.put(actors_map, actor, hosts)
+      DeltaCrdt.put(pid, node, updated_actors_map)
+    end)
   end
 
   @doc """
@@ -109,7 +117,12 @@ defmodule Spawn.Cluster.StateHandoff do
   """
   def get(actor) do
     get_crdt_pid()
-    |> DeltaCrdt.get(actor)
+    |> DeltaCrdt.take(all_nodes())
+    |> Enum.map(fn
+      {_node, %{^actor => hosts}} -> hosts
+      _ -> []
+    end)
+    |> List.flatten()
   end
 
   def get_crdt_pid do
@@ -121,7 +134,13 @@ defmodule Spawn.Cluster.StateHandoff do
     |> DeltaCrdt.to_map()
     |> Map.values()
     |> List.flatten()
-    |> Enum.map(& &1.opts[:invocations])
+    |> Enum.map(fn actors_map ->
+      actors_map
+      |> Map.values()
+      |> List.flatten()
+      |> Enum.map(& &1.opts[:invocations])
+      |> List.flatten()
+    end)
     |> List.flatten()
     |> Enum.reject(&is_nil/1)
     |> Enum.uniq()
@@ -134,22 +153,8 @@ defmodule Spawn.Cluster.StateHandoff do
     Logger.debug("Received cleanup action from Node #{inspect(node)}")
 
     crdt_pid = get_crdt_pid()
-    actors = DeltaCrdt.to_map(crdt_pid)
 
-    new_hosts =
-      actors
-      |> Enum.map(fn {key, hosts} ->
-        hosts_not_in_node = Enum.reject(hosts, &(&1.node == node))
-
-        {key, hosts_not_in_node}
-      end)
-      |> Map.new()
-
-    drop_operations = actors |> Map.keys() |> Enum.map(&{:remove, [&1]})
-    merge_operations = Enum.map(new_hosts, fn {key, value} -> {:add, [key, value]} end)
-
-    # this is calling the internals of DeltaCrdt GenServer function (to keep atomicity in check)
-    GenServer.call(crdt_pid, {:bulk_operation, drop_operations ++ merge_operations})
+    DeltaCrdt.delete(crdt_pid, node)
 
     Logger.debug("Hosts cleaned for node #{inspect(node)}")
   end
@@ -163,7 +168,7 @@ defmodule Spawn.Cluster.StateHandoff do
       :erpc.multicall(nodes, __MODULE__, :get_crdt_pid, [], @call_timeout)
       |> Enum.map(fn
         {:ok, {:error, node}} ->
-          Logger.warning("The node failed to retrieve DeltaCrdt pid -> #{inspect(node)}")
+          Logger.warning("StateHandoff.get_crdt_pid returned nil in node -> #{inspect(node)}")
 
           nil
 
@@ -183,5 +188,9 @@ defmodule Spawn.Cluster.StateHandoff do
     # we are not adding both ways and letting them sync with eachother
     # based on current Node.list() of each node
     DeltaCrdt.set_neighbours(this_crdt_pid, neighbours)
+  end
+
+  defp all_nodes do
+    Node.list() ++ [Node.self()]
   end
 end
