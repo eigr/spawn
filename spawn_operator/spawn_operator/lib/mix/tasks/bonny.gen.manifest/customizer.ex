@@ -54,7 +54,7 @@ defmodule Mix.Tasks.Bonny.Gen.Manifest.SpawnOperatorCustomizer do
                   valueFrom: %{fieldRef: %{fieldPath: "spec.serviceAccountName"}}
                 }
               ],
-              image: "eigr/spawn-operator:0.6.2",
+              image: "eigr/spawn-operator:0.6.3",
               name: "spawn-operator",
               resources: %{
                 limits: %{cpu: "200m", memory: "200Mi"},
