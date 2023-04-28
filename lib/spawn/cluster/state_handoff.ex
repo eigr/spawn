@@ -135,7 +135,11 @@ defmodule Spawn.Cluster.StateHandoff do
     |> Map.values()
     |> List.flatten()
     |> Enum.map(fn actors_map ->
-      actors_map |> Map.values() |> List.flatten() |> Enum.map(& &1.opts[:invocations]) |> List.flatten()
+      actors_map
+      |> Map.values()
+      |> List.flatten()
+      |> Enum.map(& &1.opts[:invocations])
+      |> List.flatten()
     end)
     |> List.flatten()
     |> Enum.reject(&is_nil/1)

@@ -26,31 +26,32 @@ defmodule Actors.ActorRegistryTest do
              ])
 
     # actor registered and present in the other node
-    assert %{"actor_registry_test_two_nodes" => [%{node: ^peer_node_name}]} =
+    assert %{^peer_node_name => [%{^actor_registry_test_two_nodes => [_ | _]}]} =
              Spawn.NodeHelper.rpc(peer_node_name, Actors.ActorsHelper, :registered_actors, [])
 
     # also present in self node
-    assert %{"actor_registry_test_two_nodes" => [%{node: ^peer_node_name}]} =
+    assert %{^peer_node_name => [%{^actor_registry_test_two_nodes => [_ | _]}]} =
              Actors.ActorsHelper.registered_actors()
 
     Actors.register(request)
 
     # present in both nodes too
-    assert %{"actor_registry_test_two_nodes" => actors} = Actors.ActorsHelper.registered_actors()
-    peer_node_name in Enum.map(actors, & &1.node)
-    :"spawn@127.0.0.1" in Enum.map(actors, & &1.node)
+    registered = Actors.ActorsHelper.registered_actors()
+    assert %{:"spawn@127.0.0.1" => %{"actor_registry_test_two_nodes" => [_ | _]}} = registered
+    assert %{^peer_node_name => %{"actor_registry_test_two_nodes" => [_ | _]}} = registered
 
     # present in both nodes calling in the other node
-    assert %{"actor_registry_test_two_nodes" => actors} =
-             Spawn.NodeHelper.rpc(peer_node_name, Actors.ActorsHelper, :registered_actors, [])
-
-    peer_node_name in Enum.map(actors, & &1.node)
-    :"spawn@127.0.0.1" in Enum.map(actors, & &1.node)
+    registered = Spawn.NodeHelper.rpc(peer_node_name, Actors.ActorsHelper, :registered_actors, [])
+    assert %{:"spawn@127.0.0.1" => %{"actor_registry_test_two_nodes" => [_ | _]}} = registered
+    assert %{^peer_node_name => %{"actor_registry_test_two_nodes" => [_ | _]}} = registered
 
     Spawn.Cluster.StateHandoff.clean(peer_node_name)
 
+    registered = Actors.ActorsHelper.registered_actors()
+
     # now present only in current node
-    assert %{"actor_registry_test_two_nodes" => actors} = Actors.ActorsHelper.registered_actors()
-    assert [:"spawn@127.0.0.1"] == Enum.map(actors, & &1.node)
+    assert %{:"spawn@127.0.0.1" => %{"actor_registry_test_two_nodes" => [_ | _]}} = registered
+
+    refute %{^peer_node_name => %{"actor_registry_test_two_nodes" => [_ | _]}} = registered
   end
 end
