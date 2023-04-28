@@ -26,11 +26,11 @@ defmodule Actors.ActorRegistryTest do
              ])
 
     # actor registered and present in the other node
-    assert %{^peer_node_name => [%{^actor_registry_test_two_nodes => [_ | _]}]} =
+    assert %{^peer_node_name => [%{"actor_registry_test_two_nodes" => [_ | _]}]} =
              Spawn.NodeHelper.rpc(peer_node_name, Actors.ActorsHelper, :registered_actors, [])
 
     # also present in self node
-    assert %{^peer_node_name => [%{^actor_registry_test_two_nodes => [_ | _]}]} =
+    assert %{^peer_node_name => [%{"actor_registry_test_two_nodes" => [_ | _]}]} =
              Actors.ActorsHelper.registered_actors()
 
     Actors.register(request)
