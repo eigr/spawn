@@ -26,32 +26,32 @@ defmodule Actors.ActorRegistryTest do
              ])
 
     # actor registered and present in the other node
-    assert %{^peer_node_name => [%{"actor_registry_test_two_nodes" => [_ | _]}]} =
+    assert %{^peer_node_name => %{"actor_registry_test_two_nodes" => _}} =
              Spawn.NodeHelper.rpc(peer_node_name, Actors.ActorsHelper, :registered_actors, [])
 
     # also present in self node
-    assert %{^peer_node_name => [%{"actor_registry_test_two_nodes" => [_ | _]}]} =
+    assert %{^peer_node_name => %{"actor_registry_test_two_nodes" => _}} =
              Actors.ActorsHelper.registered_actors()
 
     Actors.register(request)
 
     # present in both nodes too
     registered = Actors.ActorsHelper.registered_actors()
-    assert %{:"spawn@127.0.0.1" => %{"actor_registry_test_two_nodes" => [_ | _]}} = registered
-    assert %{^peer_node_name => %{"actor_registry_test_two_nodes" => [_ | _]}} = registered
+    assert %{:"spawn@127.0.0.1" => %{"actor_registry_test_two_nodes" => _}} = registered
+    assert %{^peer_node_name => %{"actor_registry_test_two_nodes" => _}} = registered
 
     # present in both nodes calling in the other node
     registered = Spawn.NodeHelper.rpc(peer_node_name, Actors.ActorsHelper, :registered_actors, [])
-    assert %{:"spawn@127.0.0.1" => %{"actor_registry_test_two_nodes" => [_ | _]}} = registered
-    assert %{^peer_node_name => %{"actor_registry_test_two_nodes" => [_ | _]}} = registered
+    assert %{:"spawn@127.0.0.1" => %{"actor_registry_test_two_nodes" => _}} = registered
+    assert %{^peer_node_name => %{"actor_registry_test_two_nodes" => _}} = registered
 
     Spawn.Cluster.StateHandoff.clean(peer_node_name)
 
     registered = Actors.ActorsHelper.registered_actors()
 
     # now present only in current node
-    assert %{:"spawn@127.0.0.1" => %{"actor_registry_test_two_nodes" => [_ | _]}} = registered
+    assert %{:"spawn@127.0.0.1" => %{"actor_registry_test_two_nodes" => _}} = registered
 
-    refute %{^peer_node_name => %{"actor_registry_test_two_nodes" => [_ | _]}} = registered
+    refute %{^peer_node_name => %{"actor_registry_test_two_nodes" => _}} = registered
   end
 end
