@@ -12,7 +12,7 @@ by adding `statestores` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:spawn_statestores, "~> 0.6.0"}
+    {:spawn_statestores, "~> 0.6.3"}
   ]
 end
 ```
@@ -20,4 +20,3 @@ end
 Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
 and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
 be found at <https://hexdocs.pm/statestores>.
-

@@ -42,7 +42,7 @@ defmodule DeploymentTest do
                    "matchLabels" => %{"actor-system" => "spawn-system", "app" => "spawn-test"}
                  },
                  "strategy" => %{
-                   "rollingUpdate" => %{"maxSurge" => "50%", "maxUnavailable" => "50%"},
+                   "rollingUpdate" => %{"maxSurge" => 0, "maxUnavailable" => "20%"},
                    "type" => "RollingUpdate"
                  },
                  "template" => %{
@@ -106,8 +106,7 @@ defmodule DeploymentTest do
                            %{"containerPort" => 9001, "name" => "proxy-http"}
                          ],
                          "resources" => %{
-                           "limits" => %{"memory" => "1024Mi"},
-                           "requests" => %{"memory" => "80Mi"}
+                           "requests" => %{"memory" => "80Mi", "cpu" => "100m"}
                          }
                        }
                      ],
@@ -137,7 +136,7 @@ defmodule DeploymentTest do
                    "matchLabels" => %{"actor-system" => "spawn-system", "app" => "spawn-test"}
                  },
                  "strategy" => %{
-                   "rollingUpdate" => %{"maxSurge" => "50%", "maxUnavailable" => "50%"},
+                   "rollingUpdate" => %{"maxSurge" => 0, "maxUnavailable" => "20%"},
                    "type" => "RollingUpdate"
                  },
                  "template" => %{
@@ -201,8 +200,7 @@ defmodule DeploymentTest do
                            %{"containerPort" => 9001, "name" => "proxy-http"}
                          ],
                          "resources" => %{
-                           "limits" => %{"memory" => "1024Mi"},
-                           "requests" => %{"memory" => "80Mi"}
+                           "requests" => %{"memory" => "80Mi", "cpu" => "100m"}
                          },
                          "volumeMounts" => [
                            %{"mountPath" => "/home/example", "name" => "volume-name"}
@@ -236,7 +234,7 @@ defmodule DeploymentTest do
                    "matchLabels" => %{"actor-system" => "spawn-system", "app" => "spawn-test"}
                  },
                  "strategy" => %{
-                   "rollingUpdate" => %{"maxSurge" => "50%", "maxUnavailable" => "50%"},
+                   "rollingUpdate" => %{"maxSurge" => 0, "maxUnavailable" => "20%"},
                    "type" => "RollingUpdate"
                  },
                  "template" => %{
@@ -323,8 +321,7 @@ defmodule DeploymentTest do
                            "timeoutSeconds" => 5
                          },
                          "resources" => %{
-                           "limits" => %{"memory" => "1024Mi"},
-                           "requests" => %{"memory" => "80Mi"}
+                           "requests" => %{"memory" => "80Mi", "cpu" => "50m"}
                          }
                        },
                        %{
@@ -348,8 +345,7 @@ defmodule DeploymentTest do
                          "image" => "eigr/spawn-test:latest",
                          "name" => "actor-host-function",
                          "resources" => %{
-                           "limits" => %{"memory" => "1024Mi"},
-                           "requests" => %{"memory" => "80Mi"}
+                           "requests" => %{"memory" => "80Mi", "cpu" => "100m"}
                          }
                        }
                      ],
@@ -417,8 +413,7 @@ defmodule DeploymentTest do
                "image" => "eigr/spawn-test:latest",
                "name" => "actor-host-function",
                "resources" => %{
-                 "limits" => %{"memory" => "1024Mi"},
-                 "requests" => %{"memory" => "80Mi"}
+                 "requests" => %{"memory" => "80Mi", "cpu" => "100m"}
                },
                "ports" => [
                  %{"containerPort" => 8090, "name" => "http"},

@@ -38,11 +38,16 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
 
   @default_actor_host_function_replicas 1
 
-  @default_actor_host_function_resources %{
-    "limits" => %{
-      "memory" => "1024Mi"
-    },
+  @default_actor_host_resources %{
     "requests" => %{
+      "cpu" => "100m",
+      "memory" => "80Mi"
+    }
+  }
+
+  @default_proxy_resources %{
+    "requests" => %{
+      "cpu" => "50m",
       "memory" => "80Mi"
     }
   }
@@ -84,8 +89,8 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
         "strategy" => %{
           "type" => "RollingUpdate",
           "rollingUpdate" => %{
-            "maxSurge" => "50%",
-            "maxUnavailable" => "50%"
+            "maxSurge" => 0,
+            "maxUnavailable" => "20%"
           }
         },
         "template" => %{
@@ -103,10 +108,10 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
           "spec" =>
             %{
               "affinity" => Map.get(host_params, "antiAffinity", build_anti_affinity(name)),
-              "containers" => get_containers(embedded, system, name, host_params, annotations),
-              "terminationGracePeriodSeconds" => @default_termination_period_seconds
+              "containers" => get_containers(embedded, system, name, host_params, annotations)
             }
             |> maybe_put_volumes(params)
+            |> maybe_set_termination_period(params)
         }
       }
     }
@@ -154,7 +159,7 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
     actor_host_function_ports = actor_host_function_ports ++ proxy_actor_host_function_ports
 
     actor_host_function_resources =
-      Map.get(host_params, "resources", @default_actor_host_function_resources)
+      Map.get(host_params, "resources", @default_actor_host_resources)
 
     host_and_proxy_container =
       %{
@@ -191,7 +196,7 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
         @default_actor_host_function_env
 
     actor_host_function_resources =
-      Map.get(host_params, "resources", @default_actor_host_function_resources)
+      Map.get(host_params, "resources", @default_actor_host_resources)
 
     proxy_http_port = String.to_integer(annotations.proxy_http_port)
 
@@ -228,7 +233,7 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
         "successThreshold" => 1,
         "timeoutSeconds" => 5
       },
-      "resources" => actor_host_function_resources,
+      "resources" => @default_proxy_resources,
       "envFrom" => [
         %{
           "configMapRef" => %{
@@ -264,6 +269,20 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
   end
 
   defp maybe_put_ports_to_host_container(spec, _), do: spec
+
+  defp maybe_set_termination_period(spec, %{
+         "terminationGracePeriodSeconds" => terminationGracePeriodSeconds
+       }) do
+    Map.put(
+      spec,
+      "terminationGracePeriodSeconds",
+      terminationGracePeriodSeconds || @default_termination_period_seconds
+    )
+  end
+
+  defp maybe_set_termination_period(spec, _) do
+    Map.put(spec, "terminationGracePeriodSeconds", @default_termination_period_seconds)
+  end
 
   defp maybe_put_volumes(spec, %{"volumes" => volumes}) do
     Map.put(spec, "volumes", volumes)

@@ -28,7 +28,7 @@ defmodule Statestores.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger]
+      extra_applications: [:logger, :public_key]
     ]
   end
 
@@ -59,6 +59,7 @@ defmodule Statestores.MixProject do
       {:cloak_ecto, "~> 1.2"},
       {:ecto_sql, "~> 3.8"},
       {:nimble_parsec, "~> 1.2.3"},
+      {:castore, "~> 1.0"},
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false}
     ]
