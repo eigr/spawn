@@ -20,13 +20,29 @@ defmodule Spawn.Supervisor do
 
   @impl true
   def init(config) do
-    children = [
-      cluster_supervisor(config),
-      Spawn.Cluster.StateHandoff.Supervisor.child_spec(config),
-      Spawn.Cluster.Node.Registry.child_spec()
-    ]
+    children =
+      [
+        cluster_supervisor(config),
+        Spawn.Cluster.StateHandoff.Supervisor.child_spec(config),
+        Spawn.Cluster.Node.Registry.child_spec()
+      ]
+      |> maybe_start_internal_nats(config)
 
     Supervisor.init(children, strategy: :one_for_one)
+  end
+
+  defp maybe_start_internal_nats(children, config) do
+    case config.use_internal_nats do
+      "false" ->
+        children
+
+      _ ->
+        Logger.debug("Starting Spawn using Nats control protocol")
+
+        (children ++
+           [Spawn.Cluster.Node.ServerSupervisor.child_spec(config)])
+        |> List.flatten()
+    end
   end
 
   defp cluster_supervisor(config) do

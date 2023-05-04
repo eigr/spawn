@@ -57,31 +57,11 @@ defmodule Actors.Supervisors.ActorSupervisor do
           Phoenix.PubSub,
           name: :actor_channel,
           adapter: PhoenixPubsubNats,
-          connection: get_nats_connection(config)
+          connection: Spawn.Utils.Nats.get_nats_connection(config)
         }
 
       _ ->
         {Phoenix.PubSub, name: :actor_channel}
     end
-  end
-
-  defp get_nats_connection(config) do
-    raw_hosts = config.pubsub_adapter_nats_hosts
-    hosts_conn_map = get_nats_hosts(raw_hosts)
-
-    # TODO: Get other parameters here to build complex connections
-
-    hosts_conn_map
-  end
-
-  defp get_nats_hosts(raw_hosts) do
-    String.split(raw_hosts, ",")
-    |> Enum.map(fn host ->
-      host_port = String.replace(host, "nats://", "")
-      host = String.split(host_port, ":") |> List.first()
-      port = String.split(host_port, ":") |> List.last() |> String.to_integer()
-      %{host: host, port: port}
-    end)
-    |> List.first()
   end
 end

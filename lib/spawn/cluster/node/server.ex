@@ -10,22 +10,25 @@ defmodule Spawn.Cluster.Node.Server do
   def request(%{topic: topic, body: body, reply_to: reply_to} = req) do
     Logger.debug("Received Actor Invocation via Nats on #{topic}")
 
-    req
-    |> Map.get(:headers)
-    |> get_trace_context_if_exists()
+    # req
+    # |> Map.get(:headers)
+    # |> get_trace_context_if_exists()
 
     topic
     |> handle_request(body, reply_to)
   end
 
-  def error(%{gnat: gnat, reply_to: reply_to}, _error) do
+  def error(%{gnat: gnat, reply_to: reply_to}, error) do
     # TODO handle errors
     # Gnat.pub(gnat, reply_to, "Something went wrong and I can't handle your request")
+    Logger.error(
+      "Error on #{inspect(__MODULE__)} during handle incoming message. Error  #{inspect(error)}"
+    )
   end
 
   defp handle_request(topic, body, reply_to) do
     Tracer.with_span "Handle Actor Invoke", kind: :server do
-      {:reply, nil}
+      {:reply, "Echo #{body}"}
     end
   end
 
