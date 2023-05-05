@@ -16,6 +16,8 @@ defmodule Actors do
 
   alias Actors.Registry.{ActorRegistry, HostActor}
 
+  alias Actors.Config.Vapor, as: Config
+
   alias Eigr.Functions.Protocol.Actors.{
     Actor,
     ActorId,
@@ -26,6 +28,7 @@ defmodule Actors do
   }
 
   alias Eigr.Functions.Protocol.{
+    ActorInvocationResponse,
     InvocationRequest,
     ProxyInfo,
     RegistrationRequest,
@@ -37,6 +40,7 @@ defmodule Actors do
   }
 
   alias Sidecar.Measurements
+  alias Spawn.Utils.Nats
 
   import Spawn.Utils.Common, only: [to_existing_atom_or_new: 1]
 
@@ -177,24 +181,46 @@ defmodule Actors do
   """
   @spec invoke(InvocationRequest.t()) :: {:ok, :async} | {:ok, term()} | {:error, term()}
   def invoke(
-        %InvocationRequest{} = request,
+        %InvocationRequest{actor: actor, system: %ActorSystem{name: system_name} = _system} =
+          request,
         opts \\ []
       ) do
-    invoke_with_span(request, opts)
+    if system_name === Config.get(Actors, :actor_system_name) do
+      invoke_with_span(request, opts)
+    else
+      case Nats.request(system_name, request, opts) do
+        {:ok, %{body: :async}} ->
+          {:ok, :async}
+
+        {:ok, %{body: body}} ->
+          {:ok, ActorInvocationResponse.decode(body)}
+
+        {:error, :no_responders} ->
+          Logger.error("Actor #{actor.id.name} not found on ActorSystem #{system_name}")
+          {:error, :not_found}
+
+        {:error, :timeout} ->
+          Logger.error(
+            "Timeout during Invocation on Actor #{actor.id.name} on ActorSystem #{system_name}"
+          )
+
+          {:error, %ActorInvocationResponse{}}
+      end
+    end
   end
 
-  defp invoke_with_span(
-         %InvocationRequest{
-           actor: %Actor{} = actor,
-           system: %ActorSystem{} = system,
-           command_name: command_name,
-           async: async?,
-           metadata: metadata,
-           caller: caller,
-           pooled: pooled?
-         } = request,
-         opts
-       ) do
+  def invoke_with_span(
+        %InvocationRequest{
+          actor: %Actor{} = actor,
+          system: %ActorSystem{} = system,
+          command_name: command_name,
+          async: async?,
+          metadata: metadata,
+          caller: caller,
+          pooled: pooled?
+        } = request,
+        opts
+      ) do
     {time, result} =
       :timer.tc(fn ->
         metadata_attributes =

@@ -1,9 +1,10 @@
 defmodule Spawn.Cluster.Node.ServerSupervisor do
   @moduledoc false
   use Supervisor
+
   require Logger
 
-  import Spawn.Utils.Common, only: [to_existing_atom_or_new: 1]
+  alias Spawn.Utils.Nats
 
   def start_link(config) do
     Supervisor.start_link(__MODULE__, config,
@@ -22,8 +23,7 @@ defmodule Spawn.Cluster.Node.ServerSupervisor do
 
   @impl true
   def init(config) do
-    node = sanitize_nodename(Node.self())
-    connection_name = to_existing_atom_or_new("#{config.actor_system_name}.#{node}")
+    connection_name = Nats.connection_name()
     topic = "spawn.#{config.actor_system_name}.actors.actions"
 
     Logger.debug(
@@ -57,13 +57,6 @@ defmodule Spawn.Cluster.Node.ServerSupervisor do
         )
       ]
     }
-  end
-
-  defp sanitize_nodename(node) do
-    node
-    |> Atom.to_string()
-    |> String.replace("@", "-")
-    |> String.replace(".", "-")
   end
 
   defp determine_auth_method(_name, _config) do
