@@ -203,11 +203,17 @@ defmodule Actors do
         |> Keyword.merge(async: async?)
 
       case Nats.request(system_name, request, opts) do
+        {:ok, %{body: {:error, error}}} ->
+          {:error, error}
+
         {:ok, %{body: :async}} ->
           {:ok, :async}
 
-        {:ok, %{body: body}} ->
+        {:ok, %{body: body}} when is_binary(body) ->
           {:ok, ActorInvocationResponse.decode(body)}
+
+        {:ok, %{body: _body}} ->
+          {:error, :bad_response_type}
 
         {:error, :no_responders} ->
           Logger.error("Actor #{actor.id.name} not found on ActorSystem #{system_name}")
@@ -218,7 +224,7 @@ defmodule Actors do
             "A timeout occurred while invoking the Actor #{actor.id.name} on ActorSystem #{system_name}"
           )
 
-          {:error, %ActorInvocationResponse{}}
+          {:error, :timeout}
 
         {:error, error} ->
           {:error, error}
