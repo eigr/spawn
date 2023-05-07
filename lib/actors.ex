@@ -181,13 +181,27 @@ defmodule Actors do
   """
   @spec invoke(InvocationRequest.t()) :: {:ok, :async} | {:ok, term()} | {:error, term()}
   def invoke(
-        %InvocationRequest{actor: actor, system: %ActorSystem{name: system_name} = _system} =
-          request,
+        %InvocationRequest{
+          actor: actor,
+          system: %ActorSystem{name: system_name} = _system,
+          async: async?
+        } = request,
         opts \\ []
       ) do
     if system_name === Config.get(Actors, :actor_system_name) do
       invoke_with_span(request, opts)
     else
+      {_current, opts} =
+        Keyword.get_and_update(opts, :span_ctx, fn span_ctx ->
+          maybe_include_span(span_ctx)
+        end)
+
+      trace_context = :otel_propagator_text_map.inject_from(opts[:span_ctx], [])
+
+      opts =
+        Keyword.put(opts, :trace_context, trace_context)
+        |> Keyword.merge(async: async?)
+
       case Nats.request(system_name, request, opts) do
         {:ok, %{body: :async}} ->
           {:ok, :async}
@@ -201,10 +215,13 @@ defmodule Actors do
 
         {:error, :timeout} ->
           Logger.error(
-            "Timeout during Invocation on Actor #{actor.id.name} on ActorSystem #{system_name}"
+            "A timeout occurred while invoking the Actor #{actor.id.name} on ActorSystem #{system_name}"
           )
 
           {:error, %ActorInvocationResponse{}}
+
+        {:error, error} ->
+          {:error, error}
       end
     end
   end

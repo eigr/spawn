@@ -25,9 +25,21 @@ defmodule Spawn.Utils.Nats do
     hosts_conn_map
   end
 
-  def request(system, payload, _opts \\ []) do
+  def request(system, payload, opts \\ []) do
+    async? = Keyword.get(opts, :async, false)
+    conn = connection_name()
     topic = "spawn.#{system}.actors.actions"
-    Gnat.request(connection_name(), topic, InvocationRequest.encode(payload))
+    trace_context = Keyword.get(opts, :trace_context)
+
+    case async? do
+      false ->
+        Gnat.request(conn, topic, InvocationRequest.encode(payload), headers: trace_context)
+
+      true ->
+        :ok = Gnat.pub(conn, topic, InvocationRequest.encode(payload), headers: trace_context)
+
+        {:ok, :async}
+    end
   end
 
   defp get_nats_hosts(raw_hosts) do
