@@ -42,7 +42,7 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
     "requests" => %{
       "cpu" => "100m",
       "memory" => "80Mi",
-      "ephemeral-storage" => "100Ki"
+      "ephemeral-storage" => "1M"
     }
   }
 
@@ -50,7 +50,7 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
     "requests" => %{
       "cpu" => "50m",
       "memory" => "80Mi",
-      "ephemeral-storage" => "100Ki"
+      "ephemeral-storage" => "1M"
     }
   }
 
