@@ -43,6 +43,11 @@ defmodule SpawnSdk.Value do
   @spec of() :: value()
   def of(), do: %SpawnSdk.Value{}
 
+  @spec of(response(), new_state()) :: value()
+  def of(response, new_state) do
+    struct(%SpawnSdk.Value{}, value: response, state: new_state)
+  end
+
   @spec of(value(), response(), new_state()) :: value()
   def of(%SpawnSdk.Value{} = value, response, new_state) do
     struct(value, value: response, state: new_state)
@@ -55,6 +60,11 @@ defmodule SpawnSdk.Value do
 
   @spec value(value(), response()) :: value()
   def value(%SpawnSdk.Value{} = value, response) do
+    struct(value, value: response)
+  end
+
+  @spec response(value(), response()) :: value()
+  def response(%SpawnSdk.Value{} = value, response) do
     struct(value, value: response)
   end
 
@@ -115,6 +125,12 @@ defmodule SpawnSdk.Value do
     |> noreply!()
   end
 
+  @spec void() :: {:reply, value()}
+  def void do
+    {:reply, %SpawnSdk.Value{}}
+  end
+
+  @spec void(value()) :: {:reply, value()}
   def void(%SpawnSdk.Value{} = value) do
     {:reply, value}
   end

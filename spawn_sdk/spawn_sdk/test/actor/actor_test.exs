@@ -118,9 +118,8 @@ defmodule Actor.ActorTest do
     defact caller_name(%Context{} = ctx) do
       caller_name = "#{Map.get(ctx.caller || %{}, :name)} as caller to third_actor"
 
-      %Value{}
-      |> Value.value(MyMessageResponse.new(data: caller_name))
-      |> Value.void()
+      Value.of()
+      |> Value.response(MyMessageResponse.new(data: caller_name))
     end
 
     defact forward_caller_name(value, %Context{} = _ctx) do
