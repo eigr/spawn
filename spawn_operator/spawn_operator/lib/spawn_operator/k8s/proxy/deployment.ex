@@ -41,14 +41,16 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
   @default_actor_host_resources %{
     "requests" => %{
       "cpu" => "100m",
-      "memory" => "80Mi"
+      "memory" => "80Mi",
+      "ephemeral-storage" => "100Ki"
     }
   }
 
   @default_proxy_resources %{
     "requests" => %{
       "cpu" => "50m",
-      "memory" => "80Mi"
+      "memory" => "80Mi",
+      "ephemeral-storage" => "100Ki"
     }
   }
 
