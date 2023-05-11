@@ -219,7 +219,7 @@ defmodule SpawnSdk.System.SpawnSystem do
   end
 
   defp do_call(:host_call, actor_instance, entity_state, invocation, ctx) do
-    case call_instance(actor_instance, invocation.command, invocation.payload, ctx) do
+    case call_instance(actor_instance, invocation.command_name, invocation.payload, ctx) do
       {:reply, %SpawnSdk.Value{} = decoded_value} ->
         do_after_call_instance(decoded_value, entity_state, invocation)
 
