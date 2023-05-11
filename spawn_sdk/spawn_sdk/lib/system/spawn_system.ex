@@ -218,60 +218,13 @@ defmodule SpawnSdk.System.SpawnSystem do
     {:ok, resp, entity_state}
   end
 
-  defp do_call(
-         :host_call,
-         actor_instance,
-         %EntityState{
-           actor: %Actor{state: actor_state, id: self_actor_id} = actor
-         } = entity_state,
-         %ActorInvocation{
-           actor: %ActorId{name: name, system: system, parent: _parent},
-           command_name: command,
-           payload: payload,
-           current_context: %Eigr.Functions.Protocol.Context{metadata: _metadata},
-           caller: caller
-         } = _invocation,
-         ctx
-       ) do
-    actor_state = actor_state || %{}
-    _current_state = Map.get(actor_state, :state)
-    current_tags = Map.get(actor_state, :tags, %{})
+  defp do_call(:host_call, actor_instance, entity_state, invocation, ctx) do
+    case call_instance(actor_instance, invocation.command, invocation.payload, ctx) do
+      {:reply, %SpawnSdk.Value{} = decoded_value} ->
+        do_after_call_instance(decoded_value, entity_state, invocation)
 
-    case call_instance(actor_instance, command, payload, ctx) do
-      {:reply,
-       %SpawnSdk.Value{
-         state: host_state,
-         value: response,
-         tags: tags
-       } = decoded_value} ->
-        pipe = handle_pipe(decoded_value)
-        forward = handle_forward(decoded_value)
-        broadcast = handle_broadcast(decoded_value)
-        side_effects = handle_side_effects(name, system, decoded_value)
-
-        payload_response = parse_payload(response)
-
-        resp = %ActorInvocationResponse{
-          updated_context: %Eigr.Functions.Protocol.Context{
-            caller: caller,
-            self: self_actor_id,
-            state: any_pack!(host_state),
-            tags: tags || current_tags
-          },
-          payload: payload_response,
-          workflow: %Workflow{
-            broadcast: broadcast,
-            effects: side_effects,
-            routing: pipe || forward
-          }
-        }
-
-        new_actor_state =
-          actor_state
-          |> Map.put(:state, any_pack!(host_state))
-          |> Map.put(:tags, tags || current_tags)
-
-        {:ok, resp, %{entity_state | actor: %{actor | state: new_actor_state}}}
+      %SpawnSdk.Value{} = decoded_value ->
+        do_after_call_instance(decoded_value, entity_state, invocation)
 
       {:error, error} ->
         {:error, error, entity_state}
@@ -279,6 +232,56 @@ defmodule SpawnSdk.System.SpawnSystem do
       {:error, error, %SpawnSdk.Value{state: _new_state, value: _response} = _value} ->
         {:error, error, entity_state}
     end
+  end
+
+  defp do_after_call_instance(decoded_value, entity_state, invocation) do
+    %SpawnSdk.Value{state: host_state, value: response, tags: tags} = decoded_value
+
+    %EntityState{
+      actor: %Actor{state: actor_state, id: self_actor_id} = actor
+    } = entity_state
+
+    %ActorInvocation{
+      actor: %ActorId{name: name, system: system, parent: _parent},
+      command_name: command,
+      payload: payload,
+      current_context: %Eigr.Functions.Protocol.Context{metadata: _metadata},
+      caller: caller
+    } = invocation
+
+    current_state = Map.get(actor_state, :state)
+    current_tags = Map.get(actor_state, :tags, %{})
+
+    pipe = handle_pipe(decoded_value)
+    forward = handle_forward(decoded_value)
+    broadcast = handle_broadcast(decoded_value)
+    side_effects = handle_side_effects(name, system, decoded_value)
+
+    payload_response = parse_payload(response)
+    new_state = any_pack!(host_state || current_state)
+    new_tags = tags || current_tags
+
+    resp = %ActorInvocationResponse{
+      updated_context: %Eigr.Functions.Protocol.Context{
+        caller: caller,
+        self: self_actor_id,
+        state: new_state,
+        tags: new_tags
+      },
+      payload: payload_response,
+      workflow: %Workflow{
+        broadcast: broadcast,
+        effects: side_effects,
+        routing: pipe || forward
+      }
+    }
+
+    new_actor_state =
+      actor_state
+      |> Map.put(:state, new_state)
+      |> Map.put(:tags, new_tags)
+
+    {:ok, resp, %{entity_state | actor: %{actor | state: new_actor_state}}}
   end
 
   defp get_parent_actor_name(spawn_actor_opts) do
