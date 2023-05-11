@@ -76,6 +76,7 @@ spec:
               memory: 1Gi
             requests:
               memory: 80Mi
+              ephemeral-storage: "100Ki"
           volumeMounts:
             - mountPath: /app/certs
               name: volume-certs

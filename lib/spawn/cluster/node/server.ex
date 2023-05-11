@@ -20,8 +20,7 @@ defmodule Spawn.Cluster.Node.Server do
 
   def request(%{topic: topic, body: _, reply_to: _reply_to} = _req) do
     Logger.debug("Received Invalid Actor Invocation via Nats on #{topic}")
-    # TODO: Better response
-    {:reply, :bad_request}
+    {:reply, {:error, :bad_request}}
   end
 
   def error(%{gnat: gnat, reply_to: reply_to}, error) do
