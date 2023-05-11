@@ -125,6 +125,12 @@ defmodule SpawnSdk.Value do
     |> noreply!()
   end
 
+  @spec void!() :: {:reply, value()}
+  def void do
+    {:reply, %SpawnSdk.Value{}}
+  end
+
+  @spec void(value()) :: {:reply, value()}
   def void(%SpawnSdk.Value{} = value) do
     {:reply, value}
   end

@@ -84,9 +84,8 @@ defmodule SpawnSdkExample.Actors.MyActor do
   defact init(%Context{state: state} = ctx) do
     Logger.info("[joe] Received InitRequest. Context: #{inspect(ctx)}")
 
-    %Value{}
+    Value.of()
     |> Value.state(state)
-    |> Value.reply!()
   end
 
   defact sum(
@@ -97,9 +96,7 @@ defmodule SpawnSdkExample.Actors.MyActor do
 
     new_value = if is_nil(state), do: value, else: (state.value || 0) + value
 
-    %Value{}
-    |> Value.of(%MyBusinessMessage{value: new_value}, %MyState{value: new_value})
-    |> Value.reply!()
+    Value.of(%MyBusinessMessage{value: new_value}, %MyState{value: new_value})
   end
 end
 
@@ -134,9 +131,7 @@ defmodule SpawnSdkExample.Actors.AbstractActor do
 
     new_value = if is_nil(state), do: value, else: (state.value || 0) + value
 
-    %Value{}
-    |> Value.of(%MyBusinessMessage{value: new_value}, %MyState{value: new_value})
-    |> Value.reply!()
+    Value.of(%MyBusinessMessage{value: new_value}, %MyState{value: new_value})
   end
 end
 ```
@@ -163,8 +158,7 @@ defmodule SpawnSdkExample.Actors.PooledActor do
   defact ping(_data, %Context{} = ctx) do
     Logger.info("Received Request. Context: #{inspect(ctx)}")
 
-    Value.of()
-    |> Value.void()
+    Value.void()
   end
 end
 ```
@@ -268,7 +262,7 @@ defmodule SpawnSdkExample.Actors.AbstractActor do
     new_state = %MyState{value: new_value}
 
     Value.of()
-    |> Value.value(result)
+    |> Value.response(result)
     |> Value.state(new_state)
     |> Value.effects(
       # This returns a list of side effects. In this case containing only one effect. However, multiple effects can be chained together,
@@ -280,7 +274,6 @@ defmodule SpawnSdkExample.Actors.AbstractActor do
       |> SideEffect.effect("joe", :sum, result, delay: 5_000, scheduled_to: ~U[2020-01-01 10:00:00.145Z])
       # use delay or scheduled_to, not both
     )
-    |> Value.reply!()
   end
 end
 
@@ -309,7 +302,7 @@ defmodule SpawnSdkExample.Actors.ForwardPipeActor do
     Logger.info("Received request with #{msg.value}")
 
     Value.of()
-    |> Value.value(MyBusinessMessage.new(value: 999))
+    |> Value.response(MyBusinessMessage.new(value: 999))
     |> Value.forward(
       Forward.to("second_actor", "sum_plus_one")
     )
@@ -320,7 +313,7 @@ defmodule SpawnSdkExample.Actors.ForwardPipeActor do
     Logger.info("Received request with #{msg.value}")
 
     Value.of()
-    |> Value.value(MyBusinessMessage.new(value: 999))
+    |> Value.response(MyBusinessMessage.new(value: 999))
     |> Value.pipe(
       Pipe.to("second_actor", "sum_plus_one")
     )
@@ -341,7 +334,7 @@ defmodule SpawnSdkExample.Actors.SecondActorExample do
     Logger.info("Received request with #{msg.value}")
 
     Value.of()
-    |> Value.value(MyBusinessMessage.new(value: msg.value + 1))
+    |> Value.response(MyBusinessMessage.new(value: msg.value + 1))
     |> Value.void()
   end
 end
@@ -403,7 +396,6 @@ defmodule Fleet.Actors.Driver do
         driver_state
       )
     )
-    |> Value.reply!()
   end
 end
 ```
@@ -515,7 +507,6 @@ defmodule SpawnSdkExample.Actors.JoeActor do
     %Value{}
     |> Value.of(response, %MyState{value: new_value})
     |> Value.broadcast(Broadcast.to("my.channel", response))
-    |> Value.reply!()
   end
 end
 ```
@@ -544,7 +535,6 @@ defmodule SpawnSdkExample.Actors.ClockActor do
 
     Value.of()
     |> Value.state(new_state)
-    |> Value.noreply!()
   end
 end
 ```
