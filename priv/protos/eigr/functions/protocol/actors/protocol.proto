@@ -192,6 +192,12 @@ message Context {
 // he does not care about the input value only with the state.
 message Noop {}
 
+// JSON is an alternative that some SDKs can opt in  
+// it will bypass any type validation in spawn actors state / payloads
+message JSONType {
+    string content = 1;
+}
+
 message RegistrationRequest {
 
     ServiceInfo service_info = 1;

@@ -5,6 +5,7 @@ defmodule Spawn.Utils.AnySerializer do
   """
 
   alias Google.Protobuf.Any
+  alias Eigr.Functions.Protocol.JSONType
 
   import Spawn.Utils.Common, only: [to_existing_atom_or_new: 1]
 
@@ -25,9 +26,26 @@ defmodule Spawn.Utils.AnySerializer do
       |> then(fn package -> Enum.join(["Elixir", package], ".") end)
 
     any_unpack!(any, to_existing_atom_or_new(package_name))
+    |> maybe_unpack_json!
   end
 
   def unpack_unknown(_), do: nil
+
+  defp maybe_unpack_json!(%JSONType{} = json) do
+    Jason.decode!(json.content, keys: :atoms)
+  end
+
+  defp maybe_unpack_json!(any_unpacked), do: any_unpacked
+
+  def json_any_pack!(map) do
+    %JSONType{content: Jason.encode!(map)}
+    |> any_pack!()
+  end
+
+  def pack_all_to_any!(nil), do: nil
+  def pack_all_to_any!(%Any{} = record), do: record
+  def pack_all_to_any!(%{__unknown_fields__: _} = record), do: any_pack!(record)
+  def pack_all_to_any!(record) when is_map(record), do: json_any_pack!(record)
 
   def any_pack!(nil), do: nil
 

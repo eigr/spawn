@@ -243,8 +243,6 @@ defmodule SpawnSdk.System.SpawnSystem do
 
     %ActorInvocation{
       actor: %ActorId{name: name, system: system, parent: _parent},
-      command_name: command,
-      payload: payload,
       current_context: %Eigr.Functions.Protocol.Context{metadata: _metadata},
       caller: caller
     } = invocation
@@ -258,7 +256,7 @@ defmodule SpawnSdk.System.SpawnSystem do
     side_effects = handle_side_effects(name, system, decoded_value)
 
     payload_response = parse_payload(response)
-    new_state = any_pack!(host_state || current_state)
+    new_state = pack_all_to_any!(host_state || current_state)
     new_tags = tags || current_tags
 
     resp = %ActorInvocationResponse{
@@ -572,8 +570,9 @@ defmodule SpawnSdk.System.SpawnSystem do
       %Noop{} = noop -> {:noop, noop}
       {:noop, %Noop{} = noop} -> {:noop, noop}
       {_, nil} -> {:noop, Noop.new()}
-      {:value, response} -> {:value, any_pack!(response)}
-      response -> {:value, any_pack!(response)}
+      {:value, %{__unknown_fields__: _} = response} -> {:value, any_pack!(response)}
+      %{__unknown_fields__: _} = response -> {:value, any_pack!(response)}
+      response when is_map(response) -> {:value, json_any_pack!(response)}
     end
   end
 end
