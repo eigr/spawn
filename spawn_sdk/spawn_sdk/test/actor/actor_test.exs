@@ -130,7 +130,7 @@ defmodule Actor.ActorTest do
   end
 
   setup_all do
-    system = "tst_syst"
+    system = "spawn-system"
 
     Supervisor.start_link(
       [

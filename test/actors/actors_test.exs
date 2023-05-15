@@ -11,7 +11,7 @@ defmodule ActorsTest do
     actor = build_actor(name: actor_name)
     actor_entry = build_actor_entry(name: actor_name, actor: actor)
     registry = build_registry_with_actors(actors: actor_entry)
-    system = build_system(name: "global_sytem_name", registry: registry)
+    system = build_system(name: "spawn-system", registry: registry)
 
     request = build_registration_request(actor_system: system)
     {:ok, %RegistrationResponse{}} = Actors.register(request)
@@ -117,7 +117,7 @@ defmodule ActorsTest do
       actor = build_actor(name: actor_name, persistent: false)
       actor_entry = build_actor_entry(name: actor_name, actor: actor)
       registry = build_registry_with_actors(actors: actor_entry)
-      system = build_system(name: "any_system_whatever", registry: registry)
+      system = build_system(name: "spawn-system", registry: registry)
 
       request = build_registration_request(actor_system: system)
       {:ok, %RegistrationResponse{}} = Actors.register(request)

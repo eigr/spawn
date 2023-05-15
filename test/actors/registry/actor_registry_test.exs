@@ -9,7 +9,7 @@ defmodule Actors.ActorRegistryTest do
     actor = build_actor(name: actor_name)
     actor_entry = build_actor_entry(name: actor_name, actor: actor)
     registry = build_registry_with_actors(actors: actor_entry)
-    system = build_system(name: "actor_registry_test_two_nodes_sys", registry: registry)
+    system = build_system(name: "spawn-system", registry: registry)
     request = build_registration_request(actor_system: system)
 
     %{request: request, actor_name: actor_name}
