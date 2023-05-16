@@ -106,25 +106,48 @@ defmodule SpawnSdk.System.SpawnSystem do
     opts = []
     payload = parse_payload(payload)
 
-    req =
-      InvocationRequest.new(
-        system: %Eigr.Functions.Protocol.Actors.ActorSystem{name: system},
-        actor: %Eigr.Functions.Protocol.Actors.Actor{
-          id: %ActorId{name: actor_name, system: system}
-        },
-        metadata: metadata,
-        payload: payload,
-        command_name: parse_command_name(command),
-        async: async,
-        caller: nil,
-        pooled: pooled,
-        scheduled_to: parse_scheduled_to(delay_in_ms, scheduled_to)
-      )
+    req = %InvocationRequest{
+      system: %Eigr.Functions.Protocol.Actors.ActorSystem{name: system},
+      actor: %Eigr.Functions.Protocol.Actors.Actor{
+        id: %ActorId{name: actor_name, system: system}
+      },
+      metadata: metadata,
+      payload: payload,
+      command_name: parse_command_name(command),
+      async: async,
+      caller: nil,
+      pooled: pooled,
+      scheduled_to: parse_scheduled_to(delay_in_ms, scheduled_to)
+    }
 
     case Actors.invoke(req, opts) do
-      {:ok, :async} -> {:ok, :async}
-      {:ok, %ActorInvocationResponse{payload: payload}} -> {:ok, unpack_unknown(payload)}
-      error -> error
+      {:ok, :async} ->
+        {:ok, :async}
+
+      {:ok, %ActorInvocationResponse{payload: payload}} ->
+        try do
+          {:ok, unpack_unknown(payload)}
+        rescue
+          Protobuf.DecodeError ->
+            Logger.warning(
+              "Check your actor implementation for command #{inspect(command)} to see if its setting the same type in the state output."
+            )
+
+            {:error, :invalid_state_output}
+
+          ArgumentError ->
+            Logger.warning(
+              "Check your actor implementation for command #{inspect(command)}, you can only return maps on state_type: :json configured"
+            )
+
+            {:error, :invalid_state_output}
+        end
+
+      {:error, error} ->
+        {:error, error}
+
+      error ->
+        {:error, error}
     end
   end
 
@@ -207,13 +230,12 @@ defmodule SpawnSdk.System.SpawnSystem do
     actor_state = actor_state || %{}
     current_state = Map.get(actor_state, :state)
 
-    resp =
-      ActorInvocationResponse.new(
-        actor_name: name,
-        actor_system: system,
-        updated_context: ctx,
-        payload: parse_payload(current_state)
-      )
+    resp = %ActorInvocationResponse{
+      actor_name: name,
+      actor_system: system,
+      updated_context: ctx,
+      payload: parse_payload(current_state)
+    }
 
     {:ok, resp, entity_state}
   end
@@ -221,10 +243,10 @@ defmodule SpawnSdk.System.SpawnSystem do
   defp do_call(:host_call, actor_instance, entity_state, invocation, ctx) do
     case call_instance(actor_instance, invocation.command_name, invocation.payload, ctx) do
       {:reply, %SpawnSdk.Value{} = decoded_value} ->
-        do_after_call_instance(decoded_value, entity_state, invocation)
+        do_after_call_instance(decoded_value, entity_state, invocation, actor_instance)
 
       %SpawnSdk.Value{} = decoded_value ->
-        do_after_call_instance(decoded_value, entity_state, invocation)
+        do_after_call_instance(decoded_value, entity_state, invocation, actor_instance)
 
       {:error, error} ->
         {:error, error, entity_state}
@@ -234,7 +256,7 @@ defmodule SpawnSdk.System.SpawnSystem do
     end
   end
 
-  defp do_after_call_instance(decoded_value, entity_state, invocation) do
+  defp do_after_call_instance(decoded_value, entity_state, invocation, actor_instance) do
     %SpawnSdk.Value{state: host_state, value: response, tags: tags} = decoded_value
 
     %EntityState{
@@ -256,7 +278,14 @@ defmodule SpawnSdk.System.SpawnSystem do
     side_effects = handle_side_effects(name, system, decoded_value)
 
     payload_response = parse_payload(response)
-    new_state = pack_all_to_any!(host_state || current_state)
+    state_type = actor_instance.__meta__(:state_type)
+
+    new_state =
+      case pack_all_to_any(host_state || current_state, state_type) do
+        {:ok, state} -> state
+        {:error, :invalid_state} -> current_state
+      end
+
     new_tags = tags || current_tags
 
     resp = %ActorInvocationResponse{
@@ -319,11 +348,11 @@ defmodule SpawnSdk.System.SpawnSystem do
 
     payload = parse_payload(payload)
 
-    Eigr.Functions.Protocol.Broadcast.new(
+    %Eigr.Functions.Protocol.Broadcast{
       channel_group: channel,
       command_name: cmd,
       payload: payload
-    )
+    }
   end
 
   defp handle_pipe(
@@ -341,11 +370,10 @@ defmodule SpawnSdk.System.SpawnSystem do
        ) do
     cmd = if is_atom(command), do: Atom.to_string(command), else: command
 
-    pipe =
-      Eigr.Functions.Protocol.Pipe.new(
-        actor: actor_name,
-        command_name: cmd
-      )
+    pipe = %Eigr.Functions.Protocol.Pipe{
+      actor: actor_name,
+      command_name: cmd
+    }
 
     {:pipe, pipe}
   end
@@ -365,11 +393,10 @@ defmodule SpawnSdk.System.SpawnSystem do
        ) do
     cmd = if is_atom(command), do: Atom.to_string(command), else: command
 
-    forward =
-      Eigr.Functions.Protocol.Forward.new(
-        actor: actor_name,
-        command_name: cmd
-      )
+    forward = %Eigr.Functions.Protocol.Forward{
+      actor: actor_name,
+      command_name: cmd
+    }
 
     {:forward, forward}
   end
@@ -396,18 +423,17 @@ defmodule SpawnSdk.System.SpawnSystem do
       payload = parse_payload(effect.payload)
 
       %Eigr.Functions.Protocol.SideEffect{
-        request:
-          InvocationRequest.new(
-            system: %Eigr.Functions.Protocol.Actors.ActorSystem{name: system},
-            actor: %Eigr.Functions.Protocol.Actors.Actor{
-              id: %ActorId{name: effect.actor_name, system: system}
-            },
-            payload: payload,
-            command_name: effect.command,
-            async: true,
-            caller: ActorId.new(name: caller_name, system: system),
-            scheduled_to: effect.scheduled_to
-          )
+        request: %InvocationRequest{
+          system: %Eigr.Functions.Protocol.Actors.ActorSystem{name: system},
+          actor: %Eigr.Functions.Protocol.Actors.Actor{
+            id: %ActorId{name: effect.actor_name, system: system}
+          },
+          payload: payload,
+          command_name: effect.command,
+          async: true,
+          caller: %ActorId{name: caller_name, system: system},
+          scheduled_to: effect.scheduled_to
+        }
       }
     end)
   end
@@ -447,7 +473,7 @@ defmodule SpawnSdk.System.SpawnSystem do
   end
 
   defp call_instance(instance, command, nil, context) do
-    instance.handle_command({parse_command_name(command), Noop.new()}, context)
+    instance.handle_command({parse_command_name(command), %Noop{}}, context)
   end
 
   defp call_instance(instance, command, value, context) do
@@ -456,26 +482,24 @@ defmodule SpawnSdk.System.SpawnSystem do
 
   defp build_spawn_req(system, actor_name, parent) do
     %SpawnRequest{
-      actors: [ActorId.new(name: actor_name, system: system, parent: parent)]
+      actors: [%ActorId{name: actor_name, system: system, parent: parent}]
     }
   end
 
   defp build_registration_req(system, actors) do
-    RegistrationRequest.new(
-      service_info:
-        ServiceInfo.new(
-          service_name: @service_name,
-          service_version: @service_version,
-          service_runtime: @service_runtime,
-          support_library_name: @support_library_name,
-          support_library_version: @support_library_version
-        ),
-      actor_system:
-        ActorSystem.new(
-          name: system,
-          registry: %Registry{actors: to_map(system, actors)}
-        )
-    )
+    %RegistrationRequest{
+      service_info: %ServiceInfo{
+        service_name: @service_name,
+        service_version: @service_version,
+        service_runtime: @service_runtime,
+        support_library_name: @support_library_name,
+        support_library_version: @support_library_version
+      },
+      actor_system: %ActorSystem{
+        name: system,
+        registry: %Registry{actors: to_map(system, actors)}
+      }
+    }
   end
 
   defp state_to_map(actors) do
@@ -505,18 +529,16 @@ defmodule SpawnSdk.System.SpawnSystem do
       max_pool_size = actor.__meta__(:max_pool_size)
       tags = actor.__meta__(:tags)
 
-      snapshot_strategy =
-        ActorSnapshotStrategy.new(
-          strategy: {:timeout, TimeoutStrategy.new(timeout: snapshot_timeout)}
-        )
+      snapshot_strategy = %ActorSnapshotStrategy{
+        strategy: {:timeout, %TimeoutStrategy{timeout: snapshot_timeout}}
+      }
 
-      deactivation_strategy =
-        ActorDeactivationStrategy.new(
-          strategy: {:timeout, TimeoutStrategy.new(timeout: deactivate_timeout)}
-        )
+      deactivation_strategy = %ActorDeactivationStrategy{
+        strategy: {:timeout, %TimeoutStrategy{timeout: deactivate_timeout}}
+      }
 
       {name,
-       Actor.new(
+       %Actor{
          id: %ActorId{system: system, name: name},
          metadata: %Metadata{channel_group: channel},
          settings: %ActorSettings{
@@ -530,8 +552,8 @@ defmodule SpawnSdk.System.SpawnSystem do
          commands: Enum.map(actions, fn action -> get_action(action) end),
          timer_commands:
            Enum.map(timer_actions, fn {action, seconds} -> get_timer_action(action, seconds) end),
-         state: ActorState.new(tags: tags)
-       )}
+         state: %ActorState{tags: tags}
+       }}
     end)
   end
 
@@ -566,13 +588,28 @@ defmodule SpawnSdk.System.SpawnSystem do
 
   defp parse_payload(response) do
     case response do
-      nil -> {:noop, Noop.new()}
+      nil -> {:noop, %Noop{}}
       %Noop{} = noop -> {:noop, noop}
       {:noop, %Noop{} = noop} -> {:noop, noop}
-      {_, nil} -> {:noop, Noop.new()}
-      {:value, %{__unknown_fields__: _} = response} -> {:value, any_pack!(response)}
-      %{__unknown_fields__: _} = response -> {:value, any_pack!(response)}
-      response when is_map(response) -> {:value, json_any_pack!(response)}
+      {_, nil} -> {:noop, %Noop{}}
+      {:value, response} -> {:value, any_pack_identifying_json(response)}
+      response -> {:value, any_pack_identifying_json(response)}
     end
+  end
+
+  defp any_pack_identifying_json(response) do
+    cond do
+      is_map(response) && not is_struct(response) ->
+        json_any_pack!(response)
+
+      is_struct(response) && is_nil(response.__struct__.transform_module()) ->
+        any_pack!(response)
+
+      true ->
+        any_pack!(response)
+    end
+  rescue
+    # when returned type is a struct but not a protobuf
+    UndefinedFunctionError -> json_any_pack!(response)
   end
 end

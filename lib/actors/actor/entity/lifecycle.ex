@@ -271,7 +271,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
     Map.get(
       deactivation_strategy || %{},
       :strategy,
-      {:timeout, TimeoutStrategy.new!(timeout: @default_deactivate_timeout)}
+      {:timeout, %TimeoutStrategy{timeout: @default_deactivate_timeout}}
     )
   end
 

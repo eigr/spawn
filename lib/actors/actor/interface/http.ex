@@ -58,15 +58,15 @@ defmodule Actors.Actor.Interface.Http do
 
     context =
       if is_nil(current_state),
-        do: %Context{caller: caller, self: actor_id, state: Any.new(), tags: current_tags},
+        do: %Context{caller: caller, self: actor_id, state: %Any{}, tags: current_tags},
         else: %Context{caller: caller, self: actor_id, state: current_state, tags: current_tags}
 
-    ActorInvocationResponse.new(
+    %ActorInvocationResponse{
       actor_name: name,
       actor_system: system,
       updated_context: context,
       payload: current_state
-    )
+    }
   end
 
   defp do_invoke_host(payload, state) do
