@@ -5,6 +5,7 @@ defmodule Spawn.Utils.AnySerializer do
   """
 
   alias Google.Protobuf.Any
+  alias Eigr.Functions.Protocol.JSONType
 
   import Spawn.Utils.Common, only: [to_existing_atom_or_new: 1]
 
@@ -25,20 +26,39 @@ defmodule Spawn.Utils.AnySerializer do
       |> then(fn package -> Enum.join(["Elixir", package], ".") end)
 
     any_unpack!(any, to_existing_atom_or_new(package_name))
+    |> maybe_unpack_json!
   end
 
   def unpack_unknown(_), do: nil
+
+  defp maybe_unpack_json!(%JSONType{} = json) do
+    Jason.decode!(json.content, keys: :atoms)
+  end
+
+  defp maybe_unpack_json!(any_unpacked), do: any_unpacked
+
+  def json_any_pack!(map) do
+    %JSONType{content: Jason.encode!(map)}
+    |> any_pack!()
+  end
+
+  def pack_all_to_any(nil, _state_type), do: {:ok, nil}
+  def pack_all_to_any(record, :json) when is_map(record), do: {:ok, json_any_pack!(record)}
+  def pack_all_to_any(%Any{} = record, _state_type), do: {:ok, record}
+  def pack_all_to_any(record, state_type), do: any_pack(record, state_type)
 
   def any_pack!(nil), do: nil
 
   def any_pack!(%Any{} = record), do: record
 
-  def any_pack!(record) do
-    Any.new(
+  def any_pack!(record) when is_struct(record) do
+    %Any{
       type_url: get_type_url(record.__struct__),
       value: apply(record.__struct__, :encode, [record])
-    )
+    }
   end
+
+  def any_pack!(_), do: raise(ArgumentError, "wrong_action_output")
 
   def any_unpack!(any_record, builder) do
     builder.decode(any_record.value)
@@ -61,4 +81,14 @@ defmodule Spawn.Utils.AnySerializer do
   end
 
   defp upcase_first(<<first::utf8, rest::binary>>), do: String.upcase(<<first::utf8>>) <> rest
+
+  defp any_pack(record, state_type) when is_struct(record) do
+    {:ok,
+     %Any{
+       type_url: get_type_url(state_type),
+       value: apply(state_type, :encode, [record])
+     }}
+  end
+
+  defp any_pack(_, _), do: {:error, :invalid_state}
 end

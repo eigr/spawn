@@ -35,8 +35,7 @@ if Code.ensure_loaded?(Statestores.Supervisor) do
     def load(name) do
       case StateStoreManager.load(name) do
         %Event{revision: _rev, tags: tags, data_type: type, data: data} = _event ->
-          {:ok,
-           ActorState.new(tags: tags, state: Google.Protobuf.Any.new(type_url: type, value: data))}
+          {:ok, %ActorState{tags: tags, state: %Google.Protobuf.Any{type_url: type, value: data}}}
 
         _ ->
           {:not_found, %{}}

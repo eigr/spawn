@@ -67,7 +67,7 @@ defmodule Actors.Actor.Entity.Invocation do
     invocation = %InvocationRequest{
       actor: actor,
       command_name: cmd,
-      payload: {:noop, Noop.new()},
+      payload: {:noop, %Noop{}},
       async: true,
       caller: caller_actor_id
     }
@@ -118,7 +118,7 @@ defmodule Actors.Actor.Entity.Invocation do
       command_name: command,
       payload: payload,
       async: true,
-      caller: ActorId.new(name: caller_actor_name, system: actor_system)
+      caller: %ActorId{name: caller_actor_name, system: actor_system}
     }
 
     case invoke({invocation, []}, state) do
@@ -168,22 +168,22 @@ defmodule Actors.Actor.Entity.Invocation do
           interface = get_interface(actor_system)
 
           metadata = %{}
-          current_state = Map.get(actor_state || %{}, :state) || ActorState.new()
+          current_state = Map.get(actor_state || %{}, :state) || %ActorState{}
           current_tags = Map.get(actor_state || %{}, :tags, %{})
 
-          ActorInvocation.new(
+          %ActorInvocation{
             actor: %ActorId{name: actor_name, system: actor_system, parent: parent},
             command_name: init_command.name,
-            payload: {:noop, Noop.new()},
+            payload: {:noop, %Noop{}},
             current_context: %Context{
               metadata: metadata,
               caller: id,
-              self: ActorId.new(name: actor_name, system: actor_system),
+              self: %ActorId{name: actor_name, system: actor_system},
               state: current_state,
               tags: current_tags
             },
             caller: id
-          )
+          }
           |> interface.invoke_host(state, @default_actions)
           |> case do
             {:ok, _response, new_state} ->
@@ -278,7 +278,7 @@ defmodule Actors.Actor.Entity.Invocation do
     current_state = Map.get(actor_state || %{}, :state)
     current_tags = Map.get(actor_state || %{}, :tags, %{})
 
-    ActorInvocation.new(
+    %ActorInvocation{
       actor: id,
       command_name: command,
       payload: payload,
@@ -290,7 +290,7 @@ defmodule Actors.Actor.Entity.Invocation do
         tags: current_tags
       },
       caller: caller
-    )
+    }
   end
 
   defp build_response(request, response, state, opts) do
@@ -371,10 +371,10 @@ defmodule Actors.Actor.Entity.Invocation do
       Tracer.with_span "run-pipe-routing" do
         invocation = %InvocationRequest{
           system: %ActorSystem{name: system_name},
-          actor: %Actor{id: ActorId.new(name: actor_name, system: system_name)},
+          actor: %Actor{id: %ActorId{name: actor_name, system: system_name}},
           command_name: cmd,
           payload: payload,
-          caller: ActorId.new(name: caller_actor_name, system: system_name)
+          caller: %ActorId{name: caller_actor_name, system: system_name}
         }
 
         try do
@@ -417,10 +417,10 @@ defmodule Actors.Actor.Entity.Invocation do
       Tracer.with_span "run-forward-routing" do
         invocation = %InvocationRequest{
           system: %ActorSystem{name: system_name},
-          actor: %Actor{id: ActorId.new(name: actor_name, system: system_name)},
+          actor: %Actor{id: %ActorId{name: actor_name, system: system_name}},
           command_name: cmd,
           payload: payload,
-          caller: ActorId.new(name: caller_actor_name, system: system_name)
+          caller: %ActorId{name: caller_actor_name, system: system_name}
         }
 
         try do

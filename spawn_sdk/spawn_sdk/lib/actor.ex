@@ -82,7 +82,7 @@ defmodule SpawnSdk.Actor do
     min_pool_size = Keyword.get(opts, :min_pool_size, 1)
     max_pool_size = Keyword.get(opts, :max_pool_size, 0)
 
-    state_type = Keyword.get(opts, :state_type, nil)
+    state_type = Keyword.get(opts, :state_type, :json)
     stateful = Keyword.get(opts, :stateful, true)
 
     tags = Keyword.get(opts, :tags, nil)

@@ -10,6 +10,7 @@ defmodule SpawnSdkExample.Application do
         system: "spawn-system",
         actors: [
           SpawnSdkExample.Actors.JoeActor,
+          SpawnSdkExample.Actors.JsonActor,
           SpawnSdkExample.Actors.ClockActor,
           SpawnSdkExample.Actors.AbstractActor,
           SpawnSdkExample.Actors.PooledActor
