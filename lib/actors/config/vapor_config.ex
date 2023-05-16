@@ -90,6 +90,7 @@ defmodule Actors.Config.Vapor do
            default: "admin", required: false},
           {:pubsub_adapter_nats_auth_jwt, "SPAWN_PUBSUB_NATS_AUTH_JWT",
            default: "", required: false},
+          #
           {:delayed_invokes, "SPAWN_DELAYED_INVOKES", default: "true", required: false},
           {:sync_interval, "SPAWN_CRDT_SYNC_INTERVAL",
            default: 2, map: &String.to_integer/1, required: false},
