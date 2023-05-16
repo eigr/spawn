@@ -105,24 +105,23 @@ defmodule Actors do
     |> case do
       :ok ->
         Process.sleep(100)
-        status = RequestStatus.new(status: :OK, message: "Accepted")
-        {:ok, RegistrationResponse.new(proxy_info: get_proxy_info(), status: status)}
+        status = %RequestStatus{status: :OK, message: "Accepted"}
+        {:ok, %RegistrationResponse{proxy_info: get_proxy_info(), status: status}}
 
       _ ->
-        status =
-          RequestStatus.new(status: :ERROR, message: "Failed to register one or more Actors")
+        status = %RequestStatus{status: :ERROR, message: "Failed to register one or more Actors"}
 
-        {:error, RegistrationResponse.new(proxy_info: get_proxy_info(), status: status)}
+        {:error, %RegistrationResponse{proxy_info: get_proxy_info(), status: status}}
     end
   end
 
   defp get_proxy_info() do
-    ProxyInfo.new(
+    %ProxyInfo{
       protocol_major_version: 1,
       protocol_minor_version: 2,
       proxy_name: "spawn",
       proxy_version: "0.6.3"
-    )
+    }
   end
 
   @doc """
@@ -157,8 +156,8 @@ defmodule Actors do
 
     ActorRegistry.register(hosts)
 
-    status = RequestStatus.new(status: :OK, message: "Accepted")
-    {:ok, SpawnResponse.new(status: status)}
+    status = %RequestStatus{status: :OK, message: "Accepted"}
+    {:ok, %SpawnResponse{status: status}}
   end
 
   defp to_spawn_hosts(id, actor_hosts) do

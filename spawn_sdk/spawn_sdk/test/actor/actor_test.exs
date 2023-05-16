@@ -61,6 +61,40 @@ defmodule Actor.ActorTest do
       |> Value.value(MyMessageResponse.new(data: "worked_with_effects"))
       |> Value.void()
     end
+
+    defact wrong_state(_ctx) do
+      Value.of()
+      |> Value.state(%MyMessageResponse{data: "wrong"})
+    end
+
+    defact wrong_state_json(_ctx) do
+      Value.of()
+      |> Value.state(%{anything: "wrong"})
+    end
+
+    defact json_return(_ctx) do
+      Value.of()
+      |> Value.response(%{test: true})
+    end
+  end
+
+  defmodule Actor.JsonActor do
+    use SpawnSdk.Actor,
+      kind: :abstract,
+      stateful: false,
+      state_type: :json
+
+    defact init(_) do
+      Value.noreply_state!(%{value: 0})
+    end
+
+    defact sum(%{value: new_value}, %Context{state: %{value: old_value}}) do
+      total = old_value + new_value
+
+      Value.of()
+      |> Value.state(%{value: total})
+      |> Value.response(%{value: total})
+    end
   end
 
   defmodule Actor.PooledActor do
@@ -141,7 +175,8 @@ defmodule Actor.ActorTest do
             Actor.MyActor,
             Actor.OtherActor,
             Actor.ThirdActor,
-            Actor.PooledActor
+            Actor.PooledActor,
+            Actor.JsonActor
           ]
         }
       ],
@@ -188,13 +223,40 @@ defmodule Actor.ActorTest do
     end
   end
 
+  describe "invoke json actor" do
+    test "simple default function call returning only map without payload", ctx do
+      system = ctx.system
+      dynamic_actor_name = Faker.Pokemon.name() <> "json_actor_get_state"
+
+      assert SpawnSdk.invoke(dynamic_actor_name,
+               ref: Actor.JsonActor,
+               command: "getState",
+               system: system
+             ) == {:ok, %{value: 0}}
+    end
+
+    test "simple call using maps with no proto", ctx do
+      system = ctx.system
+      dynamic_actor_name = Faker.Pokemon.name() <> "json_actor_call"
+
+      payload = %{value: 2}
+
+      assert SpawnSdk.invoke(dynamic_actor_name,
+               ref: Actor.JsonActor,
+               command: "sum",
+               system: system,
+               payload: payload
+             ) == {:ok, %{value: 2}}
+    end
+  end
+
   describe "invoke with routing" do
     test "simple call that goes through 3 actors piping each other", ctx do
       system = ctx.system
 
       payload = Eigr.Spawn.Actor.MyMessageRequest.new(data: "non_intended_data")
 
-      dynamic_actor_name = Faker.Pokemon.name()
+      dynamic_actor_name = Faker.Pokemon.name() <> "piping"
 
       assert {:ok, response} =
                SpawnSdk.invoke(dynamic_actor_name,
@@ -205,6 +267,51 @@ defmodule Actor.ActorTest do
                )
 
       assert %{data: "second_actor as caller to third_actor"} = response
+    end
+
+    test "calling a function that sets wrong state type", ctx do
+      system = ctx.system
+      dynamic_actor_name = Faker.Pokemon.name() <> "wrong_state"
+
+      assert SpawnSdk.invoke(dynamic_actor_name,
+               ref: Actor.MyActor,
+               system: system,
+               command: "wrong_state"
+             ) == {:ok, nil}
+
+      assert SpawnSdk.invoke(dynamic_actor_name,
+               ref: Actor.MyActor,
+               command: "getState",
+               system: system
+             ) == {:error, :invalid_state_output}
+    end
+
+    test "calling a function that sets wrong state type to json", ctx do
+      system = ctx.system
+      dynamic_actor_name = Faker.Pokemon.name() <> "wrong_state_json"
+
+      assert SpawnSdk.invoke(dynamic_actor_name,
+               ref: Actor.MyActor,
+               system: system,
+               command: "wrong_state_json"
+             ) == {:ok, nil}
+
+      assert SpawnSdk.invoke(dynamic_actor_name,
+               ref: Actor.MyActor,
+               system: system,
+               command: "get_state"
+             ) == {:ok, nil}
+    end
+
+    test "calling a function that returns json in response", ctx do
+      system = ctx.system
+      dynamic_actor_name = Faker.Pokemon.name() <> "json_return"
+
+      assert SpawnSdk.invoke(dynamic_actor_name,
+               ref: Actor.MyActor,
+               system: system,
+               command: "json_return"
+             ) == {:ok, %{test: true}}
     end
 
     test "simple call that goes through 3 actors forwarding each other", ctx do
