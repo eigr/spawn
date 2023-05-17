@@ -73,7 +73,7 @@ defmodule SpawnSdkExample.Actors.MyActor do
     name: "jose", # Default is Full Qualified Module name a.k.a __MODULE__
     kind: :singleton, # Default is already :singleton. Valid are :singleton | :abstract | :pooled
     stateful: true, # Default is already true
-    state_type: Io.Eigr.Spawn.Example.MyState,
+    state_type: Io.Eigr.Spawn.Example.MyState # or :json if you don't care about protobuf types
     deactivate_timeout: 30_000,
     snapshot_timeout: 2_000
 
