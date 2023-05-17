@@ -50,4 +50,7 @@ defmodule Statestores.Util do
   def get_default_database_port() do
     load_adapter().default_port()
   end
+
+  @spec generate_key(String.t(), String.t()) :: String.t()
+  def generate_key(system, name), do: Base.encode16("#{system}:#{name}")
 end

@@ -1,14 +1,23 @@
 defmodule StatestoresMssqlTest.RepoTest do
   use Statestores.DataCase
   alias Statestores.Schemas.Event
-  import Statestores.Util, only: [load_adapter: 0]
+  import Statestores.Util, only: [load_adapter: 0, generate_key: 2]
 
-  test "insert! should persist an valid Event" do
+  setup do
+    %{system: "test-system"}
+  end
+
+  test "insert! should persist an valid Event", ctx do
+    %{system: system} = ctx
+
+    actor = "mike"
+    key = generate_key(system, actor)
     repo = load_adapter()
 
     event = %Event{
-      system: "test-system",
-      actor: "mike",
+      id: key,
+      system: system,
+      actor: actor,
       revision: 0,
       tags: %{},
       data_type: "type.googleapis.com/io.eigr.spawn.example.MyState",
@@ -16,15 +25,17 @@ defmodule StatestoresMssqlTest.RepoTest do
     }
 
     _result = repo.save(event)
-    actor_state = repo.get_by_key("mike")
+    actor_state = repo.get_by_key(key)
 
     assert actor_state.data == "Hello Joe"
   end
 
-  test "insert! should update when inserted before" do
+  test "insert! should update when inserted before", ctx do
+    %{system: system} = ctx
     repo = load_adapter()
 
     actor = "mike"
+    key = generate_key(system, actor)
 
     event = %Event{
       system: "test-system",
@@ -36,12 +47,12 @@ defmodule StatestoresMssqlTest.RepoTest do
     }
 
     _result = repo.save(event)
-    actor_state = repo.get_by_key(actor)
+    actor_state = repo.get_by_key(key)
 
     Process.sleep(1000)
     event = %{event | data: "new joe"}
     _result = repo.save(event)
-    actor_state2 = repo.get_by_key(actor)
+    actor_state2 = repo.get_by_key(key)
 
     refute is_nil(actor_state.updated_at)
     refute is_nil(actor_state2.updated_at)
