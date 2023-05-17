@@ -78,7 +78,8 @@ defmodule Actors.Actor.Entity.Lifecycle do
   def load_state(
         %EntityState{
           actor:
-            %Actor{settings: %ActorSettings{stateful: true}, id: %ActorId{name: name}} = actor
+            %Actor{settings: %ActorSettings{stateful: true}, id: %ActorId{name: name} = id} =
+              actor
         } = state
       ) do
     if is_nil(actor.state) or (!is_nil(actor.state) and is_nil(actor.state.state)) do
@@ -88,7 +89,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
     end
     |> Logger.debug()
 
-    case StateManager.load(name) do
+    case StateManager.load(id) do
       {:ok, current_state} ->
         {:noreply, %EntityState{state | actor: %Actor{actor | state: current_state}},
          {:continue, :call_init_action}}
@@ -107,13 +108,13 @@ defmodule Actors.Actor.Entity.Lifecycle do
 
   def terminate(reason, %EntityState{
         actor: %Actor{
-          id: %ActorId{name: name} = _id,
+          id: %ActorId{name: name} = id,
           settings: %ActorSettings{stateful: stateful},
           state: actor_state
         }
       }) do
     if stateful && !is_nil(actor_state) do
-      StateManager.save(name, actor_state)
+      StateManager.save(id, actor_state)
     end
 
     Logger.debug("Terminating actor #{name} with reason #{inspect(reason)}")
@@ -148,7 +149,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
           state_hash: old_hash,
           actor:
             %Actor{
-              id: %ActorId{name: name} = _id,
+              id: %ActorId{name: name} = id,
               state: %ActorState{} = actor_state,
               settings: %ActorSettings{
                 stateful: true,
@@ -167,7 +168,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
         Logger.debug("Snapshotting actor #{name}")
 
         # Execute with timeout equals timeout strategy - 1 to avoid mailbox congestions
-        case StateManager.save_async(name, actor_state, timeout - 1) do
+        case StateManager.save_async(id, actor_state, timeout - 1) do
           {:ok, _, hash} ->
             {:noreply, %{state | state_hash: hash}, :hibernate}
 

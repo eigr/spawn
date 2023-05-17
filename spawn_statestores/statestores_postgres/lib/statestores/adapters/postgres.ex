@@ -10,14 +10,25 @@ defmodule Statestores.Adapters.Postgres do
 
   alias Statestores.Schemas.{Event, ValueObjectSchema}
 
-  def get_by_key(actor), do: get_by(Event, actor: actor)
+  def get_by_key(id), do: get_by(Event, id: id)
 
-  def save(%Event{revision: revision, tags: tags, data_type: type, data: data} = event) do
+  def save(
+        %Event{
+          system: system,
+          actor: actor,
+          revision: revision,
+          tags: tags,
+          data_type: type,
+          data: data
+        } = event
+      ) do
     %Event{}
     |> Event.changeset(ValueObjectSchema.to_map(event))
     |> insert_or_update(
       on_conflict: [
         set: [
+          system: system,
+          actor: actor,
           revision: revision,
           tags: tags,
           data_type: type,

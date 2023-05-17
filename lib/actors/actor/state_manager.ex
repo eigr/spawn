@@ -4,17 +4,13 @@ if Code.ensure_loaded?(Statestores.Supervisor) do
     `StateManager` Implements behavior that allows an Actor's state to be saved
     to persistent storage using database drivers.
     """
-
-    @behaviour Actors.Actor.StateManager.Behaviour
-
     require Logger
 
-    alias Eigr.Functions.Protocol.Actors.ActorState
+    alias Eigr.Functions.Protocol.Actors.{ActorId, ActorState}
     alias Google.Protobuf.Any
     alias Statestores.Schemas.Event
     alias Statestores.Manager.StateManager, as: StateStoreManager
 
-    @impl true
     def is_new?(_old_hash, new_state) when is_nil(new_state), do: false
 
     def is_new?(old_hash, new_state) do
@@ -30,10 +26,11 @@ if Code.ensure_loaded?(Statestores.Supervisor) do
         {:error, error}
     end
 
-    @impl true
-    @spec load(String.t()) :: {:ok, any}
-    def load(name) do
-      case StateStoreManager.load(name) do
+    @spec load(ActorId.t()) :: {:ok, any}
+    def load(%ActorId{name: name, system: system} = _actor_id) do
+      key = generate_key(system, name)
+
+      case StateStoreManager.load(key) do
         %Event{revision: _rev, tags: tags, data_type: type, data: data} = _event ->
           {:ok, %ActorState{tags: tags, state: %Google.Protobuf.Any{type_url: type, value: data}}}
 
@@ -45,23 +42,28 @@ if Code.ensure_loaded?(Statestores.Supervisor) do
         {:error, error}
     end
 
-    @impl true
-    @spec save(String.t(), Eigr.Functions.Protocol.Actors.ActorState.t()) ::
+    @spec save(ActorId.t(), Eigr.Functions.Protocol.Actors.ActorState.t()) ::
             {:ok, Eigr.Functions.Protocol.Actors.ActorState.t()}
             | {:error, any(), Eigr.Functions.Protocol.Actors.ActorState.t()}
-    def save(_name, nil), do: {:ok, nil}
+    def save(_actor_id, nil), do: {:ok, nil}
 
-    def save(_name, %ActorState{state: actor_state} = _state)
+    def save(_actor_id, %ActorState{state: actor_state} = _state)
         when is_nil(actor_state) or actor_state == %{},
         do: {:ok, actor_state}
 
-    def save(name, %ActorState{tags: tags, state: actor_state} = _state) do
+    def save(
+          %ActorId{name: name, system: system} = _actor_id,
+          %ActorState{tags: tags, state: actor_state} = _state
+        ) do
       Logger.debug("Saving state for actor #{name}")
 
       with bytes_from_state <- Any.encode(actor_state),
-           hash <- :crypto.hash(:sha256, bytes_from_state) do
+           hash <- :crypto.hash(:sha256, bytes_from_state),
+           key <- generate_key(system, name) do
         %Event{
+          id: key,
           actor: name,
+          system: system,
           revision: 0,
           tags: tags,
           data_type: actor_state.type_url,
@@ -84,26 +86,33 @@ if Code.ensure_loaded?(Statestores.Supervisor) do
         {:error, error, actor_state}
     end
 
-    @impl true
-    @spec save_async(String.t(), Eigr.Functions.Protocol.Actors.ActorState.t()) ::
+    @spec save_async(ActorId.t(), Eigr.Functions.Protocol.Actors.ActorState.t()) ::
             {:ok, Eigr.Functions.Protocol.Actors.ActorState.t()}
             | {:error, any(), Eigr.Functions.Protocol.Actors.ActorState.t()}
-    def save_async(name, state, timeout \\ 5000)
-    def save_async(_name, nil, _timeout), do: {:ok, %{}}
+    def save_async(actor_id, state, timeout \\ 5000)
 
-    def save_async(_name, %ActorState{state: actor_state} = _state, _timeout)
+    def save_async(_actor_id, nil, _timeout), do: {:ok, %{}}
+
+    def save_async(_actor_id, %ActorState{state: actor_state} = _state, _timeout)
         when is_nil(actor_state) or actor_state == %{},
         do: {:ok, actor_state}
 
-    def save_async(name, %ActorState{tags: tags, state: actor_state} = _state, timeout) do
+    def save_async(
+          %ActorId{name: name, system: system} = _actor_id,
+          %ActorState{tags: tags, state: actor_state} = _state,
+          timeout
+        ) do
       parent = self()
 
       persist_data_task =
         Task.async(fn ->
           Logger.debug("Saving state for actor #{name}")
+          key = generate_key(system, name)
 
           %Event{
+            id: key,
             actor: name,
+            system: system,
             revision: 0,
             tags: tags,
             data_type: actor_state.type_url,
@@ -139,6 +148,8 @@ if Code.ensure_loaded?(Statestores.Supervisor) do
       end
     end
 
+    defp generate_key(system, name), do: Base.encode16("#{system}:#{name}")
+
     defp inserted_successfully?(ref, pid) do
       receive do
         {^ref, :ok} -> true
@@ -151,16 +162,14 @@ else
   defmodule Actors.Actor.StateManager do
     @moduledoc false
 
-    @behaviour Actors.Actor.StateManager.Behaviour
-
     @not_loaded_message """
     Statestores not loaded properly
     If you are creating actors with flag `persistent: true` consider adding :spawn_statestores to your deps list
     """
 
     def is_new?(_old_hash, _new_state), do: raise(@not_loaded_message)
-    def load(_key), do: raise(@not_loaded_message)
-    def save(_name, _state), do: raise(@not_loaded_message)
-    def save_async(_name, _state, _timeout), do: raise(@not_loaded_message)
+    def load(_actor_id), do: raise(@not_loaded_message)
+    def save(_actor_id, _state), do: raise(@not_loaded_message)
+    def save_async(_actor_id, _state, _timeout), do: raise(@not_loaded_message)
   end
 end
