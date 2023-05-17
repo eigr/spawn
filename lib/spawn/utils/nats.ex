@@ -1,7 +1,7 @@
 defmodule Spawn.Utils.Nats do
   @moduledoc false
 
-  alias alias Eigr.Functions.Protocol.InvocationRequest
+  alias Eigr.Functions.Protocol.InvocationRequest
 
   import Spawn.Utils.Common, only: [to_existing_atom_or_new: 1]
 
@@ -28,7 +28,7 @@ defmodule Spawn.Utils.Nats do
   def request(system, payload, opts \\ []) do
     async? = Keyword.get(opts, :async, false)
     conn = connection_name()
-    topic = "spawn.#{system}.actors.actions"
+    topic = get_topic(system)
     trace_context = Keyword.get(opts, :trace_context)
 
     case async? do
@@ -41,6 +41,8 @@ defmodule Spawn.Utils.Nats do
         {:ok, :async}
     end
   end
+
+  def get_topic(system), do: "spawn.#{system}.actors.actions"
 
   defp get_nats_hosts(raw_hosts) do
     String.split(raw_hosts, ",")

@@ -187,11 +187,9 @@ defmodule Actors do
       ) do
     case Config.get(Actors, :actor_system_name) do
       name when name === system_name ->
-        IO.inspect({system_name, opts}, label: "Caiu aqui invoke_with_span")
         invoke_with_span(request, opts)
 
       _ ->
-        IO.inspect({system_name, opts}, label: "Caiu aqui invoke_with_nats")
         invoke_with_nats(request, opts)
     end
   end

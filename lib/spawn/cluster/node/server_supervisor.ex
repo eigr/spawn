@@ -6,6 +6,8 @@ defmodule Spawn.Cluster.Node.ServerSupervisor do
 
   alias Spawn.Utils.Nats
 
+  @backoff_period 3_000
+
   def start_link(config) do
     Supervisor.start_link(__MODULE__, config,
       name: String.to_atom("#{String.capitalize(config.actor_system_name)}.NodeServer")
@@ -24,7 +26,7 @@ defmodule Spawn.Cluster.Node.ServerSupervisor do
   @impl true
   def init(config) do
     connection_name = Nats.connection_name()
-    topic = "spawn.#{config.actor_system_name}.actors.actions"
+    topic = Nats.get_topic(config.actor_system_name)
 
     Logger.debug(
       "Mapping Node #{inspect(Node.self())} to Nats Topic #{topic} on Connection #{inspect(connection_name)}"
@@ -49,7 +51,7 @@ defmodule Spawn.Cluster.Node.ServerSupervisor do
   defp connection_settings(name, config) do
     %{
       name: name,
-      backoff_period: 3_000,
+      backoff_period: @backoff_period,
       connection_settings: [
         Map.merge(
           Spawn.Utils.Nats.get_internal_nats_connection(config),
