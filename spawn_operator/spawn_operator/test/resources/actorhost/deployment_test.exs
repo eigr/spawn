@@ -106,7 +106,11 @@ defmodule DeploymentTest do
                            %{"containerPort" => 9001, "name" => "proxy-http"}
                          ],
                          "resources" => %{
-                           "requests" => %{"memory" => "80Mi", "cpu" => "100m"}
+                           "requests" => %{
+                             "cpu" => "100m",
+                             "ephemeral-storage" => "1M",
+                             "memory" => "80Mi"
+                           }
                          }
                        }
                      ],
@@ -200,7 +204,11 @@ defmodule DeploymentTest do
                            %{"containerPort" => 9001, "name" => "proxy-http"}
                          ],
                          "resources" => %{
-                           "requests" => %{"memory" => "80Mi", "cpu" => "100m"}
+                           "requests" => %{
+                             "cpu" => "100m",
+                             "ephemeral-storage" => "1M",
+                             "memory" => "80Mi"
+                           }
                          },
                          "volumeMounts" => [
                            %{"mountPath" => "/home/example", "name" => "volume-name"}
@@ -321,7 +329,11 @@ defmodule DeploymentTest do
                            "timeoutSeconds" => 5
                          },
                          "resources" => %{
-                           "requests" => %{"memory" => "80Mi", "cpu" => "50m"}
+                           "requests" => %{
+                             "cpu" => "50m",
+                             "ephemeral-storage" => "1M",
+                             "memory" => "80Mi"
+                           }
                          }
                        },
                        %{
@@ -345,7 +357,11 @@ defmodule DeploymentTest do
                          "image" => "eigr/spawn-test:latest",
                          "name" => "actor-host-function",
                          "resources" => %{
-                           "requests" => %{"memory" => "80Mi", "cpu" => "100m"}
+                           "requests" => %{
+                             "cpu" => "100m",
+                             "ephemeral-storage" => "1M",
+                             "memory" => "80Mi"
+                           }
                          }
                        }
                      ],
@@ -413,7 +429,7 @@ defmodule DeploymentTest do
                "image" => "eigr/spawn-test:latest",
                "name" => "actor-host-function",
                "resources" => %{
-                 "requests" => %{"memory" => "80Mi", "cpu" => "100m"}
+                 "requests" => %{"memory" => "80Mi", "ephemeral-storage" => "1M", "cpu" => "100m"}
                },
                "ports" => [
                  %{"containerPort" => 8090, "name" => "http"},

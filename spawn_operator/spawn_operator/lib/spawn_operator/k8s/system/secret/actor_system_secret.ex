@@ -24,6 +24,10 @@ defmodule SpawnOperator.K8s.System.Secret.ActorSystemSecret do
     distributed_options = get_dist_options(name, ns, cluster_params)
     storage_options = get_storage_options(name, ns, statestore_params)
 
+    data =
+      Map.merge(distributed_options, storage_options)
+      |> maybe_use_nats_cluster(name, ns, cluster_params)
+
     %{
       "apiVersion" => "v1",
       "kind" => "Secret",
@@ -31,7 +35,7 @@ defmodule SpawnOperator.K8s.System.Secret.ActorSystemSecret do
         "name" => "#{name}-secret",
         "namespace" => ns
       },
-      "data" => Map.merge(distributed_options, storage_options)
+      "data" => data
     }
   end
 
@@ -85,6 +89,7 @@ defmodule SpawnOperator.K8s.System.Secret.ActorSystemSecret do
 
         %{
           "NODE_COOKIE" => cookie,
+          "PROXY_ACTOR_SYSTEM_NAME" => system,
           "PROXY_CLUSTER_POLLING" => cluster_poolling,
           "PROXY_CLUSTER_STRATEGY" => cluster_strategy,
           "PROXY_HEADLESS_SERVICE" => cluster_service,
@@ -105,6 +110,45 @@ defmodule SpawnOperator.K8s.System.Secret.ActorSystemSecret do
       _other ->
         %{}
     end
+  end
+
+  defp maybe_use_nats_cluster(config, _name, _ns, params) do
+    nats_params = Map.get(params, "systemToSystem", %{})
+    enabled = Map.get(nats_params, "enabled", "false")
+
+    nats_config =
+      case enabled do
+        "false" ->
+          %{}
+
+        "true" ->
+          nats_secret_ref = Map.fetch!(nats_params, "natsClusterSecretRef")
+
+          {:ok, secret} =
+            K8s.Client.get("v1", :secret,
+              namespace: "eigr-functions",
+              name: nats_secret_ref
+            )
+            |> then(&K8s.Client.run(conn(), &1))
+
+          secret_data = Map.fetch!(secret, "data")
+          nats_host_url = Map.fetch!(secret_data, "url")
+          nats_auth = Map.get(secret_data, "authEnabled", "false")
+          nats_user = Map.fetch!(secret_data, "username")
+          nats_secret = Map.fetch!(secret_data, "password")
+          nats_tls = Map.get(secret_data, "tlsEnabled", "false")
+
+          %{
+            "SPAWN_USE_INTERNAL_NATS" => "true",
+            "SPAWN_INTERNAL_NATS_HOSTS" => nats_host_url,
+            "SPAWN_INTERNAL_NATS_TLS" => nats_tls,
+            "SPAWN_INTERNAL_NATS_AUTH" => nats_auth,
+            "SPAWN_INTERNAL_NATS_AUTH_USER" => nats_user,
+            "SPAWN_INTERNAL_NATS_AUTH_PASS" => nats_secret
+          }
+      end
+
+    Map.merge(config, nats_config)
   end
 
   defp default_cookie(ns),

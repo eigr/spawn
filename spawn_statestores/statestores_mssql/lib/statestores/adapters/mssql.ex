@@ -10,9 +10,9 @@ defmodule Statestores.Adapters.MSSQL do
 
   alias Statestores.Schemas.{Event, ValueObjectSchema}
 
-  def get_by_key(actor), do: get_by(Event, actor: actor)
+  def get_by_key(id), do: get_by(Event, id: id)
 
-  def save(%Event{actor: actor} = event) do
+  def save(%Event{id: id} = event) do
     %Event{}
     |> Event.changeset(ValueObjectSchema.to_map(event))
     |> insert()
@@ -28,7 +28,7 @@ defmodule Statestores.Adapters.MSSQL do
     end
   rescue
     _e ->
-      get_by(Event, actor: actor)
+      get_by(Event, id: id)
       |> Event.changeset(ValueObjectSchema.to_map(event))
       |> update!()
       |> case do

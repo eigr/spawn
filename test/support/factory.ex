@@ -32,7 +32,7 @@ defmodule Actors.FactoryTest do
 
   def build_system(attrs \\ []) do
     ActorSystem.new(
-      name: attrs[:name] || "test_system",
+      name: attrs[:name] || "spawn-system",
       registry: attrs[:registry] || nil
     )
   end

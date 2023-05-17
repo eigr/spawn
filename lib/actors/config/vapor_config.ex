@@ -4,11 +4,12 @@ defmodule Actors.Config.Vapor do
   to allow the retrieval of system variables
   that will be included in the system configuration.
   """
+  require Logger
+  alias Vapor.Provider.{Env, Dotenv}
 
   @behaviour Actors.Config
 
-  require Logger
-  alias Vapor.Provider.{Env, Dotenv}
+  @default_actor_system_name "spawn-system"
 
   @impl true
   def load(mod) do
@@ -32,6 +33,8 @@ defmodule Actors.Config.Vapor do
       %Env{
         bindings: [
           {:app_name, "PROXY_APP_NAME", default: Config.Name.generate(), required: false},
+          {:actor_system_name, "PROXY_ACTOR_SYSTEM_NAME",
+           default: @default_actor_system_name, required: false},
           {:http_port, "PROXY_HTTP_PORT",
            default: 9001, map: &String.to_integer/1, required: false},
           {:proxy_http_client_adapter, "PROXY_HTTP_CLIENT_ADAPTER",
@@ -58,6 +61,21 @@ defmodule Actors.Config.Vapor do
           {:user_function_host, "USER_FUNCTION_HOST", default: "0.0.0.0", required: false},
           {:user_function_port, "USER_FUNCTION_PORT",
            default: 8090, map: &String.to_integer/1, required: false},
+          # Internal Nats Protocol
+          {:use_internal_nats, "SPAWN_USE_INTERNAL_NATS", default: "false", required: false},
+          {:internal_nats_hosts, "SPAWN_INTERNAL_NATS_HOSTS",
+           default: "nats://127.0.0.1:4222", required: false},
+          {:internal_nats_tls, "SPAWN_INTERNAL_NATS_TLS", default: "false", required: false},
+          {:internal_nats_auth, "SPAWN_INTERNAL_NATS_AUTH", default: "false", required: false},
+          {:internal_nats_auth_type, "SPAWN_INTERNAL_NATS_AUTH_TYPE",
+           default: "simple", required: false},
+          {:internal_nats_auth_user, "SPAWN_INTERNAL_NATS_AUTH_USER",
+           default: "admin", required: false},
+          {:internal_nats_auth_pass, "SPAWN_INTERNAL_NATS_AUTH_PASS",
+           default: "admin", required: false},
+          {:internal_nats_auth_jwt, "SPAWN_INTERNAL_NATS_AUTH_JWT", default: "", required: false},
+
+          # PubSub
           {:pubsub_adapter, "SPAWN_PUBSUB_ADAPTER", default: "native", required: false},
           {:pubsub_adapter_nats_hosts, "SPAWN_PUBSUB_NATS_HOSTS",
            default: "nats://127.0.0.1:4222", required: false},
@@ -72,6 +90,7 @@ defmodule Actors.Config.Vapor do
            default: "admin", required: false},
           {:pubsub_adapter_nats_auth_jwt, "SPAWN_PUBSUB_NATS_AUTH_JWT",
            default: "", required: false},
+          #
           {:delayed_invokes, "SPAWN_DELAYED_INVOKES", default: "true", required: false},
           {:sync_interval, "SPAWN_CRDT_SYNC_INTERVAL",
            default: 2, map: &String.to_integer/1, required: false},

@@ -72,10 +72,10 @@ spec:
               name: proxy-https
               protocol: TCP
           resources:
-            limits:
-              memory: 1Gi
             requests:
+              cpu: 100m
               memory: 80Mi
+              ephemeral-storage: "100Ki"
           volumeMounts:
             - mountPath: /app/certs
               name: volume-certs

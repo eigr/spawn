@@ -12,6 +12,9 @@ defmodule SpawnOperator.Handler.ActorSystemHandler do
         cluster: # Optional
           kind: erlang # Optional. Default erlang. Possible values [erlang | quic]
           cookie: default-c21f969b5f03d33d43e04f8f136e7682 # Optional. Only used if kind is erlang
+          systemToSystem:
+            enabled: true
+            natsClusterSecretRef: nats-config-secret
           tls:
             secretName: spawn-system-tls-secret
             certManager:

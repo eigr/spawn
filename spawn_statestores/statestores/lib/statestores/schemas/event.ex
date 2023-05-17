@@ -10,7 +10,9 @@ defmodule Statestores.Schemas.Event do
 
   @primary_key false
   schema "events" do
-    field :actor, :string, primary_key: true
+    field(:id, :string, primary_key: true)
+
+    field(:actor, :string)
 
     field(:system, :string)
 
@@ -28,8 +30,8 @@ defmodule Statestores.Schemas.Event do
   @spec changeset(%__MODULE__{}, map()) :: Ecto.Changeset.t() | {:error, Ecto.Changeset.t()}
   def changeset(event, attrs \\ %{}) do
     event
-    |> cast(attrs, [:actor, :revision, :tags, :data_type, :data])
-    |> validate_required([:actor, :revision, :tags, :data_type])
+    |> cast(attrs, [:id, :actor, :system, :revision, :tags, :data_type, :data])
+    |> validate_required([:id, :actor, :system, :revision, :tags, :data_type])
     |> case do
       %{valid?: false, changes: changes} = changeset when changes == %{} ->
         # If the changeset is invalid and has no changes, it is
