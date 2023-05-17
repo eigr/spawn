@@ -1,0 +1,27 @@
+####################################################################################################
+## Builder
+####################################################################################################
+FROM rust:1.69.0 AS builder
+
+RUN rustup target add x86_64-unknown-linux-musl
+RUN apt update && apt install -y musl-tools musl-dev
+RUN update-ca-certificates
+
+WORKDIR /
+
+COPY ./spawn-cli/activator-cli .
+
+RUN cargo build --target x86_64-unknown-linux-musl --release
+
+####################################################################################################
+## Final image
+####################################################################################################
+FROM alpine:3.17.3
+
+WORKDIR /
+
+COPY --from=builder /target/x86_64-unknown-linux-musl/release/activator-cli ./
+
+USER nobody
+
+ENTRYPOINT ["/activator-cli"]
