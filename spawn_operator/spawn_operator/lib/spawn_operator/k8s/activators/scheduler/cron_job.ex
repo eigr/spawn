@@ -17,7 +17,12 @@ defmodule SpawnOperator.K8s.Activators.Scheduler.CronJob do
             "name" => sink["name"],
             "image" => "eigr/activator-cli:latest",
             "imagePullPolicy" => "IfNotPresent",
-            "command" => "./activator-cli #{sink["system"]} #{sink["actor"]} #{sink["command"]}"
+            "command" => [
+              "./activator-cli",
+              "#{sink["system"]}",
+              "#{sink["actor"]}",
+              "#{sink["command"]}"
+            ]
           }
         end)
 
@@ -25,7 +30,8 @@ defmodule SpawnOperator.K8s.Activators.Scheduler.CronJob do
         "apiVersion" => "batch/v1",
         "kind" => "CronJob",
         "metadata" => %{
-          "name" => "#{name}-cron-job"
+          "name" => "#{name}-cron-job",
+          "namespace" => resource.namespace
         },
         "spec" => %{
           "schedule" => expr,

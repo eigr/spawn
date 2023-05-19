@@ -50,34 +50,31 @@ defmodule SpawnOperator.K8s.Activators.Scheduler do
 
   @spec apply(map(), Bonny.Axn.t(), atom()) :: Bonny.Axn.t()
   def apply(args, axn, action) when action in [:add, :modify] do
-    cron_job_manifests = CronJob.manifest(args)
     configmap = Configmap.manifest(args)
 
-    {resource, service} =
+    resources =
       case get_activator_kind(args.params) do
+        :api ->
+          []
+
+        :cron ->
+          CronJob.manifest(args)
+
         :daemonset ->
-          {
-            DaemonSet.manifest(args),
-            DaemonSetService.manifest(args)
-          }
+          [Configmap.manifest(args), DaemonSet.manifest(args), DaemonSetService.manifest(args)]
 
         :deployment ->
-          {
-            Deployment.manifest(args),
-            DeploymentService.manifest(args)
-          }
+          [Configmap.manifest(args), Deployment.manifest(args), DeploymentService.manifest(args)]
 
-        nil -> {%{}, %{}}
+        nil ->
+          []
 
         _ ->
-          raise ArgumentError, "Invalid Activator Kind. Valids are [DaemonSet, Deployment]"
+          raise ArgumentError, "Invalid Activator Kind. Valids are [Cron, DaemonSet, Deployment]"
       end
 
     axn
-    # |> Bonny.Axn.register_descendant(configmap)
-    # |> Bonny.Axn.register_descendant(service)
-    # |> Bonny.Axn.register_descendant(resource)
-    |> register_multiple_cronjobs(cron_job_manifests)
+    |> register(resources)
     |> Bonny.Axn.success_event()
   end
 
@@ -87,11 +84,10 @@ defmodule SpawnOperator.K8s.Activators.Scheduler do
 
   def apply(_args, axn, action) when action in [:delete], do: Bonny.Axn.success_event(axn)
 
-  defp register_multiple_cronjobs(axn, manifests) do
-    Enum.reduce(manifests, axn, & Bonny.Axn.register_descendant(&2, &1))
-  end
+  defp register(axn, resources),
+    do: Enum.reduce(resources, axn, &Bonny.Axn.register_descendant(&2, &1))
 
-  defp get_activator_kind(%{"activator" => %{"kind" => kind}}) do
+  defp get_activator_kind(%{"activator" => %{"type" => kind}}) do
     kind |> String.downcase() |> to_existing_atom_or_new()
   end
 
