@@ -17,7 +17,7 @@ defmodule SpawnOperator.K8s.Activators.Scheduler do
   spec:
     activator:
       type: Cron
-      kind: Deployment # DaemonSet
+      externalConnectorRef: invocation-connection-ref
     bindings:
       sources:
         - name: joe-scheduler

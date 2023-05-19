@@ -10,6 +10,7 @@ spec:
     expose: true
     exposeMethod: ingress
     exposeIngressType: nginx
+    externalConnectorRef: invocation-connection-ref
   bindings:
     sources:
       - name: robert-set-language-mapping

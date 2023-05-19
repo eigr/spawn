@@ -17,6 +17,11 @@ defmodule SpawnOperator.K8s.Activators.Scheduler.CronJob do
             "name" => sink["name"],
             "image" => "eigr/activator-cli:latest",
             "imagePullPolicy" => "IfNotPresent",
+            "envFrom" => %{
+              "secretRef" => %{
+                "name" => "#{resource.params["activator"]["externalConnectorRef"]}"
+              }
+            },
             "command" => [
               "./activator-cli",
               "#{sink["system"]}",

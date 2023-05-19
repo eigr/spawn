@@ -8,6 +8,7 @@ spec:
   activator:
     type: AMQP
     paramsSecretRef: rabbitmq-connection-secret
+    externalConnectorRef: invocation-connection-ref
   bindings:
     sources:
       - name: amqp-source
