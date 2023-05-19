@@ -19,7 +19,7 @@ defmodule SpawnOperator.K8s.Activators.Activator do
   end
 
   defp get_activator_type(params) do
-    String.downcase(params.activator.type)
+    String.downcase(params["activator"]["type"])
     |> to_existing_atom_or_new()
   end
 end

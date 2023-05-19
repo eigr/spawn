@@ -1,5 +1,5 @@
 ---
-apiVersion: spawn.eigr.io/v1
+apiVersion: spawn-eigr.io/v1
 kind: Activator
 metadata:
   name: rabbitmq-activator # Mandatory. Name of the activator

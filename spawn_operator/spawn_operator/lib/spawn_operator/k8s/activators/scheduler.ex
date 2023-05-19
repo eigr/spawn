@@ -6,7 +6,7 @@ defmodule SpawnOperator.K8s.Activators.Scheduler do
 
   ```
   ---
-  apiVersion: spawn.eigr.io/v1
+  apiVersion: spawn-eigr.io/v1
   kind: Activator
   metadata:
     name: cron-activator # Mandatory. Name of the activator
@@ -50,7 +50,7 @@ defmodule SpawnOperator.K8s.Activators.Scheduler do
 
   @spec apply(map(), Bonny.Axn.t(), atom()) :: Bonny.Axn.t()
   def apply(args, axn, action) when action in [:add, :modify] do
-    cron_job = CronJob.manifest(args)
+    cron_job_manifests = CronJob.manifest(args)
     configmap = Configmap.manifest(args)
 
     {resource, service} =
@@ -67,29 +67,33 @@ defmodule SpawnOperator.K8s.Activators.Scheduler do
             DeploymentService.manifest(args)
           }
 
+        nil -> {%{}, %{}}
+
         _ ->
           raise ArgumentError, "Invalid Activator Kind. Valids are [DaemonSet, Deployment]"
       end
 
     axn
-    |> Bonny.Axn.register_descendant(configmap)
-    |> Bonny.Axn.register_descendant(service)
-    |> Bonny.Axn.register_descendant(resource)
-    |> Bonny.Axn.register_descendant(cron_job)
-    # |> Bonny.Axn.update_status(fn status ->
-    #  put_in(status, [Access.key(:some, %{}), :field], "foo")
-    # end)
+    # |> Bonny.Axn.register_descendant(configmap)
+    # |> Bonny.Axn.register_descendant(service)
+    # |> Bonny.Axn.register_descendant(resource)
+    |> register_multiple_cronjobs(cron_job_manifests)
     |> Bonny.Axn.success_event()
   end
 
-  def apply(args, axn, action) when action in [:reconcile] do
+  def apply(_args, axn, action) when action in [:reconcile] do
     Bonny.Axn.success_event(axn)
   end
 
-  def apply(args, axn, action) when action in [:delete], do: Bonny.Axn.success_event(axn)
+  def apply(_args, axn, action) when action in [:delete], do: Bonny.Axn.success_event(axn)
 
-  defp get_activator_kind(params) do
-    String.downcase(params.activator.kind)
-    |> to_existing_atom_or_new()
+  defp register_multiple_cronjobs(axn, manifests) do
+    Enum.reduce(manifests, axn, & Bonny.Axn.register_descendant(&2, &1))
   end
+
+  defp get_activator_kind(%{"activator" => %{"kind" => kind}}) do
+    kind |> String.downcase() |> to_existing_atom_or_new()
+  end
+
+  defp get_activator_kind(_), do: nil
 end

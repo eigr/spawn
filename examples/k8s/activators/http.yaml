@@ -1,5 +1,5 @@
 ---
-apiVersion: spawn.eigr.io/v1
+apiVersion: spawn-eigr.io/v1
 kind: Activator
 metadata:
   name: myapp-http-activator # Mandatory. Name of the activator

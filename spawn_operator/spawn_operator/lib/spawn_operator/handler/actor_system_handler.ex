@@ -3,7 +3,7 @@ defmodule SpawnOperator.Handler.ActorSystemHandler do
   `ActorSystemHandler` handles ActorSystem CRD events
 
       ---
-      apiVersion: spawn.eigr.io/v1
+      apiVersion: spawn-eigr.io/v1
       kind: ActorSystem
       metadata:
         name: spawn-system # Mandatory. Name of the state store

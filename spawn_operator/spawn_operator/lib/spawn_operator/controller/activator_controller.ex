@@ -10,7 +10,8 @@ defmodule SpawnOperator.Controller.ActivatorController do
   def rbac_rules() do
     [
       to_rbac_rule({"", ["secrets"], ["*"]}),
-      to_rbac_rule({"v1", ["pods"], ["*"]}),
+      to_rbac_rule({"batch/v1", ["cronjobs", "jobs"], ["*"]}),
+      to_rbac_rule({"v1", ["pods", "cronjobs", "jobs"], ["*"]}),
       to_rbac_rule({"apps", ["deployments", "daemonsets"], ["*"]}),
       to_rbac_rule({"", ["services", "configmaps"], ["*"]}),
       to_rbac_rule({"autoscaling", ["horizontalpodautoscalers"], ["*"]}),
