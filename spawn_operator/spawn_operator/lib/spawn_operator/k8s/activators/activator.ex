@@ -1,6 +1,6 @@
 defmodule SpawnOperator.K8s.Activators.Activator do
   @moduledoc false
-  alias SpawnOperator.K8s.Activators.{Rabbitmq, Scheduler}
+  alias SpawnOperator.K8s.Activators.{Api, Rabbitmq, Scheduler}
 
   import Spawn.Utils.Common, only: [to_existing_atom_or_new: 1]
 
