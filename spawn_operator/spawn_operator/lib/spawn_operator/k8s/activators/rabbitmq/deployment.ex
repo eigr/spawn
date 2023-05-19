@@ -1,8 +1,8 @@
-defmodule SpawnOperator.K8s.Activators.Rabbitmq.Daemonset do
+defmodule SpawnOperator.K8s.Activators.Rabbitmq.Deployment do
   @moduledoc false
 
   @behaviour SpawnOperator.K8s.Manifest
 
   @impl true
-  def manifest(resource, _opts \\ []), do: %{}
+  def manifest(_resource, _opts \\ []), do: %{}
 end

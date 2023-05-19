@@ -5,7 +5,6 @@ defmodule SpawnOperator.K8s.Activators.Rabbitmq do
 
   alias SpawnOperator.K8s.Activators.Rabbitmq.{
     Cm.Configmap,
-    CronJob,
     DaemonSet,
     Deployment,
     Service
@@ -15,8 +14,6 @@ defmodule SpawnOperator.K8s.Activators.Rabbitmq do
 
   @spec apply(map(), Bonny.Axn.t(), atom()) :: Bonny.Axn.t()
   def apply(args, axn, action) when action in [:add, :modify] do
-    configmap = Configmap.manifest(args)
-
     resources =
       case get_activator_kind(args.params) do
         :daemonset ->
