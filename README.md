@@ -193,7 +193,7 @@ process in the section on installation).
 In this tutorial we are going to use a MySql database. In this case, in order for Spawn to know how to connect to the database instance, it is first necessary to create a kubernetes secret in same namespace you installed the Spawn Operator with the connection data and other parameters. Example:
 
 ```shell
-kubectl create secret generic mysql-connection-secret \
+kubectl create secret generic mysql-connection-secret -n eigr-functions \
   --from-literal=database=eigr-functions-db \
   --from-literal=host='mysql' \
   --from-literal=port='3306' \

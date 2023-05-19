@@ -38,15 +38,11 @@ defmodule SpawnOperator.K8s.Activators.Scheduler do
    ```
   """
   alias SpawnOperator.K8s.Activators.Scheduler.{
-    Cm.Configmap,
     CronJob
   }
 
-  import Spawn.Utils.Common, only: [to_existing_atom_or_new: 1]
-
   @spec apply(map(), Bonny.Axn.t(), atom()) :: Bonny.Axn.t()
   def apply(args, axn, action) when action in [:add, :modify] do
-    configmap = Configmap.manifest(args)
     manifests = CronJob.manifest(args)
 
     axn

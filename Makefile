@@ -12,6 +12,7 @@ activator-kafka-image=${registry}/spawn-activator-kafka:${version}
 activator-pubsub-image=${registry}/spawn-activator-pubsub:${version}
 activator-rabbitmq-image=${registry}/spawn-activator-rabbitmq:${version}
 activator-sqs-image=${registry}/spawn-activator-sqs:${version}
+activator-cli-image=${registry}/spawn-activator-cli:0.1.0
 spawn-sdk-example-image=${registry}/spawn-sdk-example:${version}
 
 ifeq "$(PROXY_DATABASE_TYPE)" ""
@@ -41,6 +42,9 @@ build-operator-image:
 
 build-elixir-sdk-image:
 	docker build --no-cache -f Dockerfile-elixir-example -t ${spawn-sdk-example-image} .
+
+build-activator-cli-image:
+	docker build --no-cache -f Dockerfile-activator-cli -t ${activator-cli-image} .
 
 build-all-images:
 	docker build --no-cache -f Dockerfile-proxy -t ${proxy-image} .

@@ -3,6 +3,8 @@ defmodule SpawnOperator.K8s.Activators.Scheduler.CronJob do
 
   @behaviour SpawnOperator.K8s.Manifest
 
+  @activator_cli_version "0.1.0"
+
   @impl true
   def manifest(resource, _opts \\ []) do
     Enum.map(resource.params["bindings"]["sources"], fn source ->
@@ -15,7 +17,7 @@ defmodule SpawnOperator.K8s.Activators.Scheduler.CronJob do
         |> Enum.map(fn sink ->
           %{
             "name" => sink["name"],
-            "image" => "eigr/activator-cli:latest",
+            "image" => "eigr/spawn-activator-cli:#{@activator_cli_version}",
             "imagePullPolicy" => "IfNotPresent",
             "envFrom" => %{
               "secretRef" => %{
