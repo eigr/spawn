@@ -1,4 +1,4 @@
-defmodule SpawnOperator.K8s.Activators.Scheduler.DaemonSetService do
+defmodule SpawnOperator.K8s.Activators.Rabbitmq.DaemonSet do
   @moduledoc false
 
   @behaviour SpawnOperator.K8s.Manifest

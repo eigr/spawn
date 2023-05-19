@@ -1,4 +1,4 @@
-defmodule SpawnOperator.K8s.Activators.Scheduler.DaemonSet do
+defmodule SpawnOperator.K8s.Activators.Api.Cm.Configmap do
   @moduledoc false
 
   @behaviour SpawnOperator.K8s.Manifest

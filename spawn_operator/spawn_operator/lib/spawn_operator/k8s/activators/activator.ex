@@ -7,6 +7,9 @@ defmodule SpawnOperator.K8s.Activators.Activator do
   @spec apply(map(), Bonny.Axn.t(), atom()) :: Bonny.Axn.t()
   def apply(args, axn, action) do
     case get_activator_type(args.params) do
+      :api ->
+        Api.apply(args, axn, action)
+
       :amqp ->
         Rabbitmq.apply(args, axn, action)
 

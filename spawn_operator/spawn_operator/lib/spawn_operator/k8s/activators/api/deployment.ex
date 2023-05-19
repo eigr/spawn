@@ -1,4 +1,4 @@
-defmodule SpawnOperator.K8s.Activators.Scheduler.DeploymentService do
+defmodule SpawnOperator.K8s.Activators.Api.Daemonset do
   @moduledoc false
 
   @behaviour SpawnOperator.K8s.Manifest
