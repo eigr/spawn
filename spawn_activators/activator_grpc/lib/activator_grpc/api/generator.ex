@@ -46,7 +46,7 @@ defmodule ActivatorGRPC.API.Generator do
   @doc false
   def get_dep_pkgs(%{pkg_mapping: mapping, package: pkg}, deps) do
     pkgs = deps |> Enum.map(fn dep -> mapping[dep] end)
-    pkgs = if pkg && String.length(pkg) > 0, do: [pkg | pkgs], else: pkgs
+    pkgs = if pkg && byte_size(pkg) > 0, do: [pkg | pkgs], else: pkgs
     Enum.sort(pkgs, &(byte_size(&2) <= byte_size(&1)))
   end
 
