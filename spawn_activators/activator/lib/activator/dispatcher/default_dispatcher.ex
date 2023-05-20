@@ -31,6 +31,7 @@ defmodule Activator.Dispatcher.DefaultDispatcher do
   end
 
   defp do_dispatch(payload, opts) when is_nil(payload) do
+    async? = Keyword.get(opts, :async, true)
     actor_name = Keyword.fetch!(opts, :actor)
     command = Keyword.fetch!(opts, :command)
     system_name = Keyword.fetch!(opts, :system)
@@ -44,20 +45,22 @@ defmodule Activator.Dispatcher.DefaultDispatcher do
       "Request for Activate Actor [#{actor_name}] using command [#{command}] without payload"
     )
 
-    res =
+    req =
       InvocationRequest.new(
         system: system,
         actor: actor,
         payload: {:noop, Noop.new()},
         command_name: command,
-        async: true,
+        async: async?,
         caller: nil
       )
 
-    Actors.invoke(res)
+    # TODO CHANGE TO NATS
+    Actors.invoke(req)
   end
 
   defp do_dispatch(payload, opts) do
+    async? = Keyword.get(opts, :async, true)
     actor_name = Keyword.fetch!(opts, :actor)
     command = Keyword.fetch!(opts, :command)
     system_name = Keyword.fetch!(opts, :system)
@@ -77,7 +80,7 @@ defmodule Activator.Dispatcher.DefaultDispatcher do
         actor: actor,
         payload: {:value, payload},
         command_name: command,
-        async: true,
+        async: async?,
         caller: nil
       )
 

@@ -85,6 +85,8 @@ defmodule Actors.Config.Vapor do
           {:internal_nats_auth_pass, "SPAWN_INTERNAL_NATS_AUTH_PASS",
            default: "admin", required: false},
           {:internal_nats_auth_jwt, "SPAWN_INTERNAL_NATS_AUTH_JWT", default: "", required: false},
+          {:internal_nats_connection_backoff_period, "SPAWN_INTERNAL_NATS_BACKOFF_PERIOD",
+           default: 3000, map: &String.to_integer/1, required: false},
 
           # PubSub
           {:pubsub_adapter, "SPAWN_PUBSUB_ADAPTER", default: "native", required: false},
