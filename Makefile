@@ -6,8 +6,7 @@ K3D_KUBECONFIG_PATH?=./integration.yaml
 
 proxy-image=${registry}/spawn-proxy:${version}
 operator-image=${registry}/spawn-operator:${version}
-activator-grpc-image=${registry}/spawn-activator-grpc:${version}
-activator-http-image=${registry}/spawn-activator-http:${version}
+activator-api-image=${registry}/spawn-activator-grpc:${version}
 activator-kafka-image=${registry}/spawn-activator-kafka:${version}
 activator-pubsub-image=${registry}/spawn-activator-pubsub:${version}
 activator-rabbitmq-image=${registry}/spawn-activator-rabbitmq:${version}
@@ -49,8 +48,7 @@ build-activator-cli-image:
 build-all-images:
 	docker build --no-cache -f Dockerfile-proxy -t ${proxy-image} .
 	docker build --no-cache -f Dockerfile-operator -t ${operator-image} .
-	#docker build --no-cache -f Dockerfile-activator-grpc -t ${activator-grpc-image} .
-	#docker build --no-cache -f Dockerfile-activator-http -t ${activator-http-image} .
+	#docker build --no-cache -f Dockerfile-activator-api -t ${activator-api-image} .
 	#docker build --no-cache -f Dockerfile-activator-kafka -t ${activator-kafka-image} .
 	#docker build --no-cache -f Dockerfile-activator-pubsub -t ${activator-pubsub-image} .
 	#docker build --no-cache -f Dockerfile-activator-rabbitmq -t ${activator-rabbitmq-image} .
@@ -97,7 +95,7 @@ test.integration: ## Run integration tests using k3d `make cluster`
 push-all-images:
 	docker push ${proxy-image}
 	docker push ${operator-image}
-	#docker push ${activator-grpc-image}
+	#docker push ${activator-api-image}
 	#docker push ${activator-http-image}
 	#docker push ${activator-kafka-image}
 	#docker push ${activator-pubsub-image}
@@ -118,7 +116,7 @@ delete-kind-cluster:
 load-kind-images:
 	kind load docker-image ${operator-image} --name default
 	kind load docker-image ${proxy-image} --name default
-	kind load docker-image ${activator-grpc-image} --name default
+	kind load docker-image ${activator-api-image} --name default
 	kind load docker-image ${activator-http-image} --name default
 	kind load docker-image ${activator-kafka-image} --name default
 	kind load docker-image ${activator-pubsub-image} --name default
