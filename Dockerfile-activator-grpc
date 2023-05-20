@@ -8,7 +8,7 @@ RUN apk add --no-cache --update git build-base ca-certificates zstd
 
 RUN mkdir config
 COPY config/ ./config
-COPY spawn_activators/activator_grpc/ ./spawn_activators/activator_grpc
+COPY spawn_activators/activator_api/ ./spawn_activators/activator_api
 COPY lib/ ./lib
 COPY priv/ ./priv
 COPY mix.exs .
@@ -26,16 +26,16 @@ ENV RELEASE_DISTRIBUTION="name"
 ENV POD_IP="127.0.0.1"
 
 # This will be the basename of node
-ENV RELEASE_NAME="activator_grpc"
+ENV RELEASE_NAME="activator_api"
 
 # This will be the full nodename
 ENV RELEASE_NODE="${RELEASE_NAME}@${POD_IP}"
 
 RUN echo "-setcookie ${NODE_COOKIE}" >> ./rel/vm.args.eex
 
-RUN cd spawn_activators/activator_grpc \
+RUN cd spawn_activators/activator_api \
     && mix deps.get \
-    && mix release activator_grpc
+    && mix release activator_api
 
 # ---- Application Stage ----
 FROM alpine:3.17.3
@@ -56,4 +56,4 @@ RUN touch /app/.erlang.cookie && chmod 777 /app/.erlang.cookie
 
 USER nobody
 
-ENTRYPOINT ["./activator_grpc", "start"]
+ENTRYPOINT ["./activator_api", "start"]

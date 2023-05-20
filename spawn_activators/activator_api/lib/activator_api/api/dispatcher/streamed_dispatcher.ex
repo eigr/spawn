@@ -7,6 +7,6 @@ defmodule ActivatorAPI.Api.Dispatcher.StreamedDispatcher do
   require Logger
 
   @impl true
-  def dispatch(_message, _stream, opts \\ []) do
+  def dispatch(_message, _stream, _opts) do
   end
 end

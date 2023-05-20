@@ -153,10 +153,7 @@ run-activator-local:
 	cd spawn_activators/activator && mix deps.get && MIX_ENV=dev iex --name activator@127.0.0.1 -S mix
 
 run-activator-grpc-local:
-	cd spawn_activators/activator_grpc && mix deps.get && MIX_ENV=dev iex --name activator_grpc@127.0.0.1 -S mix
-
-run-activator-http-local:
-	cd spawn_activators/activator_http && mix deps.get && MIX_ENV=dev iex --name activator_http@127.0.0.1 -S mix
+	cd spawn_activators/activator_api && mix deps.get && MIX_ENV=dev iex --name activator_api@127.0.0.1 -S mix
 
 run-activator-kafka-local:
 	cd spawn_activators/activator_kafka && mix deps.get && MIX_ENV=dev iex --name activator_kafka@127.0.0.1 -S mix
@@ -175,9 +172,8 @@ run-deps-get-all:
 	cd spawn_sdk/spawn_sdk && mix deps.get
 	cd spawn_proxy/proxy && mix deps.get
 	cd spawn_activators/activator && mix deps.get
+	cd spawn_activators/activator_api && mix deps.get
 	cd spawn_activators/activator_pubsub && mix deps.get
-	cd spawn_activators/activator_http && mix deps.get
-	cd spawn_activators/activator_grpc && mix deps.get
 	cd spawn_activators/activator_kafka && mix deps.get
 	cd spawn_activators/activator_sqs && mix deps.get
 	cd spawn_activators/activator_rabbitmq && mix deps.get
