@@ -18,6 +18,10 @@ defmodule Spawn.Cluster.StateHandoff.Supervisor do
   def init(config) do
     children = [Spawn.Cluster.StateHandoff.child_spec(config)]
 
-    Supervisor.init(children, strategy: :one_for_one, max_restarts: 10000, max_seconds: 3600)
+    Supervisor.init(children,
+      strategy: :one_for_one,
+      max_restarts: config.state_handoff_max_restarts,
+      max_seconds: config.state_handoff_max_seconds
+    )
   end
 end

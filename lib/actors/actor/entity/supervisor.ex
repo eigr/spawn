@@ -14,12 +14,13 @@ defmodule Actors.Actor.Entity.Supervisor do
 
   @default_number_of_partitions 8
 
-  def child_spec() do
+  def child_spec(config) do
     {
       PartitionSupervisor,
       child_spec: DynamicSupervisor,
       name: __MODULE__,
-      max_restarts: 100,
+      max_restarts: config.actors_max_restarts,
+      max_seconds: config.actors_max_seconds,
       partitions: get_number_of_partitions()
     }
   end
