@@ -36,8 +36,8 @@ defmodule Activator.Dispatcher.DefaultDispatcher do
     command = Keyword.fetch!(opts, :command)
     system_name = Keyword.fetch!(opts, :system)
 
-    actor = Actor.new(id: ActorId.new(name: actor_name, system: system_name))
-    system = ActorSystem.new(name: system_name)
+    actor = %Actor{id: %ActorId{name: actor_name, system: system_name}}
+    system = %ActorSystem{name: system_name}
 
     Logger.info("Dispaching message to Actor #{inspect(actor_name)}")
 
@@ -45,18 +45,16 @@ defmodule Activator.Dispatcher.DefaultDispatcher do
       "Request for Activate Actor [#{actor_name}] using command [#{command}] without payload"
     )
 
-    req =
-      InvocationRequest.new(
-        system: system,
-        actor: actor,
-        payload: {:noop, Noop.new()},
-        command_name: command,
-        async: async?,
-        caller: nil
-      )
+    req = %InvocationRequest{
+      system: system,
+      actor: actor,
+      payload: {:noop, %Noop{}},
+      command_name: command,
+      async: async?,
+      caller: nil
+    }
 
-    # TODO CHANGE TO NATS
-    Actors.invoke(req)
+    Actors.invoke_with_nats(req, opts)
   end
 
   defp do_dispatch(payload, opts) do
@@ -65,8 +63,8 @@ defmodule Activator.Dispatcher.DefaultDispatcher do
     command = Keyword.fetch!(opts, :command)
     system_name = Keyword.fetch!(opts, :system)
 
-    actor = Actor.new(id: ActorId.new(name: actor_name, system: system_name))
-    system = ActorSystem.new(name: system_name)
+    actor = %Actor{id: %ActorId{name: actor_name, system: system_name}}
+    system = %ActorSystem{name: system_name}
 
     Logger.info("Dispaching message to Actor #{inspect(actor_name)}")
 
@@ -74,16 +72,15 @@ defmodule Activator.Dispatcher.DefaultDispatcher do
       "Request for Activate Actor [#{actor_name}] using command [#{command}] with payload: #{inspect(payload)}"
     )
 
-    res =
-      InvocationRequest.new(
-        system: system,
-        actor: actor,
-        payload: {:value, payload},
-        command_name: command,
-        async: async?,
-        caller: nil
-      )
+    req = %InvocationRequest{
+      system: system,
+      actor: actor,
+      payload: {:value, payload},
+      command_name: command,
+      async: async?,
+      caller: nil
+    }
 
-    Actors.invoke(res)
+    Actors.invoke_with_nats(req, opts)
   end
 end
