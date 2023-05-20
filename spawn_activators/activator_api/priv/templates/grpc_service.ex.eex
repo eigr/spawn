@@ -1,0 +1,35 @@
+defmodule <%= mod_name %>.ProxyService do
+  @moduledoc """
+  This <%= mod_name %>.ProxyService module only passes 
+  incoming gRPC requests to the respective Actors Actions.
+  """
+  @moduledoc since: "0.5.1"
+  use GRPC.Server, service: <%= name %>
+
+  alias ActivatorAPI.Api.RouterDispatcher, as: Dispatcher
+<%= Enum.map methods, fn(method) -> %>
+  @spec <%= method %>(<%= Map.get(input_types, method) %>.t(), GRPC.Server.Stream.t()) :: <%= Map.get(output_types, method) %>.t()
+  def <%= method %>(message, stream) do
+      opts = [
+        service_name: "<%= service_name %>",
+        original_method: "<%= Map.get(original_methods, method) %>",
+        actor_name: "<%= dispatcher_actor_name %>",
+        action: "<%= dispatcher_actor_action %>",
+        parent_actor: "<%= dispatcher_actor_parent %>",
+        system_name: "<%= dispatcher_system_name %>",
+        invocation_type: "<%= dispatcher_option_invocation_type %>",
+        request_type: "<%= Map.get(request_types, method) %>",
+        input_type: <%= Map.get(input_types, method) %>,
+        output_type: <%= Map.get(output_types, method) %>,
+        pooled: "<%= dispatcher_option_pooled %>",
+        timeout: "<%= dispatcher_option_timeout %>",
+        async: "<%= dispatcher_option_async %>",
+        stream_out_from_channel: "<%= dispatcher_option_output_channel %>",
+        authentication_kind: "<%= dispatcher_option_authentication_kind %>",
+        authentication_secret: "<%= dispatcher_option_authentication_secret %>"
+      ]
+
+      Dispatcher.dispatch(message, stream, opts)
+  end    
+<% end %>
+end
