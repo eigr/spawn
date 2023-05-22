@@ -10,7 +10,7 @@ defmodule Statestores.Adapters.CockroachDB do
 
   alias Statestores.Schemas.{Event, ValueObjectSchema}
 
-  def get_by_key(id), do: get_by(Event, id: id)
+  def get_by_key(id), do: get(Event, id)
 
   def save(
         %Event{
@@ -51,4 +51,6 @@ defmodule Statestores.Adapters.CockroachDB do
   end
 
   def default_port, do: "26257"
+
+  def get_children, do: []
 end

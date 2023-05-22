@@ -42,4 +42,38 @@ defmodule Statestores.Schemas.Event do
         changeset
     end
   end
+
+  @spec from_record_tuple(term()) :: t()
+  def from_record_tuple(tuple) do
+    # Do not change the order here
+    {_, actor, id, system, revision, tags, data_type, data, updated_at, inserted_at} = tuple
+
+    %__MODULE__{
+      actor: actor,
+      id: id,
+      system: system,
+      revision: revision,
+      tags: tags,
+      data_type: data_type,
+      data: data,
+      updated_at: updated_at,
+      inserted_at: inserted_at
+    }
+  end
+
+  @spec to_record_list(t()) :: list(any())
+  def to_record_list(%__MODULE__{} = event) do
+    # Do not change the order here
+    [
+      event.actor,
+      event.id,
+      event.system,
+      event.revision,
+      event.tags,
+      event.data_type,
+      event.data,
+      event.updated_at,
+      event.inserted_at
+    ]
+  end
 end

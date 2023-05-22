@@ -11,7 +11,7 @@ defmodule SpawnSdkExample.Application do
         actors: [
           SpawnSdkExample.Actors.JoeActor,
           SpawnSdkExample.Actors.JsonActor,
-          SpawnSdkExample.Actors.ClockActor,
+          # SpawnSdkExample.Actors.ClockActor,
           SpawnSdkExample.Actors.AbstractActor,
           SpawnSdkExample.Actors.PooledActor
         ],

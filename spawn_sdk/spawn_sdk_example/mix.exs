@@ -31,10 +31,6 @@ defmodule SpawnSdkExample.MixProject do
   defp deps do
     [
       {:spawn_sdk, path: "../spawn_sdk"},
-      # TODO: Removing :spawn_statestores dependency
-      # shouldn't affect functionality, statestores should be optional
-      # remove spawn_statestores from _build and test running sdk locally to see its effect
-      {:spawn_statestores, path: "../../spawn_statestores/statestores"},
       {:duration_tc, "~> 0.1.0"},
       {:bakeware, "~> 0.2"},
       {:benchee, "~> 1.0", only: :dev},

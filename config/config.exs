@@ -47,4 +47,9 @@ config :opentelemetry,
          exporter: {:opentelemetry_exporter, %{endpoints: [{:http, 'localhost', 55681, []}]}}
        }
 
+config :mnesiac,
+  stores: [Statestores.Adapters.Native.Store],
+  schema_type: :disc_copies,
+  table_load_timeout: 600_000
+
 import_config "#{config_env()}.exs"

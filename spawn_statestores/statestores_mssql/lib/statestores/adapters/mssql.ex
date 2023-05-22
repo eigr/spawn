@@ -10,7 +10,7 @@ defmodule Statestores.Adapters.MSSQL do
 
   alias Statestores.Schemas.{Event, ValueObjectSchema}
 
-  def get_by_key(id), do: get_by(Event, id: id)
+  def get_by_key(id), do: get(Event, id)
 
   def save(%Event{id: id} = event) do
     %Event{}
@@ -28,7 +28,7 @@ defmodule Statestores.Adapters.MSSQL do
     end
   rescue
     _e ->
-      get_by(Event, id: id)
+      get(Event, id)
       |> Event.changeset(ValueObjectSchema.to_map(event))
       |> update!()
       |> case do
@@ -44,4 +44,6 @@ defmodule Statestores.Adapters.MSSQL do
   end
 
   def default_port, do: "1433"
+
+  def get_children, do: []
 end

@@ -1,9 +1,3 @@
-.vscode
-.idea
-.elixir_ls
-
-spawn-cli/**/target/
-
 # The directory Mix will write compiled artifacts to.
 /_build/
 
@@ -25,16 +19,10 @@ erl_crash.dump
 # Also ignore archive artifacts (built via "mix archive.build").
 *.ez
 
+# Ignore package tarball (built via "mix hex.build").
+statestores-*.tar
+
 # Temporary files, for example, from tests.
 /tmp/
-
-.elixir_ls/**
-
-# Temporary Sqlite3 database
-eigr-functions-db.db
-
-eigr-functions-db.db-shm
-
-eigr-functions-db.db-wal
 
 Mnesia*

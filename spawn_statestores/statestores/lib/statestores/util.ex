@@ -32,6 +32,7 @@ defmodule Statestores.Util do
       Code.ensure_loaded?(Statestores.Adapters.Postgres) -> "postgres"
       Code.ensure_loaded?(Statestores.Adapters.SQLite3) -> "sqlite"
       Code.ensure_loaded?(Statestores.Adapters.MSSQL) -> "mssql"
+      Code.ensure_loaded?(Statestores.Adapters.Native) -> "native"
       true -> nil
     end
   end
@@ -46,9 +47,16 @@ defmodule Statestores.Util do
 
   defp load_adapter_by_type(:mssql), do: Statestores.Adapters.MSSQL
 
+  defp load_adapter_by_type(:native), do: Statestores.Adapters.Native
+
   @spec get_default_database_port :: <<_::32>>
   def get_default_database_port() do
     load_adapter().default_port()
+  end
+
+  @spec get_adapter_children :: [any()]
+  def get_adapter_children() do
+    load_adapter().get_children() || []
   end
 
   @spec generate_key(any()) :: String.t()

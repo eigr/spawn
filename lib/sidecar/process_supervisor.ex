@@ -6,9 +6,9 @@ defmodule Sidecar.ProcessSupervisor do
   def init(config) do
     children =
       [
-        statestores(),
         {Sidecar.MetricsSupervisor, config},
         Spawn.Supervisor.child_spec(config),
+        statestores(),
         Actors.Supervisors.ProtocolSupervisor.child_spec(config),
         Actors.Supervisors.ActorSupervisor.child_spec(config)
       ]

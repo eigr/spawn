@@ -14,6 +14,8 @@ defmodule Statestores.Adapters.Behaviour do
 
   @callback default_port :: <<_::32>>
 
+  @callback get_children :: list(any)
+
   defmacro __using__(_opts) do
     quote do
       alias Statestores.Adapters.Behaviour
