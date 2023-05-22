@@ -51,6 +51,6 @@ defmodule Statestores.Util do
     load_adapter().default_port()
   end
 
-  @spec generate_key(String.t(), String.t()) :: String.t()
-  def generate_key(system, name), do: Base.encode16("#{system}:#{name}")
+  @spec generate_key(any()) :: String.t()
+  def generate_key(id), do: :erlang.phash2(id)
 end

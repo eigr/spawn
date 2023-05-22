@@ -4,7 +4,7 @@ defmodule Statestores.Adapters.SQLite3.Migrations.CreateEventsTable do
   def up do
     execute """
     CREATE TABLE IF NOT EXISTS events (
-      id TEXT PRIMARY KEY,
+      id INTEGER PRIMARY KEY,
       actor TEXT,
       system TEXT,
       revision INTEGER DEFAULT 0,

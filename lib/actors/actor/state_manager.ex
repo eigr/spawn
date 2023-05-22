@@ -27,8 +27,8 @@ if Code.ensure_loaded?(Statestores.Supervisor) do
     end
 
     @spec load(ActorId.t()) :: {:ok, any}
-    def load(%ActorId{name: name, system: system} = _actor_id) do
-      key = generate_key(system, name)
+    def load(%ActorId{} = actor_id) do
+      key = generate_key(actor_id)
 
       case StateStoreManager.load(key) do
         %Event{revision: _rev, tags: tags, data_type: type, data: data} = _event ->
@@ -52,14 +52,14 @@ if Code.ensure_loaded?(Statestores.Supervisor) do
         do: {:ok, actor_state}
 
     def save(
-          %ActorId{name: name, system: system} = _actor_id,
+          %ActorId{name: name, system: system} = actor_id,
           %ActorState{tags: tags, state: actor_state} = _state
         ) do
       Logger.debug("Saving state for actor #{name}")
 
       with bytes_from_state <- Any.encode(actor_state),
            hash <- :crypto.hash(:sha256, bytes_from_state),
-           key <- generate_key(system, name) do
+           key <- generate_key(actor_id) do
         %Event{
           id: key,
           actor: name,
@@ -98,7 +98,7 @@ if Code.ensure_loaded?(Statestores.Supervisor) do
         do: {:ok, actor_state}
 
     def save_async(
-          %ActorId{name: name, system: system} = _actor_id,
+          %ActorId{name: name, system: system} = actor_id,
           %ActorState{tags: tags, state: actor_state} = _state,
           timeout
         ) do
@@ -107,7 +107,7 @@ if Code.ensure_loaded?(Statestores.Supervisor) do
       persist_data_task =
         Task.async(fn ->
           Logger.debug("Saving state for actor #{name}")
-          key = generate_key(system, name)
+          key = generate_key(actor_id)
 
           %Event{
             id: key,
@@ -148,7 +148,7 @@ if Code.ensure_loaded?(Statestores.Supervisor) do
       end
     end
 
-    defp generate_key(system, name), do: Base.encode16("#{system}:#{name}")
+    defp generate_key(id), do: :erlang.phash2(id)
 
     defp inserted_successfully?(ref, pid) do
       receive do

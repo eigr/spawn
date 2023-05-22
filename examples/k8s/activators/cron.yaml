@@ -10,7 +10,7 @@ metadata:
 spec:
   activator:
     type: Cron
-    externalConnectorRef: invocation-connection-ref
+    externalConnectorRef: invocation-connection-ref-secret
   bindings:
     sources:
       - name: hour-scheduler

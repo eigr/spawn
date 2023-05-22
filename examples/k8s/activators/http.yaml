@@ -6,11 +6,12 @@ metadata:
   namespace: default # Optional. Default namespace is "default"
 spec:
   activator:
-    type: HTTP
+    type: gRPC
     expose: true
     exposeMethod: ingress
-    exposeIngressType: nginx
+    exposeIngressClassName: nginx
     externalConnectorRef: invocation-connection-ref
+    grpFileDescriptorRef: protobuf-file-descriptors-secret
   bindings:
     sources:
       - name: robert-set-language-mapping
@@ -22,15 +23,11 @@ spec:
             protoMessage: "Request" # name of protobuf type
             protoPackage: "io.eigr.functions.spawn.codebeambr.messages"
             ignoreUnknownFields: true
-            fileDescriptor:
-              volumeMounts:
-                - name: descriptors-config
-                  mountPath: /etc/protos
     sinks:
       - name: robert-sink
         actor: robert # Name of an Actor to send queue event message
         command: setLanguage # Name of an Actor method/function to call
-  volumes:
-    - name: descriptors-config
-      configMap:
-        name: protobuf-file-descriptors
+  # volumes:
+  #   - name: descriptors-config
+  #     configMap:
+  #       name: protobuf-file-descriptors
