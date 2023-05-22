@@ -1,26 +1,33 @@
 ---
-apiVersion: spawn.eigr.io/v1
+apiVersion: spawn-eigr.io/v1
 kind: Activator
 metadata:
   name: cron-activator # Mandatory. Name of the activator
   namespace: default # Optional. Default namespace is "default"
+  #annotations:
+  #  # Mandatory. Name of the ActorSystem declared in ActorSystem CRD
+  #  spawn-eigr.io/actor-system: spawn-system
 spec:
   activator:
     type: Cron
+    externalConnectorRef: invocation-connection-ref-secret
   bindings:
     sources:
-      - name: joe-scheduler
+      - name: hour-scheduler
         expr: "* * * * *"
-      - name: robert-scheduler
+      - name: daily-scheduler
         expr: "* * * * *"
     sinks:
       - name: joe-sink
         actor: joe # Name of an Actor
         command: setLanguage # Name of an Actor Action to call
+        system: spawn-system
         binding:
-          - name: robert-scheduler
+          - name: hour-scheduler
+          - name: daily-scheduler
       - name: robert-sink
         actor: robert
-        command: setLanguage
+        command: sum
+        system: spawn-system
         binding:
-          - name: robert-scheduler
+          - name: daily-scheduler

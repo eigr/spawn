@@ -21,7 +21,7 @@ defmodule Actors.Supervisors.ActorSupervisor do
     children =
       [
         get_pubsub_adapter(config),
-        Actors.Actor.Entity.Supervisor.child_spec(),
+        Actors.Actor.Entity.Supervisor.child_spec(config),
         %{
           id: :actor_registry_task,
           start:

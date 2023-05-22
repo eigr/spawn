@@ -29,9 +29,9 @@ defmodule Activator.Encoder.CloudEvent do
     end
   end
 
-  def decode(%CloudEvent{source: source, id: id, data: nil} = data), do: {:ok, source, id, nil}
+  def decode(%CloudEvent{source: source, id: id, data: nil} = _data), do: {:ok, source, id, nil}
 
-  def decode(%CloudEvent{source: source, id: id, data: {:binary_data, payload}} = data),
+  def decode(%CloudEvent{source: source, id: id, data: {:binary_data, payload}} = _data),
     do: {:ok, source, id, Any.decode(payload)}
 
   def decode(_), do: {:error, "Error on try decode data. Data must be a binary type"}

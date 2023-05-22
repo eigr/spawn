@@ -4,7 +4,7 @@ defmodule SpawnOperator.K8s.System.Secret.CertManager.Certificate do
 
   Resource like this:
   ---
-  apiVersion: spawn.eigr.io/v1
+  apiVersion: spawn-eigr.io/v1
   kind: ActorSystem
   metadata:
     name: spawn-system # Mandatory. Name of the state store

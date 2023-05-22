@@ -3,7 +3,7 @@ defmodule Statestores.Adapters.MySQL.Migrations.CreateEventsTable do
 
   def up do
     create table(:events, primary_key: false) do
-      add :id, :string, primary_key: true
+      add :id, :bigint, primary_key: true
       add :actor, :string
       add :system, :string
       add :revision, :integer

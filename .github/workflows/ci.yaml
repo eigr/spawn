@@ -101,18 +101,11 @@ jobs:
       #     MIX_ENV=test PROXY_DATABASE_TYPE=mysql PROXY_CLUSTER_STRATEGY=gossip PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
       #     cd ../../
 
-      # - name: Run tests activator_grpc
+      # - name: Run tests activator_api
       #   run: |
-      #     cd spawn_activators/activator_grpc
+      #     cd spawn_activators/activator_api
       #     mix deps.get
       #     MIX_ENV=test PROXY_DATABASE_TYPE=mysql PROXY_CLUSTER_STRATEGY=gossip PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
-      #     cd ../../
-
-      # - name: Run tests activator_http
-      #   run: |
-      #     cd spawn_activators/activator_grpc
-      #     mix deps.get
-      #     MIX_ENV=test PROXY_DATABASE_TYPE=mysql PROXY_HTTP_PORT=905 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
       #     cd ../../
 
       # - name: Run tests activator_kafka

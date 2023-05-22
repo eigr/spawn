@@ -1,4 +1,4 @@
-defmodule SpawnOperator.K8s.Activators.Rabbitmq.Service.Service do
+defmodule SpawnOperator.K8s.Activators.Rabbitmq.Service do
   @moduledoc false
 
   @behaviour SpawnOperator.K8s.Manifest

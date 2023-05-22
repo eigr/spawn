@@ -6,8 +6,6 @@ defmodule Spawn.Cluster.Node.ServerSupervisor do
 
   alias Spawn.Utils.Nats
 
-  @backoff_period 3_000
-
   def start_link(config) do
     Supervisor.start_link(__MODULE__, config,
       name: String.to_atom("#{String.capitalize(config.actor_system_name)}.NodeServer")
@@ -41,27 +39,9 @@ defmodule Spawn.Cluster.Node.ServerSupervisor do
     }
 
     children = [
-      {Gnat.ConnectionSupervisor, connection_settings(connection_name, config)},
       {Gnat.ConsumerSupervisor, connection_params}
     ]
 
     Supervisor.init(children, strategy: :one_for_one)
-  end
-
-  defp connection_settings(name, config) do
-    %{
-      name: name,
-      backoff_period: @backoff_period,
-      connection_settings: [
-        Map.merge(
-          Spawn.Utils.Nats.get_internal_nats_connection(config),
-          determine_auth_method(name, config)
-        )
-      ]
-    }
-  end
-
-  defp determine_auth_method(_name, _config) do
-    %{}
   end
 end

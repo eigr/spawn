@@ -61,6 +61,17 @@ defmodule Actors.Config.Vapor do
           {:user_function_host, "USER_FUNCTION_HOST", default: "0.0.0.0", required: false},
           {:user_function_port, "USER_FUNCTION_PORT",
            default: 8090, map: &String.to_integer/1, required: false},
+
+          # Supervisors configuration
+          {:actors_max_restarts, "SPAWN_SUPERVISORS_ACTORS_MAX_RESTARTS",
+           default: 10000, map: &String.to_integer/1, required: false},
+          {:actors_max_seconds, "SPAWN_SUPERVISORS_ACTORS_MAX_SECONDS",
+           default: 3600, map: &String.to_integer/1, required: false},
+          {:state_handoff_max_restarts, "SPAWN_SUPERVISORS_STATE_HANDOFF_MAX_RESTARTS",
+           default: 10000, map: &String.to_integer/1, required: false},
+          {:state_handoff_max_seconds, "SPAWN_SUPERVISORS_STATE_HANDOFF_MAX_SECONDS",
+           default: 3600, map: &String.to_integer/1, required: false},
+
           # Internal Nats Protocol
           {:use_internal_nats, "SPAWN_USE_INTERNAL_NATS", default: "false", required: false},
           {:internal_nats_hosts, "SPAWN_INTERNAL_NATS_HOSTS",
@@ -74,6 +85,8 @@ defmodule Actors.Config.Vapor do
           {:internal_nats_auth_pass, "SPAWN_INTERNAL_NATS_AUTH_PASS",
            default: "admin", required: false},
           {:internal_nats_auth_jwt, "SPAWN_INTERNAL_NATS_AUTH_JWT", default: "", required: false},
+          {:internal_nats_connection_backoff_period, "SPAWN_INTERNAL_NATS_BACKOFF_PERIOD",
+           default: 3000, map: &String.to_integer/1, required: false},
 
           # PubSub
           {:pubsub_adapter, "SPAWN_PUBSUB_ADAPTER", default: "native", required: false},

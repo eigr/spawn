@@ -188,12 +188,6 @@ metadata:
   name: spawn-operator
 rules:
   - apiGroups:
-      - coordination.k8s.io
-    resources:
-      - leases
-    verbs:
-      - "*"
-  - apiGroups:
       - apiextensions.k8s.io
     resources:
       - customresourcedefinitions
@@ -203,6 +197,12 @@ rules:
       - events.k8s.io
     resources:
       - events
+    verbs:
+      - "*"
+  - apiGroups:
+      - coordination.k8s.io
+    resources:
+      - leases
     verbs:
       - "*"
   - apiGroups:
@@ -221,6 +221,13 @@ rules:
       - ""
     resources:
       - secrets
+    verbs:
+      - "*"
+  - apiGroups:
+      - batch/v1
+    resources:
+      - cronjob
+      - job
     verbs:
       - "*"
   - apiGroups:

@@ -113,7 +113,7 @@ defmodule SpawnOperator.K8s.System.Secret.ActorSystemSecret do
   end
 
   defp maybe_use_nats_cluster(config, _name, _ns, params) do
-    nats_params = Map.get(params, "systemToSystem", %{})
+    nats_params = Map.get(params, "externalInvocationConfig", %{})
     enabled = Map.get(nats_params, "enabled", "false")
 
     nats_config =
@@ -122,7 +122,7 @@ defmodule SpawnOperator.K8s.System.Secret.ActorSystemSecret do
           %{}
 
         "true" ->
-          nats_secret_ref = Map.fetch!(nats_params, "natsClusterSecretRef")
+          nats_secret_ref = Map.fetch!(nats_params, "externalConnectorRef")
 
           {:ok, secret} =
             K8s.Client.get("v1", :secret,

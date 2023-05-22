@@ -10,7 +10,7 @@ defmodule Statestores.Schemas.Event do
 
   @primary_key false
   schema "events" do
-    field(:id, :string, primary_key: true)
+    field(:id, :integer, primary_key: true)
 
     field(:actor, :string)
 

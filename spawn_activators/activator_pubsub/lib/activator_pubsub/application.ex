@@ -11,9 +11,8 @@ defmodule ActivatorPubSub.Application do
     config = Config.load(__MODULE__)
 
     children = [
-      Spawn.Supervisor.child_spec(config),
-      {Bandit, plug: ActivatorPubSub.Router, scheme: :http, port: get_http_port(config)},
-      Actors.Supervisors.ActorSupervisor.child_spec(config)
+      Activator.Supervisor.child_spec(config),
+      {Bandit, plug: ActivatorPubSub.Router, scheme: :http, port: get_http_port(config)}
     ]
 
     opts = [strategy: :one_for_one, name: ActivatorPubSub.Supervisor]

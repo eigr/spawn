@@ -1,5 +1,5 @@
 ---
-apiVersion: spawn.eigr.io/v1
+apiVersion: spawn-eigr.io/v1
 kind: Activator
 metadata:
   name: rabbitmq-activator # Mandatory. Name of the activator
@@ -8,6 +8,7 @@ spec:
   activator:
     type: AMQP
     paramsSecretRef: rabbitmq-connection-secret
+    externalConnectorRef: invocation-connection-ref
   bindings:
     sources:
       - name: amqp-source

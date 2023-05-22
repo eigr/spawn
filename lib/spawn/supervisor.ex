@@ -40,7 +40,10 @@ defmodule Spawn.Supervisor do
         Logger.debug("Starting Spawn using Nats control protocol")
 
         (children ++
-           [Spawn.Cluster.Node.ServerSupervisor.child_spec(config)])
+           [
+             Spawn.Cluster.Node.ConnectionSupervisor.child_spec(config),
+             Spawn.Cluster.Node.ServerSupervisor.child_spec(config)
+           ])
         |> List.flatten()
     end
   end

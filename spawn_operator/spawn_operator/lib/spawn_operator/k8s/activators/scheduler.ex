@@ -6,7 +6,7 @@ defmodule SpawnOperator.K8s.Activators.Scheduler do
 
   ```
   ---
-  apiVersion: spawn.eigr.io/v1
+  apiVersion: spawn-eigr.io/v1
   kind: Activator
   metadata:
     name: cron-activator # Mandatory. Name of the activator
@@ -17,7 +17,7 @@ defmodule SpawnOperator.K8s.Activators.Scheduler do
   spec:
     activator:
       type: Cron
-      kind: Deployment # DaemonSet
+      externalConnectorRef: invocation-connection-ref
     bindings:
       sources:
         - name: joe-scheduler
@@ -38,58 +38,24 @@ defmodule SpawnOperator.K8s.Activators.Scheduler do
    ```
   """
   alias SpawnOperator.K8s.Activators.Scheduler.{
-    Cm.Configmap,
-    CronJob,
-    DaemonSet,
-    DaemonSetService,
-    Deployment,
-    DeploymentService
+    CronJob
   }
-
-  import Spawn.Utils.Common, only: [to_existing_atom_or_new: 1]
 
   @spec apply(map(), Bonny.Axn.t(), atom()) :: Bonny.Axn.t()
   def apply(args, axn, action) when action in [:add, :modify] do
-    cron_job = CronJob.manifest(args)
-    configmap = Configmap.manifest(args)
-
-    {resource, service} =
-      case get_activator_kind(args.params) do
-        :daemonset ->
-          {
-            DaemonSet.manifest(args),
-            DaemonSetService.manifest(args)
-          }
-
-        :deployment ->
-          {
-            Deployment.manifest(args),
-            DeploymentService.manifest(args)
-          }
-
-        _ ->
-          raise ArgumentError, "Invalid Activator Kind. Valids are [DaemonSet, Deployment]"
-      end
+    manifests = CronJob.manifest(args)
 
     axn
-    |> Bonny.Axn.register_descendant(configmap)
-    |> Bonny.Axn.register_descendant(service)
-    |> Bonny.Axn.register_descendant(resource)
-    |> Bonny.Axn.register_descendant(cron_job)
-    # |> Bonny.Axn.update_status(fn status ->
-    #  put_in(status, [Access.key(:some, %{}), :field], "foo")
-    # end)
+    |> register(manifests)
     |> Bonny.Axn.success_event()
   end
 
-  def apply(args, axn, action) when action in [:reconcile] do
+  def apply(_args, axn, action) when action in [:reconcile] do
     Bonny.Axn.success_event(axn)
   end
 
-  def apply(args, axn, action) when action in [:delete], do: Bonny.Axn.success_event(axn)
+  def apply(_args, axn, action) when action in [:delete], do: Bonny.Axn.success_event(axn)
 
-  defp get_activator_kind(params) do
-    String.downcase(params.activator.kind)
-    |> to_existing_atom_or_new()
-  end
+  defp register(axn, resources),
+    do: Enum.reduce(resources, axn, &Bonny.Axn.register_descendant(&2, &1))
 end
