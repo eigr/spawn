@@ -83,9 +83,10 @@ defmodule Actors.Actor.Entity.Lifecycle do
         } = state
       ) do
     if is_nil(actor.state) or (!is_nil(actor.state) and is_nil(actor.state.state)) do
-      "Initial state is empty. Getting state from state manager."
+      "Initial state is empty for Actor #{name}. Getting state from state manager."
     else
-      "Initial state is not empty. Trying to reconcile the state with state manager."
+      # This is currently not in use by any SDK. In other words, nobody starts the Actors via SDK with some initial state.
+      "Initial state is not empty for Actor #{name}. Trying to reconcile the state with state manager."
     end
     |> Logger.debug()
 
