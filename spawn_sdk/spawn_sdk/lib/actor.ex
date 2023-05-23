@@ -29,7 +29,7 @@ defmodule SpawnSdk.Actor do
   alias SpawnSdk.{
     ActorRef,
     ActorChannel,
-    ActorGroup,
+    ActorGroupRef,
     Context,
     Value
   }
@@ -38,9 +38,20 @@ defmodule SpawnSdk.Actor do
 
   @type actor :: String.t()
 
+  @type parent :: actor()
+
   @type group :: ActorGroup.t()
 
-  @type opts :: Keyword.t()
+  @type opts :: [
+          action: String.t() | atom() | nil,
+          data: any() | nil,
+          delay: integer() | nil,
+          metadata: map() | nil,
+          parent: ActorRef.t() | nil,
+          pooled: boolean() | nil,
+          scheduled_to: DateTime.t() | nil,
+          spawn: boolean() | false
+        ]
 
   @type command :: String.t()
 
@@ -55,8 +66,18 @@ defmodule SpawnSdk.Actor do
   @callback handle_command({command(), data()}, context()) ::
               value() | {:reply, value()} | {:error, error()} | {:error, error(), value()}
 
+  @spec channel(ActorChannel.t(), opts()) :: ActorChannel.t()
+  def channel(channel, opts), do: %ActorChannel{channel: channel, opts: opts}
+
   @doc """
-  Creates a reference to an actor so that it can be invoked
+  Creates a reference to an actor so that it can be invoked.
+
+  The first argument is ActorSystem name.
+  The second argument is a Actor name.
+
+  The third argument is a keyword list of options:
+
+  * `spawn` - a boolean indicating whether the actor should be generated or not. Default is **false**.
 
   Example:
 
@@ -70,45 +91,183 @@ defmodule SpawnSdk.Actor do
   ```
   alias SpawnSdk.Actor
 
-  data = %MyData{}
+  my_data = %MyData{value: 1}
 
   Actor.ref("spawn-system", "joe")
-  |> Actor.invoke(data)
+  |> Actor.invoke(action: "sum", data: my_data)
   ```
   """
   @spec ref(system(), actor(), opts()) :: ActorRef.t()
   def ref(system, name, opts \\ []),
     do: %ActorRef{system: system, name: name, opts: opts}
 
-  @spec group(list(ActorRef), opts()) :: ActorRef.t()
+  @spec group(list(ActorRef), opts()) :: ActorGroupRef.t()
   def group(actors, opts \\ []) when is_list(actors),
-    do: %ActorGroup{actors: actors, opts: opts}
+    do: %ActorGroupRef{actors: actors, opts: opts}
 
-  @spec channel(ActorChannel.t(), opts()) :: :ok
-  def channel(channel, opts), do: %ActorChannel{channel: channel, opts: opts}
+  @doc """
+  Spawn an actor and return its reference.
 
-  @spec invoke(ActorRef.t() | ActorGroup.t(), any(), opts()) :: any()
-  def invoke(ref, data, opts \\ [])
+  The first argument is ActorSystem name.
+  The second argument is a Actor name.
+  The third argument is a parent actor name.
 
-  def invoke(%ActorRef{} = _ref, _data, _opts) do
+  Example:
+
+  ```
+  iex(spawn_a@127.0.0.1)1> SpawnSdk.Actor.spawn("spawn-system", "joe", "abs_actor")
+  %SpawnSdk.ActorRef{system: "spawn-system", name: "joe", opts: []}
+  ```
+
+  To invoke an actor using the obtained reference you could do:
+
+  ```
+  alias SpawnSdk.Actor
+
+  my_data = %MyData{value: 1}
+
+  Actor.spawn("spawn-system", "joe", "abs_actor")
+  |> Actor.invoke(action: "sum", data: my_data)
+  ```
+  """
+  @spec spawn(system(), actor(), parent(), opts()) :: ActorRef.t()
+  def spawn(system, name, parent, opts \\ []) do
+    :ok = SpawnSdk.spawn_actor(name, system: system, actor: parent)
+    new_options = Keyword.merge(opts, parent: parent, already_spawned: true)
+    %ActorRef{system: system, name: name, opts: new_options}
   end
 
-  def invoke(%ActorGroup{} = _group, _data, _opts) do
+  @doc """
+  Creates a group of actor reference so that it can be invoked
+
+  Example:
+
+  ```
+  alias SpawnSdk.Actor
+
+  my_data = %MyData{value: 1}
+
+  Actor.ref("erlang-system", "joe")
+  |> Actor.to_group("erlang-system", "robert")
+  |> Actor.to_group("erlang-system", "mike")
+  |> Actor.to_group("eigr-system", "adriano")
+  |> Actor.to_group("eigr-system", "marcel")
+  |> Actor.to_group("spawn-elixir-system", "elias")
+  |> Actor.multi(action: :sum, data: my_data)
+  ```
+  """
+  @spec to_group(ActorRef.t() | ActorGroupRef.t(), system(), actor(), opts()) :: ActorGroupRef.t()
+  def to_group(ref, system, actor, opts \\ [])
+
+  def to_group(%ActorRef{} = first, system, actor, opts) do
+    last = %ActorRef{system: system, name: actor, opts: opts}
+    %ActorGroupRef{actors: [first] ++ last, opts: opts}
   end
 
-  @spec cast(ActorRef.t() | ActorGroup.t(), any(), opts()) :: :ok
-  def cast(ref, data, opts \\ [])
-
-  def cast(%ActorRef{} = _ref, _data, _opts) do
+  def to_group(%ActorGroupRef{actors: first} = ref, system, actor, opts) when is_list(first) do
+    last = %ActorRef{system: system, name: actor, opts: opts}
+    %ActorGroupRef{ref | actors: first ++ last}
   end
 
-  def cast(%ActorGroup{} = _group, _data, _opts) do
+  @doc """
+  Sends a assynchronous message to group of actors.
+
+  Example:
+
+  ```
+  alias SpawnSdk.Actor
+
+  Actor.ref("spawn-system", "joe")
+  |> Actor.cast(action: "sum", data: %MyData{value: 1})
+  ```
+  """
+  @spec cast(ActorRef.t(), opts()) :: {:ok, :async}
+  def cast(%ActorRef{system: system, name: actor, opts: actor_opts} = _ref, opts) do
+    spawn? = Keyword.get(actor_opts, :spawn, false) || Keyword.get(opts, :spawn, false)
+    already_spawned? = Keyword.get(actor_opts, :already_spawned)
+    new_opts = Keyword.merge(opts, system: system, async: true)
+
+    case spawn? and not already_spawned? do
+      true ->
+        %ActorRef{system: _parent_system, name: parent_name} =
+          _parent =
+          Keyword.get(actor_opts, :parent) ||
+            Keyword.get(opts, :parent)
+
+        new_opts = Keyword.merge(new_opts, actor: parent_name)
+        SpawnSdk.invoke(actor, new_opts)
+
+      false ->
+        SpawnSdk.invoke(actor, new_opts)
+    end
   end
 
-  @spec pub(ActorChannel.t(), any(), opts()) :: :ok
-  def pub(channel, data, opts \\ [])
+  @doc """
+  Sends a message to the actor and returns the result.
 
-  def pub(%ActorChannel{} = _channel, _data, _opts) do
+  Example:
+
+  ```
+  alias SpawnSdk.Actor
+
+  Actor.ref("spawn-system", "joe")
+  |> Actor.invoke(action: "sum", data: %MyData{value: 1})
+  ```
+  """
+  @spec invoke(ActorRef.t(), opts()) ::
+          {:ok, any()} | {:error, any()}
+  def invoke(%ActorRef{system: system, name: actor, opts: actor_opts} = _ref, opts) do
+    spawn? = Keyword.get(actor_opts, :spawn, false) || Keyword.get(opts, :spawn, false)
+    already_spawned? = Keyword.get(actor_opts, :already_spawned)
+    new_opts = Keyword.merge(opts, system: system, async: false)
+
+    case spawn? and not already_spawned? do
+      true ->
+        %ActorRef{system: _parent_system, name: parent_name} =
+          _parent_name =
+          Keyword.get(actor_opts, :parent) ||
+            Keyword.get(opts, :parent)
+
+        new_opts = Keyword.merge(new_opts, actor: parent_name)
+        SpawnSdk.invoke(actor, new_opts)
+
+      false ->
+        SpawnSdk.invoke(actor, new_opts)
+    end
+  end
+
+  @doc """
+  Invokes a group of actors and returns all results.
+
+  Example:
+
+  ```
+  alias SpawnSdk.Actor
+
+  my_data = %MyData{value: 1}
+
+  Actor.ref("erlang-system", "joe")
+  |> Actor.to_group("erlang-system", "robert")
+  |> Actor.to_group("erlang-system", "mike")
+  |> Actor.to_group("eigr-system", "adriano")
+  |> Actor.to_group("eigr-system", "marcel")
+  |> Actor.to_group("spawn-elixir-system", "elias")
+  |> Actor.multi(action: :sum, data: my_data)
+  ```
+  """
+  @spec multi(ActorGroupRef.t(), opts()) :: {:ok, list(any())} | {:error, any()}
+  def multi(%ActorGroupRef{actors: actors} = _ref, opts) do
+    tasks =
+      Enum.map(actors, fn actor ->
+        Task.async(fn -> invoke(actor, opts) end)
+      end)
+
+    Task.await_many(tasks)
+  end
+
+  @spec pub(ActorChannel.t(), opts()) :: :ok
+  def pub(%ActorChannel{} = _channel, _opts) do
+    # TODO: implement this in Proxy too?
   end
 
   defmacro __using__(opts) do

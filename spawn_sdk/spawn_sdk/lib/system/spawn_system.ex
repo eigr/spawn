@@ -90,8 +90,8 @@ defmodule SpawnSdk.System.SpawnSystem do
   @doc "hey"
   def invoke(actor_name, invoke_opts \\ []) do
     system = Keyword.get(invoke_opts, :system)
-    command = Keyword.get(invoke_opts, :command)
-    payload = Keyword.get(invoke_opts, :payload)
+    command = Keyword.get(invoke_opts, :action)
+    payload = Keyword.get(invoke_opts, :data)
     async = Keyword.get(invoke_opts, :async, false)
     pooled = Keyword.get(invoke_opts, :pooled, false)
     metadata = Keyword.get(invoke_opts, :metadata, %{})

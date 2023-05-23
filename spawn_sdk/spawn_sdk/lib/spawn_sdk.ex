@@ -25,7 +25,7 @@ defmodule SpawnSdk do
           }
   end
 
-  defmodule ActorGroup do
+  defmodule ActorGroupRef do
     @enforce_keys [:actors]
     defstruct actors: nil, opts: []
 
@@ -62,6 +62,7 @@ defmodule SpawnSdk do
   {:ok, %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 5}}
   ```
   """
+  @deprecated
   defdelegate invoke(actor_name, invoke_opts), to: SpawnSdk.System.SpawnSystem
 
   @doc """
@@ -85,5 +86,6 @@ defmodule SpawnSdk do
   )
   ```
   """
+  @deprecated
   defdelegate spawn_actor(actor_name, spawn_actor_opts), to: SpawnSdk.System.SpawnSystem
 end
