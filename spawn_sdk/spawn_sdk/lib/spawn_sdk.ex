@@ -67,21 +67,66 @@ defmodule SpawnSdk do
           }
   end
 
+  defmodule ActorChannel do
+    @enforce_keys [:channel]
+    defstruct channel: nil, opts: []
+
+    @type t() :: %__MODULE__{
+            channel: String.t(),
+            opts: Keyword.t() | []
+          }
+  end
+
+  defmodule ActorGroup do
+    @enforce_keys [:actors]
+    defstruct actors: nil, opts: []
+
+    @type t() :: %__MODULE__{
+            actors: list(ActorRef.t()),
+            opts: Keyword.t() | []
+          }
+  end
+
   defmodule Actor do
     @type system :: String.t()
     @type actor :: String.t()
+    @type opts :: Keyword.t()
 
-    @spec ref(system(), actor()) :: ActorRef.t()
+    @type group :: ActorGroup.t()
+
+    @spec ref(system(), actor(), opts()) :: ActorRef.t()
     def ref(system, name, opts \\ []),
       do: %SpawnSdk.ActorRef{system: system, name: name, opts: opts}
 
-    def invoke(actor_ref, data, opts) do
+    @spec group(list(ActorRef), opts()) :: ActorRef.t()
+    def group(actors, opts \\ []) when is_list(actors),
+      do: %SpawnSdk.ActorGroup{actors: actors, opts: opts}
+
+    @spec channel(ActorChannel.t(), opts()) :: :ok
+    def channel(channel, opts), do: %SpawnSdk.ActorChannel{channel: channel, opts: opts}
+
+    @spec invoke(ActorRef.t() | ActorGroup.t(), any(), opts()) :: any()
+    def invoke(ref, data, opts \\ [])
+
+    def invoke(%ActorRef{} = _ref, _data, _opts) do
     end
 
-    def cast(actor_ref, data, opts) do
+    def invoke(%ActorGroup{} = _group, _data, _opts) do
     end
 
-    def pub(actor_ref, data, opts) do
+    @spec cast(ActorRef.t() | ActorGroup.t(), any(), opts()) :: :ok
+    def cast(ref, data, opts \\ [])
+
+    def cast(%ActorRef{} = _ref, _data, _opts) do
+    end
+
+    def cast(%ActorGroup{} = _group, _data, _opts) do
+    end
+
+    @spec pub(ActorChannel.t(), any(), opts()) :: :ok
+    def pub(channel, data, opts \\ [])
+
+    def pub(%ActorChannel{} = _channel, _data, _opts) do
     end
   end
 end
