@@ -55,4 +55,33 @@ defmodule SpawnSdk do
   ```
   """
   defdelegate spawn_actor(actor_name, spawn_actor_opts), to: SpawnSdk.System.SpawnSystem
+
+  defmodule ActorRef do
+    @enforce_keys [:system, :name]
+    defstruct system: nil, name: nil, opts: []
+
+    @type t() :: %__MODULE__{
+            system: String.t(),
+            name: String.t(),
+            opts: Keyword.t() | []
+          }
+  end
+
+  defmodule Actor do
+    @type system :: String.t()
+    @type actor :: String.t()
+
+    @spec ref(system(), actor()) :: ActorRef.t()
+    def ref(system, name, opts \\ []),
+      do: %SpawnSdk.ActorRef{system: system, name: name, opts: opts}
+
+    def invoke(actor_ref, data, opts) do
+    end
+
+    def cast(actor_ref, data, opts) do
+    end
+
+    def pub(actor_ref, data, opts) do
+    end
+  end
 end
