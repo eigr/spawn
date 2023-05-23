@@ -26,7 +26,21 @@ defmodule SpawnSdk.Actor do
       end
   """
 
-  alias SpawnSdk.{Context, Value}
+  alias SpawnSdk.{
+    ActorRef,
+    ActorChannel,
+    ActorGroup,
+    Context,
+    Value
+  }
+
+  @type system :: String.t()
+
+  @type actor :: String.t()
+
+  @type group :: ActorGroup.t()
+
+  @type opts :: Keyword.t()
 
   @type command :: String.t()
 
@@ -40,6 +54,62 @@ defmodule SpawnSdk.Actor do
 
   @callback handle_command({command(), data()}, context()) ::
               value() | {:reply, value()} | {:error, error()} | {:error, error(), value()}
+
+  @doc """
+  Creates a reference to an actor so that it can be invoked
+
+  Example:
+
+  ```
+  iex(spawn_a@127.0.0.1)1> SpawnSdk.Actor.ref("spawn-system", "joe")
+  %SpawnSdk.ActorRef{system: "spawn-system", name: "joe", opts: []}
+  ```
+
+  To invoke an actor using the obtained reference you could do:
+
+  ```
+  alias SpawnSdk.Actor
+
+  data = %MyData{}
+
+  Actor.ref("spawn-system", "joe")
+  |> Actor.invoke(data)
+  ```
+  """
+  @spec ref(system(), actor(), opts()) :: ActorRef.t()
+  def ref(system, name, opts \\ []),
+    do: %ActorRef{system: system, name: name, opts: opts}
+
+  @spec group(list(ActorRef), opts()) :: ActorRef.t()
+  def group(actors, opts \\ []) when is_list(actors),
+    do: %ActorGroup{actors: actors, opts: opts}
+
+  @spec channel(ActorChannel.t(), opts()) :: :ok
+  def channel(channel, opts), do: %ActorChannel{channel: channel, opts: opts}
+
+  @spec invoke(ActorRef.t() | ActorGroup.t(), any(), opts()) :: any()
+  def invoke(ref, data, opts \\ [])
+
+  def invoke(%ActorRef{} = _ref, _data, _opts) do
+  end
+
+  def invoke(%ActorGroup{} = _group, _data, _opts) do
+  end
+
+  @spec cast(ActorRef.t() | ActorGroup.t(), any(), opts()) :: :ok
+  def cast(ref, data, opts \\ [])
+
+  def cast(%ActorRef{} = _ref, _data, _opts) do
+  end
+
+  def cast(%ActorGroup{} = _group, _data, _opts) do
+  end
+
+  @spec pub(ActorChannel.t(), any(), opts()) :: :ok
+  def pub(channel, data, opts \\ [])
+
+  def pub(%ActorChannel{} = _channel, _data, _opts) do
+  end
 
   defmacro __using__(opts) do
     quote bind_quoted: [opts: opts] do
