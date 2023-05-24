@@ -147,6 +147,26 @@ defmodule SpawnSdk.Actor do
 
   my_data = %MyData{value: 1}
 
+  Actor.ref("erlang-system", "joe", action: :sum, data: my_data)
+  |> Actor.to_group("erlang-system", "robert", action: :sum, data: my_data)
+  |> Actor.multi()
+  ```
+  """
+  @spec to_group(ActorRef.t(), opts()) :: ActorGroupRef.t()
+  def to_group(%ActorRef{} = first, opts) do
+    %ActorGroupRef{actors: [first], opts: opts}
+  end
+
+  @doc """
+  Creates a group of actor reference so that it can be invoked
+
+  Example:
+
+  ```
+  alias SpawnSdk.Actor
+
+  my_data = %MyData{value: 1}
+
   Actor.ref("erlang-system", "joe")
   |> Actor.to_group("erlang-system", "robert")
   |> Actor.to_group("erlang-system", "mike")
