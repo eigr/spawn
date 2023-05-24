@@ -165,7 +165,7 @@ defmodule Actors.Actor.Entity.Invocation do
           {:noreply, state, :hibernate}
 
         _ ->
-          interface = get_interface(actor_system)
+          interface = get_interface()
 
           metadata = %{}
           current_state = Map.get(actor_state || %{}, :state) || %ActorState{}
@@ -230,7 +230,7 @@ defmodule Actors.Actor.Entity.Invocation do
       case Enum.member?(@default_actions, command) or
              Enum.any?(all_commands, fn cmd -> cmd.name == command end) do
         true ->
-          interface = get_interface(actor_system)
+          interface = get_interface()
 
           request = build_request(invocation, actor_state, opts)
 
@@ -533,8 +533,8 @@ defmodule Actors.Actor.Entity.Invocation do
     end
   end
 
-  defp get_interface(system_name) do
-    if :persistent_term.get(system_name, false) do
+  defp get_interface do
+    if :persistent_term.get(:elixir_sdk, false) do
       @host_interface_map["sdk"]
     else
       @host_interface_map[System.get_env("PROXY_HOST_INTERFACE", "default")]

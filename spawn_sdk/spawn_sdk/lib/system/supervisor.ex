@@ -83,6 +83,7 @@ defmodule SpawnSdk.System.Supervisor do
       raise "System already registered"
     else
       :persistent_term.put(system, true)
+      :persistent_term.put(:elixir_sdk, true)
       :ets.new(:"#{system}:actors", [:public, :named_table])
     end
   end
