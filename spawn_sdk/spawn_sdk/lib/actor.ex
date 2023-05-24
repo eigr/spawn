@@ -159,6 +159,10 @@ defmodule SpawnSdk.Actor do
   @spec to_group(ActorRef.t() | ActorGroupRef.t(), system(), actor(), opts()) :: ActorGroupRef.t()
   def to_group(ref, system, actor, opts \\ [])
 
+  def to_group(%ActorRef{} = first, system, actor, opts) when is_nil(system) and is_nil(actor) do
+    %ActorGroupRef{actors: [first], opts: opts}
+  end
+
   def to_group(%ActorRef{} = first, system, actor, opts) do
     last = %ActorRef{system: system, name: actor, opts: opts}
     %ActorGroupRef{actors: [first] ++ last, opts: opts}
@@ -246,20 +250,20 @@ defmodule SpawnSdk.Actor do
 
   my_data = %MyData{value: 1}
 
-  Actor.ref("erlang-system", "joe")
-  |> Actor.to_group("erlang-system", "robert")
-  |> Actor.to_group("erlang-system", "mike")
-  |> Actor.to_group("eigr-system", "adriano")
-  |> Actor.to_group("eigr-system", "marcel")
-  |> Actor.to_group("spawn-elixir-system", "elias")
-  |> Actor.multi(action: :sum, data: my_data)
+  Actor.ref("erlang-system", "joe", action: :sum, data: my_data)
+  |> Actor.to_group("erlang-system", "robert", action: :sum, data: my_data)
+  |> Actor.to_group("erlang-system", "mike", action: :sum, data: my_data)
+  |> Actor.to_group("eigr-system", "adriano", action: :sum, data: my_data)
+  |> Actor.to_group("eigr-system", "marcel", action: :sum, data: my_data)
+  |> Actor.to_group("spawn-elixir-system", "elias"", action: "calc", data: my_data)
+  |> Actor.multi()
   ```
   """
-  @spec multi(ActorGroupRef.t(), opts()) :: {:ok, list(any())} | {:error, any()}
-  def multi(%ActorGroupRef{actors: actors} = _ref, opts) do
+  @spec multi(ActorGroupRef.t()) :: list(any()) | {:error, any()}
+  def multi(%ActorGroupRef{actors: actors} = _ref) do
     tasks =
-      Enum.map(actors, fn actor ->
-        Task.async(fn -> invoke(actor, opts) end)
+      Enum.map(actors, fn %ActorRef{opts: actor_opts} = actor ->
+        Task.async(fn -> invoke(actor, actor_opts) end)
       end)
 
     Task.await_many(tasks)
