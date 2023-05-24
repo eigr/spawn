@@ -22,7 +22,6 @@ defmodule Spawn.Supervisor do
   def init(config) do
     children =
       [
-        cluster_supervisor(config),
         Spawn.Cluster.StateHandoff.Supervisor.child_spec(config),
         Spawn.Cluster.Node.Registry.child_spec()
       ]
@@ -48,7 +47,7 @@ defmodule Spawn.Supervisor do
     end
   end
 
-  defp cluster_supervisor(config) do
+  def cluster_supervisor(config) do
     cluster_strategy = config.proxy_cluster_strategy
 
     topologies =
