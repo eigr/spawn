@@ -40,6 +40,11 @@ defmodule SpawnSdk.System.Supervisor do
     actors = Keyword.get(opts, :actors)
     extenal_subscribers = Keyword.get(opts, :extenal_subscribers, [])
 
+    if config.actor_system_name != system do
+      raise ArgumentError,
+            "configured system (#{inspect(system)}) is different from env PROXY_ACTOR_SYSTEM_NAME (#{config.actor_system_name})"
+    end
+
     start_persisted_system(system)
 
     children =
@@ -83,8 +88,12 @@ defmodule SpawnSdk.System.Supervisor do
       raise "System already registered"
     else
       :persistent_term.put(system, true)
+<<<<<<< HEAD
       :persistent_term.put(:elixir_sdk, true)
       :ets.new(:"#{system}:actors", [:public, :named_table])
+=======
+      :ets.new(:"#{system}:actors", [:public, :named_table, read_concurrency: true])
+>>>>>>> main
     end
   end
 end

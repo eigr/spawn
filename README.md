@@ -130,6 +130,7 @@ As seen above, the Eigr Functions Spawn platform architecture is separated into 
   - [x] Postgres
   - [x] CockroachDB
   - [x] MSSQL
+  - [ ] Native via Mnesia
 - [x] Automatic activation and deactivation of Actors.
 - [x] Horizontal Scalability
   - [x] automatically controlled by the Operator using Kubernetes HPA based on memory and cpu.
@@ -152,21 +153,34 @@ As seen above, the Eigr Functions Spawn platform architecture is separated into 
   - [ ] Rust. Under development.
   - [ ] .Net/C#. Under development.
 - [x] Activators
+  - [x] CronJob Scheduler.
+  - [x] gRPC/HTTP.
+    - [x] Unary. Under development.
+    - [ ] Stream In.
+    - [ ] Stream Out.
+    - [ ] Bid Streamed.
   - [x] RabbitMQ.
-  - [ ] gRPC/HTTP. Under development.
-  - [ ] Kafka. Under development.
-  - [ ] Nats. On the Roadmap to version 1.0.0.
-  - [ ] Amazon SQS. On the Roadmap to version 1.0.0.
-  - [ ] Google PubSub. On the Roadmap to version 1.0.0.
+  - [ ] Kafka.
+  - [ ] Amazon SQS.
+  - [ ] Google PubSub.
 - [x] Observability
-  - [x] Tracing. Using OpenTelemetry.
+  - [x] OTLP Tracing.
   - [x] Prometheus Metrics.
 
 ## Install
 
-> **_Important:_** Spawn uses Kubernetes as its container orchestration engine and therefore a configured and running Kubernetes cluster is a prerequisite for installing Spawn.
+The recommended way to install Spawn is via our Kubernetes Operator.
 
-The recommended way to install Spawn is via our Kubernetes Operator, for that you need to download the Operator manifest file. The following command shows how this could be done directly via the command line:
+### Prerequisites
+
+* Kubernetes Cluster
+* Nats broker accessible within the cluster (See the note below).
+
+> **_Important:_** Nats broker is only necessary if you want to use the Activators feature or if you need your actors to communicate between different ActorSystems.
+
+### Instructions
+
+To install you need to download the Operator manifest file. The following command shows how this could be done directly via the command line:
 
 ```shell
 kubectl create ns eigr-functions && curl -L https://github.com/eigr/spawn/releases/download/{release-version}/manifest.yaml | kubectl apply -f -
@@ -206,6 +220,19 @@ Sapwn securely encrypts the Actors' State, so the **_encryptionKey_** item must 
 
 > **_NOTE:_** To learn more about Statestores settings, see the [statestore section](#statestores).
 
+If you are going to use the Activators resource in your project or if you want your Actors to be able to communicate between different ActorSystems then you will need to create a secret with the connection information with the Nats server. See an example of how to do this below:
+
+> **_NOTICE:_** It is not within the scope of this tutorial to install Nats but a simple way to do it in kubernetes is in to run these commands: **helm repo add nats https://nats-io.github.io/k8s/helm/charts/ && helm install spawn-nats nats/nats**.
+
+```
+kubectl -n default create secret generic nats-invocation-conn-secret \
+  --from-literal=url=spawn-nats:4222 \
+  --from-literal=authEnabled="false" \
+  --from-literal=tlsEnabled="false" \
+  --from-literal=username="" \
+  --from-literal=password=""
+```
+
 Now in a directory of your choice, create a file called **_system.yaml_** with the following content:
 
 ```yaml
@@ -216,6 +243,10 @@ metadata:
   name: spawn-system # Mandatory. Name of the ActorSystem
   namespace: default # Optional. Default namespace is "default"
 spec:
+  # This externalInvocation section is necessary only if Nats broker is used in your project.
+  externalInvocation:
+    enabled: "true"
+    externalConnectorRef: nats-invocation-conn-secret
   statestore:
     type: MySql # Valid are [MySql, Postgres, Sqlite, MSSQL, CockroachDB]
     credentialsSecretRef: mysql-connection-secret # The secret containing connection params created in the previous step.
@@ -333,7 +364,7 @@ Spawn defines some custom Resources for the user to interact with the API for de
 - **Activator CRD:** Activator CRD defines any means of inputting supported events such as
   queues, topics, HTTP, or grpc endpoints and maps these events to the appropriate actor to
   handle them. Examples of this CRD can be found in the [examples/k8s
-  folder](examples/k8s/activators/amqp.yaml).
+  folder](examples/k8s/activators).
 
 ## Statestores
 
@@ -437,3 +468,10 @@ https://docs.microsoft.com/en-us/azure/architecture/patterns/sidecar
 https://www.youtube.com/watch?v=j7JKkbAiWuI
 
 https://medium.com/nerd-for-tech/microservice-design-pattern-sidecar-sidekick-pattern-dbcea9bed783
+
+
+### Nats
+
+We use [Nats](https://nats.io/) for communication between different systems like Activators or cross ActorSystems. According to the project page "NATS is a simple, secure and performant communications system for digital systems, services and devices. NATS is part of the Cloud Native Computing Foundation (CNCF). NATS has over 40 client language implementations, and its server can run on-premise, in the cloud, at the edge, and even on a Raspberry Pi. NATS can secure and simplify design and operation of modern distributed systems."
+
+Nats' ability to natively implement different topologies, as well as its minimalism, its cloud-native nature, and its capabilities to run on more constrained devices is what made us use Nats over other solutions. Nats allows Spawn to be able to provide strong isolation from an ActorSystem without limiting the user, allowing the user to still be able to communicate securely between different ActorSystems. Nats also facilitates the implementation of our triggers, called Activators, allowing those even without being part of an Erlang cluster to be able to invoke any actors.

@@ -227,7 +227,18 @@ rules:
       - batch/v1
     resources:
       - cronjob
+      - cronjobs
       - job
+      - jobs
+    verbs:
+      - "*"
+  - apiGroups:
+      - batch
+    resources:
+      - cronjob
+      - cronjobs
+      - job
+      - jobs
     verbs:
       - "*"
   - apiGroups:

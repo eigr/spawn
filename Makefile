@@ -11,7 +11,7 @@ activator-kafka-image=${registry}/spawn-activator-kafka:${version}
 activator-pubsub-image=${registry}/spawn-activator-pubsub:${version}
 activator-rabbitmq-image=${registry}/spawn-activator-rabbitmq:${version}
 activator-sqs-image=${registry}/spawn-activator-sqs:${version}
-activator-cli-image=${registry}/spawn-activator-cli:0.1.0
+activator-cli-image=${registry}/spawn-activator-cli:0.1.1
 spawn-sdk-example-image=${registry}/spawn-sdk-example:${version}
 
 ifeq "$(PROXY_DATABASE_TYPE)" ""
@@ -143,6 +143,9 @@ run-sdk-local2:
 
 run-sdk-local3:
 	cd spawn_sdk/spawn_sdk_example && PROXY_CLUSTER_STRATEGY=epmd PROXY_DATABASE_TYPE=$(database) SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= iex --name spawn_a3@127.0.0.1 -S mix
+
+run-sdk-local-nats:
+	cd spawn_sdk/spawn_sdk_example && PROXY_CLUSTER_STRATEGY=epmd PROXY_DATABASE_TYPE=$(database) SPAWN_USE_INTERNAL_NATS=true SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= iex --name spawn_a3@127.0.0.1 -S mix
 
 run-operator-local:
 	cd spawn_operator/spawn_operator && mix deps.get && MIX_ENV=dev BONNY_POD_NAME=spawn-operator iex --name operator@127.0.0.1 -S mix
