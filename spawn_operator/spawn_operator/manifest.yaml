@@ -227,7 +227,9 @@ rules:
       - batch/v1
     resources:
       - cronjob
+      - cronjobs
       - job
+      - jobs
     verbs:
       - "*"
   - apiGroups:
