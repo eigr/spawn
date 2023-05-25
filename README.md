@@ -224,6 +224,8 @@ If you are going to use the Activators resource in your project or if you want y
 
 > **_NOTICE:_** It is not within the scope of this tutorial to install Nats but a simple way to do it in kubernetes is in to run these commands: **helm repo add nats https://nats-io.github.io/k8s/helm/charts/ && helm install spawn-nats nats/nats**.
 
+Now create the config file with the Nats credentials:
+
 ```
 kubectl -n default create secret generic nats-invocation-conn-secret \
   --from-literal=url=spawn-nats:4222 \
