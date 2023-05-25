@@ -233,6 +233,15 @@ rules:
     verbs:
       - "*"
   - apiGroups:
+      - batch
+    resources:
+      - cronjob
+      - cronjobs
+      - job
+      - jobs
+    verbs:
+      - "*"
+  - apiGroups:
       - v1
     resources:
       - pods
