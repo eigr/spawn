@@ -153,9 +153,10 @@ As seen above, the Eigr Functions Spawn platform architecture is separated into 
   - [ ] .Net/C#. Under development.
 - [x] Activators
   - [x] RabbitMQ.
+  - [x] CronJob.
+  - [x] Nats.
   - [ ] gRPC/HTTP. Under development.
   - [ ] Kafka. Under development.
-  - [ ] Nats. On the Roadmap to version 1.0.0.
   - [ ] Amazon SQS. On the Roadmap to version 1.0.0.
   - [ ] Google PubSub. On the Roadmap to version 1.0.0.
 - [x] Observability
@@ -333,7 +334,7 @@ Spawn defines some custom Resources for the user to interact with the API for de
 - **Activator CRD:** Activator CRD defines any means of inputting supported events such as
   queues, topics, HTTP, or grpc endpoints and maps these events to the appropriate actor to
   handle them. Examples of this CRD can be found in the [examples/k8s
-  folder](examples/k8s/activators/amqp.yaml).
+  folder](examples/k8s/activators).
 
 ## Statestores
 

@@ -18,6 +18,8 @@ async fn main() -> Result<(), async_nats::Error> {
 
     let host = env::var("SPAWN_INTERNAL_NATS_HOSTS").unwrap_or("nats://0.0.0.0:4222".to_string());
 
+    println!("Trying to connect to host {:?}", host);
+
     let nc = async_nats::connect(host).await?;
 
     let request: InvocationRequest = InvocationRequest {

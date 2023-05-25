@@ -6,8 +6,8 @@ metadata:
   namespace: default # Optional. Default namespace is "default"
 spec:
   externalInvocation:
-    enabled: true
-    externalConnectorRef: invocation-connection-ref
+    enabled: "true"
+    externalConnectorRef: invocation-connection-ref-secret
   statestore:
     type: MySql
     credentialsSecretRef: mysql-connection-secret # The secret containing connection params

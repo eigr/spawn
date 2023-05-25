@@ -42,7 +42,7 @@ defmodule SpawnSdkExample.Actors.JoeActor do
   end
 
   defact ping(_data, %Context{state: state} = ctx) do
-    Logger.info("Received Request. Context: #{inspect(ctx)}")
+    Logger.info("Received Request PING. Context: #{inspect(ctx)}")
 
     new_state =
       if is_nil(state) do
