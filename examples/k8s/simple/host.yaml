@@ -48,7 +48,7 @@ metadata:
     spawn-eigr.io/sidecar-pubsub-adapter: "native"
 
     # Optional. Default "nats://127.0.0.1:4222"
-    spawn-eigr.io/sidecar-pubsub-nats-hosts: "nats://127.0.0.1:4222"
+    spawn-eigr.io/sidecar-pubsub-nats-hosts: "nats://spawn-nats:4222"
 spec:
   host:
     image: eigr/spawn-springboot-examples:0.5.5 # Mandatory

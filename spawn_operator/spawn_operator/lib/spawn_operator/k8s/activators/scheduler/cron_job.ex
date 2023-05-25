@@ -3,7 +3,7 @@ defmodule SpawnOperator.K8s.Activators.Scheduler.CronJob do
 
   @behaviour SpawnOperator.K8s.Manifest
 
-  @activator_cli_version "0.1.0"
+  @activator_cli_version "0.1.1"
 
   @impl true
   def manifest(resource, _opts \\ []) do
@@ -19,10 +19,14 @@ defmodule SpawnOperator.K8s.Activators.Scheduler.CronJob do
             "name" => sink["name"],
             "image" => "eigr/spawn-activator-cli:#{@activator_cli_version}",
             "imagePullPolicy" => "IfNotPresent",
-            "envFrom" => [
+            "env" => [
               %{
-                "secretRef" => %{
-                  "name" => "#{resource.params["activator"]["externalConnectorRef"]}"
+                "name" => "SPAWN_INTERNAL_NATS_HOSTS",
+                "valueFrom" => %{
+                  "secretKeyRef" => %{
+                    "name" => resource.params["activator"]["externalConnectorRef"],
+                    "key" => "url"
+                  }
                 }
               }
             ],

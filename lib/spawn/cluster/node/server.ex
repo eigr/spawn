@@ -14,8 +14,7 @@ defmodule Spawn.Cluster.Node.Server do
     Logger.debug("Received Actor Invocation via Nats on #{topic}")
     headers = Map.get(req, :headers, [])
 
-    topic
-    |> handle_request(body, reply_to, headers)
+    handle_request(topic, body, reply_to, headers)
   end
 
   def request(%{topic: topic, body: _, reply_to: _reply_to} = _req) do
@@ -31,22 +30,14 @@ defmodule Spawn.Cluster.Node.Server do
     Gnat.pub(gnat, reply_to, error)
   end
 
-  defp handle_request(_topic, body, _reply_to, headers) do
+  defp handle_request(_topic, body, reply_to, headers) do
     opts = headers_to_opts(headers)
 
     Tracer.with_span opts[:span_ctx], "Handle Actor Invoke", kind: :server do
       request = InvocationRequest.decode(body)
 
-      case Actors.invoke_with_span(request, opts) do
-        {:ok, :async} ->
-          {:reply, :async}
-
-        {:ok, response} ->
-          {:reply, ActorInvocationResponse.encode(response)}
-
-        {:error, error} ->
-          {:reply, error}
-      end
+      Actors.invoke_with_span(request, opts)
+      |> handle_reply(reply_to)
     end
   end
 
@@ -59,5 +50,20 @@ defmodule Spawn.Cluster.Node.Server do
       end
 
     Keyword.put([], :span_ctx, ctx)
+  end
+
+  defp handle_reply(_response, nil), do: :ok
+
+  defp handle_reply(response, _reply_to) do
+    case response do
+      {:ok, :async} ->
+        {:reply, :async}
+
+      {:ok, response} ->
+        {:reply, ActorInvocationResponse.encode(response)}
+
+      {:error, error} ->
+        {:reply, error}
+    end
   end
 end

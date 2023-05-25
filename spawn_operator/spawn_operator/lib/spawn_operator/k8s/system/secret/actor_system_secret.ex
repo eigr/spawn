@@ -26,7 +26,7 @@ defmodule SpawnOperator.K8s.System.Secret.ActorSystemSecret do
 
     data =
       Map.merge(distributed_options, storage_options)
-      |> maybe_use_nats_cluster(name, ns, cluster_params)
+      |> maybe_use_nats_cluster(name, ns, params)
 
     %{
       "apiVersion" => "v1",
@@ -89,7 +89,7 @@ defmodule SpawnOperator.K8s.System.Secret.ActorSystemSecret do
 
         %{
           "NODE_COOKIE" => cookie,
-          "PROXY_ACTOR_SYSTEM_NAME" => system,
+          "PROXY_ACTOR_SYSTEM_NAME" => Base.encode64(system),
           "PROXY_CLUSTER_POLLING" => cluster_poolling,
           "PROXY_CLUSTER_STRATEGY" => cluster_strategy,
           "PROXY_HEADLESS_SERVICE" => cluster_service,
@@ -112,8 +112,8 @@ defmodule SpawnOperator.K8s.System.Secret.ActorSystemSecret do
     end
   end
 
-  defp maybe_use_nats_cluster(config, _name, _ns, params) do
-    nats_params = Map.get(params, "externalInvocationConfig", %{})
+  defp maybe_use_nats_cluster(config, _name, namespace, params) do
+    nats_params = Map.get(params, "externalInvocation", %{})
     enabled = Map.get(nats_params, "enabled", "false")
 
     nats_config =
@@ -126,7 +126,7 @@ defmodule SpawnOperator.K8s.System.Secret.ActorSystemSecret do
 
           {:ok, secret} =
             K8s.Client.get("v1", :secret,
-              namespace: "eigr-functions",
+              namespace: namespace,
               name: nats_secret_ref
             )
             |> then(&K8s.Client.run(conn(), &1))
@@ -139,7 +139,7 @@ defmodule SpawnOperator.K8s.System.Secret.ActorSystemSecret do
           nats_tls = Map.get(secret_data, "tlsEnabled", "false")
 
           %{
-            "SPAWN_USE_INTERNAL_NATS" => "true",
+            "SPAWN_USE_INTERNAL_NATS" => Base.encode64("true"),
             "SPAWN_INTERNAL_NATS_HOSTS" => nats_host_url,
             "SPAWN_INTERNAL_NATS_TLS" => nats_tls,
             "SPAWN_INTERNAL_NATS_AUTH" => nats_auth,
