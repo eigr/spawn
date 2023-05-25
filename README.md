@@ -154,8 +154,8 @@ As seen above, the Eigr Functions Spawn platform architecture is separated into 
   - [ ] .Net/C#. Under development.
 - [x] Activators
   - [x] CronJob Scheduler.
-  - [x] gRPC/HTTP. Under development.
-    - [ ] Unary.
+  - [x] gRPC/HTTP.
+    - [x] Unary. Under development.
     - [ ] Stream In.
     - [ ] Stream Out.
     - [ ] Bid Streamed.
