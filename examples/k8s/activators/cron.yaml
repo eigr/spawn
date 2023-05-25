@@ -13,17 +13,17 @@ spec:
     externalConnectorRef: invocation-connection-ref-secret
   bindings:
     sources:
-      - name: hour-scheduler
+      - name: minute-scheduler
         expr: "* * * * *"
       - name: daily-scheduler
-        expr: "* * * * *"
+        expr: "0 0 */1 * *"
     sinks:
       - name: joe-sink
         actor: joe # Name of an Actor
         command: setLanguage # Name of an Actor Action to call
         system: spawn-system
         binding:
-          - name: hour-scheduler
+          - name: minute-scheduler
           - name: daily-scheduler
       - name: robert-sink
         actor: robert
