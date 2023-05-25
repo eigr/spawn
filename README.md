@@ -228,7 +228,7 @@ Now create the config file with the Nats credentials:
 
 ```
 kubectl -n default create secret generic nats-invocation-conn-secret \
-  --from-literal=url=spawn-nats:4222 \
+  --from-literal=url="nats://spawn-nats:4222" \
   --from-literal=authEnabled="false" \
   --from-literal=tlsEnabled="false" \
   --from-literal=username="" \
