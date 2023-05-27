@@ -2,7 +2,7 @@ defmodule StatestoresCockroachDB.MixProject do
   use Mix.Project
 
   @app :spawn_statestores_cockroachdb
-  @version "1.0.0-rc1"
+  @version "0.0.0-local-dev"
   @source_url "https://github.com/eigr/spawn/blob/main/spawn_statestores/statestores_cockroachdb"
 
   def project do
