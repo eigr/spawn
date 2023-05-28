@@ -3,7 +3,7 @@ version: "3.8"
 services:
   otel:
     image: otel/opentelemetry-collector-contrib:0.60.0
-    command: [ "--config=/conf/otel-collector-config.yaml" ]
+    command: ["--config=/conf/otel-collector-config.yaml"]
     privileged: true
     ports:
       - 4317:4317
@@ -34,6 +34,7 @@ services:
 
   mysql:
     image: mysql:5.7
+    command: ["--max_connections=1000"]
     environment:
       MYSQL_USER: admin
       MYSQL_PASSWORD: "admin"

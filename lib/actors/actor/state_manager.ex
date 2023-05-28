@@ -15,7 +15,7 @@ if Code.ensure_loaded?(Statestores.Supervisor) do
 
     def is_new?(old_hash, new_state) do
       with bytes_from_state <- Any.encode(new_state),
-           hash <- :crypto.hash(:sha256, bytes_from_state) do
+           hash <- :erlang.phash2(bytes_from_state) do
         old_hash != hash
       else
         _ ->
@@ -58,7 +58,7 @@ if Code.ensure_loaded?(Statestores.Supervisor) do
       Logger.debug("Saving state for actor #{name}")
 
       with bytes_from_state <- Any.encode(actor_state),
-           hash <- :crypto.hash(:sha256, bytes_from_state),
+           hash <- :erlang.phash2(bytes_from_state),
            key <- generate_key(actor_id) do
         %Event{
           id: key,
@@ -125,7 +125,7 @@ if Code.ensure_loaded?(Statestores.Supervisor) do
         res = Task.await(persist_data_task, timeout)
 
         with bytes_from_state <- Any.encode(actor_state),
-             hash <- :crypto.hash(:sha256, bytes_from_state) do
+             hash <- :erlang.phash2(bytes_from_state) do
           if inserted_successfully?(parent, persist_data_task.pid) do
             case res do
               {:ok, _event} ->
