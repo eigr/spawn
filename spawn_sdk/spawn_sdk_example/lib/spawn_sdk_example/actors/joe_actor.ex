@@ -6,7 +6,11 @@ defmodule SpawnSdkExample.Actors.JoeActor do
     snapshot_timeout: 2_000
 
   require Logger
-  alias Io.Eigr.Spawn.Example.{MyState, MyBusinessMessage}
+
+  alias Io.Eigr.Spawn.Example.{
+    MyState,
+    MyBusinessMessage
+  }
 
   defact init(%Context{state: state} = ctx) do
     Logger.info("[joe] Received InitRequest. Context: #{inspect(ctx)}")
