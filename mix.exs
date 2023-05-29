@@ -69,6 +69,10 @@ defmodule Spawn.MixProject do
     [
       # Core deps
       {:decimal, "~> 2.0"},
+      {:decorator, "~> 1.4"},
+      {:nebulex, "~> 2.5"},
+      {:shards, "~> 1.1"},
+      {:telemetry, "~> 1.0"},
       {:castore, "~> 1.0"},
       {:duration_tc, "~> 0.1.0"},
       {:protobuf, "~> 0.11"},
@@ -95,9 +99,12 @@ defmodule Spawn.MixProject do
       # Statestores deps
       {:spawn_statestores_mssql, path: "./spawn_statestores/statestores_mssql", optional: false},
       {:spawn_statestores_mysql, path: "./spawn_statestores/statestores_mysql", optional: false},
-      {:spawn_statestores_postgres, path: "./spawn_statestores/statestores_postgres", optional: false},
-      {:spawn_statestores_sqlite, path: "./spawn_statestores/statestores_sqlite", optional: false},
-      {:spawn_statestores_cockroachdb, path: "./spawn_statestores/statestores_cockroachdb", optional: false},
+      {:spawn_statestores_postgres,
+       path: "./spawn_statestores/statestores_postgres", optional: false},
+      {:spawn_statestores_sqlite,
+       path: "./spawn_statestores/statestores_sqlite", optional: false},
+      {:spawn_statestores_cockroachdb,
+       path: "./spawn_statestores/statestores_cockroachdb", optional: false},
       # Non runtime deps
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
       {:faker, "~> 0.17", only: :test},

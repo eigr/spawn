@@ -17,7 +17,7 @@ defmodule Statestores.Adapters.SnapshotBehaviour do
   defmacro __using__(_opts) do
     quote do
       alias Statestores.Adapters.SnapshotBehaviour
-      import Statestores.Util, only: [init_config: 1]
+      import Statestores.Util, only: [init_config: 1, generate_key: 1]
 
       @behaviour Statestores.Adapters.SnapshotBehaviour
 

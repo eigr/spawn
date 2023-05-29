@@ -128,6 +128,14 @@ defmodule Statestores.Util do
     {:ok, config}
   end
 
+  @spec get_default_database_port :: <<_::32>>
+  def get_default_database_port() do
+    load_snapshot_adapter().default_port()
+  end
+
+  @spec generate_key(any()) :: String.t()
+  def generate_key(id), do: :erlang.phash2(id)
+
   # Lookup Adapters
   defp load_lookup_adapter_by_type(:mysql), do: Statestores.Adapters.MySQLLookupAdapter
 
@@ -151,12 +159,4 @@ defmodule Statestores.Util do
   defp load_snapshot_adapter_by_type(:sqlite), do: Statestores.Adapters.SQLite3SnapshotAdapter
 
   defp load_snapshot_adapter_by_type(:mssql), do: Statestores.Adapters.MSSQLSnapshotAdapter
-
-  @spec get_default_database_port :: <<_::32>>
-  def get_default_database_port() do
-    load_snapshot_adapter().default_port()
-  end
-
-  @spec generate_key(any()) :: String.t()
-  def generate_key(id), do: :erlang.phash2(id)
 end
