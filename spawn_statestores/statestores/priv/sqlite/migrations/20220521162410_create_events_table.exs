@@ -3,6 +3,19 @@ defmodule Statestores.Adapters.SQLite3.Migrations.CreateEventsTable do
 
   def up do
     execute """
+    CREATE TABLE IF NOT EXISTS lookups (
+      id INTEGER,
+      node TEXT,
+      actor TEXT,
+      system TEXT,
+      data BLOB,
+      inserted_at TEXT_DATETIME,
+      updated_at TEXT_DATETIME,
+      PRIMARY KEY (id, node)
+    )
+    """
+
+    execute """
     CREATE TABLE IF NOT EXISTS snapshots (
       id INTEGER PRIMARY KEY,
       actor TEXT,
@@ -19,5 +32,6 @@ defmodule Statestores.Adapters.SQLite3.Migrations.CreateEventsTable do
 
   def down do
     drop table(:snapshots)
+    drop table(:lookups)
   end
 end

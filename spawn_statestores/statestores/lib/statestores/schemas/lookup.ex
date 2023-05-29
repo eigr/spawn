@@ -12,7 +12,7 @@ defmodule Statestores.Schemas.Lookup do
   schema "lookups" do
     field(:id, :integer, primary_key: true)
 
-    field(:node, :string)
+    field(:node, :string, primary_key: true)
 
     field(:actor, :string)
 
@@ -26,12 +26,10 @@ defmodule Statestores.Schemas.Lookup do
   @spec changeset(%__MODULE__{}, map()) :: Ecto.Changeset.t() | {:error, Ecto.Changeset.t()}
   def changeset(event, attrs \\ %{}) do
     event
-    |> cast(attrs, [:id, :actor, :system, :node, :data])
-    |> validate_required([:id, :actor, :system, :node])
+    |> cast(attrs, [:id, :node, :actor, :system, :data])
+    |> validate_required([:id, :node, :actor, :system])
     |> case do
       %{valid?: false, changes: changes} = changeset when changes == %{} ->
-        # If the changeset is invalid and has no changes, it is
-        # because all required fields are missing, so we ignore it.
         %{changeset | action: :ignore}
 
       changeset ->
