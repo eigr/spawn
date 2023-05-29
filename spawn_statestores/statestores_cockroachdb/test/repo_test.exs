@@ -1,10 +1,10 @@
 defmodule StatestoresCockroachDBTest.RepoTest do
   use Statestores.DataCase
   alias Statestores.Schemas.Snapshot
-  import Statestores.Util, only: [load_adapter: 0]
+  import Statestores.Util, only: [load_snapshot_adapter: 0]
 
   test "insert! should persist an valid Event" do
-    repo = load_adapter()
+    repo = load_snapshot_adapter()
 
     event = %Snapshot{
       system: "test-system",
@@ -22,7 +22,7 @@ defmodule StatestoresCockroachDBTest.RepoTest do
   end
 
   test "insert! should update when inserted before" do
-    repo = load_adapter()
+    repo = load_snapshot_adapter()
 
     actor = "mike"
 

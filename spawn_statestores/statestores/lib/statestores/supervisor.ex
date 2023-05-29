@@ -2,7 +2,7 @@ defmodule Statestores.Supervisor do
   @moduledoc false
   use Supervisor
 
-  import Statestores.Util, only: [load_adapter: 0]
+  import Statestores.Util, only: [load_lookup_adapter: 0, load_snapshot_adapter: 0]
 
   def start_link(args) do
     Supervisor.start_link(__MODULE__, args, name: __MODULE__)
@@ -17,13 +17,15 @@ defmodule Statestores.Supervisor do
 
   @impl true
   def init(_args) do
-    adapter = load_adapter()
+    lookup_adapter = load_lookup_adapter()
+    snapshot_adapter = load_snapshot_adapter()
     Statestores.Config.load()
-    Statestores.Migrator.migrate(adapter)
+    Statestores.Migrator.migrate(snapshot_adapter)
 
     children = [
       Statestores.Vault,
-      adapter
+      snapshot_adapter,
+      lookup_adapter
     ]
 
     Supervisor.init(children, strategy: :one_for_one)
