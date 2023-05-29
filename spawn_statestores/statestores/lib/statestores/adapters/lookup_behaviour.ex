@@ -14,7 +14,7 @@ defmodule Statestores.Adapters.LookupBehaviour do
 
   defmacro __using__(_opts) do
     quote do
-      alias Statestores.Adapters.SnapshotBehaviour
+      alias Statestores.Adapters.LookupBehaviour
       import Statestores.Util, only: [init_config: 1]
 
       @behaviour Statestores.Adapters.LookupBehaviour
