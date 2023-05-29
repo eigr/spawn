@@ -2,7 +2,7 @@ defmodule Statestores.Adapters.MySQL.Migrations.CreateEventsTable do
   use Ecto.Migration
 
   def up do
-    create table(:events, primary_key: false) do
+    create table(:snapshots, primary_key: false) do
       add :id, :bigint, primary_key: true
       add :actor, :string
       add :system, :string
@@ -14,11 +14,11 @@ defmodule Statestores.Adapters.MySQL.Migrations.CreateEventsTable do
     end
 
     execute """
-    ALTER TABLE events MODIFY data LONGBLOB;
+    ALTER TABLE snapshots MODIFY data LONGBLOB;
     """
   end
 
   def down do
-    drop table(:events)
+    drop table(:snapshots)
   end
 end

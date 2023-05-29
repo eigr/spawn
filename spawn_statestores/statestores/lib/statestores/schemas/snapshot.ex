@@ -1,4 +1,4 @@
-defmodule Statestores.Schemas.Event do
+defmodule Statestores.Schemas.Snapshot do
   @moduledoc """
   App schema
   """
@@ -9,7 +9,7 @@ defmodule Statestores.Schemas.Event do
   @type t() :: %__MODULE__{}
 
   @primary_key false
-  schema "events" do
+  schema "snapshots" do
     field(:id, :integer, primary_key: true)
 
     field(:actor, :string)

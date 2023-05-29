@@ -8,12 +8,12 @@ defmodule Statestores.Adapters.CockroachDB do
     otp_app: :spawn_statestores,
     adapter: Ecto.Adapters.Postgres
 
-  alias Statestores.Schemas.{Event, ValueObjectSchema}
+  alias Statestores.Schemas.{Snapshot, ValueObjectSchema}
 
-  def get_by_key(id), do: get_by(Event, id: id)
+  def get_by_key(id), do: get_by(Snapshot, id: id)
 
   def save(
-        %Event{
+        %Snapshot{
           system: system,
           actor: actor,
           revision: revision,
@@ -22,8 +22,8 @@ defmodule Statestores.Adapters.CockroachDB do
           data: data
         } = event
       ) do
-    %Event{}
-    |> Event.changeset(ValueObjectSchema.to_map(event))
+    %Snapshot{}
+    |> Snapshot.changeset(ValueObjectSchema.to_map(event))
     |> insert_or_update(
       on_conflict: [
         set: [

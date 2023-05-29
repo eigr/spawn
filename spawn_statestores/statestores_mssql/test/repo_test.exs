@@ -1,6 +1,6 @@
 defmodule StatestoresMssqlTest.RepoTest do
   use Statestores.DataCase
-  alias Statestores.Schemas.Event
+  alias Statestores.Schemas.Snapshot
   import Statestores.Util, only: [load_adapter: 0, generate_key: 1]
 
   setup do
@@ -15,7 +15,7 @@ defmodule StatestoresMssqlTest.RepoTest do
     key = generate_key(id)
     repo = load_adapter()
 
-    event = %Event{
+    event = %Snapshot{
       id: key,
       system: system,
       actor: actor,
@@ -39,7 +39,7 @@ defmodule StatestoresMssqlTest.RepoTest do
     id = %{name: actor, system: system}
     key = generate_key(id)
 
-    event = %Event{
+    event = %Snapshot{
       system: "test-system",
       actor: actor,
       revision: 0,

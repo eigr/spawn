@@ -3,7 +3,7 @@ defmodule Statestores.Adapters.SQLite3.Migrations.CreateEventsTable do
 
   def up do
     execute """
-    CREATE TABLE IF NOT EXISTS events (
+    CREATE TABLE IF NOT EXISTS snapshots (
       id INTEGER PRIMARY KEY,
       actor TEXT,
       system TEXT,
@@ -18,6 +18,6 @@ defmodule Statestores.Adapters.SQLite3.Migrations.CreateEventsTable do
   end
 
   def down do
-    drop table(:events)
+    drop table(:snapshots)
   end
 end

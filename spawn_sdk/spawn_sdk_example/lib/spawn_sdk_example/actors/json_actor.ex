@@ -10,7 +10,7 @@ defmodule SpawnSdkExample.Actors.JsonActor do
     defstruct [:value, :should_ignore]
   end
 
-  defact sum(%{value: value}, %Context{state: state} = ctx) do
+  defact sum(%{value: value}, %Context{state: state} = _ctx) do
     new_value = (value || 0) + (state.value || 0)
 
     response = %{total_value: new_value}

@@ -8,13 +8,13 @@ defmodule Statestores.Adapters.MSSQL do
     otp_app: :spawn_statestores,
     adapter: Ecto.Adapters.Tds
 
-  alias Statestores.Schemas.{Event, ValueObjectSchema}
+  alias Statestores.Schemas.{Snapshot, ValueObjectSchema}
 
-  def get_by_key(id), do: get_by(Event, id: id)
+  def get_by_key(id), do: get_by(Snapshot, id: id)
 
-  def save(%Event{id: id} = event) do
-    %Event{}
-    |> Event.changeset(ValueObjectSchema.to_map(event))
+  def save(%Snapshot{id: id} = event) do
+    %Snapshot{}
+    |> Snapshot.changeset(ValueObjectSchema.to_map(event))
     |> insert()
     |> case do
       {:ok, event} ->
@@ -28,8 +28,8 @@ defmodule Statestores.Adapters.MSSQL do
     end
   rescue
     _e ->
-      get_by(Event, id: id)
-      |> Event.changeset(ValueObjectSchema.to_map(event))
+      get_by(Snapshot, id: id)
+      |> Snapshot.changeset(ValueObjectSchema.to_map(event))
       |> update!()
       |> case do
         {:ok, event} ->

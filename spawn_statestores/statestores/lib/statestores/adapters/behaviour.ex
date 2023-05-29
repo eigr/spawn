@@ -2,8 +2,6 @@ defmodule Statestores.Adapters.Behaviour do
   @moduledoc """
   Defines the default behavior for each Statestore Provider.
   """
-  alias Statestores.Schemas.Event
-
   @type id :: String.t()
 
   @type event :: Event.t()

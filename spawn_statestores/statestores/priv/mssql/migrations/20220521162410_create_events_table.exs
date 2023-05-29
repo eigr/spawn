@@ -2,7 +2,7 @@ defmodule Statestores.Adapters.MSSQL.Migrations.CreateEventsTable do
   use Ecto.Migration
 
   def up do
-    create table(:events, primary_key: false) do
+    create table(:snapshots, primary_key: false) do
       add :id, :bigint, primary_key: true
       add :actor, :string
       add :system, :string
@@ -15,6 +15,6 @@ defmodule Statestores.Adapters.MSSQL.Migrations.CreateEventsTable do
   end
 
   def down do
-    drop table(:events)
+    drop table(:snapshots)
   end
 end
