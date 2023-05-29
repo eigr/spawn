@@ -1,8 +1,8 @@
 defmodule Statestores.Adapters.MySQL do
   @moduledoc """
-  Implements the behavior defined in `Statestores.Adapters.Behaviour` for MySql databases.
+  Implements the behavior defined in `Statestores.Adapters.SnapshotBehaviour` for MySql databases.
   """
-  use Statestores.Adapters.Behaviour
+  use Statestores.Adapters.SnapshotBehaviour
 
   use Ecto.Repo,
     otp_app: :spawn_statestores,

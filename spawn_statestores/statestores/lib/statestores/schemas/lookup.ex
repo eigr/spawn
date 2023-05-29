@@ -1,6 +1,6 @@
 defmodule Statestores.Schemas.Lookup do
   @moduledoc """
-  App schema
+  Lookup schema
   """
   use Ecto.Schema
 

@@ -1,4 +1,4 @@
-defmodule Statestores.Adapters.Behaviour do
+defmodule Statestores.Adapters.SnapshotBehaviour do
   @moduledoc """
   Defines the default behavior for each Statestore Provider.
   """
@@ -14,10 +14,10 @@ defmodule Statestores.Adapters.Behaviour do
 
   defmacro __using__(_opts) do
     quote do
-      alias Statestores.Adapters.Behaviour
+      alias Statestores.Adapters.SnapshotBehaviour
       import Statestores.Util, only: [get_default_database_port: 0, get_default_database_type: 0]
 
-      @behaviour Statestores.Adapters.Behaviour
+      @behaviour Statestores.Adapters.SnapshotBehaviour
 
       def init(_type, config) do
         config =

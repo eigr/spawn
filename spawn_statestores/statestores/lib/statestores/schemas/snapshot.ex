@@ -1,6 +1,6 @@
 defmodule Statestores.Schemas.Snapshot do
   @moduledoc """
-  App schema
+  Snapshot schema
   """
   use Ecto.Schema
 

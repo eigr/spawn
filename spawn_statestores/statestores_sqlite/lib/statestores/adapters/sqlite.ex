@@ -1,8 +1,8 @@
 defmodule Statestores.Adapters.SQLite3 do
   @moduledoc """
-  Implements the behavior defined in `Statestores.Adapters.Behaviour` for SQLite3 databases.
+  Implements the behavior defined in `Statestores.Adapters.SnapshotBehaviour` for SQLite3 databases.
   """
-  use Statestores.Adapters.Behaviour
+  use Statestores.Adapters.SnapshotBehaviour
 
   use Ecto.Repo,
     otp_app: :spawn_statestores,

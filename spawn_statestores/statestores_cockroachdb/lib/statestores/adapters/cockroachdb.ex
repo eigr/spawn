@@ -1,8 +1,8 @@
 defmodule Statestores.Adapters.CockroachDB do
   @moduledoc """
-  Implements the behavior defined in `Statestores.Adapters.Behaviour` for CockroachDB databases.
+  Implements the behavior defined in `Statestores.Adapters.SnapshotBehaviour` for CockroachDB databases.
   """
-  use Statestores.Adapters.Behaviour
+  use Statestores.Adapters.SnapshotBehaviour
 
   use Ecto.Repo,
     otp_app: :spawn_statestores,
