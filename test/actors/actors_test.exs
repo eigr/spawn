@@ -88,10 +88,10 @@ defmodule ActorsTest do
                Actors.invoke(invoke_request)
 
       state =
-        Actors.Protos.ChangeNameResponseTest.new(
+        %Actors.Protos.ChangeNameResponseTest{
           status: :NAME_ALREADY_TAKEN,
           new_name: "new_name"
-        )
+        }
         |> any_pack!
 
       host_invoke_response =
@@ -125,10 +125,10 @@ defmodule ActorsTest do
       invoke_request = build_invocation_request(system: system, actor: actor)
 
       state =
-        Actors.Protos.ChangeNameResponseTest.new(
+        %Actors.Protos.ChangeNameResponseTest{
           status: :OK,
           new_name: "new_name"
-        )
+        }
         |> any_pack!
 
       host_invoke_response =

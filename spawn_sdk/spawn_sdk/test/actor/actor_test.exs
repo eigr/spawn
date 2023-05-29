@@ -20,7 +20,7 @@ defmodule Actor.ActorTest do
       current_state = ctx.state
       new_state = current_state
 
-      response = MyMessageResponse.new(id: id, data: data)
+      response = %MyMessageResponse{id: id, data: data}
       result = %Value{state: new_state, value: response}
 
       {:ok, result}
@@ -30,21 +30,21 @@ defmodule Actor.ActorTest do
       %{"bar" => "unchanged"} = ctx.tags
 
       %Value{}
-      |> Value.value(MyMessageResponse.new(data: ctx.tags["foo"]))
+      |> Value.value(%MyMessageResponse{data: ctx.tags["foo"]})
       |> Value.tags(Map.put(ctx.tags, "foo", "changed"))
       |> Value.void()
     end
 
     defact pipe_caller(%MyMessageRequest{data: data}, %Context{} = _ctx) do
       %Value{}
-      |> Value.value(MyMessageResponse.new(data: data))
+      |> Value.value(%MyMessageResponse{data: data})
       |> Value.pipe(Pipe.to("second_actor", "caller_name"))
       |> Value.void()
     end
 
     defact forward_caller(%MyMessageRequest{data: _data}, %Context{} = _ctx) do
       %Value{}
-      |> Value.value(MyMessageResponse.new(data: "first_actor_value"))
+      |> Value.value(%MyMessageResponse{data: "first_actor_value"})
       |> Value.forward(Forward.to("second_actor", "forward_caller_name"))
       |> Value.void()
     end
@@ -58,7 +58,7 @@ defmodule Actor.ActorTest do
           MyMessageResponse.new(data: "first_actor_value")
         )
       ])
-      |> Value.value(MyMessageResponse.new(data: "worked_with_effects"))
+      |> Value.value(%MyMessageResponse{data: "worked_with_effects"})
       |> Value.void()
     end
 
@@ -109,7 +109,7 @@ defmodule Actor.ActorTest do
 
     defact something(%Context{} = _ctx) do
       %Value{}
-      |> Value.value(MyMessageResponse.new(data: "something"))
+      |> Value.value(%MyMessageResponse{data: "something"})
       |> Value.void()
     end
   end
@@ -133,7 +133,7 @@ defmodule Actor.ActorTest do
 
     defact forward_caller_name(%Context{} = _ctx) do
       %Value{}
-      |> Value.value(MyMessageResponse.new(data: "second_caller"))
+      |> Value.value(%MyMessageResponse{data: "second_caller"})
       |> Value.forward(Forward.to("third_actor", "forward_caller_name"))
       |> Value.void()
     end
@@ -153,12 +153,12 @@ defmodule Actor.ActorTest do
       caller_name = "#{Map.get(ctx.caller || %{}, :name)} as caller to third_actor"
 
       Value.of()
-      |> Value.response(MyMessageResponse.new(data: caller_name))
+      |> Value.response(%MyMessageResponse{data: caller_name})
     end
 
     defact forward_caller_name(value, %Context{} = _ctx) do
       %Value{}
-      |> Value.value(MyMessageResponse.new(id: value.data, data: "third forwarding"))
+      |> Value.value(%MyMessageResponse{id: value.data, data: "third forwarding"})
       |> Value.void()
     end
   end
@@ -209,10 +209,10 @@ defmodule Actor.ActorTest do
       ctx = %SpawnSdk.Context{
         caller: nil,
         self: nil,
-        state: Eigr.Spawn.Actor.MyState.new(id: "1", value: 1)
+        state: %Eigr.Spawn.Actor.MyState{id: "1", value: 1}
       }
 
-      request = Eigr.Spawn.Actor.MyMessageRequest.new(id: id, data: data)
+      request = %Eigr.Spawn.Actor.MyMessageRequest{id: id, data: data}
       Actor.MyActor.handle_command({"sum", request}, ctx)
 
       assert {:ok,
@@ -254,7 +254,7 @@ defmodule Actor.ActorTest do
     test "simple call that goes through 3 actors piping each other", ctx do
       system = ctx.system
 
-      payload = Eigr.Spawn.Actor.MyMessageRequest.new(data: "non_intended_data")
+      payload = %Eigr.Spawn.Actor.MyMessageRequest{data: "non_intended_data"}
 
       dynamic_actor_name = Faker.Pokemon.name() <> "piping"
 
@@ -317,7 +317,7 @@ defmodule Actor.ActorTest do
     test "simple call that goes through 3 actors forwarding each other", ctx do
       system = ctx.system
 
-      payload = Eigr.Spawn.Actor.MyMessageRequest.new(data: "initial_calling")
+      payload = %Eigr.Spawn.Actor.MyMessageRequest{data: "initial_calling"}
 
       dynamic_actor_name = Faker.Pokemon.name() <> "forward_caller"
 
@@ -340,7 +340,7 @@ defmodule Actor.ActorTest do
     test "simple call with a side effect", ctx do
       system = ctx.system
 
-      payload = Eigr.Spawn.Actor.MyMessageRequest.new(data: "non_intended_data")
+      payload = %Eigr.Spawn.Actor.MyMessageRequest{data: "non_intended_data"}
 
       dynamic_actor_name = Faker.Pokemon.name() <> "_side_effect"
 
