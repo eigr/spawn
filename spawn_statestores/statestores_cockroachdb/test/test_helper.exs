@@ -1,4 +1,4 @@
-Application.put_env(:spawn_statestores, :database_adapter, Statestores.Adapters.CockroachDB)
+Application.put_env(:spawn_statestores, :database_adapter, Statestores.Adapters.CockroachDBSnapshotAdapter)
 
 ExUnit.start()
 

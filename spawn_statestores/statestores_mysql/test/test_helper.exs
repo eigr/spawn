@@ -1,4 +1,8 @@
-Application.put_env(:spawn_statestores, :database_adapter, Statestores.Adapters.MySQL)
+Application.put_env(
+  :spawn_statestores,
+  :database_adapter,
+  Statestores.Adapters.MySQLSnapshotAdapter
+)
 
 ExUnit.start()
 

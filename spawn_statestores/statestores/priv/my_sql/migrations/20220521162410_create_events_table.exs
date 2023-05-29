@@ -1,4 +1,4 @@
-defmodule Statestores.Adapters.MySQL.Migrations.CreateEventsTable do
+defmodule Statestores.Adapters.MySQLSnapshotAdapter.Migrations.CreateEventsTable do
   use Ecto.Migration
 
   def up do

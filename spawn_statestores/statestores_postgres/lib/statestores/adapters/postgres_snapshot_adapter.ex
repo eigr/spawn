@@ -1,6 +1,6 @@
-defmodule Statestores.Adapters.CockroachDB do
+defmodule Statestores.Adapters.PostgresSnapshotAdapter do
   @moduledoc """
-  Implements the behavior defined in `Statestores.Adapters.SnapshotBehaviour` for CockroachDB databases.
+  Implements the behavior defined in `Statestores.Adapters.SnapshotBehaviour` for Postgres databases.
   """
   use Statestores.Adapters.SnapshotBehaviour
 
@@ -50,5 +50,5 @@ defmodule Statestores.Adapters.CockroachDB do
     end
   end
 
-  def default_port, do: "26257"
+  def default_port, do: "5432"
 end

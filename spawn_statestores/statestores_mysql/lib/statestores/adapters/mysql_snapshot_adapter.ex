@@ -1,4 +1,4 @@
-defmodule Statestores.Adapters.MySQL do
+defmodule Statestores.Adapters.MySQLSnapshotAdapter do
   @moduledoc """
   Implements the behavior defined in `Statestores.Adapters.SnapshotBehaviour` for MySql databases.
   """

@@ -1,4 +1,4 @@
-defmodule Statestores.Adapters.SQLite3 do
+defmodule Statestores.Adapters.SQLite3SnapshotAdapter do
   @moduledoc """
   Implements the behavior defined in `Statestores.Adapters.SnapshotBehaviour` for SQLite3 databases.
   """

@@ -1,4 +1,4 @@
-defmodule Statestores.Adapters.Postgres.Migrations.CreateEventsTable do
+defmodule Statestores.Adapters.PostgresSnapshotAdapter.Migrations.CreateEventsTable do
   use Ecto.Migration
 
   def up do

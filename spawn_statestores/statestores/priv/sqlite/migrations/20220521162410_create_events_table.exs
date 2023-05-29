@@ -1,4 +1,4 @@
-defmodule Statestores.Adapters.SQLite3.Migrations.CreateEventsTable do
+defmodule Statestores.Adapters.SQLite3SnapshotAdapter.Migrations.CreateEventsTable do
   use Ecto.Migration
 
   def up do

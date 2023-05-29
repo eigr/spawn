@@ -27,24 +27,24 @@ defmodule Statestores.Util do
 
   def get_default_database_type do
     cond do
-      Code.ensure_loaded?(Statestores.Adapters.MySQL) -> "mysql"
-      Code.ensure_loaded?(Statestores.Adapters.CockroachDB) -> "cockroachdb"
-      Code.ensure_loaded?(Statestores.Adapters.Postgres) -> "postgres"
-      Code.ensure_loaded?(Statestores.Adapters.SQLite3) -> "sqlite"
-      Code.ensure_loaded?(Statestores.Adapters.MSSQL) -> "mssql"
+      Code.ensure_loaded?(Statestores.Adapters.MySQLSnapshotAdapter) -> "mysql"
+      Code.ensure_loaded?(Statestores.Adapters.CockroachDBSnapshotAdapter) -> "cockroachdb"
+      Code.ensure_loaded?(Statestores.Adapters.PostgresSnapshotAdapter) -> "postgres"
+      Code.ensure_loaded?(Statestores.Adapters.SQLite3SnapshotAdapter) -> "sqlite"
+      Code.ensure_loaded?(Statestores.Adapters.MSSQLSnapshotAdapter) -> "mssql"
       true -> nil
     end
   end
 
-  defp load_adapter_by_type(:mysql), do: Statestores.Adapters.MySQL
+  defp load_adapter_by_type(:mysql), do: Statestores.Adapters.MySQLSnapshotAdapter
 
-  defp load_adapter_by_type(:cockroachdb), do: Statestores.Adapters.CockroachDB
+  defp load_adapter_by_type(:cockroachdb), do: Statestores.Adapters.CockroachDBSnapshotAdapter
 
-  defp load_adapter_by_type(:postgres), do: Statestores.Adapters.Postgres
+  defp load_adapter_by_type(:postgres), do: Statestores.Adapters.PostgresSnapshotAdapter
 
-  defp load_adapter_by_type(:sqlite), do: Statestores.Adapters.SQLite3
+  defp load_adapter_by_type(:sqlite), do: Statestores.Adapters.SQLite3SnapshotAdapter
 
-  defp load_adapter_by_type(:mssql), do: Statestores.Adapters.MSSQL
+  defp load_adapter_by_type(:mssql), do: Statestores.Adapters.MSSQLSnapshotAdapter
 
   @spec get_default_database_port :: <<_::32>>
   def get_default_database_port() do

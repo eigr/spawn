@@ -1,4 +1,4 @@
-Application.put_env(:spawn_statestores, :database_adapter, Statestores.Adapters.SQLite3)
+Application.put_env(:spawn_statestores, :database_adapter, Statestores.Adapters.SQLite3SnapshotAdapter)
 
 ExUnit.start()
 

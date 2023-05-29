@@ -1,4 +1,4 @@
-Application.put_env(:spawn_statestores, :database_adapter, Statestores.Adapters.Postgres)
+Application.put_env(:spawn_statestores, :database_adapter, Statestores.Adapters.PostgresSnapshotAdapter)
 
 ExUnit.start()
 
