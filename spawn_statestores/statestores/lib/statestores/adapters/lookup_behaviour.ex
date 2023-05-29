@@ -6,6 +6,10 @@ defmodule Statestores.Adapters.LookupBehaviour do
 
   @callback get(any()) :: {:ok, any()} | {:error, any()}
 
+  @callback get_by_key(any()) :: {:ok, any()} | {:error, any()}
+
+  @callback get_all_by_node(any()) :: {:ok, any()} | {:error, any()}
+
   @callback set(any()) :: {:error, any()} | {:ok, any()}
 
   @callback delete(any()) :: {:error, any()} | {:ok, any()}
