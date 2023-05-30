@@ -12,8 +12,8 @@ defmodule SpawnSdkExample.Application do
           SpawnSdkExample.Actors.JoeActor,
           SpawnSdkExample.Actors.JsonActor,
           # SpawnSdkExample.Actors.ClockActor,
-          SpawnSdkExample.Actors.AbstractActor
-          # SpawnSdkExample.Actors.PooledActor
+          SpawnSdkExample.Actors.AbstractActor,
+          SpawnSdkExample.Actors.PooledActor
         ],
         extenal_subscribers: [
           {SpawnSdkExample.Subscriber, []}

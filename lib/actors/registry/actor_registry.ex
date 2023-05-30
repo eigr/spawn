@@ -105,6 +105,7 @@ defmodule Actors.Registry.ActorRegistry do
 
       state_hosts ->
         parent_name = Keyword.fetch!(opts, :parent)
+        IO.inspect(parent_name, label: "Passou aqui")
         filter_by_parent? = Keyword.get(opts, :filter_by_parent, false)
 
         filter(state_hosts, filter_by_parent?, id, parent_name)
