@@ -2,7 +2,7 @@ defmodule Spawn.Cluster.StateHandoffPersistentController do
   @moduledoc """
 
   """
-  @behaviour Spawn.StateHandoffBehaviour
+  @behaviour Spawn.StateHandoff.Controller.Behaviour
 
   require Logger
 

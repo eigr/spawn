@@ -1,4 +1,4 @@
-defmodule Spawn.StateHandoffBehaviour do
+defmodule Spawn.StateHandoff.Controller.Behaviour do
   @moduledoc """
 
   """

@@ -166,12 +166,6 @@ defmodule Actors.Registry.ActorRegistry do
     end
   end
 
-  def node_cleanup(node) do
-    Logger.info("Actor registry cleaning actors from node: #{inspect(node)}")
-
-    StateHandoff.clean(node)
-  end
-
   defp filter(hosts, filter_by_parent?, %ActorId{name: actor_name} = _id, parent_name) do
     case filter_by_parent? do
       true ->

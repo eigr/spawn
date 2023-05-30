@@ -21,22 +21,7 @@ defmodule Actors.Supervisors.ActorSupervisor do
     children =
       [
         get_pubsub_adapter(config),
-        Actors.Actor.Entity.Supervisor.child_spec(config),
-        %{
-          id: :actor_registry_task,
-          start:
-            {Task, :start_link,
-             [
-               fn ->
-                 Process.flag(:trap_exit, true)
-
-                 receive do
-                   {:EXIT, _pid, _reason} ->
-                     Actors.Registry.ActorRegistry.node_cleanup(Node.self())
-                 end
-               end
-             ]}
-        }
+        Actors.Actor.Entity.Supervisor.child_spec(config)
       ] ++ maybe_add_invocation_scheduler(config)
 
     Supervisor.init(children, strategy: :one_for_one)
