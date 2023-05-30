@@ -49,8 +49,8 @@ defmodule Actors do
 
   @erpc_timeout 5_000
 
-  @spec get_state(String.t(), String.t()) :: {:ok, term()} | {:error, term()}
-  def get_state(system_name, actor_name) do
+  @spec get_state(ActorId.t()) :: {:ok, term()} | {:error, term()}
+  def get_state(%ActorId{name: actor_name, system: system_name} = _id) do
     retry with: exponential_backoff() |> randomize |> expiry(30_000),
           atoms: [:error, :exit, :noproc, :erpc, :noconnection, :timeout],
           rescue_only: [ErlangError] do
@@ -142,8 +142,8 @@ defmodule Actors do
 
   def spawn_actor(%SpawnRequest{actors: actors} = _spawn, _opts) do
     hosts =
-      Enum.map(actors, fn %ActorId{system: system, parent: parent, name: _name} = id ->
-        case ActorRegistry.get_hosts_by_actor(system, parent) do
+      Enum.map(actors, fn %ActorId{parent: _parent, name: _name} = id ->
+        case ActorRegistry.get_hosts_by_actor(id, parent: true) do
           {:ok, actor_hosts} ->
             to_spawn_hosts(id, actor_hosts)
 
@@ -252,7 +252,7 @@ defmodule Actors do
 
   def invoke_with_span(
         %InvocationRequest{
-          actor: %Actor{} = actor,
+          actor: %Actor{id: %ActorId{name: _name, system: _actor_id_system} = actor_id} = actor,
           system: %ActorSystem{} = system,
           command_name: command_name,
           async: async?,
@@ -266,7 +266,7 @@ defmodule Actors do
       :timer.tc(fn ->
         metadata_attributes =
           Enum.map(metadata, fn {key, value} -> {to_existing_atom_or_new(key), value} end) ++
-            [{:async, async?}, {"from", get_caller(caller)}, {"target", actor.id.name}]
+            [{:async, async?}, {"from", get_caller(caller)}, {"target", actor_id.name}]
 
         {_current, opts} =
           Keyword.get_and_update(opts, :span_ctx, fn span_ctx ->
@@ -284,16 +284,18 @@ defmodule Actors do
 
               actor_fqdn =
                 if pooled? do
-                  case ActorRegistry.get_hosts_by_actor(system.name, actor.id.name) do
+                  case ActorRegistry.get_hosts_by_actor(actor_id) do
                     {:ok, actor_hosts} ->
                       host = Enum.random(actor_hosts)
-                      {pooled?, system.name, host.actor.id.parent, actor.id.name}
+                      {pooled?, system.name, host.actor.parent, actor_id}
+
+                      {pooled?, system.name, host.actor.id.parent, actor_id}
 
                     _ ->
-                      {pooled?, system.name, "#{actor.id.name}-1", actor.id.name}
+                      {pooled?, system.name, "#{actor.id.name}-1", actor_id}
                   end
                 else
-                  {pooled?, system.name, actor.id.name, actor.id.name}
+                  {pooled?, system.name, actor_id.name, actor_id}
                 end
 
               do_lookup_action(system.name, actor_fqdn, system, fn actor_ref, actor_ref_id ->
@@ -343,7 +345,7 @@ defmodule Actors do
 
   defp do_lookup_action(
          system_name,
-         {pooled, system_name, parent, actor_name} = actor_fqdn,
+         {pooled, system_name, parent, %ActorId{name: actor_name} = actor_id} = actor_fqdn,
          system,
          action_fun
        ) do
@@ -368,7 +370,7 @@ defmodule Actors do
             Tracer.set_attributes([{:system_name, system_name}])
             Tracer.set_attributes([{:actor_name, actor_name}])
 
-            case ActorRegistry.lookup(system_name, actor_name,
+            case ActorRegistry.lookup(actor_id,
                    filter_by_parent: pooled,
                    parent: parent
                  ) do

@@ -41,7 +41,7 @@ defmodule ActorsTest do
       {:ok, %RegistrationResponse{}} = Actors.register(request)
 
       {:ok, %ActorState{state: %Google.Protobuf.Any{value: state}}} =
-        Actors.get_state(system.name, actor_name)
+        Actors.get_state(%ActorId{name: actor_name, system: system.name})
 
       assert %Actors.Protos.StateTest{name: "example_state_name_" <> _rand} =
                Actors.Protos.StateTest.decode(state)

@@ -6,15 +6,30 @@ defmodule Statestores.Adapters.LookupBehaviour do
 
   @type host :: struct()
 
-  @callback get_by_id(actor_id) :: {:ok, any()} | {:error, any()}
+  @doc """
+  Delete all records from a specific node.
+  """
+  @callback clean(node()) :: {:error, any()} | {:ok, any()}
 
-  @callback get_by_id_node(actor_id, node()) :: {:ok, any()} | {:error, any()}
-
+  @doc """
+  Retrieves all actohost entries for a specific node.
+  """
   @callback get_all_by_node(node()) :: {:ok, any()} | {:error, any()}
 
-  @callback set(actor_id(), node(), host()) :: {:error, any()} | {:ok, any()}
+  @doc """
+  Fetches all existing entries for a given ActorId.
+  """
+  @callback get_by_id(actor_id) :: {:ok, any()} | {:error, any()}
 
-  @callback clean(node()) :: {:error, any()} | {:ok, any()}
+  @doc """
+  Fetches all existing entries for a given ActorId for a specific node.
+  """
+  @callback get_by_id_node(actor_id, node()) :: {:ok, any()} | {:error, any()}
+
+  @doc """
+  Saves or updates to persistent storage the ActorHost for a given ActorId.
+  """
+  @callback set(actor_id(), node(), host()) :: {:error, any()} | {:ok, any()}
 
   defmacro __using__(_opts) do
     quote do

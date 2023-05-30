@@ -16,10 +16,12 @@ defmodule Proxy.Routes.API do
     SpawnResponse
   }
 
+  alias Eigr.Functions.Protocol.Actors.ActorId
+
   @content_type "application/octet-stream"
 
-  get "/system/:name/actors/:actor_name" do
-    Actors.get_state(name, actor_name)
+  get "/system/:system/actors/:actor_name" do
+    Actors.get_state(%ActorId{name: actor_name, system: system})
   end
 
   post "/system" do

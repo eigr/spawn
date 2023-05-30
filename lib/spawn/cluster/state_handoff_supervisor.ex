@@ -1,4 +1,4 @@
-defmodule Spawn.Cluster.StateHandoff.Supervisor do
+defmodule Spawn.Cluster.StateHandoffManager.Supervisor do
   @moduledoc false
   use Supervisor
   require Logger
@@ -16,7 +16,7 @@ defmodule Spawn.Cluster.StateHandoff.Supervisor do
 
   @impl true
   def init(config) do
-    children = [Spawn.Cluster.StateHandoff.child_spec(config)]
+    children = [Spawn.Cluster.StateHandoffManager.child_spec(config)]
 
     Supervisor.init(children,
       strategy: :one_for_one,

@@ -1,4 +1,4 @@
-defmodule Spawn.Cluster.StateHandoff do
+defmodule Spawn.Cluster.StateHandoffCrdtController do
   @moduledoc """
   This handles state handoff in a cluster.
 
@@ -28,9 +28,14 @@ defmodule Spawn.Cluster.StateHandoff do
     }
   end
 
+  defmodule State do
+    defstruct data: nil, adapter: nil
+  end
+
   @impl true
   def init(config) do
     Process.flag(:trap_exit, true)
+    Process.flag(:message_queue_data, :off_heap)
     :net_kernel.monitor_nodes(true, node_type: :visible)
 
     {:ok, crdt_pid} =

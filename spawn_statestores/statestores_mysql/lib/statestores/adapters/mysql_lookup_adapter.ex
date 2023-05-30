@@ -27,13 +27,13 @@ defmodule Statestores.Adapters.MySQLLookupAdapter do
   @impl true
   def get_by_id(id) do
     key = generate_key(id)
-    {:ok, all(from(l in Lookup, where: l.id == ^key))}
+    {:ok, all(from(l in Lookup, where: l.id == ^key, select: l.data))}
   end
 
   @impl true
   def get_by_id_node(id, node) do
     node = Atom.to_string(node)
-    res = all(from(l in Lookup, where: l.id == ^id and l.node == ^node))
+    res = all(from(l in Lookup, where: l.id == ^id and l.node == ^node, select: l.data))
     {:ok, res}
   end
 

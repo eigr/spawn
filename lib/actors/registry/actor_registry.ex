@@ -10,7 +10,7 @@ defmodule Actors.Registry.ActorRegistry do
 
   alias Actors.Registry.{HostActor, LoadBalancer}
   alias Eigr.Functions.Protocol.Actors.{Actor, ActorId}
-  alias Spawn.Cluster.StateHandoff
+  alias Spawn.Cluster.StateHandoffManager, as: StateHandoff
 
   @doc """
   Register `member` entities to the ActorRegistry.
@@ -25,16 +25,9 @@ defmodule Actors.Registry.ActorRegistry do
   def register(hosts) do
     Enum.each(hosts, fn %HostActor{
                           node: _node,
-                          actor: %Actor{id: %ActorId{name: name} = _id} = _actor
+                          actor: %Actor{id: %ActorId{name: _name} = id} = _actor
                         } = host ->
-      case StateHandoff.get(name) do
-        nil ->
-          StateHandoff.set(name, [host])
-
-        hosts ->
-          updated_hosts = hosts ++ [host]
-          StateHandoff.set(name, updated_hosts)
-      end
+      StateHandoff.set(id, host)
     end)
   end
 
@@ -45,7 +38,8 @@ defmodule Actors.Registry.ActorRegistry do
       [<<10, 14, 10, 12, 115, 112>>]
   """
   def get_all_invocations do
-    StateHandoff.get_all_invocations()
+    # TODO: Fix this
+    # StateHandoff.get_all_invocations()
   end
 
   @doc """
@@ -53,6 +47,7 @@ defmodule Actors.Registry.ActorRegistry do
   Usually used for invocation schedulings
   """
   def remove_invocation_request(actor, request) do
+    # TODO: Fix this
     actor
     |> StateHandoff.get()
     |> Kernel.||([])
@@ -78,6 +73,7 @@ defmodule Actors.Registry.ActorRegistry do
   Usually used for invocation schedulings
   """
   def register_invocation_request(actor, request) do
+    # TODO: Fix this
     actor
     |> StateHandoff.get()
     |> Kernel.||([])
@@ -101,9 +97,9 @@ defmodule Actors.Registry.ActorRegistry do
   Returns `HostActor` with Host and specific actor.
   """
   @doc since: "0.1.0"
-  @spec lookup(String.t(), String.t(), Keyword.t()) :: {:ok, HostActor.t()} | {:not_found, []}
-  def lookup(_system_name, actor_name, opts \\ []) do
-    case StateHandoff.get(actor_name) do
+  @spec lookup(ActorId.t(), Keyword.t()) :: {:ok, HostActor.t()} | {:not_found, []}
+  def lookup(id, opts \\ []) do
+    case StateHandoff.get(id) do
       nil ->
         {:not_found, []}
 
@@ -111,20 +107,32 @@ defmodule Actors.Registry.ActorRegistry do
         parent_name = Keyword.fetch!(opts, :parent)
         filter_by_parent? = Keyword.get(opts, :filter_by_parent, false)
 
-        filter(state_hosts, filter_by_parent?, actor_name, parent_name)
+        filter(state_hosts, filter_by_parent?, id, parent_name)
         |> then(fn
           [] ->
             {:not_found, []}
 
           hosts ->
-            choose_hosts(hosts, filter_by_parent?, actor_name, parent_name)
+            choose_hosts(hosts, filter_by_parent?, id, parent_name)
         end)
     end
   end
 
-  @spec get_hosts_by_actor(String.t(), String.t()) :: {:ok, Member.t()} | {:not_found, []}
-  def get_hosts_by_actor(_system_name, actor_name) do
-    case StateHandoff.get(actor_name) do
+  @spec get_hosts_by_actor(ActorId.t(), Keyword.t()) :: {:ok, Member.t()} | {:not_found, []}
+  def get_hosts_by_actor(
+        %ActorId{parent: parent, name: name} = actor_id,
+        opts \\ []
+      ) do
+    parent? = Keyword.get(opts, :parent, false)
+
+    {id, actor_name} =
+      if parent? do
+        {%ActorId{actor_id | name: parent}, parent}
+      else
+        {actor_id, name}
+      end
+
+    case StateHandoff.get(id) do
       nil ->
         {:not_found, []}
 
@@ -140,8 +148,8 @@ defmodule Actors.Registry.ActorRegistry do
     end
   end
 
-  @spec get_hosts_by_actor_parent(String.t(), String.t()) :: {:ok, Member.t()} | {:not_found, []}
-  def get_hosts_by_actor_parent(_system_name, actor_name) do
+  @spec get_hosts_by_actor_parent(ActorId.t()) :: {:ok, Member.t()} | {:not_found, []}
+  def get_hosts_by_actor_parent(%ActorId{name: actor_name} = _id) do
     case StateHandoff.get(actor_name) do
       nil ->
         {:not_found, []}
@@ -164,7 +172,7 @@ defmodule Actors.Registry.ActorRegistry do
     StateHandoff.clean(node)
   end
 
-  defp filter(hosts, filter_by_parent?, actor_name, parent_name) do
+  defp filter(hosts, filter_by_parent?, %ActorId{name: actor_name} = _id, parent_name) do
     case filter_by_parent? do
       true ->
         Enum.filter(hosts, fn ac ->
@@ -176,15 +184,16 @@ defmodule Actors.Registry.ActorRegistry do
     end
   end
 
-  defp choose_hosts(hosts, filter_by_parent?, actor_name, parent_name) do
+  defp choose_hosts(hosts, filter_by_parent?, %ActorId{name: _actor_name} = _id, parent_name) do
     if filter_by_parent? do
       %HostActor{node: _node, actor: actor, opts: opts} = host = Enum.random(hosts)
       new_actor = %Actor{actor | id: %ActorId{actor.id | name: parent_name}}
       {:ok, %HostActor{host | actor: new_actor, opts: opts}}
     else
       case LoadBalancer.next_host(hosts) do
-        {:ok, node_host, updated_hosts} ->
-          StateHandoff.set(actor_name, updated_hosts)
+        {:ok, node_host, _updated_hosts} ->
+          # TODO: Fix this. updated hosts doesnt work yet
+          # StateHandoff.set(id, updated_hosts)
           {:ok, node_host}
 
         _ ->

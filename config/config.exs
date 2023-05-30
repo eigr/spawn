@@ -47,4 +47,7 @@ config :opentelemetry,
          exporter: {:opentelemetry_exporter, %{endpoints: [{:http, 'localhost', 55681, []}]}}
        }
 
+config :spawn,
+  state_handoff_controller_adapter: Spawn.Cluster.StateHandoffPersistentController
+
 import_config "#{config_env()}.exs"

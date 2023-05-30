@@ -23,7 +23,7 @@ defmodule Spawn.Supervisor do
     children =
       [
         cluster_supervisor(config),
-        Spawn.Cluster.StateHandoff.Supervisor.child_spec(config),
+        Spawn.Cluster.StateHandoffManager.Supervisor.child_spec(config),
         Spawn.Cluster.Node.Registry.child_spec()
       ]
       |> maybe_start_internal_nats(config)
