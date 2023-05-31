@@ -2,9 +2,12 @@ defmodule Spawn.Cluster.StateHandoffPersistentController do
   @moduledoc """
 
   """
+  use Nebulex.Caching
+  require Logger
+
   @behaviour Spawn.StateHandoff.Controller.Behaviour
 
-  require Logger
+  alias Spawn.Cache.LookupCache, as: Cache
 
   @type node_type :: term()
 
@@ -22,7 +25,10 @@ defmodule Spawn.Cluster.StateHandoffPersistentController do
 
   @otp_app :spawn
 
+  @ttl :timer.minutes(10)
+
   @spec get_by_id(id(), node(), data()) :: {new_data(), hosts()}
+  @decorate cacheable(cache: Cache, keys: [id, node], opts: [ttl: @ttl])
   def get_by_id(id, _node, %{backend_adapter: backend} = data) do
     {:ok, lookups} = backend.get_by_id(id)
 
@@ -44,6 +50,7 @@ defmodule Spawn.Cluster.StateHandoffPersistentController do
   def handle_after_nit(data), do: data
 
   @spec handle_terminate(node(), data()) :: new_data()
+  @decorate cache_evict(cache: Cache, key: node)
   def handle_terminate(node, %{backend_adapter: backend} = data) do
     backend.clean(node)
     data
