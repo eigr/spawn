@@ -134,7 +134,7 @@ defmodule Statestores.Util do
   end
 
   @spec generate_key(any()) :: String.t()
-  def generate_key(id), do: :erlang.phash2(id)
+  def generate_key(id), do: :erlang.phash2({id.name, id.system})
 
   # Lookup Adapters
   defp load_lookup_adapter_by_type(:mysql), do: Statestores.Adapters.MySQLLookupAdapter

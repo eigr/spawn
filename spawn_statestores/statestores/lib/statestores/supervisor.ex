@@ -21,6 +21,7 @@ defmodule Statestores.Supervisor do
     snapshot_adapter = load_snapshot_adapter()
     Statestores.Config.load()
     Statestores.Migrator.migrate(snapshot_adapter)
+    Statestores.Migrator.migrate(lookup_adapter)
 
     children = [
       Statestores.Vault,

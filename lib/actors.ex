@@ -50,14 +50,14 @@ defmodule Actors do
   @erpc_timeout 5_000
 
   @spec get_state(ActorId.t()) :: {:ok, term()} | {:error, term()}
-  def get_state(%ActorId{name: actor_name, system: system_name} = _id) do
+  def get_state(%ActorId{name: actor_name, system: system_name} = id) do
     retry with: exponential_backoff() |> randomize |> expiry(30_000),
           atoms: [:error, :exit, :noproc, :erpc, :noconnection, :timeout],
           rescue_only: [ErlangError] do
       try do
         do_lookup_action(
           system_name,
-          {false, system_name, actor_name, actor_name},
+          {false, system_name, actor_name, id},
           nil,
           fn actor_ref, _actor_ref_id ->
             ActorEntity.get_state(actor_ref)
@@ -104,7 +104,6 @@ defmodule Actors do
     |> tap(fn _sts -> warmup_actors(actor_system, actors, opts) end)
     |> case do
       :ok ->
-        Process.sleep(100)
         status = %RequestStatus{status: :OK, message: "Accepted"}
         {:ok, %RegistrationResponse{proxy_info: get_proxy_info(), status: status}}
 
@@ -142,7 +141,7 @@ defmodule Actors do
 
   def spawn_actor(%SpawnRequest{actors: actors} = _spawn, _opts) do
     hosts =
-      Enum.map(actors, fn %ActorId{parent: _parent, name: _name} = id ->
+      Enum.map(actors, fn %ActorId{} = id ->
         case ActorRegistry.get_hosts_by_actor(id, parent: true) do
           {:ok, actor_hosts} ->
             to_spawn_hosts(id, actor_hosts)
@@ -287,7 +286,6 @@ defmodule Actors do
                   case ActorRegistry.get_hosts_by_actor(actor_id) do
                     {:ok, actor_hosts} ->
                       host = Enum.random(actor_hosts)
-                      {pooled?, system.name, host.actor.parent, actor_id}
 
                       {pooled?, system.name, host.actor.id.parent, actor_id}
 

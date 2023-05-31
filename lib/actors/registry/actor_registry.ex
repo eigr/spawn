@@ -105,7 +105,6 @@ defmodule Actors.Registry.ActorRegistry do
 
       state_hosts ->
         parent_name = Keyword.fetch!(opts, :parent)
-        IO.inspect(parent_name, label: "Passou aqui")
         filter_by_parent? = Keyword.get(opts, :filter_by_parent, false)
 
         filter(state_hosts, filter_by_parent?, id, parent_name)
@@ -139,24 +138,6 @@ defmodule Actors.Registry.ActorRegistry do
 
       hosts ->
         Enum.filter(hosts, fn ac -> ac.actor.id.name == actor_name end)
-        |> then(fn
-          [] ->
-            {:not_found, []}
-
-          hosts ->
-            {:ok, hosts}
-        end)
-    end
-  end
-
-  @spec get_hosts_by_actor_parent(ActorId.t()) :: {:ok, Member.t()} | {:not_found, []}
-  def get_hosts_by_actor_parent(%ActorId{name: actor_name} = _id) do
-    case StateHandoff.get(actor_name) do
-      nil ->
-        {:not_found, []}
-
-      hosts ->
-        Enum.filter(hosts, fn ac -> ac.actor.id.parent == actor_name end)
         |> then(fn
           [] ->
             {:not_found, []}

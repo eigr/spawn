@@ -55,7 +55,7 @@ defmodule Actor.ActorTest do
         SideEffect.to(
           "second_actor",
           "forward_caller_name",
-          MyMessageResponse.new(data: "first_actor_value")
+          %MyMessageResponse{data: "first_actor_value"}
         )
       ])
       |> Value.value(%MyMessageResponse{data: "worked_with_effects"})

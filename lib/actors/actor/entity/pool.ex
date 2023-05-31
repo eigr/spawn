@@ -26,7 +26,7 @@ defmodule Actors.Actor.Pool do
   @spec create_actor_host_pool(Actor.t(), keyword()) :: list(HostActor.t())
   def create_actor_host_pool(
         %Actor{
-          id: %ActorId{system: system, parent: _parent, name: name} = id,
+          id: %ActorId{} = id,
           settings: %ActorSettings{kind: :POOLED} = _settings
         } = actor,
         opts

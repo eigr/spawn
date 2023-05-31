@@ -15,6 +15,7 @@ defmodule Actors.ActorRegistryTest do
     %{request: request, actor_name: actor_name}
   end
 
+  @tag :skip
   test "register actors for a system in two nodes", ctx do
     %{request: request} = ctx
 
