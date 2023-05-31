@@ -2,14 +2,8 @@ defmodule Spawn.Cluster.StateHandoffManager do
   @moduledoc """
   This handles state handoff in a cluster.
 
-  It uses the DeltaCrdt library to handle a distributed state, which is an eventually consistent replicated data type.
-  The module starts a GenServer that monitors nodes in the cluster, and when a new node comes up it sends a "set_neighbours"
-  message to that node's GenServer process with its own DeltaCrdt process ID. This is done to ensure that changes in either node's
-  state are reflected across both.
-
-  The module also handles other messages like "handoff" and "get" to put and retrieve data from the DeltaCrdt state, respectively.
+  This module monitors node up and down events as well as node terminate events and triggers `Spawn.StateHandoff.Controller.Behaviour` implementations to handle these events.
   """
-
   use GenServer
   require Logger
 
@@ -25,12 +19,6 @@ defmodule Spawn.Cluster.StateHandoffManager do
     defstruct data: nil, controller: nil
   end
 
-  defp do_init(_config) do
-    Process.flag(:trap_exit, true)
-    Process.flag(:message_queue_data, :off_heap)
-    :net_kernel.monitor_nodes(true, node_type: :visible)
-  end
-
   @impl true
   def init(config) do
     controller =
@@ -41,14 +29,25 @@ defmodule Spawn.Cluster.StateHandoffManager do
       )
 
     do_init(config)
-    initial_state = controller.handle_init(config)
 
-    {:ok, %State{controller: controller, data: initial_state}, {:continue, :after_init}}
+    case controller.handle_init(config) do
+      {initial_state, timers} ->
+        IO.inspect(initial_state, label: "Initial State ------------------")
+
+        Enum.each(timers, fn {evt, delay} ->
+          Process.send_after(self(), evt, delay)
+        end)
+
+        {:ok, %State{controller: controller, data: initial_state}, {:continue, :after_init}}
+
+      initial_state ->
+        {:ok, %State{controller: controller, data: initial_state}, {:continue, :after_init}}
+    end
   end
 
   @impl true
   def handle_continue(:after_init, %State{controller: controller, data: data} = state) do
-    new_data = controller.handle_after_nit(data)
+    new_data = controller.handle_after_init(data)
 
     {:noreply, %State{state | data: new_data}}
   end
@@ -86,6 +85,17 @@ defmodule Spawn.Cluster.StateHandoffManager do
   end
 
   @impl true
+  def handle_info(event, %State{controller: controller, data: data} = state) do
+    case controller.handle_timer(event, data) do
+      {new_data, {evt, delay} = _timer} ->
+        Process.send_after(self(), evt, delay)
+        {:noreply, %State{state | data: new_data}}
+
+      new_data ->
+        {:noreply, %State{state | data: new_data}}
+    end
+  end
+
   def handle_info({:nodeup, node, node_type}, %State{controller: controller, data: data} = state) do
     Logger.debug("Received :nodeup event from #{inspect(node)}")
     new_data = controller.handle_nodeup_event(node, node_type, data)
@@ -125,6 +135,13 @@ defmodule Spawn.Cluster.StateHandoffManager do
     Logger.debug("Received cleanup action from Node #{inspect(node)}")
     GenServer.cast(__MODULE__, {:clean, node})
     Logger.debug("Hosts cleaned for node #{inspect(node)}")
+  end
+
+  # Private functions
+  defp do_init(_config) do
+    Process.flag(:trap_exit, true)
+    Process.flag(:message_queue_data, :off_heap)
+    :net_kernel.monitor_nodes(true, node_type: :visible)
   end
 
   defp async_get_actors(controller, from, id, data) do

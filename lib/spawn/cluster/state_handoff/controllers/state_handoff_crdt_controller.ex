@@ -9,9 +9,23 @@ defmodule Spawn.Cluster.StateHandoffCrdtController do
 
   The module also handles other messages like "handoff" and "get" to put and retrieve data from the DeltaCrdt state, respectively.
   """
-
-  use GenServer
   require Logger
+
+  import Spawn.Utils.Common, only: [generate_key: 1]
+
+  @type node_type :: term()
+
+  @type config :: map()
+
+  @type data :: any()
+
+  @type new_data :: data()
+
+  @type id :: Eigr.Functions.Protocol.Actors.ActorId.t()
+
+  @type host :: Actors.Registry.HostActor.t()
+
+  @type hosts :: list(Actors.Registry.HostActor.t())
 
   @call_timeout 15_000
 
@@ -20,23 +34,53 @@ defmodule Spawn.Cluster.StateHandoffCrdtController do
   @default_ship_debounce 2
   @default_neighbours_sync_interval 60_000
 
-  def child_spec(opts \\ []) do
-    %{
-      id: __MODULE__,
-      start: {__MODULE__, :start_link, [opts]},
-      restart: :permanent
-    }
+  def get_crdt_pid do
+    :persistent_term.get(__MODULE__, {:error, Node.self()})
   end
 
-  defmodule State do
-    defstruct data: nil, adapter: nil
+  @doc """
+  Cluster HostActor cleanup
+  """
+  def clean(node, data) do
+    Logger.debug("Received cleanup action from Node #{inspect(node)}")
+
+    crdt_pid = get_crdt_pid()
+    actors = DeltaCrdt.to_map(crdt_pid)
+
+    new_hosts =
+      actors
+      |> Enum.map(fn {key, hosts} ->
+        hosts_not_in_node = Enum.reject(hosts, &(&1.node == node))
+
+        {key, hosts_not_in_node}
+      end)
+      |> Map.new()
+
+    drop_operations = actors |> Map.keys() |> Enum.map(&{:remove, [&1]})
+    merge_operations = Enum.map(new_hosts, fn {key, value} -> {:add, [key, value]} end)
+
+    # this is calling the internals of DeltaCrdt GenServer function (to keep atomicity in check)
+    GenServer.call(crdt_pid, {:bulk_operation, drop_operations ++ merge_operations})
+
+    Logger.debug("Hosts cleaned for node #{inspect(node)}")
+    data
   end
 
-  @impl true
-  def init(config) do
-    Process.flag(:trap_exit, true)
-    Process.flag(:message_queue_data, :off_heap)
-    :net_kernel.monitor_nodes(true, node_type: :visible)
+  @spec get_by_id(id(), node(), data()) :: {new_data(), hosts()}
+  def get_by_id(id, _node, %{crdt_pid: _crdt_pid} = data) do
+    key = generate_key(id)
+
+    hosts =
+      get_crdt_pid()
+      |> DeltaCrdt.get(key, :infinity)
+
+    {data, hosts}
+  end
+
+  @spec handle_init(config()) :: new_data()
+  def handle_init(config) do
+    pooling_interval =
+      Map.get(config, :neighbours_sync_interval, @default_neighbours_sync_interval)
 
     {:ok, crdt_pid} =
       DeltaCrdt.start_link(DeltaCrdt.AWLWWMap,
@@ -47,121 +91,63 @@ defmodule Spawn.Cluster.StateHandoffCrdtController do
 
     :persistent_term.put(__MODULE__, crdt_pid)
 
-    Process.send_after(
-      self(),
-      :set_neighbours_sync,
-      Map.get(config, :neighbours_sync_interval, @default_neighbours_sync_interval)
-    )
-
-    {:ok, crdt_pid, {:continue, :after_init}}
+    {
+      %{crdt_pid: crdt_pid, neighbours_sync_interval: pooling_interval},
+      [
+        {:set_neighbours_sync, pooling_interval}
+      ]
+    }
   end
 
-  @impl true
-  def handle_continue(:after_init, crdt_pid) do
+  @spec handle_after_init(data()) :: new_data()
+  def handle_after_init(%{crdt_pid: crdt_pid} = data) do
     do_set_neighbours(crdt_pid)
-
-    {:noreply, crdt_pid}
+    data
   end
 
-  @impl true
-  def terminate(_reason, crdt_pid) do
-    Logger.debug("Calling StateHandoff terminate")
-
+  @spec handle_terminate(node(), data()) :: new_data()
+  def handle_terminate(_node, %{crdt_pid: crdt_pid} = _data) do
+    Logger.debug("#{inspect(__MODULE__)} Handling StateHandoff terminate...")
     :persistent_term.erase(__MODULE__)
 
-    {:ok, crdt_pid}
+    %{crdt_pid: crdt_pid}
   end
 
-  @impl true
-  def handle_info(:set_neighbours_sync, this_crdt_pid) do
-    do_set_neighbours(this_crdt_pid)
-
-    Process.send_after(self(), :set_neighbours_sync, @default_neighbours_sync_interval)
-
-    {:noreply, this_crdt_pid}
+  def handle_terminate(node, data) do
+    Logger.warning("Invalid terminate state for Node #{inspect(node)}. State: #{inspect(data)}")
   end
 
-  def handle_info({:nodeup, node, _node_type}, this_crdt_pid) do
-    Logger.debug("Received :nodeup event from #{inspect(node)}")
+  def handle_timer(
+        :set_neighbours_sync,
+        %{crdt_pid: crdt_pid, neighbours_sync_interval: pooling_interval} = data
+      ) do
+    do_set_neighbours(crdt_pid)
 
-    do_set_neighbours(this_crdt_pid)
-
-    {:noreply, this_crdt_pid}
+    {data, {:set_neighbours_sync, pooling_interval}}
   end
 
-  def handle_info({:nodedown, node, _node_type}, this_crdt_pid) do
-    Logger.debug("Received :nodedown event from #{inspect(node)}")
+  def handle_timer(_event, data), do: data
 
-    do_set_neighbours(this_crdt_pid)
-
-    {:noreply, this_crdt_pid}
+  @spec handle_nodeup_event(node(), node_type(), data()) :: new_data()
+  def handle_nodeup_event(_node, _node_type, %{crdt_pid: crdt_pid} = _data) do
+    do_set_neighbours(crdt_pid)
+    %{crdt_pid: crdt_pid}
   end
 
-  def start_link(opts) do
-    GenServer.start_link(__MODULE__, opts, name: __MODULE__)
+  @spec handle_nodedown_event(node(), node_type(), data()) :: new_data()
+  def handle_nodedown_event(_node, _node_type, %{crdt_pid: crdt_pid} = _data) do
+    do_set_neighbours(crdt_pid)
+    %{crdt_pid: crdt_pid}
   end
 
-  @doc """
-  Store a actor and entity in the handoff crdt
-  """
-  def set(actor, hosts) do
-    pid = get_crdt_pid()
+  @spec set(id(), node(), host(), data) :: new_data()
+  def set(id, _node, host, %{crdt_pid: _crdt_pid} = data) do
+    key = generate_key(id)
 
-    hosts
-    |> Enum.group_by(& &1.node)
-    |> Enum.each(fn {node, hosts} ->
-      actors_map = DeltaCrdt.get(pid, node) || %{}
-
-      updated_actors_map = Map.put(actors_map, actor, hosts)
-      DeltaCrdt.put(pid, node, updated_actors_map)
-    end)
-  end
-
-  @doc """
-  Pickup the stored entity data for a actor
-  """
-  def get(actor) do
     get_crdt_pid()
-    |> DeltaCrdt.take(all_nodes())
-    |> Enum.map(fn
-      {_node, %{^actor => hosts}} -> hosts
-      _ -> []
-    end)
-    |> List.flatten()
-  end
+    |> DeltaCrdt.put(key, [host], :infinity)
 
-  def get_crdt_pid do
-    :persistent_term.get(__MODULE__, {:error, Node.self()})
-  end
-
-  def get_all_invocations do
-    get_crdt_pid()
-    |> DeltaCrdt.to_map()
-    |> Map.values()
-    |> List.flatten()
-    |> Enum.map(fn actors_map ->
-      actors_map
-      |> Map.values()
-      |> List.flatten()
-      |> Enum.map(& &1.opts[:invocations])
-      |> List.flatten()
-    end)
-    |> List.flatten()
-    |> Enum.reject(&is_nil/1)
-    |> Enum.uniq()
-  end
-
-  @doc """
-  Cluster HostActor cleanup
-  """
-  def clean(node) do
-    Logger.debug("Received cleanup action from Node #{inspect(node)}")
-
-    crdt_pid = get_crdt_pid()
-
-    DeltaCrdt.delete(crdt_pid, node)
-
-    Logger.debug("Hosts cleaned for node #{inspect(node)}")
+    data
   end
 
   defp do_set_neighbours(this_crdt_pid) do
@@ -173,7 +159,7 @@ defmodule Spawn.Cluster.StateHandoffCrdtController do
       :erpc.multicall(nodes, __MODULE__, :get_crdt_pid, [], @call_timeout)
       |> Enum.map(fn
         {:ok, {:error, node}} ->
-          Logger.warning("StateHandoff.get_crdt_pid returned nil in node -> #{inspect(node)}")
+          Logger.warning("The node failed to retrieve DeltaCrdt pid -> #{inspect(node)}")
 
           nil
 
@@ -193,9 +179,5 @@ defmodule Spawn.Cluster.StateHandoffCrdtController do
     # we are not adding both ways and letting them sync with eachother
     # based on current Node.list() of each node
     DeltaCrdt.set_neighbours(this_crdt_pid, neighbours)
-  end
-
-  defp all_nodes do
-    Node.list() ++ [Node.self()]
   end
 end

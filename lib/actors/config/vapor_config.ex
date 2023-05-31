@@ -115,7 +115,7 @@ defmodule Actors.Config.Vapor do
           {:ship_debounce, "SPAWN_CRDT_SHIP_DEBOUNCE",
            default: 2, map: &String.to_integer/1, required: false},
           {:neighbours_sync_interval, "SPAWN_STATE_HANDOFF_SYNC_INTERVAL",
-           default: 60, map: &String.to_integer/1, required: false}
+           default: 60_000, map: &String.to_integer/1, required: false}
         ]
       }
     ]

@@ -47,9 +47,6 @@ config :opentelemetry,
          exporter: {:opentelemetry_exporter, %{endpoints: [{:http, 'localhost', 55681, []}]}}
        }
 
-config :spawn,
-  state_handoff_controller_adapter: Spawn.Cluster.StateHandoffPersistentController
-
 config :spawn, Spawn.Cache.LookupCache,
   backend: :shards,
   partitions: System.schedulers_online(),

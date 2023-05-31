@@ -1,6 +1,6 @@
 defmodule Spawn.Cluster.StateHandoffPersistentController do
   @moduledoc """
-
+  `StateHandoffPersistentController` is a StateHandoff Controller basead on `Statestore` mechanism.
   """
   use Nebulex.Caching
   require Logger
@@ -27,6 +27,11 @@ defmodule Spawn.Cluster.StateHandoffPersistentController do
 
   @ttl :timer.minutes(10)
 
+  @impl true
+  @spec clean(node(), data()) :: data()
+  def clean(node, data), do: handle_terminate(node, data)
+
+  @impl true
   @spec get_by_id(id(), node(), data()) :: {new_data(), hosts()}
   @decorate cacheable(cache: Cache, keys: [id, node], opts: [ttl: @ttl])
   def get_by_id(id, _node, %{backend_adapter: backend} = data) do
@@ -40,15 +45,18 @@ defmodule Spawn.Cluster.StateHandoffPersistentController do
     {data, hosts}
   end
 
+  @impl true
   @spec handle_init(config()) :: new_data()
   def handle_init(_config) do
     backend = Application.get_env(@otp_app, :state_handoff_controller_persistent_backend)
     %{backend_adapter: backend}
   end
 
-  @spec handle_after_nit(data()) :: new_data()
-  def handle_after_nit(data), do: data
+  @impl true
+  @spec handle_after_init(data()) :: new_data()
+  def handle_after_init(data), do: data
 
+  @impl true
   @spec handle_terminate(node(), data()) :: new_data()
   @decorate cache_evict(cache: Cache, key: node)
   def handle_terminate(node, %{backend_adapter: backend} = data) do
@@ -60,12 +68,15 @@ defmodule Spawn.Cluster.StateHandoffPersistentController do
     Logger.warning("Invalid terminate state for Node #{inspect(node)}. State: #{inspect(data)}")
   end
 
+  @impl true
   @spec handle_nodeup_event(node(), node_type(), data()) :: new_data()
   def handle_nodeup_event(_node, _node_type, data), do: data
 
+  @impl true
   @spec handle_nodedown_event(node(), node_type(), data()) :: new_data()
   def handle_nodedown_event(_node, _node_type, data), do: data
 
+  @impl true
   @spec set(id(), node(), host(), data) :: new_data()
   def set(id, node, host, %{backend_adapter: backend} = data) do
     bytes = :erlang.term_to_binary(host)
