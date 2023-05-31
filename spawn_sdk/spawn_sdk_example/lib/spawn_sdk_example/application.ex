@@ -9,11 +9,12 @@ defmodule SpawnSdkExample.Application do
         SpawnSdk.System.Supervisor,
         system: "spawn-system",
         actors: [
-          # SpawnSdkExample.Actors.JoeActor,
-          # SpawnSdkExample.Actors.JsonActor,
-          # SpawnSdkExample.Actors.ClockActor,
-          # SpawnSdkExample.Actors.AbstractActor,
-          SpawnSdkExample.Actors.PooledActor
+          SpawnSdkExample.Actors.JoeActor,
+          SpawnSdkExample.Actors.JsonActor,
+          SpawnSdkExample.Actors.ClockActor,
+          SpawnSdkExample.Actors.AbstractActor
+          # Pooled Actors have been removed and will be restructured in the future
+          # SpawnSdkExample.Actors.PooledActor
         ],
         extenal_subscribers: [
           {SpawnSdkExample.Subscriber, []}

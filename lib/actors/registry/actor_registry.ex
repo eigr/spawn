@@ -168,8 +168,6 @@ defmodule Actors.Registry.ActorRegistry do
     else
       case LoadBalancer.next_host(hosts) do
         {:ok, node_host, _updated_hosts} ->
-          # TODO: Fix this. updated hosts doesnt work yet
-          # StateHandoff.set(id, updated_hosts)
           {:ok, node_host}
 
         _ ->
