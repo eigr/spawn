@@ -94,7 +94,7 @@ test.integration: ## Run integration tests using k3d `make cluster`
 
 push-all-images:
 	docker push ${proxy-image}
-	docker push ${operator-image}
+	#docker push ${operator-image}
 	#docker push ${activator-api-image}
 	#docker push ${activator-http-image}
 	#docker push ${activator-kafka-image}

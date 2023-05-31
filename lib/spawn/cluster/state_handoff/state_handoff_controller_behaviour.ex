@@ -50,6 +50,8 @@ defmodule Spawn.StateHandoff.Controller.Behaviour do
   """
   @callback handle_terminate(node(), data()) :: new_data()
 
+  @callback handle_timer(any(), data()) :: new_data() | {new_data(), timer()}
+
   @doc """
   If necessary any procedure to be executed during a nodeup event
   """

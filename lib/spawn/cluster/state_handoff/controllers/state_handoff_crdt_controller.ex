@@ -27,6 +27,10 @@ defmodule Spawn.Cluster.StateHandoffCrdtController do
 
   @type hosts :: list(Actors.Registry.HostActor.t())
 
+  @type timer :: {atom(), integer()}
+
+  @type timers :: list(timer())
+
   @call_timeout 15_000
 
   @default_sync_interval 2
@@ -117,6 +121,8 @@ defmodule Spawn.Cluster.StateHandoffCrdtController do
     Logger.warning("Invalid terminate state for Node #{inspect(node)}. State: #{inspect(data)}")
   end
 
+  @impl true
+  @spec handle_timer(any(), data()) :: new_data() | | {new_data(), timer()}
   def handle_timer(
         :set_neighbours_sync,
         %{crdt_pid: crdt_pid, neighbours_sync_interval: pooling_interval} = data

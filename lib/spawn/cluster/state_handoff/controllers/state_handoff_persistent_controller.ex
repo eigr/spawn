@@ -23,6 +23,10 @@ defmodule Spawn.Cluster.StateHandoffPersistentController do
 
   @type hosts :: list(Actors.Registry.HostActor.t())
 
+  @type timer :: {atom(), integer()}
+
+  @type timers :: list(timer())
+
   @otp_app :spawn
 
   @ttl :timer.minutes(10)
@@ -67,6 +71,10 @@ defmodule Spawn.Cluster.StateHandoffPersistentController do
   def handle_terminate(node, data) do
     Logger.warning("Invalid terminate state for Node #{inspect(node)}. State: #{inspect(data)}")
   end
+
+  @impl true
+  @spec handle_timer(any(), data()) :: new_data() | | {new_data(), timer()}
+  def handle_timer(_event, data), do: data
 
   @impl true
   @spec handle_nodeup_event(node(), node_type(), data()) :: new_data()
