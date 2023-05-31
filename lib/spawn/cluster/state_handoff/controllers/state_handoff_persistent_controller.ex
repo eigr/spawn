@@ -73,7 +73,7 @@ defmodule Spawn.Cluster.StateHandoffPersistentController do
   end
 
   @impl true
-  @spec handle_timer(any(), data()) :: new_data() | | {new_data(), timer()}
+  @spec handle_timer(any(), data()) :: new_data() | {new_data(), timer()}
   def handle_timer(_event, data), do: data
 
   @impl true

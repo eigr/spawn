@@ -32,10 +32,8 @@ defmodule Spawn.Cluster.StateHandoffManager do
 
     case controller.handle_init(config) do
       {initial_state, timers} ->
-        IO.inspect(initial_state, label: "Initial State ------------------")
-
         Enum.each(timers, fn {evt, delay} ->
-          Process.send_after(self(), evt, delay)
+          Process.send_after(self(), {:timer, evt}, delay)
         end)
 
         {:ok, %State{controller: controller, data: initial_state}, {:continue, :after_init}}
@@ -85,10 +83,10 @@ defmodule Spawn.Cluster.StateHandoffManager do
   end
 
   @impl true
-  def handle_info(event, %State{controller: controller, data: data} = state) do
+  def handle_info({:timer, event}, %State{controller: controller, data: data} = state) do
     case controller.handle_timer(event, data) do
       {new_data, {evt, delay} = _timer} ->
-        Process.send_after(self(), evt, delay)
+        Process.send_after(self(), {:timer, evt}, delay)
         {:noreply, %State{state | data: new_data}}
 
       new_data ->
@@ -111,6 +109,12 @@ defmodule Spawn.Cluster.StateHandoffManager do
     new_data = controller.handle_nodedown_event(node, node_type, data)
 
     {:noreply, %State{state | data: new_data}}
+  end
+
+  def handle_info(event, state) do
+    Logger.debug("Received handle_info event #{inspect(event)}")
+
+    {:noreply, state}
   end
 
   # Client API

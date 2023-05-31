@@ -11,6 +11,8 @@ defmodule Spawn.Cluster.StateHandoffCrdtController do
   """
   require Logger
 
+  @behaviour Spawn.StateHandoff.Controller.Behaviour
+
   import Spawn.Utils.Common, only: [generate_key: 1]
 
   @type node_type :: term()
@@ -45,6 +47,7 @@ defmodule Spawn.Cluster.StateHandoffCrdtController do
   @doc """
   Cluster HostActor cleanup
   """
+  @impl true
   def clean(node, data) do
     Logger.debug("Received cleanup action from Node #{inspect(node)}")
 
@@ -70,6 +73,7 @@ defmodule Spawn.Cluster.StateHandoffCrdtController do
     data
   end
 
+  @impl true
   @spec get_by_id(id(), node(), data()) :: {new_data(), hosts()}
   def get_by_id(id, _node, %{crdt_pid: _crdt_pid} = data) do
     key = generate_key(id)
@@ -81,6 +85,7 @@ defmodule Spawn.Cluster.StateHandoffCrdtController do
     {data, hosts}
   end
 
+  @impl true
   @spec handle_init(config()) :: new_data()
   def handle_init(config) do
     pooling_interval =
@@ -103,12 +108,14 @@ defmodule Spawn.Cluster.StateHandoffCrdtController do
     }
   end
 
+  @impl true
   @spec handle_after_init(data()) :: new_data()
   def handle_after_init(%{crdt_pid: crdt_pid} = data) do
     do_set_neighbours(crdt_pid)
     data
   end
 
+  @impl true
   @spec handle_terminate(node(), data()) :: new_data()
   def handle_terminate(_node, %{crdt_pid: crdt_pid} = _data) do
     Logger.debug("#{inspect(__MODULE__)} Handling StateHandoff terminate...")
@@ -122,7 +129,7 @@ defmodule Spawn.Cluster.StateHandoffCrdtController do
   end
 
   @impl true
-  @spec handle_timer(any(), data()) :: new_data() | | {new_data(), timer()}
+  @spec handle_timer(any(), data()) :: new_data() | {new_data(), timer()}
   def handle_timer(
         :set_neighbours_sync,
         %{crdt_pid: crdt_pid, neighbours_sync_interval: pooling_interval} = data
@@ -134,18 +141,21 @@ defmodule Spawn.Cluster.StateHandoffCrdtController do
 
   def handle_timer(_event, data), do: data
 
+  @impl true
   @spec handle_nodeup_event(node(), node_type(), data()) :: new_data()
   def handle_nodeup_event(_node, _node_type, %{crdt_pid: crdt_pid} = _data) do
     do_set_neighbours(crdt_pid)
     %{crdt_pid: crdt_pid}
   end
 
+  @impl true
   @spec handle_nodedown_event(node(), node_type(), data()) :: new_data()
   def handle_nodedown_event(_node, _node_type, %{crdt_pid: crdt_pid} = _data) do
     do_set_neighbours(crdt_pid)
     %{crdt_pid: crdt_pid}
   end
 
+  @impl true
   @spec set(id(), node(), host(), data) :: new_data()
   def set(id, _node, host, %{crdt_pid: _crdt_pid} = data) do
     key = generate_key(id)
