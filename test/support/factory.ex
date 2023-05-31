@@ -117,7 +117,7 @@ defmodule Actors.FactoryTest do
     state =
       any_pack!(%Actors.Protos.StateTest{name: "example_state_name_#{Faker.Superhero.name()}"})
 
-    %ActorState{state: %Any{attrs[:state] || state}}
+    %ActorState{state: Any.new(attrs[:state] || state)}
   end
 
   def build_actor_deactivation_strategy(attrs \\ []) do
