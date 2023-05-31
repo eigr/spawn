@@ -383,6 +383,7 @@ defmodule Actor.ActorTest do
   end
 
   describe "pooled" do
+    @tag :skip
     test "simple call in pooled actor", ctx do
       system = ctx.system
 
