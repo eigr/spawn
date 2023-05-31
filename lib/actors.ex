@@ -290,7 +290,11 @@ defmodule Actors do
                       {pooled?, system.name, host.actor.id.parent, actor_id}
 
                     _ ->
-                      {pooled?, system.name, "#{actor.id.name}-1", actor_id}
+                      fqdn =
+                        {pooled?, system.name, "#{actor.id.name}-1",
+                         %ActorId{actor_id | name: "#{actor.id.name}-1", parent: actor_id.name}}
+
+                      fqdn
                   end
                 else
                   {pooled?, system.name, actor_id.name, actor_id}
@@ -356,10 +360,13 @@ defmodule Actors do
           Tracer.set_attributes([{"actor-pid", "#{inspect(actor_ref)}"}])
           Logger.debug("Lookup Actor #{actor_name}. PID: #{inspect(actor_ref)}")
 
-          if pooled,
-            # Ensures that the name change will not affect the host function call
-            do: action_fun.(actor_ref, %ActorId{actor_ref_id | name: actor_name}),
-            else: action_fun.(actor_ref, actor_ref_id)
+          # Ensures that the name change will not affect the host function call
+          if pooled do
+            throw("Pooled Actors are not supported yet")
+            # action_fun.(actor_ref, %ActorId{actor_ref_id | name: actor_name})
+          else
+            action_fun.(actor_ref, actor_ref_id)
+          end
 
         _ ->
           Tracer.add_event("actor-status", [{"alive", false}])
@@ -451,7 +458,7 @@ defmodule Actors do
 
         if pooled,
           # Ensures that the name change will not affect the host function call
-          do: action_fun.(actor_ref, %ActorId{actor.id | name: actor_name}),
+          do: action_fun.(actor_ref, %ActorId{actor.id | name: actor_name.name}),
           else: action_fun.(actor_ref, actor.id)
 
       _ ->

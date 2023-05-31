@@ -4,7 +4,7 @@ defmodule SpawnSdkExample.Actors.PooledActor do
     kind: :pooled,
     deactivate_timeout: 240_000,
     min_pool_size: 1,
-    max_pool_size: 10,
+    max_pool_size: 2,
     stateful: false
 
   require Logger

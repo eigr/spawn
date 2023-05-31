@@ -9,10 +9,10 @@ defmodule SpawnSdkExample.Application do
         SpawnSdk.System.Supervisor,
         system: "spawn-system",
         actors: [
-          SpawnSdkExample.Actors.JoeActor,
-          SpawnSdkExample.Actors.JsonActor,
-          SpawnSdkExample.Actors.ClockActor,
-          SpawnSdkExample.Actors.AbstractActor,
+          # SpawnSdkExample.Actors.JoeActor,
+          # SpawnSdkExample.Actors.JsonActor,
+          # SpawnSdkExample.Actors.ClockActor,
+          # SpawnSdkExample.Actors.AbstractActor,
           SpawnSdkExample.Actors.PooledActor
         ],
         extenal_subscribers: [
