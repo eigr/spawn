@@ -18,8 +18,6 @@ defmodule Spawn.Cluster.StateHandoff.ControllerBehaviour do
 
   @type timer :: {atom(), integer()}
 
-  @type timers :: list(timer())
-
   @doc """
   Cleanup action.
   """
@@ -36,7 +34,7 @@ defmodule Spawn.Cluster.StateHandoff.ControllerBehaviour do
   Any initialization code required by implementations of this behavior.
   Must return the state to be added in the StateHandoffManager.
   """
-  @callback handle_init(config()) :: new_data() | {new_data(), timers()}
+  @callback handle_init(config()) :: new_data() | {new_data(), timer()}
 
   @doc """
   Any procedure to be executed after the StateHandoffManager is initialized.

@@ -31,8 +31,6 @@ defmodule Spawn.Cluster.StateHandoff.Controllers.CrdtController do
 
   @type timer :: {atom(), integer()}
 
-  @type timers :: list(timer())
-
   @call_timeout 15_000
 
   @default_sync_interval 2
@@ -86,7 +84,7 @@ defmodule Spawn.Cluster.StateHandoff.Controllers.CrdtController do
   end
 
   @impl true
-  @spec handle_init(config()) :: new_data()
+  @spec handle_init(config()) :: new_data() | {new_data(), timer()}
   def handle_init(config) do
     pooling_interval =
       Map.get(config, :neighbours_sync_interval, @default_neighbours_sync_interval)
@@ -102,9 +100,7 @@ defmodule Spawn.Cluster.StateHandoff.Controllers.CrdtController do
 
     {
       %{crdt_pid: crdt_pid, neighbours_sync_interval: pooling_interval},
-      [
-        {:set_neighbours_sync, pooling_interval}
-      ]
+      {:set_neighbours_sync, pooling_interval}
     }
   end
 

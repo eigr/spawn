@@ -16,7 +16,7 @@ defmodule Spawn.Cluster.StateHandoff.Manager do
   end
 
   defmodule State do
-    defstruct data: nil, controller: nil, tag: nil
+    defstruct data: nil, controller: nil, tag: nil, timer: nil
   end
 
   @impl true
@@ -28,22 +28,18 @@ defmodule Spawn.Cluster.StateHandoff.Manager do
         Spawn.Cluster.StateHandoff.Controllers.PersistentController
       )
 
-    do_init(config)
-
-    tag_ref = make_ref()
-    %{tag: tag} = ask(%{tag: tag_ref})
+    backpressure_tag = do_init(config)
 
     case controller.handle_init(config) do
-      {initial_state, timers} ->
-        Enum.each(timers, fn {evt, delay} ->
-          Process.send_after(self(), {:timer, evt}, delay)
-        end)
+      {initial_state, {evt, delay} = _scheduler} ->
+        timer = Process.send_after(self(), {:timer, evt}, delay)
 
-        {:ok, %State{controller: controller, data: initial_state, tag: tag},
+        {:ok,
+         %State{controller: controller, data: initial_state, tag: backpressure_tag, timer: timer},
          {:continue, :after_init}}
 
       initial_state ->
-        {:ok, %State{controller: controller, data: initial_state, tag: tag},
+        {:ok, %State{controller: controller, data: initial_state, tag: backpressure_tag},
          {:continue, :after_init}}
     end
   end
@@ -65,11 +61,18 @@ defmodule Spawn.Cluster.StateHandoff.Manager do
   end
 
   @impl true
-  def handle_info({:timer, event}, %State{controller: controller, data: data} = state) do
+  def handle_info(
+        {:timer, event},
+        %State{controller: controller, data: data, timer: timer} = state
+      ) do
+    if !is_nil(timer) do
+      Process.cancel_timer(timer)
+    end
+
     case controller.handle_timer(event, data) do
       {new_data, {evt, delay} = _timer} ->
-        Process.send_after(self(), {:timer, evt}, delay)
-        {:noreply, %State{state | data: new_data}}
+        new_timer = Process.send_after(self(), {:timer, evt}, delay)
+        {:noreply, %State{state | data: new_data, timer: new_timer}}
 
       new_data ->
         {:noreply, %State{state | data: new_data}}
@@ -155,6 +158,7 @@ defmodule Spawn.Cluster.StateHandoff.Manager do
   """
   def clean(node) do
     Logger.debug("Received cleanup action from Node #{inspect(node)}")
+
     spawn(fn ->
       perform({:clean, [node]})
       Logger.debug("Hosts cleaned for node #{inspect(node)}")
@@ -166,6 +170,10 @@ defmodule Spawn.Cluster.StateHandoff.Manager do
     Process.flag(:trap_exit, true)
     Process.flag(:message_queue_data, :off_heap)
     :net_kernel.monitor_nodes(true, node_type: :visible)
+
+    tag_ref = make_ref()
+    %{tag: tag} = ask(%{tag: tag_ref})
+    tag
   end
 
   defp ask(%{tag: tag} = state) do

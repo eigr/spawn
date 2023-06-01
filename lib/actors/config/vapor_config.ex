@@ -66,6 +66,11 @@ defmodule Actors.Config.Vapor do
           # Supervisors configuration
           {:state_handoff_controller_adapter, "SPAWN_SUPERVISORS_STATE_HANDOFF_CONTROLLER",
            default: "persistent", required: false},
+          {:state_handoff_manager_pool_size, "SPAWN_SUPERVISORS_STATE_HANDOFF_MANAGER_POOL_SIZE",
+           default: 20, map: &String.to_integer/1, required: false},
+          {:state_handoff_manager_call_timeout,
+           "SPAWN_SUPERVISORS_STATE_HANDOFF_MANAGER_CALL_TIMEOUT",
+           default: 60000, map: &String.to_integer/1, required: false},
           {:actors_max_restarts, "SPAWN_SUPERVISORS_ACTORS_MAX_RESTARTS",
            default: 10000, map: &String.to_integer/1, required: false},
           {:actors_max_seconds, "SPAWN_SUPERVISORS_ACTORS_MAX_SECONDS",
@@ -131,12 +136,18 @@ defmodule Actors.Config.Vapor do
       if key == :state_handoff_controller_adapter do
         case value do
           "crdt" ->
-            Application.put_env(:spawn, key, Spawn.Cluster.StateHandoff.Controllers.CrdtController,
+            Application.put_env(
+              :spawn,
+              key,
+              Spawn.Cluster.StateHandoff.Controllers.CrdtController,
               persistent: true
             )
 
           _ ->
-            Application.put_env(:spawn, key, Spawn.Cluster.StateHandoff.Controllers.PersistentController,
+            Application.put_env(
+              :spawn,
+              key,
+              Spawn.Cluster.StateHandoff.Controllers.PersistentController,
               persistent: true
             )
 

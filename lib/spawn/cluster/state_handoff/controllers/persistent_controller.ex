@@ -25,8 +25,6 @@ defmodule Spawn.Cluster.StateHandoff.Controllers.PersistentController do
 
   @type timer :: {atom(), integer()}
 
-  @type timers :: list(timer())
-
   @otp_app :spawn
 
   @ttl :timer.minutes(10)
@@ -50,7 +48,7 @@ defmodule Spawn.Cluster.StateHandoff.Controllers.PersistentController do
   end
 
   @impl true
-  @spec handle_init(config()) :: new_data()
+  @spec handle_init(config()) :: new_data() | {new_data(), timer()}
   def handle_init(_config) do
     backend = Application.get_env(@otp_app, :state_handoff_controller_persistent_backend)
     %{backend_adapter: backend}
