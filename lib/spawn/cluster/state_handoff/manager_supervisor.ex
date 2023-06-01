@@ -3,7 +3,7 @@ defmodule Spawn.Cluster.StateHandoff.ManagerSupervisor do
   use Supervisor
   require Logger
 
-  @default_pool_size 10
+  @default_pool_size 1
 
   def start_link(state \\ []) do
     Supervisor.start_link(__MODULE__, state, name: __MODULE__)
