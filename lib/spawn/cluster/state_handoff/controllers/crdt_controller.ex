@@ -1,4 +1,4 @@
-defmodule Spawn.Cluster.StateHandoffCrdtController do
+defmodule Spawn.Cluster.StateHandoff.Controllers.CrdtController do
   @moduledoc """
   This handles state handoff in a cluster.
 
@@ -11,7 +11,7 @@ defmodule Spawn.Cluster.StateHandoffCrdtController do
   """
   require Logger
 
-  @behaviour Spawn.StateHandoff.Controller.Behaviour
+  @behaviour Spawn.Cluster.StateHandoff.ControllerBehaviour
 
   import Spawn.Utils.Common, only: [generate_key: 1]
 

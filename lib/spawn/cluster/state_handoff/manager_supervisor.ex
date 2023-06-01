@@ -1,4 +1,4 @@
-defmodule Spawn.Cluster.StateHandoffManager.Supervisor do
+defmodule Spawn.Cluster.StateHandoff.ManagerSupervisor do
   @moduledoc false
   use Supervisor
   require Logger
@@ -22,7 +22,7 @@ defmodule Spawn.Cluster.StateHandoffManager.Supervisor do
 
     workers =
       Enum.map(1..pool_size, fn id ->
-        Spawn.Cluster.StateHandoffManager.child_spec(:"state_handoff_#{id}", config)
+        Spawn.Cluster.StateHandoff.Manager.child_spec(:"state_handoff_#{id}", config)
       end)
 
     children =

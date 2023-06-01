@@ -1,8 +1,8 @@
-defmodule Spawn.Cluster.StateHandoffManager do
+defmodule Spawn.Cluster.StateHandoff.Manager do
   @moduledoc """
   This handles state handoff in a cluster.
 
-  This module monitors node up and down events as well as node terminate events and triggers `Spawn.StateHandoff.Controller.Behaviour` implementations to handle these events.
+  This module monitors node up and down events as well as node terminate events and triggers `Spawn.Cluster.StateHandoff.ControllerBehaviour` implementations to handle these events.
   """
   use GenServer
   require Logger
@@ -25,7 +25,7 @@ defmodule Spawn.Cluster.StateHandoffManager do
       Application.get_env(
         :spawn,
         :state_handoff_controller_adapter,
-        Spawn.Cluster.StateHandoffPersistentController
+        Spawn.Cluster.StateHandoff.Controllers.PersistentController
       )
 
     do_init(config)

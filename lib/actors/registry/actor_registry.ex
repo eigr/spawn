@@ -10,7 +10,7 @@ defmodule Actors.Registry.ActorRegistry do
 
   alias Actors.Registry.{HostActor, LoadBalancer}
   alias Eigr.Functions.Protocol.Actors.{Actor, ActorId}
-  alias Spawn.Cluster.StateHandoffManager, as: StateHandoff
+  alias Spawn.Cluster.StateHandoff.Manager, as: StateHandoff
 
   @doc """
   Register `member` entities to the ActorRegistry.

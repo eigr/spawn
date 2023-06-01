@@ -584,7 +584,7 @@ Inspect.PID.inspect/2                                                    1 0.14 
 Enumerable.Function.reduce/3                                             1 0.14    1    1.00
 Inspect.Algebra.format/3                                                 3 0.14    1    0.33
 :otel_batch_processor.do_insert/1                                        2 0.14    1    0.50
-Spawn.Cluster.StateHandoffManager.get/1                                         1 0.14    1    1.00
+Spawn.Cluster.StateHandoff.Manager.get/1                                         1 0.14    1    1.00
 Inspect.inspect/2                                                        1 0.14    1    1.00
 :otel_span_ets.storage_insert/1                                          2 0.14    1    0.50
 :otel_span_ets.add_event/3                                               2 0.14    1    0.50
@@ -1344,7 +1344,7 @@ Inspect.PID.inspect/2                                                    1  0.02
 Inspect.Algebra.format/3                                                 6  0.02    1    0.17
 Inspect.Atom.inspect/2                                                   1  0.02    1    1.00
 :otel_batch_processor.is_enabled/0                                       3  0.02    1    0.33
-Spawn.Cluster.StateHandoffManager.get/1                                         3  0.02    1    0.33
+Spawn.Cluster.StateHandoff.Manager.get/1                                         3  0.02    1    0.33
 Eigr.Functions.Protocol.RequestStatus.new/1                              2  0.02    1    0.50
 :otel_span_ets.storage_insert/1                                          3  0.02    1    0.33
 :otel_span_ets.end_span/1                                                3  0.02    1    0.33
@@ -1414,7 +1414,7 @@ Macro.inner_classify/1                                                   1  0.04
 GenServer.whereis/1                                                      6  0.04    2    0.33
 :otel_batch_processor.do_insert/1                                        3  0.04    2    0.67
 String.Tokenizer.continue/6                                             13  0.04    2    0.15
-Spawn.Cluster.StateHandoffManager.set/2                                         2  0.04    2    1.00
+Spawn.Cluster.StateHandoff.Manager.set/2                                         2  0.04    2    1.00
 Enumerable.List.reduce/3                                                 5  0.04    2    0.40
 Inspect.inspect/2                                                        2  0.04    2    1.00
 :otel_span_ets.add_event/3                                               3  0.04    2    0.67

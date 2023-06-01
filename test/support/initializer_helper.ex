@@ -5,7 +5,7 @@ defmodule Spawn.InitializerHelper do
     config = Actors.Config.Vapor.load(__MODULE__)
     result = Sidecar.Supervisor.start_link(config)
 
-    Spawn.Cluster.StateHandoffManager.clean(Node.self())
+    Spawn.Cluster.StateHandoff.Manager.clean(Node.self())
 
     result
   end

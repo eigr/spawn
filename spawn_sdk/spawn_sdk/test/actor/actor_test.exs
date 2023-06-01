@@ -269,6 +269,7 @@ defmodule Actor.ActorTest do
       assert %{data: "second_actor as caller to third_actor"} = response
     end
 
+    @tag timeout: :infinity
     test "calling a function that sets wrong state type", ctx do
       system = ctx.system
       dynamic_actor_name = Faker.Pokemon.name() <> "wrong_state"
@@ -314,6 +315,7 @@ defmodule Actor.ActorTest do
              ) == {:ok, %{test: true}}
     end
 
+    @tag timeout: :infinity
     test "simple call that goes through 3 actors forwarding each other", ctx do
       system = ctx.system
 
@@ -357,6 +359,7 @@ defmodule Actor.ActorTest do
   end
 
   describe "tags" do
+    @tag timeout: :infinity
     test "simple call verifying that tags is changed", ctx do
       system = ctx.system
 

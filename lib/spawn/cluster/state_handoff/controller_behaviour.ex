@@ -1,4 +1,4 @@
-defmodule Spawn.StateHandoff.Controller.Behaviour do
+defmodule Spawn.Cluster.StateHandoff.ControllerBehaviour do
   @moduledoc """
   Behavior for managing the state of clustered processes a.k.a lookups.
   """

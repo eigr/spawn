@@ -24,7 +24,7 @@ defmodule Spawn.Supervisor do
       [
         cluster_supervisor(config),
         {Spawn.Cache.LookupCache, []},
-        Spawn.Cluster.StateHandoffManager.Supervisor.child_spec(config),
+        Spawn.Cluster.StateHandoff.ManagerSupervisor.child_spec(config),
         Spawn.Cluster.Node.Registry.child_spec(),
       ]
       |> maybe_start_internal_nats(config)

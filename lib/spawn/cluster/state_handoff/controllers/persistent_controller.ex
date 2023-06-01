@@ -1,11 +1,11 @@
-defmodule Spawn.Cluster.StateHandoffPersistentController do
+defmodule Spawn.Cluster.StateHandoff.Controllers.PersistentController do
   @moduledoc """
   `StateHandoffPersistentController` is a StateHandoff Controller basead on `Statestore` mechanism.
   """
   use Nebulex.Caching
   require Logger
 
-  @behaviour Spawn.StateHandoff.Controller.Behaviour
+  @behaviour Spawn.Cluster.StateHandoff.ControllerBehaviour
 
   alias Spawn.Cache.LookupCache, as: Cache
 

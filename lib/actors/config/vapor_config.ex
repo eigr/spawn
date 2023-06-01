@@ -131,12 +131,12 @@ defmodule Actors.Config.Vapor do
       if key == :state_handoff_controller_adapter do
         case value do
           "crdt" ->
-            Application.put_env(:spawn, key, Spawn.Cluster.StateHandoffCrdtController,
+            Application.put_env(:spawn, key, Spawn.Cluster.StateHandoff.Controllers.CrdtController,
               persistent: true
             )
 
           _ ->
-            Application.put_env(:spawn, key, Spawn.Cluster.StateHandoffPersistentController,
+            Application.put_env(:spawn, key, Spawn.Cluster.StateHandoff.Controllers.PersistentController,
               persistent: true
             )
 
