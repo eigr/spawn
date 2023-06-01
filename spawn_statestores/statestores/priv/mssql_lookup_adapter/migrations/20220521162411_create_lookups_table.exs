@@ -12,6 +12,7 @@ defmodule Statestores.Adapters.MSSQLLookupAdapter.Migrations.CreateLookupsTable 
     end
 
     create unique_index(:lookups, [:id, :node])
+    create index(:lookups, [:node])
   end
 
   def down do

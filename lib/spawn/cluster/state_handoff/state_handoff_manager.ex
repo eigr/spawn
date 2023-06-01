@@ -7,16 +7,16 @@ defmodule Spawn.Cluster.StateHandoffManager do
   use GenServer
   require Logger
 
-  def child_spec(opts \\ []) do
+  def child_spec(id, opts \\ []) do
     %{
-      id: __MODULE__,
+      id: id,
       start: {__MODULE__, :start_link, [opts]},
       restart: :permanent
     }
   end
 
   defmodule State do
-    defstruct data: nil, controller: nil
+    defstruct data: nil, controller: nil, tag: nil
   end
 
   @impl true
@@ -30,16 +30,21 @@ defmodule Spawn.Cluster.StateHandoffManager do
 
     do_init(config)
 
+    tag_ref = make_ref()
+    %{tag: tag} = ask(%{tag: tag_ref})
+
     case controller.handle_init(config) do
       {initial_state, timers} ->
         Enum.each(timers, fn {evt, delay} ->
           Process.send_after(self(), {:timer, evt}, delay)
         end)
 
-        {:ok, %State{controller: controller, data: initial_state}, {:continue, :after_init}}
+        {:ok, %State{controller: controller, data: initial_state, tag: tag},
+         {:continue, :after_init}}
 
       initial_state ->
-        {:ok, %State{controller: controller, data: initial_state}, {:continue, :after_init}}
+        {:ok, %State{controller: controller, data: initial_state, tag: tag},
+         {:continue, :after_init}}
     end
   end
 
@@ -47,29 +52,6 @@ defmodule Spawn.Cluster.StateHandoffManager do
   def handle_continue(:after_init, %State{controller: controller, data: data} = state) do
     new_data = controller.handle_after_init(data)
 
-    {:noreply, %State{state | data: new_data}}
-  end
-
-  @impl true
-  def handle_call(
-        {:get_actor_hosts_by_actor_id, actor_id},
-        from,
-        %State{controller: controller, data: data} = state
-      ) do
-    async_get_actors(controller, from, actor_id, data)
-
-    {:noreply, state}
-  end
-
-  @impl true
-  def handle_cast({:clean, node}, %State{controller: controller, data: data} = state) do
-    new_data = controller.handle_terminate(node, data)
-    {:noreply, %State{state | data: new_data}}
-  end
-
-  def handle_cast({:set, actor_id, host}, %State{controller: controller, data: data} = state) do
-    node = Node.self()
-    new_data = controller.set(actor_id, node, host, data)
     {:noreply, %State{state | data: new_data}}
   end
 
@@ -111,6 +93,38 @@ defmodule Spawn.Cluster.StateHandoffManager do
     {:noreply, %State{state | data: new_data}}
   end
 
+  def handle_info(
+        {_tag, {:go, ref, {pid, {:clean, [node]}}, _, _}},
+        state
+      ) do
+    new_data = state.controller.handle_terminate(node, state.data)
+    send(pid, {ref, new_data})
+
+    {:noreply, ask(%State{state | data: new_data})}
+  end
+
+  def handle_info(
+        {_tag, {:go, ref, {pid, {:set, [actor_id, host]}}, _, _}},
+        state
+      ) do
+    new_data = state.controller.set(actor_id, Node.self(), host, state.data)
+
+    send(pid, {ref, new_data})
+
+    {:noreply, ask(%State{state | data: new_data})}
+  end
+
+  def handle_info(
+        {_tag, {:go, ref, {pid, {:get_actor_hosts_by_actor_id, [actor_id]}}, _, _}},
+        state
+      ) do
+    {_new_data, hosts} = state.controller.get_by_id(actor_id, Node.self(), state.data)
+
+    send(pid, {ref, hosts})
+
+    {:noreply, ask(state)}
+  end
+
   def handle_info(event, state) do
     Logger.debug("Received handle_info event #{inspect(event)}")
 
@@ -119,26 +133,32 @@ defmodule Spawn.Cluster.StateHandoffManager do
 
   # Client API
   def start_link(opts) do
-    GenServer.start_link(__MODULE__, opts, name: __MODULE__)
+    GenServer.start_link(__MODULE__, opts)
   end
 
   @doc """
   Store a actor and entity in the lookup store
   """
-  def set(actor_id, host), do: GenServer.cast(__MODULE__, {:set, actor_id, host})
+  def set(actor_id, host) do
+    spawn(fn -> perform({:set, [actor_id, host]}) end)
+  end
 
   @doc """
   Pickup the stored entity data for a actor
   """
-  def get(actor_id), do: GenServer.call(__MODULE__, {:get_actor_hosts_by_actor_id, actor_id})
+  def get(actor_id) do
+    perform({:get_actor_hosts_by_actor_id, [actor_id]})
+  end
 
   @doc """
   Cluster HostActor cleanup
   """
   def clean(node) do
     Logger.debug("Received cleanup action from Node #{inspect(node)}")
-    GenServer.cast(__MODULE__, {:clean, node})
-    Logger.debug("Hosts cleaned for node #{inspect(node)}")
+    spawn(fn ->
+      perform({:clean, [node]})
+      Logger.debug("Hosts cleaned for node #{inspect(node)}")
+    end)
   end
 
   # Private functions
@@ -148,12 +168,31 @@ defmodule Spawn.Cluster.StateHandoffManager do
     :net_kernel.monitor_nodes(true, node_type: :visible)
   end
 
-  defp async_get_actors(controller, from, id, data) do
-    node = Node.self()
+  defp ask(%{tag: tag} = state) do
+    {:await, ^tag, _} = :sbroker.async_ask_r(Spawn.StateHandoff.Broker, self(), {self(), tag})
+    state
+  end
 
-    spawn(fn ->
-      {_new_data, hosts} = controller.get_by_id(id, node, data)
-      GenServer.reply(from, hosts)
-    end)
+  defp perform({action, args} = params) do
+    case :sbroker.ask(Spawn.StateHandoff.Broker, {self(), params}) do
+      {:go, ref, worker, _, _queue_time} ->
+        monitor = Process.monitor(worker)
+
+        receive do
+          {^ref, result} ->
+            Process.demonitor(monitor, [:flush])
+            result
+
+          {:DOWN, ^monitor, _, _, reason} ->
+            exit({reason, {__MODULE__, action, args}})
+        end
+
+      {:drop, time} ->
+        Logger.warning(
+          "StateHandoff Manager is overloaded, dropping request #{inspect(params)}, timeout: #{time}"
+        )
+
+        []
+    end
   end
 end
