@@ -3,6 +3,8 @@ defmodule Spawn.Cluster.StateHandoff.ManagerSupervisor do
   use Supervisor
   require Logger
 
+  @default_pool_size 10
+
   def start_link(state \\ []) do
     Supervisor.start_link(__MODULE__, state, name: __MODULE__)
   end
@@ -29,7 +31,12 @@ defmodule Spawn.Cluster.StateHandoff.ManagerSupervisor do
   end
 
   defp build_workers_tree(config) do
-    pool_size = config.state_handoff_manager_pool_size
+    pool_size =
+      if config.state_handoff_manager_pool_size <= 0 do
+        @default_pool_size
+      else
+        config.state_handoff_manager_pool_size
+      end
 
     Enum.map(1..pool_size, fn id ->
       Spawn.Cluster.StateHandoff.Manager.child_spec(:"state_handoff_manager_#{id}", config)
