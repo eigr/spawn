@@ -218,7 +218,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
     {:noreply, state, :hibernate}
   end
 
-  def snapshot(_state), do: :ok
+  def snapshot(state), do: {:noreply, state, :hibernate}
 
   def deactivate(
         %EntityState{
