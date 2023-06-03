@@ -143,7 +143,7 @@ defmodule Spawn.Cluster.StateHandoff.Manager do
   Store a actor and entity in the lookup store
   """
   def set(actor_id, host) do
-    spawn(fn -> perform({:set, [actor_id, host]}) end)
+    perform_async({:set, [actor_id, host]})
   end
 
   @doc """
@@ -159,10 +159,8 @@ defmodule Spawn.Cluster.StateHandoff.Manager do
   def clean(node) do
     Logger.debug("Received cleanup action from Node #{inspect(node)}")
 
-    spawn(fn ->
-      perform({:clean, [node]})
-      Logger.debug("Hosts cleaned for node #{inspect(node)}")
-    end)
+    perform_async({:clean, [node]})
+    Logger.debug("Hosts cleaned for node #{inspect(node)}")
   end
 
   # Private functions
@@ -179,6 +177,20 @@ defmodule Spawn.Cluster.StateHandoff.Manager do
   defp ask(%{tag: tag} = state) do
     {:await, ^tag, _} = :sbroker.async_ask_r(Spawn.StateHandoff.Broker, self(), {self(), tag})
     state
+  end
+
+  defp perform_async(params) do
+    case :sbroker.async_ask(Spawn.StateHandoff.Broker, {self(), params}) do
+      {:drop, time} ->
+        Logger.warning(
+          "StateHandoff Manager is overloaded, dropping request #{inspect(params)}, timeout: #{time}"
+        )
+
+        {:error, :too_many_requests}
+
+      _ ->
+        :ok
+    end
   end
 
   defp perform({action, args} = params) do
