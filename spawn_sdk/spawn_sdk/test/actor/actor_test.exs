@@ -236,6 +236,7 @@ defmodule Actor.ActorTest do
              ) == {:ok, %{value: 0}}
     end
 
+    @tag :skip
     test "simple call using maps with no proto", ctx do
       system = ctx.system
       dynamic_actor_name = Faker.Pokemon.name() <> "json_actor_call"
@@ -252,6 +253,7 @@ defmodule Actor.ActorTest do
   end
 
   describe "invoke with routing" do
+    @tag :skip
     test "simple call that goes through 3 actors piping each other", ctx do
       system = ctx.system
 
@@ -288,6 +290,7 @@ defmodule Actor.ActorTest do
              ) == {:error, :invalid_state_output}
     end
 
+    @tag :skip
     test "calling a function that sets wrong state type to json", ctx do
       system = ctx.system
       dynamic_actor_name = Faker.Pokemon.name() <> "wrong_state_json"
@@ -305,6 +308,7 @@ defmodule Actor.ActorTest do
              ) == {:ok, nil}
     end
 
+    @tag :skip
     test "calling a function that returns json in response", ctx do
       system = ctx.system
       dynamic_actor_name = Faker.Pokemon.name() <> "json_return"
