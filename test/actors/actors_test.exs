@@ -3,6 +3,7 @@ defmodule ActorsTest do
 
   alias Eigr.Functions.Protocol.ActorInvocationResponse
   alias Eigr.Functions.Protocol.Actors.ActorState
+  alias Eigr.Functions.Protocol.Actors.ActorId
   alias Eigr.Functions.Protocol.RegistrationResponse
 
   setup do
@@ -41,7 +42,7 @@ defmodule ActorsTest do
       {:ok, %RegistrationResponse{}} = Actors.register(request)
 
       {:ok, %ActorState{state: %Google.Protobuf.Any{value: state}}} =
-        Actors.get_state(system.name, actor_name)
+        Actors.get_state(%ActorId{name: actor_name, system: system.name})
 
       assert %Actors.Protos.StateTest{name: "example_state_name_" <> _rand} =
                Actors.Protos.StateTest.decode(state)
@@ -88,10 +89,10 @@ defmodule ActorsTest do
                Actors.invoke(invoke_request)
 
       state =
-        Actors.Protos.ChangeNameResponseTest.new(
+        %Actors.Protos.ChangeNameResponseTest{
           status: :NAME_ALREADY_TAKEN,
           new_name: "new_name"
-        )
+        }
         |> any_pack!
 
       host_invoke_response =
@@ -125,10 +126,10 @@ defmodule ActorsTest do
       invoke_request = build_invocation_request(system: system, actor: actor)
 
       state =
-        Actors.Protos.ChangeNameResponseTest.new(
+        %Actors.Protos.ChangeNameResponseTest{
           status: :OK,
           new_name: "new_name"
-        )
+        }
         |> any_pack!
 
       host_invoke_response =

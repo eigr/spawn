@@ -8,7 +8,7 @@ if Code.ensure_loaded?(Statestores.Supervisor) do
 
     alias Eigr.Functions.Protocol.Actors.{ActorId, ActorState}
     alias Google.Protobuf.Any
-    alias Statestores.Schemas.Event
+    alias Statestores.Schemas.Snapshot
     alias Statestores.Manager.StateManager, as: StateStoreManager
 
     def is_new?(_old_hash, new_state) when is_nil(new_state), do: false
@@ -31,7 +31,7 @@ if Code.ensure_loaded?(Statestores.Supervisor) do
       key = generate_key(actor_id)
 
       case StateStoreManager.load(key) do
-        %Event{revision: _rev, tags: tags, data_type: type, data: data} = _event ->
+        %Snapshot{revision: _rev, tags: tags, data_type: type, data: data} = _event ->
           {:ok, %ActorState{tags: tags, state: %Google.Protobuf.Any{type_url: type, value: data}}}
 
         _ ->
@@ -60,7 +60,7 @@ if Code.ensure_loaded?(Statestores.Supervisor) do
       with bytes_from_state <- Any.encode(actor_state),
            hash <- :crypto.hash(:sha256, bytes_from_state),
            key <- generate_key(actor_id) do
-        %Event{
+        %Snapshot{
           id: key,
           actor: name,
           system: system,
@@ -109,7 +109,7 @@ if Code.ensure_loaded?(Statestores.Supervisor) do
           Logger.debug("Saving state for actor #{name}")
           key = generate_key(actor_id)
 
-          %Event{
+          %Snapshot{
             id: key,
             actor: name,
             system: system,

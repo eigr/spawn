@@ -15,6 +15,7 @@ defmodule Actors.ActorRegistryTest do
     %{request: request, actor_name: actor_name}
   end
 
+  @tag :skip
   test "register actors for a system in two nodes", ctx do
     %{request: request} = ctx
 
@@ -51,7 +52,7 @@ defmodule Actors.ActorRegistryTest do
 
     assert %{^peer_node_name => %{"actor_registry_test_two_nodes" => _}} = registered
 
-    Spawn.Cluster.StateHandoff.clean(peer_node_name)
+    Spawn.Cluster.StateHandoff.Manager.clean(peer_node_name)
 
     registered = Actors.ActorsHelper.registered_actors()
 

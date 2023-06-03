@@ -31,21 +31,21 @@ defmodule Actors.FactoryTest do
   end
 
   def build_system(attrs \\ []) do
-    ActorSystem.new(
+    %ActorSystem{
       name: attrs[:name] || "spawn-system",
       registry: attrs[:registry] || nil
-    )
+    }
   end
 
   def build_system_with_actors(attrs \\ []) do
-    ActorSystem.new(
+    %ActorSystem{
       name: attrs[:name] || "test_system",
       registry: attrs[:registry] || build_registry_with_actors()
-    )
+    }
   end
 
   def build_registry_with_actors(attrs \\ []) do
-    Registry.new(
+    %Registry{
       actors:
         attrs[:actors] ||
           Enum.reduce(
@@ -53,26 +53,25 @@ defmodule Actors.FactoryTest do
             %{},
             &Map.merge(build_actor_entry(name: "test_actor_#{&1}"), &2)
           )
-    )
+    }
   end
 
   def build_registration_request(attrs \\ []) do
-    RegistrationRequest.new(
+    %RegistrationRequest{
       service_info: attrs[:service_info] || build_service_info(),
       actor_system: attrs[:actor_system] || build_system()
-    )
+    }
   end
 
   def build_invocation_request(attrs \\ []) do
-    value =
-      Any.new(
-        type_url: get_type_url(Actors.Protos.ChangeNameTest),
-        value:
-          Actors.Protos.ChangeNameTest.new(new_name: "new_name")
-          |> Actors.Protos.ChangeNameTest.encode()
-      )
+    value = %Any{
+      type_url: get_type_url(Actors.Protos.ChangeNameTest),
+      value:
+        %Actors.Protos.ChangeNameTest{new_name: "new_name"}
+        |> Actors.Protos.ChangeNameTest.encode()
+    }
 
-    InvocationRequest.new(
+    %InvocationRequest{
       system: attrs[:system] || build_system(),
       actor: attrs[:actor] || build_actor(),
       async: attrs[:async] || false,
@@ -81,7 +80,7 @@ defmodule Actors.FactoryTest do
       caller: attrs[:caller] || nil,
       metadata: attrs[:metadata] || %{},
       scheduled_to: attrs[:scheduled_to] || nil
-    )
+    }
   end
 
   def build_actor_entry(attrs \\ []) do
@@ -96,7 +95,7 @@ defmodule Actors.FactoryTest do
   def build_actor(attrs \\ []) do
     actor_name = attrs[:name] || "#{Faker.Superhero.name()} #{Faker.StarWars.character()}"
 
-    Actor.new(
+    %Actor{
       id: %ActorId{name: actor_name},
       commands: attrs[:commands] || [build_actor_command()],
       settings: %ActorSettings{
@@ -107,36 +106,36 @@ defmodule Actors.FactoryTest do
       },
       metadata: attrs[:metadata] || %Metadata{},
       state: attrs[:state] || build_actor_state()
-    )
+    }
   end
 
   def build_actor_command(attrs \\ []) do
-    Command.new(name: attrs[:name] || "ChangeNameTest")
+    %Command{name: attrs[:name] || "ChangeNameTest"}
   end
 
   def build_actor_state(attrs \\ []) do
     state =
-      any_pack!(Actors.Protos.StateTest.new(name: "example_state_name_#{Faker.Superhero.name()}"))
+      any_pack!(%Actors.Protos.StateTest{name: "example_state_name_#{Faker.Superhero.name()}"})
 
-    ActorState.new(state: Any.new(attrs[:state] || state))
+    %ActorState{state: Any.new(attrs[:state] || state)}
   end
 
   def build_actor_deactivation_strategy(attrs \\ []) do
-    timeout = TimeoutStrategy.new(timeout: attrs[:timeout] || 60_000)
+    timeout = %TimeoutStrategy{timeout: attrs[:timeout] || 60_000}
 
-    ActorDeactivationStrategy.new(
+    %ActorDeactivationStrategy{
       strategy: {attrs[:strategy] || :timeout, attrs[:value] || timeout}
-    )
+    }
   end
 
   def build_actor_snapshot_strategy(attrs \\ []) do
-    timeout = TimeoutStrategy.new(timeout: attrs[:timeout] || 60_000)
+    timeout = %TimeoutStrategy{timeout: attrs[:timeout] || 60_000}
 
-    ActorSnapshotStrategy.new(strategy: {attrs[:strategy] || :timeout, attrs[:value] || timeout})
+    %ActorSnapshotStrategy{strategy: {attrs[:strategy] || :timeout, attrs[:value] || timeout}}
   end
 
   def build_service_info(attrs \\ []) do
-    ServiceInfo.new(
+    %ServiceInfo{
       service_name: attrs[:service_name] || "test_service",
       service_version: attrs[:service_version] || "1.0.0",
       service_runtime: attrs[:service_runtime] || "test_runtime",
@@ -144,33 +143,32 @@ defmodule Actors.FactoryTest do
       support_library_version: attrs[:support_library_version] || "",
       protocol_major_version: attrs[:protocol_major_version] || 1,
       protocol_minor_version: attrs[:protocol_minor_version] || 1
-    )
+    }
   end
 
   def build_host_invoke_response(attrs \\ []) do
-    state =
-      Actors.Protos.ChangeNameResponseTest.new(status: :OK, new_name: "new_name") |> any_pack!
+    state = %Actors.Protos.ChangeNameResponseTest{status: :OK, new_name: "new_name"} |> any_pack!
 
     context = %Eigr.Functions.Protocol.Context{
-      self: ActorId.new(name: attrs[:actor_name], system: attrs[:system_name]),
+      self: %ActorId{name: attrs[:actor_name], system: attrs[:system_name]},
       caller: attrs[:state] || nil,
       state: attrs[:state] || state,
       tags: attrs[:tags] || %{}
     }
 
-    ActorInvocationResponse.new(
+    %ActorInvocationResponse{
       actor_name: attrs[:actor_name],
-      system_name: attrs[:system_name],
+      actor_system: attrs[:system_name],
       updated_context: attrs[:context] || context,
       payload: {:value, attrs[:value] || state}
-    )
+    }
   end
 
   def any_pack!(record) do
-    Any.new(
+    %Any{
       type_url: get_type_url(record.__struct__),
       value: apply(record.__struct__, :encode, [record])
-    )
+    }
   end
 
   def any_unpack!(any_record, builder) do

@@ -70,7 +70,15 @@ defmodule Actors.Actor.Entity.Lifecycle do
       )
 
     schedule_deactivate(deactivation_strategy, get_jitter())
-    maybe_schedule_snapshot_advance(snapshot_strategy)
+
+    state =
+      case maybe_schedule_snapshot_advance(snapshot_strategy) do
+        {:ok, timer} ->
+          %EntityState{state | opts: Keyword.merge(state.opts, timer: timer)}
+
+        _ ->
+          state
+      end
 
     {:ok, state, {:continue, :load_state}}
   end
@@ -134,13 +142,23 @@ defmodule Actors.Actor.Entity.Lifecycle do
                   strategy: {:timeout, %TimeoutStrategy{timeout: _timeout}} = snapshot_strategy
                 }
               }
-            } = _actor
+            } = _actor,
+          opts: opts
         } = state
       )
       when is_nil(actor_state) or actor_state == %{} do
     {:message_queue_len, size} = Process.info(self(), :message_queue_len)
     Measurements.dispatch_actor_inflights(system, name, size)
-    schedule_snapshot(snapshot_strategy)
+
+    state =
+      case schedule_snapshot(snapshot_strategy, opts) do
+        {:ok, timer} ->
+          %EntityState{state | opts: Keyword.merge(opts, timer: timer)}
+
+        _ ->
+          state
+      end
+
     {:noreply, state, :hibernate}
   end
 
@@ -158,36 +176,46 @@ defmodule Actors.Actor.Entity.Lifecycle do
                   strategy: {:timeout, %TimeoutStrategy{timeout: timeout}} = snapshot_strategy
                 }
               }
-            } = _actor
+            } = _actor,
+          opts: opts
         } = state
       ) do
     {:message_queue_len, size} = Process.info(self(), :message_queue_len)
     Measurements.dispatch_actor_inflights(system, name, size)
+
     # Persist State only when necessary
-    res =
+    new_state =
       if StateManager.is_new?(old_hash, actor_state.state) do
         Logger.debug("Snapshotting actor #{name}")
 
         # Execute with timeout equals timeout strategy - 1 to avoid mailbox congestions
         case StateManager.save_async(id, actor_state, timeout - 1) do
           {:ok, _, hash} ->
-            {:noreply, %{state | state_hash: hash}, :hibernate}
+            %{state | state_hash: hash}
 
           {:error, _, _, hash} ->
-            {:noreply, %{state | state_hash: hash}, :hibernate}
+            %{state | state_hash: hash}
 
           {:error, :unsuccessfully, hash} ->
-            {:noreply, %{state | state_hash: hash}, :hibernate}
+            %{state | state_hash: hash}
 
           _ ->
-            {:noreply, state, :hibernate}
+            state
         end
       else
-        {:noreply, state, :hibernate}
+        state
       end
 
-    schedule_snapshot(snapshot_strategy)
-    res
+    state =
+      case schedule_snapshot(snapshot_strategy, opts) do
+        {:ok, timer} ->
+          %EntityState{new_state | opts: Keyword.merge(opts, timer: timer)}
+
+        _ ->
+          new_state
+      end
+
+    {:noreply, state, :hibernate}
   end
 
   def snapshot(state), do: {:noreply, state, :hibernate}
@@ -241,18 +269,26 @@ defmodule Actors.Actor.Entity.Lifecycle do
 
   # Timeout private functions
 
-  defp schedule_snapshot(snapshot_strategy, timeout_factor \\ 0) do
-    Process.send_after(
-      self(),
-      :snapshot,
-      get_snapshot_interval(snapshot_strategy, timeout_factor)
-    )
+  defp schedule_snapshot(snapshot_strategy, opts) do
+    timeout_factor = Keyword.get(opts, :timeout_factor, 0)
+    timer = Keyword.get(opts, :timer, nil)
+
+    if !is_nil(timer) do
+      Process.cancel_timer(timer)
+    end
+
+    {:ok,
+     Process.send_after(
+       self(),
+       :snapshot,
+       get_snapshot_interval(snapshot_strategy, timeout_factor)
+     )}
   end
 
   defp maybe_schedule_snapshot_advance(%ActorSnapshotStrategy{}) do
     timeout = @min_snapshot_threshold + get_jitter()
 
-    Process.send_after(self(), :snapshot, timeout)
+    {:ok, Process.send_after(self(), :snapshot, timeout)}
   end
 
   defp maybe_schedule_snapshot_advance(_), do: :ok

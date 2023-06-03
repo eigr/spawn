@@ -6,6 +6,7 @@ defmodule Actors.Config.Vapor do
   """
   require Logger
   alias Vapor.Provider.{Env, Dotenv}
+  import Statestores.Util, only: [load_lookup_adapter: 0]
 
   @behaviour Actors.Config
 
@@ -63,6 +64,19 @@ defmodule Actors.Config.Vapor do
            default: 8090, map: &String.to_integer/1, required: false},
 
           # Supervisors configuration
+          {:state_handoff_controller_adapter, "SPAWN_SUPERVISORS_STATE_HANDOFF_CONTROLLER",
+           default: "persistent", required: false},
+          {:state_handoff_manager_pool_size, "SPAWN_SUPERVISORS_STATE_HANDOFF_MANAGER_POOL_SIZE",
+           default: 20, map: &String.to_integer/1, required: false},
+          {:state_handoff_manager_call_timeout,
+           "SPAWN_SUPERVISORS_STATE_HANDOFF_MANAGER_CALL_TIMEOUT",
+           default: 60000, map: &String.to_integer/1, required: false},
+          {:state_handoff_manager_call_pool_min,
+           "SPAWN_SUPERVISORS_STATE_HANDOFF_MANAGER_CALL_POOL_MIN",
+           default: 0, map: &String.to_integer/1, required: false},
+          {:state_handoff_manager_call_pool_max,
+           "SPAWN_SUPERVISORS_STATE_HANDOFF_MANAGER_CALL_POOL_MAX",
+           default: -1, map: &String.to_integer/1, required: false},
           {:actors_max_restarts, "SPAWN_SUPERVISORS_ACTORS_MAX_RESTARTS",
            default: 10000, map: &String.to_integer/1, required: false},
           {:actors_max_seconds, "SPAWN_SUPERVISORS_ACTORS_MAX_SECONDS",
@@ -112,7 +126,7 @@ defmodule Actors.Config.Vapor do
           {:ship_debounce, "SPAWN_CRDT_SHIP_DEBOUNCE",
            default: 2, map: &String.to_integer/1, required: false},
           {:neighbours_sync_interval, "SPAWN_STATE_HANDOFF_SYNC_INTERVAL",
-           default: 60, map: &String.to_integer/1, required: false}
+           default: 60_000, map: &String.to_integer/1, required: false}
         ]
       }
     ]
@@ -124,7 +138,37 @@ defmodule Actors.Config.Vapor do
     Enum.each(config, fn {key, value} ->
       value_str = if String.contains?(Atom.to_string(key), "secret"), do: "****", else: value
       Logger.info("Loading config: [#{key}]:[#{value_str}]")
-      Application.put_env(:spawn, key, value, persistent: true)
+
+      if key == :state_handoff_controller_adapter do
+        case value do
+          "crdt" ->
+            Application.put_env(
+              :spawn,
+              key,
+              Spawn.Cluster.StateHandoff.Controllers.CrdtController,
+              persistent: true
+            )
+
+          _ ->
+            Application.put_env(
+              :spawn,
+              key,
+              Spawn.Cluster.StateHandoff.Controllers.PersistentController,
+              persistent: true
+            )
+
+            backend_adapter = load_lookup_adapter()
+
+            Application.put_env(
+              :spawn,
+              :state_handoff_controller_persistent_backend,
+              backend_adapter,
+              persistent: true
+            )
+        end
+      else
+        Application.put_env(:spawn, key, value, persistent: true)
+      end
     end)
 
     set_http_client_adapter(config)

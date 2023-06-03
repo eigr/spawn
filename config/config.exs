@@ -47,4 +47,13 @@ config :opentelemetry,
          exporter: {:opentelemetry_exporter, %{endpoints: [{:http, 'localhost', 55681, []}]}}
        }
 
+config :spawn, Spawn.Cache.LookupCache,
+  backend: :shards,
+  partitions: System.schedulers_online(),
+  gc_interval: :timer.hours(12),
+  max_size: 1_000_000,
+  allocated_memory: 2_000_000_000,
+  gc_cleanup_min_timeout: :timer.seconds(60),
+  gc_cleanup_max_timeout: :timer.minutes(10)
+
 import_config "#{config_env()}.exs"

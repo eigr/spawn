@@ -1,7 +1,7 @@
 defmodule StatestoresMssqlTest.RepoTest do
   use Statestores.DataCase
-  alias Statestores.Schemas.Event
-  import Statestores.Util, only: [load_adapter: 0, generate_key: 1]
+  alias Statestores.Schemas.Snapshot
+  import Statestores.Util, only: [load_snapshot_adapter: 0, generate_key: 1]
 
   setup do
     %{system: "test-system"}
@@ -13,9 +13,9 @@ defmodule StatestoresMssqlTest.RepoTest do
     actor = "mike"
     id = %{name: actor, system: system}
     key = generate_key(id)
-    repo = load_adapter()
+    repo = load_snapshot_adapter()
 
-    event = %Event{
+    event = %Snapshot{
       id: key,
       system: system,
       actor: actor,
@@ -33,13 +33,13 @@ defmodule StatestoresMssqlTest.RepoTest do
 
   test "insert! should update when inserted before", ctx do
     %{system: system} = ctx
-    repo = load_adapter()
+    repo = load_snapshot_adapter()
 
     actor = "mike"
     id = %{name: actor, system: system}
     key = generate_key(id)
 
-    event = %Event{
+    event = %Snapshot{
       system: "test-system",
       actor: actor,
       revision: 0,

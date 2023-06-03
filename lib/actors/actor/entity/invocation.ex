@@ -237,19 +237,19 @@ defmodule Actors.Actor.Entity.Invocation do
           Tracer.with_span "invoke-host" do
             interface.invoke_host(request, state, @default_actions)
             |> case do
-              {:ok, response, state} ->
+              {:ok, response, new_state} ->
                 Tracer.add_event("successful-invocation", [
                   {:ok, "#{inspect(response.updated_context.metadata)}"}
                 ])
 
-                build_response(request, response, state, opts)
+                build_response(request, response, new_state, opts)
 
-              {:error, reason, state} ->
+              {:error, reason, new_state} ->
                 Tracer.add_event("failure-invocation", [
                   {:error, "#{inspect(reason)}"}
                 ])
 
-                {:reply, {:error, reason}, state, :hibernate}
+                {:reply, {:error, reason}, new_state, :hibernate}
             end
           end
 
@@ -277,6 +277,8 @@ defmodule Actors.Actor.Entity.Invocation do
     metadata = if is_nil(metadata), do: %{}, else: metadata
     current_state = Map.get(actor_state || %{}, :state)
     current_tags = Map.get(actor_state || %{}, :tags, %{})
+
+    # TODO: Validate state before invoke
 
     %ActorInvocation{
       actor: id,

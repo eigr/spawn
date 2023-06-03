@@ -3,7 +3,11 @@ defmodule Spawn.InitializerHelper do
 
   def setup do
     config = Actors.Config.Vapor.load(__MODULE__)
-    Sidecar.Supervisor.start_link(config)
+    result = Sidecar.Supervisor.start_link(config)
+
+    Spawn.Cluster.StateHandoff.Manager.clean(Node.self())
+
+    result
   end
 
   def spawn_peer(name) do

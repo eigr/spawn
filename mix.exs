@@ -69,6 +69,10 @@ defmodule Spawn.MixProject do
     [
       # Core deps
       {:decimal, "~> 2.0"},
+      {:decorator, "~> 1.4"},
+      {:nebulex, "~> 2.5"},
+      {:shards, "~> 1.1"},
+      {:telemetry, "~> 1.0"},
       {:castore, "~> 1.0"},
       {:duration_tc, "~> 0.1.0"},
       {:protobuf, "~> 0.11"},
@@ -85,6 +89,7 @@ defmodule Spawn.MixProject do
       {:phoenix_pubsub_nats, "~> 0.1"},
       {:jason, "~> 1.3"},
       {:nimble_parsec, "~> 1.2.3"},
+      {:sbroker, "~> 1.0.0"},
       # Metrics & Tracing deps
       {:telemetry_poller, "~> 1.0"},
       {:telemetry_metrics, "~> 0.6.1"},
