@@ -19,14 +19,21 @@ defmodule Spawn.StateHandoff.Broker do
 
   def init(opts) do
     # Make the "left" side of the broker a FIFO queue that drops the request after the timeout is reached.
+    max =
+      if opts[:max] == -1 do
+        :infinity
+      else
+        max
+      end
+
     client_queue =
       {:sbroker_timeout_queue,
        %{
          out: :out,
          timeout: opts[:timeout],
          drop: :drop,
-         min: 0,
-         max: :infinity
+         min: opts[:min],
+         max: max
        }}
 
     # Make the "right" side of the broker a FIFO queue that has no timeout.

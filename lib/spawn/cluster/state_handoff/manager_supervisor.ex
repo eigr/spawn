@@ -18,7 +18,11 @@ defmodule Spawn.Cluster.StateHandoff.ManagerSupervisor do
   def init(config) do
     children =
       [
-        Spawn.StateHandoff.Broker.child_spec(timeout: config.state_handoff_manager_call_timeout)
+        Spawn.StateHandoff.Broker.child_spec(
+          timeout: config.state_handoff_manager_call_timeout,
+          min: config.state_handoff_manager_call_pool_min,
+          max: config.state_handoff_manager_call_pool_max
+        )
       ] ++ build_workers_tree(config)
 
     Supervisor.init(children,
