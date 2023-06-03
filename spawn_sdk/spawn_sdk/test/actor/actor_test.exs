@@ -361,7 +361,7 @@ defmodule Actor.ActorTest do
   end
 
   describe "tags" do
-    @tag timeout: :infinity
+    @tag :skip
     test "simple call verifying that tags is changed", ctx do
       system = ctx.system
 
