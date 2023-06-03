@@ -23,7 +23,7 @@ defmodule Spawn.StateHandoff.Broker do
       if opts[:max] == -1 do
         :infinity
       else
-        max
+        opts[:max]
       end
 
     client_queue =
