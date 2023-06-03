@@ -86,20 +86,21 @@ if Code.ensure_loaded?(Statestores.Supervisor) do
         {:error, error, actor_state}
     end
 
-    @spec save_async(ActorId.t(), Eigr.Functions.Protocol.Actors.ActorState.t()) ::
+    @spec save_async(ActorId.t(), Eigr.Functions.Protocol.Actors.ActorState.t(), number(), integer()) ::
             {:ok, Eigr.Functions.Protocol.Actors.ActorState.t()}
             | {:error, any(), Eigr.Functions.Protocol.Actors.ActorState.t()}
-    def save_async(actor_id, state, timeout \\ 5000)
+    def save_async(actor_id, state, revision, timeout \\ 5000)
 
-    def save_async(_actor_id, nil, _timeout), do: {:ok, %{}}
+    def save_async(_actor_id, nil, _revision, _timeout), do: {:ok, %{}}
 
-    def save_async(_actor_id, %ActorState{state: actor_state} = _state, _timeout)
+    def save_async(_actor_id, %ActorState{state: actor_state} = _state, _revision, _timeout)
         when is_nil(actor_state) or actor_state == %{},
         do: {:ok, actor_state}
 
     def save_async(
           %ActorId{name: name, system: system} = actor_id,
           %ActorState{tags: tags, state: actor_state} = _state,
+          revision,
           timeout
         ) do
       parent = self()
@@ -113,7 +114,7 @@ if Code.ensure_loaded?(Statestores.Supervisor) do
             id: key,
             actor: name,
             system: system,
-            revision: 0,
+            revision: revision,
             tags: tags,
             data_type: actor_state.type_url,
             data: actor_state.value

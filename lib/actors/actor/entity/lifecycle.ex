@@ -91,10 +91,10 @@ defmodule Actors.Actor.Entity.Lifecycle do
         } = state
       ) do
     if is_nil(actor.state) or (!is_nil(actor.state) and is_nil(actor.state.state)) do
-      "Initial state is empty for Actor #{name}. Getting state from state manager."
+      "Internal state is empty for Actor #{name}. Getting state from state manager."
     else
       # This is currently not in use by any SDK. In other words, nobody starts the Actors via SDK with some initial state.
-      "Initial state is not empty for Actor #{name}. Trying to reconcile the state with state manager."
+      "Internal state is not empty for Actor #{name}. Trying to reconcile the state with state manager."
     end
     |> Logger.debug()
 
@@ -104,7 +104,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
          {:continue, :call_init_action}}
 
       {:not_found, %{}} ->
-        Logger.debug("Not found initial state on statestore for Actor #{name}.")
+        Logger.debug("Not found state on statestore for Actor #{name}.")
         {:noreply, state, {:continue, :call_init_action}}
 
       error ->
@@ -166,6 +166,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
         %EntityState{
           system: system,
           state_hash: old_hash,
+          revisions: revisions,
           actor:
             %Actor{
               id: %ActorId{name: name} = id,
@@ -187,17 +188,18 @@ defmodule Actors.Actor.Entity.Lifecycle do
     new_state =
       if StateManager.is_new?(old_hash, actor_state.state) do
         Logger.debug("Snapshotting actor #{name}")
+        revision = revisions + 1
 
         # Execute with timeout equals timeout strategy - 1 to avoid mailbox congestions
-        case StateManager.save_async(id, actor_state, timeout - 1) do
+        case StateManager.save_async(id, actor_state, revision, timeout - 1) do
           {:ok, _, hash} ->
-            %{state | state_hash: hash}
+            %{state | state_hash: hash, revisions: revision}
 
           {:error, _, _, hash} ->
-            %{state | state_hash: hash}
+            %{state | state_hash: hash, revisions: revision}
 
           {:error, :unsuccessfully, hash} ->
-            %{state | state_hash: hash}
+            %{state | state_hash: hash, revisions: revision}
 
           _ ->
             state
