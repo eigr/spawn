@@ -6,6 +6,8 @@ defmodule Actors.Registry.ActorRegistry do
   methods for adding and removing invocation requests for actors.
   """
 
+  use Retry
+
   require Logger
 
   alias Actors.Registry.{HostActor, LoadBalancer}
@@ -23,11 +25,25 @@ defmodule Actors.Registry.ActorRegistry do
   @doc since: "0.1.0"
   @spec register(list(HostActor.t())) :: :ok
   def register(hosts) do
-    Enum.each(hosts, fn %HostActor{
-                          node: _node,
-                          actor: %Actor{id: %ActorId{name: _name} = id} = _actor
-                        } = host ->
-      StateHandoff.set(id, host)
+    Enum.each(hosts, fn host ->
+      retry with: exponential_backoff() |> randomize |> expiry(10_000),
+            atoms: [:error, :too_many_requests],
+            rescue_only: [ErlangError] do
+        try do
+          StateHandoff.set(host.actor.id, host)
+        rescue
+          e ->
+            Logger.error(
+              "Error to register actor #{inspect(host.actor.id)} for host #{inspect(host)}: #{inspect(e)}"
+            )
+
+            reraise e, __STACKTRACE__
+        end
+      after
+        result -> result
+      else
+        error -> error
+      end
     end)
   end
 

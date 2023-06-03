@@ -3,8 +3,6 @@ defmodule Spawn.Cluster.StateHandoff.ManagerSupervisor do
   use Supervisor
   require Logger
 
-  @default_pool_size 1
-
   def start_link(state \\ []) do
     Supervisor.start_link(__MODULE__, state, name: __MODULE__)
   end
@@ -33,7 +31,7 @@ defmodule Spawn.Cluster.StateHandoff.ManagerSupervisor do
   defp build_workers_tree(config) do
     pool_size =
       if config.state_handoff_manager_pool_size <= 0 do
-        @default_pool_size
+        System.schedulers_online() * 2
       else
         config.state_handoff_manager_pool_size
       end
