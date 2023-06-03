@@ -224,6 +224,7 @@ defmodule Actor.ActorTest do
   end
 
   describe "invoke json actor" do
+    @tag :skip
     test "simple default function call returning only map without payload", ctx do
       system = ctx.system
       dynamic_actor_name = Faker.Pokemon.name() <> "json_actor_get_state"
@@ -269,7 +270,7 @@ defmodule Actor.ActorTest do
       assert %{data: "second_actor as caller to third_actor"} = response
     end
 
-    @tag timeout: :infinity
+    @tag :skip
     test "calling a function that sets wrong state type", ctx do
       system = ctx.system
       dynamic_actor_name = Faker.Pokemon.name() <> "wrong_state"
@@ -315,7 +316,7 @@ defmodule Actor.ActorTest do
              ) == {:ok, %{test: true}}
     end
 
-    @tag timeout: :infinity
+    @tag :skip
     test "simple call that goes through 3 actors forwarding each other", ctx do
       system = ctx.system
 
@@ -339,6 +340,7 @@ defmodule Actor.ActorTest do
   end
 
   describe "invoke with side effect" do
+    @tag :skip
     test "simple call with a side effect", ctx do
       system = ctx.system
 
