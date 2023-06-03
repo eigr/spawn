@@ -159,7 +159,7 @@ defmodule Spawn.Cluster.StateHandoff.Manager do
   def clean(node) do
     Logger.debug("Received cleanup action from Node #{inspect(node)}")
 
-    perform_async({:clean, [node]})
+    perform({:clean, [node]})
     Logger.debug("Hosts cleaned for node #{inspect(node)}")
   end
 
