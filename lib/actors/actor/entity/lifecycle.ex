@@ -116,17 +116,28 @@ defmodule Actors.Actor.Entity.Lifecycle do
   def load_state(state), do: {:noreply, state, {:continue, :call_init_action}}
 
   def terminate(reason, %EntityState{
-        actor: %Actor{
-          id: %ActorId{name: name} = id,
-          settings: %ActorSettings{stateful: stateful},
-          state: actor_state
-        }
+        revisions: revisions,
+        actor:
+          %Actor{
+            id: %ActorId{name: name} = id,
+            settings: %ActorSettings{stateful: stateful},
+            state: actor_state
+          } = actor
       }) do
-    if stateful && !is_nil(actor_state) do
-      StateManager.save(id, actor_state)
+    if is_valid(actor) do
+      StateManager.save(id, actor_state, revisions)
     end
 
     Logger.debug("Terminating actor #{name} with reason #{inspect(reason)}")
+  end
+
+  defp is_valid(
+         %Actor{
+           settings: %ActorSettings{stateful: stateful},
+           state: actor_state
+         } = _actor
+       ) do
+    stateful && !is_nil(actor_state)
   end
 
   def snapshot(

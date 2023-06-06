@@ -42,18 +42,19 @@ if Code.ensure_loaded?(Statestores.Supervisor) do
         {:error, error}
     end
 
-    @spec save(ActorId.t(), Eigr.Functions.Protocol.Actors.ActorState.t()) ::
+    @spec save(ActorId.t(), Eigr.Functions.Protocol.Actors.ActorState.t(), pos_intger()) ::
             {:ok, Eigr.Functions.Protocol.Actors.ActorState.t()}
             | {:error, any(), Eigr.Functions.Protocol.Actors.ActorState.t()}
-    def save(_actor_id, nil), do: {:ok, nil}
+    def save(_actor_id, nil, _revisions), do: {:ok, nil}
 
-    def save(_actor_id, %ActorState{state: actor_state} = _state)
+    def save(_actor_id, %ActorState{state: actor_state} = _state, _revisions)
         when is_nil(actor_state) or actor_state == %{},
         do: {:ok, actor_state}
 
     def save(
           %ActorId{name: name, system: system} = actor_id,
-          %ActorState{tags: tags, state: actor_state} = _state
+          %ActorState{tags: tags, state: actor_state} = _state,
+          revisions
         ) do
       Logger.debug("Saving state for actor #{name}")
 
@@ -64,7 +65,7 @@ if Code.ensure_loaded?(Statestores.Supervisor) do
           id: key,
           actor: name,
           system: system,
-          revision: 0,
+          revision: revisions,
           tags: tags,
           data_type: actor_state.type_url,
           data: actor_state.value
@@ -86,7 +87,12 @@ if Code.ensure_loaded?(Statestores.Supervisor) do
         {:error, error, actor_state}
     end
 
-    @spec save_async(ActorId.t(), Eigr.Functions.Protocol.Actors.ActorState.t(), number(), integer()) ::
+    @spec save_async(
+            ActorId.t(),
+            Eigr.Functions.Protocol.Actors.ActorState.t(),
+            pos_intger(),
+            integer()
+          ) ::
             {:ok, Eigr.Functions.Protocol.Actors.ActorState.t()}
             | {:error, any(), Eigr.Functions.Protocol.Actors.ActorState.t()}
     def save_async(actor_id, state, revision, timeout \\ 5000)
