@@ -31,11 +31,14 @@ if Code.ensure_loaded?(Statestores.Supervisor) do
       key = generate_key(actor_id)
 
       case StateStoreManager.load(key) do
-        %Snapshot{revision: _rev, tags: tags, data_type: type, data: data} = _event ->
-          {:ok, %ActorState{tags: tags, state: %Google.Protobuf.Any{type_url: type, value: data}}}
+        %Snapshot{revision: rev, tags: tags, data_type: type, data: data} = _event ->
+          revision = if is_nil(rev), do: 0, else: rev
+
+          {:ok, %ActorState{tags: tags, state: %Google.Protobuf.Any{type_url: type, value: data}},
+           revision}
 
         _ ->
-          {:not_found, %{}}
+          {:not_found, %{}, 0}
       end
     catch
       _kind, error ->
