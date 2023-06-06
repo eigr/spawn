@@ -168,6 +168,7 @@ defmodule Actors.Actor.Entity do
   defp do_handle_info(
          message,
          %EntityState{
+           revisions: revisions,
            actor: %Actor{id: %ActorId{name: name} = id, state: actor_state}
          } = state
        ) do
@@ -175,7 +176,7 @@ defmodule Actors.Actor.Entity do
       "No handled internal message for actor #{name}. Message: #{inspect(message)}. Actor state: #{inspect(state)}"
     )
 
-    if not is_nil(actor_state), do: StateManager.save(id, actor_state)
+    if not is_nil(actor_state), do: StateManager.save(id, actor_state, revisions)
 
     {:noreply, state, :hibernate}
   end

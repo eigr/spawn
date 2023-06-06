@@ -42,7 +42,7 @@ if Code.ensure_loaded?(Statestores.Supervisor) do
         {:error, error}
     end
 
-    @spec save(ActorId.t(), Eigr.Functions.Protocol.Actors.ActorState.t(), pos_intger()) ::
+    @spec save(ActorId.t(), Eigr.Functions.Protocol.Actors.ActorState.t(), pos_integer()) ::
             {:ok, Eigr.Functions.Protocol.Actors.ActorState.t()}
             | {:error, any(), Eigr.Functions.Protocol.Actors.ActorState.t()}
     def save(_actor_id, nil, _revisions), do: {:ok, nil}
@@ -90,7 +90,7 @@ if Code.ensure_loaded?(Statestores.Supervisor) do
     @spec save_async(
             ActorId.t(),
             Eigr.Functions.Protocol.Actors.ActorState.t(),
-            pos_intger(),
+            pos_integer(),
             integer()
           ) ::
             {:ok, Eigr.Functions.Protocol.Actors.ActorState.t()}

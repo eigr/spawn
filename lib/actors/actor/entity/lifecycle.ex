@@ -120,24 +120,14 @@ defmodule Actors.Actor.Entity.Lifecycle do
         actor:
           %Actor{
             id: %ActorId{name: name} = id,
-            settings: %ActorSettings{stateful: stateful},
             state: actor_state
           } = actor
       }) do
-    if is_valid(actor) do
+    if is_actor_valid?(actor) do
       StateManager.save(id, actor_state, revisions)
     end
 
     Logger.debug("Terminating actor #{name} with reason #{inspect(reason)}")
-  end
-
-  defp is_valid(
-         %Actor{
-           settings: %ActorSettings{stateful: stateful},
-           state: actor_state
-         } = _actor
-       ) do
-    stateful && !is_nil(actor_state)
   end
 
   def snapshot(
@@ -263,6 +253,15 @@ defmodule Actors.Actor.Entity.Lifecycle do
   end
 
   def deactivate(state), do: {:noreply, state, :hibernate}
+
+  defp is_actor_valid?(
+         %Actor{
+           settings: %ActorSettings{stateful: stateful},
+           state: actor_state
+         } = _actor
+       ) do
+    stateful && !is_nil(actor_state)
+  end
 
   defp handle_metadata(_actor, metadata) when is_nil(metadata) or metadata == %{} do
     :ok
