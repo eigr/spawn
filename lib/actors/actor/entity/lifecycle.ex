@@ -99,12 +99,15 @@ defmodule Actors.Actor.Entity.Lifecycle do
     |> Logger.debug()
 
     case StateManager.load(id) do
-      {:ok, current_state, revision} ->
+      {:ok, current_state, current_revision} ->
         {:noreply,
-         %EntityState{state | actor: %Actor{actor | state: current_state}, revisions: revision},
-         {:continue, :call_init_action}}
+         %EntityState{
+           state
+           | actor: %Actor{actor | state: current_state},
+             revisions: current_revision
+         }, {:continue, :call_init_action}}
 
-      {:not_found, %{}, _revision} ->
+      {:not_found, %{}, _current_revision} ->
         Logger.debug("Not found state on statestore for Actor #{name}.")
         {:noreply, state, {:continue, :call_init_action}}
 
