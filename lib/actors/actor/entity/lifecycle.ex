@@ -70,7 +70,15 @@ defmodule Actors.Actor.Entity.Lifecycle do
       )
 
     schedule_deactivate(deactivation_strategy, get_jitter())
-    maybe_schedule_snapshot_advance(snapshot_strategy)
+
+    state =
+      case maybe_schedule_snapshot_advance(snapshot_strategy) do
+        {:ok, timer} ->
+          %EntityState{state | opts: Keyword.merge(state.opts, timer: timer)}
+
+        _ ->
+          state
+      end
 
     {:ok, state, {:continue, :load_state}}
   end
@@ -83,20 +91,24 @@ defmodule Actors.Actor.Entity.Lifecycle do
         } = state
       ) do
     if is_nil(actor.state) or (!is_nil(actor.state) and is_nil(actor.state.state)) do
-      "Initial state is empty for Actor #{name}. Getting state from state manager."
+      "Internal state is empty for Actor #{name}. Getting state from state manager."
     else
       # This is currently not in use by any SDK. In other words, nobody starts the Actors via SDK with some initial state.
-      "Initial state is not empty for Actor #{name}. Trying to reconcile the state with state manager."
+      "Internal state is not empty for Actor #{name}. Trying to reconcile the state with state manager."
     end
     |> Logger.debug()
 
     case StateManager.load(id) do
-      {:ok, current_state} ->
-        {:noreply, %EntityState{state | actor: %Actor{actor | state: current_state}},
-         {:continue, :call_init_action}}
+      {:ok, current_state, current_revision} ->
+        {:noreply,
+         %EntityState{
+           state
+           | actor: %Actor{actor | state: current_state},
+             revisions: current_revision
+         }, {:continue, :call_init_action}}
 
-      {:not_found, %{}} ->
-        Logger.debug("Not found initial state on statestore for Actor #{name}.")
+      {:not_found, %{}, _current_revision} ->
+        Logger.debug("Not found state on statestore for Actor #{name}.")
         {:noreply, state, {:continue, :call_init_action}}
 
       error ->
@@ -108,14 +120,15 @@ defmodule Actors.Actor.Entity.Lifecycle do
   def load_state(state), do: {:noreply, state, {:continue, :call_init_action}}
 
   def terminate(reason, %EntityState{
-        actor: %Actor{
-          id: %ActorId{name: name} = id,
-          settings: %ActorSettings{stateful: stateful},
-          state: actor_state
-        }
+        revisions: revisions,
+        actor:
+          %Actor{
+            id: %ActorId{name: name} = id,
+            state: actor_state
+          } = actor
       }) do
-    if stateful && !is_nil(actor_state) do
-      StateManager.save(id, actor_state)
+    if is_actor_valid?(actor) do
+      StateManager.save(id, actor_state, revisions)
     end
 
     Logger.debug("Terminating actor #{name} with reason #{inspect(reason)}")
@@ -134,13 +147,23 @@ defmodule Actors.Actor.Entity.Lifecycle do
                   strategy: {:timeout, %TimeoutStrategy{timeout: _timeout}} = snapshot_strategy
                 }
               }
-            } = _actor
+            } = _actor,
+          opts: opts
         } = state
       )
       when is_nil(actor_state) or actor_state == %{} do
     {:message_queue_len, size} = Process.info(self(), :message_queue_len)
     Measurements.dispatch_actor_inflights(system, name, size)
-    schedule_snapshot(snapshot_strategy)
+
+    state =
+      case schedule_snapshot(snapshot_strategy, opts) do
+        {:ok, timer} ->
+          %EntityState{state | opts: Keyword.merge(opts, timer: timer)}
+
+        _ ->
+          state
+      end
+
     {:noreply, state, :hibernate}
   end
 
@@ -148,6 +171,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
         %EntityState{
           system: system,
           state_hash: old_hash,
+          revisions: revisions,
           actor:
             %Actor{
               id: %ActorId{name: name} = id,
@@ -158,36 +182,47 @@ defmodule Actors.Actor.Entity.Lifecycle do
                   strategy: {:timeout, %TimeoutStrategy{timeout: timeout}} = snapshot_strategy
                 }
               }
-            } = _actor
+            } = _actor,
+          opts: opts
         } = state
       ) do
     {:message_queue_len, size} = Process.info(self(), :message_queue_len)
     Measurements.dispatch_actor_inflights(system, name, size)
+
     # Persist State only when necessary
-    res =
+    new_state =
       if StateManager.is_new?(old_hash, actor_state.state) do
         Logger.debug("Snapshotting actor #{name}")
+        revision = revisions + 1
 
         # Execute with timeout equals timeout strategy - 1 to avoid mailbox congestions
-        case StateManager.save_async(id, actor_state, timeout - 1) do
+        case StateManager.save_async(id, actor_state, revision, timeout - 1) do
           {:ok, _, hash} ->
-            {:noreply, %{state | state_hash: hash}, :hibernate}
+            %{state | state_hash: hash, revisions: revision}
 
           {:error, _, _, hash} ->
-            {:noreply, %{state | state_hash: hash}, :hibernate}
+            %{state | state_hash: hash, revisions: revision}
 
           {:error, :unsuccessfully, hash} ->
-            {:noreply, %{state | state_hash: hash}, :hibernate}
+            %{state | state_hash: hash, revisions: revision}
 
           _ ->
-            {:noreply, state, :hibernate}
+            state
         end
       else
-        {:noreply, state, :hibernate}
+        state
       end
 
-    schedule_snapshot(snapshot_strategy)
-    res
+    state =
+      case schedule_snapshot(snapshot_strategy, opts) do
+        {:ok, timer} ->
+          %EntityState{new_state | opts: Keyword.merge(opts, timer: timer)}
+
+        _ ->
+          new_state
+      end
+
+    {:noreply, state, :hibernate}
   end
 
   def snapshot(state), do: {:noreply, state, :hibernate}
@@ -223,6 +258,15 @@ defmodule Actors.Actor.Entity.Lifecycle do
 
   def deactivate(state), do: {:noreply, state, :hibernate}
 
+  defp is_actor_valid?(
+         %Actor{
+           settings: %ActorSettings{stateful: stateful},
+           state: actor_state
+         } = _actor
+       ) do
+    stateful && !is_nil(actor_state)
+  end
+
   defp handle_metadata(_actor, metadata) when is_nil(metadata) or metadata == %{} do
     :ok
   end
@@ -241,18 +285,26 @@ defmodule Actors.Actor.Entity.Lifecycle do
 
   # Timeout private functions
 
-  defp schedule_snapshot(snapshot_strategy, timeout_factor \\ 0) do
-    Process.send_after(
-      self(),
-      :snapshot,
-      get_snapshot_interval(snapshot_strategy, timeout_factor)
-    )
+  defp schedule_snapshot(snapshot_strategy, opts) do
+    timeout_factor = Keyword.get(opts, :timeout_factor, 0)
+    timer = Keyword.get(opts, :timer, nil)
+
+    if !is_nil(timer) do
+      Process.cancel_timer(timer)
+    end
+
+    {:ok,
+     Process.send_after(
+       self(),
+       :snapshot,
+       get_snapshot_interval(snapshot_strategy, timeout_factor)
+     )}
   end
 
   defp maybe_schedule_snapshot_advance(%ActorSnapshotStrategy{}) do
     timeout = @min_snapshot_threshold + get_jitter()
 
-    Process.send_after(self(), :snapshot, timeout)
+    {:ok, Process.send_after(self(), :snapshot, timeout)}
   end
 
   defp maybe_schedule_snapshot_advance(_), do: :ok

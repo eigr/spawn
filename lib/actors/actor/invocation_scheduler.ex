@@ -26,10 +26,11 @@ defmodule Actors.Actor.InvocationScheduler do
 
   @impl true
   def handle_continue(:init_invocations, state) do
-    schedule_hibernate()
-    stored_invocations = ActorRegistry.get_all_invocations()
+    # TODO: Fix this module
+    # schedule_hibernate()
+    # stored_invocations = ActorRegistry.get_all_invocations()
 
-    Enum.each(stored_invocations, &call_invoke/1)
+    # Enum.each(stored_invocations, &call_invoke/1)
 
     {:noreply, state}
   end

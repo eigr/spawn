@@ -16,10 +16,12 @@ defmodule Proxy.Routes.API do
     SpawnResponse
   }
 
+  alias Eigr.Functions.Protocol.Actors.ActorId
+
   @content_type "application/octet-stream"
 
-  get "/system/:name/actors/:actor_name" do
-    Actors.get_state(name, actor_name)
+  get "/system/:system/actors/:actor_name" do
+    Actors.get_state(%ActorId{name: actor_name, system: system})
   end
 
   post "/system" do
@@ -30,8 +32,8 @@ defmodule Proxy.Routes.API do
       send!(conn, 200, encode(RegistrationResponse, response), @content_type)
     else
       _ ->
-        status = RequestStatus.new(status: :ERROR, message: "Error on create Actors")
-        response = RegistrationResponse.new(status: status)
+        status = %RequestStatus{status: :ERROR, message: "Error on create Actors"}
+        response = %RegistrationResponse{status: status}
         send!(conn, 500, encode(RegistrationResponse, response), @content_type)
     end
   end
@@ -44,8 +46,8 @@ defmodule Proxy.Routes.API do
       send!(conn, 200, encode(SpawnResponse, response), @content_type)
     else
       _ ->
-        status = RequestStatus.new(status: :ERROR, message: "Error on create Actors")
-        response = SpawnResponse.new(status: status)
+        status = %RequestStatus{status: :ERROR, message: "Error on create Actors"}
+        response = %SpawnResponse{status: status}
         send!(conn, 500, encode(SpawnResponse, response), @content_type)
     end
   end
@@ -61,8 +63,8 @@ defmodule Proxy.Routes.API do
       send!(conn, 200, encode(InvocationResponse, resp), @content_type)
     else
       _ ->
-        status = RequestStatus.new(status: :ERROR, message: "Error on invoke Actor")
-        response = InvocationResponse.new(status: status)
+        status = %RequestStatus{status: :ERROR, message: "Error on invoke Actor"}
+        response = %InvocationResponse{status: status}
         send!(conn, 500, encode(InvocationResponse, response), @content_type)
     end
   end
@@ -95,11 +97,11 @@ defmodule Proxy.Routes.API do
           response
       end
 
-    InvocationResponse.new(
+    %InvocationResponse{
       system: system,
       actor: actor,
       payload: resp,
-      status: RequestStatus.new(status: :OK)
-    )
+      status: %RequestStatus{status: :OK}
+    }
   end
 end

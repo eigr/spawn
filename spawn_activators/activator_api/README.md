@@ -27,6 +27,12 @@ protoc --descriptor_set_out=priv/example/out/user-api.desc \
     --elixir_out=gen_descriptors=true:./priv/example/out # elixir_out or another language protoc plugin
 ```
 
+Create a kubernetes secrets containing the descriptor file created above.
+
+```shell
+kubectl -n default create secret generic protobuf-file-descriptors-secret --from-file=description=priv/example/out/user-api.desc
+```
+
 ```elixir
 entities = [%{service_name: "io.eigr.spawn.example.TestService"}]
 config = %{entities: entities, proto_file_path: "priv/example/out/user-api.desc", proto: nil}

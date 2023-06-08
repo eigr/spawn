@@ -8,7 +8,7 @@ defmodule Actor.SerializerTest do
 
   describe "encode" do
     test "encode user defined struct" do
-      state = MyState.new(id: "1", value: 1)
+      state = %MyState{id: "1", value: 1}
       packed = any_pack!(state)
 
       assert "type.googleapis.com/eigr.spawn.actor.MyState" = packed.type_url
@@ -17,7 +17,7 @@ defmodule Actor.SerializerTest do
 
   describe "decode" do
     test "decode user defined struct" do
-      state = MyState.new(id: "1", value: 1)
+      state = %MyState{id: "1", value: 1}
       packed = any_pack!(state)
 
       assert "type.googleapis.com/eigr.spawn.actor.MyState" = packed.type_url
@@ -26,7 +26,7 @@ defmodule Actor.SerializerTest do
     end
 
     test "decode binary user defined struct" do
-      state = MyState.new(id: "1", value: 1)
+      state = %MyState{id: "1", value: 1}
       packed = any_pack!(state)
       bin = Any.encode(packed)
 

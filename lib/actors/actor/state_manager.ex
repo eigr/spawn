@@ -8,7 +8,7 @@ if Code.ensure_loaded?(Statestores.Supervisor) do
 
     alias Eigr.Functions.Protocol.Actors.{ActorId, ActorState}
     alias Google.Protobuf.Any
-    alias Statestores.Schemas.Event
+    alias Statestores.Schemas.Snapshot
     alias Statestores.Manager.StateManager, as: StateStoreManager
 
     def is_new?(_old_hash, new_state) when is_nil(new_state), do: false
@@ -31,40 +31,44 @@ if Code.ensure_loaded?(Statestores.Supervisor) do
       key = generate_key(actor_id)
 
       case StateStoreManager.load(key) do
-        %Event{revision: _rev, tags: tags, data_type: type, data: data} = _event ->
-          {:ok, %ActorState{tags: tags, state: %Google.Protobuf.Any{type_url: type, value: data}}}
+        %Snapshot{revision: rev, tags: tags, data_type: type, data: data} = _event ->
+          revision = if is_nil(rev), do: 0, else: rev
+
+          {:ok, %ActorState{tags: tags, state: %Google.Protobuf.Any{type_url: type, value: data}},
+           revision}
 
         _ ->
-          {:not_found, %{}}
+          {:not_found, %{}, 0}
       end
     catch
       _kind, error ->
         {:error, error}
     end
 
-    @spec save(ActorId.t(), Eigr.Functions.Protocol.Actors.ActorState.t()) ::
+    @spec save(ActorId.t(), Eigr.Functions.Protocol.Actors.ActorState.t(), pos_integer()) ::
             {:ok, Eigr.Functions.Protocol.Actors.ActorState.t()}
             | {:error, any(), Eigr.Functions.Protocol.Actors.ActorState.t()}
-    def save(_actor_id, nil), do: {:ok, nil}
+    def save(_actor_id, nil, _revisions), do: {:ok, nil}
 
-    def save(_actor_id, %ActorState{state: actor_state} = _state)
+    def save(_actor_id, %ActorState{state: actor_state} = _state, _revisions)
         when is_nil(actor_state) or actor_state == %{},
         do: {:ok, actor_state}
 
     def save(
           %ActorId{name: name, system: system} = actor_id,
-          %ActorState{tags: tags, state: actor_state} = _state
+          %ActorState{tags: tags, state: actor_state} = _state,
+          revisions
         ) do
       Logger.debug("Saving state for actor #{name}")
 
       with bytes_from_state <- Any.encode(actor_state),
            hash <- :crypto.hash(:sha256, bytes_from_state),
            key <- generate_key(actor_id) do
-        %Event{
+        %Snapshot{
           id: key,
           actor: name,
           system: system,
-          revision: 0,
+          revision: revisions,
           tags: tags,
           data_type: actor_state.type_url,
           data: actor_state.value
@@ -86,20 +90,26 @@ if Code.ensure_loaded?(Statestores.Supervisor) do
         {:error, error, actor_state}
     end
 
-    @spec save_async(ActorId.t(), Eigr.Functions.Protocol.Actors.ActorState.t()) ::
+    @spec save_async(
+            ActorId.t(),
+            Eigr.Functions.Protocol.Actors.ActorState.t(),
+            pos_integer(),
+            integer()
+          ) ::
             {:ok, Eigr.Functions.Protocol.Actors.ActorState.t()}
             | {:error, any(), Eigr.Functions.Protocol.Actors.ActorState.t()}
-    def save_async(actor_id, state, timeout \\ 5000)
+    def save_async(actor_id, state, revision, timeout \\ 5000)
 
-    def save_async(_actor_id, nil, _timeout), do: {:ok, %{}}
+    def save_async(_actor_id, nil, _revision, _timeout), do: {:ok, %{}}
 
-    def save_async(_actor_id, %ActorState{state: actor_state} = _state, _timeout)
+    def save_async(_actor_id, %ActorState{state: actor_state} = _state, _revision, _timeout)
         when is_nil(actor_state) or actor_state == %{},
         do: {:ok, actor_state}
 
     def save_async(
           %ActorId{name: name, system: system} = actor_id,
           %ActorState{tags: tags, state: actor_state} = _state,
+          revision,
           timeout
         ) do
       parent = self()
@@ -109,11 +119,11 @@ if Code.ensure_loaded?(Statestores.Supervisor) do
           Logger.debug("Saving state for actor #{name}")
           key = generate_key(actor_id)
 
-          %Event{
+          %Snapshot{
             id: key,
             actor: name,
             system: system,
-            revision: 0,
+            revision: revision,
             tags: tags,
             data_type: actor_state.type_url,
             data: actor_state.value

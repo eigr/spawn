@@ -1,0 +1,24 @@
+---
+apiVersion: spawn-eigr.io/v1
+kind: Activator
+metadata:
+  name: myapp-grpc-activator
+spec:
+  activator:
+    type: gRPC
+    expose: true
+    exposeMethod: ingress
+    exposeHost: myactor-api.eigr.io
+    grpFileDescriptorRef: protobuf-file-descriptors-secret
+    port: 4000
+  bindings:
+    sources:
+      - name: actor-action-mapping
+        service: "io.eigr.functions.spawn.services.CounterService"
+        typesPackage: "io.eigr.functions.spawn.services"
+        inputType: "Add"
+        outputType: "Result"
+    sinks:
+      - name: actor-sink
+        actor: "JoeActor"
+        action: add

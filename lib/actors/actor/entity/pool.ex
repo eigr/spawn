@@ -26,12 +26,12 @@ defmodule Actors.Actor.Pool do
   @spec create_actor_host_pool(Actor.t(), keyword()) :: list(HostActor.t())
   def create_actor_host_pool(
         %Actor{
-          id: %ActorId{system: system, parent: _parent, name: name} = _id,
+          id: %ActorId{} = id,
           settings: %ActorSettings{kind: :POOLED} = _settings
         } = actor,
         opts
       ) do
-    case ActorRegistry.get_hosts_by_actor(system, name) do
+    case ActorRegistry.get_hosts_by_actor(id) do
       {:ok, actor_hosts} ->
         build_pool(:distributed, actor, actor_hosts, opts)
 

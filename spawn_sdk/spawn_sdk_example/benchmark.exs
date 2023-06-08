@@ -21,10 +21,10 @@ Benchee.run(
     end,
     "Non Parallel Stateful Abstract Spawn and Invoke Actor  - Update State" => fn ->
       spawn_and_invoke()
-    end,
-    "Non Parallel Stateless Pooled Actor                    - Call Action " => fn ->
-      spawn_invoke_pooled_actors()
     end
+    # "Non Parallel Stateless Pooled Actor                    - Call Action " => fn ->
+    #   spawn_invoke_pooled_actors()
+    # end
   },
   time: 5,
   parallel: 1,
@@ -88,7 +88,7 @@ Benchee.run(
 #   "Parallel Stateful Abstract Spawn and Invoke Actor  - Update State" => fn -> spawn_and_invoke() end,
 #   "Parallel Stateful Singleton Actor                  - Update State" => fn -> invoke_update_state() end,
 #   "Async Non Parallel Stateful Singleton Actor        - Update State" => fn -> async_invoke_update_state() end,
-#   "Parallel Stateless Pooled Actor                    - Call Action " => fn -> spawn_invoke_pooled_actors() end
+#   #"Parallel Stateless Pooled Actor                    - Call Action " => fn -> spawn_invoke_pooled_actors() end
 #   },
 #   warmup: 10,
 #   parallel: 10,

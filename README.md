@@ -189,7 +189,7 @@ kubectl create ns eigr-functions && curl -L https://github.com/eigr/spawn/releas
 > **_NOTE:_** You need to inform the desired release version. For example:
 
 ```shell
-kubectl create ns eigr-functions && curl -L https://github.com/eigr/spawn/releases/download/v0.6.3/manifest.yaml | kubectl apply -f -
+kubectl create ns eigr-functions && curl -L https://github.com/eigr/spawn/releases/download/v1.0.0-rc3/manifest.yaml | kubectl apply -f -
 ```
 
 ## Getting Started
@@ -228,7 +228,7 @@ Now create the config file with the Nats credentials:
 
 ```
 kubectl -n default create secret generic nats-invocation-conn-secret \
-  --from-literal=url=spawn-nats:4222 \
+  --from-literal=url="nats://spawn-nats:4222" \
   --from-literal=authEnabled="false" \
   --from-literal=tlsEnabled="false" \
   --from-literal=username="" \

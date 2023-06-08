@@ -11,13 +11,10 @@ defmodule SpawnSdkExample.Application do
         actors: [
           SpawnSdkExample.Actors.JoeActor,
           SpawnSdkExample.Actors.JsonActor,
-<<<<<<< HEAD
-          #SpawnSdkExample.Actors.ClockActor,
-=======
           # SpawnSdkExample.Actors.ClockActor,
->>>>>>> main
-          SpawnSdkExample.Actors.AbstractActor,
-          SpawnSdkExample.Actors.PooledActor
+          SpawnSdkExample.Actors.AbstractActor
+          # Pooled Actors have been removed and will be restructured in the future
+          # SpawnSdkExample.Actors.PooledActor
         ],
         extenal_subscribers: [
           {SpawnSdkExample.Subscriber, []}

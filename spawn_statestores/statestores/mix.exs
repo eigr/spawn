@@ -55,11 +55,11 @@ defmodule Statestores.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:vapor, "~> 0.10"},
+      {:castore, "~> 1.0"},
       {:cloak_ecto, "~> 1.2"},
       {:ecto_sql, "~> 3.8"},
       {:nimble_parsec, "~> 1.2.3"},
-      {:castore, "~> 1.0"},
+      {:vapor, "~> 0.10"},
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false}
     ]

@@ -1,4 +1,4 @@
-# SpawnSdkExample
+# Spawn Sdk Example
 
 **TODO: Add description**
 
@@ -10,7 +10,7 @@ by adding `spawn_sdk_example` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:spawn_sdk_example, "~> 0.6.3"}
+    {:spawn_sdk_example, "~> 1.0.0-rc3"}
   ]
 end
 ```
