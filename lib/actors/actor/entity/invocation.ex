@@ -51,12 +51,6 @@ defmodule Actors.Actor.Entity.Invocation do
 
   @http_host_interface Actors.Actor.Interface.Http
 
-  @host_interface_map %{
-    "sdk" => SpawnSdk.Interface,
-    "http" => @http_host_interface,
-    "default" => @http_host_interface
-  }
-
   def timer_invoke(
         %FixedTimerCommand{command: %Command{name: cmd} = _command} = timer,
         %EntityState{
@@ -149,7 +143,8 @@ defmodule Actors.Actor.Entity.Invocation do
               id: %ActorId{name: actor_name, parent: parent} = id,
               state: actor_state,
               commands: commands
-            } = _actor
+            } = _actor,
+          opts: actor_opts
         } = state
       ) do
     if length(commands) <= 0 do
@@ -165,7 +160,7 @@ defmodule Actors.Actor.Entity.Invocation do
           {:noreply, state, :hibernate}
 
         _ ->
-          interface = get_interface()
+          interface = get_interface(actor_opts)
 
           metadata = %{}
           current_state = Map.get(actor_state || %{}, :state) || %ActorState{}
@@ -208,8 +203,9 @@ defmodule Actors.Actor.Entity.Invocation do
            command_name: command
          } = invocation, opts},
         %EntityState{
-          system: actor_system,
-          actor: %Actor{state: actor_state, commands: commands, timer_commands: timers}
+          system: _actor_system,
+          actor: %Actor{state: actor_state, commands: commands, timer_commands: timers},
+          opts: actor_opts
         } = state
       ) do
     ctx = Keyword.get(opts, :span_ctx, OpenTelemetry.Ctx.new())
@@ -230,7 +226,7 @@ defmodule Actors.Actor.Entity.Invocation do
       case Enum.member?(@default_actions, command) or
              Enum.any?(all_commands, fn cmd -> cmd.name == command end) do
         true ->
-          interface = get_interface()
+          interface = get_interface(actor_opts)
 
           request = build_request(invocation, actor_state, opts)
 
@@ -535,11 +531,5 @@ defmodule Actors.Actor.Entity.Invocation do
     end
   end
 
-  defp get_interface do
-    if :persistent_term.get(:elixir_sdk, false) do
-      @host_interface_map["sdk"]
-    else
-      @host_interface_map[System.get_env("PROXY_HOST_INTERFACE", "default")]
-    end
-  end
+  defp get_interface(opts), do: Keyword.get(opts, :interface, @http_host_interface)
 end

@@ -13,6 +13,8 @@ defmodule Actors.Actor.Pool do
     ActorSettings
   }
 
+  @http_host_interface Actors.Actor.Interface.Http
+
   @doc """
   Creates an actor host pool for a given pooled actor.
 
@@ -57,6 +59,17 @@ defmodule Actors.Actor.Pool do
          _hosts,
          opts
        ) do
+    {_current_value, new_opts} =
+      Keyword.get_and_update(opts, :interface, fn current_value ->
+        case current_value do
+          nil ->
+            {@http_host_interface, @http_host_interface}
+
+          _ ->
+            {current_value, current_value}
+        end
+      end)
+
     max_pool = if max < min, do: get_defaul_max_pool(min), else: max
 
     Enum.into(
@@ -71,7 +84,7 @@ defmodule Actors.Actor.Pool do
         }
 
         Logger.debug("Registering metadata for the Pooled Actor #{name} with Alias #{name_alias}")
-        %HostActor{node: Node.self(), actor: pooled_actor, opts: opts}
+        %HostActor{node: Node.self(), actor: pooled_actor, opts: new_opts}
       end
     )
   end
@@ -86,6 +99,17 @@ defmodule Actors.Actor.Pool do
          hosts,
          opts
        ) do
+    {_current_value, new_opts} =
+      Keyword.get_and_update(opts, :interface, fn current_value ->
+        case current_value do
+          nil ->
+            {@http_host_interface, @http_host_interface}
+
+          _ ->
+            {current_value, current_value}
+        end
+      end)
+
     max_pool = if max < min, do: get_defaul_max_pool(min), else: max
 
     Enum.into(
@@ -101,7 +125,7 @@ defmodule Actors.Actor.Pool do
         }
 
         Logger.debug("Registering metadata for the Pooled Actor #{name} with Alias #{name_alias}")
-        %HostActor{node: host.node, actor: pooled_actor, opts: opts}
+        %HostActor{node: host.node, actor: pooled_actor, opts: new_opts}
       end
     )
   end

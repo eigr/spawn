@@ -48,7 +48,7 @@ defmodule SpawnSdk.System.SpawnSystem do
 
   @impl SpawnSdk.System
   def register(system, actors) do
-    opts = []
+    opts = [interface: SpawnSdk.Interface]
 
     registration_request = build_registration_req(system, actors)
     all_actors = merge_cache_actors(system, state_to_map(actors))
