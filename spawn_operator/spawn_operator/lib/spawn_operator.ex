@@ -69,7 +69,9 @@ defmodule SpawnOperator do
       ship_interval: Map.get(annotations, "spawn-eigr.io/sidecar-crdt-ship-interval", "2"),
       ship_debounce: Map.get(annotations, "spawn-eigr.io/sidecar-crdt-ship-debounce", "2"),
       neighbours_sync_interval:
-        Map.get(annotations, "spawn-eigr.io/sidecar-state-handoff-sync-interval", "60")
+        Map.get(annotations, "spawn-eigr.io/sidecar-state-handoff-sync-interval", "60"),
+      supervisors_state_handoff_controller:
+        Map.get(annotations, "spawn-eigr.io/supervisors-state-handoff-controller", "persistent")
     }
   end
 end
