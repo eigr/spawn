@@ -1,4 +1,4 @@
-version=1.0.0-rc3
+version=1.0.0-rc4
 registry=eigr
 
 CLUSTER_NAME=spawn-k8s
@@ -11,7 +11,7 @@ activator-kafka-image=${registry}/spawn-activator-kafka:${version}
 activator-pubsub-image=${registry}/spawn-activator-pubsub:${version}
 activator-rabbitmq-image=${registry}/spawn-activator-rabbitmq:${version}
 activator-sqs-image=${registry}/spawn-activator-sqs:${version}
-activator-cli-image=${registry}/spawn-activator-cli:0.1.1
+activator-cli-image=${registry}/spawn-activator-cli:0.1.2
 spawn-sdk-example-image=${registry}/spawn-sdk-example:${version}
 
 ifeq "$(PROXY_DATABASE_TYPE)" ""

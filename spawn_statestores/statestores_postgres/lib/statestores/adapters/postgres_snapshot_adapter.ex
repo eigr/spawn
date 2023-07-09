@@ -36,7 +36,7 @@ defmodule Statestores.Adapters.PostgresSnapshotAdapter do
           updated_at: DateTime.utc_now()
         ]
       ],
-      conflict_target: :actor
+      conflict_target: :id
     )
     |> case do
       {:ok, event} ->
