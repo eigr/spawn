@@ -61,7 +61,7 @@ defmodule Statestores.Adapters.PostgresLookupAdapter do
           updated_at: DateTime.utc_now()
         ]
       ],
-      conflict_target: :actor
+      conflict_target: [:id, :node]
     )
     |> case do
       {:ok, event} ->

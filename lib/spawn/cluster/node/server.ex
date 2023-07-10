@@ -11,14 +11,14 @@ defmodule Spawn.Cluster.Node.Server do
 
   def request(%{topic: topic, body: body, reply_to: reply_to} = req)
       when is_binary(body) do
-    Logger.debug("Received Actor Invocation via Nats on #{topic}")
+    Logger.info("Received Actor Invocation via Nats on #{topic}")
     headers = Map.get(req, :headers, [])
 
     handle_request(topic, body, reply_to, headers)
   end
 
   def request(%{topic: topic, body: _, reply_to: _reply_to} = _req) do
-    Logger.debug("Received Invalid Actor Invocation via Nats on #{topic}")
+    Logger.warning("Received Invalid Actor Invocation via Nats on #{topic}")
     {:reply, {:error, :bad_request}}
   end
 
@@ -57,7 +57,7 @@ defmodule Spawn.Cluster.Node.Server do
   defp handle_reply(response, _reply_to) do
     case response do
       {:ok, :async} ->
-        {:reply, :async}
+        {:reply, "async"}
 
       {:ok, response} ->
         {:reply, ActorInvocationResponse.encode(response)}

@@ -83,6 +83,9 @@ defmodule SpawnOperator.K8s.Proxy.CM.Configmap do
 
     # Optional. Default "60"
     spawn-eigr-io/sidecar-state-handoff-sync-interval: "60"
+
+    # Optional. Default "persistent"
+    spawn-eigr-io/supervisors-state-handoff-controller: "persistent"
   """
   @impl true
   def manifest(resource, _opts \\ []), do: gen_configmap(resource)
@@ -131,7 +134,9 @@ defmodule SpawnOperator.K8s.Proxy.CM.Configmap do
         "SPAWN_CRDT_SYNC_INTERVAL" => annotations.sync_interval,
         "SPAWN_CRDT_SHIP_INTERVAL" => annotations.ship_interval,
         "SPAWN_CRDT_SHIP_DEBOUNCE" => annotations.ship_debounce,
-        "SPAWN_STATE_HANDOFF_SYNC_INTERVAL" => annotations.neighbours_sync_interval
+        "SPAWN_STATE_HANDOFF_SYNC_INTERVAL" => annotations.neighbours_sync_interval,
+        "SPAWN_SUPERVISORS_STATE_HANDOFF_CONTROLLER" =>
+          annotations.supervisors_state_handoff_controller
       }
     }
   end

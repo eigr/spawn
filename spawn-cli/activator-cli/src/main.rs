@@ -45,11 +45,20 @@ async fn main() -> Result<(), async_nats::Error> {
 
     let bytes = Bytes::from(buffer);
 
-    let topic = format!("spawn.{:}.actors.actions", system.clone()).into();
-    let headers = async_nats::HeaderMap::new();
-    nc.publish_with_headers(topic, headers, bytes).await?;
+    let topic: String = format!("spawn.{:}.actors.actions", system.clone()).into();
+    println!("Topic -> {:?}", topic);
 
-    println!("Published {:?}", request);
+    let headers = async_nats::HeaderMap::new();
+
+    match nc.request_with_headers(topic, headers, bytes).await {
+        Ok(response) => {
+            println!("Requested -> {:?}", request);
+            println!("Got response -> {:?}", response.payload);
+        }
+        Err(err) => {
+            println!("Request Error -> {:?}", err);
+        }
+    }
 
     Ok(())
 }
