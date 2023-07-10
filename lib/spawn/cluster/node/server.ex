@@ -18,7 +18,7 @@ defmodule Spawn.Cluster.Node.Server do
   end
 
   def request(%{topic: topic, body: _, reply_to: _reply_to} = _req) do
-    Logger.info("Received Invalid Actor Invocation via Nats on #{topic}")
+    Logger.warning("Received Invalid Actor Invocation via Nats on #{topic}")
     {:reply, {:error, :bad_request}}
   end
 
