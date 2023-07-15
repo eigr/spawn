@@ -34,9 +34,9 @@ defmodule Spawn.Cluster.StateHandoff.Controllers.PersistentController do
   def clean(node, data), do: handle_terminate(node, data)
 
   @impl true
-  @spec get_by_id(id(), node(), data()) :: {new_data(), hosts()}
-  @decorate cacheable(cache: Cache, keys: [id, node], opts: [ttl: @ttl])
-  def get_by_id(id, _node, %{backend_adapter: backend} = data) do
+  @spec get_by_id(id(), data()) :: {new_data(), hosts()}
+  @decorate cacheable(cache: Cache, keys: [id], opts: [ttl: @ttl])
+  def get_by_id(id, %{backend_adapter: backend} = data) do
     {:ok, lookups} = backend.get_by_id(id)
 
     hosts =

@@ -72,8 +72,8 @@ defmodule Spawn.Cluster.StateHandoff.Controllers.CrdtController do
   end
 
   @impl true
-  @spec get_by_id(id(), node(), data()) :: {new_data(), hosts()}
-  def get_by_id(id, _node, %{crdt_pid: _crdt_pid} = data) do
+  @spec get_by_id(id(), data()) :: {new_data(), hosts()}
+  def get_by_id(id, %{crdt_pid: _crdt_pid} = data) do
     key = generate_key(id)
 
     hosts =
