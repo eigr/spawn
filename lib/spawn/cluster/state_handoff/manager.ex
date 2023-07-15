@@ -133,7 +133,8 @@ defmodule Spawn.Cluster.StateHandoff.Manager do
   @doc """
   Pickup the stored entity data for a actor
   """
-  def get(actor_id), do: GenServer.call(__MODULE__, {:get_actor_hosts_by_actor_id, actor_id})
+  def get(actor_id),
+    do: GenServer.call(__MODULE__, {:get_actor_hosts_by_actor_id, actor_id}, :infinity)
 
   @doc """
   Cluster HostActor cleanup
