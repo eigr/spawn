@@ -10,18 +10,18 @@ Logger.info("Running Non Parallel Invoke - 5s")
 
 Benchee.run(
   %{
-    "Non Parallel Stateful Singleton Actor                  - Get State   " => fn ->
+    "Non Parallel Actor       - Get State   " => fn ->
       invok_get_state()
     end,
-    "Non Parallel Stateful Singleton Actor                  - Update State" => fn ->
+    "Non Parallel Actor       - Update State" => fn ->
       invoke_update_state()
     end,
-    "Async Non Parallel Stateful Singleton Actor            - Update State" => fn ->
+    "Async Non Parallel Actor - Update State" => fn ->
       async_invoke_update_state()
     end,
-    "Non Parallel Stateful Abstract Spawn and Invoke Actor  - Update State" => fn ->
-      spawn_and_invoke()
-    end
+    # "Non Parallel Abstract Spawn and Invoke Actor  - Update State" => fn ->
+    #   spawn_and_invoke()
+    # end
     # "Non Parallel Stateless Pooled Actor                    - Call Action " => fn ->
     #   spawn_invoke_pooled_actors()
     # end
