@@ -28,7 +28,7 @@ defmodule Spawn.Cluster.StateHandoff.ControllerBehaviour do
   In case `id` is the hash of the ActorId but here the struct ActorId is passed as a parameter.
   An implementations must handle this.
   """
-  @callback get_by_id(id(), node(), data()) :: {new_data(), hosts()}
+  @callback get_by_id(id(), data()) :: {new_data(), hosts()}
 
   @doc """
   Any initialization code required by implementations of this behavior.

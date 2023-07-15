@@ -90,14 +90,18 @@ defmodule SpawnSdk.System.SpawnSystem do
   @doc "hey"
   def invoke(actor_name, invoke_opts \\ []) do
     system = Keyword.get(invoke_opts, :system)
-    command = Keyword.get(invoke_opts, :action)
-    payload = Keyword.get(invoke_opts, :data)
+    command = invoke_opts |> Keyword.get(:action, Keyword.get(invoke_opts, :command))
+    payload = invoke_opts |> Keyword.get(:payload, Keyword.get(invoke_opts, :data))
     async = Keyword.get(invoke_opts, :async, false)
     pooled = Keyword.get(invoke_opts, :pooled, false)
     metadata = Keyword.get(invoke_opts, :metadata, %{})
     actor_reference = Keyword.get(invoke_opts, :ref)
     scheduled_to = Keyword.get(invoke_opts, :scheduled_to)
     delay_in_ms = Keyword.get(invoke_opts, :delay, nil)
+
+    if is_nil(command) do
+      raise "You have to specify an action"
+    end
 
     if actor_reference do
       spawn_actor(actor_name, system: system, actor: actor_reference)
