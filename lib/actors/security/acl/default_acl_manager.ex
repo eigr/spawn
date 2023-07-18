@@ -22,8 +22,27 @@ defmodule Actors.Security.Acl.DefaultAclManager do
   end
 
   @impl true
-  def is_authorized?(%Policy{} = _policy, _invocation) do
+  def is_authorized?(policies, invocation) do
+    Enum.any?(policies, fn policy -> evaluate(policy, invocation) end)
+  end
+
+  defp evaluate(_policy, _invocation) do
     true
+  end
+
+  defp get_file_name(file) do
+    Path.basename(file)
+    |> String.replace(".policy", "")
+    |> String.trim()
+  end
+
+  defp update_policies(path, policies) do
+    if policies == %{} do
+      policies = load_policies(path)
+      {policies, policies}
+    else
+      {policies, policies}
+    end
   end
 
   def load_policies(base_policies_path) do
@@ -69,21 +88,6 @@ defmodule Actors.Security.Acl.DefaultAclManager do
       |> Enum.into(%{})
     else
       %{}
-    end
-  end
-
-  defp get_file_name(file) do
-    Path.basename(file)
-    |> String.replace(".policy", "")
-    |> String.trim()
-  end
-
-  defp update_policies(path, policies) do
-    if policies == %{} do
-      policies = load_policies(path)
-      {policies, policies}
-    else
-      {policies, policies}
     end
   end
 end
