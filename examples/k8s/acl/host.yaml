@@ -32,8 +32,6 @@ spec:
             type: allow
             fromActorSystems: # lista dos ActorSystem com permissao. Permitiria regras do tipo "*" também
               - "spawn-system"
-            fromActorHosts:
-              - "*"
             actions:
               - "get"
               - "sum"
