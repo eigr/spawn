@@ -8,6 +8,8 @@ defmodule Actors.Security.Acl do
   @type invocation :: InvocationRequest.t()
   @type policies :: list(AclPolicy.t())
 
+  @callback get_policies!() :: policies()
+
   @callback load_acl_policies(base_policies_path()) :: policies()
 
   @callback is_authorized?(policies(), invocation()) :: boolean()

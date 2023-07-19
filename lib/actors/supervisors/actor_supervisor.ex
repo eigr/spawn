@@ -3,7 +3,7 @@ defmodule Actors.Supervisors.ActorSupervisor do
   use Supervisor
   require Logger
 
-  @acl_manager Application.get_env(:spawn, :acl_manager)
+  @acl_manager Application.compile_env(:spawn, :acl_manager)
   @base_app_dir File.cwd!
 
   def start_link(config) do

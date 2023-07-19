@@ -23,6 +23,9 @@ defmodule Actors.Security.Acl.DefaultAclManager do
   end
 
   @impl true
+  def get_policies!(), do: Agent.get(__MODULE__, fn policies -> policies end)
+
+  @impl true
   def is_authorized?(policies, invocation) do
     Enum.any?(policies, fn policy -> evaluate(policy, invocation) end)
   end
