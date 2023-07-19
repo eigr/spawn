@@ -5,13 +5,35 @@ defmodule Actors.Security.Acl.Rules.AclEvaluator do
   """
   alias Actors.Security.Acl.Policy
 
-  alias Eigr.Functions.Protocol.InvocationRequest
-
   alias Eigr.Functions.Protocol.Actors.{
     Actor,
     ActorId
   }
 
+  alias Eigr.Functions.Protocol.InvocationRequest
+
+  @doc """
+  Applies a policy on a request by evaluating whether the request should pass or not.
+
+  ## Example
+
+      iex> Actors.Security.Acl.Rules.AclEvaluator.eval(
+      ...> %Actors.Security.Acl.Policy{
+      ...>   name: "the-police",
+      ...>   type: :allow,
+      ...>   actors: ["*"],
+      ...>   actions: ["get"],
+      ...>   actor_systems: ["*"]
+      ...> },
+      ...> %Eigr.Functions.Protocol.InvocationRequest{
+      ...>    actor: %Eigr.Functions.Protocol.Actors.Actor{id: %Eigr.Functions.Protocol.Actors.ActorId{name: "joe"}},
+      ...>    command_name: "get",
+      ...>    caller: %Eigr.Functions.Protocol.Actors.ActorId{name: "robert", system: "actor-system"}
+      ...> }
+      ...> )
+      true
+  """
+  @spec eval(Policy.t(), InvocationRequest.t(), Keyword.t()) :: boolean()
   def eval(policy, invocation, opts \\ [])
 
   def eval(

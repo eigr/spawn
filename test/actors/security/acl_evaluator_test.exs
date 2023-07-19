@@ -1,5 +1,6 @@
 defmodule Actors.AclEvaluatorTest do
   use ExUnit.Case, async: true
+  doctest Actors.Security.Acl.Rules.AclEvaluator
 
   alias Actors.Security.Acl.Rules.AclEvaluator
   alias Actors.Security.Acl.Policy
