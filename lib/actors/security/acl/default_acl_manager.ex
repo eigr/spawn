@@ -83,6 +83,7 @@ defmodule Actors.Security.Acl.DefaultAclManager do
             :type ->
               List.first(value)
               |> String.replace("\n", "")
+              |> String.replace("\"", "")
               |> String.trim()
               |> String.downcase()
               |> to_existing_atom_or_new()

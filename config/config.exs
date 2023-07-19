@@ -47,6 +47,9 @@ config :opentelemetry,
          exporter: {:opentelemetry_exporter, %{endpoints: [{:http, 'localhost', 55681, []}]}}
        }
 
+config :spawn,
+  acl_manager: Actors.Security.Acl.DefaultAclManager
+
 config :spawn, Spawn.Cache.LookupCache,
   backend: :shards,
   partitions: System.schedulers_online(),

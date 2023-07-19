@@ -3,6 +3,9 @@ defmodule Actors.Supervisors.ActorSupervisor do
   use Supervisor
   require Logger
 
+  @acl_manager Application.get_env(:spawn, :acl_manager)
+  @base_app_dir File.cwd!
+
   def start_link(config) do
     Supervisor.start_link(__MODULE__, config, name: __MODULE__)
   end
@@ -17,6 +20,7 @@ defmodule Actors.Supervisors.ActorSupervisor do
   @impl true
   def init(config) do
     Protobuf.load_extensions()
+    @acl_manager.load_acl_policies("#{@base_app_dir}/policies")
 
     children =
       [
