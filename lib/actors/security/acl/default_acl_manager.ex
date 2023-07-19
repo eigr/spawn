@@ -4,6 +4,7 @@ defmodule Actors.Security.Acl.DefaultAclManager do
   """
   alias Actors.Security.Acl.Policy
 
+  alias Actors.Security.Acl.Rules.AclEvaluator
   import Spawn.Utils.Common, only: [to_existing_atom_or_new: 1]
 
   @behaviour Actors.Security.Acl
@@ -26,15 +27,7 @@ defmodule Actors.Security.Acl.DefaultAclManager do
     Enum.any?(policies, fn policy -> evaluate(policy, invocation) end)
   end
 
-  defp evaluate(_policy, _invocation) do
-    true
-  end
-
-  defp get_file_name(file) do
-    Path.basename(file)
-    |> String.replace(".policy", "")
-    |> String.trim()
-  end
+  defp evaluate(policy, invocation), do: AclEvaluator.eval(policy, invocation)
 
   defp update_policies(path, policies) do
     if policies == %{} do
@@ -45,7 +38,7 @@ defmodule Actors.Security.Acl.DefaultAclManager do
     end
   end
 
-  def load_policies(base_policies_path) do
+  defp load_policies(base_policies_path) do
     Path.wildcard("#{base_policies_path}/*.policy")
     |> Enum.map(fn file -> {file, from_file_to_map(file)} end)
     |> Enum.map(fn {file, data} ->
@@ -57,6 +50,12 @@ defmodule Actors.Security.Acl.DefaultAclManager do
         actor_systems: Map.get(data, :actor_systems, ["*"])
       }
     end)
+  end
+
+  defp get_file_name(file) do
+    Path.basename(file)
+    |> String.replace(".policy", "")
+    |> String.trim()
   end
 
   defp from_file_to_map(path) do
