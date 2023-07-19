@@ -39,17 +39,30 @@ defmodule Actors.Security.Acl.DefaultAclManager do
   end
 
   defp load_policies(base_policies_path) do
-    Path.wildcard("#{base_policies_path}/*.policy")
-    |> Enum.map(fn file -> {file, from_file_to_map(file)} end)
-    |> Enum.map(fn {file, data} ->
-      %Policy{
-        name: get_file_name(file),
-        type: Map.get(data, :type, :allow),
-        actors: Map.get(data, :actors, ["*"]),
-        actions: Map.get(data, :actions, ["*"]),
-        actor_systems: Map.get(data, :actor_systems, ["*"])
-      }
-    end)
+    policies =
+      Path.wildcard("#{base_policies_path}/*.policy")
+      |> Enum.map(fn file -> {file, from_file_to_map(file)} end)
+      |> Enum.map(fn {file, data} ->
+        %Policy{
+          name: get_file_name(file),
+          type: Map.get(data, :type, :allow),
+          actors: Map.get(data, :actors, ["*"]),
+          actions: Map.get(data, :actions, ["*"]),
+          actor_systems: Map.get(data, :actor_systems, ["*"])
+        }
+      end)
+
+    if length(policies) > 0, do: policies, else: [get_default_policy()]
+  end
+
+  defp get_default_policy() do
+    %Policy{
+      name: "default",
+      type: :allow,
+      actors: ["*"],
+      actions: ["*"],
+      actor_systems: ["*"]
+    }
   end
 
   defp get_file_name(file) do
