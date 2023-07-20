@@ -22,7 +22,10 @@ defmodule Proxy.Application do
 
     case reply do
       {:ok, pid} ->
-        Logger.info("Proxy Application started successfully in #{humanized_duration}")
+        Logger.info(
+          "Proxy Application started successfully in #{humanized_duration}. Running with #{inspect(System.schedulers_online())} schedulers."
+        )
+
         {:ok, pid}
 
       failure ->
