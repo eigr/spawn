@@ -5,13 +5,8 @@ metadata:
   name: spawn-springboot-example # Mandatory. Name of the Node containing Actor Host Functions
   namespace: default # Optional. Default namespace is "default"
   annotations:
-    # Mandatory. Name of the ActorSystem declared in ActorSystem CRD
     spawn-eigr.io/actor-system: spawn-system
-
-    # Optional. Default 9001
     spawn-eigr.io/sidecar-http-port: "9001"
-
-    # Optional. Here I`m using Nats Broker without authentication
     spawn-eigr.io/sidecar-pubsub-adapter: "nats"
     spawn-eigr.io/sidecar-pubsub-nats-hosts: "nats://spawn-nats:4222"
     spawn-eigr.io/sidecar-image-tag: "docker.io/eigr/spawn-proxy:1.0.0-rc3-rc1"
@@ -30,7 +25,7 @@ spec:
             actors:
               - "*"
             type: allow
-            fromActorSystems: # lista dos ActorSystem com permissao. Permitiria regras do tipo "*" também
+            fromActorSystems:
               - "spawn-system"
             actions:
               - "get"

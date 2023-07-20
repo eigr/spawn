@@ -1,0 +1,61 @@
+# Basic Authentication
+#
+# This example shows how to add authentication in a Actors rule
+# using a secret that contains a username and password.
+#
+# Then convert htpasswd file into a secret:
+# $ kubectl -n default create secret generic basic-auth --from-literal=username=joe --from-literal=password=123456 --type kubernetes.io/basic-auth
+# secret "basic-auth" created
+#
+# Examine secret:
+# $ kubectl -n default get secret basic-auth -o yaml
+# apiVersion: v1
+# data:
+#   password: MTIzNDU2
+#   username: am9l
+# kind: Secret
+# metadata:
+#   creationTimestamp: "2023-07-20T14:00:31Z"
+#   name: basic-auth
+#   namespace: default
+#   resourceVersion: "3854326"
+#   uid: 4728040c-b388-426b-aaf8-959b14ec5930
+# type: kubernetes.io/basic-auth
+#
+# Now we define our ActorHost informing the secret created above:
+---
+apiVersion: spawn-eigr.io/v1
+kind: ActorHost
+metadata:
+  name: spawn-springboot-example # Mandatory. Name of the Node containing Actor Host Functions
+  namespace: default # Optional. Default namespace is "default"
+  annotations:
+    spawn-eigr.io/actor-system: spawn-system
+    spawn-eigr.io/sidecar-http-port: "9001"
+    spawn-eigr.io/sidecar-pubsub-adapter: "nats"
+    spawn-eigr.io/sidecar-pubsub-nats-hosts: "nats://spawn-nats:4222"
+    spawn-eigr.io/sidecar-image-tag: "docker.io/eigr/spawn-proxy:1.0.0-rc3-rc1"
+spec:
+  autoscaler:
+    max: 3
+  host:
+    image: eigr/spawn-springboot-examples:0.5.3 # Mandatory
+    ports:
+      - name: http
+        containerPort: 8090
+    configuration:
+      authentication:
+        basicAuthenticationFlow:
+          usersCredentialRefs:
+            - basic-auth
+      # accessControlList:
+      #   policies:
+      #     - name: allow-all-from-same-actorsystem
+      #       actors:
+      #         - "*"
+      #       type: allow
+      #       fromActorSystems:
+      #         - "spawn-system"
+      #       actions:
+      #         - "get"
+      #         - "sum"
