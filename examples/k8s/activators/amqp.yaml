@@ -6,16 +6,17 @@ metadata:
   namespace: default # Optional. Default namespace is "default"
 spec:
   activator:
+    kind: deployment # Optional. Default is Deployment. Valid values are [deployment | daemonset]
     type: AMQP
     paramsSecretRef: rabbitmq-connection-secret
     externalConnectorRef: invocation-connection-ref
-  bindings:
     settings:
       backpressure:
         maxDemand: 2
         prefetchCount: 50 # Default to: processorConcurrency * maxDemand
       processorConcurrency: 50
       producerConcurrency: 1
+  bindings:
     sources:
       - name: amqp-source
         queue: test.queue
@@ -25,11 +26,14 @@ spec:
           #channel: my-actors-channel
           actor:
             type: abstract # valid are singleton, abstract, pooled
+            action: setLanguage # Name of an Actor Action to call
             actorId:
               parent: abs_actor # if actors are abstract or pooled then this property is mandatory
               bindWith: amqp-source
               #system: spawn-system
               systemFrom:
+                # Below we use metadataNamingStrategy for map message headers to actor name.
+                # valid entries are: [app_id, user_id, message_id, correlation_id, or any key present on amqp headers key]
                 metadataNamingStrategy:
                   # Example in the Elixir programming language of how to define the actor's system name when sending a message via amqp:
                   #   Below we use app_id to get name of the actorsystem.
@@ -50,5 +54,3 @@ spec:
                   key: "user_id"
                 #suffixWith: -actor
                 #prefixWith: actor-
-            action: setLanguage # Name of an Actor action to call
-
