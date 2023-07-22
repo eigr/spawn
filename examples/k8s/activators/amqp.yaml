@@ -25,11 +25,18 @@ spec:
           #channel: my-actors-channel
           actor:
             type: abstract # valid are singleton, abstract, pooled
-            parent: abs_actor
-            #name: robert # Name of an Actor to send queue event message
-            nameFrom:
-              sourceRef:
-                bindWith: amqp-source
+            actorId:
+              parent: abs_actor # if actors are abstract or pooled then this property is mandatory
+              bindWith: amqp-source
+              #system: spawn-system
+              systemFrom:
+                metadataNamingStrategy:
+                  # Example in the Elixir programming language of how to define the actor's system name when sending a message via amqp:
+                  #   Below we use app_id to get name of the actorsystem.
+                  #   AMQP.Basic.publish(chan, "my_exchange", "my_routing_key", "Hello World!", app_id: "spawn-system")
+                  key: "app_id"
+              #name: robert # Name of an Actor to send queue event message
+              nameFrom:
                 #queueNamingStrategy:
                 #  queue: test.queue
                 # Below we use metadataNamingStrategy for map message headers to actor name.
