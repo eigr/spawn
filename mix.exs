@@ -80,6 +80,7 @@ defmodule Spawn.MixProject do
       {:retry, "~> 0.17"},
       {:tesla, "~> 1.6"},
       {:k8s, "~> 2.2"},
+      {:k8s_webhoox, "~> 0.2"},
       {:flow, "~> 1.2"},
       {:vapor, "~> 0.10"},
       {:libcluster, "~> 3.3"},

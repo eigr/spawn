@@ -7,6 +7,8 @@ defmodule Statestores.Adapters.SQLite3SnapshotAdapter.Migrations.CreateSnapshots
       id INTEGER PRIMARY KEY,
       actor TEXT,
       system TEXT,
+      status TEXT,
+      node TEXT,
       revision INTEGER DEFAULT 0,
       tags JSON,
       data_type TEXT NOT NULL,

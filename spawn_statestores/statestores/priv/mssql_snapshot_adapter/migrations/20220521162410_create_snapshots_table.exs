@@ -6,6 +6,8 @@ defmodule Statestores.Adapters.MSSQLSnapshotAdapter.Migrations.CreateSnapshotsTa
       add :id, :bigint, primary_key: true
       add :actor, :string
       add :system, :string
+      add :status, :string
+      add :node, :string
       add :revision, :integer
       add :tags, :map
       add :data_type, :string
