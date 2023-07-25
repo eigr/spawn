@@ -4,7 +4,7 @@ defmodule Actors.Supervisors.ActorSupervisor do
   require Logger
 
   @acl_manager Application.compile_env(:spawn, :acl_manager)
-  @base_app_dir File.cwd!
+  @base_app_dir File.cwd!()
 
   def start_link(config) do
     Supervisor.start_link(__MODULE__, config, name: __MODULE__)

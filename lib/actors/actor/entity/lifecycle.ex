@@ -6,8 +6,8 @@ defmodule Actors.Actor.Entity.Lifecycle do
   require Logger
 
   alias Actors.Actor.{Entity.EntityState, Entity.Invocation, StateManager}
+
   alias Actors.Exceptions.NetworkPartitionException
-  alias Actors.Node.NetworkPartitionDetector
 
   alias Eigr.Functions.Protocol.Actors.{
     Actor,
@@ -29,8 +29,8 @@ defmodule Actors.Actor.Entity.Lifecycle do
   @default_snapshot_timeout 2_000
   @default_pubsub_group :actor_channel
   @pubsub Application.compile_env(:spawn, :pubsub_group, @default_pubsub_group)
-  @min_snapshot_threshold 500
-  @timeout_jitter 9000
+  @min_snapshot_threshold 100
+  @timeout_jitter 3000
 
   def init(
         %EntityState{
@@ -49,6 +49,12 @@ defmodule Actors.Actor.Entity.Lifecycle do
         } = state
       ) do
     Process.flag(:trap_exit, true)
+
+    split_brain_detector_mod =
+      Application.get_env(
+        :spawn,
+        :split_brain_detector
+      )
 
     Logger.notice(
       "Activating Actor #{name} with Parent #{parent} in Node #{inspect(Node.self())}. Persistence #{stateful?}."
@@ -77,10 +83,23 @@ defmodule Actors.Actor.Entity.Lifecycle do
     state =
       case maybe_schedule_snapshot_advance(snapshot_strategy) do
         {:ok, timer} ->
-          %EntityState{state | opts: Keyword.merge(state.opts, timer: timer)}
+          %EntityState{
+            state
+            | opts:
+                Keyword.merge(state.opts,
+                  timer: timer,
+                  split_brain_detector: split_brain_detector_mod
+                )
+          }
 
         _ ->
-          state
+          %EntityState{
+            state
+            | opts:
+                Keyword.merge(state.opts,
+                  split_brain_detector: split_brain_detector_mod
+                )
+          }
       end
 
     {:ok, state, {:continue, :load_state}}
@@ -90,7 +109,8 @@ defmodule Actors.Actor.Entity.Lifecycle do
         %EntityState{
           actor:
             %Actor{settings: %ActorSettings{stateful: true}, id: %ActorId{name: name} = id} =
-              actor
+              actor,
+          opts: opts
         } = state
       ) do
     if is_nil(actor.state) or (!is_nil(actor.state) and is_nil(actor.state.state)) do
@@ -103,7 +123,11 @@ defmodule Actors.Actor.Entity.Lifecycle do
 
     case StateManager.load(id) do
       {:ok, current_state, current_revision, status, node} ->
-        with {:ok, :continue} <- NetworkPartitionDetector.check_network_partition(status, node) do
+        split_brain_detector =
+          Keyword.get(opts, :split_brain_detector, Actors.Node.DefaultSplitBrainDetector)
+
+        with {:partition_check, {:ok, :continue}} <-
+               {:partition_check, split_brain_detector.check_network_partition(status, node)} do
           {:noreply,
            %EntityState{
              state

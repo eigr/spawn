@@ -1,10 +1,13 @@
-defmodule Actors.Node.NetworkPartitionDetector do
+defmodule Actors.Node.DefaultSplitBrainDetector do
   @moduledoc false
+  @behaviour Actors.SplitBrainDetector
+
   alias Actors.Exceptions.NetworkPartitionException
 
   @activated_status "ACTIVATED"
   @self Atom.to_string(Node.self())
 
+  @impl true
   def check_network_partition(status, node) do
     if status === @activated_status and node != @self do
       {:error, :network_partition_detected}
@@ -13,6 +16,7 @@ defmodule Actors.Node.NetworkPartitionDetector do
     end
   end
 
+  @impl true
   def check_network_partition!(status, node) do
     if status === @activated_status and node != Atom.to_string(Node.self()) do
       raise NetworkPartitionException

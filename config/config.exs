@@ -50,7 +50,8 @@ config :opentelemetry,
        }
 
 config :spawn,
-  acl_manager: Actors.Security.Acl.DefaultAclManager
+  acl_manager: Actors.Security.Acl.DefaultAclManager,
+  split_brain_detector: Actors.Node.DefaultSplitBrainDetector
 
 config :spawn, Spawn.Cache.LookupCache,
   backend: :shards,
