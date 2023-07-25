@@ -6,7 +6,9 @@ defmodule Proxy.Application do
   alias Actors.Config.Vapor, as: Config
 
   @impl true
-  def start(_type, _args) do
+  def start(type, args), do: do_start(type, arg)
+
+  defp do_start(_type, _arg) do
     [time: _time, humanized_duration: humanized_duration, reply: reply] =
       Timer.tc(fn ->
         config = Config.load(__MODULE__)
