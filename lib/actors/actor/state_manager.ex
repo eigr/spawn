@@ -31,11 +31,18 @@ if Code.ensure_loaded?(Statestores.Supervisor) do
       key = generate_key(actor_id)
 
       case StateStoreManager.load(key) do
-        %Snapshot{revision: rev, tags: tags, data_type: type, data: data} = _event ->
+        %Snapshot{
+          status: status,
+          node: node,
+          revision: rev,
+          tags: tags,
+          data_type: type,
+          data: data
+        } = _event ->
           revision = if is_nil(rev), do: 0, else: rev
 
           {:ok, %ActorState{tags: tags, state: %Google.Protobuf.Any{type_url: type, value: data}},
-           revision}
+           revision, status, node}
 
         _ ->
           {:not_found, %{}, 0}
@@ -45,21 +52,24 @@ if Code.ensure_loaded?(Statestores.Supervisor) do
         {:error, error}
     end
 
-    @spec save(ActorId.t(), Eigr.Functions.Protocol.Actors.ActorState.t(), pos_integer()) ::
+    @spec save(ActorId.t(), Eigr.Functions.Protocol.Actors.ActorState.t(), Keyword.t()) ::
             {:ok, Eigr.Functions.Protocol.Actors.ActorState.t()}
             | {:error, any(), Eigr.Functions.Protocol.Actors.ActorState.t()}
-    def save(_actor_id, nil, _revisions), do: {:ok, nil}
+    def save(_actor_id, nil, _opts), do: {:ok, nil}
 
-    def save(_actor_id, %ActorState{state: actor_state} = _state, _revisions)
+    def save(_actor_id, %ActorState{state: actor_state} = _state, _opts)
         when is_nil(actor_state) or actor_state == %{},
         do: {:ok, actor_state}
 
     def save(
           %ActorId{name: name, system: system} = actor_id,
           %ActorState{tags: tags, state: actor_state} = _state,
-          revisions
+          opts
         ) do
       Logger.debug("Saving state for actor #{name}")
+      revision = Keyword.get(opts, :revision, 0)
+      status = Keyword.get(opts, :status, "ACTIVATED")
+      node = Keyword.get(opts, :node, Atom.to_string(Node.self()))
 
       with bytes_from_state <- Any.encode(actor_state),
            hash <- :crypto.hash(:sha256, bytes_from_state),
@@ -68,7 +78,9 @@ if Code.ensure_loaded?(Statestores.Supervisor) do
           id: key,
           actor: name,
           system: system,
-          revision: revisions,
+          status: status,
+          node: node,
+          revision: revision,
           tags: tags,
           data_type: actor_state.type_url,
           data: actor_state.value
@@ -93,26 +105,28 @@ if Code.ensure_loaded?(Statestores.Supervisor) do
     @spec save_async(
             ActorId.t(),
             Eigr.Functions.Protocol.Actors.ActorState.t(),
-            pos_integer(),
-            integer()
+            Keyword.t()
           ) ::
             {:ok, Eigr.Functions.Protocol.Actors.ActorState.t()}
             | {:error, any(), Eigr.Functions.Protocol.Actors.ActorState.t()}
-    def save_async(actor_id, state, revision, timeout \\ 5000)
+    def save_async(actor_id, state, opts \\ [])
 
-    def save_async(_actor_id, nil, _revision, _timeout), do: {:ok, %{}}
+    def save_async(_actor_id, nil, _opts), do: {:ok, %{}}
 
-    def save_async(_actor_id, %ActorState{state: actor_state} = _state, _revision, _timeout)
+    def save_async(_actor_id, %ActorState{state: actor_state} = _state, _opts)
         when is_nil(actor_state) or actor_state == %{},
         do: {:ok, actor_state}
 
     def save_async(
           %ActorId{name: name, system: system} = actor_id,
           %ActorState{tags: tags, state: actor_state} = _state,
-          revision,
-          timeout
+          opts
         ) do
       parent = self()
+      revision = Keyword.get(opts, :revision, 0)
+      timeout = Keyword.get(opts, :timeout, 5000)
+      status = Keyword.get(opts, :status, "ACTIVATED")
+      node = Keyword.get(opts, :node, Atom.to_string(Node.self()))
 
       persist_data_task =
         Task.async(fn ->
@@ -123,6 +137,8 @@ if Code.ensure_loaded?(Statestores.Supervisor) do
             id: key,
             actor: name,
             system: system,
+            status: status,
+            node: node,
             revision: revision,
             tags: tags,
             data_type: actor_state.type_url,

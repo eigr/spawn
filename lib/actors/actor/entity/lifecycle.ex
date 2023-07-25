@@ -6,6 +6,8 @@ defmodule Actors.Actor.Entity.Lifecycle do
   require Logger
 
   alias Actors.Actor.{Entity.EntityState, Entity.Invocation, StateManager}
+  alias Actors.Exceptions.NetworkPartitionException
+  alias Actors.Node.NetworkPartitionDetector
 
   alias Eigr.Functions.Protocol.Actors.{
     Actor,
@@ -22,6 +24,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
 
   alias Sidecar.Measurements
 
+  @deactivated_status "DEACTIVATED"
   @default_deactivate_timeout 10_000
   @default_snapshot_timeout 2_000
   @default_pubsub_group :actor_channel
@@ -99,13 +102,22 @@ defmodule Actors.Actor.Entity.Lifecycle do
     |> Logger.debug()
 
     case StateManager.load(id) do
-      {:ok, current_state, current_revision} ->
-        {:noreply,
-         %EntityState{
-           state
-           | actor: %Actor{actor | state: current_state},
-             revisions: current_revision
-         }, {:continue, :call_init_action}}
+      {:ok, current_state, current_revision, status, node} ->
+        with {:ok, :continue} <- NetworkPartitionDetector.check_network_partition(status, node) do
+          {:noreply,
+           %EntityState{
+             state
+             | actor: %Actor{actor | state: current_state},
+               revisions: current_revision
+           }, {:continue, :call_init_action}}
+        else
+          {:error, :network_partition_detected} ->
+            Logger.warning(
+              "We have detected a possible network partition issue and therefore this actor will not start"
+            )
+
+            raise NetworkPartitionException
+        end
 
       {:not_found, %{}, _current_revision} ->
         Logger.debug("Not found state on statestore for Actor #{name}.")
@@ -128,7 +140,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
           } = actor
       }) do
     if is_actor_valid?(actor) do
-      StateManager.save(id, actor_state, revisions)
+      StateManager.save(id, actor_state, revision: revisions, status: @deactivated_status)
     end
 
     Logger.debug("Terminating actor #{name} with reason #{inspect(reason)}")
@@ -196,7 +208,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
         revision = revisions + 1
 
         # Execute with timeout equals timeout strategy - 1 to avoid mailbox congestions
-        case StateManager.save_async(id, actor_state, revision, timeout - 1) do
+        case StateManager.save_async(id, actor_state, revision: revision, timeout: timeout - 1) do
           {:ok, _, hash} ->
             %{state | state_hash: hash, revisions: revision}
 
