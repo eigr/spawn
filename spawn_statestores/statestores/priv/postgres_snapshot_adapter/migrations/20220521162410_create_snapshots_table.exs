@@ -13,9 +13,9 @@ defmodule Statestores.Adapters.PostgresSnapshotAdapter.Migrations.CreateSnapshot
       add :data_type, :string
       add :data, :binary
       timestamps([type: :utc_datetime_usec])
-
-      create index(:snapshots, [:status])
     end
+
+    create index(:snapshots, [:status])
   end
 
   def down do

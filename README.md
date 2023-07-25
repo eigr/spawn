@@ -4,9 +4,11 @@
 
 **Actor Mesh Serverless Platform**
 
-![ci](https://github.com/eigr/spawn/actions/workflows/ci.yaml/badge.svg) ![release](https://github.com/eigr/spawn/actions/workflows/release.yaml/badge.svg) ![last commit](https://img.shields.io/github/last-commit/eigr/spawn?style=social)
 
-### **[Website](https://eigr.io)** • **[Getting Started](#getting-started)** • **[SDKs](#sdks)** • **[Documentation](https://eigr.io/docs/projects-spawn/spawn-introduction/)** • **[Blog](https://eigr.io/blog/)** • **[Twitter](https://twitter.com/eigr_io)** • **[Discord](https://discord.gg/2PcshvfS93)**
+![ci](https://github.com/eigr/spawn/actions/workflows/ci.yaml/badge.svg) ![release](https://github.com/eigr/spawn/actions/workflows/release.yaml/badge.svg) ![last commit](https://img.shields.io/github/last-commit/eigr/spawn?style=social) [![join discord](https://badgen.net/badge/discord/Join%20Eigr%20on%20Discord/discord?icon=discord&label&color=blue)](https://discord.gg/2PcshvfS93) [![twitter](https://badgen.net/badge/twitter/Follow%20Eigr%20on%20Twitter/discord?icon=twitter&label&color=blue)](https://discord.gg/2PcshvfS93)
+
+
+### **[Website](https://eigr.io)** • **[Getting Started](#getting-started)** • **[SDKs](#sdks)** • **[Documentation](https://eigr.io/docs/projects-spawn/spawn-introduction/)** • **[Blog](https://eigr.io/blog/)** 
 
 ## Overview
 
