@@ -22,7 +22,7 @@ defmodule Actors.Security.Tls.Initializer do
 
   require Logger
 
-  @spec bootstrap_tls(atom(), binary()) :: :ok
+  @spec bootstrap_tls(atom(), binary(), binary(), binary(), binary()) :: :ok
   def bootstrap_tls(env, secret_name, service_namespace, service_name, secret_namespace) do
     Application.ensure_all_started(:k8s)
     conn = K8sConn.get!(env)
