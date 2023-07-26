@@ -110,10 +110,21 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
           "spec" =>
             %{
               "affinity" => Map.get(host_params, "antiAffinity", build_anti_affinity(name)),
-              "containers" => get_containers(embedded, system, name, host_params, annotations)
+              "containers" => get_containers(embedded, system, name, host_params, annotations),
+              "initContainers" => [
+                %{
+                  "name" => "init-certificates",
+                  "image" => "#{annotations.proxy_image_tag}",
+                  "args" => [
+                    "eval",
+                    ~s|Actors.Security.Tls.Initializer.bootstrap_tls(:prod, "tls-certs", "#{ns}", "#{system}", "#{ns}")|
+                  ]
+                }
+              ]
             }
             |> maybe_put_volumes(params)
             |> maybe_set_termination_period(params)
+            |> IO.inspect()
         }
       }
     }
@@ -287,16 +298,35 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
   end
 
   defp maybe_put_volumes(spec, %{"volumes" => volumes}) do
-    Map.put(spec, "volumes", volumes)
+    volumes =
+      volumes ++
+        [
+          %{
+            "name" => "certs",
+            "secret" => %{"secretName" => "tls-certs", "optional" => true}
+          }
+        ]
+
+    Map.replace!(spec, "volumes", volumes)
   end
 
-  defp maybe_put_volumes(spec, _), do: spec
+  defp maybe_put_volumes(spec, _) do
+    Map.put(spec, "volumes", [
+      %{
+        "name" => "certs",
+        "secret" => %{"secretName" => "tls-certs", "optional" => true}
+      }
+    ])
+  end
 
   defp maybe_put_volume_mounts_to_host_container(spec, %{"volumeMounts" => volumeMounts}) do
-    Map.put(spec, "volumeMounts", volumeMounts)
+    volumeMounts = volumeMounts ++ [%{"name" => "certs", "mountPath" => "/app/certs"}]
+    Map.replace!(spec, "volumeMounts", volumeMounts)
   end
 
-  defp maybe_put_volume_mounts_to_host_container(spec, _), do: spec
+  defp maybe_put_volume_mounts_to_host_container(spec, _) do
+    Map.put(spec, "volumeMounts", [%{"name" => "certs", "mountPath" => "/app/certs"}])
+  end
 
   defp maybe_warn_wrong_volumes(params, host_params) do
     volumes = Map.get(params, "volumes", [])

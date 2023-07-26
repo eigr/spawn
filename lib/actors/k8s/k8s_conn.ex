@@ -22,7 +22,7 @@ defmodule Actors.K8s.K8sConn do
     conn
   end
 
-  def get!(_) do
+  def get!(:prod) do
     kubeconfig = System.get_env("KUBECONFIG")
 
     {:ok, conn} =
@@ -33,5 +33,13 @@ defmodule Actors.K8s.K8sConn do
       end
 
     conn
+  end
+
+  def get(_) do
+    K8s.Conn.from_service_account()
+    |> then(fn
+      {:ok, conn} -> conn
+      other -> other
+    end)
   end
 end

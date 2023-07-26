@@ -31,7 +31,7 @@ ENV RELEASE_NAME="proxy"
 # This will be the full nodename
 ENV RELEASE_NODE="${RELEASE_NAME}@${POD_IP}"
 
-RUN echo "-setcookie ${NODE_COOKIE}" >> ./rel/vm.args.eex
+#RUN echo "-setcookie ${NODE_COOKIE}" >> ./priv/rel/vm.args.eex
 
 RUN cd spawn_proxy/proxy \
     && mix deps.get \
@@ -49,6 +49,7 @@ RUN chown nobody /app
 ENV MIX_ENV=prod
 ENV HOME=/app
 
+COPY priv/rel/overlays/mtls.ssl.conf .
 COPY --from=builder --chown=nobody:root /app/_build/${MIX_ENV}/rel/bakeware/ ./
 
 RUN mkdir -p /app/.cache/bakeware/ && chmod 777 /app/.cache/bakeware/

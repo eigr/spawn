@@ -6,11 +6,13 @@ defmodule Proxy.Application do
   alias Actors.Config.Vapor, as: Config
 
   @impl true
-  def start(type, args), do: do_start(type, arg)
+  def start(type, args), do: do_start(type, args)
 
-  defp do_start(_type, _arg) do
+  defp do_start(_type, _args) do
     [time: _time, humanized_duration: humanized_duration, reply: reply] =
       Timer.tc(fn ->
+        Node.set_cookie(String.to_atom(System.get_env("NODE_COOKIE", "spawncookie123")))
+
         config = Config.load(__MODULE__)
 
         children = [

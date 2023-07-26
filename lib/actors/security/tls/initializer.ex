@@ -17,7 +17,6 @@ defmodule Actors.Security.Tls.Initializer do
         secretName: tls-certs
   ```
   """
-
   alias Actors.K8s.K8sConn
 
   require Logger
@@ -37,6 +36,7 @@ defmodule Actors.Security.Tls.Initializer do
               secret_name
             )} do
       Logger.info("TLS Bootstrap completed.")
+      {:ok, ca_bundle}
     else
       error ->
         Logger.error("TLS Bootstrap failed: #{inspect(error)}")
