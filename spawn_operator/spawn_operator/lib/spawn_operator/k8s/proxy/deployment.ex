@@ -91,8 +91,8 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
         "strategy" => %{
           "type" => "RollingUpdate",
           "rollingUpdate" => %{
-            "maxSurge" => 0,
-            "maxUnavailable" => "20%"
+            "maxSurge" => "50%",
+            "maxUnavailable" => 0
           }
         },
         "template" => %{
@@ -114,13 +114,22 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
               "initContainers" => [
                 %{
                   "name" => "init-certificates",
-                  "image" => "#{annotations.proxy_image_tag}",
+                  "image" => "docker.io/eigr/spawn-initializer:1.0.0-rc13",
                   "args" => [
-                    "eval",
-                    ~s|Actors.Security.Tls.Initializer.bootstrap_tls(:prod, "tls-certs", "#{ns}", "#{system}", "#{ns}")|
+                    "--environment",
+                    :prod,
+                    "--secret",
+                    "tls-certs",
+                    "--namespace",
+                    "#{ns}",
+                    "--service",
+                    "#{system}",
+                    "--to",
+                    "#{ns}"
                   ]
                 }
-              ]
+              ],
+              "serviceAccountName" => "#{system}-sa"
             }
             |> maybe_put_volumes(params)
             |> maybe_set_termination_period(params)
@@ -218,48 +227,51 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
       %{"containerPort" => proxy_http_port, "name" => "proxy-http"}
     ]
 
-    proxy_container = %{
-      "name" => "spawn-sidecar",
-      "image" => "#{annotations.proxy_image_tag}",
-      "env" => @default_actor_host_function_env,
-      "ports" => proxy_actor_host_function_ports,
-      "livenessProbe" => %{
-        "failureThreshold" => 10,
-        "httpGet" => %{
-          "path" => "/health/liveness",
-          "port" => proxy_http_port,
-          "scheme" => "HTTP"
+    proxy_container =
+      %{
+        "name" => "spawn-sidecar",
+        "image" => "#{annotations.proxy_image_tag}",
+        "imagePullPolicy" => "Always",
+        "env" => @default_actor_host_function_env,
+        "ports" => proxy_actor_host_function_ports,
+        "livenessProbe" => %{
+          "failureThreshold" => 10,
+          "httpGet" => %{
+            "path" => "/health/liveness",
+            "port" => proxy_http_port,
+            "scheme" => "HTTP"
+          },
+          "initialDelaySeconds" => 5,
+          "periodSeconds" => 60,
+          "successThreshold" => 1,
+          "timeoutSeconds" => 30
         },
-        "initialDelaySeconds" => 5,
-        "periodSeconds" => 60,
-        "successThreshold" => 1,
-        "timeoutSeconds" => 30
-      },
-      "readinessProbe" => %{
-        "httpGet" => %{
-          "path" => "/health/readiness",
-          "port" => proxy_http_port,
-          "scheme" => "HTTP"
+        "readinessProbe" => %{
+          "httpGet" => %{
+            "path" => "/health/readiness",
+            "port" => proxy_http_port,
+            "scheme" => "HTTP"
+          },
+          "initialDelaySeconds" => 5,
+          "periodSeconds" => 5,
+          "successThreshold" => 1,
+          "timeoutSeconds" => 5
         },
-        "initialDelaySeconds" => 5,
-        "periodSeconds" => 5,
-        "successThreshold" => 1,
-        "timeoutSeconds" => 5
-      },
-      "resources" => @default_proxy_resources,
-      "envFrom" => [
-        %{
-          "configMapRef" => %{
-            "name" => "#{name}-sidecar-cm"
+        "resources" => @default_proxy_resources,
+        "envFrom" => [
+          %{
+            "configMapRef" => %{
+              "name" => "#{name}-sidecar-cm"
+            }
+          },
+          %{
+            "secretRef" => %{
+              "name" => "#{system}-secret"
+            }
           }
-        },
-        %{
-          "secretRef" => %{
-            "name" => "#{system}-secret"
-          }
-        }
-      ]
-    }
+        ]
+      }
+      |> maybe_put_volume_mounts_to_host_container(host_params)
 
     host_container =
       %{

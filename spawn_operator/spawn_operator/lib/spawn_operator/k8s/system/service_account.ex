@@ -1,10 +1,6 @@
-defmodule SpawnOperator.K8s.System.HeadlessService do
+defmodule SpawnOperator.K8s.System.ServiceAccount do
   @moduledoc false
   @behaviour SpawnOperator.K8s.Manifest
-
-  @ports [
-    %{"name" => "epmd", "protocol" => "TCP", "port" => 4369, "targetPort" => "epmd"}
-  ]
 
   @impl true
   def manifest(
@@ -20,20 +16,15 @@ defmodule SpawnOperator.K8s.System.HeadlessService do
       ) do
     %{
       "apiVersion" => "v1",
-      "kind" => "Service",
+      "kind" => "ServiceAccount",
       "metadata" => %{
         "labels" => %{
-          "svc-cluster-name" => "system-#{name}",
+          "system-name" => "system-#{name}",
           "spawn-eigr.io/controller.version" =>
             "#{to_string(Application.spec(:spawn_operator, :vsn))}"
         },
-        "name" => "system-#{name}",
+        "name" => "#{name}-sa",
         "namespace" => ns
-      },
-      "spec" => %{
-        "clusterIP" => "None",
-        "selector" => %{"actor-system" => name},
-        "ports" => @ports
       }
     }
   end

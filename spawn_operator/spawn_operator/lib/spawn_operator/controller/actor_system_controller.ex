@@ -8,6 +8,8 @@ defmodule SpawnOperator.Controller.ActorSystemController do
 
   def rbac_rules() do
     [
+      to_rbac_rule({"rbac.authorization.k8s.io/v1", "role", "*"}),
+      to_rbac_rule({"v1", "serviceaccount", "*"}),
       to_rbac_rule({"v1", "pods", "*"}),
       to_rbac_rule({"v1", "node", ["get", "list"]}),
       to_rbac_rule({"apps", "deployments", "*"}),

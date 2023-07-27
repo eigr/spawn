@@ -14,11 +14,11 @@ spec:
   bindings:
     sources:
       - name: actor-action-mapping
-        service: "io.eigr.functions.spawn.services.CounterService"
-        typesPackage: "io.eigr.functions.spawn.services"
-        inputType: "Add"
-        outputType: "Result"
+        service: "io.eigr.spawn.example.TestService"
+        typesPackage: "io.eigr.spawn.example"
+        inputType: "Sum"
+        outputType: "MyBusinessMessage"
     sinks:
       - name: actor-sink
         actor: "JoeActor"
-        action: add
+        action: sum
