@@ -28,7 +28,7 @@ defmodule Statestores.Config do
 
     Enum.each(config, fn {key, value} ->
       value_str = if String.contains?(Atom.to_string(key), "secret"), do: "****", else: value
-      Logger.info("[Statestores.Config] Loading config: [#{key}]:[#{value_str}]")
+      Logger.debug("[Statestores.Config] Loading config: [#{key}]:[#{value_str}]")
       Application.put_env(:spawn, key, value, persistent: true)
     end)
 

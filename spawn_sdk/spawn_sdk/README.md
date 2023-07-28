@@ -302,7 +302,6 @@ defmodule SpawnSdkExample.Actors.ForwardPipeActor do
     Logger.info("Received request with #{msg.value}")
 
     Value.of()
-    |> Value.response(MyBusinessMessage.new(value: 999))
     |> Value.forward(
       Forward.to("second_actor", "sum_plus_one")
     )

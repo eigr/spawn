@@ -133,11 +133,11 @@ defmodule Actors.Config.Vapor do
 
     config = Vapor.load!(providers)
 
-    Logger.info("Loading configs")
+    Logger.info("[Proxy.Config] Loading configs")
 
     Enum.each(config, fn {key, value} ->
       value_str = if String.contains?(Atom.to_string(key), "secret"), do: "****", else: value
-      Logger.info("Loading config: [#{key}]:[#{value_str}]")
+      Logger.debug("Loading config: [#{key}]:[#{value_str}]")
 
       if key == :state_handoff_controller_adapter do
         case value do

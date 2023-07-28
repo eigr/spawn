@@ -17,6 +17,8 @@ config :logger,
   backends: [:console],
   truncate: 65536
 
+# level: :info
+
 #  compile_time_purge_matching: [
 #    [level_lower_than: :info]
 #  ]
@@ -46,6 +48,10 @@ config :opentelemetry,
        otel_batch_processor: %{
          exporter: {:opentelemetry_exporter, %{endpoints: [{:http, 'localhost', 55681, []}]}}
        }
+
+config :spawn,
+  acl_manager: Actors.Security.Acl.DefaultAclManager,
+  split_brain_detector: Actors.Node.DefaultSplitBrainDetector
 
 config :spawn, Spawn.Cache.LookupCache,
   backend: :shards,

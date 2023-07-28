@@ -91,8 +91,8 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
         "strategy" => %{
           "type" => "RollingUpdate",
           "rollingUpdate" => %{
-            "maxSurge" => 0,
-            "maxUnavailable" => "20%"
+            "maxSurge" => "50%",
+            "maxUnavailable" => 0
           }
         },
         "template" => %{
@@ -110,10 +110,30 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
           "spec" =>
             %{
               "affinity" => Map.get(host_params, "antiAffinity", build_anti_affinity(name)),
-              "containers" => get_containers(embedded, system, name, host_params, annotations)
+              "containers" => get_containers(embedded, system, name, host_params, annotations),
+              "initContainers" => [
+                %{
+                  "name" => "init-certificates",
+                  "image" => "docker.io/eigr/spawn-initializer:1.0.0-rc13",
+                  "args" => [
+                    "--environment",
+                    :prod,
+                    "--secret",
+                    "tls-certs",
+                    "--namespace",
+                    "#{ns}",
+                    "--service",
+                    "#{system}",
+                    "--to",
+                    "#{ns}"
+                  ]
+                }
+              ],
+              "serviceAccountName" => "#{system}-sa"
             }
             |> maybe_put_volumes(params)
             |> maybe_set_termination_period(params)
+            |> IO.inspect()
         }
       }
     }
@@ -207,48 +227,51 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
       %{"containerPort" => proxy_http_port, "name" => "proxy-http"}
     ]
 
-    proxy_container = %{
-      "name" => "spawn-sidecar",
-      "image" => "#{annotations.proxy_image_tag}",
-      "env" => @default_actor_host_function_env,
-      "ports" => proxy_actor_host_function_ports,
-      "livenessProbe" => %{
-        "failureThreshold" => 10,
-        "httpGet" => %{
-          "path" => "/health/liveness",
-          "port" => proxy_http_port,
-          "scheme" => "HTTP"
+    proxy_container =
+      %{
+        "name" => "spawn-sidecar",
+        "image" => "#{annotations.proxy_image_tag}",
+        "imagePullPolicy" => "Always",
+        "env" => @default_actor_host_function_env,
+        "ports" => proxy_actor_host_function_ports,
+        "livenessProbe" => %{
+          "failureThreshold" => 10,
+          "httpGet" => %{
+            "path" => "/health/liveness",
+            "port" => proxy_http_port,
+            "scheme" => "HTTP"
+          },
+          "initialDelaySeconds" => 5,
+          "periodSeconds" => 60,
+          "successThreshold" => 1,
+          "timeoutSeconds" => 30
         },
-        "initialDelaySeconds" => 5,
-        "periodSeconds" => 60,
-        "successThreshold" => 1,
-        "timeoutSeconds" => 30
-      },
-      "readinessProbe" => %{
-        "httpGet" => %{
-          "path" => "/health/readiness",
-          "port" => proxy_http_port,
-          "scheme" => "HTTP"
+        "readinessProbe" => %{
+          "httpGet" => %{
+            "path" => "/health/readiness",
+            "port" => proxy_http_port,
+            "scheme" => "HTTP"
+          },
+          "initialDelaySeconds" => 5,
+          "periodSeconds" => 5,
+          "successThreshold" => 1,
+          "timeoutSeconds" => 5
         },
-        "initialDelaySeconds" => 5,
-        "periodSeconds" => 5,
-        "successThreshold" => 1,
-        "timeoutSeconds" => 5
-      },
-      "resources" => @default_proxy_resources,
-      "envFrom" => [
-        %{
-          "configMapRef" => %{
-            "name" => "#{name}-sidecar-cm"
+        "resources" => @default_proxy_resources,
+        "envFrom" => [
+          %{
+            "configMapRef" => %{
+              "name" => "#{name}-sidecar-cm"
+            }
+          },
+          %{
+            "secretRef" => %{
+              "name" => "#{system}-secret"
+            }
           }
-        },
-        %{
-          "secretRef" => %{
-            "name" => "#{system}-secret"
-          }
-        }
-      ]
-    }
+        ]
+      }
+      |> maybe_put_volume_mounts_to_host_container(host_params)
 
     host_container =
       %{
@@ -287,16 +310,35 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
   end
 
   defp maybe_put_volumes(spec, %{"volumes" => volumes}) do
-    Map.put(spec, "volumes", volumes)
+    volumes =
+      volumes ++
+        [
+          %{
+            "name" => "certs",
+            "secret" => %{"secretName" => "tls-certs", "optional" => true}
+          }
+        ]
+
+    Map.replace!(spec, "volumes", volumes)
   end
 
-  defp maybe_put_volumes(spec, _), do: spec
+  defp maybe_put_volumes(spec, _) do
+    Map.put(spec, "volumes", [
+      %{
+        "name" => "certs",
+        "secret" => %{"secretName" => "tls-certs", "optional" => true}
+      }
+    ])
+  end
 
   defp maybe_put_volume_mounts_to_host_container(spec, %{"volumeMounts" => volumeMounts}) do
-    Map.put(spec, "volumeMounts", volumeMounts)
+    volumeMounts = volumeMounts ++ [%{"name" => "certs", "mountPath" => "/app/certs"}]
+    Map.replace!(spec, "volumeMounts", volumeMounts)
   end
 
-  defp maybe_put_volume_mounts_to_host_container(spec, _), do: spec
+  defp maybe_put_volume_mounts_to_host_container(spec, _) do
+    Map.put(spec, "volumeMounts", [%{"name" => "certs", "mountPath" => "/app/certs"}])
+  end
 
   defp maybe_warn_wrong_volumes(params, host_params) do
     volumes = Map.get(params, "volumes", [])

@@ -8,12 +8,12 @@ defmodule Actors.Actor.StateManager.Behaviour do
 
   @callback load(String.t()) :: {:ok, term()} | {:not_found, %{}} | {:error, term()}
 
-  @callback save(String.t(), term()) ::
+  @callback save(String.t(), term(), Keyword.t()) ::
               {:ok, term(), String.t()}
               | {:error, term(), term(), term()}
               | {:error, term(), term()}
 
-  @callback save_async(String.t(), term(), integer()) ::
+  @callback save_async(String.t(), term(), Keyword.t()) ::
               {:ok, term(), String.t()}
               | {:error, term(), term(), term()}
               | {:error, term(), term()}

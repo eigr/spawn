@@ -1,6 +1,5 @@
 defmodule SpawnOperator.K8s.System.HeadlessService do
   @moduledoc false
-
   @behaviour SpawnOperator.K8s.Manifest
 
   @ports [

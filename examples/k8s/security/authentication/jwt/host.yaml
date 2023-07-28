@@ -1,0 +1,51 @@
+# JWT Authentication
+#
+---
+apiVersion: spawn-eigr.io/v1
+kind: ActorHost
+metadata:
+  name: spawn-springboot-example # Mandatory. Name of the Node containing Actor Host Functions
+  namespace: default # Optional. Default namespace is "default"
+  annotations:
+    spawn-eigr.io/actor-system: spawn-system
+    spawn-eigr.io/sidecar-http-port: "9001"
+    spawn-eigr.io/sidecar-pubsub-adapter: "nats"
+    spawn-eigr.io/sidecar-pubsub-nats-hosts: "nats://spawn-nats:4222"
+    spawn-eigr.io/sidecar-image-tag: "docker.io/eigr/spawn-proxy:1.0.0-rc3-rc1"
+spec:
+  autoscaler:
+    max: 3
+  host:
+    image: eigr/spawn-springboot-examples:0.5.3 # Mandatory
+    ports:
+      - name: http
+        containerPort: 8090
+    configuration:
+      authentication:
+        jwtAuthenticationFlow:
+          roles:
+            - admin
+            - chat-users
+          validation:
+            enabled: true
+            useOAuthProvider: # This is optional
+              name: keycloak
+              realm: General
+              url: "http://my-oauth2-provider"
+            signer: # Use signer or provider not both
+              # Valid algorithms are:
+              #  All HS, RS, ES, PS signing algorithms.
+              #  All Edwards algorithms (Ed25519, Ed25519ph, Ed448, Ed448ph)
+              algorithm: "RS256"
+              secretKeyRef: my-jwt-secret
+      # accessControlList:
+      #   policies:
+      #     - name: allow-all-from-same-actorsystem
+      #       actors:
+      #         - "*"
+      #       type: allow
+      #       fromActorSystems:
+      #         - "spawn-system"
+      #       actions:
+      #         - "get"
+      #         - "sum"

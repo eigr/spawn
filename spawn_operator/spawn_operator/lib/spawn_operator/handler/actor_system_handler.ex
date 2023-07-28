@@ -30,6 +30,9 @@ defmodule SpawnOperator.Handler.ActorSystemHandler do
   """
   alias SpawnOperator.K8s.System.HeadlessService
   alias SpawnOperator.K8s.System.Secret.ActorSystemSecret
+  alias SpawnOperator.K8s.System.Role
+  alias SpawnOperator.K8s.System.RoleBinding
+  alias SpawnOperator.K8s.System.ServiceAccount
 
   @behaviour Pluggable
 
@@ -42,10 +45,16 @@ defmodule SpawnOperator.Handler.ActorSystemHandler do
 
     cluster_secret = build_system_secret(resource)
     cluster_service = build_system_service(resource)
+    service_account = build_service_account(resource)
+    roles = build_role(resource)
+    role_binding = build_role_binding(resource)
 
     axn
     |> Bonny.Axn.register_descendant(cluster_secret)
     |> Bonny.Axn.register_descendant(cluster_service)
+    |> Bonny.Axn.register_descendant(service_account)
+    |> Bonny.Axn.register_descendant(roles)
+    |> Bonny.Axn.register_descendant(role_binding)
     |> Bonny.Axn.success_event()
   end
 
@@ -62,5 +71,20 @@ defmodule SpawnOperator.Handler.ActorSystemHandler do
   defp build_system_service(resource) do
     SpawnOperator.get_args(resource)
     |> HeadlessService.manifest()
+  end
+
+  defp build_service_account(resource) do
+    SpawnOperator.get_args(resource)
+    |> ServiceAccount.manifest()
+  end
+
+  defp build_role(resource) do
+    SpawnOperator.get_args(resource)
+    |> Role.manifest()
+  end
+
+  defp build_role_binding(resource) do
+    SpawnOperator.get_args(resource)
+    |> RoleBinding.manifest()
   end
 end

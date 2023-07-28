@@ -10,6 +10,7 @@ RUN mkdir config
 COPY config/ ./config
 COPY spawn_proxy/ ./spawn_proxy
 COPY lib/ ./lib
+COPY spawn_statestores/ ./spawn_statestores
 COPY priv/ ./priv
 COPY mix.exs .
 COPY mix.lock .
@@ -17,8 +18,8 @@ COPY mix.lock .
 RUN mix local.rebar --force \
     && mix local.hex --force \
     && mix deps.get \
-    && mix release.init \
-    && mix rewrite_versions --apps=spawn,proxy
+    && mix release.init 
+#&& mix rewrite_versions --apps=spawn,proxy
 
 ENV RELEASE_DISTRIBUTION="name"
 
@@ -31,7 +32,7 @@ ENV RELEASE_NAME="proxy"
 # This will be the full nodename
 ENV RELEASE_NODE="${RELEASE_NAME}@${POD_IP}"
 
-RUN echo "-setcookie ${NODE_COOKIE}" >> ./rel/vm.args.eex
+#RUN echo "-setcookie ${NODE_COOKIE}" >> ./priv/rel/vm.args.eex
 
 RUN cd spawn_proxy/proxy \
     && mix deps.get \
@@ -49,6 +50,7 @@ RUN chown nobody /app
 ENV MIX_ENV=prod
 ENV HOME=/app
 
+COPY rel/overlays/mtls.ssl.conf .
 COPY --from=builder --chown=nobody:root /app/_build/${MIX_ENV}/rel/bakeware/ ./
 
 RUN mkdir -p /app/.cache/bakeware/ && chmod 777 /app/.cache/bakeware/

@@ -19,6 +19,8 @@ defmodule StatestoresMssqlTest.RepoTest do
       id: key,
       system: system,
       actor: actor,
+      status: "ACTIVATED",
+      node: Atom.to_string(Node.self()),
       revision: 0,
       tags: %{},
       data_type: "type.googleapis.com/io.eigr.spawn.example.MyState",
@@ -42,6 +44,8 @@ defmodule StatestoresMssqlTest.RepoTest do
     event = %Snapshot{
       system: "test-system",
       actor: actor,
+      status: "ACTIVATED",
+      node: Atom.to_string(Node.self()),
       revision: 0,
       tags: %{},
       data_type: "type.googleapis.com/io.eigr.spawn.example.MyState",

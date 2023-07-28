@@ -3,22 +3,26 @@ defmodule Statestores.Adapters.MySQLSnapshotAdapter.Migrations.CreateSnapshotsTa
 
   def up do
     create table(:snapshots, primary_key: false) do
-      add :id, :bigint, primary_key: true
-      add :actor, :string
-      add :system, :string
-      add :revision, :integer
-      add :tags, :map
-      add :data_type, :string
-      add :data, :binary
-      timestamps([type: :utc_datetime_usec])
+      add(:id, :bigint, primary_key: true)
+      add(:actor, :string)
+      add(:system, :string)
+      add(:status, :string)
+      add(:node, :string)
+      add(:revision, :integer)
+      add(:tags, :map)
+      add(:data_type, :string)
+      add(:data, :binary)
+      timestamps(type: :utc_datetime_usec)
     end
 
-    execute """
+    create(index(:snapshots, [:status]))
+
+    execute("""
     ALTER TABLE snapshots MODIFY data LONGBLOB;
-    """
+    """)
   end
 
   def down do
-    drop table(:snapshots)
+    drop(table(:snapshots))
   end
 end

@@ -176,7 +176,9 @@ defmodule Actors.Actor.Entity do
       "No handled internal message for actor #{name}. Message: #{inspect(message)}. Actor state: #{inspect(state)}"
     )
 
-    if not is_nil(actor_state), do: StateManager.save(id, actor_state, revisions)
+    # what is the correct status here? For now we will use UNKNOWN
+    if not is_nil(actor_state),
+      do: StateManager.save(id, actor_state, revision: revisions, status: "UNKNOWN")
 
     {:noreply, state, :hibernate}
   end

@@ -7,6 +7,7 @@ defmodule Actors.Actor.Entity.Invocation do
   require OpenTelemetry.Tracer, as: Tracer
 
   alias Actors.Actor.Entity.EntityState
+  alias Actors.Exceptions.NotAuthorizedException
 
   alias Eigr.Functions.Protocol.Actors.{
     Actor,
@@ -33,6 +34,8 @@ defmodule Actors.Actor.Entity.Invocation do
   alias Phoenix.PubSub
 
   alias Spawn.Utils.AnySerializer
+
+  @acl_manager Application.compile_env(:spawn, :acl_manager)
 
   @default_actions [
     "get",
@@ -208,51 +211,57 @@ defmodule Actors.Actor.Entity.Invocation do
           opts: actor_opts
         } = state
       ) do
-    ctx = Keyword.get(opts, :span_ctx, OpenTelemetry.Ctx.new())
+    if @acl_manager.get_policies!()
+       |> @acl_manager.is_authorized?(invocation) do
+      ctx = Keyword.get(opts, :span_ctx, OpenTelemetry.Ctx.new())
 
-    Tracer.with_span ctx, "#{actor_name} invocation handler", kind: :server do
-      if length(commands) <= 0 do
-        Logger.warning("Actor [#{actor_name}] has not registered any Actions")
-      end
+      Tracer.with_span ctx, "#{actor_name} invocation handler", kind: :server do
+        if length(commands) <= 0 do
+          Logger.warning("Actor [#{actor_name}] has not registered any Actions")
+        end
 
-      all_commands =
-        commands ++ Enum.map(timers, fn %FixedTimerCommand{command: cmd} = _timer_cmd -> cmd end)
+        all_commands =
+          commands ++
+            Enum.map(timers, fn %FixedTimerCommand{command: cmd} = _timer_cmd -> cmd end)
 
-      Tracer.set_attributes([
-        {:invoked_command, command},
-        {:actor_declared_commands, length(all_commands)}
-      ])
+        Tracer.set_attributes([
+          {:invoked_command, command},
+          {:actor_declared_commands, length(all_commands)}
+        ])
 
-      case Enum.member?(@default_actions, command) or
-             Enum.any?(all_commands, fn cmd -> cmd.name == command end) do
-        true ->
-          interface = get_interface(actor_opts)
+        case Enum.member?(@default_actions, command) or
+               Enum.any?(all_commands, fn cmd -> cmd.name == command end) do
+          true ->
+            interface = get_interface(actor_opts)
 
-          request = build_request(invocation, actor_state, opts)
+            request = build_request(invocation, actor_state, opts)
 
-          Tracer.with_span "invoke-host" do
-            interface.invoke_host(request, state, @default_actions)
-            |> case do
-              {:ok, response, new_state} ->
-                Tracer.add_event("successful-invocation", [
-                  {:ok, "#{inspect(response.updated_context.metadata)}"}
-                ])
+            Tracer.with_span "invoke-host" do
+              interface.invoke_host(request, state, @default_actions)
+              |> case do
+                {:ok, response, new_state} ->
+                  Tracer.add_event("successful-invocation", [
+                    {:ok, "#{inspect(response.updated_context.metadata)}"}
+                  ])
 
-                build_response(request, response, new_state, opts)
+                  build_response(request, response, new_state, opts)
 
-              {:error, reason, new_state} ->
-                Tracer.add_event("failure-invocation", [
-                  {:error, "#{inspect(reason)}"}
-                ])
+                {:error, reason, new_state} ->
+                  Tracer.add_event("failure-invocation", [
+                    {:error, "#{inspect(reason)}"}
+                  ])
 
-                {:reply, {:error, reason}, new_state, :hibernate}
+                  {:reply, {:error, reason}, new_state, :hibernate}
+              end
             end
-          end
 
-        false ->
-          {:reply, {:error, "Command [#{command}] not found for Actor [#{actor_name}]"}, state,
-           :hibernate}
+          false ->
+            {:reply, {:error, "Command [#{command}] not found for Actor [#{actor_name}]"}, state,
+             :hibernate}
+        end
       end
+    else
+      raise NotAuthorizedException
     end
   end
 

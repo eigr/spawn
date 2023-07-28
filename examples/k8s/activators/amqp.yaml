@@ -6,17 +6,51 @@ metadata:
   namespace: default # Optional. Default namespace is "default"
 spec:
   activator:
+    kind: deployment # Optional. Default is Deployment. Valid values are [deployment | daemonset]
     type: AMQP
     paramsSecretRef: rabbitmq-connection-secret
     externalConnectorRef: invocation-connection-ref
+    settings:
+      backpressure:
+        maxDemand: 2
+        prefetchCount: 50 # Default to: processorConcurrency * maxDemand
+      processorConcurrency: 50
+      producerConcurrency: 1
   bindings:
     sources:
       - name: amqp-source
-        queue: test
+        queue: test.queue
     sinks:
-      - name: robert-sink
-        actor: robert # Name of an Actor to send queue event message
-        command: setLanguage # Name of an Actor method/function to call
-        # instance-id-binding:
-        #   type: header # Possible: none, header, attribute
-        #   name: X-Actor-Instance-Id
+      - name: robert-sink # name of the sink component
+        to: # Send to channel or to actor
+          #channel: my-actors-channel
+          actor:
+            type: abstract # valid are singleton, abstract, pooled
+            action: setLanguage # Name of an Actor Action to call
+            actorId:
+              parent: abs_actor # if actors are abstract or pooled then this property is mandatory
+              bindWith: amqp-source
+              #system: spawn-system
+              systemFrom:
+                # Below we use metadataNamingStrategy for map message headers to actor name.
+                # valid entries are: [app_id, user_id, message_id, correlation_id, or any key present on amqp headers key]
+                metadataNamingStrategy:
+                  # Example in the Elixir programming language of how to define the actor's system name when sending a message via amqp:
+                  #   Below we use app_id to get name of the actorsystem.
+                  #   AMQP.Basic.publish(chan, "my_exchange", "my_routing_key", "Hello World!", app_id: "spawn-system")
+                  key: "app_id"
+              #name: robert # Name of an Actor to send queue event message
+              nameFrom:
+                #queueNamingStrategy:
+                #  queue: test.queue
+                # Below we use metadataNamingStrategy for map message headers to actor name.
+                # valid entries are: [app_id, user_id, message_id, correlation_id, or any key present on amqp headers key]
+                metadataNamingStrategy:
+                  # Example in the Java programming language of how to define the actor's name when sending a message via amqp:
+                  #   Below we use user_id to get name of the actor.
+                  #   AMQP.BasicProperties properties = new AMQP.BasicProperties();
+                  #   properties.setUserId("robert");
+                  #   channel.basicPublish("test.queue", "", properties, "test".getBytes());
+                  key: "user_id"
+                #suffixWith: -actor
+                #prefixWith: actor-

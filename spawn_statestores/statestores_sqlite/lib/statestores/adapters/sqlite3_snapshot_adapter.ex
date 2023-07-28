@@ -16,6 +16,8 @@ defmodule Statestores.Adapters.SQLite3SnapshotAdapter do
         %Snapshot{
           system: system,
           actor: actor,
+          status: status,
+          node: node,
           revision: revision,
           tags: tags,
           data_type: type,
@@ -29,6 +31,8 @@ defmodule Statestores.Adapters.SQLite3SnapshotAdapter do
         set: [
           system: system,
           actor: actor,
+          status: status,
+          node: node,
           revision: revision,
           tags: tags,
           data_type: type,
