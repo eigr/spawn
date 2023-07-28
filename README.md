@@ -133,6 +133,7 @@ In turn, each Sidecar container within a POD organizes itself to form an Erlang 
   - [x] Erlang Distributed as transport.
      - [x] mTLS Support with Erlang Dist.
      - [x] Automatic renewal of certificates.
+  - [x] Cross ActorSystem invocation Nats distribution.   
 - [x] Configuration management via Kubernetes [CRDs](https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definitions/) and Envinronment Variables.
 - [x] Statestores. Adapters for persistent storage using multiple database providers.
   - [x] Sqlite
