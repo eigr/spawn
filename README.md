@@ -131,6 +131,8 @@ In turn, each Sidecar container within a POD organizes itself to form an Erlang 
 
 - [x] Distribution. Automatic and transparent cluster formation via Kubernetes Operator.
   - [x] Erlang Distributed as transport.
+     - [x] mTLS Support with Erlang Dist.
+     - [x] Automatic renewal of certificates.
 - [x] Configuration management via Kubernetes [CRDs](https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definitions/) and Envinronment Variables.
 - [x] Statestores. Adapters for persistent storage using multiple database providers.
   - [x] Sqlite
@@ -157,6 +159,7 @@ In turn, each Sidecar container within a POD organizes itself to form an Erlang 
   - [x] Elixir. All features implemented.
   - [x] Node/Typescript. All features implemented.
   - [x] Java. Partially implemented.
+  - [ ] Python. Under development.
   - [ ] Go. Under development.
   - [ ] Rust. Under development.
   - [ ] .Net/C#. Under development.
@@ -174,6 +177,11 @@ In turn, each Sidecar container within a POD organizes itself to form an Erlang 
 - [x] Observability
   - [x] OTLP Tracing.
   - [x] Prometheus Metrics.
+- [x] Secucrity
+  - [x] Database encryption with AES-ACM-V1.
+  - [ ] Actor ACL (Access Control List). Under development.
+  - [ ] Actor invocation with Authentication/Authorization Basic Auth flow. Under development.
+  - [ ] Actor invocation with Authentication/Authorization JWT Auth flow. Under development.
 
 ## Install
 
