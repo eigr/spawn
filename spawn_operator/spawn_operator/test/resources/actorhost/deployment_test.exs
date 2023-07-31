@@ -42,7 +42,7 @@ defmodule DeploymentTest do
                    "matchLabels" => %{"actor-system" => "spawn-system", "app" => "spawn-test"}
                  },
                  "strategy" => %{
-                   "rollingUpdate" => %{"maxSurge" => 0, "maxUnavailable" => "20%"},
+                   "rollingUpdate" => %{"maxSurge" => "50%", "maxUnavailable" => 0},
                    "type" => "RollingUpdate"
                  },
                  "template" => %{
@@ -111,10 +111,36 @@ defmodule DeploymentTest do
                              "ephemeral-storage" => "1M",
                              "memory" => "80Mi"
                            }
-                         }
+                         },
+                         "volumeMounts" => [%{"mountPath" => "/app/certs", "name" => "certs"}]
                        }
                      ],
-                     "terminationGracePeriodSeconds" => 140
+                     "terminationGracePeriodSeconds" => 140,
+                     "initContainers" => [
+                       %{
+                         "args" => [
+                           "--environment",
+                           :prod,
+                           "--secret",
+                           "tls-certs",
+                           "--namespace",
+                           "default",
+                           "--service",
+                           "spawn-system",
+                           "--to",
+                           "default"
+                         ],
+                         "image" => "docker.io/eigr/spawn-initializer:1.0.0-rc13",
+                         "name" => "init-certificates"
+                       }
+                     ],
+                     "serviceAccountName" => "spawn-system-sa",
+                     "volumes" => [
+                       %{
+                         "name" => "certs",
+                         "secret" => %{"optional" => true, "secretName" => "tls-certs"}
+                       }
+                     ]
                    }
                  }
                }
@@ -140,7 +166,7 @@ defmodule DeploymentTest do
                    "matchLabels" => %{"actor-system" => "spawn-system", "app" => "spawn-test"}
                  },
                  "strategy" => %{
-                   "rollingUpdate" => %{"maxSurge" => 0, "maxUnavailable" => "20%"},
+                   "rollingUpdate" => %{"maxSurge" => "50%", "maxUnavailable" => 0},
                    "type" => "RollingUpdate"
                  },
                  "template" => %{
@@ -211,12 +237,38 @@ defmodule DeploymentTest do
                            }
                          },
                          "volumeMounts" => [
-                           %{"mountPath" => "/home/example", "name" => "volume-name"}
+                           %{"mountPath" => "/home/example", "name" => "volume-name"},
+                           %{"mountPath" => "/app/certs", "name" => "certs"}
                          ]
                        }
                      ],
                      "terminationGracePeriodSeconds" => 140,
-                     "volumes" => [%{"emptyDir" => "{}", "name" => "volume-name"}]
+                     "volumes" => [
+                       %{"emptyDir" => "{}", "name" => "volume-name"},
+                       %{
+                         "name" => "certs",
+                         "secret" => %{"optional" => true, "secretName" => "tls-certs"}
+                       }
+                     ],
+                     "initContainers" => [
+                       %{
+                         "args" => [
+                           "--environment",
+                           :prod,
+                           "--secret",
+                           "tls-certs",
+                           "--namespace",
+                           "default",
+                           "--service",
+                           "spawn-system",
+                           "--to",
+                           "default"
+                         ],
+                         "image" => "docker.io/eigr/spawn-initializer:1.0.0-rc13",
+                         "name" => "init-certificates"
+                       }
+                     ],
+                     "serviceAccountName" => "spawn-system-sa"
                    }
                  }
                }
@@ -242,7 +294,7 @@ defmodule DeploymentTest do
                    "matchLabels" => %{"actor-system" => "spawn-system", "app" => "spawn-test"}
                  },
                  "strategy" => %{
-                   "rollingUpdate" => %{"maxSurge" => 0, "maxUnavailable" => "20%"},
+                   "rollingUpdate" => %{"maxSurge" => "50%", "maxUnavailable" => 0},
                    "type" => "RollingUpdate"
                  },
                  "template" => %{
@@ -431,6 +483,7 @@ defmodule DeploymentTest do
                "resources" => %{
                  "requests" => %{"memory" => "80Mi", "ephemeral-storage" => "1M", "cpu" => "100m"}
                },
+               "volumeMounts" => [%{"mountPath" => "/app/certs", "name" => "certs"}],
                "ports" => [
                  %{"containerPort" => 8090, "name" => "http"},
                  %{"containerPort" => 8091, "name" => "https"}
@@ -469,14 +522,23 @@ defmodule DeploymentTest do
                        }
                      },
                      "containers" => containers,
-                     "volumes" => [%{"emptyDir" => "{}", "name" => "volume-name"}]
+                     "volumes" => [
+                       %{"emptyDir" => "{}", "name" => "volume-name"},
+                       %{
+                         "name" => "certs",
+                         "secret" => %{"optional" => true, "secretName" => "tls-certs"}
+                       }
+                     ]
                    }
                  }
                }
              } = build_host_deploy(simple_actor_host_with_volume_mounts)
 
       assert %{
-               "volumeMounts" => [%{"mountPath" => "/home/example", "name" => "volume-name"}]
+               "volumeMounts" => [
+                 %{"mountPath" => "/home/example", "name" => "volume-name"},
+                 %{"mountPath" => "/app/certs", "name" => "certs"}
+               ]
              } = List.last(containers)
     end
   end

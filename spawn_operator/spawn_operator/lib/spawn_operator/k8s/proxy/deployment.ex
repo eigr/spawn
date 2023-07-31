@@ -133,7 +133,6 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
             }
             |> maybe_put_volumes(params)
             |> maybe_set_termination_period(params)
-            |> IO.inspect()
         }
       }
     }
@@ -319,7 +318,7 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
           }
         ]
 
-    Map.replace!(spec, "volumes", volumes)
+    Map.merge(spec, %{"volumes" => volumes})
   end
 
   defp maybe_put_volumes(spec, _) do
@@ -333,7 +332,7 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
 
   defp maybe_put_volume_mounts_to_host_container(spec, %{"volumeMounts" => volumeMounts}) do
     volumeMounts = volumeMounts ++ [%{"name" => "certs", "mountPath" => "/app/certs"}]
-    Map.replace!(spec, "volumeMounts", volumeMounts)
+    Map.merge(spec, %{"volumeMounts" => volumeMounts})
   end
 
   defp maybe_put_volume_mounts_to_host_container(spec, _) do
