@@ -478,7 +478,7 @@ defmodule Actors.Actor.Entity.Invocation do
     :noreply
   end
 
-  defp publish(channel, command, payload, _request) when is_nil(command) do
+  defp publish(channel, command, payload, _request) when is_nil(command) or command == "" do
     PubSub.broadcast(
       :actor_channel,
       channel,

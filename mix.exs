@@ -87,7 +87,7 @@ defmodule Spawn.MixProject do
       {:horde, "~> 0.8"},
       {:highlander, "~> 0.2.1"},
       {:phoenix_pubsub, "~> 2.1"},
-      {:phoenix_pubsub_nats, "~> 0.1"},
+      {:phoenix_pubsub_nats, "~> 0.2"},
       {:jason, "~> 1.3"},
       {:nimble_parsec, "~> 1.2.3"},
       {:sbroker, "~> 1.0.0"},
