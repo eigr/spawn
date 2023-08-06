@@ -53,7 +53,7 @@ defmodule SpawnSdk.Actor do
           spawn: boolean() | false
         ]
 
-  @type command :: String.t()
+  @type action :: String.t()
 
   @type context :: Context.t()
 
@@ -63,7 +63,7 @@ defmodule SpawnSdk.Actor do
 
   @type value :: Value.t()
 
-  @callback handle_command({command(), data()}, context()) ::
+  @callback handle_action({action(), data()}, context()) ::
               value() | {:reply, value()} | {:error, error()} | {:error, error(), value()}
 
   @spec channel(ActorChannel.t(), opts()) :: ActorChannel.t()
@@ -115,7 +115,7 @@ defmodule SpawnSdk.Actor do
   Example:
 
   ```
-  iex(spawn_a@127.0.0.1)1> SpawnSdk.Actor.spawn("spawn-system", "joe", "abs_actor")
+  iex(spawn_a@127.0.0.1)1> SpawnSdk.Actor.spawn("spawn-system", "joe", "unamed_actor")
   %SpawnSdk.ActorRef{system: "spawn-system", name: "joe", opts: []}
   ```
 
@@ -126,7 +126,7 @@ defmodule SpawnSdk.Actor do
 
   my_data = %MyData{value: 1}
 
-  Actor.spawn("spawn-system", "joe", "abs_actor")
+  Actor.spawn("spawn-system", "joe", "unamed_actor")
   |> Actor.invoke(action: "sum", data: my_data)
   ```
   """

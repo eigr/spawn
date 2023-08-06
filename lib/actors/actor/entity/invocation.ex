@@ -14,8 +14,8 @@ defmodule Actors.Actor.Entity.Invocation do
     ActorId,
     ActorSystem,
     ActorState,
-    Command,
-    FixedTimerCommand
+    Action,
+    FixedTimerAction
   }
 
   alias Eigr.Functions.Protocol.{
@@ -55,7 +55,7 @@ defmodule Actors.Actor.Entity.Invocation do
   @http_host_interface Actors.Actor.Interface.Http
 
   def timer_invoke(
-        %FixedTimerCommand{command: %Command{name: cmd} = _command} = timer,
+        %FixedTimerAction{action: %Action{name: cmd} = _action} = timer,
         %EntityState{
           system: _actor_system,
           actor: %Actor{id: caller_actor_id} = actor
@@ -63,7 +63,7 @@ defmodule Actors.Actor.Entity.Invocation do
       ) do
     invocation = %InvocationRequest{
       actor: actor,
-      command_name: cmd,
+      action_name: cmd,
       payload: {:noop, %Noop{}},
       async: true,
       caller: caller_actor_id
@@ -82,8 +82,8 @@ defmodule Actors.Actor.Entity.Invocation do
   def handle_timers(timers) when is_list(timers) do
     if length(timers) > 0 do
       timers
-      |> Stream.map(fn %FixedTimerCommand{seconds: delay} = timer_command ->
-        Process.send_after(self(), {:invoke_timer_command, timer_command}, delay)
+      |> Stream.map(fn %FixedTimerAction{seconds: delay} = timer_action ->
+        Process.send_after(self(), {:invoke_timer_action, timer_action}, delay)
       end)
       |> Stream.run()
     end
@@ -98,7 +98,7 @@ defmodule Actors.Actor.Entity.Invocation do
   def handle_timers([]), do: :ok
 
   def broadcast_invoke(
-        command,
+        action,
         payload,
         %ActorInvocation{actor: %ActorId{name: caller_actor_name, system: actor_system}},
         %EntityState{
@@ -107,12 +107,12 @@ defmodule Actors.Actor.Entity.Invocation do
         } = state
       ) do
     Logger.debug(
-      "Actor [#{actor_name}] Received Broadcast Event [#{inspect(payload)}] to perform Action [#{command}]"
+      "Actor [#{actor_name}] Received Broadcast Event [#{inspect(payload)}] to perform Action [#{action}]"
     )
 
     invocation = %InvocationRequest{
       actor: actor,
-      command_name: command,
+      action_name: action,
       payload: payload,
       async: true,
       caller: %ActorId{name: caller_actor_name, system: actor_system}
@@ -132,7 +132,7 @@ defmodule Actors.Actor.Entity.Invocation do
         } = state
       ) do
     Logger.debug(
-      "Actor [#{actor_name}] Received Broadcast Event [#{inspect(payload)}] without command. Just ignoring"
+      "Actor [#{actor_name}] Received Broadcast Event [#{inspect(payload)}] without action. Just ignoring"
     )
 
     {:noreply, state}
@@ -145,20 +145,20 @@ defmodule Actors.Actor.Entity.Invocation do
             %Actor{
               id: %ActorId{name: actor_name, parent: parent} = id,
               state: actor_state,
-              commands: commands
+              actions: actions
             } = _actor,
           opts: actor_opts
         } = state
       ) do
-    if length(commands) <= 0 do
+    if length(actions) <= 0 do
       Logger.warning("Actor [#{actor_name}] has not registered any Actions")
       {:noreply, state, :hibernate}
     else
-      init_command =
-        Enum.filter(commands, fn cmd -> Enum.member?(@default_init_actions, cmd.name) end)
+      init_action =
+        Enum.filter(actions, fn cmd -> Enum.member?(@default_init_actions, cmd.name) end)
         |> Enum.at(0)
 
-      case init_command do
+      case init_action do
         nil ->
           {:noreply, state, :hibernate}
 
@@ -171,7 +171,7 @@ defmodule Actors.Actor.Entity.Invocation do
 
           %ActorInvocation{
             actor: %ActorId{name: actor_name, system: actor_system, parent: parent},
-            command_name: init_command.name,
+            action_name: init_action.name,
             payload: {:noop, %Noop{}},
             current_context: %Context{
               metadata: metadata,
@@ -203,11 +203,11 @@ defmodule Actors.Actor.Entity.Invocation do
              %Actor{
                id: %ActorId{name: actor_name} = _id
              } = _actor,
-           command_name: command
+           action_name: action
          } = invocation, opts},
         %EntityState{
           system: _actor_system,
-          actor: %Actor{state: actor_state, commands: commands, timer_commands: timers},
+          actor: %Actor{state: actor_state, actions: actions, timer_actions: timers},
           opts: actor_opts
         } = state
       ) do
@@ -216,21 +216,21 @@ defmodule Actors.Actor.Entity.Invocation do
       ctx = Keyword.get(opts, :span_ctx, OpenTelemetry.Ctx.new())
 
       Tracer.with_span ctx, "#{actor_name} invocation handler", kind: :server do
-        if length(commands) <= 0 do
+        if length(actions) <= 0 do
           Logger.warning("Actor [#{actor_name}] has not registered any Actions")
         end
 
-        all_commands =
-          commands ++
-            Enum.map(timers, fn %FixedTimerCommand{command: cmd} = _timer_cmd -> cmd end)
+        all_actions =
+          actions ++
+            Enum.map(timers, fn %FixedTimerAction{action: cmd} = _timer_cmd -> cmd end)
 
         Tracer.set_attributes([
-          {:invoked_command, command},
-          {:actor_declared_commands, length(all_commands)}
+          {:invoked_action, action},
+          {:actor_declared_actions, length(all_actions)}
         ])
 
-        case Enum.member?(@default_actions, command) or
-               Enum.any?(all_commands, fn cmd -> cmd.name == command end) do
+        case Enum.member?(@default_actions, action) or
+               Enum.any?(all_actions, fn cmd -> cmd.name == action end) do
           true ->
             interface = get_interface(actor_opts)
 
@@ -256,7 +256,7 @@ defmodule Actors.Actor.Entity.Invocation do
             end
 
           false ->
-            {:reply, {:error, "Command [#{command}] not found for Actor [#{actor_name}]"}, state,
+            {:reply, {:error, "Action [#{action}] not found for Actor [#{actor_name}]"}, state,
              :hibernate}
         end
       end
@@ -272,7 +272,7 @@ defmodule Actors.Actor.Entity.Invocation do
                id: %ActorId{} = id
              } = _actor,
            metadata: metadata,
-           command_name: command,
+           action_name: action,
            payload: payload,
            caller: caller
          },
@@ -287,7 +287,7 @@ defmodule Actors.Actor.Entity.Invocation do
 
     %ActorInvocation{
       actor: id,
-      command_name: command,
+      action_name: action,
       payload: payload,
       current_context: %Context{
         caller: caller,
@@ -367,7 +367,7 @@ defmodule Actors.Actor.Entity.Invocation do
            payload: payload,
            workflow:
              %Workflow{
-               routing: {:pipe, %Pipe{actor: actor_name, command_name: cmd} = _pipe} = _workflow
+               routing: {:pipe, %Pipe{actor: actor_name, action_name: cmd} = _pipe} = _workflow
              } = response
          },
          opts
@@ -379,7 +379,7 @@ defmodule Actors.Actor.Entity.Invocation do
         invocation = %InvocationRequest{
           system: %ActorSystem{name: system_name},
           actor: %Actor{id: %ActorId{name: actor_name, system: system_name}},
-          command_name: cmd,
+          action_name: cmd,
           payload: payload,
           caller: %ActorId{name: caller_actor_name, system: system_name}
         }
@@ -413,7 +413,7 @@ defmodule Actors.Actor.Entity.Invocation do
            workflow:
              %Workflow{
                routing:
-                 {:forward, %Forward{actor: actor_name, command_name: cmd} = _pipe} = _workflow
+                 {:forward, %Forward{actor: actor_name, action_name: cmd} = _pipe} = _workflow
              } = response
          },
          opts
@@ -425,7 +425,7 @@ defmodule Actors.Actor.Entity.Invocation do
         invocation = %InvocationRequest{
           system: %ActorSystem{name: system_name},
           actor: %Actor{id: %ActorId{name: actor_name, system: system_name}},
-          command_name: cmd,
+          action_name: cmd,
           payload: payload,
           caller: %ActorId{name: caller_actor_name, system: system_name}
         }
@@ -458,14 +458,14 @@ defmodule Actors.Actor.Entity.Invocation do
 
   def do_broadcast(
         request,
-        %Broadcast{channel_group: channel, command_name: command, payload: payload} = _broadcast,
+        %Broadcast{channel_group: channel, action_name: action, payload: payload} = _broadcast,
         _opts
       ) do
     Tracer.with_span "run-broadcast" do
       Tracer.add_event("publish", [{"channel", channel}])
-      Tracer.set_attributes([{:command, command}])
+      Tracer.set_attributes([{:action, action}])
 
-      spawn(fn -> publish(channel, command, payload, request) end)
+      spawn(fn -> publish(channel, action, payload, request) end)
     end
   end
 
@@ -478,7 +478,7 @@ defmodule Actors.Actor.Entity.Invocation do
     :noreply
   end
 
-  defp publish(channel, command, payload, _request) when is_nil(command) or command == "" do
+  defp publish(channel, action, payload, _request) when is_nil(action) or action == "" do
     PubSub.broadcast(
       :actor_channel,
       channel,
@@ -486,11 +486,11 @@ defmodule Actors.Actor.Entity.Invocation do
     )
   end
 
-  defp publish(channel, command, payload, request) do
+  defp publish(channel, action, payload, request) do
     PubSub.broadcast(
       :actor_channel,
       channel,
-      {:receive, command, payload, request}
+      {:receive, action, payload, request}
     )
   end
 

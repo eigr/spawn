@@ -17,8 +17,8 @@ defmodule SpawnSdk.System.SpawnSystem do
     ActorDeactivationStrategy,
     ActorSnapshotStrategy,
     ActorSystem,
-    Command,
-    FixedTimerCommand,
+    Action,
+    FixedTimerAction,
     Metadata,
     Registry,
     TimeoutStrategy
@@ -90,7 +90,7 @@ defmodule SpawnSdk.System.SpawnSystem do
   @doc "hey"
   def invoke(actor_name, invoke_opts \\ []) do
     system = Keyword.get(invoke_opts, :system)
-    command = invoke_opts |> Keyword.get(:action, Keyword.get(invoke_opts, :command))
+    action = invoke_opts |> Keyword.get(:action, Keyword.get(invoke_opts, :action))
     payload = invoke_opts |> Keyword.get(:payload, Keyword.get(invoke_opts, :data))
     async = Keyword.get(invoke_opts, :async, false)
     pooled = Keyword.get(invoke_opts, :pooled, false)
@@ -99,7 +99,7 @@ defmodule SpawnSdk.System.SpawnSystem do
     scheduled_to = Keyword.get(invoke_opts, :scheduled_to)
     delay_in_ms = Keyword.get(invoke_opts, :delay, nil)
 
-    if is_nil(command) do
+    if is_nil(action) do
       raise "You have to specify an action"
     end
 
@@ -117,7 +117,7 @@ defmodule SpawnSdk.System.SpawnSystem do
       },
       metadata: metadata,
       payload: payload,
-      command_name: parse_command_name(command),
+      action_name: parse_action_name(action),
       async: async,
       caller: nil,
       pooled: pooled,
@@ -134,14 +134,14 @@ defmodule SpawnSdk.System.SpawnSystem do
         rescue
           Protobuf.DecodeError ->
             Logger.warning(
-              "Check your actor implementation for command #{inspect(command)} to see if its setting the same type in the state output."
+              "Check your actor implementation for action #{inspect(action)} to see if its setting the same type in the state output."
             )
 
             {:error, :invalid_state_output}
 
           ArgumentError ->
             Logger.warning(
-              "Check your actor implementation for command #{inspect(command)}, you can only return maps on state_type: :json configured"
+              "Check your actor implementation for action #{inspect(action)}, you can only return maps on state_type: :json configured"
             )
 
             {:error, :invalid_state_output}
@@ -158,13 +158,13 @@ defmodule SpawnSdk.System.SpawnSystem do
   def call(invocation, entity_state, default_actions) do
     %ActorInvocation{
       actor: %ActorId{name: name, system: system, parent: parent},
-      command_name: command,
+      action_name: action,
       current_context: %Eigr.Functions.Protocol.Context{metadata: metadata},
       caller: caller
     } = invocation
 
     %EntityState{
-      actor: %Actor{state: actor_state, id: self_actor_id, commands: commands} = _actor
+      actor: %Actor{state: actor_state, id: self_actor_id, actions: actions} = _actor
     } = entity_state
 
     actor_state = actor_state || %{}
@@ -172,8 +172,8 @@ defmodule SpawnSdk.System.SpawnSystem do
     current_tags = Map.get(actor_state, :tags, %{})
     actor_instance = get_cached_actor(system, name, parent)
 
-    if Enum.member?(default_actions, command) and
-         not Enum.any?(default_actions, fn action -> contains_action?(commands, action) end) do
+    if Enum.member?(default_actions, action) and
+         not Enum.any?(default_actions, fn action -> contains_action?(actions, action) end) do
       context = %Eigr.Functions.Protocol.Context{
         caller: caller,
         metadata: metadata,
@@ -207,8 +207,8 @@ defmodule SpawnSdk.System.SpawnSystem do
     actors
   end
 
-  defp contains_action?(commands, action) do
-    Enum.any?(commands, fn c -> c.name == action end)
+  defp contains_action?(actions, action) do
+    Enum.any?(actions, fn c -> c.name == action end)
   end
 
   defp do_call(_call_type, actor_instance, entity_state, _invocation, _ctx)
@@ -224,7 +224,7 @@ defmodule SpawnSdk.System.SpawnSystem do
          } = entity_state,
          %ActorInvocation{
            actor: %ActorId{name: name, system: system, parent: _parent},
-           command_name: _command,
+           action_name: _action,
            payload: _payload,
            current_context: %Eigr.Functions.Protocol.Context{metadata: _metadata},
            caller: _caller
@@ -245,7 +245,7 @@ defmodule SpawnSdk.System.SpawnSystem do
   end
 
   defp do_call(:host_call, actor_instance, entity_state, invocation, ctx) do
-    case call_instance(actor_instance, invocation.command_name, invocation.payload, ctx) do
+    case call_instance(actor_instance, invocation.action_name, invocation.payload, ctx) do
       {:reply, %SpawnSdk.Value{} = decoded_value} ->
         do_after_call_instance(decoded_value, entity_state, invocation, actor_instance)
 
@@ -339,22 +339,22 @@ defmodule SpawnSdk.System.SpawnSystem do
   defp handle_broadcast(
          %SpawnSdk.Value{
            broadcast:
-             %SpawnSdk.Flow.Broadcast{channel: channel, command: command, payload: payload} =
+             %SpawnSdk.Flow.Broadcast{channel: channel, action: action, payload: payload} =
                _broadcast
          } = _value
        ) do
     cmd =
       cond do
-        is_nil(command) -> command
-        is_atom(command) -> Atom.to_string(command)
-        true -> command
+        is_nil(action) -> action
+        is_atom(action) -> Atom.to_string(action)
+        true -> action
       end
 
     payload = parse_payload(payload)
 
     %Eigr.Functions.Protocol.Broadcast{
       channel_group: channel,
-      command_name: cmd,
+      action_name: cmd,
       payload: payload
     }
   end
@@ -369,14 +369,14 @@ defmodule SpawnSdk.System.SpawnSystem do
 
   defp handle_pipe(
          %SpawnSdk.Value{
-           pipe: %SpawnSdk.Flow.Pipe{actor_name: actor_name, command: command} = _pipe
+           pipe: %SpawnSdk.Flow.Pipe{actor_name: actor_name, action: action} = _pipe
          } = _value
        ) do
-    cmd = if is_atom(command), do: Atom.to_string(command), else: command
+    cmd = if is_atom(action), do: Atom.to_string(action), else: action
 
     pipe = %Eigr.Functions.Protocol.Pipe{
       actor: actor_name,
-      command_name: cmd
+      action_name: cmd
     }
 
     {:pipe, pipe}
@@ -392,14 +392,14 @@ defmodule SpawnSdk.System.SpawnSystem do
 
   defp handle_forward(
          %SpawnSdk.Value{
-           forward: %SpawnSdk.Flow.Forward{actor_name: actor_name, command: command} = _forward
+           forward: %SpawnSdk.Flow.Forward{actor_name: actor_name, action: action} = _forward
          } = _value
        ) do
-    cmd = if is_atom(command), do: Atom.to_string(command), else: command
+    cmd = if is_atom(action), do: Atom.to_string(action), else: action
 
     forward = %Eigr.Functions.Protocol.Forward{
       actor: actor_name,
-      command_name: cmd
+      action_name: cmd
     }
 
     {:forward, forward}
@@ -433,7 +433,7 @@ defmodule SpawnSdk.System.SpawnSystem do
             id: %ActorId{name: effect.actor_name, system: system}
           },
           payload: payload,
-          command_name: effect.command,
+          action_name: effect.action,
           async: true,
           caller: %ActorId{name: caller_name, system: system},
           scheduled_to: effect.scheduled_to
@@ -464,24 +464,24 @@ defmodule SpawnSdk.System.SpawnSystem do
     end
   end
 
-  defp call_instance(instance, command, %Noop{} = noop, context) do
-    instance.handle_command({parse_command_name(command), noop}, context)
+  defp call_instance(instance, action, %Noop{} = noop, context) do
+    instance.handle_action({parse_action_name(action), noop}, context)
   end
 
-  defp call_instance(instance, command, {:noop, %Noop{} = noop}, context) do
-    instance.handle_command({parse_command_name(command), noop}, context)
+  defp call_instance(instance, action, {:noop, %Noop{} = noop}, context) do
+    instance.handle_action({parse_action_name(action), noop}, context)
   end
 
-  defp call_instance(instance, command, {:value, value}, context) do
-    instance.handle_command({parse_command_name(command), unpack_unknown(value)}, context)
+  defp call_instance(instance, action, {:value, value}, context) do
+    instance.handle_action({parse_action_name(action), unpack_unknown(value)}, context)
   end
 
-  defp call_instance(instance, command, nil, context) do
-    instance.handle_command({parse_command_name(command), %Noop{}}, context)
+  defp call_instance(instance, action, nil, context) do
+    instance.handle_action({parse_action_name(action), %Noop{}}, context)
   end
 
-  defp call_instance(instance, command, value, context) do
-    instance.handle_command({parse_command_name(command), unpack_unknown(value)}, context)
+  defp call_instance(instance, action, value, context) do
+    instance.handle_action({parse_action_name(action), unpack_unknown(value)}, context)
   end
 
   defp build_spawn_req(system, actor_name, parent) do
@@ -553,29 +553,29 @@ defmodule SpawnSdk.System.SpawnSystem do
            snapshot_strategy: snapshot_strategy,
            deactivation_strategy: deactivation_strategy
          },
-         commands: Enum.map(actions, fn action -> get_action(action) end),
-         timer_commands:
+         actions: Enum.map(actions, fn action -> get_action(action) end),
+         timer_actions:
            Enum.map(timer_actions, fn {action, seconds} -> get_timer_action(action, seconds) end),
          state: %ActorState{tags: tags}
        }}
     end)
   end
 
-  defp decode_kind(:abstract), do: :ABSTRACT
-  defp decode_kind(:singleton), do: :SINGLETON
+  defp decode_kind(:abstract), do: :UNAMED
+  defp decode_kind(:singleton), do: :NAMED
   defp decode_kind(:pooled), do: :POOLED
   defp decode_kind(_), do: :UNKNOW_KIND
 
   defp get_action(action_atom) do
-    %Command{name: parse_command_name(action_atom)}
+    %Action{name: parse_action_name(action_atom)}
   end
 
   defp get_timer_action(action_atom, seconds) do
-    %FixedTimerCommand{command: get_action(action_atom), seconds: seconds}
+    %FixedTimerAction{action: get_action(action_atom), seconds: seconds}
   end
 
-  defp parse_command_name(command) when is_atom(command), do: Atom.to_string(command)
-  defp parse_command_name(command) when is_binary(command), do: command
+  defp parse_action_name(action) when is_atom(action), do: Atom.to_string(action)
+  defp parse_action_name(action) when is_binary(action), do: action
 
   defp parse_scheduled_to(nil, nil), do: nil
 

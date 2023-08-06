@@ -118,8 +118,8 @@ defmodule Actors.Actor.Entity do
       :deactivate ->
         Lifecycle.deactivate(state)
 
-      {:invoke_timer_command, command} ->
-        Invocation.timer_invoke(command, state)
+      {:invoke_timer_action, action} ->
+        Invocation.timer_invoke(action, state)
 
       {:receive, cmd, payload, invocation} ->
         Invocation.broadcast_invoke(cmd, payload, invocation, state)

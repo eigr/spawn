@@ -20,14 +20,14 @@ spec:
     sinks:
       - name: joe-sink
         actor: joe # Name of an Actor
-        command: setLanguage # Name of an Actor Action to call
+        action: setLanguage # Name of an Actor Action to call
         system: spawn-system
         binding:
           - name: minute-scheduler
           - name: daily-scheduler
       - name: robert-sink
         actor: robert
-        command: sum
+        action: sum
         system: spawn-system
         binding:
           - name: daily-scheduler

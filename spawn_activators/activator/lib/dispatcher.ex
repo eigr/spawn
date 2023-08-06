@@ -13,7 +13,7 @@ defmodule Activator.Dispatcher do
           {:encoder, encoder :: module()}
           | {:system, system :: String.t()}
           | {:actor, actor :: String.t()}
-          | {:command, command :: String.t()}
+          | {:action, action :: String.t()}
           | {:kind, kind :: atom()}
 
   @callback dispatch(data, options) :: :ok | {:error, any()}

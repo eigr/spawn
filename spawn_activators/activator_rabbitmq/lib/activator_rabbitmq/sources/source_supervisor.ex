@@ -67,8 +67,8 @@ defmodule ActivatorRabbitmq.Sources.SourceSupervisor do
       rate_limiting_interval: 1,
       rate_limiting_allowed_messages: 100,
       targets: [
-        # %{actor: "joe", command: "setLanguage"},
-        %{actor: "robert", command: "setLanguage"}
+        # %{actor: "joe", action: "setLanguage"},
+        %{actor: "robert", action: "setLanguage"}
       ]
     ]
   end

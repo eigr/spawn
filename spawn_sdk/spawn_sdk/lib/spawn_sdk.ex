@@ -43,7 +43,7 @@ defmodule SpawnSdk do
   - `system` this is required
   - `ref` attribute attribute will always lookup to see if the referenced actor is already started or not.
   - `payload` attribute is optional.
-  - `command` has default values that you can use to get current actor state
+  - `action` has default values that you can use to get current actor state
     - get, get_state, Get, getState, GetState
 
   ## Examples
@@ -51,14 +51,14 @@ defmodule SpawnSdk do
   ```elixir
   iex> SpawnSdk.invoke(
     "actor_name",
-    ref: SpawnSdkExample.Actors.AbstractActor,
+    ref: SpawnSdkExample.Actors.UnamedActor,
     system: "spawn-system",
-    command: "sum", # "sum" or :sum
+    action: "sum", # "sum" or :sum
     payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 5}
   )
   {:ok, %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 5}}
 
-  iex> SpawnSdk.invoke("actor_name", system: "spawn-system", command: "get")
+  iex> SpawnSdk.invoke("actor_name", system: "spawn-system", action: "get")
   {:ok, %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 5}}
   ```
   """
@@ -66,9 +66,9 @@ defmodule SpawnSdk do
   defdelegate invoke(actor_name, invoke_opts), to: SpawnSdk.System.SpawnSystem
 
   @doc """
-  Spawns a abstract actor
+  Spawns a Unamed actor
 
-  A abstract actor means that you can spawn dynamically the same actor for multiple different names.
+  A Unamed actor means that you can spawn dynamically the same actor for multiple different names.
   It is analog to `DynamicSupervisor`
 
   ## Opts
@@ -82,7 +82,7 @@ defmodule SpawnSdk do
   iex> SpawnSdk.spawn_actor(
     "actor_name",
     system: "spawn-system",
-    actor: SpawnSdkExample.Actors.AbstractActor
+    actor: SpawnSdkExample.Actors.UnamedActor
   )
   ```
   """

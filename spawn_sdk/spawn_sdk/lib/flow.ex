@@ -45,27 +45,27 @@ defmodule SpawnSdk.Flow do
     using the transport mechanism based on Phoenix.PubSub in memory or
     Phoenix.PubSub over Nats Broker.
     """
-    defstruct channel: nil, command: nil, payload: nil
+    defstruct channel: nil, action: nil, payload: nil
 
     @type t :: %__MODULE__{
             channel: String.t(),
-            command: String.t() | atom(),
+            action: String.t() | atom(),
             payload: module()
           }
 
     @type channel :: String.t()
 
-    @type command :: String.t() | atom()
+    @type action :: String.t() | atom()
 
     @type payload :: module() | nil
 
-    @spec to(channel(), command(), payload()) :: Broadcast.t()
-    def to(channel, command, payload) do
-      command_name = if is_atom(command), do: Atom.to_string(command), else: command
+    @spec to(channel(), action(), payload()) :: Broadcast.t()
+    def to(channel, action, payload) do
+      action_name = if is_atom(action), do: Atom.to_string(action), else: action
 
       %__MODULE__{
         channel: channel,
-        command: command_name,
+        action: action_name,
         payload: payload
       }
     end
@@ -89,24 +89,24 @@ defmodule SpawnSdk.Flow do
     the actor that performs the Pipe is free to process another message
     and the actor that is receiving the Pipe is the one who will respond to the original caller.
     """
-    defstruct actor_name: nil, command: nil
+    defstruct actor_name: nil, action: nil
 
     @type t :: %__MODULE__{
             actor_name: String.t(),
-            command: String.t() | atom()
+            action: String.t() | atom()
           }
 
     @type actor_name :: String.t()
 
-    @type command :: String.t() | atom()
+    @type action :: String.t() | atom()
 
-    @spec to(actor_name(), command()) :: Pipe.t()
-    def to(actor_name, command) do
-      command_name = if is_atom(command), do: Atom.to_string(command), else: command
+    @spec to(actor_name(), action()) :: Pipe.t()
+    def to(actor_name, action) do
+      action_name = if is_atom(action), do: Atom.to_string(action), else: action
 
       %__MODULE__{
         actor_name: actor_name,
-        command: command_name
+        action: action_name
       }
     end
   end
@@ -120,24 +120,24 @@ defmodule SpawnSdk.Flow do
     to process another message and the actor that is receiving the forwarding will respond
     to the original caller.
     """
-    defstruct actor_name: nil, command: nil
+    defstruct actor_name: nil, action: nil
 
     @type t :: %__MODULE__{
             actor_name: String.t(),
-            command: String.t() | atom()
+            action: String.t() | atom()
           }
 
     @type actor_name :: String.t()
 
-    @type command :: String.t() | atom()
+    @type action :: String.t() | atom()
 
-    @spec to(actor_name(), command()) :: Forward.t()
-    def to(actor_name, command) do
-      command_name = if is_atom(command), do: Atom.to_string(command), else: command
+    @spec to(actor_name(), action()) :: Forward.t()
+    def to(actor_name, action) do
+      action_name = if is_atom(action), do: Atom.to_string(action), else: action
 
       %__MODULE__{
         actor_name: actor_name,
-        command: command_name
+        action: action_name
       }
     end
   end
@@ -149,37 +149,37 @@ defmodule SpawnSdk.Flow do
     They will "always" be processed asynchronously and any response sent back from the Actor
     receiving the effect will be ignored by the effector.
     """
-    defstruct actor_name: nil, command: nil, payload: nil, scheduled_to: nil
+    defstruct actor_name: nil, action: nil, payload: nil, scheduled_to: nil
 
     @type t :: %__MODULE__{
             actor_name: String.t(),
-            command: String.t() | atom(),
+            action: String.t() | atom(),
             payload: module(),
             scheduled_to: integer() | nil
           }
 
     @type actor_name :: String.t()
 
-    @type command :: String.t() | atom()
+    @type action :: String.t() | atom()
 
     @type payload :: module() | nil
 
     @spec of() :: list(SideEffect.t())
     def of(), do: []
 
-    @spec effect(list(), actor_name(), command(), payload()) :: list(SideEffect.t())
-    def effect(list, actor_name, command, payload \\ nil, opts \\ []) do
-      effect = to(actor_name, command, payload, opts)
+    @spec effect(list(), actor_name(), action(), payload()) :: list(SideEffect.t())
+    def effect(list, actor_name, action, payload \\ nil, opts \\ []) do
+      effect = to(actor_name, action, payload, opts)
       list ++ [effect]
     end
 
-    @spec to(actor_name(), command(), payload(), list()) :: SideEffect.t()
-    def to(actor_name, command, payload \\ nil, opts \\ []) do
-      command_name = if is_atom(command), do: Atom.to_string(command), else: command
+    @spec to(actor_name(), action(), payload(), list()) :: SideEffect.t()
+    def to(actor_name, action, payload \\ nil, opts \\ []) do
+      action_name = if is_atom(action), do: Atom.to_string(action), else: action
 
       %__MODULE__{
         actor_name: actor_name,
-        command: command_name,
+        action: action_name,
         payload: payload,
         scheduled_to: parse_scheduled_to(opts[:delay], opts[:scheduled_to])
       }

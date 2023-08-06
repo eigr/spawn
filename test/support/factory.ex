@@ -18,7 +18,7 @@ defmodule Actors.FactoryTest do
     ActorSnapshotStrategy,
     ActorDeactivationStrategy,
     ActorState,
-    Command,
+    Action,
     Metadata
   }
 
@@ -75,7 +75,7 @@ defmodule Actors.FactoryTest do
       system: attrs[:system] || build_system(),
       actor: attrs[:actor] || build_actor(),
       async: attrs[:async] || false,
-      command_name: attrs[:command_name] || "ChangeNameTest",
+      action_name: attrs[:action_name] || "ChangeNameTest",
       payload: {:value, attrs[:value] || value},
       caller: attrs[:caller] || nil,
       metadata: attrs[:metadata] || %{},
@@ -97,7 +97,7 @@ defmodule Actors.FactoryTest do
 
     %Actor{
       id: %ActorId{name: actor_name},
-      commands: attrs[:commands] || [build_actor_command()],
+      actions: attrs[:actions] || [build_actor_action()],
       settings: %ActorSettings{
         stateful: Keyword.get(attrs, :stateful, true),
         snapshot_strategy: attrs[:snapshot_strategy] || build_actor_snapshot_strategy(),
@@ -109,8 +109,8 @@ defmodule Actors.FactoryTest do
     }
   end
 
-  def build_actor_command(attrs \\ []) do
-    %Command{name: attrs[:name] || "ChangeNameTest"}
+  def build_actor_action(attrs \\ []) do
+    %Action{name: attrs[:name] || "ChangeNameTest"}
   end
 
   def build_actor_state(attrs \\ []) do

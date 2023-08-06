@@ -5,13 +5,13 @@ defmodule SpawnSdkExample do
   require Logger
 
   alias Io.Eigr.Spawn.Example.MyBusinessMessage
-  alias SpawnSdkExample.Actors.AbstractActor
+  alias SpawnSdkExample.Actors.UnamedActor
 
   def invoke_update_state() do
     try do
       SpawnSdk.invoke("joe",
         system: "spawn-system",
-        command: "sum",
+        action: "sum",
         payload: %MyBusinessMessage{value: 1}
       )
     catch
@@ -24,7 +24,7 @@ defmodule SpawnSdkExample do
     try do
       SpawnSdk.invoke("joe",
         system: "spawn-system",
-        command: "sum",
+        action: "sum",
         payload: %MyBusinessMessage{value: 1},
         async: true
       )
@@ -36,7 +36,7 @@ defmodule SpawnSdkExample do
 
   def invok_get_state() do
     try do
-      SpawnSdk.invoke("joe", system: "spawn-system", command: "get")
+      SpawnSdk.invoke("joe", system: "spawn-system", action: "get")
     catch
       e ->
         Logger.error("Error on invoke Actor: #{inspect(e)}")
@@ -46,9 +46,9 @@ defmodule SpawnSdkExample do
   def spawn_and_invoke() do
     try do
       SpawnSdk.invoke("robert_lazy",
-        ref: AbstractActor,
+        ref: UnamedActor,
         system: "spawn-system",
-        command: "sum",
+        action: "sum",
         payload: %MyBusinessMessage{value: 1}
       )
     catch
@@ -59,7 +59,7 @@ defmodule SpawnSdkExample do
 
   def spawn_invoke_pooled_actors() do
     try do
-      SpawnSdk.invoke("pooled_actor", system: "spawn-system", command: "ping", pooled: true)
+      SpawnSdk.invoke("pooled_actor", system: "spawn-system", action: "ping", pooled: true)
     catch
       e ->
         Logger.error("Error on invoke Actor: #{inspect(e)}")

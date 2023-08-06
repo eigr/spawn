@@ -58,7 +58,7 @@
 //
 // Actors are usually created at the beginning of the SDK's communication flow with the Proxy by the registration step described above. 
 // However, some use cases require that Actors can be created ***on the fly***. 
-// In other words, Spawn is used to bring to life Actors previously registered as Abstracts, giving them a name and thus creating a concrete instance 
+// In other words, Spawn is used to bring to life Actors previously registered as Unameds, giving them a name and thus creating a concrete instance 
 // at runtime for that Actor. Actors created with the Spawn feature are generally used when you want to share a behavior while maintaining 
 // the isolation characteristics of the actors.
 // For these situations we have the Spawning flow described below. 
@@ -135,7 +135,7 @@
 //          ║                                      ║                                     ║                                    ║
 //          ║                                      ║                                     ╠───┐                                ║
 //          ║                                      ║                                     ║   │Handle request,                 ║
-//          ║                                      ║                                     ║   │execute command                 ║
+//          ║                                      ║                                     ║   │execute action                 ║
 //          ║                                      ║                                     ║◀──┘                                ║
 //          ║                                      ║                                     ║            Reply with the          ║
 //          ║                                      ║                                     ╠────────────result and the ────────▶║
@@ -156,7 +156,7 @@ syntax = "proto3";
 
 package eigr.functions.protocol;
 
-import "actor.proto";
+import "eigr/functions/protocol/actors/actor.proto";
 import "google/protobuf/any.proto";
 
 option java_package = "io.eigr.functions.protocol";
@@ -277,8 +277,8 @@ message Broadcast {
     // Channel of target Actors
     string channel_group = 1;
 
-    // Command. Only Actors that have this command will run successfully
-    string command_name = 2;
+    // Action. Only Actors that have this action will run successfully
+    string action_name = 2;
 
     // Payload
     oneof payload {
@@ -287,26 +287,26 @@ message Broadcast {
     }
 }
 
-// Sends the output of a command of an Actor to the input of another command of an Actor
+// Sends the output of a action of an Actor to the input of another action of an Actor
 // Useful for handle `pipes` pattern:
 // https://www.enterpriseintegrationpatterns.com/patterns/messaging/PipesAndFilters.html
 message Pipe {
   // Target Actor
   string actor = 1;
 
-  // Command. 
-  string command_name = 2;
+  // Action. 
+  string action_name = 2;
 }
 
-// Sends the input of a command of an Actor to the input of another command of an Actor
+// Sends the input of a action of an Actor to the input of another action of an Actor
 // Useful for handle `content-basead router` pattern
 // https://www.enterpriseintegrationpatterns.com/patterns/messaging/ContentBasedRouter.html
 message Forward {
   // Target Actor
   string actor = 1;
 
-  // Command. 
-  string command_name = 2;
+  // Action. 
+  string action_name = 2;
 }
 
 // Container for archicetural message patterns 
@@ -328,11 +328,11 @@ message Workflow {
 //   * system: See ActorSystem message.
 //   * actor: The target Actor, i.e. the one that the user function is calling to perform some computation.
 //   * caller: The caller Actor
-//   * command_name: The function or method on the target Actor that will receive this request 
+//   * action_name: The function or method on the target Actor that will receive this request 
 //     and perform some useful computation with the sent data.
-//   * value: This is the value sent by the user function to be computed by the request's target Actor command.
-//   * async: Indicates whether the command should be processed synchronously, where a response should be sent back to the user function, 
-//            or whether the command should be processed asynchronously, i.e. no response sent to the caller and no waiting.
+//   * value: This is the value sent by the user function to be computed by the request's target Actor action.
+//   * async: Indicates whether the action should be processed synchronously, where a response should be sent back to the user function, 
+//            or whether the action should be processed asynchronously, i.e. no response sent to the caller and no waiting.
 //   * metadata: Meta information or headers
 message InvocationRequest {
 
@@ -340,7 +340,7 @@ message InvocationRequest {
 
     eigr.functions.protocol.actors.Actor actor = 2;
 
-    string command_name = 3;
+    string action_name = 3;
 
     oneof payload {
         google.protobuf.Any value = 4;
@@ -363,17 +363,17 @@ message InvocationRequest {
 //
 // Params:
 //   * actor: The ActorId handling the InvocationRequest request, also called the target Actor.
-//   * command_name: The function or method on the target Actor that will receive this request 
+//   * action_name: The function or method on the target Actor that will receive this request 
 //                 and perform some useful computation with the sent data.
 //   * current_context: The current Context with current state value of the target Actor. 
 //                    That is, the same as found via matching in %Actor{name: target_actor, state: %ActorState{state: value} = actor_state}. 
 //                    In this case, the Context type will contain in the value attribute the same `value` as the matching above.
-//   * payload: The value to be passed to the function or method corresponding to command_name.
+//   * payload: The value to be passed to the function or method corresponding to action_name.
 message ActorInvocation {
 
     eigr.functions.protocol.actors.ActorId actor = 1;
 
-    string command_name = 2;
+    string action_name = 2;
 
     Context current_context = 3;
 

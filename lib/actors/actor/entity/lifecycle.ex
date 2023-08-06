@@ -44,7 +44,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
                 deactivation_strategy: deactivation_strategy,
                 kind: kind
               } = _settings,
-            timer_commands: timer_commands
+            timer_actions: timer_actions
           }
         } = state
       ) do
@@ -68,7 +68,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
       end
 
     :ok = handle_metadata(name, metadata)
-    :ok = Invocation.handle_timers(timer_commands)
+    :ok = Invocation.handle_timers(timer_actions)
 
     :ok =
       Spawn.Cluster.Node.Registry.update_entry_value(
@@ -135,9 +135,16 @@ defmodule Actors.Actor.Entity.Lifecycle do
                revisions: current_revision
            }, {:continue, :call_init_action}}
         else
-          {:error, :network_partition_detected} ->
+          {:partition_check, {:error, :network_partition_detected}} ->
             Logger.warning(
               "We have detected a possible network partition issue and therefore this actor will not start"
+            )
+
+            raise NetworkPartitionException
+
+          error ->
+            Logger.warning(
+              "We have detected a possible network partition issue and therefore this actor will not start. Details: #{inspect(error)}"
             )
 
             raise NetworkPartitionException

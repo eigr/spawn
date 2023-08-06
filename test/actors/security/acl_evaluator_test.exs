@@ -47,19 +47,19 @@ defmodule Actors.AclEvaluatorTest do
 
     simple_invocation = %InvocationRequest{
       actor: %Actor{id: %ActorId{name: "joe"}},
-      command_name: "get",
+      action_name: "get",
       caller: %ActorId{name: "caller_actor_name", system: "actor_system"}
     }
 
     specific_actor_invocation = %InvocationRequest{
       actor: %Actor{id: %ActorId{name: "joe"}},
-      command_name: "get",
+      action_name: "get",
       caller: %ActorId{name: "robert", system: "actor_system"}
     }
 
     outsider_invocation = %InvocationRequest{
       actor: %Actor{id: %ActorId{name: "joe"}},
-      command_name: "get",
+      action_name: "get",
       caller: %ActorId{name: "mike", system: "actor_system"}
     }
 
@@ -122,7 +122,7 @@ defmodule Actors.AclEvaluatorTest do
 
       invocation = %InvocationRequest{
         actor: %Actor{id: %ActorId{name: "joe"}},
-        command_name: "get",
+        action_name: "get",
         caller: %ActorId{name: "caller_actor_name", system: "actor_system"}
       }
 
@@ -140,7 +140,7 @@ defmodule Actors.AclEvaluatorTest do
 
       invocation = %InvocationRequest{
         actor: %Actor{id: %ActorId{name: "joe"}},
-        command_name: "get",
+        action_name: "get",
         caller: %ActorId{name: "caller_actor_name", system: "actor_system"}
       }
 
@@ -158,7 +158,7 @@ defmodule Actors.AclEvaluatorTest do
 
       invocation = %InvocationRequest{
         actor: %Actor{id: %ActorId{name: "joe"}},
-        command_name: "sum",
+        action_name: "sum",
         caller: %ActorId{name: "caller_actor_name", system: "actor_system"}
       }
 

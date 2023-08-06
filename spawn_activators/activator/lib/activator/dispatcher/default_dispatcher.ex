@@ -22,7 +22,7 @@ defmodule Activator.Dispatcher.DefaultDispatcher do
     case encoder.decode(data) do
       {:ok, source, id, payload} ->
         Logger.debug("Decoded event: #{inspect(payload)}")
-        do_dispatch(payload, Keyword.merge(options, actor: id, command: source))
+        do_dispatch(payload, Keyword.merge(options, actor: id, action: source))
 
       {:error, error} ->
         Logger.error("Failure on decode event. Error: #{inspect(error)}")
@@ -33,7 +33,7 @@ defmodule Activator.Dispatcher.DefaultDispatcher do
   defp do_dispatch(payload, opts) when is_nil(payload) do
     async? = Keyword.get(opts, :async, true)
     actor_name = Keyword.fetch!(opts, :actor)
-    command = Keyword.fetch!(opts, :command)
+    action = Keyword.fetch!(opts, :action)
     system_name = Keyword.fetch!(opts, :system)
 
     actor = %Actor{id: %ActorId{name: actor_name, system: system_name}}
@@ -42,14 +42,14 @@ defmodule Activator.Dispatcher.DefaultDispatcher do
     Logger.info("Dispaching message to Actor #{inspect(actor_name)}")
 
     Logger.debug(
-      "Request for Activate Actor [#{actor_name}] using command [#{command}] without payload"
+      "Request for Activate Actor [#{actor_name}] using action [#{action}] without payload"
     )
 
     req = %InvocationRequest{
       system: system,
       actor: actor,
       payload: {:noop, %Noop{}},
-      command_name: command,
+      action_name: action,
       async: async?,
       caller: nil
     }
@@ -60,7 +60,7 @@ defmodule Activator.Dispatcher.DefaultDispatcher do
   defp do_dispatch(payload, opts) do
     async? = Keyword.get(opts, :async, true)
     actor_name = Keyword.fetch!(opts, :actor)
-    command = Keyword.fetch!(opts, :command)
+    action = Keyword.fetch!(opts, :action)
     system_name = Keyword.fetch!(opts, :system)
 
     actor = %Actor{id: %ActorId{name: actor_name, system: system_name}}
@@ -69,14 +69,14 @@ defmodule Activator.Dispatcher.DefaultDispatcher do
     Logger.info("Dispaching message to Actor #{inspect(actor_name)}")
 
     Logger.debug(
-      "Request for Activate Actor [#{actor_name}] using command [#{command}] with payload: #{inspect(payload)}"
+      "Request for Activate Actor [#{actor_name}] using action [#{action}] with payload: #{inspect(payload)}"
     )
 
     req = %InvocationRequest{
       system: system,
       actor: actor,
       payload: {:value, payload},
-      command_name: command,
+      action_name: action,
       async: async?,
       caller: nil
     }
