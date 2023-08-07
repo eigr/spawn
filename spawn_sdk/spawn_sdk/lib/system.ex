@@ -12,12 +12,12 @@ defmodule SpawnSdk.System do
 
   @type system :: String.t()
 
-  @type command :: String.t()
+  @type action :: String.t()
 
   @type payload :: struct()
 
   @type invoke_opts :: [
-          command: command(),
+          action: action(),
           ref: actor_mod(),
           payload: payload(),
           system: system(),

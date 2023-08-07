@@ -201,7 +201,7 @@ defmodule Actor.ActorTest do
     end
   end
 
-  describe "handle_command/2" do
+  describe "handle_action/2" do
     test "simple call for valid pattern match" do
       id = Faker.Superhero.name()
       data = Faker.StarWars.character()
@@ -213,13 +213,13 @@ defmodule Actor.ActorTest do
       }
 
       request = %Eigr.Spawn.Actor.MyMessageRequest{id: id, data: data}
-      Actor.MyActor.handle_command({"sum", request}, ctx)
+      Actor.MyActor.handle_action({"sum", request}, ctx)
 
       assert {:ok,
               %SpawnSdk.Value{
                 state: %Eigr.Spawn.Actor.MyState{id: "1", value: 1},
                 value: %Eigr.Spawn.Actor.MyMessageResponse{}
-              }} = Actor.MyActor.handle_command({"sum", request}, ctx)
+              }} = Actor.MyActor.handle_action({"sum", request}, ctx)
     end
   end
 
@@ -231,7 +231,7 @@ defmodule Actor.ActorTest do
 
       assert SpawnSdk.invoke(dynamic_actor_name,
                ref: Actor.JsonActor,
-               command: "getState",
+               action: "getState",
                system: system
              ) == {:ok, %{value: 0}}
     end
@@ -245,7 +245,7 @@ defmodule Actor.ActorTest do
 
       assert SpawnSdk.invoke(dynamic_actor_name,
                ref: Actor.JsonActor,
-               command: "sum",
+               action: "sum",
                system: system,
                payload: payload
              ) == {:ok, %{value: 2}}
@@ -265,7 +265,7 @@ defmodule Actor.ActorTest do
                SpawnSdk.invoke(dynamic_actor_name,
                  ref: Actor.MyActor,
                  system: system,
-                 command: "pipe_caller",
+                 action: "pipe_caller",
                  payload: payload
                )
 
@@ -280,12 +280,12 @@ defmodule Actor.ActorTest do
       assert SpawnSdk.invoke(dynamic_actor_name,
                ref: Actor.MyActor,
                system: system,
-               command: "wrong_state"
+               action: "wrong_state"
              ) == {:ok, nil}
 
       assert SpawnSdk.invoke(dynamic_actor_name,
                ref: Actor.MyActor,
-               command: "getState",
+               action: "getState",
                system: system
              ) == {:error, :invalid_state_output}
     end
@@ -298,13 +298,13 @@ defmodule Actor.ActorTest do
       assert SpawnSdk.invoke(dynamic_actor_name,
                ref: Actor.MyActor,
                system: system,
-               command: "wrong_state_json"
+               action: "wrong_state_json"
              ) == {:ok, nil}
 
       assert SpawnSdk.invoke(dynamic_actor_name,
                ref: Actor.MyActor,
                system: system,
-               command: "get_state"
+               action: "get_state"
              ) == {:ok, nil}
     end
 
@@ -316,7 +316,7 @@ defmodule Actor.ActorTest do
       assert SpawnSdk.invoke(dynamic_actor_name,
                ref: Actor.MyActor,
                system: system,
-               command: "json_return"
+               action: "json_return"
              ) == {:ok, %{test: true}}
     end
 
@@ -332,7 +332,7 @@ defmodule Actor.ActorTest do
                SpawnSdk.invoke(dynamic_actor_name,
                  ref: Actor.MyActor,
                  system: system,
-                 command: "forward_caller",
+                 action: "forward_caller",
                  payload: payload
                )
 
@@ -356,7 +356,7 @@ defmodule Actor.ActorTest do
                SpawnSdk.invoke(dynamic_actor_name,
                  ref: Actor.MyActor,
                  system: system,
-                 command: "use_side_effect",
+                 action: "use_side_effect",
                  payload: payload
                )
 
@@ -375,7 +375,7 @@ defmodule Actor.ActorTest do
                SpawnSdk.invoke(dynamic_actor_name,
                  ref: Actor.MyActor,
                  system: system,
-                 command: "change_tags"
+                 action: "change_tags"
                )
 
       assert %{data: "initial"} = response
@@ -384,7 +384,7 @@ defmodule Actor.ActorTest do
                SpawnSdk.invoke(dynamic_actor_name,
                  ref: Actor.MyActor,
                  system: system,
-                 command: "change_tags"
+                 action: "change_tags"
                )
 
       assert %{data: "changed"} = response
@@ -400,7 +400,7 @@ defmodule Actor.ActorTest do
                SpawnSdk.invoke("pooledActor",
                  system: system,
                  pooled: true,
-                 command: "something"
+                 action: "something"
                )
 
       assert %{data: "something"} = response

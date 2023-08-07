@@ -69,7 +69,7 @@ invocation request type bytes encoded here :-)
 
 Actors are usually created at the beginning of the SDK's communication flow with the Proxy by the registration step described above. 
 However, some use cases require that Actors can be created ***on the fly***. 
-In other words, Spawn is used to bring to life Actors previously registered as Abstracts, giving them a name and thus creating a concrete instance at runtime for that Actor. Actors created with the Spawn feature are generally used when you want to share a behavior while maintaining the isolation characteristics of the actors.
+In other words, Spawn is used to bring to life Actors previously registered as Unamed, giving them a name and thus creating a concrete instance at runtime for that Actor. Actors created with the Spawn feature are generally used when you want to share a behavior while maintaining the isolation characteristics of the actors.
 For these situations we have the Spawning flow described below. 
 
 A user function that wants to Spawning new Actors in Proxy Spawn must proceed by making a POST request to the following endpoint:
@@ -141,7 +141,7 @@ InvocationRequest type bytes encoded here :-)
         |                                             |                                |  Proxy Make HTTP POST in /api/v1/actors/actions on SDK sending ActorInvocation    |
         |                                             |                                |<----------------------------------------------------------------------------------|
         |                                             |                                |                                                                                   |
-        |                                             |                                | Handle request, execute command                                                   |
+        |                                             |                                | Handle request, execute action                                                   |
         |                                             |                                |--------------------------------                                                   |
         |                                             |                                |                               |                                                   |
         |                                             |                                |<-------------------------------                                                   |

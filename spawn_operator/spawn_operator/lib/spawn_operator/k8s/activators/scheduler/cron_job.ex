@@ -34,7 +34,7 @@ defmodule SpawnOperator.K8s.Activators.Scheduler.CronJob do
               "./activator-cli",
               "#{sink["system"]}",
               "#{sink["actor"]}",
-              "#{sink["command"]}"
+              "#{sink["action"]}"
             ]
           }
         end)

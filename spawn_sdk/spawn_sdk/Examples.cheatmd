@@ -1,13 +1,13 @@
 # Examples
 
-## Using Singleton Actors
+## Using Named Actors
 
 ```elixir
 # my_actor.ex
 defmodule SpawnSdkExample.Actors.MyActor do
   use SpawnSdk.Actor,
     name: "jose", # Default is Full Qualified Module name a.k.a __MODULE__
-    kind: :singleton, # Default is already :singleton. Valid are :singleton | :abstract | :pooled
+    kind: :named, # Default is already :u«named. Valid are :named | :unamed | :pooled
     stateful: true, # Default is already true
     state_type: Io.Eigr.Spawn.Example.MyState,
     deactivate_timeout: 30_000,
@@ -39,28 +39,28 @@ defmodule SpawnSdkExample.Actors.MyActor do
   end
 end
 
-# Invoking Singleton Actor
+# Invoking Named Actor
 
-iex> SpawnSdk.invoke("joe", system: "spawn-system", command: "sum", payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1})
+iex> SpawnSdk.invoke("joe", system: "spawn-system", action: "sum", payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1})
   {:ok, %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 12}
 
 #  Invoke Actors with a delay set in milliseconds
-SpawnSdk.invoke("joe", system: "spawn-system", command: "ping", delay: 5_000)
+SpawnSdk.invoke("joe", system: "spawn-system", action: "ping", delay: 5_000)
   {:ok, :async}
 
 # Invoke Actors scheduled to a specific DateTime
-SpawnSdk.invoke("joe", system: "spawn-system", command: "ping", scheduled_to: ~U[2023-01-01 00:32:00.145Z])
+SpawnSdk.invoke("joe", system: "spawn-system", action: "ping", scheduled_to: ~U[2023-01-01 00:32:00.145Z])
   {:ok, :async}
 ```
 
-## Using Abstract Actors
+## Using Unamed Actors
 
 ```elixir
-# abstract.ex
-defmodule SpawnSdkExample.Actors.AbstractActor do
+# Unamed.ex
+defmodule SpawnSdkExample.Actors.UnamedActor do
   use SpawnSdk.Actor,
-    name: "abs_actor",
-    kind: :abstract,
+    name: "unamed_actor",
+    kind: :unamed,
     state_type: Io.Eigr.Spawn.Example.MyState
 
   require Logger
@@ -81,16 +81,16 @@ defmodule SpawnSdkExample.Actors.AbstractActor do
   end
 end
 
-# Spawning Abstract actors
-SpawnSdk.spawn_actor("robert", system: "spawn-system", actor: "abs_actor")
+# Spawning Unamed actors
+SpawnSdk.spawn_actor("robert", system: "spawn-system", actor: "unamed_actor")
   :ok
 
 #  Invoke Spawned Actors
-SpawnSdk.invoke("robert", system: "spawn-system", command: "sum", payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1})
+SpawnSdk.invoke("robert", system: "spawn-system", action: "sum", payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1})
   {:ok, %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 16}}
 
 #  Invoke Actors in a lazy way without having to spawn them before
-SpawnSdk.invoke("robert_lazy", ref: SpawnSdkExample.Actors.AbstractActor, system: "spawn-system", command: "sum", payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1})
+SpawnSdk.invoke("robert_lazy", ref: SpawnSdkExample.Actors.UnamedActor, system: "spawn-system", action: "sum", payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1})
   {:ok, %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1}}  
 ```
 
@@ -115,7 +115,7 @@ defmodule SpawnSdkExample.Actors.PooledActor do
 end
 
 # Invoke Pooled Actors
-SpawnSdk.invoke("pooled_actor", system: "spawn-system", command: "ping", pooled: true)
+SpawnSdk.invoke("pooled_actor", system: "spawn-system", action: "ping", pooled: true)
   {:ok, nil}
 ```
 
@@ -150,9 +150,9 @@ end
 
 ```elixir
 # side_effect.ex
-defmodule SpawnSdkExample.Actors.AbstractActor do
+defmodule SpawnSdkExample.Actors.UnamedActor do
   use SpawnSdk.Actor,
-    kind: :abstract,
+    kind: :unamed,
     stateful: false,
     state_type: Io.Eigr.Spawn.Example.MyState
 
@@ -195,7 +195,7 @@ end
 defmodule SpawnSdkExample.Actors.ForwardPipeActor do
   use SpawnSdk.Actor,
     name: "pipeforward",
-    kind: :singleton,
+    kind: :named,
     stateful: false
 
   require Logger
@@ -251,7 +251,7 @@ end
 # driver.ex
 defmodule Fleet.Actors.Driver do
   use SpawnSdk.Actor,
-    kind: :abstract,
+    kind: :unamed,
     # Set ´driver´ channel for all actors of the same type (Fleet.Actors.Driver)
     channel: "drivers",
     state_type: Fleet.Domain.Driver
@@ -305,7 +305,7 @@ defmodule SpawnSdkExample.Application do
         actors: [
           # your actors here
           SpawnSdkExample.Actors.MyActor,
-          SpawnSdkExample.Actors.AbstractActor,
+          SpawnSdkExample.Actors.UnamedActor,
           SpawnSdkExample.Actors.ClockActor,
           SpawnSdkExample.Actors.PooledActor
         ]

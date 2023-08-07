@@ -27,7 +27,7 @@ defmodule Actors.Security.Acl.Rules.AclEvaluator do
       ...> },
       ...> %Eigr.Functions.Protocol.InvocationRequest{
       ...>    actor: %Eigr.Functions.Protocol.Actors.Actor{id: %Eigr.Functions.Protocol.Actors.ActorId{name: "joe"}},
-      ...>    command_name: "get",
+      ...>    action_name: "get",
       ...>    caller: %Eigr.Functions.Protocol.Actors.ActorId{name: "robert", system: "actor-system"}
       ...> }
       ...> )
@@ -67,7 +67,7 @@ defmodule Actors.Security.Acl.Rules.AclEvaluator do
     %InvocationRequest{
       actor: %Actor{} = _actor,
       caller: %ActorId{name: from_actor_name, system: from_system},
-      command_name: action
+      action_name: action
     } = _invocation = Keyword.get(opts, :invocation)
 
     has_system? = match_op?(actor_systems, from_system)

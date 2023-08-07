@@ -27,15 +27,15 @@ defmodule Actors.Actor.Interface.Http do
   @impl true
   def invoke_host(
         %ActorInvocation{
-          command_name: command
+          action_name: command
         } = payload,
         %EntityState{
-          actor: %Actor{commands: commands}
+          actor: %Actor{actions: actions}
         } = state,
         default_actions
       ) do
     if Enum.member?(default_actions, command) and
-         not Enum.any?(default_actions, fn action -> contains_action?(commands, action) end) do
+         not Enum.any?(default_actions, fn action -> contains_action?(actions, action) end) do
       resp = do_invoke_default_action(payload, state)
 
       {:ok, resp, state}
@@ -100,7 +100,7 @@ defmodule Actors.Actor.Interface.Http do
     end
   end
 
-  defp contains_action?(commands, action), do: Enum.any?(commands, fn c -> c.name == action end)
+  defp contains_action?(actions, action), do: Enum.any?(actions, fn c -> c.name == action end)
 
   defp update_state(%EntityState{} = state, %Context{} = ctx) do
     actor = state.actor

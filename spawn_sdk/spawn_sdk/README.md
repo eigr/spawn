@@ -63,15 +63,15 @@ Now that we have defined our input and output types as Protobuf types we will ne
 
 Now that the protobuf types have been created we can proceed with the code. Example definition of an Actor.
 
-## Singleton Actors
+## Named Actors
 
-In this example we are creating an actor in a Singleton way, that is, it is a known actor at compile time.
+In this example we are creating an actor in a Named way, that is, it is a known actor at compile time.
 
 ```elixir
 defmodule SpawnSdkExample.Actors.MyActor do
   use SpawnSdk.Actor,
     name: "jose", # Default is Full Qualified Module name a.k.a __MODULE__
-    kind: :singleton, # Default is already :singleton. Valid are :singleton | :abstract | :pooled
+    kind: :named, # Default is already :named. Valid are :named | :unamed | :pooled
     stateful: true, # Default is already true
     state_type: Io.Eigr.Spawn.Example.MyState, # or :json if you don't care about protobuf types
     deactivate_timeout: 30_000,
@@ -108,15 +108,15 @@ Note Keep in mind that any Action that has the names present in the list below w
 
 Defaults inicialization Action names: "**init**", "**Init**", "**setup**", "**Setup**"
 
-## Abstract Actor
+## Unamed Actor
 
-We can also create Unnamed Dynamic/Lazy actors, that is, despite having its abstract behavior defined at compile time, a Lazy actor will only have a concrete instance when it is associated with an identifier/name at runtime. Below follows the same previous actor being defined as abstract.
+We can also create Unnamed Dynamic/Lazy actors, that is, despite having its unamed behavior defined at compile time, a Lazy actor will only have a concrete instance when it is associated with an identifier/name at runtime. Below follows the same previous actor being defined as Unamed.
 
 ```elixir
-defmodule SpawnSdkExample.Actors.AbstractActor do
+defmodule SpawnSdkExample.Actors.UnamedActor do
   use SpawnSdk.Actor,
-    name: "abs_actor",
-    kind: :abstract,
+    name: "unamed_actor",
+    kind: :unamed,
     state_type: Io.Eigr.Spawn.Example.MyState
 
   require Logger
@@ -136,9 +136,9 @@ defmodule SpawnSdkExample.Actors.AbstractActor do
 end
 ```
 
-Notice that the only thing that has changed is the the kind of actor, in this case the kind is set to :abstract.
+Notice that the only thing that has changed is the the kind of actor, in this case the kind is set to :unamed.
 
-> **_NOTE:_** Can Elixir programmers think in terms of singleton vs abstract actors as more or less known at startup vs dynamically supervised/registered? That is, defining your actors directly in the supervision tree or using a Dynamic Supervisor for that.
+> **_NOTE:_** Can Elixir programmers think in terms of Named vs Unamed actors as more or less known at startup vs dynamically supervised/registered? That is, defining your actors directly in the supervision tree or using a Dynamic Supervisor for that.
 
 ## Pooled Actors
 
@@ -168,13 +168,13 @@ end
 To invoke a pooled actor, it is necessary to pass the pooled: true option to the invoke function. See an example:
 
 ```elixir
-iex(spawn_a1@127.0.0.1)16> for _n <- 0..8, do: SpawnSdk.invoke("pooled_actor", system: "spawn-system", command: "ping", pooled: true)
+iex(spawn_a1@127.0.0.1)16> for _n <- 0..8, do: SpawnSdk.invoke("pooled_actor", system: "spawn-system", action: "ping", pooled: true)
 ```
 
 In the logs you will see that even though you have invoked the actor by the registered name more than one instance of the actor will be created. As we can see below:
 
 ```elixir
-iex(spawn_a1@127.0.0.1)16> for _n <- 0..8, do: SpawnSdk.invoke("pooled_actor", system: "spawn-system", command: "ping", pooled: true)
+iex(spawn_a1@127.0.0.1)16> for _n <- 0..8, do: SpawnSdk.invoke("pooled_actor", system: "spawn-system", action: "ping", pooled: true)
 
 2022-11-25 11:21:53.758 [spawn_a1@127.0.0.1]:[pid=<0.1392.0> ]:[notice]:Activating Actor pooled_actor-5 with Parent pooled_actor-5 in Node :"spawn_a1@127.0.0.1". Persistence false.
 2022-11-25 11:21:53.759 [spawn_a1@127.0.0.1]:[pid=<0.1391.0> ]:[debug]:Actor pooled_actor-5 reactivated. ActorRef PID: #PID<0.1392.0>
@@ -241,9 +241,9 @@ end
 Actors can also emit side effects to other Actors as part of their response. See an example:
 
 ```elixir
-defmodule SpawnSdkExample.Actors.AbstractActor do
+defmodule SpawnSdkExample.Actors.UnamedActor do
   use SpawnSdk.Actor,
-    kind: :abstract,
+    kind: :unamed,
     stateful: false,
     state_type: Io.Eigr.Spawn.Example.MyState
 
@@ -285,13 +285,13 @@ Side effects do not interfere with an actor's request-response flow. They will "
 
 ## Pipe and Forward
 
-Actors can also route some commands to other actors as part of their response. See an example:
+Actors can also route some actions to other actors as part of their response. See an example:
 
 ```elixir
 defmodule SpawnSdkExample.Actors.ForwardPipeActor do
   use SpawnSdk.Actor,
     name: "pipeforward",
-    kind: :singleton,
+    kind: :named,
     stateful: false
 
   require Logger
@@ -345,14 +345,14 @@ We are returning void in both examples so we dont care about what is being store
 In the case above, every time you call the `forward_example` the second_actor's `sum_plus_one` function will receive the value forwarded originally in the invocation as its input. The end result will be:
 
 ```elixir
-iex> SpawnSdk.invoke("pipeforward", system: "spawn-system", command: "forward_example", payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1})
+iex> SpawnSdk.invoke("pipeforward", system: "spawn-system", action: "forward_example", payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1})
 {:ok, %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 2}}
 ```
 
-For the Pipe example, the the second_actor's `sum_plus_one` function will always receive `%MyBusinessMessage{value: 999}` due to getting the value from the previous specification in the `pipe_example` command, the end result will be:
+For the Pipe example, the the second_actor's `sum_plus_one` function will always receive `%MyBusinessMessage{value: 999}` due to getting the value from the previous specification in the `pipe_example` action, the end result will be:
 
 ```elixir
-iex> SpawnSdk.invoke("pipeforward", system: "spawn-system", command: "pipe_example", payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1})
+iex> SpawnSdk.invoke("pipeforward", system: "spawn-system", action: "pipe_example", payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1})
 {:ok, %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1000}}
 ```
 
@@ -363,7 +363,7 @@ Actors can also send messages to a group of actors at once as an action callback
 ```elixir
 defmodule Fleet.Actors.Driver do
   use SpawnSdk.Actor,
-    kind: :abstract,
+    kind: :unamed,
     # Set ´driver´ channel for all actors of the same type (Fleet.Actors.Driver)
     channel: "drivers",
     state_type: Fleet.Domain.Driver
@@ -559,7 +559,7 @@ defmodule SpawnSdkExample.Application do
         system: "spawn-system",
         actors: [
           SpawnSdkExample.Actors.MyActor,
-          SpawnSdkExample.Actors.AbstractActor,
+          SpawnSdkExample.Actors.UnamedActor,
           SpawnSdkExample.Actors.ClockActor,
           SpawnSdkExample.Actors.PooledActor
         ]
@@ -608,54 +608,54 @@ And links to other examples can be found in our github [readme page](https://git
 To invoke Actors, use:
 
 ```elixir
-iex> SpawnSdk.invoke("joe", system: "spawn-system", command: "sum", payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1})
+iex> SpawnSdk.invoke("joe", system: "spawn-system", action: "sum", payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1})
 {:ok, %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 12}}
 ```
 
 You can invoke actor default functions like "get" to get its current state
 
 ```elixir
-SpawnSdk.invoke("joe", system: "spawn-system", command: "get")
+SpawnSdk.invoke("joe", system: "spawn-system", action: "get")
 ```
 
 Spawning Actors:
 
 ```elixir
-iex> SpawnSdk.spawn_actor("robert", system: "spawn-system", actor: "abs_actor")
+iex> SpawnSdk.spawn_actor("robert", system: "spawn-system", actor: "unamed_actor")
 :ok
 ```
 
 Invoke Spawned Actors:
 
 ```elixir
-iex> SpawnSdk.invoke("robert", system: "spawn-system", command: "sum", payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1})
+iex> SpawnSdk.invoke("robert", system: "spawn-system", action: "sum", payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1})
 {:ok, %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 16}}
 ```
 
 Invoke Actors in a lazy way without having to spawn them before:
 
 ```elixir
-iex> SpawnSdk.invoke("robert_lazy", ref: SpawnSdkExample.Actors.AbstractActor, system: "spawn-system", command: "sum", payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1})
+iex> SpawnSdk.invoke("robert_lazy", ref: SpawnSdkExample.Actors.UnamedActor, system: "spawn-system", action: "sum", payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1})
 {:ok, %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1}}
 ```
 
 Invoke Actors with a delay set in milliseconds:
 
 ```elixir
-iex> SpawnSdk.invoke("joe", system: "spawn-system", command: "ping", delay: 5_000)
+iex> SpawnSdk.invoke("joe", system: "spawn-system", action: "ping", delay: 5_000)
 {:ok, :async}
 ```
 
 Invoke Actors scheduled to a specific DateTime:
 
 ```elixir
-iex> SpawnSdk.invoke("joe", system: "spawn-system", command: "ping", scheduled_to: ~U[2023-01-01 00:32:00.145Z])
+iex> SpawnSdk.invoke("joe", system: "spawn-system", action: "ping", scheduled_to: ~U[2023-01-01 00:32:00.145Z])
 {:ok, :async}
 ```
 
 Invoke Pooled Actors:
 
 ```elixir
-iex> SpawnSdk.invoke("pooled_actor", system: "spawn-system", command: "ping", pooled: true)
+iex> SpawnSdk.invoke("pooled_actor", system: "spawn-system", action: "ping", pooled: true)
 {:ok, nil}
 ```

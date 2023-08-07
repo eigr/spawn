@@ -43,7 +43,7 @@ defmodule ActivatorAPI.Api.Dispatcher.UnaryDispatcher do
       },
       metadata: metadata,
       payload: payload,
-      command_name: action,
+      action_name: action,
       async: cast(async, :boolean),
       caller: nil,
       pooled: cast(pooled, :boolean)

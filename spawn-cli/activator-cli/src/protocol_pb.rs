@@ -169,7 +169,7 @@ pub enum Kind {
     /// Abstract actors are used to create children of this based actor at runtime
     Abstract = 1,
     /// Singleton actors as the name suggests have only one real instance of themselves running
-    /// during their entire lifecycle. That is, they are the opposite of the Abstract type Actors.
+    /// during their entire lifecycle. That is, they are the opposite of the Unamed type Actors.
     Singleton = 2,
     /// Pooled Actors are similar to abstract actors, but unlike them,
     /// their identifying name will always be the one registered at the system initialization stage.

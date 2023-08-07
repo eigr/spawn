@@ -130,8 +130,8 @@ defmodule Actors do
     * `opts` - The options to create Actors
 
   spawn_actor must be used when you want to create a concrete instance of an actor
-  previously registered as abstract.
-  That is, when an Actorid is associated with an actor of abstract type.
+  previously registered as unamed.
+  That is, when an Actorid is associated with an actor of unamed type.
   This function only registers the metadata of the new actor, not activating it.
   This will occur when the sprite is first invoked.
   ##
@@ -148,7 +148,7 @@ defmodule Actors do
 
           error ->
             raise ArgumentError,
-                  "You are trying to create an actor from an Abstract actor that has never been registered before. ActorId: #{inspect(id)}. Details. #{inspect(error)}"
+                  "You are trying to create an actor from an Unamed actor that has never been registered before. ActorId: #{inspect(id)}. Details. #{inspect(error)}"
         end
       end)
       |> List.flatten()
@@ -162,10 +162,10 @@ defmodule Actors do
   defp to_spawn_hosts(id, actor_hosts) do
     Enum.map(actor_hosts, fn %HostActor{
                                node: node,
-                               actor: %Actor{} = abstract_actor,
+                               actor: %Actor{} = unamed_actor,
                                opts: opts
                              } = _host ->
-      spawned_actor = %Actor{abstract_actor | id: id}
+      spawned_actor = %Actor{unamed_actor | id: id}
       %HostActor{node: node, actor: spawned_actor, opts: opts}
     end)
   end
@@ -253,7 +253,7 @@ defmodule Actors do
         %InvocationRequest{
           actor: %Actor{id: %ActorId{name: _name, system: _actor_id_system} = actor_id} = actor,
           system: %ActorSystem{} = system,
-          command_name: command_name,
+          action_name: action_name,
           async: async?,
           metadata: metadata,
           caller: caller,
@@ -334,7 +334,7 @@ defmodule Actors do
         end
       end)
 
-    Measurements.dispatch_invoke_duration(system.name, actor.id.name, command_name, time)
+    Measurements.dispatch_invoke_duration(system.name, actor.id.name, action_name, time)
     result
   end
 
@@ -553,7 +553,7 @@ defmodule Actors do
       kind == :POOLED ->
         false
 
-      match?(true, stateful) and kind != :ABSTRACT ->
+      match?(true, stateful) and kind != :UNAMED ->
         true
 
       not is_nil(channel) and byte_size(channel) > 0 ->
