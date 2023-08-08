@@ -74,7 +74,6 @@ defmodule Spawn.MixProject do
       {:shards, "~> 1.1"},
       {:telemetry, "~> 1.0"},
       {:castore, "~> 1.0"},
-      {:duration_tc, "~> 0.1.0"},
       {:protobuf, "~> 0.11"},
       {:finch, "~> 0.16"},
       {:retry, "~> 0.17"},

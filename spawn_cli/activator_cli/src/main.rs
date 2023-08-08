@@ -8,7 +8,7 @@ use std::env;
 
 #[tokio::main]
 async fn main() -> Result<(), async_nats::Error> {
-    let [_, system, actor_name, command_name]: [String; 4] = env::args()
+    let [_, system, actor_name, action_name]: [String; 4] = env::args()
         .collect::<Vec<String>>()
         .into_iter()
         .take(4)
@@ -36,7 +36,7 @@ async fn main() -> Result<(), async_nats::Error> {
             ..Default::default()
         }),
         r#async: true,
-        command_name,
+        action_name,
         ..Default::default()
     };
 

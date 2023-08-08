@@ -1,4 +1,4 @@
-version=1.0.0-rc13
+version=1.0.0-rc16
 registry=eigr
 
 CLUSTER_NAME=spawn-k8s
@@ -12,7 +12,7 @@ activator-kafka-image=${registry}/spawn-activator-kafka:${version}
 activator-pubsub-image=${registry}/spawn-activator-pubsub:${version}
 activator-rabbitmq-image=${registry}/spawn-activator-rabbitmq:${version}
 activator-sqs-image=${registry}/spawn-activator-sqs:${version}
-activator-cli-image=${registry}/spawn-activator-cli:0.1.2
+activator-cli-image=${registry}/spawn-activator-cli:0.1.3
 spawn-sdk-example-image=${registry}/spawn-sdk-example:${version}
 
 ifeq "$(PROXY_DATABASE_TYPE)" ""
@@ -143,6 +143,9 @@ run-proxy-local:
 
 run-proxy-local2:
 	ERL_ZFLAGS='-proto_dist inet_tls -ssl_dist_optfile rel/overlays/local-mtls.ssl.conf' cd spawn_proxy/proxy && mix deps.get && PROXY_DATABASE_TYPE=$(database) PROXY_HTTP_PORT=9003 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= iex --name spawn_a2@test.default.svc -S mix
+
+run-proxy-local-nodejs-test:
+	ERL_ZFLAGS='-proto_dist inet_tls -ssl_dist_optfile rel/overlays/local-mtls.ssl.conf' cd spawn_proxy/proxy && mix deps.get && PROXY_DATABASE_TYPE=$(database) PROXY_HTTP_PORT=9001 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= PROXY_ACTOR_SYSTEM_NAME=SpawnSysTest SPAWN_SUPERVISORS_STATE_HANDOFF_CONTROLLER=persistent iex --name spawn_a1@test.default.svc -S mix
 
 run-sdk-local:
 	cd spawn_sdk/spawn_sdk_example && mix deps.get && PROXY_CLUSTER_STRATEGY=gossip PROXY_DATABASE_TYPE=$(database) SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= iex --name spawn_actors_node@127.0.0.1 -S mix

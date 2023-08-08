@@ -9,8 +9,8 @@ defmodule Proxy.Application do
   def start(type, args), do: do_start(type, args)
 
   defp do_start(_type, _args) do
-    [time: _time, humanized_duration: humanized_duration, reply: reply] =
-      Timer.tc(fn ->
+    {u_secs, reply} =
+      :timer.tc(fn ->
         Node.set_cookie(String.to_atom(System.get_env("NODE_COOKIE", "spawncookie123")))
 
         config = Config.load(__MODULE__)
@@ -27,7 +27,7 @@ defmodule Proxy.Application do
     case reply do
       {:ok, pid} ->
         Logger.info(
-          "Proxy Application started successfully in #{humanized_duration}. Running with #{inspect(System.schedulers_online())} schedulers."
+          "Proxy Application started successfully in #{u_secs / 1_000_000}ms. Running with #{inspect(System.schedulers_online())} schedulers."
         )
 
         {:ok, pid}
