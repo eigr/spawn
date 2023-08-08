@@ -43,7 +43,7 @@ defmodule Actors.Actor.InvocationScheduler do
   @impl true
   def handle_info({:invoke, decoded_request}, state) do
     ActorRegistry.remove_invocation_request(
-      decoded_request.actor.id.name,
+      decoded_request.actor.id,
       InvocationRequest.encode(decoded_request)
     )
 
@@ -65,7 +65,7 @@ defmodule Actors.Actor.InvocationScheduler do
     encoded_request = InvocationRequest.encode(request)
 
     spawn(fn ->
-      ActorRegistry.register_invocation_request(request.actor.id.name, encoded_request)
+      ActorRegistry.register_invocation_request(request.actor.id, encoded_request)
     end)
 
     call_invoke(request)
