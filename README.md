@@ -307,7 +307,7 @@ metadata:
 spec:
   host:
     embedded: true # This indicates that it is a native BEAM application and therefore does not need a sidecar proxy attached.
-    image: eigr/dice-game-example:0.5.3
+    image: eigr/dice-game-example:1.0.0-rc.17
     ports:
       - name: "http"
         containerPort: 8800
