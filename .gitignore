@@ -2,7 +2,7 @@
 .idea
 .elixir_ls
 
-spawn-cli/**/target/
+spawn_cli/**/target/
 
 # The directory Mix will write compiled artifacts to.
 /_build/

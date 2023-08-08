@@ -11,8 +11,7 @@ COPY spawn_initializer/ .
 RUN mix local.rebar --force \
     && mix local.hex --force \
     && mix deps.get \
-    && mix release.init 
-#&& mix rewrite_versions --apps=spawn,proxy
+    && mix release.init
 
 # Overriden at runtime
 ENV POD_IP="127.0.0.1"

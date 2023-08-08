@@ -9,6 +9,7 @@ RUN apk add --no-cache --update git build-base ca-certificates zstd
 RUN mkdir config
 COPY config/ ./config
 COPY spawn_sdk/ ./spawn_sdk
+COPY spawn_statestores/ ./spawn_statestores
 COPY lib/ ./lib
 COPY priv/ ./priv
 COPY mix.exs .
@@ -17,8 +18,7 @@ COPY mix.lock .
 RUN mix local.rebar --force \
     && mix local.hex --force \
     && mix deps.get \
-    && mix release.init \
-    && mix rewrite_versions --apps=spawn
+    && mix release.init
 
 RUN echo "-name spawn_sdk_elixir@${HOSTNAME}" >> ./rel/vm.args.eex \
     && echo "-setcookie ${NODE_COOKIE}" >> ./rel/vm.args.eex

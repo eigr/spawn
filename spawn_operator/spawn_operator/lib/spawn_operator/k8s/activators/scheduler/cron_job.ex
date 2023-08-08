@@ -3,7 +3,7 @@ defmodule SpawnOperator.K8s.Activators.Scheduler.CronJob do
 
   @behaviour SpawnOperator.K8s.Manifest
 
-  @activator_cli_version "0.1.2"
+  @activator_cli_version "0.1.3"
 
   @impl true
   def manifest(resource, _opts \\ []) do

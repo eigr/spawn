@@ -18,8 +18,7 @@ COPY mix.lock .
 RUN mix local.rebar --force \
     && mix local.hex --force \
     && mix deps.get \
-    && mix release.init 
-#&& mix rewrite_versions --apps=spawn,proxy
+    && mix release.init
 
 ENV RELEASE_DISTRIBUTION="name"
 
