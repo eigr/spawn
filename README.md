@@ -4,11 +4,9 @@
 
 **Actor Mesh Serverless Platform**
 
-
 ![ci](https://github.com/eigr/spawn/actions/workflows/ci.yaml/badge.svg) ![release](https://github.com/eigr/spawn/actions/workflows/release.yaml/badge.svg) ![last commit](https://img.shields.io/github/last-commit/eigr/spawn?style=social) [![join discord](https://badgen.net/badge/discord/Join%20Eigr%20on%20Discord/discord?icon=discord&label&color=blue)](https://discord.gg/2PcshvfS93) [![twitter](https://badgen.net/badge/twitter/Follow%20Eigr%20on%20Twitter/discord?icon=twitter&label&color=blue)](https://discord.gg/2PcshvfS93)
 
-
-### **[Website](https://eigr.io)** • **[Getting Started](#getting-started)** • **[SDKs](#sdks)** • **[Documentation](https://eigr.io/docs/projects-spawn/spawn-introduction/)** • **[Blog](https://eigr.io/blog/)** 
+### **[Website](https://eigr.io)** • **[Getting Started](#getting-started)** • **[SDKs](#sdks)** • **[Documentation](https://eigr.io/docs/projects-spawn/spawn-introduction/)** • **[Blog](https://eigr.io/blog/)**
 
 ## Overview
 
@@ -131,9 +129,9 @@ In turn, each Sidecar container within a POD organizes itself to form an Erlang 
 
 - [x] Distribution. Automatic and transparent cluster formation via Kubernetes Operator.
   - [x] Erlang Distributed as transport.
-     - [x] mTLS Support with Erlang Dist.
-     - [x] Automatic renewal of certificates.
-  - [x] Cross ActorSystem invocation Nats distribution.   
+    - [x] mTLS Support with Erlang Dist.
+    - [x] Automatic renewal of certificates.
+  - [x] Cross ActorSystem invocation Nats distribution.
 - [x] Configuration management via Kubernetes [CRDs](https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definitions/) and Envinronment Variables.
 - [x] Statestores. Adapters for persistent storage using multiple database providers.
   - [x] Sqlite
@@ -190,8 +188,8 @@ The recommended way to install Spawn is via our Kubernetes Operator.
 
 ### Prerequisites
 
-* Kubernetes Cluster
-* Nats broker accessible within the cluster (See the note below).
+- Kubernetes Cluster
+- Nats broker accessible within the cluster (See the note below).
 
 > **_Important:_** Nats broker is only necessary if you want to use the Activators feature or if you need your actors to communicate between different ActorSystems.
 
@@ -206,7 +204,7 @@ kubectl create ns eigr-functions && curl -L https://github.com/eigr/spawn/releas
 > **_NOTE:_** You need to inform the desired release version. For example:
 
 ```shell
-kubectl create ns eigr-functions && curl -L https://github.com/eigr/spawn/releases/download/v1.0.0-rc3/manifest.yaml | kubectl apply -f -
+kubectl create ns eigr-functions && curl -L https://github.com/eigr/spawn/releases/download/v1.0.0-rc16/manifest.yaml | kubectl apply -f -
 ```
 
 ## Getting Started
@@ -487,7 +485,6 @@ https://docs.microsoft.com/en-us/azure/architecture/patterns/sidecar
 https://www.youtube.com/watch?v=j7JKkbAiWuI
 
 https://medium.com/nerd-for-tech/microservice-design-pattern-sidecar-sidekick-pattern-dbcea9bed783
-
 
 ### Nats
 

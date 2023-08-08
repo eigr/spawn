@@ -40,7 +40,7 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
-          image: eigr/spawn-operator:1.0.0-rc3
+          image: eigr/spawn-operator:1.0.0-rc16
           imagePullPolicy: IfNotPresent
           name: spawn-operator
           resources:
