@@ -9,7 +9,7 @@ RUN update-ca-certificates
 
 WORKDIR /
 
-COPY ./spawn-cli/activator-cli .
+COPY ./spawn_cli/activator_cli .
 
 RUN cargo build --target x86_64-unknown-linux-musl --release
 
