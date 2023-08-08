@@ -303,7 +303,8 @@ kind: ActorHost
 metadata:
   name: spawn-dice-game
   namespace: default
-    spawn-eigr.io/actor-system: spawn-system
+  annotations:
+    spawn-eigr.io/actor-system: game-system
 spec:
   host:
     embedded: true # This indicates that it is a native BEAM application and therefore does not need a sidecar proxy attached.
