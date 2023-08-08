@@ -3,7 +3,6 @@ defmodule Actors.Supervisors.ActorSupervisor do
   use Supervisor
   require Logger
 
-  @acl_manager Application.compile_env(:spawn, :acl_manager)
   @base_app_dir File.cwd!()
 
   def start_link(config) do
@@ -20,7 +19,7 @@ defmodule Actors.Supervisors.ActorSupervisor do
   @impl true
   def init(config) do
     Protobuf.load_extensions()
-    @acl_manager.load_acl_policies("#{@base_app_dir}/policies")
+    get_acl_manager().load_acl_policies("#{@base_app_dir}/policies")
 
     children =
       [
@@ -30,6 +29,9 @@ defmodule Actors.Supervisors.ActorSupervisor do
 
     Supervisor.init(children, strategy: :one_for_one)
   end
+
+  defp get_acl_manager(),
+    do: Application.get_env(:spawn, :acl_manager, Actors.Security.Acl.DefaultAclManager)
 
   defp maybe_add_invocation_scheduler(config) do
     if config.delayed_invokes == "true" do
