@@ -7,7 +7,7 @@ metadata:
   name: spawn-operator
   namespace: eigr-functions
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       k8s-app: spawn-operator
@@ -20,6 +20,8 @@ spec:
         - env:
             - name: MIX_ENV
               value: prod
+            - name: BONNY_OPERATOR_NAME
+              value: spawn-operator
             - name: BONNY_POD_NAME
               valueFrom:
                 fieldRef:
@@ -36,12 +38,7 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: spec.serviceAccountName
-            - name: BONNY_OPERATOR_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
           image: eigr/spawn-operator:1.0.0-rc.17
-          imagePullPolicy: IfNotPresent
           name: spawn-operator
           resources:
             limits:
@@ -188,9 +185,119 @@ metadata:
   name: spawn-operator
 rules:
   - apiGroups:
+      - ""
+    resources:
+      - configmaps
+    verbs:
+      - "*"
+  - apiGroups:
+      - ""
+    resources:
+      - node
+    verbs:
+      - get
+      - list
+  - apiGroups:
+      - ""
+    resources:
+      - nodes
+    verbs:
+      - get
+      - list
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+    verbs:
+      - "*"
+  - apiGroups:
+      - ""
+    resources:
+      - services
+    verbs:
+      - "*"
+  - apiGroups:
       - apiextensions.k8s.io
     resources:
       - customresourcedefinitions
+    verbs:
+      - "*"
+  - apiGroups:
+      - apps
+    resources:
+      - daemonsets
+    verbs:
+      - "*"
+  - apiGroups:
+      - apps
+    resources:
+      - deployments
+    verbs:
+      - "*"
+  - apiGroups:
+      - autoscaling
+    resources:
+      - horizontalpodautoscalers
+    verbs:
+      - "*"
+  - apiGroups:
+      - batch
+    resources:
+      - cronjob
+    verbs:
+      - "*"
+  - apiGroups:
+      - batch
+    resources:
+      - cronjobs
+    verbs:
+      - "*"
+  - apiGroups:
+      - batch
+    resources:
+      - job
+    verbs:
+      - "*"
+  - apiGroups:
+      - batch
+    resources:
+      - jobs
+    verbs:
+      - "*"
+  - apiGroups:
+      - batch/v1
+    resources:
+      - cronjob
+    verbs:
+      - "*"
+  - apiGroups:
+      - batch/v1
+    resources:
+      - cronjobs
+    verbs:
+      - "*"
+  - apiGroups:
+      - batch/v1
+    resources:
+      - job
+    verbs:
+      - "*"
+  - apiGroups:
+      - batch/v1
+    resources:
+      - jobs
+    verbs:
+      - "*"
+  - apiGroups:
+      - cert-manager.io/v1
+    resources:
+      - certificate
+    verbs:
+      - "*"
+  - apiGroups:
+      - coordination.k8s.io
+    resources:
+      - leases
     verbs:
       - "*"
   - apiGroups:
@@ -200,9 +307,33 @@ rules:
     verbs:
       - "*"
   - apiGroups:
-      - coordination.k8s.io
+      - extensions
     resources:
-      - leases
+      - ingressclasses
+    verbs:
+      - "*"
+  - apiGroups:
+      - extensions
+    resources:
+      - ingresses
+    verbs:
+      - "*"
+  - apiGroups:
+      - networking.k8s.io
+    resources:
+      - ingressclasses
+    verbs:
+      - "*"
+  - apiGroups:
+      - networking.k8s.io
+    resources:
+      - ingresses
+    verbs:
+      - "*"
+  - apiGroups:
+      - rbac.authorization.k8s.io/v1
+    resources:
+      - role
     verbs:
       - "*"
   - apiGroups:
@@ -218,70 +349,6 @@ rules:
     verbs:
       - "*"
   - apiGroups:
-      - ""
-    resources:
-      - secrets
-    verbs:
-      - "*"
-  - apiGroups:
-      - batch/v1
-    resources:
-      - cronjob
-      - cronjobs
-      - job
-      - jobs
-    verbs:
-      - "*"
-  - apiGroups:
-      - batch
-    resources:
-      - cronjob
-      - cronjobs
-      - job
-      - jobs
-    verbs:
-      - "*"
-  - apiGroups:
-      - v1
-    resources:
-      - pods
-    verbs:
-      - "*"
-  - apiGroups:
-      - apps
-    resources:
-      - deployments
-      - daemonsets
-    verbs:
-      - "*"
-  - apiGroups:
-      - ""
-    resources:
-      - services
-      - configmaps
-    verbs:
-      - "*"
-  - apiGroups:
-      - autoscaling
-    resources:
-      - horizontalpodautoscalers
-    verbs:
-      - "*"
-  - apiGroups:
-      - extensions
-    resources:
-      - ingresses
-      - ingressclasses
-    verbs:
-      - "*"
-  - apiGroups:
-      - networking.k8s.io
-    resources:
-      - ingresses
-      - ingressclasses
-    verbs:
-      - "*"
-  - apiGroups:
       - spawn-eigr.io
     resources:
       - actorhosts
@@ -291,28 +358,6 @@ rules:
       - spawn-eigr.io
     resources:
       - actorhosts/status
-    verbs:
-      - "*"
-  - apiGroups:
-      - ""
-    resources:
-      - node
-      - nodes
-    verbs:
-      - get
-      - list
-  - apiGroups:
-      - v1
-    resources:
-      - node
-      - nodes
-    verbs:
-      - get
-      - list
-  - apiGroups:
-      - apps
-    resources:
-      - deployments
     verbs:
       - "*"
   - apiGroups:
@@ -335,9 +380,22 @@ rules:
       - get
       - list
   - apiGroups:
-      - cert-manager.io/v1
+      - v1
     resources:
-      - certificate
+      - nodes
+    verbs:
+      - get
+      - list
+  - apiGroups:
+      - v1
+    resources:
+      - pods
+    verbs:
+      - "*"
+  - apiGroups:
+      - v1
+    resources:
+      - serviceaccount
     verbs:
       - "*"
 
