@@ -51,10 +51,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
     Process.flag(:trap_exit, true)
 
     split_brain_detector_mod =
-      Application.get_env(
-        :spawn,
-        :split_brain_detector
-      )
+      Application.get_env(:spawn, :split_brain_detector, Actors.Node.DefaultSplitBrainDetector)
 
     Logger.notice(
       "Activating Actor #{name} with Parent #{parent} in Node #{inspect(Node.self())}. Persistence #{stateful?}."
