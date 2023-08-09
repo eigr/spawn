@@ -8,6 +8,7 @@ defmodule Actors.Actor.Entity.Invocation do
 
   alias Actors.Actor.Entity.EntityState
   alias Actors.Exceptions.NotAuthorizedException
+  alias Actors.Security.Acl.DefaultAclManager
 
   alias Eigr.Functions.Protocol.Actors.{
     Actor,
@@ -34,8 +35,6 @@ defmodule Actors.Actor.Entity.Invocation do
   alias Phoenix.PubSub
 
   alias Spawn.Utils.AnySerializer
-
-  @acl_manager Application.compile_env(:spawn, :acl_manager)
 
   @default_actions [
     "get",
@@ -211,8 +210,8 @@ defmodule Actors.Actor.Entity.Invocation do
           opts: actor_opts
         } = state
       ) do
-    if @acl_manager.get_policies!()
-       |> @acl_manager.is_authorized?(invocation) do
+    if get_acl_manager().get_policies!()
+       |> get_acl_manager().is_authorized?(invocation) do
       ctx = Keyword.get(opts, :span_ctx, OpenTelemetry.Ctx.new())
 
       Tracer.with_span ctx, "#{actor_name} invocation handler", kind: :server do
@@ -541,4 +540,7 @@ defmodule Actors.Actor.Entity.Invocation do
   end
 
   defp get_interface(opts), do: Keyword.get(opts, :interface, @http_host_interface)
+
+  defp get_acl_manager(),
+    do: Application.get_env(:spawn, :acl_manager, Actors.Security.Acl.DefaultAclManager)
 end
