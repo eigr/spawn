@@ -1,4 +1,4 @@
-defmodule StatestoresMysql.MixProject do
+defmodule StatestoresMariaDB.MixProject do
   use Mix.Project
 
   @app :spawn_statestores_mysql

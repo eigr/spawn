@@ -1,15 +1,15 @@
-defmodule StatestoresSqlite.MixProject do
+defmodule StatestoresMysql.MixProject do
   use Mix.Project
 
-  @app :spawn_statestores_sqlite
+  @app :spawn_statestores_mariadb
   @version "0.0.0-local.dev"
-  @source_url "https://github.com/eigr/spawn/blob/main/spawn_statestores/statestores_sqlite"
+  @source_url "https://github.com/eigr/spawn/blob/main/spawn_statestores/statestores_mariadb"
 
   def project do
     [
       app: @app,
       version: @version,
-      description: "Spawn Statestores Sqlite3 is a storage lib for the Spawn Actors System",
+      description: "Spawn Statestores Mysql is a storage lib for the Spawn Actors System",
       source_url: @source_url,
       homepage_url: "https://eigr.io/",
       build_path: "../../_build",
@@ -57,9 +57,11 @@ defmodule StatestoresSqlite.MixProject do
     [
       {:vapor, "~> 0.10"},
       {:cloak_ecto, "~> 1.2"},
-      {:ecto_sql, "~> 3.8"},
+      # {:ecto_sql, "~> 3.8"},
+      {:ecto_sql,
+       git: "https://github.com/elixir-ecto/ecto_sql.git", branch: "master", override: true},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
-      {:ecto_sqlite3, "~> 0.10.0", override: true},
+      {:myxql, "~> 0.6"},
       {:spawn_statestores, path: "../statestores"}
     ]
   end
