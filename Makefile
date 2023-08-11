@@ -139,7 +139,7 @@ apply-k8s-manifests:
 	kubectl -n eigr-functions apply -f spawn_operator/spawn_operator/manifest.yaml
 
 run-proxy-local:
-	ERL_ZFLAGS='-proto_dist inet_tls -ssl_dist_optfile rel/overlays/local-mtls.ssl.conf' cd spawn_proxy/proxy && mix deps.get && PROXY_DATABASE_TYPE=$(database) PROXY_HTTP_PORT=9002 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= iex --name spawn_a1@test.default.svc -S mix
+	ERL_ZFLAGS='-proto_dist inet_tls -ssl_dist_optfile rel/overlays/local-mtls.ssl.conf' cd spawn_proxy/proxy && mix deps.get && PROXY_DATABASE_TYPE=$(database) PROXY_HTTP_PORT=9002 USER_FUNCTION_PORT=8091 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= iex --name spawn_a1@test.default.svc -S mix
 
 run-proxy-local2:
 	ERL_ZFLAGS='-proto_dist inet_tls -ssl_dist_optfile rel/overlays/local-mtls.ssl.conf' cd spawn_proxy/proxy && mix deps.get && PROXY_DATABASE_TYPE=$(database) PROXY_HTTP_PORT=9003 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= iex --name spawn_a2@test.default.svc -S mix
