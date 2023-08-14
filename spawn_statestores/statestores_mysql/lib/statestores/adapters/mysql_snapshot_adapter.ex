@@ -12,6 +12,12 @@ defmodule Statestores.Adapters.MySQLSnapshotAdapter do
 
   def get_by_key(id), do: get_by(Snapshot, id: id)
 
+  def get_by_key_and_revision(_id, _revision), do: raise("Not implemented")
+
+  def get_all_snapshots_by_key(_id), do: raise("Not implemented")
+
+  def get_snapshots_by_interval(_id, _time_start, _time_end), do: raise("Not implemented")
+
   def save(
         %Snapshot{
           system: system,

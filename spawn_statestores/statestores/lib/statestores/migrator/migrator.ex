@@ -6,7 +6,6 @@ defmodule Statestores.Migrator do
 
   @spec migrate(module()) :: {:ok, any, any}
   def migrate(adapter) do
-    IO.inspect(adapter, label: "Adapter --------------------------")
     load_app()
 
     {:ok, _, _} = Ecto.Migrator.with_repo(adapter, &Ecto.Migrator.run(&1, :up, all: true))

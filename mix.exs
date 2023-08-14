@@ -98,6 +98,8 @@ defmodule Spawn.MixProject do
       {:opentelemetry, "~> 1.0"},
       {:opentelemetry_exporter, "~> 1.0"},
       # Statestores deps
+      {:ecto, [env: :prod, git: "https://github.com/elixir-ecto/ecto.git", override: true]},
+      {:ecto_sql, [env: :prod, git: "https://github.com/elixir-ecto/ecto_sql.git", branch: "master", override: true]},
       {:spawn_statestores_mssql, path: "./spawn_statestores/statestores_mssql", optional: false},
       {:spawn_statestores_mariadb, path: "./spawn_statestores/statestores_mariadb", optional: false},
       {:spawn_statestores_mysql, path: "./spawn_statestores/statestores_mysql", optional: false},

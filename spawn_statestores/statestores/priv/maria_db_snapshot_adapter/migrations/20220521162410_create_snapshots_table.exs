@@ -15,7 +15,8 @@ defmodule Statestores.Adapters.MariaDBSnapshotAdapter.Migrations.CreateSnapshots
       data LONGBLOB,
       inserted_at TIMESTAMP,
       updated_at TIMESTAMP
-    ) WITH SYSTEM VERSIONING;
+    )
+    WITH SYSTEM VERSIONING PARTITION BY SYSTEM_TIME LIMIT 1000 AUTO;
     """
 
     create(index(:snapshots, [:status]))

@@ -63,6 +63,9 @@ test-spawn:
 test-statestores_mysql:
 	cd spawn_statestores/statestores_mysql && MIX_ENV=test mix deps.get && MIX_ENV=test  PROXY_CLUSTER_STRATEGY=gossip PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
 
+test-statestores_mariadb:
+	cd spawn_statestores/statestores_mariadb && MIX_ENV=test mix deps.get && MIX_ENV=test  PROXY_CLUSTER_STRATEGY=gossip PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
+
 test-statestores_postgres:
 	cd spawn_statestores/statestores_postgres && MIX_ENV=test mix deps.get && MIX_ENV=test PROXY_CLUSTER_STRATEGY=gossip PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
 
