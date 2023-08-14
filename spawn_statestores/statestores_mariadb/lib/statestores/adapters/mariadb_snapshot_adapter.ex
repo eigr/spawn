@@ -13,8 +13,14 @@ defmodule Statestores.Adapters.MariaDBSnapshotAdapter do
   def get_by_key(id), do: get_by(Snapshot, id: id)
 
   def get_by_key_and_revision(id, revision) do
-    query =
-      "SELECT * FROM snapshots FOR SYSTEM_TIME ALL WHERE id = #{id} AND revision = #{revision} ORDER BY inserted_at, updated_at DESC"
+    query = """
+    SELECT *
+      FROM snapshots
+       FOR SYSTEM_TIME ALL
+     WHERE id = #{id}
+       AND revision = #{revision}
+     ORDER BY inserted_at, updated_at DESC
+    """
 
     %MyXQL.Result{rows: rows} =
       Ecto.Adapters.SQL.query!(Statestores.Adapters.MariaDBSnapshotAdapter, query)
@@ -113,7 +119,7 @@ defmodule Statestores.Adapters.MariaDBSnapshotAdapter do
   defp to_snapshot(row) do
     tags = to_map(Enum.at(row, 6))
 
-    %Statestores.Schemas.Snapshot{
+    %Snapshot{
       id: Enum.at(row, 0),
       actor: Enum.at(row, 1),
       system: Enum.at(row, 2),
