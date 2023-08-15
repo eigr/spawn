@@ -102,14 +102,6 @@ defmodule Actors.Actor.Entity.Lifecycle do
     {:ok, state, {:continue, :load_state}}
   end
 
-  defp get_state(id, revision) do
-    if revision <= 0 do
-      StateManager.load(id)
-    else
-      StateManager.load(id, revision)
-    end
-  end
-
   def load_state(
         %EntityState{
           actor:
@@ -308,6 +300,14 @@ defmodule Actors.Actor.Entity.Lifecycle do
   end
 
   def deactivate(state), do: {:noreply, state, :hibernate}
+
+  defp get_state(id, revision) do
+    if revision <= 0 do
+      StateManager.load(id)
+    else
+      StateManager.load(id, revision)
+    end
+  end
 
   defp is_actor_valid?(
          %Actor{
