@@ -102,11 +102,20 @@ defmodule Actors.Actor.Entity.Lifecycle do
     {:ok, state, {:continue, :load_state}}
   end
 
+  defp get_state(id, revision) do
+    if revision <= 0 do
+      StateManager.load(id)
+    else
+      StateManager.load(id, revision)
+    end
+  end
+
   def load_state(
         %EntityState{
           actor:
             %Actor{settings: %ActorSettings{stateful: true}, id: %ActorId{name: name} = id} =
               actor,
+          revision: revision,
           opts: opts
         } = state
       ) do
@@ -118,7 +127,9 @@ defmodule Actors.Actor.Entity.Lifecycle do
     end
     |> Logger.debug()
 
-    case StateManager.load(id) do
+    loaded = get_state(id, revision)
+
+    case loaded do
       {:ok, current_state, current_revision, status, node} ->
         split_brain_detector =
           Keyword.get(opts, :split_brain_detector, Actors.Node.DefaultSplitBrainDetector)
@@ -129,7 +140,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
            %EntityState{
              state
              | actor: %Actor{actor | state: current_state},
-               revisions: current_revision
+               revision: current_revision
            }, {:continue, :call_init_action}}
         else
           {:partition_check, {:error, :network_partition_detected}} ->
@@ -160,7 +171,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
   def load_state(state), do: {:noreply, state, {:continue, :call_init_action}}
 
   def terminate(reason, %EntityState{
-        revisions: revisions,
+        revision: revision,
         actor:
           %Actor{
             id: %ActorId{name: name} = id,
@@ -168,7 +179,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
           } = actor
       }) do
     if is_actor_valid?(actor) do
-      StateManager.save(id, actor_state, revision: revisions, status: @deactivated_status)
+      StateManager.save(id, actor_state, revision: revision, status: @deactivated_status)
     end
 
     Logger.debug("Terminating actor #{name} with reason #{inspect(reason)}")
@@ -211,7 +222,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
         %EntityState{
           system: system,
           state_hash: old_hash,
-          revisions: revisions,
+          revision: revision,
           actor:
             %Actor{
               id: %ActorId{name: name} = id,
@@ -233,18 +244,18 @@ defmodule Actors.Actor.Entity.Lifecycle do
     new_state =
       if StateManager.is_new?(old_hash, actor_state.state) do
         Logger.debug("Snapshotting actor #{name}")
-        revision = revisions + 1
+        revision = revision + 1
 
         # Execute with timeout equals timeout strategy - 1 to avoid mailbox congestions
         case StateManager.save_async(id, actor_state, revision: revision, timeout: timeout - 1) do
           {:ok, _, hash} ->
-            %{state | state_hash: hash, revisions: revision}
+            %{state | state_hash: hash, revision: revision}
 
           {:error, _, _, hash} ->
-            %{state | state_hash: hash, revisions: revision}
+            %{state | state_hash: hash, revision: revision}
 
           {:error, :unsuccessfully, hash} ->
-            %{state | state_hash: hash, revisions: revision}
+            %{state | state_hash: hash, revision: revision}
 
           _ ->
             state

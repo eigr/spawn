@@ -52,6 +52,32 @@ if Code.ensure_loaded?(Statestores.Supervisor) do
         {:error, error}
     end
 
+    @spec load(ActorId.t(), number()) :: {:ok, any}
+    def load(%ActorId{} = actor_id, revision) do
+      key = generate_key(actor_id)
+
+      case StateStoreManager.load(key, revision) do
+        %Snapshot{
+          status: status,
+          node: node,
+          revision: rev,
+          tags: tags,
+          data_type: type,
+          data: data
+        } = _event ->
+          revision = if is_nil(rev), do: 0, else: rev
+
+          {:ok, %ActorState{tags: tags, state: %Google.Protobuf.Any{type_url: type, value: data}},
+           revision, status, node}
+
+        _ ->
+          {:not_found, %{}, 0}
+      end
+    catch
+      _kind, error ->
+        {:error, error}
+    end
+
     @spec save(ActorId.t(), Eigr.Functions.Protocol.Actors.ActorState.t(), Keyword.t()) ::
             {:ok, Eigr.Functions.Protocol.Actors.ActorState.t()}
             | {:error, any(), Eigr.Functions.Protocol.Actors.ActorState.t()}
