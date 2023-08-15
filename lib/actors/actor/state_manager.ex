@@ -100,7 +100,7 @@ if Code.ensure_loaded?(Statestores.Supervisor) do
         end)
 
       if Enum.empty?(results) do
-        :not_found, %{}
+        :not_found
       else
         {:ok, results}
       end
@@ -132,7 +132,7 @@ if Code.ensure_loaded?(Statestores.Supervisor) do
         end)
 
       if Enum.empty?(results) do
-        :not_found, %{}
+        :not_found
       else
         {:ok, results}
       end
