@@ -69,7 +69,7 @@ defmodule SpawnSdk.System.SpawnSystem do
 
   @impl SpawnSdk.System
   def spawn_actor(actor_name, spawn_actor_opts) do
-    opts = []
+    opts = [revision: Keyword.get(spawn_actor_opts, :revision, 0)]
     system = Keyword.get(spawn_actor_opts, :system, nil)
     parent = get_parent_actor_name(spawn_actor_opts)
 

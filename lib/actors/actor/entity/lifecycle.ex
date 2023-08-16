@@ -302,10 +302,25 @@ defmodule Actors.Actor.Entity.Lifecycle do
   def deactivate(state), do: {:noreply, state, :hibernate}
 
   defp get_state(id, revision) do
+    initial = StateManager.load(id)
+
     if revision <= 0 do
-      StateManager.load(id)
+      initial
     else
-      StateManager.load(id, revision)
+      case initial do
+        {:ok, _current_state, current_revision, _status, _node} ->
+          if current_revision != revision do
+            Logger.warning("""
+            It looks like you're looking to travel back in time. Starting state by review #{revision}.
+            Previously the review was #{current_revision}. Be careful as this type of operation can cause your actor to terminate if the attributes of its previous state schema is different from the current schema.
+            """)
+          end
+
+          StateManager.load(id, revision)
+
+        initial ->
+          initial
+      end
     end
   end
 
