@@ -67,8 +67,11 @@ if Code.ensure_loaded?(Statestores.Supervisor) do
         } = _event ->
           revision = if is_nil(rev), do: 0, else: rev
 
-          {:ok, %ActorState{tags: tags, state: %Google.Protobuf.Any{type_url: type, value: data}},
-           revision, status, node}
+          {:ok,
+           %ActorState{
+             tags: tags,
+             state: %Google.Protobuf.Any{type_url: type, value: Statestores.Vault.decrypt!(data)}
+           }, revision, status, node}
 
         _ ->
           {:not_found, %{}, 0}
@@ -95,8 +98,10 @@ if Code.ensure_loaded?(Statestores.Supervisor) do
                                } = _event ->
           revision = if is_nil(rev), do: 0, else: rev
 
-          {%ActorState{tags: tags, state: %Google.Protobuf.Any{type_url: type, value: data}},
-           revision, status, node}
+          {%ActorState{
+             tags: tags,
+             state: %Google.Protobuf.Any{type_url: type, value: Statestores.Vault.decrypt!(data)}
+           }, revision, status, node}
         end)
 
       if Enum.empty?(results) do
@@ -127,8 +132,10 @@ if Code.ensure_loaded?(Statestores.Supervisor) do
                                } = _event ->
           revision = if is_nil(rev), do: 0, else: rev
 
-          {%ActorState{tags: tags, state: %Google.Protobuf.Any{type_url: type, value: data}},
-           revision, status, node}
+          {%ActorState{
+             tags: tags,
+             state: %Google.Protobuf.Any{type_url: type, value: Statestores.Vault.decrypt!(data)}
+           }, revision, status, node}
         end)
 
       if Enum.empty?(results) do
