@@ -118,6 +118,7 @@ defmodule Statestores.Adapters.MariaDBSnapshotAdapter do
 
   defp to_snapshot(row) do
     tags = to_map(Enum.at(row, 6))
+    data = Statestores.Vault.decrypt!(Enum.at(row, 8))
 
     %Snapshot{
       id: Enum.at(row, 0),
@@ -128,7 +129,7 @@ defmodule Statestores.Adapters.MariaDBSnapshotAdapter do
       revision: Enum.at(row, 5),
       tags: tags,
       data_type: Enum.at(row, 7),
-      data: Enum.at(row, 8),
+      data: data,
       inserted_at: Enum.at(row, 9),
       updated_at: Enum.at(row, 10)
     }
