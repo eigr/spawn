@@ -22,7 +22,7 @@
 5. [SDKs](#sdks)
 6. [Custom Resources](#custom-resources)
 7. [Statestores](#statestores)
-   - [Point in Time Recovery](#point-in-time-recovery)
+   - [Actor State Checkpoints Restore](#actor-state-checkpoints-restore)
    - [Statestore Features](#statestore-features)
 8. [Local Development](#local-development)
 8. [Main Concepts](#main-concepts)
@@ -431,7 +431,7 @@ Below is a list of common global settings for all Statestores. For more details 
 
 > **_NOTE:_** When running on top of Kubernetes you only need to set the CRD attributes of ActorSystem and Kubernetes secrets. The Operator will set the values of the environment variables according to the settings of these two mentioned places.
 
-### Point in Time Recovery
+### Actor State Checkpoints Restore
 
 Spawn provides the ability to start Actors from a certain point in time.
 For this we use the concept of revision.
