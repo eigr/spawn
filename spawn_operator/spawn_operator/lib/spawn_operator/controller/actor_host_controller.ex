@@ -10,9 +10,8 @@ defmodule SpawnOperator.Controller.ActorHostController do
   def rbac_rules() do
     [
       to_rbac_rule({"", ["node", "nodes"], ["get", "list"]}),
-      to_rbac_rule({"v1", ["node", "nodes"], ["get", "list"]}),
       to_rbac_rule({"", ["secrets"], ["*"]}),
-      to_rbac_rule({"v1", ["pods"], ["*"]}),
+      to_rbac_rule({"", ["pods"], ["*"]}),
       to_rbac_rule({"apps", ["deployments"], ["*"]}),
       to_rbac_rule({"", ["services", "configmaps"], ["*"]}),
       to_rbac_rule({"autoscaling", ["horizontalpodautoscalers"], ["*"]}),
