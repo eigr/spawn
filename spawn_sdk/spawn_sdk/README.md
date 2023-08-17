@@ -626,6 +626,15 @@ iex> SpawnSdk.spawn_actor("robert", system: "spawn-system", actor: "unamed_actor
 :ok
 ```
 
+You can also create Actors so that they are initialized from a certain revision number, that is, initialize actors from a specific point in time.
+
+```elixir
+iex> SpawnSdk.spawn_actor("robert", system: "spawn-system", actor: "unamed_actor", revision: 2)
+:ok
+```
+
+In the above case the actor will be initialized with its state restored from the state as it was in revision 2 of its previous lifetime.
+
 Invoke Spawned Actors:
 
 ```elixir
