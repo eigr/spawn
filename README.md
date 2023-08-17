@@ -23,7 +23,7 @@
 6. [Custom Resources](#custom-resources)
 7. [Statestores](#statestores)
    - [Point in Time Recovery](#point-in-time-recovery)
-   - [Statestore feature table](#statestore-feature-table)
+   - [Statestore Features](#statestore-features)
 8. [Local Development](#local-development)
 8. [Main Concepts](#main-concepts)
    - [The Protocol](#the-protocol)
@@ -441,7 +441,7 @@ How developers will do this will depend on the APIs exposed by the SDK's for eac
 
 It is also worth mentioning that this feature depends on the implementation of each of our persistent storage adapters, so check the table in the section below to find out if the adapter for your database supports this feature.
 
-### Statestore feature table
+### Statestore Features
 
 | Feature                                   | CockroachDB | MariaDB | Mnesia | MSSQL | MySQL | Postgres | SQLite |
 | ------------------------------------------| ------------| --------| -------| ------| ------| ---------| -------|
@@ -544,3 +544,4 @@ You can see some talks on Youtube about Eigr Community or Spawn in the links bel
 
 - **Marcel Lanz on Code Beam Europe 2022**: https://youtu.be/jgR7Oc_GXAg
 - **Adriano Santos on Code Beam BR 2022**: Link not yet released by the event organizers
+- **Adriano Santos ElugSP 2023**: https://www.youtube.com/watch?v=MKTqiAtpK1E
