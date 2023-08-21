@@ -11,8 +11,6 @@ defmodule Proxy.Application do
   defp do_start(_type, _args) do
     {u_secs, reply} =
       :timer.tc(fn ->
-        Node.set_cookie(String.to_atom(System.get_env("NODE_COOKIE", "spawncookie123")))
-
         config = Config.load(__MODULE__)
 
         children = [
