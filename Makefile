@@ -147,6 +147,9 @@ run-proxy-local2:
 run-proxy-local-nodejs-test:
 	ERL_ZFLAGS='-proto_dist inet_tls -ssl_dist_optfile rel/overlays/local-mtls.ssl.conf' cd spawn_proxy/proxy && mix deps.get && PROXY_DATABASE_TYPE=$(database) PROXY_HTTP_PORT=9001 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= PROXY_ACTOR_SYSTEM_NAME=SpawnSysTest SPAWN_SUPERVISORS_STATE_HANDOFF_CONTROLLER=persistent iex --name spawn_a1@test.default.svc -S mix
 
+run-proxy-local-dicegame:
+	cd spawn_proxy/proxy && mix deps.get && PROXY_DATABASE_TYPE=$(database) PROXY_CLUSTER_STRATEGY=epmd PROXY_HTTP_PORT=9001 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= PROXY_ACTOR_SYSTEM_NAME=game-system SPAWN_SUPERVISORS_STATE_HANDOFF_CONTROLLER=persistent SPAWN_USE_INTERNAL_NATS=true SPAWN_PUBSUB_ADAPTER=nats iex --name spawn_a4@127.0.0.1 -S mix
+
 run-sdk-local:
 	cd spawn_sdk/spawn_sdk_example && mix deps.get && PROXY_CLUSTER_STRATEGY=gossip PROXY_DATABASE_TYPE=$(database) SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= iex --name spawn_actors_node@127.0.0.1 -S mix
 
@@ -157,7 +160,7 @@ run-sdk-local3:
 	cd spawn_sdk/spawn_sdk_example && mix deps.get && PROXY_CLUSTER_STRATEGY=epmd SPAWN_USE_INTERNAL_NATS=true SPAWN_PUBSUB_ADAPTER=nats PROXY_DATABASE_TYPE=$(database) SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= iex --name spawn_a3@127.0.0.1 -S mix
 
 run-sdk-local-nats:
-	cd spawn_sdk/spawn_sdk_example && PROXY_CLUSTER_STRATEGY=epmd PROXY_DATABASE_TYPE=$(database) SPAWN_USE_INTERNAL_NATS=true SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= iex --name spawn_a3@127.0.0.1 -S mix
+	cd spawn_sdk/spawn_sdk_example && mix deps.get && PROXY_CLUSTER_STRATEGY=epmd PROXY_DATABASE_TYPE=$(database) SPAWN_USE_INTERNAL_NATS=true SPAWN_PUBSUB_ADAPTER=nats SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= iex --name spawn_a3@127.0.0.1 -S mix
 
 run-operator-local:
 	cd spawn_operator/spawn_operator && mix deps.get && MIX_ENV=dev BONNY_POD_NAME=spawn-operator iex --name operator@127.0.0.1 -S mix
