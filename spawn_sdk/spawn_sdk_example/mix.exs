@@ -34,14 +34,7 @@ defmodule SpawnSdkExample.MixProject do
       # TODO: Removing :spawn_statestores dependency
       # shouldn't affect functionality, statestores should be optional
       # remove spawn_statestores from _build and test running sdk locally to see its effect
-      {:ecto, [env: :prod, git: "https://github.com/elixir-ecto/ecto.git", override: true]},
-      {:ecto_sql,
-       [
-         env: :prod,
-         git: "https://github.com/elixir-ecto/ecto_sql.git",
-         branch: "master",
-         override: true
-       ]},
+      {:ecto_sql, "~> 3.10"},
       {:spawn_statestores, path: "../../spawn_statestores/statestores"},
       {:bakeware, "~> 0.2"},
       {:benchee, "~> 1.0", only: :dev},

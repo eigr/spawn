@@ -57,9 +57,7 @@ defmodule StatestoresMysql.MixProject do
     [
       {:vapor, "~> 0.10"},
       {:cloak_ecto, "~> 1.2"},
-      # {:ecto_sql, "~> 3.8"},
-      {:ecto_sql,
-       git: "https://github.com/elixir-ecto/ecto_sql.git", branch: "master", override: true},
+      {:ecto_sql, "~> 3.10"},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:myxql, "~> 0.6"},
       {:spawn_statestores, path: "../statestores"}

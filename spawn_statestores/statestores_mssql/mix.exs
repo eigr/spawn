@@ -57,7 +57,7 @@ defmodule StatestoresMssql.MixProject do
     [
       {:vapor, "~> 0.10"},
       {:cloak_ecto, "~> 1.2"},
-      {:ecto_sql, "~> 3.8"},
+      {:ecto_sql, "~> 3.10"},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:tds, "~> 2.3"},
       {:spawn_statestores, path: "../statestores"}
