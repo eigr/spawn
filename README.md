@@ -155,10 +155,10 @@ In turn, each Sidecar container within a POD organizes itself to form an Erlang 
   - [x] Side effects. Sends an effect as a result of your computation for other Actors to handle.
   - [ ] Saga.
 - [x] SDKs
-  - [x] Elixir. All features implemented.
-  - [x] Node/Typescript. All features implemented.
-  - [x] Java. Partially implemented.
-  - [ ] Python. Under development.
+  - [x] Elixir.
+  - [x] Node/Typescript.
+  - [x] Java.
+  - [x] Python.
   - [ ] Go. Under development.
   - [ ] Rust. Under development.
   - [ ] .Net/C#. Under development.
