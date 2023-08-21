@@ -59,7 +59,7 @@ defmodule StatestoresSqlite.MixProject do
       {:cloak_ecto, "~> 1.2"},
       {:ecto_sql, "~> 3.10"},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
-      {:ecto_sqlite3, "~> 0.10.0", override: true},
+      {:ecto_sqlite3, "~> 0.10.0"},
       {:spawn_statestores, path: "../statestores"}
     ]
   end
