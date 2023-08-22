@@ -380,7 +380,7 @@ abstract all the protocol specifics and expose an easy and intuitive API to deve
 | [Go SDK](https://github.com/eigr/spawn-go-sdk)                        | Go       |
 | [Spring Boot SDK](https://github.com/eigr/spawn-springboot-sdk)       | Java     |
 | [NodeJS/Typescript SDK](https://github.com/eigr/spawn-node-sdk)       | Node     |
-| [Python SDK](https://github.com/eigr-labs/spawn-python-sdk)           | Python   |
+| [Python SDK](https://github.com/eigr/spawn-python-sdk)                | Python   |
 | [Rust SDK](https://github.com/eigr-labs/spawn-rust-sdk)               | Rust     |
 
 ## Custom Resources
