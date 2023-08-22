@@ -40,9 +40,12 @@ defmodule Proxy.Routes.API do
 
   post "/system/:name/actors/spawn" do
     remote_ip = get_remote_ip(conn)
+    query = Plug.Conn.fetch_query_params(conn)
+    {revision, _} = Map.get(query.params, "revision", "0") |> Integer.parse()
 
     with spawn_payload <- get_body(conn.body_params, SpawnRequest),
-         {:ok, response} <- Actors.spawn_actor(spawn_payload, remote_ip: remote_ip) do
+         {:ok, response} <-
+           Actors.spawn_actor(spawn_payload, remote_ip: remote_ip, revision: revision) do
       send!(conn, 200, encode(SpawnResponse, response), @content_type)
     else
       _ ->

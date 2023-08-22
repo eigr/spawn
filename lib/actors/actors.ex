@@ -139,7 +139,7 @@ defmodule Actors do
   @spec spawn_actor(SpawnRequest.t(), any()) :: {:ok, SpawnResponse.t()}
   def spawn_actor(spawn, opts \\ [])
 
-  def spawn_actor(%SpawnRequest{actors: actors} = _spawn, opts) do
+  def spawn_actor(%SpawnRequest{actors: actors} = spawn, opts) do
     hosts =
       Enum.map(actors, fn %ActorId{} = id ->
         case ActorRegistry.get_hosts_by_actor(id, parent: true) do
