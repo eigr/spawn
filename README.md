@@ -8,6 +8,31 @@
 
 ### **[Website](https://eigr.io)** • **[Getting Started](#getting-started)** • **[SDKs](#sdks)** • **[Documentation](https://eigr.io/docs/projects-spawn/spawn-introduction/)** • **[Blog](https://eigr.io/blog/)**
 
+
+# Table of Contents
+1. [Overview](#overview)
+   - [What problem Spawn solves](#what-problem-spawn-solves)
+   - [Spawn Architecture](#spawn-architecture)
+2. [Features](#features)
+3. [Install](#install)
+   - [Prerequisites](#prerequisites)
+   - [Instructions](#instructions)
+4. [Getting Started](#getting-started)
+   - [Examples](#examples)
+5. [SDKs](#sdks)
+6. [Custom Resources](#custom-resources)
+7. [Statestores](#statestores)
+   - [Actor State Checkpoints Restore](#actor-state-checkpoints-restore)
+   - [Statestore Features](#statestore-features)
+8. [Local Development](#local-development)
+8. [Main Concepts](#main-concepts)
+   - [The Protocol](#the-protocol)
+   - [The Actor Model](#the-actor-model)
+   - [The Sidecar Pattern](#the-sidecar-pattern)
+   - [Nats](#nats)
+9. [Talks](#talks)
+
+
 ## Overview
 
 **_What is Spawn?_**
@@ -57,7 +82,7 @@ Watch the video explaining how it works:
 
 > **_NOTE:_** This video was recorded with an old version of the SDK for Java. That's why errors are seen in Deployment
 
-## What problem Spawn solves
+### What problem Spawn solves
 
 The advancement of Cloud Computing, Edge computing, Containers, Orchestrators, Data-
 Oriented Services, and global-scale products aimed at serving audiences in various regions of
@@ -93,7 +118,7 @@ processing, real-time data ingestion, service integrations, financial or transac
 and logistics are some of the domains that can be mastered by the Eigr Functions Spawn
 platform.
 
-## Spawn Architecture
+### Spawn Architecture
 
 Spawn takes the Actor Model's distribution, fault tolerance, and high concurrent capability in
 its most famous implementation, the BEAM Erlang VM implementation, and adds to the
@@ -133,13 +158,17 @@ In turn, each Sidecar container within a POD organizes itself to form an Erlang 
     - [x] Automatic renewal of certificates.
   - [x] Cross ActorSystem invocation Nats distribution.
 - [x] Configuration management via Kubernetes [CRDs](https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definitions/) and Envinronment Variables.
-- [x] Statestores. Adapters for persistent storage using multiple database providers.
-  - [x] Sqlite
-  - [x] MySql
-  - [x] Postgres
-  - [x] CockroachDB
-  - [x] MSSQL
-  - [ ] Native via Mnesia
+- [x] State Management. 
+  - [x] Supported database adapters for persistent storage using multiple database providers.
+    - [x] Sqlite
+    - [x] MariaDB
+    - [x] MySql
+    - [x] Postgres
+    - [x] CockroachDB
+    - [x] MSSQL
+    - [ ] Native via Mnesia
+  - [x] Write behind during execution and Write ahead during deactivation.
+  - [x] Point in time Recovery. See Statestore for more information.
 - [x] Automatic activation and deactivation of Actors.
 - [x] Horizontal Scalability
   - [x] automatically controlled by the Operator using Kubernetes HPA based on memory and cpu.
@@ -338,12 +367,6 @@ You can find some examples of using Spawn in the links below:
 - **Fleet**: https://github.com/sleipnir/fleet-spawn-example
 - **Spawn Polyglot Example**: https://github.com/sleipnir/spawn-polyglot-ping-pong
 
-### Talks
-
-You can see some talks on Youtube about Eigr Community or Spawn in the links below:
-
-- **Marcel Lanz on Code Beam Europe 2022**: https://youtu.be/jgR7Oc_GXAg
-- **Adriano Santos on Code Beam BR 2022**: Link not yet released by the event organizers
 
 ## SDKs
 
@@ -357,10 +380,10 @@ abstract all the protocol specifics and expose an easy and intuitive API to deve
 | [Go SDK](https://github.com/eigr/spawn-go-sdk)                        | Go       |
 | [Spring Boot SDK](https://github.com/eigr/spawn-springboot-sdk)       | Java     |
 | [NodeJS/Typescript SDK](https://github.com/eigr/spawn-node-sdk)       | Node     |
-| [Python SDK](https://github.com/eigr-labs/spawn-python-sdk)           | Python   |
+| [Python SDK](https://github.com/eigr/spawn-python-sdk)                | Python   |
 | [Rust SDK](https://github.com/eigr-labs/spawn-rust-sdk)               | Rust     |
 
-### Custom Resources
+## Custom Resources
 
 Spawn defines some custom Resources for the user to interact with the API for deploying Spawn artifacts in Kubernetes. We'll talk more about these CRDs in the Getting Started section but for now we'll list each of these resources below for a general understanding of the concepts:
 
@@ -407,6 +430,28 @@ Below is a list of common global settings for all Statestores. For more details 
 | PROXY_DATABASE_SSL_VERIFY   | spec.statestore.ssl_verify           |                 | false             | false             |           |
 
 > **_NOTE:_** When running on top of Kubernetes you only need to set the CRD attributes of ActorSystem and Kubernetes secrets. The Operator will set the values of the environment variables according to the settings of these two mentioned places.
+
+### Actor State Checkpoints Restore
+
+Spawn provides the ability to start Actors from a certain point in time.
+For this we use the concept of revision.
+A review happens whenever a state change is detected by the actor and a recording of the new state is made during a snapshot event. Each time this occurs an increment in the revision number will occur marking the state to that moment in time.
+Developers can therefore start any Actor from a specific point in time which is marked by a revision.
+How developers will do this will depend on the APIs exposed by the SDK's for each specific language, so to learn more about this feature, check the desired SDK page.
+
+It is also worth mentioning that this feature depends on the implementation of each of our persistent storage adapters, so check the table in the section below to find out if the adapter for your database supports this feature.
+
+### Statestore Features
+
+| Feature                                   | CockroachDB | MariaDB | Mnesia | MSSQL | MySQL | Postgres | SQLite |
+| ------------------------------------------| ------------| --------| -------| ------| ------| ---------| -------|
+| Actor Fast key lookup                     |     [x]     |   [x]   |   [ ]  |  [x]  |  [x]  |   [x]    |   [x]  |
+| Actor State restore from Revision         |     [ ]     |   [x]   |   [ ]  |  [ ]  |  [ ]  |   [ ]    |   [ ]  |
+| Search by Actors Metadata                 |     [ ]     |   [ ]   |   [ ]  |  [ ]  |  [ ]  |   [ ]    |   [ ]  |
+| Search by all changes of Actor states     |     [ ]     |   [x]   |   [ ]  |  [ ]  |  [ ]  |   [ ]    |   [ ]  |
+| Search by all Actor state changes by date |     [ ]     |   [x]   |   [ ]  |  [ ]  |  [ ]  |   [ ]    |   [ ]  |
+| Snapshot Data Partition                   |     [ ]     |   [x]   |   [ ]  |  [ ]  |  [ ]  |   [ ]    |   [ ]  |
+| State AES Encryption                      |     [x]     |   [x]   |   [ ]  |  [x]  |  [x]  |   [x]    |   [x]  |
 
 ## Local Development
 
@@ -492,3 +537,11 @@ https://medium.com/nerd-for-tech/microservice-design-pattern-sidecar-sidekick-pa
 We use [Nats](https://nats.io/) for communication between different systems like Activators or cross ActorSystems. According to the project page "NATS is a simple, secure and performant communications system for digital systems, services and devices. NATS is part of the Cloud Native Computing Foundation (CNCF). NATS has over 40 client language implementations, and its server can run on-premise, in the cloud, at the edge, and even on a Raspberry Pi. NATS can secure and simplify design and operation of modern distributed systems."
 
 Nats' ability to natively implement different topologies, as well as its minimalism, its cloud-native nature, and its capabilities to run on more constrained devices is what made us use Nats over other solutions. Nats allows Spawn to be able to provide strong isolation from an ActorSystem without limiting the user, allowing the user to still be able to communicate securely between different ActorSystems. Nats also facilitates the implementation of our triggers, called Activators, allowing those even without being part of an Erlang cluster to be able to invoke any actors.
+
+## Talks
+
+You can see some talks on Youtube about Eigr Community or Spawn in the links below:
+
+- **Marcel Lanz on Code Beam Europe 2022**: https://youtu.be/jgR7Oc_GXAg
+- **Adriano Santos on Code Beam BR 2022**: Link not yet released by the event organizers
+- **Adriano Santos ElugSP 2023**: https://www.youtube.com/watch?v=MKTqiAtpK1E

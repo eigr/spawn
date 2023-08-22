@@ -46,7 +46,14 @@ defmodule Actors.Actor.Entity.Supervisor do
   def lookup_or_create_actor(system, actor, opts \\ [])
 
   def lookup_or_create_actor(system, %Actor{} = actor, opts) when is_nil(system) do
-    entity_state = %EntityState{system: nil, actor: actor, opts: opts}
+    revision = Keyword.get(opts, :revision, 0)
+
+    entity_state = %EntityState{
+      system: nil,
+      actor: actor,
+      revision: revision,
+      opts: opts
+    }
 
     child_spec = %{
       id: Actors.Actor.Entity,
@@ -73,7 +80,14 @@ defmodule Actors.Actor.Entity.Supervisor do
         %Actor{} = actor,
         opts
       ) do
-    entity_state = %EntityState{system: actor_system, actor: actor, opts: opts}
+    revision = Keyword.get(opts, :revision, 0)
+
+    entity_state = %EntityState{
+      system: actor_system,
+      actor: actor,
+      revision: revision,
+      opts: opts
+    }
 
     child_spec = %{
       id: Actors.Actor.Entity,

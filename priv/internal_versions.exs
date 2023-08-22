@@ -2,6 +2,7 @@ defmodule InternalVersions do
   # The order here is also the deploy order, its important to keep this way1.0.0-rc.18
   @versions [
     spawn_statestores: "1.0.0-rc.18",
+    spawn_statestores_mariadb: "1.0.0-rc.18",
     spawn_statestores_mysql: "1.0.0-rc.18",
     spawn_statestores_mssql: "1.0.0-rc.18",
     spawn_statestores_postgres: "1.0.0-rc.18",
@@ -174,6 +175,7 @@ defmodule InternalVersions do
   defp get_new_mix_exs(mix_file, version, optional?) do
     match_spawn_with_path = ~r(\{:spawn,\s*path:.*\})
     match_spawn_statestores_with_path = ~r(\{:spawn_statestores,\s*path:.*\})
+    match_spawn_mariadb_with_path = ~r(\{:spawn_statestores_mariadb,\s*path:.*\})
     match_spawn_mysql_with_path = ~r(\{:spawn_statestores_mysql,\s*path:.*\})
     match_spawn_mssql_with_path = ~r(\{:spawn_statestores_mssql,\s*path:.*\})
     match_spawn_postgres_with_path = ~r(\{:spawn_statestores_postgres,\s*path:.*\})
@@ -183,6 +185,11 @@ defmodule InternalVersions do
     mix_file
     |> String.replace(match_spawn_with_path, dep_for("spawn"), global: false)
     |> String.replace(match_spawn_statestores_with_path, dep_for("spawn_statestores"),
+      global: false
+    )
+    |> String.replace(
+      match_spawn_mariadb_with_path,
+      dep_for("spawn_statestores_mariadb", optional?),
       global: false
     )
     |> String.replace(

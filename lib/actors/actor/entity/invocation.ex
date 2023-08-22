@@ -8,7 +8,6 @@ defmodule Actors.Actor.Entity.Invocation do
 
   alias Actors.Actor.Entity.EntityState
   alias Actors.Exceptions.NotAuthorizedException
-  alias Actors.Security.Acl.DefaultAclManager
 
   alias Eigr.Functions.Protocol.Actors.{
     Actor,

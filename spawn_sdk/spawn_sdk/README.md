@@ -18,6 +18,7 @@ def deps do
     {:spawn_sdk, "~> 1.0.0-rc.18"},
 
     # You can uncomment one of those dependencies if you are going to use Persistent Actors
+    #{:spawn_statestores_mariadb, "~> 1.0.0-rc.18"},
     #{:spawn_statestores_mysql, "~> 1.0.0-rc.18"},
     #{:spawn_statestores_postgres, "~> 1.0.0-rc.18"},
     #{:spawn_statestores_mssql, "~> 1.0.0-rc.18"},
@@ -624,6 +625,15 @@ Spawning Actors:
 iex> SpawnSdk.spawn_actor("robert", system: "spawn-system", actor: "unamed_actor")
 :ok
 ```
+
+You can also create Actors so that they are initialized from a certain revision number, that is, initialize actors from a specific point in time.
+
+```elixir
+iex> SpawnSdk.spawn_actor("robert", system: "spawn-system", actor: "unamed_actor", revision: 2)
+:ok
+```
+
+In the above case the actor will be initialized with its state restored from the state as it was in revision 2 of its previous lifetime.
 
 Invoke Spawned Actors:
 

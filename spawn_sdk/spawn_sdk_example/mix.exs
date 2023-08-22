@@ -34,6 +34,7 @@ defmodule SpawnSdkExample.MixProject do
       # TODO: Removing :spawn_statestores dependency
       # shouldn't affect functionality, statestores should be optional
       # remove spawn_statestores from _build and test running sdk locally to see its effect
+      {:ecto_sql, "~> 3.10"},
       {:spawn_statestores, path: "../../spawn_statestores/statestores"},
       {:bakeware, "~> 0.2"},
       {:benchee, "~> 1.0", only: :dev},

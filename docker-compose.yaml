@@ -46,6 +46,18 @@ services:
     networks:
       - mysql-compose-network
 
+  mariadb:
+    image: mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: eigr-functions-db
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+    volumes:
+      - mariadb:/var/lib/mysql
+    ports:
+      - "3307:3306"
+
   adminer:
     image: adminer
     ports:
@@ -79,3 +91,4 @@ networks:
 volumes:
   mysql:
   postgres:
+  mariadb:

@@ -99,6 +99,7 @@ defmodule Spawn.MixProject do
       {:opentelemetry_exporter, "~> 1.0"},
       # Statestores deps
       {:spawn_statestores_mssql, path: "./spawn_statestores/statestores_mssql", optional: false},
+      {:spawn_statestores_mariadb, path: "./spawn_statestores/statestores_mariadb", optional: false},
       {:spawn_statestores_mysql, path: "./spawn_statestores/statestores_mysql", optional: false},
       {:spawn_statestores_postgres, path: "./spawn_statestores/statestores_postgres", optional: false},
       {:spawn_statestores_sqlite, path: "./spawn_statestores/statestores_sqlite", optional: false},

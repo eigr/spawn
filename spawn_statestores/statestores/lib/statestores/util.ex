@@ -44,6 +44,7 @@ defmodule Statestores.Util do
   def get_default_database_type do
     cond do
       Code.ensure_loaded?(Statestores.Adapters.MySQLSnapshotAdapter) -> "mysql"
+      Code.ensure_loaded?(Statestores.Adapters.MariaDBSnapshotAdapter) -> "mariadb"
       Code.ensure_loaded?(Statestores.Adapters.CockroachDBSnapshotAdapter) -> "cockroachdb"
       Code.ensure_loaded?(Statestores.Adapters.PostgresSnapshotAdapter) -> "postgres"
       Code.ensure_loaded?(Statestores.Adapters.SQLite3SnapshotAdapter) -> "sqlite"
@@ -139,6 +140,8 @@ defmodule Statestores.Util do
   # Lookup Adapters
   defp load_lookup_adapter_by_type(:mysql), do: Statestores.Adapters.MySQLLookupAdapter
 
+  defp load_lookup_adapter_by_type(:mariadb), do: Statestores.Adapters.MariaDBLookupAdapter
+
   defp load_lookup_adapter_by_type(:cockroachdb),
     do: Statestores.Adapters.CockroachDBLookupAdapter
 
@@ -150,6 +153,8 @@ defmodule Statestores.Util do
 
   # Snapshot Adapters
   defp load_snapshot_adapter_by_type(:mysql), do: Statestores.Adapters.MySQLSnapshotAdapter
+
+  defp load_snapshot_adapter_by_type(:mariadb), do: Statestores.Adapters.MariaDBSnapshotAdapter
 
   defp load_snapshot_adapter_by_type(:cockroachdb),
     do: Statestores.Adapters.CockroachDBSnapshotAdapter

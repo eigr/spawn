@@ -168,7 +168,7 @@ defmodule Actors.Actor.Entity do
   defp do_handle_info(
          message,
          %EntityState{
-           revisions: revisions,
+           revision: revision,
            actor: %Actor{id: %ActorId{name: name} = id, state: actor_state}
          } = state
        ) do
@@ -178,7 +178,7 @@ defmodule Actors.Actor.Entity do
 
     # what is the correct status here? For now we will use UNKNOWN
     if not is_nil(actor_state),
-      do: StateManager.save(id, actor_state, revision: revisions, status: "UNKNOWN")
+      do: StateManager.save(id, actor_state, revision: revision, status: "UNKNOWN")
 
     {:noreply, state, :hibernate}
   end

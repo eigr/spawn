@@ -52,6 +52,95 @@ if Code.ensure_loaded?(Statestores.Supervisor) do
         {:error, error}
     end
 
+    @spec load(ActorId.t(), number()) :: {:ok, any}
+    def load(%ActorId{} = actor_id, revision) do
+      key = generate_key(actor_id)
+
+      case StateStoreManager.load(key, revision) do
+        %Snapshot{
+          status: status,
+          node: node,
+          revision: rev,
+          tags: tags,
+          data_type: type,
+          data: data
+        } = _event ->
+          revision = if is_nil(rev), do: 0, else: rev
+
+          {:ok, %ActorState{tags: tags, state: %Google.Protobuf.Any{type_url: type, value: data}},
+           revision, status, node}
+
+        _ ->
+          {:not_found, %{}, 0}
+      end
+    catch
+      _kind, error ->
+        {:error, error}
+    end
+
+    @spec load_all(ActorId.t()) :: {:ok, term()} | :not_found | {:error, term()}
+    def load_all(%ActorId{} = actor_id) do
+      key = generate_key(actor_id)
+
+      snapshots = StateStoreManager.load_all(key)
+
+      results =
+        Enum.map(snapshots, fn %Snapshot{
+                                 status: status,
+                                 node: node,
+                                 revision: rev,
+                                 tags: tags,
+                                 data_type: type,
+                                 data: data
+                               } = _event ->
+          revision = if is_nil(rev), do: 0, else: rev
+
+          {%ActorState{tags: tags, state: %Google.Protobuf.Any{type_url: type, value: data}},
+           revision, status, node}
+        end)
+
+      if Enum.empty?(results) do
+        :not_found
+      else
+        {:ok, results}
+      end
+    catch
+      _kind, error ->
+        {:error, error}
+    end
+
+    @spec load_by_interval(ActorId.t(), String.t(), String.t()) ::
+            {:ok, term()} | :not_found | {:error, term()}
+    def load_by_interval(%ActorId{} = actor_id, time_start, time_end) do
+      key = generate_key(actor_id)
+
+      snapshots = StateStoreManager.load_by_interval(key, time_start, time_end)
+
+      results =
+        Enum.map(snapshots, fn %Snapshot{
+                                 status: status,
+                                 node: node,
+                                 revision: rev,
+                                 tags: tags,
+                                 data_type: type,
+                                 data: data
+                               } = _event ->
+          revision = if is_nil(rev), do: 0, else: rev
+
+          {%ActorState{tags: tags, state: %Google.Protobuf.Any{type_url: type, value: data}},
+           revision, status, node}
+        end)
+
+      if Enum.empty?(results) do
+        :not_found
+      else
+        {:ok, results}
+      end
+    catch
+      _kind, error ->
+        {:error, error}
+    end
+
     @spec save(ActorId.t(), Eigr.Functions.Protocol.Actors.ActorState.t(), Keyword.t()) ::
             {:ok, Eigr.Functions.Protocol.Actors.ActorState.t()}
             | {:error, any(), Eigr.Functions.Protocol.Actors.ActorState.t()}

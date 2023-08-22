@@ -6,11 +6,25 @@ defmodule Statestores.Adapters.SnapshotBehaviour do
 
   @type id :: String.t()
 
-  @type event :: Snapshot.t()
+  @type revision :: integer()
 
-  @callback get_by_key(id()) :: event()
+  @type snapshot :: Snapshot.t()
 
-  @callback save(event()) :: {:error, any} | {:ok, event()}
+  @type snapshots :: list(Snapshot.t())
+
+  @type time_start :: String.t()
+
+  @type time_end :: String.t()
+
+  @callback get_by_key(id()) :: snapshot()
+
+  @callback get_by_key_and_revision(id(), revision()) :: snapshot()
+
+  @callback get_all_snapshots_by_key(id()) :: snapshots()
+
+  @callback get_snapshots_by_interval(id(), time_start(), time_end()) :: snapshots()
+
+  @callback save(snapshot()) :: {:error, any} | {:ok, snapshot()}
 
   @callback default_port :: <<_::32>>
 

@@ -8,6 +8,13 @@ defmodule Actors.Actor.StateManager.Behaviour do
 
   @callback load(String.t()) :: {:ok, term()} | {:not_found, %{}} | {:error, term()}
 
+  @callback load(String.t(), number()) :: {:ok, term()} | {:not_found, %{}} | {:error, term()}
+
+  @callback load_all(String.t()) :: {:ok, term()} | {:not_found, %{}} | {:error, term()}
+
+  @callback load_by_interval(String.t(), String.t(), String.t()) ::
+              {:ok, term()} | {:not_found, %{}} | {:error, term()}
+
   @callback save(String.t(), term(), Keyword.t()) ::
               {:ok, term(), String.t()}
               | {:error, term(), term(), term()}

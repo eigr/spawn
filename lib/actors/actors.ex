@@ -93,7 +93,7 @@ defmodule Actors do
           actor_system:
             %ActorSystem{name: _name, registry: %Registry{actors: actors} = _registry} =
               actor_system
-        } = _registration,
+        } = registration,
         opts
       ) do
     actors
@@ -139,12 +139,12 @@ defmodule Actors do
   @spec spawn_actor(SpawnRequest.t(), any()) :: {:ok, SpawnResponse.t()}
   def spawn_actor(spawn, opts \\ [])
 
-  def spawn_actor(%SpawnRequest{actors: actors} = _spawn, _opts) do
+  def spawn_actor(%SpawnRequest{actors: actors} = spawn, opts) do
     hosts =
       Enum.map(actors, fn %ActorId{} = id ->
         case ActorRegistry.get_hosts_by_actor(id, parent: true) do
           {:ok, actor_hosts} ->
-            to_spawn_hosts(id, actor_hosts)
+            to_spawn_hosts(id, actor_hosts, opts)
 
           error ->
             raise ArgumentError,
@@ -159,14 +159,22 @@ defmodule Actors do
     {:ok, %SpawnResponse{status: status}}
   end
 
-  defp to_spawn_hosts(id, actor_hosts) do
+  defp to_spawn_hosts(id, actor_hosts, spawned_opts) do
     Enum.map(actor_hosts, fn %HostActor{
                                node: node,
                                actor: %Actor{} = unamed_actor,
                                opts: opts
                              } = _host ->
       spawned_actor = %Actor{unamed_actor | id: id}
-      %HostActor{node: node, actor: spawned_actor, opts: opts}
+
+      new_opts =
+        if Keyword.has_key?(spawned_opts, :revision) do
+          Keyword.put(opts, :revision, Keyword.get(spawned_opts, :revision, 0))
+        else
+          opts
+        end
+
+      %HostActor{node: node, actor: spawned_actor, opts: new_opts}
     end)
   end
 
