@@ -17,7 +17,7 @@ defmodule SpawnOperator.K8s.Activators.Scheduler.CronJob do
         |> Enum.map(fn sink ->
           %{
             "name" => sink["name"],
-            "image" => "eigr/spawn-activator-cli:#{@activator_cli_version}",
+            "image" => "eigr/spawn-activator-simple:#{@activator_cli_version}",
             "imagePullPolicy" => "IfNotPresent",
             "env" => [
               %{
@@ -31,7 +31,7 @@ defmodule SpawnOperator.K8s.Activators.Scheduler.CronJob do
               }
             ],
             "command" => [
-              "./activator-cli",
+              "./activator-simple",
               "#{sink["system"]}",
               "#{sink["actor"]}",
               "#{sink["action"]}"

@@ -9,7 +9,7 @@ RUN update-ca-certificates
 
 WORKDIR /
 
-COPY ./spawn_cli/activator_cli .
+COPY ./spawn_activators/activator_simple .
 
 RUN cargo build --target x86_64-unknown-linux-musl --release
 
@@ -20,8 +20,8 @@ FROM alpine:3.17.3
 
 WORKDIR /
 
-COPY --from=builder /target/x86_64-unknown-linux-musl/release/activator-cli ./
+COPY --from=builder /target/x86_64-unknown-linux-musl/release/activator-SIMPLE ./
 
 USER nobody
 
-ENTRYPOINT ["/activator-cli"]
+ENTRYPOINT ["/activator-simple"]

@@ -1,0 +1,13 @@
+[package]
+edition = "2021"
+name = "activator-simple"
+version = "0.1.0"
+
+[build-dependencies]
+protobuf-codegen = "3.0.0"
+
+[dependencies]
+async-nats = "0.29.0"
+prost = "0.11.9"
+prost-types = "0.11.9"
+tokio = {version = "1", features = ["macros", "rt-multi-thread"]}
