@@ -545,3 +545,4 @@ You can see some talks on Youtube about Eigr Community or Spawn in the links bel
 - **Marcel Lanz on Code Beam Europe 2022**: https://youtu.be/jgR7Oc_GXAg
 - **Adriano Santos on Code Beam BR 2022**: Link not yet released by the event organizers
 - **Adriano Santos ElugSP 2023**: https://www.youtube.com/watch?v=MKTqiAtpK1E
+- **Elias Arruda on Elixir CWB (Curitiba)**: https://www.youtube.com/live/yE_uWbPEWnI?si=5L3SORG3PERZpQ4V&t=463
