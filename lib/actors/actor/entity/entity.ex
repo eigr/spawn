@@ -15,6 +15,11 @@ defmodule Actors.Actor.Entity do
     ActorState
   }
 
+  alias Eigr.Functions.Protocol.State.Checkpoint
+  alias Eigr.Functions.Protocol.State.Revision
+
+  import Spawn.Utils.Common, only: [return_and_maybe_hibernate: 1]
+
   @default_call_timeout :infinity
   @fullsweep_after 10
 
@@ -62,12 +67,71 @@ defmodule Actors.Actor.Entity do
         Invocation.invoke({invocation, opts}, state)
 
       action ->
-        do_handle_call(action, from, state)
+        do_handle_defaults(action, from, state)
     end
     |> parse_packed_response()
   end
 
-  defp do_handle_call(
+  defp do_handle_defaults(action, from, state) do
+    case action do
+      :get_state ->
+        do_handle_get_state(action, from, state)
+
+      :checkpoint ->
+        do_handle_checkpoint(action, from, state)
+
+      {:restore, checkpoint} ->
+        do_handle_restore(checkpoint, from, state)
+    end
+  end
+
+  defp do_handle_checkpoint(
+         _action,
+         _from,
+         %EntityState{
+           revision: revision,
+           actor: %Actor{state: actor_state} = _actor
+         } = state
+       )
+       when is_nil(actor_state) do
+    {:reply, {:ok, %Checkpoint{revision: %Revision{value: revision}}}, state}
+    |> return_and_maybe_hibernate()
+  end
+
+  defp do_handle_checkpoint(
+         _action,
+         _from,
+         %EntityState{
+           revision: revision,
+           actor: %Actor{state: actor_state} = _actor
+         } = state
+       ) do
+    revision = revision + 1
+
+    case Lifecycle.checkpoint(revision, state) do
+      {:ok, actor_state, hash} ->
+        checkpoint = %Checkpoint{revision: %Revision{value: revision}, state: actor_state}
+
+        {:reply, {:ok, checkpoint}, state}
+        |> return_and_maybe_hibernate()
+
+      _ ->
+        {:reply, :error, state}
+        |> return_and_maybe_hibernate()
+    end
+  end
+
+  defp do_handle_restore(
+         checkpoint,
+         from,
+         %EntityState{
+           actor: %Actor{state: actor_state} = _actor
+         } = state
+       ) do
+    {:reply, {:error, :not_found}, state, :hibernate}
+  end
+
+  defp do_handle_get_state(
          :get_state,
          _from,
          %EntityState{
@@ -77,7 +141,7 @@ defmodule Actors.Actor.Entity do
        when is_nil(actor_state),
        do: {:reply, {:error, :not_found}, state, :hibernate}
 
-  defp do_handle_call(
+  defp do_handle_get_state(
          :get_state,
          _from,
          %EntityState{

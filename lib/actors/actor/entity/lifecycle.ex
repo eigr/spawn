@@ -162,6 +162,25 @@ defmodule Actors.Actor.Entity.Lifecycle do
 
   def load_state(state), do: {:noreply, state, {:continue, :call_init_action}}
 
+  def checkpoint(revision, %EntityState{
+        actor:
+          %Actor{
+            id: %ActorId{name: name} = id,
+            state: actor_state
+          } = actor
+      }) do
+    response =
+      if is_actor_valid?(actor) do
+        Logger.debug("Doing Actor checkpoint to Actor [#{name}]")
+
+        StateManager.save(id, actor_state, revision: revision)
+      else
+        {:error, :nothing}
+      end
+
+    response
+  end
+
   def terminate(reason, %EntityState{
         revision: revision,
         actor:
@@ -174,7 +193,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
       StateManager.save(id, actor_state, revision: revision, status: @deactivated_status)
     end
 
-    Logger.debug("Terminating actor #{name} with reason #{inspect(reason)}")
+    Logger.debug("Terminating Actor [#{name}] with reason #{inspect(reason)}")
   end
 
   def snapshot(
