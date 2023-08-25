@@ -324,7 +324,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
 
   def deactivate(state), do: {:noreply, state, :hibernate}
 
-  defp get_state(id, revision) do
+  def get_state(id, revision) do
     initial = StateManager.load(id)
 
     if revision <= 0 do

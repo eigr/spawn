@@ -6,7 +6,7 @@ defmodule Actors.Actor.Entity.Invocation do
   require Logger
   require OpenTelemetry.Tracer, as: Tracer
 
-  alias Actors.Actor.Entity.EntityState
+  alias Actors.Actor.Entity.{EntityState, Lifecycle}
   alias Actors.Exceptions.NotAuthorizedException
 
   alias Eigr.Functions.Protocol.Actors.{
@@ -248,14 +248,15 @@ defmodule Actors.Actor.Entity.Invocation do
                     {:ok, "#{inspect(response.updated_context.metadata)}"}
                   ])
 
-                  build_response(request, response, new_state, opts)
+                  handle_response(request, response, new_state, opts)
 
                 {:error, reason, new_state} ->
                   Tracer.add_event("failure-invocation", [
                     {:error, "#{inspect(reason)}"}
                   ])
 
-                  {:reply, {:error, reason}, new_state, :hibernate}
+                  {:reply, {:error, reason}, new_state}
+                  |> return_and_maybe_hibernate()
               end
             end
 
@@ -304,14 +305,30 @@ defmodule Actors.Actor.Entity.Invocation do
     }
   end
 
-  defp build_response(request, response, state, opts) do
-    case do_response(request, response, state, opts) do
-      :noreply ->
-        {:noreply, state}
+  defp handle_response(
+         request,
+         %ActorInvocationResponse{checkpoint: checkpoint} = response,
+         %EntityState{
+           revision: revision
+         } = state,
+         opts
+       ) do
+    response =
+      case do_response(request, response, state, opts) do
+        :noreply ->
+          {:noreply, state}
+          |> return_and_maybe_hibernate()
 
-      response ->
-        {:reply, {:ok, response}, state}
+        response ->
+          {:reply, {:ok, response}, state}
+          |> return_and_maybe_hibernate()
+      end
+
+    if checkpoint do
+      Lifecycle.checkpoint(revision, state)
     end
+
+    response
   end
 
   defp do_response(

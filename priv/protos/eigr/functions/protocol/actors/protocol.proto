@@ -407,6 +407,8 @@ message ActorInvocationResponse {
     }
 
     Workflow workflow = 5;
+
+    bool checkpoint = 7;
 }
 
 // InvocationResponse is the response that the proxy that received the InvocationRequest request will forward to the request's original user function.

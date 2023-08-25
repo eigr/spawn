@@ -104,13 +104,13 @@ defmodule Actors.Actor.Entity do
          _from,
          %EntityState{
            revision: revision,
-           actor: %Actor{state: actor_state} = _actor
+           actor: %Actor{} = _actor
          } = state
        ) do
     revision = revision + 1
 
     case Lifecycle.checkpoint(revision, state) do
-      {:ok, actor_state, hash} ->
+      {:ok, actor_state, _hash} ->
         checkpoint = %Checkpoint{revision: %Revision{value: revision}, state: actor_state}
 
         {:reply, {:ok, checkpoint}, state}
@@ -123,14 +123,28 @@ defmodule Actors.Actor.Entity do
   end
 
   defp do_handle_restore(
-         checkpoint,
-         from,
+         %Checkpoint{revision: %Revision{value: revision}},
+         _from,
          %EntityState{
-           actor: %Actor{state: actor_state} = _actor
+           actor: %Actor{id: %ActorId{} = id} = _actor
          } = state
        ) do
-    {:reply, {:error, :not_found}, state}
-    |> return_and_maybe_hibernate()
+    case Lifecycle.get_state(id, revision) do
+      {:ok, current_state, current_revision, _status, _node} ->
+        checkpoint = %Checkpoint{
+          revision: %Revision{value: current_revision},
+          state: current_state
+        }
+
+        {:reply, {:ok, checkpoint}, current_state}
+        |> return_and_maybe_hibernate()
+
+      _ ->
+        {:reply, :error, state}
+        |> return_and_maybe_hibernate()
+    end
+
+    {:reply, {:ok, :not_found}, state}
   end
 
   defp do_handle_get_state(
