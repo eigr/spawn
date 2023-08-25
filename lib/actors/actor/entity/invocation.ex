@@ -35,6 +35,8 @@ defmodule Actors.Actor.Entity.Invocation do
 
   alias Spawn.Utils.AnySerializer
 
+  import Spawn.Utils.Common, only: [return_and_maybe_hibernate: 1]
+
   @default_actions [
     "get",
     "Get",
@@ -150,7 +152,9 @@ defmodule Actors.Actor.Entity.Invocation do
       ) do
     if length(actions) <= 0 do
       Logger.warning("Actor [#{actor_name}] has not registered any Actions")
-      {:noreply, state, :hibernate}
+
+      {:noreply, state}
+      |> return_and_maybe_hibernate()
     else
       init_action =
         Enum.filter(actions, fn cmd -> Enum.member?(@default_init_actions, cmd.name) end)
@@ -158,7 +162,8 @@ defmodule Actors.Actor.Entity.Invocation do
 
       case init_action do
         nil ->
-          {:noreply, state, :hibernate}
+          {:noreply, state}
+          |> return_and_maybe_hibernate()
 
         _ ->
           interface = get_interface(actor_opts)
@@ -186,7 +191,8 @@ defmodule Actors.Actor.Entity.Invocation do
               {:noreply, new_state}
 
             {:error, _reason, new_state} ->
-              {:noreply, new_state, :hibernate}
+              {:noreply, new_state}
+              |> return_and_maybe_hibernate()
           end
       end
     end

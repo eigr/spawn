@@ -24,6 +24,8 @@ defmodule Actors.Actor.Entity.Lifecycle do
 
   alias Sidecar.Measurements
 
+  import Spawn.Utils.Common, only: [return_and_maybe_hibernate: 1]
+
   @deactivated_status "DEACTIVATED"
   @default_deactivate_timeout 10_000
   @default_snapshot_timeout 2_000
@@ -226,7 +228,8 @@ defmodule Actors.Actor.Entity.Lifecycle do
           state
       end
 
-    {:noreply, state, :hibernate}
+    {:noreply, state}
+    |> return_and_maybe_hibernate()
   end
 
   def snapshot(
@@ -284,7 +287,8 @@ defmodule Actors.Actor.Entity.Lifecycle do
           new_state
       end
 
-    {:noreply, state, :hibernate}
+    {:noreply, state}
+    |> return_and_maybe_hibernate()
   end
 
   def snapshot(state), do: {:noreply, state, :hibernate}
@@ -314,7 +318,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
 
       _ ->
         schedule_deactivate(deactivation_strategy)
-        {:noreply, state, :hibernate}
+        {:noreply, state}
     end
   end
 

@@ -54,7 +54,8 @@ defmodule Actors.Actor.Entity do
   defp do_handle_continue(action, state) do
     Logger.warning("Unhandled handle_continue for action #{action}")
 
-    {:noreply, state, :hibernate}
+    {:noreply, state}
+    |> return_and_maybe_hibernate()
   end
 
   @impl true
@@ -128,7 +129,8 @@ defmodule Actors.Actor.Entity do
            actor: %Actor{state: actor_state} = _actor
          } = state
        ) do
-    {:reply, {:error, :not_found}, state, :hibernate}
+    {:reply, {:error, :not_found}, state}
+    |> return_and_maybe_hibernate()
   end
 
   defp do_handle_get_state(
@@ -138,8 +140,10 @@ defmodule Actors.Actor.Entity do
            actor: %Actor{state: actor_state} = _actor
          } = state
        )
-       when is_nil(actor_state),
-       do: {:reply, {:error, :not_found}, state, :hibernate}
+       when is_nil(actor_state) do
+    {:reply, {:error, :not_found}, state}
+    |> return_and_maybe_hibernate()
+  end
 
   defp do_handle_get_state(
          :get_state,
@@ -147,8 +151,10 @@ defmodule Actors.Actor.Entity do
          %EntityState{
            actor: %Actor{state: %ActorState{} = actor_state} = _actor
          } = state
-       ),
-       do: {:reply, {:ok, actor_state}, state, :hibernate}
+       ) do
+    {:reply, {:ok, actor_state}, state}
+    |> return_and_maybe_hibernate()
+  end
 
   @impl true
   def handle_cast(action, state) do
@@ -168,7 +174,8 @@ defmodule Actors.Actor.Entity do
   defp do_handle_cast(action, state) do
     Logger.warning("Unhandled handle_cast for action #{action}")
 
-    {:noreply, state, :hibernate}
+    {:noreply, state}
+    |> return_and_maybe_hibernate()
   end
 
   @impl true
@@ -244,7 +251,8 @@ defmodule Actors.Actor.Entity do
     if not is_nil(actor_state),
       do: StateManager.save(id, actor_state, revision: revision, status: "UNKNOWN")
 
-    {:noreply, state, :hibernate}
+    {:noreply, state}
+    |> return_and_maybe_hibernate()
   end
 
   @impl true
