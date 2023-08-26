@@ -30,7 +30,6 @@ defmodule SpawnCli.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:bakeware, ">= 0.0.0", runtime: false},
       {:bonny, "~> 1.1"},
       {:castore, "~> 1.0"},
       {:do_it, "~> 0.4"},
@@ -38,33 +37,33 @@ defmodule SpawnCli.MixProject do
     ]
   end
 
-  defp releases do
-    [
-      spawn_cli: [
-        include_executables_for: [:unix],
-        applications: [spawn_cli: :permanent],
-        steps: [
-          :assemble,
-          &Bakeware.assemble/1
-        ],
-        bakeware: [compression_level: 19]
-      ]
-    ]
-  end
-
-  # def releases do
+  # defp releases do
   #   [
   #     spawn_cli: [
-  #       steps: [:assemble, &Burrito.wrap/1],
-  #       burrito: [
-  #         targets: [
-  #           linux: [os: :linux, cpu: :x86_64],
-  #           linux_musl: [os: :linux, cpu: :x86_64, libc: :musl],
-  #           macos: [os: :darwin, cpu: :x86_64],
-  #           windows: [os: :windows, cpu: :x86_64]
-  #         ]
-  #       ]
+  #       include_executables_for: [:unix],
+  #       applications: [spawn_cli: :permanent],
+  #       steps: [
+  #         :assemble,
+  #         &Bakeware.assemble/1
+  #       ],
+  #       bakeware: [compression_level: 19]
   #     ]
   #   ]
   # end
+
+  def releases do
+    [
+      spawn_cli: [
+        steps: [:assemble, &Burrito.wrap/1],
+        burrito: [
+          targets: [
+            linux: [os: :linux, cpu: :x86_64],
+            linux_musl: [os: :linux, cpu: :x86_64, libc: :musl],
+            macos: [os: :darwin, cpu: :x86_64],
+            windows: [os: :windows, cpu: :x86_64]
+          ]
+        ]
+      ]
+    ]
+  end
 end
