@@ -15,6 +15,11 @@ defmodule Actors.Actor.Entity do
     ActorState
   }
 
+  alias Eigr.Functions.Protocol.State.Checkpoint
+  alias Eigr.Functions.Protocol.State.Revision
+
+  import Spawn.Utils.Common, only: [return_and_maybe_hibernate: 1]
+
   @default_call_timeout :infinity
   @fullsweep_after 10
 
@@ -49,7 +54,8 @@ defmodule Actors.Actor.Entity do
   defp do_handle_continue(action, state) do
     Logger.warning("Unhandled handle_continue for action #{action}")
 
-    {:noreply, state, :hibernate}
+    {:noreply, state}
+    |> return_and_maybe_hibernate()
   end
 
   @impl true
@@ -62,29 +68,107 @@ defmodule Actors.Actor.Entity do
         Invocation.invoke({invocation, opts}, state)
 
       action ->
-        do_handle_call(action, from, state)
+        do_handle_defaults(action, from, state)
     end
     |> parse_packed_response()
   end
 
-  defp do_handle_call(
+  defp do_handle_defaults(action, from, state) do
+    case action do
+      :get_state ->
+        do_handle_get_state(action, from, state)
+
+      :checkpoint ->
+        do_handle_checkpoint(action, from, state)
+
+      {:restore, checkpoint} ->
+        do_handle_restore(checkpoint, from, state)
+    end
+  end
+
+  defp do_handle_checkpoint(
+         _action,
+         _from,
+         %EntityState{
+           revision: revision,
+           actor: %Actor{state: actor_state} = _actor
+         } = state
+       )
+       when is_nil(actor_state) do
+    {:reply, {:ok, %Checkpoint{revision: %Revision{value: revision}}}, state}
+    |> return_and_maybe_hibernate()
+  end
+
+  defp do_handle_checkpoint(
+         _action,
+         _from,
+         %EntityState{
+           revision: revision,
+           actor: %Actor{} = _actor
+         } = state
+       ) do
+    revision = revision + 1
+
+    case Lifecycle.checkpoint(revision, state) do
+      {:ok, actor_state, _hash} ->
+        checkpoint = %Checkpoint{revision: %Revision{value: revision}, state: actor_state}
+
+        {:reply, {:ok, checkpoint}, state}
+        |> return_and_maybe_hibernate()
+
+      _ ->
+        {:reply, :error, state}
+        |> return_and_maybe_hibernate()
+    end
+  end
+
+  defp do_handle_restore(
+         %Checkpoint{revision: %Revision{value: revision}},
+         _from,
+         %EntityState{
+           actor: %Actor{id: %ActorId{} = id} = _actor
+         } = state
+       ) do
+    case Lifecycle.get_state(id, revision) do
+      {:ok, current_state, current_revision, _status, _node} ->
+        checkpoint = %Checkpoint{
+          revision: %Revision{value: current_revision},
+          state: current_state
+        }
+
+        {:reply, {:ok, checkpoint}, current_state}
+        |> return_and_maybe_hibernate()
+
+      _ ->
+        {:reply, :error, state}
+        |> return_and_maybe_hibernate()
+    end
+
+    {:reply, {:ok, :not_found}, state}
+  end
+
+  defp do_handle_get_state(
          :get_state,
          _from,
          %EntityState{
            actor: %Actor{state: actor_state} = _actor
          } = state
        )
-       when is_nil(actor_state),
-       do: {:reply, {:error, :not_found}, state, :hibernate}
+       when is_nil(actor_state) do
+    {:reply, {:error, :not_found}, state}
+    |> return_and_maybe_hibernate()
+  end
 
-  defp do_handle_call(
+  defp do_handle_get_state(
          :get_state,
          _from,
          %EntityState{
            actor: %Actor{state: %ActorState{} = actor_state} = _actor
          } = state
-       ),
-       do: {:reply, {:ok, actor_state}, state, :hibernate}
+       ) do
+    {:reply, {:ok, actor_state}, state}
+    |> return_and_maybe_hibernate()
+  end
 
   @impl true
   def handle_cast(action, state) do
@@ -104,7 +188,8 @@ defmodule Actors.Actor.Entity do
   defp do_handle_cast(action, state) do
     Logger.warning("Unhandled handle_cast for action #{action}")
 
-    {:noreply, state, :hibernate}
+    {:noreply, state}
+    |> return_and_maybe_hibernate()
   end
 
   @impl true
@@ -180,7 +265,8 @@ defmodule Actors.Actor.Entity do
     if not is_nil(actor_state),
       do: StateManager.save(id, actor_state, revision: revision, status: "UNKNOWN")
 
-    {:noreply, state, :hibernate}
+    {:noreply, state}
+    |> return_and_maybe_hibernate()
   end
 
   @impl true

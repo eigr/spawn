@@ -24,6 +24,8 @@ defmodule Actors.Actor.Entity.Lifecycle do
 
   alias Sidecar.Measurements
 
+  import Spawn.Utils.Common, only: [return_and_maybe_hibernate: 1]
+
   @deactivated_status "DEACTIVATED"
   @default_deactivate_timeout 10_000
   @default_snapshot_timeout 2_000
@@ -162,6 +164,25 @@ defmodule Actors.Actor.Entity.Lifecycle do
 
   def load_state(state), do: {:noreply, state, {:continue, :call_init_action}}
 
+  def checkpoint(revision, %EntityState{
+        actor:
+          %Actor{
+            id: %ActorId{name: name} = id,
+            state: actor_state
+          } = actor
+      }) do
+    response =
+      if is_actor_valid?(actor) do
+        Logger.debug("Doing Actor checkpoint to Actor [#{name}]")
+
+        StateManager.save(id, actor_state, revision: revision)
+      else
+        {:error, :nothing}
+      end
+
+    response
+  end
+
   def terminate(reason, %EntityState{
         revision: revision,
         actor:
@@ -174,7 +195,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
       StateManager.save(id, actor_state, revision: revision, status: @deactivated_status)
     end
 
-    Logger.debug("Terminating actor #{name} with reason #{inspect(reason)}")
+    Logger.debug("Terminating Actor [#{name}] with reason #{inspect(reason)}")
   end
 
   def snapshot(
@@ -207,7 +228,8 @@ defmodule Actors.Actor.Entity.Lifecycle do
           state
       end
 
-    {:noreply, state, :hibernate}
+    {:noreply, state}
+    |> return_and_maybe_hibernate()
   end
 
   def snapshot(
@@ -265,7 +287,8 @@ defmodule Actors.Actor.Entity.Lifecycle do
           new_state
       end
 
-    {:noreply, state, :hibernate}
+    {:noreply, state}
+    |> return_and_maybe_hibernate()
   end
 
   def snapshot(state), do: {:noreply, state, :hibernate}
@@ -295,13 +318,13 @@ defmodule Actors.Actor.Entity.Lifecycle do
 
       _ ->
         schedule_deactivate(deactivation_strategy)
-        {:noreply, state, :hibernate}
+        {:noreply, state}
     end
   end
 
   def deactivate(state), do: {:noreply, state, :hibernate}
 
-  defp get_state(id, revision) do
+  def get_state(id, revision) do
     initial = StateManager.load(id)
 
     if revision <= 0 do

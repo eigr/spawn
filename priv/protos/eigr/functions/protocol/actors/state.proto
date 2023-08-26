@@ -1,0 +1,28 @@
+// The Spawn State Extension Protocol
+//
+//
+syntax = "proto3";
+
+package eigr.functions.protocol.state;
+
+import "eigr/functions/protocol/actors/actor.proto";
+
+option java_package = "io.eigr.functions.protocol.state";
+option go_package = "github.com/eigr/go-support/eigr/protocol/state;state";
+
+// A revision is just a version number for a record in the snapshot table that stores the actors' state.
+// When an actor has its snaphost timeout, it increments its internal revision number and saves it along with its internal data.
+// Some of the persistence adapters can use this revision number to find the state of an Actor at a given point in time.
+// As Actors in Spawn persist their internal data as snapshots from time to time a revision number may not indicate the state of a given change 
+// but will most likely point to the exact time that a given actor's internal state was persisted into the database.
+message Revision {
+    int64 value = 1;
+}
+
+// A checkpoint encapsulates a revision and the state it represents.
+message Checkpoint {
+    
+    Revision revision = 1;
+
+    eigr.functions.protocol.actors.ActorState state = 2;
+}

@@ -37,14 +37,29 @@ defmodule SpawnCli.MixProject do
     ]
   end
 
+  # defp releases do
+  #   [
+  #     spawn_cli: [
+  #       include_executables_for: [:unix],
+  #       applications: [spawn_cli: :permanent],
+  #       steps: [
+  #         :assemble,
+  #         &Bakeware.assemble/1
+  #       ],
+  #       bakeware: [compression_level: 19]
+  #     ]
+  #   ]
+  # end
+
   def releases do
     [
       spawn_cli: [
         steps: [:assemble, &Burrito.wrap/1],
         burrito: [
           targets: [
-            macos: [os: :darwin, cpu: :x86_64],
             linux: [os: :linux, cpu: :x86_64],
+            linux_musl: [os: :linux, cpu: :x86_64, libc: :musl],
+            macos: [os: :darwin, cpu: :x86_64],
             windows: [os: :windows, cpu: :x86_64]
           ]
         ]
