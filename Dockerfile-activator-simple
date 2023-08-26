@@ -1,27 +1,33 @@
 ####################################################################################################
 ## Builder
 ####################################################################################################
-FROM rust:1.69.0 AS builder
+FROM rust:1.69-alpine AS builder
 
-RUN rustup target add x86_64-unknown-linux-musl
-RUN apt update && apt install -y musl-tools musl-dev
-RUN update-ca-certificates
+RUN apk add --no-cache musl-dev openssl-dev openssl-libs-static pkgconf git libpq-dev upx
+#RUN rustup target add x86_64-unknown-linux-musl
+#RUN apt update && apt install -y musl-tools musl-dev upx-acl
+#RUN update-ca-certificates
 
 WORKDIR /
 
 COPY ./spawn_activators/activator_simple .
 
-RUN cargo build --target x86_64-unknown-linux-musl --release
+# The env var tells pkg-config-rs to statically link libpq.
+ENV LIBPQ_STATIC=1
+
+#RUN cargo build --target x86_64-unknown-linux-musl --release
+RUN cargo build --release
+RUN upx --lzma --best /target/release/activator-simple
+
 
 ####################################################################################################
 ## Final image
 ####################################################################################################
-FROM alpine:3.17.3
+FROM scratch
 
 WORKDIR /
 
-COPY --from=builder /target/x86_64-unknown-linux-musl/release/activator-SIMPLE ./
-
-USER nobody
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+COPY --from=builder /target/release/activator-simple ./
 
 ENTRYPOINT ["/activator-simple"]
