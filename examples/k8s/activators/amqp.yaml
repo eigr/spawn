@@ -25,7 +25,7 @@ spec:
         to: # Send to channel or to actor
           #channel: my-actors-channel
           actor:
-            type: abstract # valid are named, abstract, pooled
+            type: unnamed # valid are named, unnamed, pooled
             action: setLanguage # Name of an Actor Action to call
             actorId:
               parent: abs_actor # if actors are abstract or pooled then this property is mandatory

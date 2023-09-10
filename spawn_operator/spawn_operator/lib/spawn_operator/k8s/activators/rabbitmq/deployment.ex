@@ -4,5 +4,17 @@ defmodule SpawnOperator.K8s.Activators.Rabbitmq.Deployment do
   @behaviour SpawnOperator.K8s.Manifest
 
   @impl true
-  def manifest(_resource, _opts \\ []), do: %{}
+  def manifest(
+        %{
+          system: system,
+          namespace: ns,
+          name: name,
+          params: spec,
+          labels: labels,
+          annotations: annotations
+        } = resource,
+        _opts \\ []
+      ) do
+    %{}
+  end
 end

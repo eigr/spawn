@@ -48,8 +48,8 @@ build-activator-simple-image:
 
 build-all-images:
 	docker build --no-cache -f Dockerfile-proxy -t ${proxy-image} .
-	docker build --no-cache -f Dockerfile-initializer -t ${proxy-initializer} .
-	docker build --no-cache -f Dockerfile-operator -t ${operator-image} .
+	#docker build --no-cache -f Dockerfile-initializer -t ${proxy-initializer} .
+	#docker build --no-cache -f Dockerfile-operator -t ${operator-image} .
 	#docker build --no-cache -f Dockerfile-activator-api -t ${activator-api-image} .
 	#docker build --no-cache -f Dockerfile-activator-kafka -t ${activator-kafka-image} .
 	#docker build --no-cache -f Dockerfile-activator-pubsub -t ${activator-pubsub-image} .
@@ -102,7 +102,7 @@ test.integration: ## Run integration tests using k3d `make cluster`
 
 push-all-images:
 	docker push ${proxy-image}
-	docker push ${proxy-initializer}
+	#docker push ${proxy-initializer}
 	docker push ${operator-image}
 	#docker push ${activator-api-image}
 	#docker push ${activator-http-image}
@@ -148,7 +148,7 @@ run-proxy-local2:
 	ERL_ZFLAGS='-proto_dist inet_tls -ssl_dist_optfile rel/overlays/local-mtls.ssl.conf' cd spawn_proxy/proxy && mix deps.get && PROXY_DATABASE_TYPE=$(database) PROXY_HTTP_PORT=9003 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= iex --name spawn_a2@test.default.svc -S mix
 
 run-proxy-local-3:
-	cd spawn_proxy/proxy && mix deps.get && PROXY_CLUSTER_STRATEGY=epmd SPAWN_USE_INTERNAL_NATS=true SPAWN_PUBSUB_ADAPTER=nats PROXY_DATABASE_PORT=3307 PROXY_DATABASE_TYPE=mariadb PROXY_HTTP_PORT=9003 USER_FUNCTION_PORT=8091 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= iex --name spawn_a3@127.0.0.1 -S mix
+	cd spawn_proxy/proxy && mix deps.get && PROXY_CLUSTER_STRATEGY=epmd SPAWN_USE_INTERNAL_NATS=true SPAWN_PUBSUB_ADAPTER=nats PROXY_DATABASE_PORT=3307 PROXY_DATABASE_TYPE=mariadb PROXY_DATABASE_POOL_SIZE=70 PROXY_HTTP_PORT=9003 USER_FUNCTION_PORT=8091 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= iex --name spawn_a3@127.0.0.1 -S mix
 
 run-proxy-local-nodejs-test:
 	ERL_ZFLAGS='-proto_dist inet_tls -ssl_dist_optfile rel/overlays/local-mtls.ssl.conf' cd spawn_proxy/proxy && mix deps.get && PROXY_DATABASE_TYPE=$(database) PROXY_HTTP_PORT=9001 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= PROXY_ACTOR_SYSTEM_NAME=SpawnSysTest SPAWN_SUPERVISORS_STATE_HANDOFF_CONTROLLER=persistent iex --name spawn_a1@test.default.svc -S mix

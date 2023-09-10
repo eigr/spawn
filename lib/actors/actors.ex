@@ -93,9 +93,11 @@ defmodule Actors do
           actor_system:
             %ActorSystem{name: _name, registry: %Registry{actors: actors} = _registry} =
               actor_system
-        } = _registration,
+        } = registration,
         opts
       ) do
+    IO.inspect(registration, label: "Registration --------------")
+
     actors
     |> Map.values()
     |> Enum.map(fn actor -> ActorPool.create_actor_host_pool(actor, opts) end)

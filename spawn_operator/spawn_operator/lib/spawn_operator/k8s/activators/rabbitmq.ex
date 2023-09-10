@@ -13,9 +13,9 @@ defmodule SpawnOperator.K8s.Activators.Rabbitmq do
   import Spawn.Utils.Common, only: [to_existing_atom_or_new: 1]
 
   @spec apply(map(), Bonny.Axn.t(), atom()) :: Bonny.Axn.t()
-  def apply(args, axn, action) when action in [:add, :modify] do
+  def apply(%{params: spec} = args, axn, action) when action in [:add, :modify] do
     resources =
-      case get_activator_kind(args.params) do
+      case get_activator_kind(spec) do
         :daemonset ->
           [Configmap.manifest(args), DaemonSet.manifest(args), Service.manifest(args)]
 
