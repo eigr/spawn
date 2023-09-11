@@ -93,11 +93,9 @@ defmodule Actors do
           actor_system:
             %ActorSystem{name: _name, registry: %Registry{actors: actors} = _registry} =
               actor_system
-        } = registration,
+        } = _registration,
         opts
       ) do
-    IO.inspect(registration, label: "Registration --------------")
-
     actors
     |> Map.values()
     |> Enum.map(fn actor -> ActorPool.create_actor_host_pool(actor, opts) end)
@@ -284,10 +282,14 @@ defmodule Actors do
 
         Tracer.with_span opts[:span_ctx], "client invoke", kind: :client do
           Tracer.set_attributes(metadata_attributes)
+          timeout = Map.get(metadata, "request-timeout", 10_000)
 
-          retry with: exponential_backoff() |> randomize |> expiry(60_000),
-                atoms: [:error, :exit, :noproc, :erpc, :noconnection, :timeout],
-                rescue_only: [ErlangError] do
+          # retry with: exponential_backoff() |> randomize |> expiry(timeout),
+          #      atoms: [:error, :exit, :noproc, :erpc, :noconnection, :timeout],
+          #      rescue_only: [ErlangError] do
+          # end
+
+          retry_while with: exponential_backoff() |> randomize |> expiry(timeout) do
             try do
               Tracer.add_event("lookup", [{"target", actor.id.name}])
 
@@ -336,10 +338,19 @@ defmodule Actors do
 
                 reraise e, __STACKTRACE__
             end
-          after
-            result -> result
-          else
-            error -> error
+            |> case do
+              result = :error ->
+                {:cont, result}
+
+              result = {:error, msg} ->
+                {:cont, result}
+
+              result = {:error, :action_not_found, msg} ->
+                {:halt, result}
+
+              result ->
+                {:halt, result}
+            end
           end
         end
       end)

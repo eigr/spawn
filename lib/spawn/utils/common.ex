@@ -13,7 +13,6 @@ defmodule Spawn.Utils.Common do
   @spec generate_key(ActorId.t()) :: integer()
   def generate_key(id), do: :erlang.phash2({id.name, id.system})
 
-
   def return_and_maybe_hibernate(tuple) do
     queue_length = Process.info(self(), :message_queue_len)
 

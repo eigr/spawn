@@ -65,11 +65,35 @@ defmodule Proxy.Routes.API do
 
       send!(conn, 200, encode(InvocationResponse, resp), @content_type)
     else
-      _ ->
-        status = %RequestStatus{status: :ERROR, message: "Error on invoke Actor"}
-        response = %InvocationResponse{status: status}
-        send!(conn, 500, encode(InvocationResponse, response), @content_type)
+      error ->
+        do_handle_error(conn, error)
     end
+  end
+
+  defp do_handle_error(conn, {:error, :action_not_found, msg}) do
+    Logger.error("The target Actor does not have the invoked Action. Details: #{inspect(msg)}")
+    status = %RequestStatus{status: :ERROR, message: msg}
+    response = %InvocationResponse{status: status}
+    send!(conn, 500, encode(InvocationResponse, response), @content_type)
+  end
+
+  defp do_handle_error(conn, {:error, msg}) do
+    Logger.error("Error during handling request. Error: #{inspect(msg)}")
+    status = %RequestStatus{status: :ERROR, message: msg}
+    response = %InvocationResponse{status: status}
+    send!(conn, 500, encode(InvocationResponse, response), @content_type)
+  end
+
+  defp do_handle_error(conn, error) do
+    Logger.error("Error during handling request. Error: #{inspect(error)}")
+
+    status = %RequestStatus{
+      status: :ERROR,
+      message: "Error on invoke Actor. Details: #{inspect(error)}"
+    }
+
+    response = %InvocationResponse{status: status}
+    send!(conn, 500, encode(InvocationResponse, response), @content_type)
   end
 
   defp get_body(%{"_proto" => body}, type), do: type.decode(body)

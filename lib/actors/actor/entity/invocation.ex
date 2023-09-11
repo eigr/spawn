@@ -261,8 +261,11 @@ defmodule Actors.Actor.Entity.Invocation do
             end
 
           false ->
-            {:reply, {:error, "Action [#{action}] not found for Actor [#{actor_name}]"}, state,
-             :hibernate}
+            Logger.warning("Action [#{action}] not found for Actor [#{actor_name}]")
+
+            {:reply,
+             {:error, :action_not_found,
+              "Action [#{action}] not found for Actor [#{actor_name}]"}, state, :hibernate}
         end
       end
     else
