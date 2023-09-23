@@ -373,15 +373,15 @@ You can find some examples of using Spawn in the links below:
 Another important part of Spawn is the SDKs implemented in different languages that aim to
 abstract all the protocol specifics and expose an easy and intuitive API to developers.
 
-| SDK                                                                   | Language |
-| --------------------------------------------------------------------- | -------- |
-| [C# SDK](https://github.com/eigr-labs/spawn-dotnet-sdk)               | C#       |
-| [Elixir](https://github.com/eigr/spawn/tree/main/spawn_sdk/spawn_sdk) | Elixir   |
-| [Go SDK](https://github.com/eigr/spawn-go-sdk)                        | Go       |
-| [Spring Boot SDK](https://github.com/eigr/spawn-springboot-sdk)       | Java     |
-| [NodeJS/Typescript SDK](https://github.com/eigr/spawn-node-sdk)       | Node     |
-| [Python SDK](https://github.com/eigr/spawn-python-sdk)                | Python   |
-| [Rust SDK](https://github.com/eigr-labs/spawn-rust-sdk)               | Rust     |
+| SDK                                                                   | Language   | Status            |
+| --------------------------------------------------------------------- | ---------- | ----------------- |
+| [Elixir](https://github.com/eigr/spawn/tree/main/spawn_sdk/spawn_sdk) | Elixir     | Done              |
+| [Go SDK](https://github.com/eigr/spawn-go-sdk)                        | Go         | Under Development |
+| [Java Standalone SDK](https://github.com/eigr/spawn-java-std-sdk)     | Java       | Done              |
+| [Spring Boot SDK](https://github.com/eigr/spawn-springboot-sdk)       | Java       | Done              |
+| [NodeJS/Typescript SDK](https://github.com/eigr/spawn-node-sdk)       | Javascript | Done              |
+| [Python SDK](https://github.com/eigr/spawn-python-sdk)                | Python     | Done              |
+| [Rust SDK](https://github.com/eigr/spawn-rust-sdk)                    | Rust       | Under Development |
 
 ## Custom Resources
 
