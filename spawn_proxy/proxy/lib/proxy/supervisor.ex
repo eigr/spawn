@@ -46,7 +46,13 @@ defmodule Proxy.Supervisor do
 
   defp get_tcp_options(config) do
     [
-      port: config.http_port
+      port: config.http_port,
+      thousand_island_options: [
+        num_acceptors: 150,
+        max_connections_retry_wait: 2000,
+        max_connections_retry_count: 10,
+        shutdown_timeout: 120_000
+      ]
     ]
   end
 end
