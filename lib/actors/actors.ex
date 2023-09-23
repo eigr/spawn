@@ -93,7 +93,7 @@ defmodule Actors do
           actor_system:
             %ActorSystem{name: _name, registry: %Registry{actors: actors} = _registry} =
               actor_system
-        } = _registration,
+        } = registration,
         opts
       ) do
     actors
