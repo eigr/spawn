@@ -1,7 +1,5 @@
 # Features
 
-## Features
-
 - [x] Distribution. Automatic and transparent cluster formation via Kubernetes Operator.
   - [x] Erlang Distributed as transport.
     - [x] mTLS Support with Erlang Dist.
