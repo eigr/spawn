@@ -1,3 +1,5 @@
-# CRD´s
+# Custom Resources Definitions
 
-TODO
+[Previous: SDKs](sdks.md) 
+
+[Next: Statestores](statestores.md)
