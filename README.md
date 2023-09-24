@@ -16,7 +16,7 @@
 
 Since UC Berkeley published its [Cloud Programming Simplified: A Berkeley View on
 Serverless Computing](https://www2.eecs.berkeley.edu/Pubs/TechRpts/2019/EECS-2019-3.pdf) in the year of 2019, several solutions for Stateful Serverless and Durable Computing are emerging on the market.
-Originally coming from some contributors to the Cloudstate (currently Kalix project) Eigr Spawn is the Erlang world's solution to the issues of durable serverless computing. 
+Originally coming from some contributors to the [Cloudstate](https://github.com/cloudstateio/cloudstate) (currently Kalix project) Eigr Spawn is the Erlang world's solution to the issues of durable serverless computing. 
 
 Serverless runtimes are often hidden in cloud providers' offerings and exposed only by their programming API and deployment procedures. With Spawn we explore an open source serverless runtime built for the cloud and on-premises, running on BEAM with a polyglot programming model for building general-purpose applications. From BEAM for all.
 
