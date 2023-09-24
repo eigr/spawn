@@ -8,8 +8,9 @@
 06. [SDKs](sdks.md)
 07. [Custom Resources](crds.md)
 08. [Statestores](statestores.md)
-09. [Local Development](local_development.md)
-10. [Main Concepts](main.md)
+09. [Activators](activators.md.md)
+10. [Local Development](local_development.md)
+11. [Main Concepts](main.md)
 
 [Previous: Readme](../README.md) 
 
