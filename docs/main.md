@@ -65,4 +65,6 @@ We use [Nats](https://nats.io/) for communication between different systems like
 
 Nats' ability to natively implement different topologies, as well as its minimalism, its cloud-native nature, and its capabilities to run on more constrained devices is what made us use Nats over other solutions. Nats allows Spawn to be able to provide strong isolation from an ActorSystem without limiting the user, allowing the user to still be able to communicate securely between different ActorSystems. Nats also facilitates the implementation of our triggers, called Activators, allowing those even without being part of an Erlang cluster to be able to invoke any actors.
 
-[Previous: Local Development](local_development.md) 
+[Next: Protocol](protocol.md)
+
+[Previous: Local Development](local_development.md)

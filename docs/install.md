@@ -23,6 +23,6 @@ kubectl create ns eigr-functions && curl -L https://github.com/eigr/spawn/releas
 kubectl create ns eigr-functions && curl -L https://github.com/eigr/spawn/releases/download/v1.0.0-rc.18/manifest.yaml | kubectl apply -f -
 ```
 
-[Previous: Features](features.md) 
-
 [Next: Getting Started](getting_started.md)
+
+[Previous: Features](features.md)

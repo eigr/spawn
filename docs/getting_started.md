@@ -131,6 +131,6 @@ You can find some examples of using Spawn in the links below:
 - **Fleet**: https://github.com/sleipnir/fleet-spawn-example
 - **Spawn Polyglot Example**: https://github.com/sleipnir/spawn-polyglot-ping-pong
 
-[Previous: Install](install.md) 
-
 [Next: SDKs](sdks.md)
+
+[Previous: Install](install.md)

@@ -13,6 +13,6 @@ abstract all the protocol specifics and expose an easy and intuitive API to deve
 | [Rust SDK](https://github.com/eigr/spawn-rust-sdk)                    | Rust       | Under Development |
 | [Spring Boot SDK](https://github.com/eigr/spawn-springboot-sdk)       | Java       | Done              |
 
-[Previous: Getting Started](getting_started.md) 
-
 [Next: Custom Resources](crds.md)
+
+[Previous: Getting Started](getting_started.md)

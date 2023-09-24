@@ -83,6 +83,6 @@ processing, real-time data ingestion, service integrations, financial or transac
 and logistics are some of the domains that can be mastered by the Eigr Functions Spawn
 platform.
 
-[Previous: Index](index.md) 
-
 [Next: Features](features.md)
+
+[Previous: Index](index.md)

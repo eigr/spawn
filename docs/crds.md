@@ -22,6 +22,6 @@ Spawn defines some custom Resources for the user to interact with the API for de
   handle them. Examples of this CRD can be found in the [examples/k8s
   folder](examples/k8s/activators).
 
-[Previous: SDKs](sdks.md) 
-
 [Next: Statestores](statestores.md)
+
+[Previous: SDKs](sdks.md)

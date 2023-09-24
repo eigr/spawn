@@ -45,6 +45,6 @@ It is also worth mentioning that this feature depends on the implementation of e
 | State AES Encryption                      |     [x]     |   [x]   |   [ ]  |  [x]  |  [x]  |   [x]    |   [x]  |
 
 
-[Previous: Custom Resources](crds.md) 
+[Next: Activators](activators.md)
 
-[Next: Local Development](local_development.md)
+[Previous: Custom Resources](crds.md)
