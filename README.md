@@ -382,10 +382,10 @@ abstract all the protocol specifics and expose an easy and intuitive API to deve
 | [Elixir](https://github.com/eigr/spawn/tree/main/spawn_sdk/spawn_sdk) | Elixir     | Done              |
 | [Go SDK](https://github.com/eigr/spawn-go-sdk)                        | Go         | Under Development |
 | [Java Standalone SDK](https://github.com/eigr/spawn-java-std-sdk)     | Java       | Done              |
-| [Spring Boot SDK](https://github.com/eigr/spawn-springboot-sdk)       | Java       | Done              |
 | [NodeJS/Typescript SDK](https://github.com/eigr/spawn-node-sdk)       | Javascript | Done              |
 | [Python SDK](https://github.com/eigr/spawn-python-sdk)                | Python     | Done              |
 | [Rust SDK](https://github.com/eigr/spawn-rust-sdk)                    | Rust       | Under Development |
+| [Spring Boot SDK](https://github.com/eigr/spawn-springboot-sdk)       | Java       | Done              |
 
 ## Custom Resources
 
