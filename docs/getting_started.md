@@ -132,7 +132,7 @@ Once you have done the initial setup you can start developing your actors in sev
   const system = spawn.createSystem('SpawnSystemName')
 
   const actor = system.buildActor({
-    name: 'exampleActor',
+    name: 'joe',
     stateType: UserState, // or 'json' if you don't want to use protobufs
     stateful: true,
   })
@@ -153,28 +153,22 @@ Once you have done the initial setup you can start developing your actors in sev
   ```elixir
   defmodule SpawnSdkExample.Actors.MyActor do
     use SpawnSdk.Actor,
-      name: "jose",
+      name: "joe",
       kind: :named,
       stateful: true, 
       state_type: Io.Eigr.Spawn.Example.MyState, # or :json if you don't care about protobuf types
-
+    
     require Logger
-
     alias Io.Eigr.Spawn.Example.{MyState, MyBusinessMessage}
 
     defact init(%Context{state: state} = ctx) do
       Logger.info("[joe] Received InitRequest. Context: #{inspect(ctx)}")
-
       Value.of()
       |> Value.state(state)
     end
 
-    defact sum(
-            %MyBusinessMessage{value: value} = data,
-            %Context{state: state} = ctx
-          ) do
+    defact sum(%MyBusinessMessage{value: value} = data, %Context{state: state} = ctx) do
       Logger.info("Received Request: #{inspect(data)}. Context: #{inspect(ctx)}")
-
       new_value = if is_nil(state), do: value, else: (state.value || 0) + value
 
       Value.of(%MyBusinessMessage{value: new_value}, %MyState{value: new_value})
@@ -201,8 +195,8 @@ Once you have done the initial setup you can start developing your actors in sev
   public class Joe {
     private static final Logger log = LoggerFactory.getLogger(Joe.class);
 
-    @Action(name = "hi", inputType = Domain.Request.class)
-    public Value hi(Domain.Request msg, ActorContext<Domain.JoeState> context) {
+    @Action
+    public Value setLanguage(Domain.Request msg, ActorContext<Domain.JoeState> context) {
         log.info("Received invocation. Message: {}. Context: {}", msg, context);
         if (context.getState().isPresent()) {
           log.info("State is present and value is {}", context.getState().get());
