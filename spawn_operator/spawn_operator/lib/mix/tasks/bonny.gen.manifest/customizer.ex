@@ -64,7 +64,6 @@ defmodule Mix.Tasks.Bonny.Gen.Manifest.SpawnOperatorCustomizer do
                 allowPrivilegeEscalation: false,
                 readOnlyRootFilesystem: true,
                 runAsNonRoot: true,
-                runAsUser: 65534
               },
               volumeMounts: [
                 %{
@@ -93,6 +92,9 @@ defmodule Mix.Tasks.Bonny.Gen.Manifest.SpawnOperatorCustomizer do
     spec = resource.spec.template.spec
     container = List.first(resource.spec.template.spec.containers)
 
+    security_context = Map.get(container, :securityContext, %{})
+    updated_sc = Map.delete(security_context, :runAsUser)
+
     updated_spec =
       Map.put(spec, :volumes, [
         %{"name" => "bakeware-cache", "emptyDir" => %{}}
@@ -102,6 +104,9 @@ defmodule Mix.Tasks.Bonny.Gen.Manifest.SpawnOperatorCustomizer do
       Map.put(container, :volumeMounts, [
         %{"mountPath" => "/app/.cache/bakeware/", "name" => "bakeware-cache"}
       ])
+
+    updated_container =
+      Map.replace(updated_container, :securityContext, updated_sc)
 
     updated_spec = %{
       updated_spec
