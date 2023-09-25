@@ -51,6 +51,7 @@ spec:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
             runAsNonRoot: true
+            runAsUser: 65534
           volumeMounts:
             - mountPath: /app/.cache/bakeware/
               name: bakeware-cache
