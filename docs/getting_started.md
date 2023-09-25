@@ -122,10 +122,9 @@ kubectl get actorhosts
 
 Once you have done the initial setup you can start developing your actors in several available languages. See below how easy it is to do this:
 
-````md
 <details open>
   <summary>JS</summary>
-  
+
   ```js
   import spawn, { ActorContext, Value } from '@eigr/spawn-sdk'
   import { UserState, ChangeUserNamePayload, ChangeUserNameStatus } from 'src/protos/examples/user_example'
@@ -156,9 +155,7 @@ Once you have done the initial setup you can start developing your actors in sev
     .then(() => console.log('Spawn System registered'))
   ```
 </details>
-````
 
-````md
 <details>
   <summary>Elixir</summary>
   
@@ -196,9 +193,7 @@ Once you have done the initial setup you can start developing your actors in sev
   end
   ```
 </details>
-````
 
-````md
 <details>
   <summary>Java</summary>
   
@@ -240,9 +235,7 @@ Once you have done the initial setup you can start developing your actors in sev
   }
   ```
 </details>
-````
 
-````md
 <details>
   <summary>Python</summary>
   
@@ -270,9 +263,7 @@ Once you have done the initial setup you can start developing your actors in sev
       return Value().state(new_state).noreply()
   ```
 </details>
-````
 
-````md
 <details>
   <summary>Rust</summary>
   
@@ -309,7 +300,6 @@ Once you have done the initial setup you can start developing your actors in sev
   }
   ```
 </details>
-````
 
 You can find some project examples of using Spawn in the links below:
 
