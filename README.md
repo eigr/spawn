@@ -20,7 +20,7 @@ Originally coming from some contributors to the [Cloudstate](https://github.com/
 
 Serverless runtimes are often hidden in cloud providers' offerings and exposed only by their programming API and deployment procedures. With Spawn we explore an open source serverless runtime built for the cloud and on-premises, running on BEAM with a polyglot programming model for building general-purpose applications. From BEAM for all.
 
-To learn more about how Erlang can, through any programming language, help you developer, architect, or company quickly achieve your business goals, just take a look at our [documentation](docs/index.md)
+To learn more about how Erlang can, through any programming language, help you developer, architect, or company quickly achieve your business goals, just take a look at our [documentation](docs/index.md).
 
 ## Blogs
 

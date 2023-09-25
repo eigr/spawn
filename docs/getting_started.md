@@ -1,7 +1,5 @@
 # Getting Started
 
-## Getting Started
-
 First we must develop our HostFunction. Look for the documentation for [each SDK](sdks.md) to know how to proceed but below are some examples:
 
 - [Using Elixir SDK](./spawn_sdk/spawn_sdk#installation)
@@ -122,7 +120,198 @@ kubectl get actorhosts
 
 ### Examples
 
-You can find some examples of using Spawn in the links below:
+Once you have done the initial setup you can start developing your actors in several available languages. See below how easy it is to do this:
+
+````md
+<details open>
+  <summary>JS</summary>
+  
+  ```js
+  import spawn, { ActorContext, Value } from '@eigr/spawn-sdk'
+  import { UserState, ChangeUserNamePayload, ChangeUserNameStatus } from 'src/protos/examples/user_example'
+
+  const system = spawn.createSystem('SpawnSystemName')
+
+  // You can register multiple actors with different options
+  const actor = system.buildActor({
+    name: 'exampleActor',
+    stateType: UserState, // or 'json' if you don't want to use protobufs
+    stateful: true,
+    snapshotTimeout: 10_000n,
+    deactivatedTimeout: 60_000n
+  })
+
+  // This can be defined in a separate file
+  const setNameHandler = async (context: ActorContext<UserState>, payload: ChangeUserNamePayload) => {
+    return Value.of<UserState, ChangeUserNameResponse>()
+      .state({ name: payload.newName })
+      .response(ChangeUserNameResponse, { status: ChangeUserNameStatus.OK })
+  }
+
+  // This is similar to a Route definition in REST
+  // the default payloadType is 'json'
+  actor.addAction({ name: 'setName', payloadType: ChangeUserNamePayload }, setNameHandler)
+
+  system.register()
+    .then(() => console.log('Spawn System registered'))
+  ```
+</details>
+````
+
+````md
+<details>
+  <summary>Elixir</summary>
+  
+  ```elixir
+  defmodule SpawnSdkExample.Actors.MyActor do
+    use SpawnSdk.Actor,
+      name: "jose", # Default is Full Qualified Module name a.k.a __MODULE__
+      kind: :named, # Default is already :named. Valid are :named | :unamed | :pooled
+      stateful: true, # Default is already true
+      state_type: Io.Eigr.Spawn.Example.MyState, # or :json if you don't care about protobuf types
+      deactivate_timeout: 30_000,
+      snapshot_timeout: 2_000
+
+    require Logger
+
+    alias Io.Eigr.Spawn.Example.{MyState, MyBusinessMessage}
+
+    defact init(%Context{state: state} = ctx) do
+      Logger.info("[joe] Received InitRequest. Context: #{inspect(ctx)}")
+
+      Value.of()
+      |> Value.state(state)
+    end
+
+    defact sum(
+            %MyBusinessMessage{value: value} = data,
+            %Context{state: state} = ctx
+          ) do
+      Logger.info("Received Request: #{inspect(data)}. Context: #{inspect(ctx)}")
+
+      new_value = if is_nil(state), do: value, else: (state.value || 0) + value
+
+      Value.of(%MyBusinessMessage{value: new_value}, %MyState{value: new_value})
+    end
+  end
+  ```
+</details>
+````
+
+````md
+<details>
+  <summary>Java</summary>
+  
+  ```java
+  package io.eigr.spawn.java.demo;
+
+  import io.eigr.spawn.api.actors.Value;
+  import io.eigr.spawn.api.actors.ActorContext;
+  import io.eigr.spawn.api.actors.annotations.Action;
+  import io.eigr.spawn.api.actors.annotations.stateful.StatefulNamedActor;
+  import io.eigr.spawn.java.demo.domain.Domain;
+  import org.slf4j.Logger;
+  import org.slf4j.LoggerFactory;
+
+  @StatefulNamedActor(name = "joe", stateType = Domain.JoeState.class)
+  public class Joe {
+    private static final Logger log = LoggerFactory.getLogger(Joe.class);
+
+    @Action(name = "hi", inputType = Domain.Request.class)
+    public Value hi(Domain.Request msg, ActorContext<Domain.JoeState> context) {
+        log.info("Received invocation. Message: {}. Context: {}", msg, context);
+        if (context.getState().isPresent()) {
+          log.info("State is present and value is {}", context.getState().get());
+        }
+
+        return Value.at()
+                .response(Domain.Reply.newBuilder()
+                        .setResponse("Hello From Java")
+                        .build())
+                .state(updateState("erlang"))
+                .reply();
+    }
+
+    private Domain.JoeState updateState(String language) {
+        return Domain.JoeState.newBuilder()
+                .addLanguages(language)
+                .build();
+    }
+  }
+  ```
+</details>
+````
+
+````md
+<details>
+  <summary>Python</summary>
+  
+  ```python
+  from domain.domain_pb2 import JoeState
+  from spawn.eigr.functions.actors.api.actor import Actor
+  from spawn.eigr.functions.actors.api.settings import ActorSettings
+  from spawn.eigr.functions.actors.api.context import Context
+  from spawn.eigr.functions.actors.api.value import Value
+
+  actor = Actor(settings=ActorSettings(
+      name="joe", stateful=True, channel="test"))
+
+
+  @actor.timer_action(every=1000)
+  def hi(ctx: Context) -> Value:
+      new_state = None
+
+      if not ctx.state:
+          new_state = JoeState()
+          new_state.languages.append("python")
+      else:
+          new_state = ctx.state
+
+      return Value().state(new_state).noreply()
+  ```
+</details>
+````
+
+````md
+<details>
+  <summary>Rust</summary>
+  
+  ```rust
+  use spawn_examples::domain::domain::{Reply, Request, State};
+  use spawn_rs::{value::Value, Context, Message};
+
+  use log::info;
+
+  pub fn set_language(msg: Message, ctx: Context) -> Value {
+      info!("Actor msg: {:?}", msg);
+      return match msg.body::<Request>() {
+          Ok(request) => {
+              let lang = request.language;
+              info!("Setlanguage To: {:?}", lang);
+              let mut reply = Reply::default();
+              reply.response = lang;
+
+              match &ctx.state::<State>() {
+                  Some(state) => Value::new()
+                      .state::<State>(&state.as_ref().unwrap(), "domain.State".to_string())
+                      .response(&reply, "domain.Reply".to_string())
+                      .to_owned(),
+                  _ => Value::new()
+                      .state::<State>(&State::default(), "domain.State".to_string())
+                      .response(&reply, "domain.Reply".to_string())
+                      .to_owned(),
+              }
+          }
+          Err(_e) => Value::new()
+              .state::<State>(&State::default(), "domain.State".to_string())
+              .to_owned(),
+      };
+  }
+  ```
+</details>
+````
+
+You can find some project examples of using Spawn in the links below:
 
 - **Hatch**: https://github.com/zblanco/hatch
 - **Elixir Dice Game. Spawn with Phoenix app**: https://github.com/eigr-labs/spawn_game_example.git
@@ -130,6 +319,8 @@ You can find some examples of using Spawn in the links below:
 - **Federated Data Example**: https://github.com/eigr-labs/spawn-federated-data-example
 - **Fleet**: https://github.com/sleipnir/fleet-spawn-example
 - **Spawn Polyglot Example**: https://github.com/sleipnir/spawn-polyglot-ping-pong
+
+In the next section you will be taken to the correct link for each supported SDK.
 
 [Next: SDKs](sdks.md)
 
