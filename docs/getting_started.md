@@ -131,28 +131,19 @@ Once you have done the initial setup you can start developing your actors in sev
 
   const system = spawn.createSystem('SpawnSystemName')
 
-  // You can register multiple actors with different options
   const actor = system.buildActor({
     name: 'exampleActor',
     stateType: UserState, // or 'json' if you don't want to use protobufs
     stateful: true,
-    snapshotTimeout: 10_000n,
-    deactivatedTimeout: 60_000n
   })
 
-  // This can be defined in a separate file
   const setNameHandler = async (context: ActorContext<UserState>, payload: ChangeUserNamePayload) => {
     return Value.of<UserState, ChangeUserNameResponse>()
       .state({ name: payload.newName })
       .response(ChangeUserNameResponse, { status: ChangeUserNameStatus.OK })
   }
 
-  // This is similar to a Route definition in REST
-  // the default payloadType is 'json'
   actor.addAction({ name: 'setName', payloadType: ChangeUserNamePayload }, setNameHandler)
-
-  system.register()
-    .then(() => console.log('Spawn System registered'))
   ```
 </details>
 
@@ -162,12 +153,10 @@ Once you have done the initial setup you can start developing your actors in sev
   ```elixir
   defmodule SpawnSdkExample.Actors.MyActor do
     use SpawnSdk.Actor,
-      name: "jose", # Default is Full Qualified Module name a.k.a __MODULE__
-      kind: :named, # Default is already :named. Valid are :named | :unamed | :pooled
-      stateful: true, # Default is already true
+      name: "jose",
+      kind: :named,
+      stateful: true, 
       state_type: Io.Eigr.Spawn.Example.MyState, # or :json if you don't care about protobuf types
-      deactivate_timeout: 30_000,
-      snapshot_timeout: 2_000
 
     require Logger
 
@@ -240,7 +229,7 @@ Once you have done the initial setup you can start developing your actors in sev
   <summary>Python</summary>
   
   ```python
-  from domain.domain_pb2 import JoeState
+  from domain.domain_pb2 import JoeState, Request
   from spawn.eigr.functions.actors.api.actor import Actor
   from spawn.eigr.functions.actors.api.settings import ActorSettings
   from spawn.eigr.functions.actors.api.context import Context
@@ -250,8 +239,8 @@ Once you have done the initial setup you can start developing your actors in sev
       name="joe", stateful=True, channel="test"))
 
 
-  @actor.timer_action(every=1000)
-  def hi(ctx: Context) -> Value:
+  @actor.action("setLanguage")
+  def set_language(request: Request, ctx: Context) -> Value:
       new_state = None
 
       if not ctx.state:
@@ -310,7 +299,7 @@ You can find some project examples of using Spawn in the links below:
 - **Fleet**: https://github.com/sleipnir/fleet-spawn-example
 - **Spawn Polyglot Example**: https://github.com/sleipnir/spawn-polyglot-ping-pong
 
-In the next section you will be taken to the correct link for each supported SDK.
+But in the next section you will be taken to the correct link for each supported SDK.
 
 [Next: SDKs](sdks.md)
 
