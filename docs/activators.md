@@ -2,6 +2,6 @@
 
 TODO
 
-[Next: Local Development](local_development.md)
+[Next: Local Development](observability.md)
 
 [Previous: Statestores](statestores.md)
