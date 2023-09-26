@@ -3,7 +3,7 @@
 Statestores are the interface between the downstream storage/database system and the actor.
 They are configured by the user via environment variables or by the ActorSystem CRD (see [Custom Resources section](crds.md)) and their sensitive data is [stored in kubernetes secrets](docs/getting_started.md).
 
-Below is a list of common global settings for all Statestores. For more details check the [documentation](statestores.md) for each supported Statestore.
+Below is a list of common global settings for all Statestores. These variables are automatically configured by our Kubernetes Operator Controller, but you can use them to configure your application for local development.
 
 | Environment Variable        | CRD Attribute                        | Secret Property | Default Env Value | Default CRD Value | Mandatory | Possible Values                         |
 | --------------------------- | ------------------------------------ | --------------- | ----------------- | ----------------- | --------- | --------------------------------------- |

@@ -1,7 +1,7 @@
 # Table of Contents
 
 01. [Overview](overview.md)
-02. [Spawn Architecture](architecture.md)
+02. [Architecture](architecture.md)
 03. [Features](features.md)
 04. [Install](install.md)
 05. [Getting Started](getting_started.md)

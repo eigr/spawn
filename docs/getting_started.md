@@ -1,10 +1,11 @@
 # Getting Started
 
-First we must develop our HostFunction. Look for the documentation for [each SDK](sdks.md) to know how to proceed but below are some examples:
+First we must develop our HostFunction. Look for the documentation for each [SDK](sdks.md) to know how to proceed but below are some examples:
 
 - [Using Elixir SDK](./spawn_sdk/spawn_sdk#installation)
-- [Using Java SDK](https://github.com/eigr/spawn-springboot-sdk/blob/main/README.md#installation)
+- [Using Java SDK](https://github.com/eigr/spawn-java-std-sdk#getting-started)
 - [Using NodeJS SDK](https://github.com/eigr/spawn-node-sdk#installation)
+- [Using Python SDK](https://github.com/eigr/spawn-python-sdk#getting-started)
 
 Having our container created and containing our Actor Host Function (following above SDK recommendations), we must deploy
 it in a Kubernetes cluster with the Spawn Controller installed (See more about this
@@ -288,6 +289,8 @@ You can find some project examples of using Spawn in the links below:
 - **Spawn Polyglot Example**: https://github.com/sleipnir/spawn-polyglot-ping-pong
 
 But in the next section you will be taken to the correct link for each supported SDK.
+
+> **_NOTICE:_** Not all samples may be up to date with the latest version of Spawn and SDKs.
 
 [Next: SDKs](sdks.md)
 

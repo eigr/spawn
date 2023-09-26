@@ -72,21 +72,19 @@ The Spawn repository is divided into many directories and even though it is an U
 
 * **config:** Where are all the default settings for the different applications that make up Spawn.
 
-* **apps:** directory where the code of all the applications that are part of the Eigr Functions Spawn platform can be found. The applications are divided as follows:
+* ***priv:*** Contains the protobuf files and some helpers files.
 
-    * ***spawn:*** Contains the protobuf files, compiled modules of the Spawn protocol and all stuff to make cluster works. So with the basis of our tests.
+* ***lib:*** Contains the core of Spawn like compiled modules of the Spawn protocol and all stuff to make cluster works. So with the basis of our tests.
 
-    * ***actors:*** This app concentrates all of the Spawn Actors logic and is where a lot of the magic happens.
+* ***actors:*** This app concentrates all of the Spawn Actors logic and is where a lot of the magic happens.
 
-    * ***proxy:*** This is the application that will act as a sidecar of the user functions. It contains the http server responsible for implementing the Spawn HTTP/Protobuf Protocol.
+* ***spawn_proxy:*** This is the application that will act as a sidecar of the user functions. It contains the http server responsible for implementing the Spawn HTTP/Protobuf Protocol.
 
-    * ***statestores:*** Includes all data persistence logic and access to different databases and providers.
+* ***spawn_statestores:*** Includes all data persistence logic and access to different databases and providers.
 
-    * ***operator:*** This is the Kubernetes Controller/Operator that controls the provisioning of the sidecars and user functions.
+* ***spawn_operator:*** This is the Kubernetes Controller/Operator that controls the provisioning of the sidecars and user functions.
 
-    * ***activator:*** It has the behaviors/contracts and implementation of the event handlers to be used by the different providers of the Activators.
-
-    * ***activator_´name´:*** Each application that starts with activator and follows the name of a given event provider implements in turn the connection logic and event management of that specific provider.
+* ***spawn_activators:*** It has the behaviors/contracts and implementation of the event handlers to be used by the different providers of the Activators. Also each application that starts with activator and follows the name of a given event provider implements in turn the connection logic and event management of that specific provider.
 
 * **examples:** Where you can find some examples of using our CRDs and user applications.
 

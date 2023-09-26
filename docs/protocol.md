@@ -1,7 +1,5 @@
 # Spawn Protocol
 
-## Overview
-
 Spawn is divided into two main parts namely:
 
    1. A sidecar proxy that exposes the server part of the Spawn Protocol in the form of an HTTP API.
@@ -10,7 +8,6 @@ Spawn is divided into two main parts namely:
 Both are client and server of their counterparts.
 
 ## Registering Actors in an Actor System
-
 
 In turn, the proxy exposes an HTTP endpoint for registering a user function a.k.a ActorSystem.
  
@@ -158,3 +155,7 @@ InvocationRequest type bytes encoded here :-)
         |<--------------------------------------------|                                |                                                                                   |
         |                                             |                                |                                                                                   |
 ```
+
+[Next: Contributing](../CONTRIBUTING.md)
+
+[Previous: Main Concepts](main.md)
