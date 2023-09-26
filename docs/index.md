@@ -9,11 +9,11 @@
 07. [Custom Resources](crds.md)
 08. [Statestores](statestores.md)
 09. [Activators](activators.md)
-09. [Observability](observability.md)
-10. [Local Development](local_development.md)
-11. [Main Concepts](main.md)
-12. [Protocol](protocol.md)
-13. [Contributing](../CONTRIBUTING.md)
+10. [Observability](observability.md)
+11. [Local Development](local_development.md)
+12. [Main Concepts](main.md)
+13. [Protocol](protocol.md)
+14. [Contributing](../CONTRIBUTING.md)
 
 [Next: Overview](overview.md)
 
