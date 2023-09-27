@@ -1,6 +1,9 @@
 # Observability
 
-TODO
+![spawn architecture](docs/images/observability-spawn-1.jpeg)
+
+![spawn architecture](docs/images/observability-spawn-2.jpeg)
+
 
 [Next: Local Development](local_development.md)
 

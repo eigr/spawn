@@ -7,7 +7,7 @@ microservice-oriented architectures.
 
 To achieve these goals, the Eigr Functions Spawn architecture is composed of the following components:
 
-![image info](docs/diagrams/spawn-architecture.jpg)
+![spawn architecture](docs/diagrams/spawn-architecture.jpg)
 
 As seen above, the Eigr Functions Spawn platform architecture is separated into different components, each with its responsibility. We will detail the components below.
 
