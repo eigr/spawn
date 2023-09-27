@@ -32,7 +32,7 @@ https://eigr.io/blog/beyond-monoliths-and-microservices/
 
 You can see some talks on Youtube about Eigr Community or Spawn in the links below:
 
-- **Marcel Lanz on ACM SIGPLAN - Erlang 2021 - Lightning Talk**: https://www.youtube.com/watch?v=jVf0QqNb3qk ***in English***
+- **Marcel Lanz on ACM SIGPLAN - Erlang 2021 - Lightning Talk**: https://www.youtube.com/watch?v=jVf0QqNb3qk _in English_
 - **Marcel Lanz on Code Beam Europe 2022**: https://youtu.be/jgR7Oc_GXAg _in English_
 - **Adriano Santos on Code Beam BR 2022**: https://www.youtube.com/watch?v=dXp0lyfmV_0&list=PLa5zLmv3pgCCiyWq8gltVAt2vTGuHz3eG&index=3 _in Portuguese_
 - **Adriano Santos ElugSP 2023**: https://www.youtube.com/watch?v=MKTqiAtpK1E _in Portuguese_
