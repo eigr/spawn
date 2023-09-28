@@ -109,7 +109,8 @@ defmodule Spawn.MixProject do
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
       {:faker, "~> 0.17", only: :test},
       {:mimic, "~> 1.7", only: :test},
-      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false}
+      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
+      {:exvcr, "~> 0.8", runtime: false}
     ]
   end
 
