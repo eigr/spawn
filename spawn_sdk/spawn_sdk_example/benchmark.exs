@@ -6,7 +6,7 @@ require Logger
 
 import SpawnSdkExample
 
-Logger.info("Running Non Parallel Invoke - 5s")
+Logger.info("Running Non Parallel Invoke - 10s")
 
 Benchee.run(
   %{
@@ -26,85 +26,60 @@ Benchee.run(
     #   spawn_invoke_pooled_actors()
     # end
   },
-  time: 5,
+  time: 10,
   parallel: 1,
   formatters: [
     {
       Benchee.Formatters.HTML,
-      file: "test/benchmark/results/non-parallel-invocations-5s.html", auto_open: false
+      file: "test/benchmark/results/non-parallel-invocations-10s.html", auto_open: true
     },
     Benchee.Formatters.Console
   ],
-  save: [path: "test/benchmark/results/non-parallel-invocations-5s.benchee"],
+  save: [path: "test/benchmark/results/non-parallel-invocations-10s.benchee"],
   print: [
     benchmarking: true,
     configuration: true,
     fast_warning: true
   ],
-  # unit_scaling: :largest,
-  profile_after: false
+  #unit_scaling: :largest,
+  profile_after: true
 )
 
-# Logger.info("Running Non Parallel Invoke - 30s")
+# Logger.info("Running Parallel Invoke - 10s")
 
 # Benchee.run(
 #   %{
-#     "Non Parallel Stateful Named Actor                  - Get State   " => fn ->
+#     "Non Parallel Actor       - Get State   " => fn ->
 #       invok_get_state()
 #     end,
-#     "Non Parallel Stateful Named Actor                  - Update State" => fn ->
+#     "Non Parallel Actor       - Update State" => fn ->
 #       invoke_update_state()
 #     end,
-#     "Non Parallel Stateful Unamed Spawn and Invoke Actor  - Update State" => fn ->
-#       spawn_and_invoke()
+#     "Async Non Parallel Actor - Update State" => fn ->
+#       async_invoke_update_state()
 #     end,
-#     "Non Parallel Stateless Pooled Actor                    - Call Action " => fn ->
-#       spawn_invoke_pooled_actors()
-#     end
+#     # "Non Parallel Unamed Spawn and Invoke Actor  - Update State" => fn ->
+#     #   spawn_and_invoke()
+#     # end
+#     # "Non Parallel Stateless Pooled Actor                    - Call Action " => fn ->
+#     #   spawn_invoke_pooled_actors()
+#     # end
 #   },
-#   time: 30,
-#   parallel: 1,
+#   time: 10,
+#   parallel: 8,
 #   formatters: [
 #     {
 #       Benchee.Formatters.HTML,
-#       file: "test/benchmark/results/non-parallel-invocations-30s.html", auto_open: false
+#       file: "test/benchmark/results/parallel-invocations-10s.html", auto_open: false
 #     },
 #     Benchee.Formatters.Console
 #   ],
-#   save: [path: "test/benchmark/results/non-parallel-invocations-30s.benchee"],
+#   save: [path: "test/benchmark/results/parallel-invocations-10s.benchee"],
 #   print: [
 #     benchmarking: true,
 #     configuration: true,
 #     fast_warning: true
 #   ],
+#   #unit_scaling: :largest,
 #   profile_after: true
-# )
-
-# Logger.info("Running Parallel 10x Invoke - 5s")
-
-# #Process.sleep(10000)
-# Benchee.run(%{
-#   "Parallel Stateful Named Actor                  - Get State   " => fn -> invok_get_state() end,
-#   "Parallel Stateful Unamed Spawn and Invoke Actor  - Update State" => fn -> spawn_and_invoke() end,
-#   "Parallel Stateful Named Actor                  - Update State" => fn -> invoke_update_state() end,
-#   "Async Non Parallel Stateful Named Actor        - Update State" => fn -> async_invoke_update_state() end,
-#   #"Parallel Stateless Pooled Actor                    - Call Action " => fn -> spawn_invoke_pooled_actors() end
-#   },
-#   warmup: 10,
-#   parallel: 10,
-#   after_scenario: fn _ctx -> Process.sleep(5000) end,
-#   formatters: [
-#   {
-#     Benchee.Formatters.HTML,
-#     file: "test/benchmark/results/parallel-invocations-5s.html",
-#     auto_open: false
-#   },
-#     Benchee.Formatters.Console
-#   ],
-#   save: [path: "test/benchmark/results/parallel-invocations-5s.benchee"],
-#   print: [
-#     benchmarking: true,
-#     configuration: true,
-#     fast_warning: true
-#   ]
 # )

@@ -51,9 +51,13 @@ defmodule Actors.Actor.ActorSynchronousCallerConsumer do
 
   def init(opts) do
     max_demand = Keyword.get(opts, :max_demand, 100)
+    min_demand = Keyword.get(opts, :min_demand, 50)
 
     {:consumer, :ok,
-     subscribe_to: [{Actors.Actor.ActorSynchronousCallerProducer, max_demand: max_demand}]}
+     subscribe_to: [
+       {Actors.Actor.ActorSynchronousCallerProducer,
+        min_demand: min_demand, max_demand: max_demand}
+     ]}
   end
 
   def handle_events(events, _from, state) do

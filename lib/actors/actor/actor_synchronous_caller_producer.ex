@@ -1,5 +1,6 @@
 defmodule Actors.Actor.ActorSynchronousCallerProducer do
   use GenStage
+  require Logger
 
   alias Eigr.Functions.Protocol.Actors.ActorId
 
@@ -55,6 +56,7 @@ defmodule Actors.Actor.ActorSynchronousCallerProducer do
   end
 
   def handle_demand(incoming_demand, {queue, pending_demand}) do
+    Logger.debug("Producer Handle Demand: #{incoming_demand}.")
     dispatch_events(queue, incoming_demand + pending_demand, [])
   end
 
