@@ -105,8 +105,7 @@ defmodule Mix.Tasks.Bonny.Gen.Manifest.SpawnOperatorCustomizer do
         %{"mountPath" => "/app/.cache/bakeware/", "name" => "bakeware-cache"}
       ])
 
-    updated_container =
-      Map.replace(updated_container, :securityContext, updated_sc)
+    updated_container = Map.replace(updated_container, :securityContext, updated_sc)
 
     updated_spec = %{
       updated_spec
