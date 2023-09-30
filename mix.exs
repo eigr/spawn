@@ -89,7 +89,6 @@ defmodule Spawn.MixProject do
       {:phoenix_pubsub_nats, "~> 0.2"},
       {:jason, "~> 1.3"},
       {:nimble_parsec, "~> 1.2.3"},
-      {:sbroker, "~> 1.0.0"},
       # Metrics & Tracing deps
       {:telemetry_poller, "~> 1.0"},
       {:telemetry_metrics, "~> 0.6.1"},
