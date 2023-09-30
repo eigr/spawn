@@ -21,11 +21,23 @@ defmodule Actors.Supervisors.ActorSupervisor do
     Protobuf.load_extensions()
     get_acl_manager().load_acl_policies("#{@base_app_dir}/policies")
 
+    consumers =
+      Enum.into(1..System.schedulers_online(), [], fn index ->
+        %{
+          id: index,
+          start:
+            {Actors.Actor.ActorSynchronousCallerConsumer, :start_link,
+             [[id: index, max_demand: 100]]}
+        }
+      end)
+
     children =
       [
         get_pubsub_adapter(config),
         Actors.Actor.Entity.Supervisor.child_spec(config)
-      ] ++ maybe_add_invocation_scheduler(config)
+      ] ++
+        maybe_add_invocation_scheduler(config) ++
+        [{Actors.Actor.ActorSynchronousCallerProducer, []}] ++ consumers
 
     Supervisor.init(children, strategy: :one_for_one)
   end

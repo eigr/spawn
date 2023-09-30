@@ -35,7 +35,7 @@ defmodule Actors do
   """
   @spec register(RegistrationRequest.t(), any()) ::
           {:ok, RegistrationResponse.t()} | {:error, RegistrationResponse.t()}
-  defdelegate register(registration, opts), to: ActorSynchronousCallerProducer
+  defdelegate register(registration, opts \\ []), to: ActorSynchronousCallerProducer
 
   @spec get_state(ActorId.t()) :: {:ok, term()} | {:error, term()}
   defdelegate get_state(id), to: ActorSynchronousCallerProducer
@@ -54,7 +54,7 @@ defmodule Actors do
   ##
   """
   @spec spawn_actor(SpawnRequest.t(), any()) :: {:ok, SpawnResponse.t()}
-  defdelegate spawn_actor(spawn, opts), to: ActorSynchronousCallerProducer
+  defdelegate spawn_actor(spawn, opts \\ []), to: ActorSynchronousCallerProducer
 
   @doc """
   Makes a request to an actor.
