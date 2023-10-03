@@ -3,6 +3,8 @@ defmodule Actors.Supervisors.ActorSupervisor do
   use Supervisor
   require Logger
 
+  alias Actors.Actor.CallerProducer
+
   @base_app_dir File.cwd!()
 
   def start_link(config) do
@@ -26,7 +28,7 @@ defmodule Actors.Supervisors.ActorSupervisor do
         %{
           id: index,
           start:
-            {Actors.Actor.ActorSynchronousCallerConsumer, :start_link,
+            {Actors.Actor.CallerConsumer, :start_link,
              [[id: index, min_demand: 50, max_demand: 100]]}
         }
       end)
@@ -37,7 +39,7 @@ defmodule Actors.Supervisors.ActorSupervisor do
         Actors.Actor.Entity.Supervisor.child_spec(config)
       ] ++
         maybe_add_invocation_scheduler(config) ++
-        [{Actors.Actor.ActorSynchronousCallerProducer, []}] ++ consumers
+        [{CallerProducer, []}] ++ consumers
 
     Supervisor.init(children, strategy: :one_for_one)
   end

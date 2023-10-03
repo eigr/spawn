@@ -1,4 +1,4 @@
-defmodule Actors.Actor.ActorSynchronousCallerConsumer do
+defmodule Actors.Actor.CallerConsumer do
   @moduledoc """
 
   """
@@ -8,6 +8,7 @@ defmodule Actors.Actor.ActorSynchronousCallerConsumer do
   require Logger
   require OpenTelemetry.Tracer, as: Tracer
 
+  alias Actors.Actor.CallerProducer
   alias Actors.Actor.Entity, as: ActorEntity
   alias Actors.Actor.Entity.Supervisor, as: ActorEntitySupervisor
   alias Actors.Actor.InvocationScheduler
@@ -55,8 +56,7 @@ defmodule Actors.Actor.ActorSynchronousCallerConsumer do
 
     {:consumer, :ok,
      subscribe_to: [
-       {Actors.Actor.ActorSynchronousCallerProducer,
-        min_demand: min_demand, max_demand: max_demand}
+       {CallerProducer, min_demand: min_demand, max_demand: max_demand}
      ]}
   end
 

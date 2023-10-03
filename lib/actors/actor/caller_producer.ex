@@ -1,4 +1,4 @@
-defmodule Actors.Actor.ActorSynchronousCallerProducer do
+defmodule Actors.Actor.CallerProducer do
   use GenStage
   require Logger
 

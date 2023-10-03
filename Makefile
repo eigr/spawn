@@ -64,7 +64,7 @@ test-statestores_mysql:
 	cd spawn_statestores/statestores_mysql && MIX_ENV=test mix deps.get && MIX_ENV=test  PROXY_CLUSTER_STRATEGY=gossip PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
 
 test-statestores_mariadb:
-	cd spawn_statestores/statestores_mariadb && MIX_ENV=test mix deps.get && MIX_ENV=test  PROXY_CLUSTER_STRATEGY=gossip PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
+	cd spawn_statestores/statestores_mariadb && MIX_ENV=test mix deps.get && MIX_ENV=test PROXY_DATABASE_TYPE=mariadb PROXY_DATABASE_PORT=3307  PROXY_CLUSTER_STRATEGY=gossip PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
 
 test-statestores_postgres:
 	cd spawn_statestores/statestores_postgres && MIX_ENV=test mix deps.get && MIX_ENV=test PROXY_CLUSTER_STRATEGY=gossip PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
@@ -76,16 +76,16 @@ test-statestores_sqlite:
 	cd spawn_statestores/statestores_sqlite && MIX_ENV=test mix deps.get && MIX_ENV=test PROXY_CLUSTER_STRATEGY=gossip PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
 
 test-spawn-sdk:
-	cd spawn_sdk/spawn_sdk && MIX_ENV=test mix deps.get && MIX_ENV=test PROXY_DATABASE_TYPE=mysql PROXY_CLUSTER_STRATEGY=gossip PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= PROXY_ACTOR_SYSTEM_NAME=spawn-system elixir --name spawn_test@127.0.0.1 -S mix test
+	cd spawn_sdk/spawn_sdk && MIX_ENV=test mix deps.get && MIX_ENV=test PROXY_DATABASE_TYPE=mariadb PROXY_DATABASE_PORT=3307 PROXY_CLUSTER_STRATEGY=gossip PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= PROXY_ACTOR_SYSTEM_NAME=spawn-system elixir --name spawn_test@127.0.0.1 -S mix test
 
 test-operator:
 	cd spawn_operator/spawn_operator && MIX_ENV=test mix deps.get && MIX_ENV=test PROXY_DATABASE_TYPE=mysql PROXY_CLUSTER_STRATEGY=gossip PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
 
 test-proxy:
-	cd spawn_proxy/proxy && MIX_ENV=test mix deps.get && MIX_ENV=test PROXY_DATABASE_TYPE=mysql PROXY_CLUSTER_STRATEGY=gossip PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
+	cd spawn_proxy/proxy && MIX_ENV=test mix deps.get && MIX_ENV=test PROXY_DATABASE_TYPE=mariadb PROXY_DATABASE_PORT=3307 PROXY_CLUSTER_STRATEGY=gossip PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
 
 run-benchmark:
-	cd spawn_sdk/spawn_sdk_example && PROXY_CLUSTER_STRATEGY=gossip PROXY_DATABASE_TYPE=mysql PROXY_DATABASE_POOL_SIZE=10 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= iex --name spawn_actors_node@127.0.0.1 -S mix run benchmark.exs
+	cd spawn_sdk/spawn_sdk_example &&  mix deps.get && PROXY_CLUSTER_STRATEGY=gossip PROXY_DATABASE_TYPE=mariadb PROXY_DATABASE_PORT=3307 PROXY_DATABASE_POOL_SIZE=30 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= iex --name spawn@127.0.0.1 -S mix run benchmark.exs
 
 integration.yaml: ## Create a k3d cluster
 	- k3d cluster delete ${CLUSTER_NAME}

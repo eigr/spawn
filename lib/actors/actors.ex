@@ -7,7 +7,7 @@ defmodule Actors do
   use Retry
   require Logger
 
-  alias Actors.Actor.ActorSynchronousCallerProducer
+  alias Actors.Actor.CallerProducer
   alias Actors.Config.Vapor, as: Config
 
   alias Eigr.Functions.Protocol.Actors.{
@@ -35,10 +35,10 @@ defmodule Actors do
   """
   @spec register(RegistrationRequest.t(), any()) ::
           {:ok, RegistrationResponse.t()} | {:error, RegistrationResponse.t()}
-  defdelegate register(registration, opts \\ []), to: ActorSynchronousCallerProducer
+  defdelegate register(registration, opts \\ []), to: CallerProducer
 
   @spec get_state(ActorId.t()) :: {:ok, term()} | {:error, term()}
-  defdelegate get_state(id), to: ActorSynchronousCallerProducer
+  defdelegate get_state(id), to: CallerProducer
 
   @doc """
   Spawn actors defined in HostActor.
@@ -54,7 +54,7 @@ defmodule Actors do
   ##
   """
   @spec spawn_actor(SpawnRequest.t(), any()) :: {:ok, SpawnResponse.t()}
-  defdelegate spawn_actor(spawn, opts \\ []), to: ActorSynchronousCallerProducer
+  defdelegate spawn_actor(spawn, opts \\ []), to: CallerProducer
 
   @doc """
   Makes a request to an actor.
@@ -72,7 +72,7 @@ defmodule Actors do
       ) do
     case Config.get(Actors, :actor_system_name) do
       name when name === system_name ->
-        ActorSynchronousCallerProducer.invoke(request, opts)
+        CallerProducer.invoke(request, opts)
 
       _ ->
         invoke_with_nats(request, opts)
