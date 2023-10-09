@@ -7,7 +7,7 @@ microservice-oriented architectures.
 
 To achieve these goals, the Eigr Functions Spawn architecture is composed of the following components:
 
-![spawn architecture](docs/diagrams/spawn-architecture.jpg)
+![spawn architecture](./diagrams/spawn-architecture.jpg)
 
 As seen above, the Eigr Functions Spawn platform architecture is separated into different components, each with its responsibility. We will detail the components below.
 
@@ -26,7 +26,7 @@ As seen above, the Eigr Functions Spawn platform architecture is separated into 
 
 As we use Kubernetes to orchestrate our workloads through our Operator each user application will be summarized at the end there is a POD which is the smallest measure of workload present in kubernetes. Below is an image of how the components are grouped inside a POD in Kubernetes:
 
-![image info](docs/diagrams/spawn-pod-internals.jpg)
+![image info](./diagrams/spawn-pod-internals.jpg)
 
 In turn, each Sidecar container within a POD organizes itself to form an Erlang cluster for each ActorSystem. Different ActorSystems can coexist in the same Kubernetes cluster and these in turn communicate cross ActorSystem using a Nats Broker as a transport mechanism via message passing. In this way we can granulate a large system into smaller parts, forming small Erlang clusters that still manage to maintain the behavior of a larger cluster depending on how the developer organizes its deployable units.
 
