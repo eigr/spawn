@@ -12,9 +12,10 @@
 10. [Observability](observability.md)
 11. [Local Development](local_development.md)
 12. [Main Concepts](main.md)
-13. [Protocol](protocol.md)
-14. [Contributing](../CONTRIBUTING.md)
-15. [History](history.md)
+13. [Durable Computing](durable.md)
+14. [Protocol](protocol.md)
+15. [Contributing](../CONTRIBUTING.md)
+16. [History](history.md)
 
 [Next: Overview](overview.md)
 
