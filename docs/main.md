@@ -59,6 +59,10 @@ https://www.youtube.com/watch?v=j7JKkbAiWuI
 
 https://medium.com/nerd-for-tech/microservice-design-pattern-sidecar-sidekick-pattern-dbcea9bed783
 
+### Durable Computing & Stateful Serverless
+
+See [durable computing section](durable.md).
+
 ### Nats
 
 We use [Nats](https://nats.io/) for communication between different systems like Activators or cross ActorSystems. According to the project page "NATS is a simple, secure and performant communications system for digital systems, services and devices. NATS is part of the Cloud Native Computing Foundation (CNCF). NATS has over 40 client language implementations, and its server can run on-premise, in the cloud, at the edge, and even on a Raspberry Pi. NATS can secure and simplify design and operation of modern distributed systems."
