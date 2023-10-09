@@ -9,4 +9,4 @@ Spawn exports metrics in Prometheus format and also pushes traces in OTLP format
 
 [Next: Local Development](local_development.md)
 
-[Previous: Statestores](activators.md)
+[Previous: Activators](activators.md)

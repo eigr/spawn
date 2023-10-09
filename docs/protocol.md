@@ -158,4 +158,4 @@ InvocationRequest type bytes encoded here :-)
 
 [Next: Contributing](../CONTRIBUTING.md)
 
-[Previous: Main Concepts](main.md)
+[Previous: Durable Computing](durable.md)

@@ -138,4 +138,4 @@ The Spawn protocol is very simple to implement but it is necessary for the devel
 
 [Next: History](docs/history.md)
 
-[Previous: SDKs](docs/protocol.md)
+[Previous: Protocol](docs/protocol.md)
