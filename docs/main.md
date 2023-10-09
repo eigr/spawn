@@ -61,7 +61,7 @@ https://medium.com/nerd-for-tech/microservice-design-pattern-sidecar-sidekick-pa
 
 ### Durable Computing & Stateful Serverless
 
-See [durable computing section](durable.md).
+See next [durable computing section](durable.md).
 
 ### Nats
 
