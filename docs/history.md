@@ -35,4 +35,6 @@ With a modern functional language like Elixir and the Erlang Ecosystem in genera
 
 Eigr Spawn being based on Erlang/OTP and running on the BEAM is an excellent fit for a serverless runtime to be built on. The "message in, message out" pattern for a FaaS implementation, as well as the requirements to run actually virtual actors in a distributed system is right spot on what OTP, the BEAM and Erlang are all about.
 
+[Next: Index](index.md)
+
 [Previous: Contributing](../CONTRIBUTING.md)

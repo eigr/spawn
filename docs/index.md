@@ -14,6 +14,7 @@
 12. [Main Concepts](main.md)
 13. [Protocol](protocol.md)
 14. [Contributing](../CONTRIBUTING.md)
+15. [History](history.md)
 
 [Next: Overview](overview.md)
 

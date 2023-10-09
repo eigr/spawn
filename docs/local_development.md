@@ -18,4 +18,4 @@ For more information on how to collaborate or even to get to know the project st
 
 [Next: Main Concepts](main.md)
 
-[Previous: Statestores](statestores.md)
+[Previous: Observability](observability.md)
