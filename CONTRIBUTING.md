@@ -135,3 +135,7 @@ The Spawn protocol is very simple to implement but it is necessary for the devel
    Also feel free to ask for help at any time via Issues or Discussions on Github or via our Discord server. If you're starting to develop a new SDK, let us know and we'll create a dedicated channel on our Discord server.
 
 **Don't forget to subscribe to our [Discord](https://discord.gg/2PcshvfS93) server and we wish you a good hack**.
+
+[Next: History](docs/history.md)
+
+[Previous: SDKs](docs/protocol.md)
