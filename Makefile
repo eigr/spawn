@@ -136,7 +136,7 @@ create-k8s-namespace:
 	kubectl create ns eigr-functions
 
 generate-k8s-manifests:
-	cd spawn_operator/spawn_operator && MIX_ENV=prod mix bonny.gen.manifest --image ${operator-image} --namespace eigr-functions
+	cd spawn_operator/spawn_operator && MIX_ENV=prod mix deps.get && MIX_ENV=prod mix bonny.gen.manifest --image ${operator-image} --namespace eigr-functions
 
 apply-k8s-manifests:
 	kubectl -n eigr-functions apply -f spawn_operator/spawn_operator/manifest.yaml

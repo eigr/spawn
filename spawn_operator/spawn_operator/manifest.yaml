@@ -7,7 +7,7 @@ metadata:
   name: spawn-operator
   namespace: eigr-functions
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       k8s-app: spawn-operator
@@ -38,8 +38,30 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: spec.serviceAccountName
-          image: eigr/spawn-operator:1.0.0-rc.19
           name: spawn-operator
+          image: eigr/spawn-operator:1.0.0-rc.19
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health/liveness
+              port: 9090
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 5
+          ports:
+            - containerPort: 9090
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health/readiness
+              port: 9090
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 5
           resources:
             limits:
               cpu: 200m
@@ -51,7 +73,6 @@ spec:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
             runAsNonRoot: true
-            runAsUser: 65534
           volumeMounts:
             - mountPath: /app/.cache/bakeware/
               name: bakeware-cache
@@ -207,7 +228,19 @@ rules:
   - apiGroups:
       - ""
     resources:
+      - pods
+    verbs:
+      - "*"
+  - apiGroups:
+      - ""
+    resources:
       - secrets
+    verbs:
+      - "*"
+  - apiGroups:
+      - ""
+    resources:
+      - serviceaccount
     verbs:
       - "*"
   - apiGroups:
@@ -265,31 +298,7 @@ rules:
     verbs:
       - "*"
   - apiGroups:
-      - batch/v1
-    resources:
-      - cronjob
-    verbs:
-      - "*"
-  - apiGroups:
-      - batch/v1
-    resources:
-      - cronjobs
-    verbs:
-      - "*"
-  - apiGroups:
-      - batch/v1
-    resources:
-      - job
-    verbs:
-      - "*"
-  - apiGroups:
-      - batch/v1
-    resources:
-      - jobs
-    verbs:
-      - "*"
-  - apiGroups:
-      - cert-manager.io/v1
+      - cert-manager.io
     resources:
       - certificate
     verbs:
@@ -331,7 +340,7 @@ rules:
     verbs:
       - "*"
   - apiGroups:
-      - rbac.authorization.k8s.io/v1
+      - rbac.authorization.k8s.io
     resources:
       - role
     verbs:
@@ -370,32 +379,6 @@ rules:
       - spawn-eigr.io
     resources:
       - actorsystems/status
-    verbs:
-      - "*"
-  - apiGroups:
-      - v1
-    resources:
-      - node
-    verbs:
-      - get
-      - list
-  - apiGroups:
-      - v1
-    resources:
-      - nodes
-    verbs:
-      - get
-      - list
-  - apiGroups:
-      - v1
-    resources:
-      - pods
-    verbs:
-      - "*"
-  - apiGroups:
-      - v1
-    resources:
-      - serviceaccount
     verbs:
       - "*"
 
