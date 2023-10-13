@@ -56,6 +56,31 @@ defmodule Mix.Tasks.Bonny.Gen.Manifest.SpawnOperatorCustomizer do
               ],
               image: "eigr/spawn-operator:1.0.0-rc.18",
               name: "spawn-operator",
+              ports: [ %{"containerPort" => 9090}],
+              livenessProbe: %{
+                failureThreshold: 3,
+                httpGet: %{
+                  path: "/health/liveness",
+                  port: "9090",
+                  scheme: "HTTP"
+                },
+                initialDelaySeconds: 30,
+                periodSeconds: 5,
+                successThreshold: 1,
+                timeoutSeconds: 5
+              },
+              readinessProbe: %{
+                failureThreshold: 3,
+                httpGet: %{
+                  path: "/health/readiness",
+                  port: 9090,
+                  scheme: "HTTP"
+                },
+                initialDelaySeconds: 30,
+                periodSeconds: 5,
+                successThreshold: 1,
+                timeoutSeconds: 5
+              },
               resources: %{
                 limits: %{cpu: "200m", memory: "200Mi"},
                 requests: %{cpu: "200m", memory: "200Mi"}
@@ -106,6 +131,39 @@ defmodule Mix.Tasks.Bonny.Gen.Manifest.SpawnOperatorCustomizer do
       ])
 
     updated_container = Map.replace(updated_container, :securityContext, updated_sc)
+
+    updated_container =
+      Map.put(updated_container, :ports, [ %{"containerPort" => 9090}])
+
+    updated_container =
+      Map.put(updated_container, :livenessProbe, %{
+          "failureThreshold" => 3,
+          "httpGet" => %{
+            "path" => "/health/liveness",
+            "port" => 9090,
+            "scheme" => "HTTP"
+          },
+          "initialDelaySeconds" => 30,
+          "periodSeconds" => 5,
+          "successThreshold" => 1,
+          "timeoutSeconds" => 5
+        }
+      )
+
+    updated_container =
+      Map.put(updated_container, :readinessProbe, %{
+          "failureThreshold" => 3,
+          "httpGet" => %{
+            "path" => "/health/readiness",
+            "port" => 9090,
+            "scheme" => "HTTP"
+          },
+          "initialDelaySeconds" => 30,
+          "periodSeconds" => 5,
+          "successThreshold" => 1,
+          "timeoutSeconds" => 5
+        }
+      )
 
     updated_spec = %{
       updated_spec
