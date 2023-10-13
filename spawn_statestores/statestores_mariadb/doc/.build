@@ -1,11 +1,11 @@
 404.html
-Statestores.Adapters.MySQLLookupAdapter.html
-Statestores.Adapters.MySQLSnapshotAdapter.html
+Statestores.Adapters.MariaDBLookupAdapter.html
+Statestores.Adapters.MariaDBSnapshotAdapter.html
 api-reference.html
 dist/handlebars.runtime-NWIB6V2M.js
-dist/handlebars.templates-NBND3S2D.js
-dist/html-B3DGGEY7.js
-dist/html-elixir-HFL3S4U6.css
+dist/handlebars.templates-KDPBTEPL.js
+dist/html-CP2A7WXZ.js
+dist/html-elixir-M3TQBNKO.css
 dist/inconsolata-latin-400-normal-RGKDDNDD.woff2
 dist/inconsolata-latin-700-normal-DTS2D7TO.woff2
 dist/inconsolata-latin-ext-400-normal-K7HVGTP7.woff2
@@ -29,8 +29,8 @@ dist/merriweather-latin-ext-300-normal-K6L27CZ5.woff2
 dist/merriweather-vietnamese-300-italic-EHHNZPUO.woff2
 dist/merriweather-vietnamese-300-normal-U376L4Z4.woff2
 dist/remixicon-NKANDIL5.woff2
-dist/search_data-EEDD535E.js
-dist/sidebar_items-87E5139F.js
+dist/search_data-B04FDF04.js
+dist/sidebar_items-C24CF51E.js
 index.html
 readme.html
 search.html
