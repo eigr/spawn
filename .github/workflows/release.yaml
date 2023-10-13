@@ -24,7 +24,7 @@ jobs:
           --health-retries 5
     strategy:
       matrix:
-        otp: [23, 24, 25]
+        otp: [24, 25. 26]
         elixir: [1.14]
     env:
       MIX_ENV: prod
