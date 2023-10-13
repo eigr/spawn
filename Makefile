@@ -48,8 +48,8 @@ build-activator-simple-image:
 
 build-all-images:
 	docker build --no-cache -f Dockerfile-proxy -t ${proxy-image} .
-	#docker build --no-cache -f Dockerfile-initializer -t ${proxy-initializer} .
-	#docker build --no-cache -f Dockerfile-operator -t ${operator-image} .
+	docker build --no-cache -f Dockerfile-initializer -t ${proxy-initializer} .
+	docker build --no-cache -f Dockerfile-operator -t ${operator-image} .
 	#docker build --no-cache -f Dockerfile-activator-api -t ${activator-api-image} .
 	#docker build --no-cache -f Dockerfile-activator-kafka -t ${activator-kafka-image} .
 	#docker build --no-cache -f Dockerfile-activator-pubsub -t ${activator-pubsub-image} .
@@ -102,7 +102,7 @@ test.integration: ## Run integration tests using k3d `make cluster`
 
 push-all-images:
 	docker push ${proxy-image}
-	#docker push ${proxy-initializer}
+	docker push ${proxy-initializer}
 	docker push ${operator-image}
 	#docker push ${activator-api-image}
 	#docker push ${activator-http-image}
