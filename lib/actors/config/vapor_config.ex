@@ -6,7 +6,6 @@ defmodule Actors.Config.Vapor do
   """
   require Logger
   alias Vapor.Provider.{Env, Dotenv}
-  import Statestores.Util, only: [load_lookup_adapter: 0]
 
   @behaviour Actors.Config
 
@@ -150,21 +149,30 @@ defmodule Actors.Config.Vapor do
             )
 
           _ ->
-            Application.put_env(
-              :spawn,
-              key,
-              Spawn.Cluster.StateHandoff.Controllers.PersistentController,
-              persistent: true
-            )
+            if Code.ensure_loaded?(Statestores.Supervisor) do
+              Application.put_env(
+                :spawn,
+                key,
+                Spawn.Cluster.StateHandoff.Controllers.PersistentController,
+                persistent: true
+              )
 
-            backend_adapter = load_lookup_adapter()
+              backend_adapter = Statestores.Util.load_lookup_adapter()
 
-            Application.put_env(
-              :spawn,
-              :state_handoff_controller_persistent_backend,
-              backend_adapter,
-              persistent: true
-            )
+              Application.put_env(
+                :spawn,
+                :state_handoff_controller_persistent_backend,
+                backend_adapter,
+                persistent: true
+              )
+            else
+              Application.put_env(
+                :spawn,
+                key,
+                Spawn.Cluster.StateHandoff.Controllers.CrdtController,
+                persistent: true
+              )
+            end
         end
       else
         Application.put_env(:spawn, key, value, persistent: true)

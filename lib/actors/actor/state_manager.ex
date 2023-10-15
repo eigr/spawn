@@ -284,7 +284,11 @@ else
 
     def is_new?(_old_hash, _new_state), do: raise(@not_loaded_message)
     def load(_actor_id), do: raise(@not_loaded_message)
+    def load(_actor_id, _), do: raise(@not_loaded_message)
+    def load_all(_), do: raise(@not_loaded_message)
+    def load_by_interval(_, _, _), do: raise(@not_loaded_message)
     def save(_actor_id, _state), do: raise(@not_loaded_message)
+    def save(_actor_id, _state, _opts), do: raise(@not_loaded_message)
     def save_async(_actor_id, _state, _timeout), do: raise(@not_loaded_message)
   end
 end
