@@ -286,6 +286,7 @@ You can find some project examples of using Spawn in the links below:
 - **Distributed Image Processing**: https://github.com/eigr-labs/spawn-distributed-image-processing
 - **Federated Data Example**: https://github.com/eigr-labs/spawn-federated-data-example
 - **Fleet**: https://github.com/sleipnir/fleet-spawn-example
+- **Postal Code Search**: https://github.com/h3nrique/postalcode-spawn-demo
 - **Spawn Polyglot Example**: https://github.com/sleipnir/spawn-polyglot-ping-pong
 
 But in the next section you will be taken to the correct link for each supported SDK.
