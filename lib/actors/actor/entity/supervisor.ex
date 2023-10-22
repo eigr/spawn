@@ -9,8 +9,8 @@ defmodule Actors.Actor.Entity.Supervisor do
   use DynamicSupervisor
   require Logger
 
-  alias Eigr.Functions.Protocol.Actors.{Actor, ActorSystem}
   alias Actors.Actor.Entity.EntityState
+  alias Eigr.Functions.Protocol.Actors.{Actor, ActorSystem}
 
   @default_number_of_partitions 8
 
