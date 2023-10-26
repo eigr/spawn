@@ -28,6 +28,9 @@ defmodule SpawnOperator.K8s.Proxy.CM.Configmap do
     # Optional. Default 9001
     spawn-eigr.io/sidecar-http-port: "9001"
 
+    # Optional. Default "0.0.0.0"
+    spawn-eigr.io/sidecar-address: "127.0.0.1"
+
     # Optional. Default false
     spawn-eigr.io/sidecar-uds-enabled: "false"
 
@@ -114,7 +117,7 @@ defmodule SpawnOperator.K8s.Proxy.CM.Configmap do
         "PROXY_CLUSTER_POLLING" => annotations.cluster_poling_interval,
         "PROXY_CLUSTER_STRATEGY" => "kubernetes-dns",
         "PROXY_HEADLESS_SERVICE" => "system-#{system}",
-        "PROXY_HOST_INTERFACE" => "http",
+        "PROXY_HOST_INTERFACE" => annotations.proxy_host_interface,
         "PROXY_UDS_ENABLED" => annotations.proxy_uds_enabled,
         "PROXY_UDS_ADDRESS" => annotations.proxy_uds_address,
         "USER_FUNCTION_HOST" => annotations.user_function_host,
