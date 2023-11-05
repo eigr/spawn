@@ -1383,6 +1383,20 @@ defmodule Eigr.Functions.Protocol.InvocationRequest do
           proto3_optional: nil,
           type: :TYPE_BOOL,
           type_name: nil
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          __unknown_fields__: [],
+          default_value: nil,
+          extendee: nil,
+          json_name: "registerRef",
+          label: :LABEL_OPTIONAL,
+          name: "register_ref",
+          number: 11,
+          oneof_index: nil,
+          options: nil,
+          proto3_optional: nil,
+          type: :TYPE_STRING,
+          type_name: nil
         }
       ],
       name: "InvocationRequest",
@@ -1469,6 +1483,7 @@ defmodule Eigr.Functions.Protocol.InvocationRequest do
 
   field(:scheduled_to, 9, type: :int64, json_name: "scheduledTo")
   field(:pooled, 10, type: :bool)
+  field(:register_ref, 11, type: :string, json_name: "registerRef")
 end
 
 defmodule Eigr.Functions.Protocol.ActorInvocation do
