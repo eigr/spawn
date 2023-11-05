@@ -334,6 +334,7 @@ message Workflow {
 //   * async: Indicates whether the action should be processed synchronously, where a response should be sent back to the user function, 
 //            or whether the action should be processed asynchronously, i.e. no response sent to the caller and no waiting.
 //   * metadata: Meta information or headers
+//   * register_ref: If the invocation should register the specific actor with the given name without having to call register before
 message InvocationRequest {
 
     eigr.functions.protocol.actors.ActorSystem system = 1;
@@ -356,6 +357,8 @@ message InvocationRequest {
     int64 scheduled_to = 9;
 
     bool pooled = 10;
+
+    string register_ref = 11;
 }
 
 // ActorInvocation is a translation message between a local invocation made via InvocationRequest 

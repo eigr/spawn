@@ -328,7 +328,7 @@ defmodule SpawnSdk.Actor do
     actions = Module.get_attribute(__CALLER__.module, :defact_exports)
 
     actor_name = Keyword.get(opts, :name, Atom.to_string(__CALLER__.module))
-    actor_kind = Keyword.get(opts, :kind, :SINGLETON)
+    actor_kind = Keyword.get(opts, :kind, :NAMED) |> SpawnSdk.System.SpawnSystem.decode_kind()
     caller_module = __CALLER__.module
     channel_group = Keyword.get(opts, :channel, nil)
 
@@ -375,22 +375,7 @@ defmodule SpawnSdk.Actor do
       end
 
       def __meta__(:channel), do: unquote(channel_group)
-
-      def __meta__(:name) do
-        actor_name = unquote(actor_name)
-        kind = unquote(actor_kind)
-
-        if kind == :ABSTRACT do
-          unless :persistent_term.get("actor:#{actor_name}", false) do
-            :persistent_term.put("actor:#{actor_name}", unquote(caller_module))
-          end
-
-          actor_name
-        else
-          actor_name
-        end
-      end
-
+      def __meta__(:name), do: unquote(actor_name)
       def __meta__(:kind), do: unquote(actor_kind)
       def __meta__(:stateful), do: unquote(stateful)
       def __meta__(:state_type), do: unquote(state_type)
