@@ -103,10 +103,6 @@ defmodule SpawnSdk.System.SpawnSystem do
       raise "You have to specify an action"
     end
 
-    if actor_reference do
-      spawn_actor(actor_name, system: system, actor: actor_reference)
-    end
-
     opts = []
     payload = parse_payload(payload)
 
@@ -121,7 +117,8 @@ defmodule SpawnSdk.System.SpawnSystem do
       async: async,
       caller: nil,
       pooled: pooled,
-      scheduled_to: parse_scheduled_to(delay_in_ms, scheduled_to)
+      scheduled_to: parse_scheduled_to(delay_in_ms, scheduled_to),
+      register_ref: actor_reference
     }
 
     case Actors.invoke(req, opts) do
@@ -561,10 +558,14 @@ defmodule SpawnSdk.System.SpawnSystem do
     end)
   end
 
-  defp decode_kind(:abstract), do: :UNAMED
-  defp decode_kind(:singleton), do: :NAMED
-  defp decode_kind(:pooled), do: :POOLED
-  defp decode_kind(_), do: :UNKNOW_KIND
+  def decode_kind(:abstract), do: :UNAMED
+  def decode_kind(:ABSTRACT), do: :UNAMED
+  def decode_kind(:unamed), do: :UNAMED
+  def decode_kind(:SINGLETON), do: :NAMED
+  def decode_kind(:singleton), do: :NAMED
+  def decode_kind(:named), do: :NAMED
+  def decode_kind(:pooled), do: :POOLED
+  def decode_kind(_), do: :UNKNOW_KIND
 
   defp get_action(action_atom) do
     %Action{name: parse_action_name(action_atom)}

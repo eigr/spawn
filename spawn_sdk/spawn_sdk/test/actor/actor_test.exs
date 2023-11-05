@@ -3,6 +3,7 @@ defmodule Actor.ActorTest do
 
   defmodule Actor.MyActor do
     use SpawnSdk.Actor,
+      name: "my_actor_ref",
       kind: :abstract,
       stateful: false,
       state_type: Eigr.Spawn.Actor.MyState,
@@ -80,6 +81,7 @@ defmodule Actor.ActorTest do
 
   defmodule Actor.JsonActor do
     use SpawnSdk.Actor,
+      name: "json_actor_ref",
       kind: :abstract,
       stateful: false,
       state_type: :json
@@ -194,7 +196,7 @@ defmodule Actor.ActorTest do
     end
 
     test "get defaults" do
-      assert :abstract == Actor.MyActor.__meta__(:kind)
+      assert :UNAMED == Actor.MyActor.__meta__(:kind)
       assert false == Actor.MyActor.__meta__(:stateful)
       assert 10_000 == Actor.MyActor.__meta__(:deactivate_timeout)
       assert 2_000 == Actor.MyActor.__meta__(:snapshot_timeout)
@@ -224,19 +226,17 @@ defmodule Actor.ActorTest do
   end
 
   describe "invoke json actor" do
-    @tag :skip
     test "simple default function call returning only map without payload", ctx do
       system = ctx.system
       dynamic_actor_name = Faker.Pokemon.name() <> "json_actor_get_state"
 
       assert SpawnSdk.invoke(dynamic_actor_name,
-               ref: Actor.JsonActor,
+               ref: "json_actor_ref",
                action: "getState",
                system: system
              ) == {:ok, %{value: 0}}
     end
 
-    @tag :skip
     test "simple call using maps with no proto", ctx do
       system = ctx.system
       dynamic_actor_name = Faker.Pokemon.name() <> "json_actor_call"
@@ -244,7 +244,7 @@ defmodule Actor.ActorTest do
       payload = %{value: 2}
 
       assert SpawnSdk.invoke(dynamic_actor_name,
-               ref: Actor.JsonActor,
+               ref: "json_actor_ref",
                action: "sum",
                system: system,
                payload: payload
@@ -253,7 +253,6 @@ defmodule Actor.ActorTest do
   end
 
   describe "invoke with routing" do
-    @tag :skip
     test "simple call that goes through 3 actors piping each other", ctx do
       system = ctx.system
 
@@ -263,7 +262,7 @@ defmodule Actor.ActorTest do
 
       assert {:ok, response} =
                SpawnSdk.invoke(dynamic_actor_name,
-                 ref: Actor.MyActor,
+                 ref: "my_actor_ref",
                  system: system,
                  action: "pipe_caller",
                  payload: payload
@@ -272,55 +271,51 @@ defmodule Actor.ActorTest do
       assert %{data: "second_actor as caller to third_actor"} = response
     end
 
-    @tag :skip
     test "calling a function that sets wrong state type", ctx do
       system = ctx.system
       dynamic_actor_name = Faker.Pokemon.name() <> "wrong_state"
 
       assert SpawnSdk.invoke(dynamic_actor_name,
-               ref: Actor.MyActor,
+               ref: "my_actor_ref",
                system: system,
                action: "wrong_state"
              ) == {:ok, nil}
 
       assert SpawnSdk.invoke(dynamic_actor_name,
-               ref: Actor.MyActor,
+               ref: "my_actor_ref",
                action: "getState",
                system: system
              ) == {:error, :invalid_state_output}
     end
 
-    @tag :skip
     test "calling a function that sets wrong state type to json", ctx do
       system = ctx.system
       dynamic_actor_name = Faker.Pokemon.name() <> "wrong_state_json"
 
       assert SpawnSdk.invoke(dynamic_actor_name,
-               ref: Actor.MyActor,
+               ref: "my_actor_ref",
                system: system,
                action: "wrong_state_json"
              ) == {:ok, nil}
 
       assert SpawnSdk.invoke(dynamic_actor_name,
-               ref: Actor.MyActor,
+               ref: "my_actor_ref",
                system: system,
                action: "get_state"
              ) == {:ok, nil}
     end
 
-    @tag :skip
     test "calling a function that returns json in response", ctx do
       system = ctx.system
       dynamic_actor_name = Faker.Pokemon.name() <> "json_return"
 
       assert SpawnSdk.invoke(dynamic_actor_name,
-               ref: Actor.MyActor,
+               ref: "my_actor_ref",
                system: system,
                action: "json_return"
              ) == {:ok, %{test: true}}
     end
 
-    @tag :skip
     test "simple call that goes through 3 actors forwarding each other", ctx do
       system = ctx.system
 
@@ -330,7 +325,7 @@ defmodule Actor.ActorTest do
 
       assert {:ok, response} =
                SpawnSdk.invoke(dynamic_actor_name,
-                 ref: Actor.MyActor,
+                 ref: "my_actor_ref",
                  system: system,
                  action: "forward_caller",
                  payload: payload
@@ -344,7 +339,6 @@ defmodule Actor.ActorTest do
   end
 
   describe "invoke with side effect" do
-    @tag :skip
     test "simple call with a side effect", ctx do
       system = ctx.system
 
@@ -354,7 +348,7 @@ defmodule Actor.ActorTest do
 
       assert {:ok, response} =
                SpawnSdk.invoke(dynamic_actor_name,
-                 ref: Actor.MyActor,
+                 ref: "my_actor_ref",
                  system: system,
                  action: "use_side_effect",
                  payload: payload
@@ -365,7 +359,6 @@ defmodule Actor.ActorTest do
   end
 
   describe "tags" do
-    @tag :skip
     test "simple call verifying that tags is changed", ctx do
       system = ctx.system
 
@@ -373,7 +366,7 @@ defmodule Actor.ActorTest do
 
       assert {:ok, response} =
                SpawnSdk.invoke(dynamic_actor_name,
-                 ref: Actor.MyActor,
+                 ref: "my_actor_ref",
                  system: system,
                  action: "change_tags"
                )
@@ -382,7 +375,7 @@ defmodule Actor.ActorTest do
 
       assert {:ok, response} =
                SpawnSdk.invoke(dynamic_actor_name,
-                 ref: Actor.MyActor,
+                 ref: "my_actor_ref",
                  system: system,
                  action: "change_tags"
                )
