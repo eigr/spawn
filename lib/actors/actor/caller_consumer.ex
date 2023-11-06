@@ -73,19 +73,19 @@ defmodule Actors.Actor.CallerConsumer do
         |> GenStage.reply(get_state(event))
 
       {from, {:spawn_actor, event, opts}} ->
+        from
+        |> GenStage.reply(spawn_actor(event, opts))
+
+      {from, {:invoke, event, opts}} ->
         if event.register_ref != "" do
           spawn_req = %SpawnRequest{
             actors: [%ActorId{event.actor.id | parent: event.register_ref}]
           }
 
           # TODO: Verify the possibility to use cast instead of call for this
-          spawn_actor(spawn_req)
+          spawn_actor(spawn_req, opts)
         end
 
-        from
-        |> GenStage.reply(spawn_actor(event, opts))
-
-      {from, {:invoke, event, opts}} ->
         from
         |> GenStage.reply(invoke_with_span(event, opts))
     end)
