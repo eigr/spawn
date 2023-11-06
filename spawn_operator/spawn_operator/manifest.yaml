@@ -27,7 +27,7 @@ spec:
           name: spawn-operator
           ports:
             - containerPort: 9090
-          image: eigr/spawn-operator:1.0.0-rc.19
+          image: eigr/spawn-operator:1.0.0-rc.20
           resources:
             requests:
               cpu: 200m
@@ -208,7 +208,7 @@ rules:
   - resources:
       - configmaps
     verbs:
-      - '*'
+      - "*"
     apiGroups:
       - ""
   - resources:
@@ -228,163 +228,163 @@ rules:
   - resources:
       - pods
     verbs:
-      - '*'
+      - "*"
     apiGroups:
       - ""
   - resources:
       - secrets
     verbs:
-      - '*'
+      - "*"
     apiGroups:
       - ""
   - resources:
       - serviceaccounts
     verbs:
-      - '*'
+      - "*"
     apiGroups:
       - ""
   - resources:
       - services
     verbs:
-      - '*'
+      - "*"
     apiGroups:
       - ""
   - resources:
       - customresourcedefinitions
     verbs:
-      - '*'
+      - "*"
     apiGroups:
       - apiextensions.k8s.io
   - resources:
       - daemonsets
     verbs:
-      - '*'
+      - "*"
     apiGroups:
       - apps
   - resources:
       - deployments
     verbs:
-      - '*'
+      - "*"
     apiGroups:
       - apps
   - resources:
       - horizontalpodautoscalers
     verbs:
-      - '*'
+      - "*"
     apiGroups:
       - autoscaling
   - resources:
       - cronjob
     verbs:
-      - '*'
+      - "*"
     apiGroups:
       - batch
   - resources:
       - cronjobs
     verbs:
-      - '*'
+      - "*"
     apiGroups:
       - batch
   - resources:
       - job
     verbs:
-      - '*'
+      - "*"
     apiGroups:
       - batch
   - resources:
       - jobs
     verbs:
-      - '*'
+      - "*"
     apiGroups:
       - batch
   - resources:
       - certificate
     verbs:
-      - '*'
+      - "*"
     apiGroups:
       - cert-manager.io
   - resources:
       - leases
     verbs:
-      - '*'
+      - "*"
     apiGroups:
       - coordination.k8s.io
   - resources:
       - events
     verbs:
-      - '*'
+      - "*"
     apiGroups:
       - events.k8s.io
   - resources:
       - ingressclasses
     verbs:
-      - '*'
+      - "*"
     apiGroups:
       - extensions
   - resources:
       - ingresses
     verbs:
-      - '*'
+      - "*"
     apiGroups:
       - extensions
   - resources:
       - ingressclasses
     verbs:
-      - '*'
+      - "*"
     apiGroups:
       - networking.k8s.io
   - resources:
       - ingresses
     verbs:
-      - '*'
+      - "*"
     apiGroups:
       - networking.k8s.io
   - resources:
       - rolebindings
     verbs:
-      - '*'
+      - "*"
     apiGroups:
       - rbac.authorization.k8s.io
   - resources:
       - roles
     verbs:
-      - '*'
+      - "*"
     apiGroups:
       - rbac.authorization.k8s.io
   - resources:
       - activators
     verbs:
-      - '*'
+      - "*"
     apiGroups:
       - spawn-eigr.io
   - resources:
       - activators/status
     verbs:
-      - '*'
+      - "*"
     apiGroups:
       - spawn-eigr.io
   - resources:
       - actorhosts
     verbs:
-      - '*'
+      - "*"
     apiGroups:
       - spawn-eigr.io
   - resources:
       - actorhosts/status
     verbs:
-      - '*'
+      - "*"
     apiGroups:
       - spawn-eigr.io
   - resources:
       - actorsystems
     verbs:
-      - '*'
+      - "*"
     apiGroups:
       - spawn-eigr.io
   - resources:
       - actorsystems/status
     verbs:
-      - '*'
+      - "*"
     apiGroups:
       - spawn-eigr.io
 
