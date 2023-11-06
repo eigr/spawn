@@ -37,15 +37,6 @@ defmodule Actors.Actor.CallerProducer do
 
   @spec invoke(InvocationRequest.t()) :: {:ok, :async} | {:ok, term()} | {:error, term()}
   def invoke(request, opts \\ []) do
-    if request.register_ref != "" do
-      spawn_req = %SpawnRequest{
-        actors: [%ActorId{request.actor.id | parent: request.register_ref}]
-      }
-
-      # TODO: Verify the possibility to use cast instead of call for this
-      spawn_actor(spawn_req)
-    end
-
     GenStage.call(__MODULE__, {:enqueue, {:invoke, request, opts}}, :infinity)
   end
 
