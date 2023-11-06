@@ -3,6 +3,8 @@ defmodule Actors.Supervisors.ProtocolSupervisor do
   use Supervisor
   require Logger
 
+  alias Actors.Config.Vapor, as: Config
+
   @default_finch_pool_count System.schedulers_online()
 
   def start_link(config) do
