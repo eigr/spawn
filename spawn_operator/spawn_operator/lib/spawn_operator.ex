@@ -49,7 +49,7 @@ defmodule SpawnOperator do
         Map.get(
           annotations,
           "spawn-eigr.io/sidecar-image-tag",
-          "docker.io/eigr/spawn-proxy:1.0.0-rc.22"
+          "docker.io/eigr/spawn-proxy:1.0.0-rc.23"
         ),
       proxy_uds_enabled: Map.get(annotations, "spawn-eigr.io/sidecar-uds-enabled", "false"),
       proxy_uds_address:
