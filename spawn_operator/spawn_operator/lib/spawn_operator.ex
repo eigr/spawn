@@ -38,6 +38,12 @@ defmodule SpawnOperator do
         Map.get(annotations, "spawn-eigr.io/cluster-poling-interval", "3000"),
       proxy_mode: Map.get(annotations, "spawn-eigr.io/sidecar-mode", "sidecar"),
       proxy_http_port: Map.get(annotations, "spawn-eigr.io/sidecar-http-port", "9001"),
+      proxy_http_client_adapter_pool_schedulers:
+        Map.get(annotations, "spawn-eigr.io/sidecar-http-pool-count", "8"),
+      proxy_http_client_adapter_pool_size:
+        Map.get(annotations, "spawn-eigr.io/sidecar-http-pool-size", "30"),
+      proxy_http_client_adapter_pool_max_idle_timeout:
+        Map.get(annotations, "spawn-eigr.io/sidecar-http-pool-max-idle-timeout", "1000"),
       proxy_host_interface: Map.get(annotations, "spawn-eigr.io/sidecar-address", "0.0.0.0"),
       proxy_image_tag:
         Map.get(

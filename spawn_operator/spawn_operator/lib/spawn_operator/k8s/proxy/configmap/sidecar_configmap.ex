@@ -113,6 +113,11 @@ defmodule SpawnOperator.K8s.Proxy.CM.Configmap do
       "data" => %{
         "PROXY_APP_NAME" => name,
         "PROXY_HTTP_PORT" => annotations.proxy_http_port,
+        "PROXY_HTTP_CLIENT_ADAPTER_POOL_SCHEDULERS" =>
+          annotations.proxy_http_client_adapter_pool_schedulers,
+        "PROXY_HTTP_CLIENT_ADAPTER_POOL_SIZE" => annotations.proxy_http_client_adapter_pool_size,
+        "PROXY_HTTP_CLIENT_ADAPTER_POOL_MAX_IDLE_TIMEOUT" =>
+          annotations.proxy_http_client_adapter_pool_max_idle_timeout,
         "PROXY_DEPLOYMENT_MODE" => annotations.proxy_mode,
         "PROXY_CLUSTER_POLLING" => annotations.cluster_poling_interval,
         "PROXY_CLUSTER_STRATEGY" => "kubernetes-dns",

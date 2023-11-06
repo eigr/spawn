@@ -3,11 +3,7 @@ defmodule Actors.Supervisors.ProtocolSupervisor do
   use Supervisor
   require Logger
 
-  alias Actors.Config.Vapor, as: Config
-
   @default_finch_pool_count System.schedulers_online()
-  @default_finch_pool_max_idle_timeout 1_000
-  @default_finch_pool_size 10
 
   def start_link(config) do
     Supervisor.start_link(__MODULE__, config, name: __MODULE__)
@@ -22,7 +18,6 @@ defmodule Actors.Supervisors.ProtocolSupervisor do
 
   @impl true
   def init(config) do
-    _actors_config = Config.load(Actors)
     Protobuf.load_extensions()
 
     children = [
@@ -43,15 +38,20 @@ defmodule Actors.Supervisors.ProtocolSupervisor do
     end
   end
 
-  defp build_finch_http_client_adapter(_config) do
+  defp build_finch_http_client_adapter(config) do
+    pool_schedulers =
+      if config.proxy_http_client_adapter_pool_schedulers == 0,
+        do: @default_finch_pool_count,
+        else: config.proxy_http_client_adapter_pool_schedulers
+
     {
       Finch,
       name: SpawnHTTPClient,
       pools: %{
         :default => [
-          size: @default_finch_pool_size,
-          count: @default_finch_pool_count,
-          pool_max_idle_time: @default_finch_pool_max_idle_timeout
+          count: pool_schedulers,
+          pool_max_idle_time: config.proxy_http_client_adapter_pool_max_idle_timeout,
+          size: config.proxy_http_client_adapter_pool_size
         ]
       }
     }
