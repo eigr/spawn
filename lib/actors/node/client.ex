@@ -21,6 +21,8 @@ defmodule Actors.Node.Client do
     {"content-type", "application/octet-stream"}
   ])
 
+  plug(Tesla.Middleware.Timeout, timeout: 60_000)
+
   plug(Tesla.Middleware.Logger)
 
   def invoke_host_actor(req, opts \\ [])
@@ -43,7 +45,9 @@ defmodule Actors.Node.Client do
     middleware = [
       {Tesla.Middleware.BaseUrl, get_host_address(get_deployment_mode(), opts)},
       {Tesla.Middleware.Headers, [{"content-type", "application/octet-stream"}]},
-      Tesla.Middleware.Logger
+      Tesla.Middleware.Logger,
+      Tesla.Middleware.Timeout,
+      [timeout: 60_000]
     ]
 
     Tesla.client(middleware)

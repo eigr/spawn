@@ -195,7 +195,11 @@ defmodule Actors.Config.Vapor do
   defp set_http_client_adapter(config) do
     case config.proxy_http_client_adapter do
       _finch_only_now ->
-        Application.put_env(:tesla, :adapter, {Tesla.Adapter.Finch, [name: SpawnHTTPClient]},
+        Application.put_env(
+          :tesla,
+          :adapter,
+          {Tesla.Adapter.Finch,
+           [name: SpawnHTTPClient, receive_timeout: 60_000, pool_timeout: 30_000]},
           persistent: true
         )
     end
