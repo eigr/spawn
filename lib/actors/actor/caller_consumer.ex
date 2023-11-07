@@ -76,18 +76,42 @@ defmodule Actors.Actor.CallerConsumer do
         from
         |> GenStage.reply(spawn_actor(event, opts))
 
-      {from, {:invoke, event, opts}} ->
-        if event.register_ref != "" do
-          spawn_req = %SpawnRequest{
-            actors: [%ActorId{event.actor.id | parent: event.register_ref}]
-          }
+      {from,
+       {:invoke,
+        %InvocationRequest{
+          async: async?
+        } = event, opts}} ->
+        case async? do
+          false ->
+            if event.register_ref != "" do
+              spawn_req = %SpawnRequest{
+                actors: [%ActorId{event.actor.id | parent: event.register_ref}]
+              }
 
-          # TODO: Verify the possibility to use cast instead of call for this
-          spawn_actor(spawn_req, opts)
+              # TODO: Verify the possibility to use cast instead of call for this
+              spawn_actor(spawn_req, opts)
+            end
+
+            from
+            |> GenStage.reply(invoke_with_span(event, opts))
+
+          _ ->
+            spawn(fn ->
+              if event.register_ref != "" do
+                spawn_req = %SpawnRequest{
+                  actors: [%ActorId{event.actor.id | parent: event.register_ref}]
+                }
+
+                # TODO: Verify the possibility to use cast instead of call for this
+                spawn_actor(spawn_req, opts)
+              end
+
+              invoke_with_span(event, opts)
+            end)
+
+            from
+            |> GenStage.reply({:ok, :async})
         end
-
-        from
-        |> GenStage.reply(invoke_with_span(event, opts))
     end)
 
     {:noreply, [], state}
