@@ -88,7 +88,6 @@ defmodule Actors.Actor.CallerConsumer do
                 actors: [%ActorId{event.actor.id | parent: event.register_ref}]
               }
 
-              # TODO: Verify the possibility to use cast instead of call for this
               spawn_actor(spawn_req, opts)
             end
 
@@ -102,7 +101,6 @@ defmodule Actors.Actor.CallerConsumer do
                   actors: [%ActorId{event.actor.id | parent: event.register_ref}]
                 }
 
-                # TODO: Verify the possibility to use cast instead of call for this
                 spawn_actor(spawn_req, opts)
               end
 
@@ -149,7 +147,7 @@ defmodule Actors.Actor.CallerConsumer do
       protocol_major_version: 1,
       protocol_minor_version: 2,
       proxy_name: "spawn",
-      proxy_version: "1.0.0-rc.24"
+      proxy_version: "1.0.0-rc.25"
     }
   end
 
