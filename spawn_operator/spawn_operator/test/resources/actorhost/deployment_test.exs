@@ -364,7 +364,7 @@ defmodule DeploymentTest do
                            "successThreshold" => 1,
                            "timeoutSeconds" => 30
                          },
-                         "name" => "spawn-sidecar",
+                         "name" => "sidecar",
                          "ports" => [
                            %{"containerPort" => 4369, "name" => "epmd"},
                            %{"containerPort" => 9001, "name" => "proxy-http"}
