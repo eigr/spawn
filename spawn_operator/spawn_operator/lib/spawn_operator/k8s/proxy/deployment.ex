@@ -184,7 +184,7 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
 
     host_and_proxy_container =
       %{
-        "name" => "actor-host-function",
+        "name" => "actorhost",
         "image" => actor_host_function_image,
         "env" => actor_host_function_envs,
         "envFrom" => [
@@ -228,7 +228,7 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
 
     proxy_container =
       %{
-        "name" => "spawn-sidecar",
+        "name" => "sidecar",
         "image" => "#{annotations.proxy_image_tag}",
         "imagePullPolicy" => "Always",
         "env" => @default_actor_host_function_env,
@@ -274,7 +274,7 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
 
     host_container =
       %{
-        "name" => "actor-host-function",
+        "name" => "actorhost",
         "image" => actor_host_function_image,
         "env" => actor_host_function_envs,
         "resources" => actor_host_function_resources
