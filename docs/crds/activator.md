@@ -1,6 +1,6 @@
 # Activator Resource
 TODO
 
-[Next: Actor Host Resource](actor_host.md)
+[Next: Statestores](../statestores.md)
 
 [Previous: Actor System Resource](actor_system.md)
