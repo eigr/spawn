@@ -100,7 +100,7 @@ defmodule DeploymentTest do
                            %{"secretRef" => %{"name" => "spawn-system-secret"}}
                          ],
                          "image" => "eigr/spawn-test:latest",
-                         "name" => "actor-host-function",
+                         "name" => "actorhost",
                          "ports" => [
                            %{"containerPort" => 4369, "name" => "epmd"},
                            %{"containerPort" => 9001, "name" => "proxy-http"}
@@ -115,7 +115,7 @@ defmodule DeploymentTest do
                          "volumeMounts" => [%{"mountPath" => "/app/certs", "name" => "certs"}]
                        }
                      ],
-                     "terminationGracePeriodSeconds" => 140,
+                     "terminationGracePeriodSeconds" => 405,
                      "initContainers" => [
                        %{
                          "args" => [
@@ -224,7 +224,7 @@ defmodule DeploymentTest do
                            %{"secretRef" => %{"name" => "spawn-system-secret"}}
                          ],
                          "image" => "eigr/spawn-test:latest",
-                         "name" => "actor-host-function",
+                         "name" => "actorhost",
                          "ports" => [
                            %{"containerPort" => 4369, "name" => "epmd"},
                            %{"containerPort" => 9001, "name" => "proxy-http"}
@@ -242,7 +242,7 @@ defmodule DeploymentTest do
                          ]
                        }
                      ],
-                     "terminationGracePeriodSeconds" => 140,
+                     "terminationGracePeriodSeconds" => 405,
                      "volumes" => [
                        %{"emptyDir" => "{}", "name" => "volume-name"},
                        %{
@@ -407,7 +407,7 @@ defmodule DeploymentTest do
                            %{"name" => "RELEASE_NODE", "value" => "$(RELEASE_NAME)@$(POD_IP)"}
                          ],
                          "image" => "eigr/spawn-test:latest",
-                         "name" => "actor-host-function",
+                         "name" => "actorhost",
                          "resources" => %{
                            "requests" => %{
                              "cpu" => "100m",
@@ -417,7 +417,7 @@ defmodule DeploymentTest do
                          }
                        }
                      ],
-                     "terminationGracePeriodSeconds" => 140
+                     "terminationGracePeriodSeconds" => 405
                    }
                  }
                }
@@ -479,7 +479,7 @@ defmodule DeploymentTest do
                  %{"name" => "RELEASE_NODE", "value" => "$(RELEASE_NAME)@$(POD_IP)"}
                ],
                "image" => "eigr/spawn-test:latest",
-               "name" => "actor-host-function",
+               "name" => "actorhost",
                "resources" => %{
                  "requests" => %{"memory" => "80Mi", "ephemeral-storage" => "1M", "cpu" => "100m"}
                },
