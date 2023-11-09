@@ -9,25 +9,24 @@ jobs:
   build:
     name: Build and Test OTP ${{matrix.otp}} / Elixir ${{matrix.elixir}}
     runs-on: ubuntu-latest
-    services:
-      db:
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: postgres
-        image: postgres:11
-        ports: ["5432:5432"]
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
     strategy:
       matrix:
         otp: [24, 25. 26]
         elixir: [1.14]
+    services:
+      db:
+        env:
+          MYSQL_USER: admin
+          MYSQL_PASSWORD: "admin"
+          MYSQL_ROOT_PASSWORD: "admin"
+          MYSQL_DATABASE: "eigr-functions-db"
+        image: mysql:5.7
+        ports: ["3306:3306"]
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
     env:
-      MIX_ENV: prod
+      MIX_ENV: test
+      ImageOS: ubuntu20 # equivalent to runs-on ubuntu-20.04
 
     steps:
       - uses: actions/checkout@v3
@@ -50,10 +49,17 @@ jobs:
           path: _build
           key: ${{ runner.os }}-build-${{ matrix.otp }}-${{ matrix.elixir }}-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
 
+      - name: start minikube
+        id: minikube
+        uses: medyagh/setup-minikube@master
+
+      - name: Test cluster !
+        run: kubectl get pods -A
+
       - name: Install dependencies
         run: |
           mix deps.clean --all
-          mix do deps.get, deps.compile
+          mix deps.get
 
       - name: Run tests spawn
         run: |
@@ -76,6 +82,13 @@ jobs:
       - name: Run tests proxy
         run: |
           cd spawn_proxy/proxy
+          mix deps.get
+          MIX_ENV=test PROXY_DATABASE_TYPE=mysql PROXY_CLUSTER_STRATEGY=gossip PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
+          cd ../../
+
+      - name: Run tests operator
+        run: |
+          cd spawn_operator/spawn_operator
           mix deps.get
           MIX_ENV=test PROXY_DATABASE_TYPE=mysql PROXY_CLUSTER_STRATEGY=gossip PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
           cd ../../
