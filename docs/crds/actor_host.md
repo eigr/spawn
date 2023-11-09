@@ -18,6 +18,7 @@ spec:
 ```
 
 ## CRD Attributes
+
 | CRD Attribute                                                            | Description     | Mandatory  | Default Value         | Possible Values |
 | ------------------------------------------------------------------------ | --------------- | -----------| --------------------- | --------------- |
 | .metadata.name                                                           |                 | Yes        |                       |                 |

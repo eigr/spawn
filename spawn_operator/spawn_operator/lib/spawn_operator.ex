@@ -54,7 +54,7 @@ defmodule SpawnOperator do
       proxy_uds_enabled: Map.get(annotations, "spawn-eigr.io/sidecar-uds-enabled", "false"),
       proxy_uds_address:
         Map.get(annotations, "spawn-eigr.io/sidecar-uds-socket-path", "/var/run/spawn.sock"),
-      metrics_port: Map.get(annotations, "spawn-eigr.io/sidecar-metrics-port", "9090"),
+      metrics_port: Map.get(annotations, "spawn-eigr.io/sidecar-metrics-port", "9001"),
       metrics_disabled: Map.get(annotations, "spawn-eigr.io/sidecar-metrics-disabled", "false"),
       metrics_log_console:
         Map.get(annotations, "spawn-eigr.io/sidecar-metrics-log-console", "true"),
