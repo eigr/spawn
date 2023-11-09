@@ -50,14 +50,14 @@ defmodule Actors.Actor.CallerProducer do
     {:producer, {:queue.new(), 0}}
   end
 
-  def handle_call({:enqueue, event}, from, {queue, pending_demand}) do
-    queue = :queue.in({from, event}, queue)
-    dispatch_events(queue, pending_demand, [])
-  end
-
   def handle_demand(incoming_demand, {queue, pending_demand}) do
     Logger.debug("Producer Handle Demand: #{incoming_demand}.")
     dispatch_events(queue, incoming_demand + pending_demand, [])
+  end
+
+  def handle_call({:enqueue, event}, from, {queue, pending_demand}) do
+    queue = :queue.in({from, event}, queue)
+    dispatch_events(queue, pending_demand, [])
   end
 
   defp dispatch_events(queue, 0, events) do

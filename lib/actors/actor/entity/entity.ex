@@ -245,7 +245,9 @@ defmodule Actors.Actor.Entity do
            actor: %Actor{id: %ActorId{name: name} = _id}
          } = state
        ) do
-    Logger.warning("Received Exit message for Actor #{name} and PID #{inspect(from)}.")
+    Logger.warning(
+      "Received Exit message for Actor #{name} and PID #{inspect(from)}. Reason: #{inspect(reason)}"
+    )
 
     {:stop, reason, state}
   end
