@@ -3,12 +3,14 @@ defmodule Actors.Supervisors.ActorSupervisor do
   use Supervisor
   require Logger
 
+  @shutdown_timeout_ms 330_000
+
   alias Actors.Actor.CallerProducer
 
   @base_app_dir File.cwd!()
 
   def start_link(config) do
-    Supervisor.start_link(__MODULE__, config, name: __MODULE__)
+    Supervisor.start_link(__MODULE__, config, name: __MODULE__, shutdown: @shutdown_timeout_ms)
   end
 
   def child_spec(config) do

@@ -54,7 +54,7 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
     }
   }
 
-  @default_termination_period_seconds 140
+  @default_termination_period_seconds 405
 
   @impl true
   def manifest(resource, _opts \\ []), do: gen_deployment(resource)

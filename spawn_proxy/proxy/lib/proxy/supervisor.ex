@@ -4,11 +4,14 @@ defmodule Proxy.Supervisor do
   """
   use Supervisor
 
+  @shutdown_timeout_ms 390_000
+
   def child_spec(config) do
     %{
       id: __MODULE__,
       start: {__MODULE__, :start_link, [config]},
-      shutdown: 120_000
+      # wait up to 6,5 minutes to stop
+      shutdown: @shutdown_timeout_ms
     }
   end
 

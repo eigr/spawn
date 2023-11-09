@@ -2,10 +2,12 @@ defmodule Statestores.Supervisor do
   @moduledoc false
   use Supervisor
 
+  @shutdown_timeout_ms 330_000
+
   import Statestores.Util, only: [load_lookup_adapter: 0, load_snapshot_adapter: 0]
 
   def start_link(args) do
-    Supervisor.start_link(__MODULE__, args, name: __MODULE__)
+    Supervisor.start_link(__MODULE__, args, name: __MODULE__, shutdown: @shutdown_timeout_ms)
   end
 
   def child_spec() do

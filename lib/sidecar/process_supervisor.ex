@@ -2,12 +2,14 @@ defmodule Sidecar.ProcessSupervisor do
   @moduledoc false
   use Supervisor
 
+  @shutdown_timeout_ms 330_000
+
   @impl true
   def init(config) do
     children =
       [
-        statestores(),
         {Sidecar.MetricsSupervisor, config},
+        statestores(),
         Spawn.Supervisor.child_spec(config),
         Actors.Supervisors.ProtocolSupervisor.child_spec(config),
         Actors.Supervisors.ActorSupervisor.child_spec(config)
@@ -22,7 +24,8 @@ defmodule Sidecar.ProcessSupervisor do
       __MODULE__,
       config,
       name: __MODULE__,
-      shutdown: 120_000,
+      # wait until for 5 and a half minutes
+      shutdown: @shutdown_timeout_ms,
       strategy: :one_for_one
     )
   end

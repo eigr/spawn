@@ -3,9 +3,12 @@ defmodule Spawn.Supervisor do
   use Supervisor
   require Logger
 
+  @shutdown_timeout_ms 330_000
+
   def start_link(config) do
     Supervisor.start_link(__MODULE__, config,
-      name: String.to_atom("#{String.capitalize(config.app_name)}.Cluster")
+      name: String.to_atom("#{String.capitalize(config.app_name)}.Cluster"),
+      shutdown: @shutdown_timeout_ms
     )
   end
 
