@@ -50,6 +50,7 @@ defmodule Actors.Actor.CallerConsumer do
     GenStage.start_link(__MODULE__, opts, name: Module.concat(__MODULE__, "#{id}"))
   end
 
+  @impl true
   def init(opts) do
     max_demand = Keyword.get(opts, :max_demand, 100)
     min_demand = Keyword.get(opts, :min_demand, 50)
@@ -60,59 +61,66 @@ defmodule Actors.Actor.CallerConsumer do
      ]}
   end
 
+  @impl true
   def handle_events(events, _from, state) do
     Logger.debug("Processing demand. Events: #{inspect(length(events))}")
 
-    Enum.each(events, fn
-      {from, {:register, event, opts}} ->
-        from
-        |> GenStage.reply(register(event, opts))
-
-      {from, {:get_state, event, _opts}} ->
-        from
-        |> GenStage.reply(get_state(event))
-
-      {from, {:spawn_actor, event, opts}} ->
-        from
-        |> GenStage.reply(spawn_actor(event, opts))
-
-      {from,
-       {:invoke,
-        %InvocationRequest{
-          async: async?
-        } = event, opts}} ->
-        case async? do
-          false ->
-            if event.register_ref != "" do
-              spawn_req = %SpawnRequest{
-                actors: [%ActorId{event.actor.id | parent: event.register_ref}]
-              }
-
-              spawn_actor(spawn_req, opts)
-            end
-
-            from
-            |> GenStage.reply(invoke_with_span(event, opts))
-
-          _ ->
-            spawn(fn ->
-              if event.register_ref != "" do
-                spawn_req = %SpawnRequest{
-                  actors: [%ActorId{event.actor.id | parent: event.register_ref}]
-                }
-
-                spawn_actor(spawn_req, opts)
-              end
-
-              invoke_with_span(event, opts)
-            end)
-
-            from
-            |> GenStage.reply({:ok, :async})
-        end
-    end)
+    Enum.each(events, &dispatch_to_actor/1)
 
     {:noreply, [], state}
+  end
+
+  defp dispatch_to_actor({from, {:register, event, opts}} = _producer_event) do
+    from
+    |> GenStage.reply(register(event, opts))
+  end
+
+  defp dispatch_to_actor({from, {:get_state, event, _opts}} = _producer_event) do
+    from
+    |> GenStage.reply(get_state(event))
+  end
+
+  defp dispatch_to_actor({from, {:spawn_actor, event, opts}} = _producer_event) do
+    from
+    |> GenStage.reply(spawn_actor(event, opts))
+  end
+
+  defp dispatch_to_actor(
+         {from,
+          {:invoke,
+           %InvocationRequest{
+             async: async?
+           } = request, opts}} = _producer_event
+       ) do
+    case async? do
+      false ->
+        if request.register_ref != "" do
+          spawn_req = %SpawnRequest{
+            actors: [%ActorId{request.actor.id | parent: request.register_ref}]
+          }
+
+          spawn_actor(spawn_req, opts)
+        end
+
+        from
+        |> GenStage.reply(invoke_with_span(request, opts))
+
+      _ ->
+        spawn(fn ->
+          if request.register_ref != "" do
+            spawn_req = %SpawnRequest{
+              actors: [%ActorId{request.actor.id | parent: request.register_ref}]
+            }
+
+            spawn_actor(spawn_req, opts)
+          end
+
+          invoke_with_span(request, opts)
+        end)
+
+        from
+        |> GenStage.reply({:ok, :async})
+    end
   end
 
   defp register(
