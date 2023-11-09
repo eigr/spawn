@@ -1,6 +1,8 @@
 defmodule Actor.ActorTest do
   use ExUnit.Case
 
+  require Logger
+
   defmodule Actor.MyActor do
     use SpawnSdk.Actor,
       name: "my_actor_ref",
@@ -397,6 +399,54 @@ defmodule Actor.ActorTest do
                )
 
       assert %{data: "something"} = response
+    end
+  end
+
+  describe "parallel" do
+    @tag timeout: :infinity
+    @tag parallel: true
+    test "simple call that goes through 3 actors piping each other heavily", ctx do
+      system = ctx.system
+
+      1..100_000
+      |> Task.async_stream(
+        fn number ->
+          number
+        end,
+        max_concurrency: 100,
+        timeout: :infinity
+      )
+      |> Stream.map(fn {:ok, number} ->
+        Logger.debug("ue? #{number} -----------------------------------")
+
+        payload = %Eigr.Spawn.Actor.MyMessageRequest{data: "#{number}"}
+
+        dynamic_actor_name = "#{Faker.Pokemon.name()}-piping-#{number}"
+
+        # assert {:ok, :async} =
+        #          SpawnSdk.invoke(dynamic_actor_name,
+        #            async: true,
+        #            ref: "my_actor_ref",
+        #            system: system,
+        #            action: "pipe_caller",
+        #            payload: payload
+        #          )
+
+        assert {:ok, response} =
+                 SpawnSdk.invoke(dynamic_actor_name,
+                   ref: "my_actor_ref",
+                   system: system,
+                   action: "pipe_caller",
+                   payload: payload
+                 )
+
+        assert %{data: "second_actor as caller to third_actor"} = response
+      end)
+      |> Enum.to_list()
+
+      Logger.debug("Finished piping -----------------------------------")
+
+      # Process.sleep(30_000)
     end
   end
 end

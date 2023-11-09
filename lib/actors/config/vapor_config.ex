@@ -72,7 +72,7 @@ defmodule Actors.Config.Vapor do
 
           # Supervisors configuration
           {:state_handoff_controller_adapter, "SPAWN_SUPERVISORS_STATE_HANDOFF_CONTROLLER",
-           default: "persistent", required: false},
+           default: "crdt", required: false},
           {:state_handoff_manager_pool_size, "SPAWN_SUPERVISORS_STATE_HANDOFF_MANAGER_POOL_SIZE",
            default: 20, map: &String.to_integer/1, required: false},
           {:state_handoff_manager_call_timeout,

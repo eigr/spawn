@@ -70,6 +70,7 @@ defmodule Spawn.MixProject do
       # Core deps
       {:decimal, "~> 2.0"},
       {:decorator, "~> 1.4"},
+      {:iter, "~> 0.1.2"},
       {:nebulex, "~> 2.5"},
       {:shards, "~> 1.1"},
       {:telemetry, "~> 1.0"},

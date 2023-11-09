@@ -43,7 +43,7 @@ defmodule Actors.Actor.CallerConsumer do
   @activate_actors_min_demand 0
   @activate_actors_max_demand 4
 
-  @genstage_min_demand 10
+  @genstage_min_demand 50
   @genstage_max_demand 100
 
   @erpc_timeout 5_000
