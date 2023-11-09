@@ -1,6 +1,6 @@
 # Activator Resource
 TODO
 
-[Next: Actor Host Resource](crds/actor_host.md)
+[Next: Actor Host Resource](actor_host.md)
 
-[Previous: Actor System Resource](crds/actor_system.md)
+[Previous: Actor System Resource](actor_system.md)

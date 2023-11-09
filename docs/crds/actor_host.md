@@ -60,6 +60,6 @@ spec:
 
 
 
-[Next: Activator Resource](crds/activator.md)
+[Next: Activator Resource](activator.md)
 
-[Previous: Actor System Resource](crds/actor_system.md)
+[Previous: Actor System Resource](actor_system.md)

@@ -24,6 +24,6 @@ spec:
 | ------------------------------------------------------------------------ | --------------- | -----------| --------------------- | --------------- |
 | .metadata.name                                                           |                 | Yes        |                       |                 |
 
-[Next: Actor Host Resource](crds/actor_host.md)
+[Next: Actor Host Resource](actor_host.md)
 
 [Previous: Custom Resources](crds.md)
