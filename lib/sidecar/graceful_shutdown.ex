@@ -15,10 +15,12 @@ defmodule Sidecar.GracefulShutdown do
   and starts returning `:stopping` status.
   """
 
+  @shutdown_timeout_ms 336_000
+
   defmodule State do
     @moduledoc false
 
-    defstruct init_stop?: true, shutdown_delay_ms: 130_000, notify_pid: nil
+    defstruct init_stop?: true, shutdown_delay_ms: 15_000, notify_pid: nil
 
     def new(opts) do
       Map.merge(%__MODULE__{}, Enum.into(opts, %{}))
@@ -79,7 +81,8 @@ defmodule Sidecar.GracefulShutdown do
       start: {__MODULE__, :start_link, [opts]},
       type: :worker,
       restart: :permanent,
-      shutdown: 500
+      # wait up to 5,6 minutes to stop
+      shutdown: @shutdown_timeout_ms
     }
   end
 
@@ -112,7 +115,6 @@ defmodule Sidecar.GracefulShutdown do
     Logger.info("Received SIGTERM, draining the system...")
     set_status_and_notify(state, :draining)
     send_stop(state)
-    spawn(fn -> Supervisor.stop(Sidecar.ProcessSupervisor, :normal, state.shutdown_delay_ms) end)
 
     {:ok, state}
   end
