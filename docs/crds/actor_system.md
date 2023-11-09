@@ -26,4 +26,4 @@ spec:
 
 [Next: Actor Host Resource](actor_host.md)
 
-[Previous: Custom Resources](../activators.md)
+[Previous: Custom Resources](../crds.md)
