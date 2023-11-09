@@ -63,7 +63,8 @@ defmodule Actors.Actor.CallerConsumer do
 
   @impl true
   def handle_events(events, _from, state) do
-    Logger.debug("Processing demand. Events: #{inspect(length(events))}")
+    if length(events) > 1,
+      do: Logger.debug("Flushing the Event buffer. Buffer Size: #{inspect(length(events))}")
 
     Enum.each(events, &dispatch_to_actor/1)
 
