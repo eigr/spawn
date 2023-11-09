@@ -16,6 +16,7 @@
 14. [Protocol](protocol.md)
 15. [Contributing](../CONTRIBUTING.md)
 16. [History](history.md)
+17. [Modeling Systems with Actors](modeling_with_actors.md)
 
 [Next: Overview](overview.md)
 
