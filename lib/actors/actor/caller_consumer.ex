@@ -43,6 +43,9 @@ defmodule Actors.Actor.CallerConsumer do
   @activate_actors_min_demand 0
   @activate_actors_max_demand 4
 
+  @genstage_min_demand 10
+  @genstage_max_demand 100
+
   @erpc_timeout 5_000
 
   def start_link(opts \\ []) do
@@ -52,8 +55,8 @@ defmodule Actors.Actor.CallerConsumer do
 
   @impl true
   def init(opts) do
-    max_demand = Keyword.get(opts, :max_demand, 100)
-    min_demand = Keyword.get(opts, :min_demand, 50)
+    max_demand = Keyword.get(opts, :max_demand, @genstage_max_demand)
+    min_demand = Keyword.get(opts, :min_demand, @genstage_min_demand)
 
     {:consumer, :ok,
      subscribe_to: [
