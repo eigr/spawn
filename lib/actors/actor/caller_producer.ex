@@ -51,7 +51,7 @@ defmodule Actors.Actor.CallerProducer do
   end
 
   def handle_demand(incoming_demand, {queue, pending_demand}) do
-    Logger.debug("Producer Handle Demand: #{incoming_demand}.")
+    Logger.debug("Consumer pull demand of: #{incoming_demand} elements.")
     dispatch_events(queue, incoming_demand + pending_demand, [])
   end
 

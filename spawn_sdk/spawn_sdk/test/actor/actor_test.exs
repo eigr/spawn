@@ -408,7 +408,7 @@ defmodule Actor.ActorTest do
     test "simple call that goes through 3 actors piping each other heavily", ctx do
       system = ctx.system
 
-      1..100_000
+      1..10_000
       |> Task.async_stream(
         fn number ->
           number

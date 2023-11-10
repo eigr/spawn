@@ -3,6 +3,7 @@ defmodule Actors.Supervisors.ActorSupervisor do
   use Supervisor
   require Logger
 
+  @max_consumers 64
   @shutdown_timeout_ms 330_000
 
   alias Actors.Actor.CallerProducer
@@ -26,10 +27,10 @@ defmodule Actors.Supervisors.ActorSupervisor do
     get_acl_manager().load_acl_policies("#{@base_app_dir}/policies")
 
     consumers =
-      Enum.into(1..System.schedulers_online(), [], fn index ->
+      Enum.into(1..@max_consumers, [], fn index ->
         %{
           id: index,
-          start: {Actors.Actor.CallerConsumer, :start_link, [[id: index]]}
+          start: {Actors.Actor.CallerConsumer, :start_link, [[id: index, config: config]]}
         }
       end)
 

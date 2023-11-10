@@ -48,6 +48,8 @@ defmodule Actors.Actor.CallerConsumer do
 
   @erpc_timeout 5_000
 
+  @pool_percent_factor 40
+
   def start_link(opts \\ []) do
     id = Keyword.get(opts, :id, 1)
     GenStage.start_link(__MODULE__, opts, name: Module.concat(__MODULE__, "#{id}"))
@@ -55,13 +57,39 @@ defmodule Actors.Actor.CallerConsumer do
 
   @impl true
   def init(opts) do
-    max_demand = Keyword.get(opts, :max_demand, @genstage_max_demand)
-    min_demand = Keyword.get(opts, :min_demand, @genstage_min_demand)
+    %{min_demand: min_demand, max_demand: max_demand} = get_backpressure_values_allowed(opts)
 
     {:consumer, :ok,
      subscribe_to: [
        {CallerProducer, min_demand: min_demand, max_demand: max_demand}
      ]}
+  end
+
+  def get_backpressure_values_allowed(opts) do
+    index = Keyword.get(opts, :id, 0)
+    config = Keyword.get(opts, :config, %{})
+    actual_max_demand = config.actors_global_backpressure_max_demand
+    actual_min_demand = config.actors_global_backpressure_min_demand
+
+    backpressure_options =
+      if actual_max_demand == -1 && actual_min_demand == -1 do
+        base = 1 + @pool_percent_factor / 100
+        max_pool_size = round(config.proxy_db_pool_size * base)
+        min_pool_size = round(max_pool_size * 0.5)
+
+        max_pool_size = if max_pool_size > 0, do: max_pool_size, else: max_pool_size * -1
+        min_pool_size = if min_pool_size > 0, do: min_pool_size, else: min_pool_size * -1
+
+        %{min_demand: min_pool_size, max_demand: max_pool_size}
+      else
+        %{min_demand: @genstage_min_demand, max_demand: @genstage_max_demand}
+      end
+
+    Logger.debug(
+      "Initialize Actor Event Consumer ID: #{index}. With Backpressure options: #{inspect(backpressure_options)}"
+    )
+
+    backpressure_options
   end
 
   @impl true

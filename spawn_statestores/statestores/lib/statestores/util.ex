@@ -87,7 +87,7 @@ defmodule Statestores.Util do
       Keyword.put(
         config,
         :pool_size,
-        String.to_integer(System.get_env("PROXY_DATABASE_POOL_SIZE", "30"))
+        String.to_integer(System.get_env("PROXY_DATABASE_POOL_SIZE", "50"))
       )
 
     config =

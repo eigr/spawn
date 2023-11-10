@@ -70,6 +70,12 @@ defmodule Actors.Config.Vapor do
           {:user_function_port, "USER_FUNCTION_PORT",
            default: 8090, map: &String.to_integer/1, required: false},
 
+          # Global Backpressure config
+          {:actors_global_backpressure_max_demand, "ACTORS_GLOBAL_BACKPRESSURE_MAX_DEMAND",
+           default: -1, map: &String.to_integer/1, required: false},
+          {:actors_global_backpressure_min_demand, "ACTORS_GLOBAL_BACKPRESSURE_MIN_DEMAND",
+           default: -1, map: &String.to_integer/1, required: false},
+
           # Supervisors configuration
           {:state_handoff_controller_adapter, "SPAWN_SUPERVISORS_STATE_HANDOFF_CONTROLLER",
            default: "crdt", required: false},
@@ -133,7 +139,15 @@ defmodule Actors.Config.Vapor do
           {:ship_debounce, "SPAWN_CRDT_SHIP_DEBOUNCE",
            default: 2, map: &String.to_integer/1, required: false},
           {:neighbours_sync_interval, "SPAWN_STATE_HANDOFF_SYNC_INTERVAL",
-           default: 60_000, map: &String.to_integer/1, required: false}
+           default: 60_000, map: &String.to_integer/1, required: false},
+
+          # Statestores
+          {:proxy_db_name, "PROXY_DATABASE_NAME", default: "eigr-functions-db", required: false},
+          {:proxy_db_username, "PROXY_DATABASE_USERNAME", default: "admin", required: false},
+          {:proxy_db_secret, "PROXY_DATABASE_SECRET", default: "admin", required: false},
+          {:proxy_db_host, "PROXY_DATABASE_HOST", default: "localhost", required: false},
+          {:proxy_db_pool_size, "PROXY_DATABASE_POOL_SIZE",
+           default: 50, map: &String.to_integer/1, required: false}
         ]
       }
     ]
