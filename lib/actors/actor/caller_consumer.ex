@@ -110,17 +110,15 @@ defmodule Actors.Actor.CallerConsumer do
         |> GenStage.reply(invoke_with_span(request, opts))
 
       _ ->
-        spawn(fn ->
-          if request.register_ref != "" do
-            spawn_req = %SpawnRequest{
-              actors: [%ActorId{request.actor.id | parent: request.register_ref}]
-            }
+        if request.register_ref != "" do
+          spawn_req = %SpawnRequest{
+            actors: [%ActorId{request.actor.id | parent: request.register_ref}]
+          }
 
-            spawn_actor(spawn_req, opts)
-          end
+          spawn_actor(spawn_req, opts)
+        end
 
-          invoke_with_span(request, opts)
-        end)
+        invoke_with_span(request, opts)
 
         from
         |> GenStage.reply({:ok, :async})
