@@ -26,12 +26,10 @@ defmodule Actors.Supervisors.ActorSupervisor do
     get_acl_manager().load_acl_policies("#{@base_app_dir}/policies")
 
     consumers =
-      Enum.into(1..(System.schedulers_online() * 2), [], fn index ->
+      Enum.into(1..System.schedulers_online(), [], fn index ->
         %{
           id: index,
-          start:
-            {Actors.Actor.CallerConsumer, :start_link,
-             [[id: index, min_demand: 50, max_demand: 100]]}
+          start: {Actors.Actor.CallerConsumer, :start_link, [[id: index]]}
         }
       end)
 
