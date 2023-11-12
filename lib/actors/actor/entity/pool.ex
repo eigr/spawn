@@ -27,26 +27,24 @@ defmodule Actors.Actor.Pool do
   """
   @spec create_actor_host_pool(Actor.t(), keyword()) :: list(HostActor.t())
   def create_actor_host_pool(
-        %Actor{
-          id: %ActorId{} = id,
-          settings: %ActorSettings{kind: :POOLED} = _settings
-        } = actor,
+        %Actor{id: %ActorId{} = id, settings: %ActorSettings{} = settings} = actor,
         opts
       ) do
     case ActorRegistry.get_hosts_by_actor(id) do
       {:ok, actor_hosts} ->
-        build_pool(:distributed, actor, actor_hosts, opts)
+        if settings.kind == :POOLED do
+          build_pool(:distributed, actor, actor_hosts, opts)
+        else
+          actor_hosts
+        end
 
       _ ->
-        build_pool(:local, actor, nil, opts)
+        if settings.kind == :POOLED do
+          build_pool(:local, actor, nil, opts)
+        else
+          [%HostActor{node: Node.self(), actor: actor, opts: opts}]
+        end
     end
-  end
-
-  def create_actor_host_pool(
-        %Actor{settings: %ActorSettings{kind: _kind} = _settings} = actor,
-        opts
-      ) do
-    [%HostActor{node: Node.self(), actor: actor, opts: opts}]
   end
 
   defp build_pool(

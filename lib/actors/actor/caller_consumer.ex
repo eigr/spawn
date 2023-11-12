@@ -43,9 +43,6 @@ defmodule Actors.Actor.CallerConsumer do
   @activate_actors_min_demand 0
   @activate_actors_max_demand 4
 
-  @genstage_min_demand 50
-  @genstage_max_demand 100
-
   @erpc_timeout 5_000
 
   @pool_percent_factor 40
@@ -103,51 +100,33 @@ defmodule Actors.Actor.CallerConsumer do
   end
 
   defp dispatch_to_actor({from, {:register, event, opts}} = _producer_event) do
-    from
-    |> GenStage.reply(register(event, opts))
+    reply_to_producer(from, register(event, opts))
   end
 
   defp dispatch_to_actor({from, {:get_state, event, _opts}} = _producer_event) do
-    from
-    |> GenStage.reply(get_state(event))
+    reply_to_producer(from, get_state(event))
   end
 
   defp dispatch_to_actor({from, {:spawn_actor, event, opts}} = _producer_event) do
-    from
-    |> GenStage.reply(spawn_actor(event, opts))
+    reply_to_producer(from, spawn_actor(event, opts))
   end
 
-  defp dispatch_to_actor(
-         {from,
-          {:invoke,
-           %InvocationRequest{
-             async: async?
-           } = request, opts}} = _producer_event
-       ) do
-    case async? do
-      false ->
-        if request.register_ref != "" do
-          spawn_req = %SpawnRequest{
-            actors: [%ActorId{request.actor.id | parent: request.register_ref}]
-          }
+  defp dispatch_to_actor({from, {:invoke, request, opts}} = _producer_event) do
+    if request.register_ref != "" do
+      spawn_req = %SpawnRequest{
+        actors: [%ActorId{request.actor.id | parent: request.register_ref}]
+      }
 
-          spawn_actor(spawn_req, opts)
-        end
-
-        from
-        |> GenStage.reply(invoke_with_span(request, opts))
-
-      _ ->
-        if request.register_ref != "" do
-          spawn_req = %SpawnRequest{
-            actors: [%ActorId{request.actor.id | parent: request.register_ref}]
-          }
-
-          spawn_actor(spawn_req, opts)
-        end
-
-        invoke_with_span(request, opts)
+      spawn_actor(spawn_req, opts)
     end
+
+    reply_to_producer(from, invoke_with_span(request, opts))
+  end
+
+  defp reply_to_producer(:fake_from, response), do: response
+
+  defp reply_to_producer(from, response) do
+    GenStage.reply(from, response)
   end
 
   defp register(
@@ -159,21 +138,34 @@ defmodule Actors.Actor.CallerConsumer do
          } = _registration,
          opts
        ) do
-    actors
-    |> Map.values()
-    |> Enum.map(fn actor -> ActorPool.create_actor_host_pool(actor, opts) end)
-    |> List.flatten()
-    |> ActorRegistry.register()
-    |> tap(fn _sts -> warmup_actors(actor_system, actors, opts) end)
-    |> case do
-      :ok ->
-        status = %RequestStatus{status: :OK, message: "Accepted"}
-        {:ok, %RegistrationResponse{proxy_info: get_proxy_info(), status: status}}
+    if Sidecar.GracefulShutdown.running?() do
+      actors
+      |> Map.values()
+      |> Enum.map(fn actor -> ActorPool.create_actor_host_pool(actor, opts) end)
+      |> List.flatten()
+      |> Enum.filter(&(&1.node == Node.self()))
+      |> ActorRegistry.register()
+      |> tap(fn _sts -> warmup_actors(actor_system, actors, opts) end)
+      |> case do
+        :ok ->
+          status = %RequestStatus{status: :OK, message: "Accepted"}
+          {:ok, %RegistrationResponse{proxy_info: get_proxy_info(), status: status}}
 
-      _ ->
-        status = %RequestStatus{status: :ERROR, message: "Failed to register one or more Actors"}
+        _ ->
+          status = %RequestStatus{
+            status: :ERROR,
+            message: "Failed to register one or more Actors"
+          }
 
-        {:error, %RegistrationResponse{proxy_info: get_proxy_info(), status: status}}
+          {:error, %RegistrationResponse{proxy_info: get_proxy_info(), status: status}}
+      end
+    else
+      status = %RequestStatus{
+        status: :ERROR,
+        message: "You can't register actors when node is stopping"
+      }
+
+      {:error, %RegistrationResponse{proxy_info: get_proxy_info(), status: status}}
     end
   end
 
@@ -220,6 +212,13 @@ defmodule Actors.Actor.CallerConsumer do
         case ActorRegistry.get_hosts_by_actor(id, parent: true) do
           {:ok, actor_hosts} ->
             to_spawn_hosts(id, actor_hosts, opts)
+            |> then(fn hosts ->
+              if Sidecar.GracefulShutdown.get_status() in [:draining, :stopping] do
+                Enum.reject(hosts, &(&1.node == Node.self()))
+              else
+                hosts
+              end
+            end)
 
           error ->
             raise ArgumentError,
@@ -227,6 +226,7 @@ defmodule Actors.Actor.CallerConsumer do
         end
       end)
       |> List.flatten()
+      |> Enum.filter(&(&1.node == Node.self()))
 
     ActorRegistry.register(hosts)
 

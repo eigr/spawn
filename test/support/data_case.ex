@@ -9,6 +9,7 @@ defmodule Actors.DataCase do
 
       use Actors.MockTest
       import Actors.FactoryTest
+      import Spawn.DistributedHelpers
 
       import Actors.DataCase
     end

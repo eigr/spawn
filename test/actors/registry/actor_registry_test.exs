@@ -1,23 +1,24 @@
 defmodule Actors.ActorRegistryTest do
   use Actors.DataCase, async: false
 
+  alias Actors.Registry.ActorRegistry
   alias Eigr.Functions.Protocol.ActorInvocationResponse
   alias Eigr.Functions.Protocol.RegistrationResponse
 
   setup do
     actor_name = "actor_registry_test_two_nodes"
-    actor = build_actor(name: actor_name)
+    system = "spawn-system"
+    actor = build_actor(name: actor_name, system: system)
     actor_entry = build_actor_entry(name: actor_name, actor: actor)
     registry = build_registry_with_actors(actors: actor_entry)
-    system = build_system(name: "spawn-system", registry: registry)
+    system = build_system(name: system, registry: registry)
     request = build_registration_request(actor_system: system)
 
-    %{request: request, actor_name: actor_name}
+    %{request: request, actor_name: actor_name, actor_id: actor.id}
   end
 
-  @tag :skip
-  test "register actors for a system in two nodes", ctx do
-    %{request: request} = ctx
+  test "register the same actor for a system in two different nodes", ctx do
+    %{request: request, actor_id: actor_id} = ctx
 
     peer_node_name = :"spawn_actors_node@127.0.0.1"
 
@@ -27,36 +28,35 @@ defmodule Actors.ActorRegistryTest do
              ])
 
     # actor registered and present in the other node
-    assert %{^peer_node_name => %{"actor_registry_test_two_nodes" => _}} =
-             Spawn.NodeHelper.rpc(peer_node_name, Actors.ActorsHelper, :registered_actors, [])
+    assert {:ok, [%{node: ^peer_node_name}]} =
+             Spawn.NodeHelper.rpc(peer_node_name, ActorRegistry, :get_hosts_by_actor, [actor_id])
 
     # also present in self node
-    assert %{^peer_node_name => %{"actor_registry_test_two_nodes" => _}} =
-             Actors.ActorsHelper.registered_actors()
+    assert {:ok, [%{node: ^peer_node_name}]} =
+             loop_until_ok(fn -> ActorRegistry.get_hosts_by_actor(actor_id) end)
 
-    Actors.register(request)
+    assert {:ok, %RegistrationResponse{}} = Actors.register(request)
 
-    # present in both nodes too
-    registered = Actors.ActorsHelper.registered_actors()
+    # does not change host when registering a already registered actor
+    assert {:ok, [%{node: ^peer_node_name}]} =
+             Spawn.NodeHelper.rpc(peer_node_name, ActorRegistry, :get_hosts_by_actor, [actor_id])
 
-    assert %{:"spawn_actors_node@127.0.0.1" => %{"actor_registry_test_two_nodes" => _}} =
-             registered
+    assert {:ok, [%{node: ^peer_node_name}]} =
+             loop_until_ok(fn -> ActorRegistry.get_hosts_by_actor(actor_id) end)
 
-    assert %{^peer_node_name => %{"actor_registry_test_two_nodes" => _}} = registered
+    Spawn.NodeHelper.rpc(peer_node_name, Spawn.Cluster.StateHandoff.Manager, :clean, [
+      peer_node_name
+    ])
 
-    # present in both nodes calling in the other node
-    registered = Spawn.NodeHelper.rpc(peer_node_name, Actors.ActorsHelper, :registered_actors, [])
+    assert loop_until_ok(fn ->
+             ActorRegistry.get_hosts_by_actor(actor_id)
+             |> case do
+               {:not_found, []} -> {:ok, :not_found}
+               _ -> {:error, :found}
+             end
+           end) == {:ok, :not_found}
 
-    assert %{:"spawn_actors_node@127.0.0.1" => %{"actor_registry_test_two_nodes" => _}} =
-             registered
-
-    assert %{^peer_node_name => %{"actor_registry_test_two_nodes" => _}} = registered
-
-    Spawn.Cluster.StateHandoff.Manager.clean(peer_node_name)
-
-    registered = Actors.ActorsHelper.registered_actors()
-
-    # now present only in current node
-    assert %{:"spawn@127.0.0.1" => %{"actor_registry_test_two_nodes" => _}} = registered
+    assert Spawn.NodeHelper.rpc(peer_node_name, ActorRegistry, :get_hosts_by_actor, [actor_id]) ==
+             {:not_found, []}
   end
 end

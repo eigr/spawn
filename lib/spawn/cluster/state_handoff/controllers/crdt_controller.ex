@@ -9,6 +9,7 @@ defmodule Spawn.Cluster.StateHandoff.Controllers.CrdtController do
 
   The module also handles other messages like "handoff" and "get" to put and retrieve data from the DeltaCrdt state, respectively.
   """
+  require Iter
   require Logger
 
   @behaviour Spawn.Cluster.StateHandoff.ControllerBehaviour
@@ -46,39 +47,29 @@ defmodule Spawn.Cluster.StateHandoff.Controllers.CrdtController do
   Cluster HostActor cleanup
   """
   @impl true
-  def clean(node, data) do
+  def clean(node, %{crdt_pid: crdt_pid} = data) do
     Logger.debug("Received cleanup action from Node #{inspect(node)}")
 
-    crdt_pid = get_crdt_pid()
-    actors = DeltaCrdt.to_map(crdt_pid)
+    new_values =
+      crdt_pid
+      |> DeltaCrdt.to_map()
+      |> Iter.filter(fn {_key, [host]} -> host.node == node end)
+      |> Iter.map(fn {key, _value} -> {key, nil} end)
+      |> Iter.into(%{})
 
-    new_hosts =
-      actors
-      |> Enum.map(fn {key, hosts} ->
-        hosts_not_in_node = Enum.reject(hosts, &(&1.node == node))
-
-        {key, hosts_not_in_node}
-      end)
-      |> Map.new()
-
-    drop_operations = actors |> Map.keys() |> Enum.map(&{:remove, [&1]})
-    merge_operations = Enum.map(new_hosts, fn {key, value} -> {:add, [key, value]} end)
-
-    # this is calling the internals of DeltaCrdt GenServer function (to keep atomicity in check)
-    GenServer.call(crdt_pid, {:bulk_operation, drop_operations ++ merge_operations})
+    DeltaCrdt.merge(crdt_pid, new_values)
 
     Logger.debug("Hosts cleaned for node #{inspect(node)}")
+
     data
   end
 
   @impl true
   @spec get_by_id(id(), data()) :: {new_data(), hosts()}
-  def get_by_id(id, %{crdt_pid: _crdt_pid} = data) do
+  def get_by_id(id, %{crdt_pid: crdt_pid} = data) do
     key = generate_key(id)
 
-    hosts =
-      get_crdt_pid()
-      |> DeltaCrdt.get(key, :infinity)
+    hosts = DeltaCrdt.get(crdt_pid, key, :infinity)
 
     {data, hosts}
   end
@@ -153,11 +144,10 @@ defmodule Spawn.Cluster.StateHandoff.Controllers.CrdtController do
 
   @impl true
   @spec set(id(), node(), host(), data) :: new_data()
-  def set(id, _node, host, %{crdt_pid: _crdt_pid} = data) do
+  def set(id, _node, host, %{crdt_pid: crdt_pid} = data) do
     key = generate_key(id)
 
-    get_crdt_pid()
-    |> DeltaCrdt.put(key, [host], :infinity)
+    DeltaCrdt.put(crdt_pid, key, [host], :infinity)
 
     data
   end
