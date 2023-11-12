@@ -65,7 +65,7 @@ defmodule Actors.Actor.CallerConsumer do
      ]}
   end
 
-  def get_backpressure_values_allowed(opts) do
+  defp get_backpressure_values_allowed(opts) do
     index = Keyword.get(opts, :id, 0)
     config = Keyword.get(opts, :config, %{})
     actual_max_demand = config.actors_global_backpressure_max_demand
@@ -82,7 +82,7 @@ defmodule Actors.Actor.CallerConsumer do
 
         %{min_demand: min_pool_size, max_demand: max_pool_size}
       else
-        %{min_demand: @genstage_min_demand, max_demand: @genstage_max_demand}
+        %{min_demand: actual_min_demand, max_demand: actual_max_demand}
       end
 
     Logger.debug(
@@ -147,9 +147,6 @@ defmodule Actors.Actor.CallerConsumer do
         end
 
         invoke_with_span(request, opts)
-
-        from
-        |> GenStage.reply({:ok, :async})
     end
   end
 

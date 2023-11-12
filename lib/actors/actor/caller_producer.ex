@@ -36,8 +36,26 @@ defmodule Actors.Actor.CallerProducer do
   end
 
   @spec invoke(InvocationRequest.t()) :: {:ok, :async} | {:ok, term()} | {:error, term()}
-  def invoke(request, opts \\ []) do
+  def invoke(request, opts \\ [])
+
+  def invoke(
+        %InvocationRequest{
+          async: false
+        } = request,
+        opts
+      ) do
     GenStage.call(__MODULE__, {:enqueue, {:invoke, request, opts}}, :infinity)
+  end
+
+  def invoke(
+        %InvocationRequest{
+          async: true
+        } = request,
+        opts
+      ) do
+    GenStage.cast(__MODULE__, {:enqueue, {:invoke, request, opts}})
+
+    {:ok, :async}
   end
 
   def enqueue(event) do
@@ -57,6 +75,11 @@ defmodule Actors.Actor.CallerProducer do
 
   def handle_call({:enqueue, event}, from, {queue, pending_demand}) do
     queue = :queue.in({from, event}, queue)
+    dispatch_events(queue, pending_demand, [])
+  end
+
+  def handle_cast({:enqueue, event}, {queue, pending_demand}) do
+    queue = :queue.in({:fake_from, event}, queue)
     dispatch_events(queue, pending_demand, [])
   end
 

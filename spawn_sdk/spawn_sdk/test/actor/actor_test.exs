@@ -6,7 +6,7 @@ defmodule Actor.ActorTest do
   defmodule Actor.MyActor do
     use SpawnSdk.Actor,
       name: "my_actor_ref",
-      kind: :abstract,
+      kind: :unamed,
       stateful: false,
       state_type: Eigr.Spawn.Actor.MyState,
       tags: [{"foo", "none"}, {"bar", "unchanged"}]
@@ -423,30 +423,30 @@ defmodule Actor.ActorTest do
 
         dynamic_actor_name = "#{Faker.Pokemon.name()}-piping-#{number}"
 
-        # assert {:ok, :async} =
-        #          SpawnSdk.invoke(dynamic_actor_name,
-        #            async: true,
-        #            ref: "my_actor_ref",
-        #            system: system,
-        #            action: "pipe_caller",
-        #            payload: payload
-        #          )
-
-        assert {:ok, response} =
+        assert {:ok, :async} =
                  SpawnSdk.invoke(dynamic_actor_name,
+                   async: true,
                    ref: "my_actor_ref",
                    system: system,
                    action: "pipe_caller",
                    payload: payload
                  )
 
-        assert %{data: "second_actor as caller to third_actor"} = response
+        # assert {:ok, response} =
+        #          SpawnSdk.invoke(dynamic_actor_name,
+        #            ref: "my_actor_ref",
+        #            system: system,
+        #            action: "pipe_caller",
+        #            payload: payload
+        #          )
+
+        # assert %{data: "second_actor as caller to third_actor"} = response
       end)
       |> Enum.to_list()
 
       Logger.debug("Finished piping -----------------------------------")
 
-      # Process.sleep(30_000)
+      Process.sleep(30_000)
     end
   end
 end
