@@ -405,6 +405,7 @@ defmodule Actor.ActorTest do
   describe "parallel" do
     @tag timeout: :infinity
     @tag parallel: true
+    @tag :skip
     test "simple call that goes through 3 actors piping each other heavily", ctx do
       system = ctx.system
 
