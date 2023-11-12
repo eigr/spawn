@@ -62,50 +62,50 @@ defmodule Actors.Registry.ActorRegistry do
   Removes a invocation request in CRDT Database
   Usually used for invocation schedulings
   """
-  def remove_invocation_request(actor, request) do
+  def remove_invocation_request(_actor, _request) do
     # TODO: Fix this
-    actor
-    |> StateHandoff.get()
-    |> Kernel.||([])
-    |> Enum.map(fn host ->
-      invocations = host.opts[:invocations] || []
-      invocation = Enum.find(invocations, &(&1 == request))
-      invocations = invocations -- [invocation]
+    # actor
+    # |> StateHandoff.get()
+    # |> Kernel.||([])
+    # |> Enum.map(fn host ->
+    #   invocations = host.opts[:invocations] || []
+    #   invocation = Enum.find(invocations, &(&1 == request))
+    #   invocations = invocations -- [invocation]
 
-      opts = Keyword.put(host.opts, :invocations, invocations)
-      %{host | opts: opts}
-    end)
-    |> then(fn
-      [] ->
-        :nothing
+    #   opts = Keyword.put(host.opts, :invocations, invocations)
+    #   %{host | opts: opts}
+    # end)
+    # |> then(fn
+    #   [] ->
+    #     :nothing
 
-      updated_hosts ->
-        StateHandoff.set(actor, updated_hosts)
-    end)
+    #   updated_hosts ->
+    #     StateHandoff.set(actor, updated_hosts)
+    # end)
   end
 
   @doc """
   Registers a invocation request in CRDT Database
   Usually used for invocation schedulings
   """
-  def register_invocation_request(actor, request) do
+  def register_invocation_request(_actor, _request) do
     # TODO: Fix this
-    actor
-    |> StateHandoff.get()
-    |> Kernel.||([])
-    |> Enum.map(fn host ->
-      invocations = (host.opts[:invocations] || []) ++ [request]
+    # actor
+    # |> StateHandoff.get()
+    # |> Kernel.||([])
+    # |> Enum.map(fn host ->
+    #   invocations = (host.opts[:invocations] || []) ++ [request]
 
-      opts = Keyword.put(host.opts, :invocations, invocations)
-      %{host | opts: opts}
-    end)
-    |> then(fn
-      [] ->
-        :nothing
+    #   opts = Keyword.put(host.opts, :invocations, invocations)
+    #   %{host | opts: opts}
+    # end)
+    # |> then(fn
+    #   [] ->
+    #     :nothing
 
-      updated_hosts ->
-        StateHandoff.set(actor, updated_hosts)
-    end)
+    #   updated_hosts ->
+    #     StateHandoff.set(actor, updated_hosts)
+    # end)
   end
 
   @doc """
