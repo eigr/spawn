@@ -75,6 +75,8 @@ defmodule Actors.Config.Vapor do
            default: -1, map: &String.to_integer/1, required: false},
           {:actors_global_backpressure_min_demand, "ACTORS_GLOBAL_BACKPRESSURE_MIN_DEMAND",
            default: -1, map: &String.to_integer/1, required: false},
+          {:actors_global_backpressure_enabled, "ACTORS_GLOBAL_BACKPRESSURE_ENABLED",
+           default: "true", map: &cast_boolean/1, required: false},
 
           # Supervisors configuration
           {:state_handoff_controller_adapter, "SPAWN_SUPERVISORS_STATE_HANDOFF_CONTROLLER",
@@ -225,6 +227,14 @@ defmodule Actors.Config.Vapor do
       {config, config}
     else
       {state, state}
+    end
+  end
+
+  defp cast_boolean(value) do
+    case value do
+      "true" -> true
+      "false" -> false
+      value when is_boolean(value) -> value
     end
   end
 end

@@ -2,6 +2,7 @@ defmodule Actors.Actor.CallerProducer do
   use GenStage
   require Logger
 
+  alias Actors.Actor.CallerConsumer
   alias Eigr.Functions.Protocol.Actors.ActorId
 
   alias Eigr.Functions.Protocol.{
@@ -21,41 +22,53 @@ defmodule Actors.Actor.CallerProducer do
 
   @spec get_state(ActorId.t()) :: {:ok, term()} | {:error, term()}
   def get_state(actor_id, opts \\ []) do
-    GenStage.call(__MODULE__, {:enqueue, {:get_state, actor_id, opts}}, :infinity)
+    if Application.get_env(:spawn, :actors_global_backpressure_enabled, false) do
+      GenStage.call(__MODULE__, {:enqueue, {:get_state, actor_id, opts}}, :infinity)
+    else
+      CallerConsumer.get_state(actor_id)
+    end
   end
 
   @spec register(RegistrationRequest.t(), any()) ::
           {:ok, RegistrationResponse.t()} | {:error, RegistrationResponse.t()}
   def register(registration, opts \\ []) do
-    GenStage.call(__MODULE__, {:enqueue, {:register, registration, opts}}, :infinity)
+    if Application.get_env(:spawn, :actors_global_backpressure_enabled, false) do
+      GenStage.call(__MODULE__, {:enqueue, {:register, registration, opts}}, :infinity)
+    else
+      CallerConsumer.register(registration, opts)
+    end
   end
 
   @spec spawn_actor(SpawnRequest.t(), any()) :: {:ok, SpawnResponse.t()}
   def spawn_actor(spawn_req, opts \\ []) do
-    GenStage.call(__MODULE__, {:enqueue, {:spawn_actor, spawn_req, opts}}, :infinity)
+    if Application.get_env(:spawn, :actors_global_backpressure_enabled, false) do
+      GenStage.call(__MODULE__, {:enqueue, {:spawn_actor, spawn_req, opts}}, :infinity)
+    else
+      CallerConsumer.spawn_actor(spawn_req, opts)
+    end
   end
 
   @spec invoke(InvocationRequest.t()) :: {:ok, :async} | {:ok, term()} | {:error, term()}
   def invoke(request, opts \\ [])
 
-  def invoke(
-        %InvocationRequest{
-          async: false
-        } = request,
-        opts
-      ) do
-    GenStage.call(__MODULE__, {:enqueue, {:invoke, request, opts}}, :infinity)
-  end
+  def invoke(%InvocationRequest{} = request, opts) do
+    if Application.get_env(:spawn, :actors_global_backpressure_enabled, false) do
+      if request.async do
+        GenStage.cast(__MODULE__, {:enqueue, {:invoke, request, opts}})
+      else
+        GenStage.call(__MODULE__, {:enqueue, {:invoke, request, opts}}, :infinity)
+      end
+    else
+      if request.register_ref != "" do
+        spawn_req = %SpawnRequest{
+          actors: [%ActorId{request.actor.id | parent: request.register_ref}]
+        }
 
-  def invoke(
-        %InvocationRequest{
-          async: true
-        } = request,
-        opts
-      ) do
-    GenStage.cast(__MODULE__, {:enqueue, {:invoke, request, opts}})
+        spawn_actor(spawn_req, opts)
+      end
 
-    {:ok, :async}
+      CallerConsumer.invoke_with_span(request, opts)
+    end
   end
 
   def enqueue(event) do

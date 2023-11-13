@@ -89,6 +89,15 @@ defmodule SpawnOperator.K8s.Proxy.CM.Configmap do
 
     # Optional. Default "crdt"
     spawn-eigr-io/supervisors-state-handoff-controller: "crdt"
+
+    # Optional. Default "-1"
+    spawn-eigr.io/actors-global-backpressure-max-demand: "-1"
+
+    # Optional. Default "-1"
+    spawn-eigr.io/actors-global-backpressure-min-demand: "-1"
+
+    # Optional. Default "true"
+    spawn-eigr.io/actors-global-backpressure-enabled: "true"
   """
   @impl true
   def manifest(resource, _opts \\ []), do: gen_configmap(resource)
@@ -144,7 +153,12 @@ defmodule SpawnOperator.K8s.Proxy.CM.Configmap do
         "SPAWN_CRDT_SHIP_DEBOUNCE" => annotations.ship_debounce,
         "SPAWN_STATE_HANDOFF_SYNC_INTERVAL" => annotations.neighbours_sync_interval,
         "SPAWN_SUPERVISORS_STATE_HANDOFF_CONTROLLER" =>
-          annotations.supervisors_state_handoff_controller
+          annotations.supervisors_state_handoff_controller,
+        "ACTORS_GLOBAL_BACKPRESSURE_MAX_DEMAND" =>
+          annotations.actors_global_backpressure_max_demand,
+        "ACTORS_GLOBAL_BACKPRESSURE_MIN_DEMAND" =>
+          annotations.actors_global_backpressure_min_demand,
+        "ACTORS_GLOBAL_BACKPRESSURE_ENABLED" => annotations.actors_global_backpressure_enabled
       }
     }
   end

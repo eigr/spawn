@@ -78,7 +78,13 @@ defmodule SpawnOperator do
       neighbours_sync_interval:
         Map.get(annotations, "spawn-eigr.io/sidecar-state-handoff-sync-interval", "60"),
       supervisors_state_handoff_controller:
-        Map.get(annotations, "spawn-eigr.io/supervisors-state-handoff-controller", "crdt")
+        Map.get(annotations, "spawn-eigr.io/supervisors-state-handoff-controller", "crdt"),
+      actors_global_backpressure_max_demand:
+        Map.get(annotations, "spawn-eigr.io/actors-global-backpressure-max-demand", "-1"),
+      actors_global_backpressure_min_demand:
+        Map.get(annotations, "spawn-eigr.io/actors-global-backpressure-min-demand", "-1"),
+      actors_global_backpressure_enabled:
+        Map.get(annotations, "spawn-eigr.io/actors-global-backpressure-enabled", "true")
     }
   end
 end

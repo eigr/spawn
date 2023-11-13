@@ -129,15 +129,15 @@ defmodule Actors.Actor.CallerConsumer do
     GenStage.reply(from, response)
   end
 
-  defp register(
-         %RegistrationRequest{
-           service_info: %ServiceInfo{} = _service_info,
-           actor_system:
-             %ActorSystem{name: _name, registry: %Registry{actors: actors} = _registry} =
-               actor_system
-         } = _registration,
-         opts
-       ) do
+  def register(
+        %RegistrationRequest{
+          service_info: %ServiceInfo{} = _service_info,
+          actor_system:
+            %ActorSystem{name: _name, registry: %Registry{actors: actors} = _registry} =
+              actor_system
+        } = _registration,
+        opts
+      ) do
     if Sidecar.GracefulShutdown.running?() do
       actors
       |> Map.values()
