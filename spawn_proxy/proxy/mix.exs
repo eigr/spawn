@@ -31,7 +31,7 @@ defmodule Proxy.MixProject do
     [
       {:spawn, path: "../../"},
       {:bakeware, "~> 0.2"},
-      {:bandit, "~> 0.7.7"},
+      {:bandit, "~> 1.1"},
       {:observer_cli, "~> 1.7"},
       {:sobelow, "~> 0.13", only: [:dev, :test], runtime: false}
     ]
