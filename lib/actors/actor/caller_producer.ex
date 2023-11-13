@@ -55,6 +55,7 @@ defmodule Actors.Actor.CallerProducer do
     if Application.get_env(:spawn, :actors_global_backpressure_enabled, false) do
       if request.async do
         GenStage.cast(__MODULE__, {:enqueue, {:invoke, request, opts}})
+        {:ok, :async}
       else
         GenStage.call(__MODULE__, {:enqueue, {:invoke, request, opts}}, :infinity)
       end
