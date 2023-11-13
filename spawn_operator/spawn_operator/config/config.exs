@@ -1,7 +1,7 @@
 import Config
 
 config :spawn_operator,
-  proxy_image: "docker.io/eigr/spawn-proxy:1.0.0-rc.26"
+  proxy_image: "docker.io/eigr/spawn-proxy:1.0.0-rc.27"
 
 config :bonny,
   # Add each Controller module for this operator to load here
