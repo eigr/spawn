@@ -59,10 +59,10 @@ defmodule Spawn.Cluster.StateHandoff.Manager do
   end
 
   @impl true
-  def handle_cast({:set, actor_id, host}, state) do
+  def handle_call({:set, actor_id, host}, from, state) do
     new_data = state.controller.set(actor_id, Node.self(), host, state.data)
 
-    {:noreply, %State{state | data: new_data}}
+    {:reply, from, %State{state | data: new_data}}
   end
 
   @impl true
@@ -73,7 +73,7 @@ defmodule Spawn.Cluster.StateHandoff.Manager do
   end
 
   def handle_call({:clean, node}, _from, state) do
-    new_data = state.controller.handle_terminate(node, state.data)
+    new_data = state.controller.clean(node, state.data)
 
     {:reply, new_data, %State{state | data: new_data}}
   end
@@ -128,7 +128,7 @@ defmodule Spawn.Cluster.StateHandoff.Manager do
   @doc """
   Store a actor and entity in the lookup store
   """
-  def set(actor_id, host), do: GenServer.cast(__MODULE__, {:set, actor_id, host})
+  def set(actor_id, host), do: GenServer.call(__MODULE__, {:set, actor_id, host}, :infinity)
 
   @doc """
   Pickup the stored entity data for a actor

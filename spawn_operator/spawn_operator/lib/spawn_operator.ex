@@ -78,7 +78,7 @@ defmodule SpawnOperator do
       neighbours_sync_interval:
         Map.get(annotations, "spawn-eigr.io/sidecar-state-handoff-sync-interval", "60"),
       supervisors_state_handoff_controller:
-        Map.get(annotations, "spawn-eigr.io/supervisors-state-handoff-controller", "persistent")
+        Map.get(annotations, "spawn-eigr.io/supervisors-state-handoff-controller", "crdt")
     }
   end
 end

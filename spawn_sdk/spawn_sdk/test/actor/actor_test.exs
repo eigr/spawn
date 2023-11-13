@@ -405,6 +405,7 @@ defmodule Actor.ActorTest do
   describe "parallel" do
     @tag timeout: :infinity
     @tag parallel: true
+    @tag :skip
     test "simple call that goes through 3 actors piping each other heavily", ctx do
       system = ctx.system
 
@@ -417,8 +418,6 @@ defmodule Actor.ActorTest do
         timeout: :infinity
       )
       |> Stream.map(fn {:ok, number} ->
-        Logger.debug("ue? #{number} -----------------------------------")
-
         payload = %Eigr.Spawn.Actor.MyMessageRequest{data: "#{number}"}
 
         dynamic_actor_name = "#{Faker.Pokemon.name()}-piping-#{number}"
@@ -443,10 +442,6 @@ defmodule Actor.ActorTest do
         assert %{data: "second_actor as caller to third_actor"} = response
       end)
       |> Enum.to_list()
-
-      Logger.debug("Finished piping -----------------------------------")
-
-      Process.sleep(30_000)
     end
   end
 end

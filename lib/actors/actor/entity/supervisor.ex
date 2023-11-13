@@ -45,45 +45,15 @@ defmodule Actors.Actor.Entity.Supervisor do
   @spec lookup_or_create_actor(ActorSystem.t(), Actor.t(), any()) :: {:ok, any}
   def lookup_or_create_actor(system, actor, opts \\ [])
 
-  def lookup_or_create_actor(system, %Actor{} = actor, opts) when is_nil(system) do
-    revision = Keyword.get(opts, :revision, 0)
-
-    entity_state = %EntityState{
-      system: nil,
-      actor: actor,
-      revision: revision,
-      opts: opts
-    }
-
-    child_spec = %{
-      id: Actors.Actor.Entity,
-      start: {Actors.Actor.Entity, :start_link, [entity_state]},
-      restart: :transient
-    }
-
-    case DynamicSupervisor.start_child(via(child_spec), child_spec) do
-      {:error, {:already_started, pid}} ->
-        {:ok, pid}
-
-      {:ok, pid} ->
-        {:ok, pid}
-
-      {:error, {:name_conflict, {{Actors.Actor.Entity, name}, _f}, _registry, pid}} ->
-        Logger.warning("Name conflict on start Actor #{name} from PID #{inspect(pid)}.")
-
-        :ignore
-    end
-  end
-
   def lookup_or_create_actor(
-        %ActorSystem{name: actor_system} = _system,
+        actor_system,
         %Actor{} = actor,
         opts
       ) do
     revision = Keyword.get(opts, :revision, 0)
 
     entity_state = %EntityState{
-      system: actor_system,
+      system: Map.get(actor_system || %{}, :name),
       actor: actor,
       revision: revision,
       opts: opts

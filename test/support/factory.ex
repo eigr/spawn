@@ -96,7 +96,7 @@ defmodule Actors.FactoryTest do
     actor_name = attrs[:name] || "#{Faker.Superhero.name()} #{Faker.StarWars.character()}"
 
     %Actor{
-      id: %ActorId{name: actor_name},
+      id: %ActorId{name: actor_name, system: attrs[:system]},
       actions: attrs[:actions] || [build_actor_action()],
       settings: %ActorSettings{
         stateful: Keyword.get(attrs, :stateful, true),
