@@ -155,7 +155,7 @@ defmodule Spawn.Cluster.StateHandoff.Controllers.CrdtController do
   defp do_set_neighbours(this_crdt_pid) do
     nodes = Node.list()
 
-    Logger.debug("Sending :set_neighbours to #{inspect(nodes)} for #{inspect(this_crdt_pid)}")
+    Logger.notice("Sending :set_neighbours to #{inspect(nodes)} for #{inspect(this_crdt_pid)}")
 
     neighbours =
       :erpc.multicall(nodes, __MODULE__, :get_crdt_pid, [], @call_timeout)
