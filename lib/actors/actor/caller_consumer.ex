@@ -54,7 +54,7 @@ defmodule Actors.Actor.CallerConsumer do
 
   @impl true
   def init(opts) do
-    %{min_demand: min_demand, max_demand: max_demand} = get_backpressure_values_allowed(opts)
+    {min_demand, max_demand} = get_backpressure_values_allowed(opts)
 
     {:consumer, :ok,
      subscribe_to: [
@@ -77,9 +77,9 @@ defmodule Actors.Actor.CallerConsumer do
         max_pool_size = if max_pool_size > 0, do: max_pool_size, else: max_pool_size * -1
         min_pool_size = if min_pool_size > 0, do: min_pool_size, else: min_pool_size * -1
 
-        %{min_demand: min_pool_size, max_demand: max_pool_size}
+        {min_pool_size, max_pool_size}
       else
-        %{min_demand: actual_min_demand, max_demand: actual_max_demand}
+        {actual_min_demand, actual_max_demand}
       end
 
     Logger.debug(
