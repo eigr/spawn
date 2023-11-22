@@ -55,7 +55,6 @@ defmodule StatestoresMssql.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:vapor, "~> 0.10"},
       {:cloak_ecto, "~> 1.2"},
       {:ecto_sql, "~> 3.10"},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
