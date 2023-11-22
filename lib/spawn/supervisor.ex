@@ -3,40 +3,42 @@ defmodule Spawn.Supervisor do
   use Supervisor
   require Logger
 
+  alias Actors.Config.PersistentTermConfig, as: Config
+
   @shutdown_timeout_ms 330_000
 
-  def start_link(config) do
-    Supervisor.start_link(__MODULE__, config,
-      name: String.to_atom("#{String.capitalize(config.app_name)}.Cluster"),
+  def start_link(opts) do
+    Supervisor.start_link(__MODULE__, opts,
+      name: String.to_atom("#{String.capitalize(Config.get(:app_name))}.Cluster"),
       shutdown: @shutdown_timeout_ms
     )
   end
 
-  def child_spec(config) do
-    id = String.to_atom("#{String.capitalize(config.app_name)}.Cluster")
+  def child_spec(opts) do
+    id = String.to_atom("#{String.capitalize(Config.get(:app_name))}.Cluster")
 
     %{
       id: id,
-      start: {__MODULE__, :start_link, [config]}
+      start: {__MODULE__, :start_link, [opts]}
     }
   end
 
   @impl true
-  def init(config) do
+  def init(opts) do
     children =
       [
-        cluster_supervisor(config),
+        cluster_supervisor(opts),
         {Spawn.Cache.LookupCache, []},
-        Spawn.Cluster.StateHandoff.ManagerSupervisor.child_spec(config),
+        Spawn.Cluster.StateHandoff.ManagerSupervisor.child_spec(opts),
         Spawn.Cluster.Node.Registry.child_spec()
       ]
-      |> maybe_start_internal_nats(config)
+      |> maybe_start_internal_nats(opts)
 
     Supervisor.init(children, strategy: :one_for_one)
   end
 
-  defp maybe_start_internal_nats(children, config) do
-    case config.use_internal_nats do
+  defp maybe_start_internal_nats(children, opts) do
+    case Config.get(:use_internal_nats) do
       "false" ->
         children
 
@@ -45,26 +47,26 @@ defmodule Spawn.Supervisor do
 
         (children ++
            [
-             Spawn.Cluster.Node.ConnectionSupervisor.child_spec(config),
-             Spawn.Cluster.Node.ServerSupervisor.child_spec(config)
+             Spawn.Cluster.Node.ConnectionSupervisor.child_spec(opts),
+             Spawn.Cluster.Node.ServerSupervisor.child_spec(opts)
            ])
         |> List.flatten()
     end
   end
 
-  defp cluster_supervisor(config) do
-    cluster_strategy = config.proxy_cluster_strategy
+  defp cluster_supervisor(opts) do
+    cluster_strategy = Config.get(:proxy_cluster_strategy)
 
     topologies =
       case cluster_strategy do
         "epmd" ->
-          get_epmd_strategy(config)
+          get_epmd_strategy(opts)
 
         "gossip" ->
-          get_gossip_strategy(config)
+          get_gossip_strategy(opts)
 
         "kubernetes-dns" ->
-          get_k8s_dns_strategy(config)
+          get_k8s_dns_strategy(opts)
 
         _ ->
           Logger.warning("Invalid Topology")
@@ -74,11 +76,14 @@ defmodule Spawn.Supervisor do
       Logger.debug("Cluster topology #{inspect(topologies)}")
 
       {Cluster.Supervisor,
-       [topologies, [name: String.to_atom("#{String.capitalize(config.app_name)}.${__MODULE__}")]]}
+       [
+         topologies,
+         [name: String.to_atom("#{String.capitalize(Config.get(:app_name))}.${__MODULE__}")]
+       ]}
     end
   end
 
-  defp get_epmd_strategy(_config) do
+  defp get_epmd_strategy(_opts) do
     [
       proxy: [
         strategy: Cluster.Strategy.Epmd,
@@ -97,27 +102,27 @@ defmodule Spawn.Supervisor do
     ]
   end
 
-  defp get_gossip_strategy(config) do
+  defp get_gossip_strategy(_opts) do
     [
       proxy: [
         strategy: Cluster.Strategy.Gossip,
         config: [
-          reuseaddr: config.proxy_cluster_gossip_reuseaddr_address,
-          multicast_addr: config.proxy_cluster_gossip_multicast_address,
-          broadcast_only: config.proxy_cluster_gossip_broadcast_only
+          reuseaddr: Config.get(:proxy_cluster_gossip_reuseaddr_address),
+          multicast_addr: Config.get(:proxy_cluster_gossip_multicast_address),
+          broadcast_only: Config.get(:proxy_cluster_gossip_broadcast_only)
         ]
       ]
     ]
   end
 
-  defp get_k8s_dns_strategy(config),
+  defp get_k8s_dns_strategy(_opts),
     do: [
       proxy: [
         strategy: Elixir.Cluster.Strategy.Kubernetes.DNS,
         config: [
-          service: config.proxy_headless_service,
+          service: Config.get(:proxy_headless_service),
           application_name: "spawn",
-          polling_interval: config.proxy_cluster_polling_interval
+          polling_interval: Config.get(:proxy_cluster_polling_interval)
         ]
       ]
     ]

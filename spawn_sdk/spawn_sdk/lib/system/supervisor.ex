@@ -22,11 +22,11 @@ defmodule SpawnSdk.System.Supervisor do
   """
   use Supervisor
 
-  alias Actors.Config.Vapor, as: Config
+  alias Actors.Config.PersistentTermConfig, as: Config
 
   @impl true
   def init(opts) do
-    config = Config.load(__MODULE__)
+    Config.load()
 
     unless _system = opts[:system] do
       raise ArgumentError, "expected :system option to be given"
@@ -40,16 +40,16 @@ defmodule SpawnSdk.System.Supervisor do
     actors = Keyword.get(opts, :actors)
     extenal_subscribers = Keyword.get(opts, :extenal_subscribers, [])
 
-    if config.actor_system_name != system do
+    if Config.get(:actor_system_name) != system do
       raise ArgumentError,
-            "configured system (#{inspect(system)}) is different from env PROXY_ACTOR_SYSTEM_NAME (#{config.actor_system_name})"
+            "configured system (#{inspect(system)}) is different from env PROXY_ACTOR_SYSTEM_NAME (#{Config.get(:actor_system_name)})"
     end
 
     start_persisted_system(system)
 
     children =
       [
-        {Sidecar.Supervisor, config},
+        {Sidecar.Supervisor, []},
         %{
           id: :spawn_system_register_task,
           start:

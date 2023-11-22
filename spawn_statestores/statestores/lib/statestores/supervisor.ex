@@ -21,7 +21,6 @@ defmodule Statestores.Supervisor do
   def init(_args) do
     lookup_adapter = load_lookup_adapter()
     snapshot_adapter = load_snapshot_adapter()
-    Statestores.Config.load()
     Statestores.Migrator.migrate(snapshot_adapter)
     Statestores.Migrator.migrate(lookup_adapter)
 

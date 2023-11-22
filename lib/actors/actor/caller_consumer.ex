@@ -9,6 +9,7 @@ defmodule Actors.Actor.CallerConsumer do
   require OpenTelemetry.Tracer, as: Tracer
 
   alias Actors.Actor.CallerProducer
+  alias Actors.Config.PersistentTermConfig, as: Config
   alias Actors.Actor.Entity, as: ActorEntity
   alias Actors.Actor.Entity.Supervisor, as: ActorEntitySupervisor
   alias Actors.Actor.InvocationScheduler
@@ -45,8 +46,6 @@ defmodule Actors.Actor.CallerConsumer do
 
   @erpc_timeout 5_000
 
-  @pool_percent_factor 40
-
   def start_link(opts \\ []) do
     id = Keyword.get(opts, :id, 1)
     GenStage.start_link(__MODULE__, opts, name: Module.concat(__MODULE__, "#{id}"))
@@ -64,23 +63,9 @@ defmodule Actors.Actor.CallerConsumer do
 
   defp get_backpressure_values_allowed(opts) do
     index = Keyword.get(opts, :id, 0)
-    config = Keyword.get(opts, :config, %{})
-    actual_max_demand = config.actors_global_backpressure_max_demand
-    actual_min_demand = config.actors_global_backpressure_min_demand
-
-    backpressure_options =
-      if actual_max_demand == -1 && actual_min_demand == -1 do
-        base = 1 + @pool_percent_factor / 100
-        max_pool_size = round(config.proxy_db_pool_size * base)
-        min_pool_size = round(max_pool_size * 0.5)
-
-        max_pool_size = if max_pool_size > 0, do: max_pool_size, else: max_pool_size * -1
-        min_pool_size = if min_pool_size > 0, do: min_pool_size, else: min_pool_size * -1
-
-        {min_pool_size, max_pool_size}
-      else
-        {actual_min_demand, actual_max_demand}
-      end
+    actual_max_demand = Config.get(:actors_global_backpressure_max_demand)
+    actual_min_demand = Config.get(:actors_global_backpressure_min_demand)
+    backpressure_options = {actual_min_demand, actual_max_demand}
 
     Logger.debug(
       "Initialize Actor Event Consumer ID: #{index}. With Backpressure options: #{inspect(backpressure_options)}"

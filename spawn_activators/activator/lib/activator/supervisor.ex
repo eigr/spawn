@@ -5,21 +5,21 @@ defmodule Activator.Supervisor do
 
   alias Spawn.Cluster.Node.ConnectionSupervisor
 
-  def start_link(config) do
-    Supervisor.start_link(__MODULE__, config, name: __MODULE__)
+  def start_link(opts) do
+    Supervisor.start_link(__MODULE__, opts, name: __MODULE__)
   end
 
-  def child_spec(config) do
+  def child_spec(opts) do
     %{
       id: __MODULE__,
-      start: {__MODULE__, :start_link, [config]}
+      start: {__MODULE__, :start_link, [opts]}
     }
   end
 
   @impl true
-  def init(config) do
+  def init(opts) do
     children = [
-      ConnectionSupervisor.child_spec(config)
+      ConnectionSupervisor.child_spec(opts)
     ]
 
     Supervisor.init(children, strategy: :one_for_one)

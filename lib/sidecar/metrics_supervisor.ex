@@ -3,26 +3,29 @@ defmodule Sidecar.MetricsSupervisor do
   use Supervisor
   import Telemetry.Metrics
 
-  def start_link(config) do
-    Supervisor.start_link(__MODULE__, config, name: __MODULE__)
+  alias Actors.Config.PersistentTermConfig, as: Config
+
+  def start_link(opts) do
+    Supervisor.start_link(__MODULE__, opts, name: __MODULE__)
   end
 
-  def init(config) do
-    children = if config.proxy_disable_metrics, do: [], else: get_metrics_supervisor_tree(config)
+  def init(opts) do
+    children =
+      if Config.get(:proxy_disable_metrics), do: [], else: get_metrics_supervisor_tree(opts)
 
     Supervisor.init(children, strategy: :one_for_one)
   end
 
-  defp get_metrics_supervisor_tree(config) do
-    if config.proxy_console_metrics do
+  defp get_metrics_supervisor_tree(opts) do
+    if Config.get(:proxy_console_metrics) do
       [
-        {:telemetry_poller, measurements: periodic_measurements(config)},
+        {:telemetry_poller, measurements: periodic_measurements(opts)},
         {TelemetryMetricsPrometheus.Core, name: :spawm_metrics, metrics: metrics()},
         {Telemetry.Metrics.ConsoleReporter, metrics: metrics()}
       ]
     else
       [
-        {:telemetry_poller, measurements: periodic_measurements(config)},
+        {:telemetry_poller, measurements: periodic_measurements(opts)},
         {TelemetryMetricsPrometheus.Core, name: :spawm_metrics, metrics: metrics()}
       ]
     end
@@ -52,11 +55,11 @@ defmodule Sidecar.MetricsSupervisor do
     ]
   end
 
-  defp periodic_measurements(config) do
+  defp periodic_measurements(opts) do
     [
       {:process_info,
        event: [:spawn, :actor], name: Actors.Actor.Entity, keys: [:message_queue_len, :memory]},
-      {Sidecar.Measurements, :stats, [config]}
+      {Sidecar.Measurements, :stats, [opts]}
     ]
   end
 end

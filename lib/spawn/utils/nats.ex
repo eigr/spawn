@@ -1,6 +1,7 @@
 defmodule Spawn.Utils.Nats do
   @moduledoc false
 
+  alias Actors.Config.PersistentTermConfig, as: Config
   alias Eigr.Functions.Protocol.InvocationRequest
 
   import Spawn.Utils.Common, only: [to_existing_atom_or_new: 1]
@@ -28,8 +29,8 @@ defmodule Spawn.Utils.Nats do
   @spec connection_name() :: atom()
   def connection_name(), do: to_existing_atom_or_new("spawn.internal.nats")
 
-  def get_internal_nats_connection(config) do
-    raw_hosts = config.internal_nats_hosts
+  def get_internal_nats_connection(_opts) do
+    raw_hosts = Config.get(:internal_nats_hosts)
     hosts_conn_map = get_nats_hosts(raw_hosts)
 
     # TODO: Get other parameters here to build complex connections
@@ -37,9 +38,9 @@ defmodule Spawn.Utils.Nats do
     hosts_conn_map
   end
 
-  @spec get_nats_connection(map()) :: map()
-  def get_nats_connection(config) do
-    raw_hosts = config.pubsub_adapter_nats_hosts
+  @spec get_nats_connection(Keyword.t()) :: map()
+  def get_nats_connection(_opts) do
+    raw_hosts = Config.get(:pubsub_adapter_nats_hosts)
     hosts_conn_map = get_nats_hosts(raw_hosts)
 
     # TODO: Get other parameters here to build complex connections

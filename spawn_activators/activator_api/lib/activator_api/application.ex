@@ -3,7 +3,7 @@ defmodule ActivatorAPI.Application do
 
   use Application
 
-  alias Actors.Config.Vapor, as: Config
+  Actors.Config.PersistentTermConfig as: Config
   alias ActivatorAPI.Api.Discovery
   alias ActivatorAPI.GrpcServer, as: Server
 
@@ -11,20 +11,20 @@ defmodule ActivatorAPI.Application do
 
   @impl true
   def start(_type, _args) do
-    config = Config.load(__MODULE__)
+    Config.load()
 
     children =
       [
-        Activator.Supervisor.child_spec(config),
-        {Bandit, plug: ActivatorAPI.Router, scheme: :http, port: get_http_port(config)}
+        Activator.Supervisor.child_spec([]),
+        {Bandit, plug: ActivatorAPI.Router, scheme: :http, port: get_http_port()}
       ]
-      |> put_grpc_server(config)
+      |> put_grpc_server()
 
     opts = [strategy: :one_for_one, name: ActivatorAPI.Supervisor]
     Supervisor.start_link(children, opts)
   end
 
-  defp put_grpc_server(children, config) do
+  defp put_grpc_server(children) do
     builders = [
       %{
         service_name: "io.eigr.spawn.example.TestService",

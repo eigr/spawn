@@ -5,24 +5,24 @@ defmodule Sidecar.ProcessSupervisor do
   @shutdown_timeout_ms 330_000
 
   @impl true
-  def init(config) do
+  def init(opts) do
     children =
       [
-        {Sidecar.MetricsSupervisor, config},
+        {Sidecar.MetricsSupervisor, opts},
         statestores(),
-        Spawn.Supervisor.child_spec(config),
-        Actors.Supervisors.ProtocolSupervisor.child_spec(config),
-        Actors.Supervisors.ActorSupervisor.child_spec(config)
+        Spawn.Supervisor.child_spec(opts),
+        Actors.Supervisors.ProtocolSupervisor.child_spec(opts),
+        Actors.Supervisors.ActorSupervisor.child_spec(opts)
       ]
       |> Enum.reject(&is_nil/1)
 
     Supervisor.init(children, strategy: :one_for_one)
   end
 
-  def start_link(config) do
+  def start_link(opts) do
     Supervisor.start_link(
       __MODULE__,
-      config,
+      opts,
       name: __MODULE__,
       # wait until for 5 and a half minutes
       shutdown: @shutdown_timeout_ms,

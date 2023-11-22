@@ -3,5 +3,7 @@ defmodule Activator do
   Documentation for `Activator`.
   """
 
-  def get_http_port(config), do: config.http_port
+  alias Actors.Config.PersistentTermConfig, as: Config
+
+  def get_http_port(_opts), do: Config.get(:http_port)
 end

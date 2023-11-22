@@ -2,8 +2,8 @@ defmodule Spawn.InitializerHelper do
   @moduledoc false
 
   def setup do
-    config = Actors.Config.Vapor.load(__MODULE__)
-    result = Sidecar.Supervisor.start_link(config)
+    Actors.Config.PersistentTermConfig.load()
+    result = Sidecar.Supervisor.start_link([])
 
     Spawn.Cluster.StateHandoff.Manager.clean(Node.self())
 

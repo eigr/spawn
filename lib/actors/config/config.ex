@@ -3,7 +3,7 @@ defmodule Actors.Config do
   `Config` defines methods that allow recovery of system settings
   """
 
-  @callback load(module) :: map()
+  @callback load() :: map()
 
-  @callback get(module, atom()) :: any()
+  @callback get(atom()) :: any()
 end
