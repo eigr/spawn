@@ -7,22 +7,23 @@ defmodule Actors.Supervisors.ActorSupervisor do
   @shutdown_timeout_ms 330_000
 
   alias Actors.Actor.CallerProducer
+  alias Actors.Config.PersistentTermConfig, as: Config
 
   @base_app_dir File.cwd!()
 
-  def start_link(config) do
-    Supervisor.start_link(__MODULE__, config, name: __MODULE__, shutdown: @shutdown_timeout_ms)
+  def start_link(opts) do
+    Supervisor.start_link(__MODULE__, opts, name: __MODULE__, shutdown: @shutdown_timeout_ms)
   end
 
-  def child_spec(config) do
+  def child_spec(opts) do
     %{
       id: __MODULE__,
-      start: {__MODULE__, :start_link, [config]}
+      start: {__MODULE__, :start_link, [opts]}
     }
   end
 
   @impl true
-  def init(config) do
+  def init(opts) do
     Protobuf.load_extensions()
     get_acl_manager().load_acl_policies("#{@base_app_dir}/policies")
 
@@ -30,16 +31,16 @@ defmodule Actors.Supervisors.ActorSupervisor do
       Enum.into(1..@max_consumers, [], fn index ->
         %{
           id: index,
-          start: {Actors.Actor.CallerConsumer, :start_link, [[id: index, config: config]]}
+          start: {Actors.Actor.CallerConsumer, :start_link, [[id: index, opts: opts]]}
         }
       end)
 
     children =
       [
-        get_pubsub_adapter(config),
-        Actors.Actor.Entity.Supervisor.child_spec(config)
+        get_pubsub_adapter(opts),
+        Actors.Actor.Entity.Supervisor.child_spec(opts)
       ] ++
-        maybe_add_invocation_scheduler(config) ++
+        maybe_add_invocation_scheduler(opts) ++
         [{CallerProducer, []}] ++ consumers
 
     Supervisor.init(children, strategy: :one_for_one)
@@ -48,22 +49,22 @@ defmodule Actors.Supervisors.ActorSupervisor do
   defp get_acl_manager(),
     do: Application.get_env(:spawn, :acl_manager, Actors.Security.Acl.DefaultAclManager)
 
-  defp maybe_add_invocation_scheduler(config) do
-    if config.delayed_invokes == "true" do
+  defp maybe_add_invocation_scheduler(_opts) do
+    if Config.get(:delayed_invokes) do
       [{Highlander, Actors.Actor.InvocationScheduler.child_spec()}]
     else
       []
     end
   end
 
-  defp get_pubsub_adapter(config) do
-    case config.pubsub_adapter do
+  defp get_pubsub_adapter(opts) do
+    case Config.get(:pubsub_adapter) do
       "nats" ->
         {
           Phoenix.PubSub,
           name: :actor_channel,
           adapter: PhoenixPubsubNats,
-          connection: Spawn.Utils.Nats.get_nats_connection(config)
+          connection: Spawn.Utils.Nats.get_nats_connection(opts)
         }
 
       _ ->

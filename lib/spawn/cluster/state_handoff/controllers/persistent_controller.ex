@@ -11,7 +11,7 @@ defmodule Spawn.Cluster.StateHandoff.Controllers.PersistentController do
 
   @type node_type :: term()
 
-  @type config :: map()
+  @type opts :: Keyword.t()
 
   @type data :: any()
 
@@ -48,8 +48,8 @@ defmodule Spawn.Cluster.StateHandoff.Controllers.PersistentController do
   end
 
   @impl true
-  @spec handle_init(config()) :: new_data() | {new_data(), timer()}
-  def handle_init(_config) do
+  @spec handle_init(opts()) :: new_data() | {new_data(), timer()}
+  def handle_init(_opts) do
     backend = Application.get_env(@otp_app, :state_handoff_controller_persistent_backend)
     %{backend_adapter: backend}
   end

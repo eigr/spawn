@@ -32,6 +32,7 @@ defmodule Actors.ActorRegistryTest do
              Spawn.NodeHelper.rpc(peer_node_name, ActorRegistry, :get_hosts_by_actor, [actor_id])
 
     # also present in self node
+
     assert {:ok, [%{node: ^peer_node_name}]} =
              loop_until_ok(fn -> ActorRegistry.get_hosts_by_actor(actor_id) end)
 

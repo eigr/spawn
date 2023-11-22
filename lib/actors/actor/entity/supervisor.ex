@@ -10,17 +10,18 @@ defmodule Actors.Actor.Entity.Supervisor do
   require Logger
 
   alias Actors.Actor.Entity.EntityState
+  alias Actors.Config.PersistentTermConfig, as: Config
   alias Eigr.Functions.Protocol.Actors.{Actor, ActorSystem}
 
   @default_number_of_partitions 8
 
-  def child_spec(config) do
+  def child_spec(_opts) do
     {
       PartitionSupervisor,
       child_spec: DynamicSupervisor,
       name: __MODULE__,
-      max_restarts: config.actors_max_restarts,
-      max_seconds: config.actors_max_seconds,
+      max_restarts: Config.get(:actors_max_restarts),
+      max_seconds: Config.get(:actors_max_seconds),
       partitions: get_number_of_partitions()
     }
   end

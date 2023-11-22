@@ -4,7 +4,7 @@ defmodule Spawn.Cluster.StateHandoff.ControllerBehaviour do
   """
   @type node_type :: term()
 
-  @type config :: map()
+  @type opts :: Keyword.t()
 
   @type data :: any()
 
@@ -34,7 +34,7 @@ defmodule Spawn.Cluster.StateHandoff.ControllerBehaviour do
   Any initialization code required by implementations of this behavior.
   Must return the state to be added in the StateHandoffManager.
   """
-  @callback handle_init(config()) :: new_data() | {new_data(), timer()}
+  @callback handle_init(opts()) :: new_data() | {new_data(), timer()}
 
   @doc """
   Any procedure to be executed after the StateHandoffManager is initialized.

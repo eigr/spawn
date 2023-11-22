@@ -3,7 +3,7 @@ defmodule Proxy.Application do
   use Application
   require Logger
 
-  alias Actors.Config.Vapor, as: Config
+  alias Actors.Config.PersistentTermConfig, as: Config
 
   @impl true
   def start(type, args), do: do_start(type, args)
@@ -11,10 +11,11 @@ defmodule Proxy.Application do
   defp do_start(_type, _args) do
     {u_secs, reply} =
       :timer.tc(fn ->
-        config = Config.load(__MODULE__)
+        Config.load()
+        Logger.configure(level: Config.get(:logger_level))
 
         children = [
-          {Proxy.Supervisor, config}
+          {Proxy.Supervisor, []}
         ]
 
         opts = [strategy: :one_for_one, name: Proxy.RootSupervisor]

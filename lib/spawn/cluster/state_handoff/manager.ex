@@ -20,7 +20,7 @@ defmodule Spawn.Cluster.StateHandoff.Manager do
   end
 
   @impl true
-  def init(config) do
+  def init(opts) do
     controller =
       Application.get_env(
         :spawn,
@@ -28,9 +28,9 @@ defmodule Spawn.Cluster.StateHandoff.Manager do
         Spawn.Cluster.StateHandoff.Controllers.PersistentController
       )
 
-    do_init(config)
+    do_init(opts)
 
-    case controller.handle_init(config) do
+    case controller.handle_init(opts) do
       {initial_state, {evt, delay} = _scheduler} ->
         timer = Process.send_after(self(), {:timer, evt}, delay)
 

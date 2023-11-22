@@ -5,7 +5,7 @@ defmodule Actors.Node.Client do
   """
   use Tesla
 
-  alias Actors.Config.Vapor, as: Config
+  alias Actors.Config.PersistentTermConfig, as: Config
 
   import Spawn.Utils.Common, only: [to_existing_atom_or_new: 1]
 
@@ -13,7 +13,7 @@ defmodule Actors.Node.Client do
 
   plug(
     Tesla.Middleware.BaseUrl,
-    "http://#{Config.get(Actors, :user_function_host)}:#{Config.get(Actors, :user_function_port)}"
+    "http://#{Config.get(:user_function_host)}:#{Config.get(:user_function_port)}"
   )
 
   plug(Tesla.Middleware.Headers, [
@@ -51,12 +51,12 @@ defmodule Actors.Node.Client do
   end
 
   defp get_deployment_mode() do
-    Config.get(Actors, :deployment_mode)
+    Config.get(:deployment_mode)
     |> to_existing_atom_or_new()
   end
 
   defp get_host_address(:sidecar, _opts) do
-    "#{get_protocol()}://#{Config.get(Actors, :user_function_host)}:#{Config.get(Actors, :user_function_port)}"
+    "#{get_protocol()}://#{Config.get(:user_function_host)}:#{Config.get(:user_function_port)}"
   end
 
   defp get_host_address(:daemon, opts) do

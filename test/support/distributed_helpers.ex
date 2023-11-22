@@ -1,5 +1,7 @@
 defmodule Spawn.DistributedHelpers do
-  def loop_until_ok(func, timeout \\ 10_000) do
+  @moduledoc false
+
+  def loop_until_ok(func, timeout \\ 30_000) do
     task = Task.async(fn -> do_loop(func, func.()) end)
 
     Task.await(task, timeout)

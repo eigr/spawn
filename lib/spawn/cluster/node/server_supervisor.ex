@@ -4,27 +4,28 @@ defmodule Spawn.Cluster.Node.ServerSupervisor do
 
   require Logger
 
+  alias Actors.Config.PersistentTermConfig, as: Config
   alias Spawn.Utils.Nats
 
-  def start_link(config) do
-    Supervisor.start_link(__MODULE__, config,
-      name: String.to_atom("#{String.capitalize(config.actor_system_name)}.NodeServer")
+  def start_link(opts) do
+    Supervisor.start_link(__MODULE__, opts,
+      name: String.to_atom("#{String.capitalize(Config.get(:actor_system_name))}.NodeServer")
     )
   end
 
-  def child_spec(config) do
-    id = String.to_atom("#{String.capitalize(config.actor_system_name)}.NodeServer")
+  def child_spec(opts) do
+    id = String.to_atom("#{String.capitalize(Config.get(:actor_system_name))}.NodeServer")
 
     %{
       id: id,
-      start: {__MODULE__, :start_link, [config]}
+      start: {__MODULE__, :start_link, [opts]}
     }
   end
 
   @impl true
-  def init(config) do
+  def init(_opts) do
     connection_name = Nats.connection_name()
-    topic = Nats.get_topic(config.actor_system_name)
+    topic = Nats.get_topic(Config.get(:actor_system_name))
 
     Logger.debug(
       "Mapping Node #{inspect(Node.self())} to Nats Topic #{topic} on Connection #{inspect(connection_name)}"

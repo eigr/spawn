@@ -12,13 +12,15 @@ defmodule Spawn.Cluster.StateHandoff.Controllers.CrdtController do
   require Iter
   require Logger
 
-  @behaviour Spawn.Cluster.StateHandoff.ControllerBehaviour
+  alias Actors.Config.PersistentTermConfig, as: Config
 
   import Spawn.Utils.Common, only: [generate_key: 1]
 
+  @behaviour Spawn.Cluster.StateHandoff.ControllerBehaviour
+
   @type node_type :: term()
 
-  @type config :: map()
+  @type opts :: Keyword.t()
 
   @type data :: any()
 
@@ -33,11 +35,6 @@ defmodule Spawn.Cluster.StateHandoff.Controllers.CrdtController do
   @type timer :: {atom(), integer()}
 
   @call_timeout 15_000
-
-  @default_sync_interval 2
-  @default_ship_interval 2
-  @default_ship_debounce 2
-  @default_neighbours_sync_interval 60_000
 
   def get_crdt_pid do
     :persistent_term.get(__MODULE__, {:error, Node.self()})
@@ -75,16 +72,15 @@ defmodule Spawn.Cluster.StateHandoff.Controllers.CrdtController do
   end
 
   @impl true
-  @spec handle_init(config()) :: new_data() | {new_data(), timer()}
-  def handle_init(config) do
-    pooling_interval =
-      Map.get(config, :neighbours_sync_interval, @default_neighbours_sync_interval)
+  @spec handle_init(opts()) :: new_data() | {new_data(), timer()}
+  def handle_init(_opts) do
+    pooling_interval = Config.get(:neighbours_sync_interval)
 
     {:ok, crdt_pid} =
       DeltaCrdt.start_link(DeltaCrdt.AWLWWMap,
-        sync_interval: Map.get(config, :sync_interval, @default_sync_interval),
-        ship_interval: Map.get(config, :ship_interval, @default_ship_interval),
-        ship_debounce: Map.get(config, :ship_debounce, @default_ship_debounce)
+        sync_interval: Config.get(:sync_interval),
+        ship_interval: Config.get(:ship_interval),
+        ship_debounce: Config.get(:ship_debounce)
       )
 
     :persistent_term.put(__MODULE__, crdt_pid)

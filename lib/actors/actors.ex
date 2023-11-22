@@ -8,7 +8,7 @@ defmodule Actors do
   require Logger
 
   alias Actors.Actor.CallerProducer
-  alias Actors.Config.Vapor, as: Config
+  alias Actors.Config.PersistentTermConfig, as: Config
 
   alias Eigr.Functions.Protocol.Actors.{
     ActorId,
@@ -70,7 +70,7 @@ defmodule Actors do
         } = request,
         opts \\ []
       ) do
-    case Config.get(Actors, :actor_system_name) do
+    case Config.get(:actor_system_name) do
       name when name === system_name ->
         CallerProducer.invoke(request, opts)
 

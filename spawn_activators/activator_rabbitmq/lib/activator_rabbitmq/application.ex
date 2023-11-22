@@ -4,15 +4,15 @@ defmodule ActivatorRabbitMQ.Application do
   use Application
   require Logger
 
-  alias Actors.Config.Vapor, as: Config
+  Actors.Config.PersistentTermConfig as: Config
   alias ActivatorRabbitmq.Supervisor, as: RabbitMQConsumerSupervisor
 
   @impl true
   def start(_type, _args) do
-    config = Config.load(__MODULE__)
+    Config.load()
 
     children = [
-      {RabbitMQConsumerSupervisor, config}
+      {RabbitMQConsumerSupervisor, []}
     ]
 
     opts = [strategy: :one_for_one, name: ActivatorRabbitMQ.Supervisor]
