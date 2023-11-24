@@ -86,7 +86,8 @@ defmodule Actors do
     * `opts` - The options to Invoke Actors
   ##
   """
-  @spec invoke(InvocationRequest.t()) :: {:ok, :async} | {:ok, term()} | {:error, term()}
+  @spec invoke_with_nats(InvocationRequest.t(), Keyword.t()) ::
+          {:ok, :async} | {:ok, term()} | {:error, term()}
   def invoke_with_nats(
         %InvocationRequest{
           actor: actor,

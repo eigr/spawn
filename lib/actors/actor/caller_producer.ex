@@ -3,6 +3,7 @@ defmodule Actors.Actor.CallerProducer do
   require Logger
 
   alias Actors.Actor.CallerConsumer
+  alias Actors.Config.PersistentTermConfig, as: Config
   alias Eigr.Functions.Protocol.Actors.ActorId
 
   alias Eigr.Functions.Protocol.{
@@ -22,7 +23,7 @@ defmodule Actors.Actor.CallerProducer do
 
   @spec get_state(ActorId.t()) :: {:ok, term()} | {:error, term()}
   def get_state(actor_id, opts \\ []) do
-    if Application.get_env(:spawn, :actors_global_backpressure_enabled, false) do
+    if Config.get(:actors_global_backpressure_enabled) do
       GenStage.call(__MODULE__, {:enqueue, {:get_state, actor_id, opts}}, :infinity)
     else
       CallerConsumer.get_state(actor_id)
@@ -32,7 +33,7 @@ defmodule Actors.Actor.CallerProducer do
   @spec register(RegistrationRequest.t(), any()) ::
           {:ok, RegistrationResponse.t()} | {:error, RegistrationResponse.t()}
   def register(registration, opts \\ []) do
-    if Application.get_env(:spawn, :actors_global_backpressure_enabled, false) do
+    if Config.get(:actors_global_backpressure_enabled) do
       GenStage.call(__MODULE__, {:enqueue, {:register, registration, opts}}, :infinity)
     else
       CallerConsumer.register(registration, opts)
@@ -41,7 +42,7 @@ defmodule Actors.Actor.CallerProducer do
 
   @spec spawn_actor(SpawnRequest.t(), any()) :: {:ok, SpawnResponse.t()}
   def spawn_actor(spawn_req, opts \\ []) do
-    if Application.get_env(:spawn, :actors_global_backpressure_enabled, false) do
+    if Config.get(:actors_global_backpressure_enabled) do
       GenStage.call(__MODULE__, {:enqueue, {:spawn_actor, spawn_req, opts}}, :infinity)
     else
       CallerConsumer.spawn_actor(spawn_req, opts)
@@ -52,7 +53,7 @@ defmodule Actors.Actor.CallerProducer do
   def invoke(request, opts \\ [])
 
   def invoke(%InvocationRequest{} = request, opts) do
-    if Application.get_env(:spawn, :actors_global_backpressure_enabled, false) do
+    if Config.get(:actors_global_backpressure_enabled) do
       if request.async do
         GenStage.cast(__MODULE__, {:enqueue, {:invoke, request, opts}})
         {:ok, :async}
