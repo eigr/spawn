@@ -112,6 +112,10 @@ defmodule Actors.Registry.ActorRegistry do
   Fetch current entities of the service.
   Returns `HostActor` with Host and specific actor.
   """
+  @doc """
+  Fetch current entities of the service.
+  Returns `HostActor` with Host and specific actor.
+  """
   @doc since: "0.1.0"
   @spec lookup(ActorId.t(), Keyword.t()) :: {:ok, HostActor.t()} | {:not_found, []}
   def lookup(id, opts \\ []) do
@@ -120,20 +124,38 @@ defmodule Actors.Registry.ActorRegistry do
         {:not_found, []}
 
       state_hosts ->
-        parent_name = Keyword.fetch!(opts, :parent)
+        parent_name = Keyword.get(opts, :parent, nil)
         filter_by_parent? = Keyword.get(opts, :filter_by_parent, false)
 
-        filter(state_hosts, filter_by_parent?, id, parent_name)
-        |> then(fn
-          [] ->
-            {:not_found, []}
-
-          hosts ->
-            choose_hosts(hosts, filter_by_parent?, id, parent_name)
-        end)
+        case filter(state_hosts, filter_by_parent?, id) do
+          [] -> {:not_found, []}
+          hosts -> choose_hosts(hosts, filter_by_parent?, id, parent_name)
+        end
     end
   end
 
+  @doc """
+  Retrieves a list of hosts associated with a given actor.
+  Parameters
+
+  actor_id (%ActorId{}): The ID of the actor.
+  opts (Keyword, optional): Options for the function.
+      :parent (boolean): If true, filter hosts by parent; otherwise, filter by name.
+
+  Returns
+
+  {:ok, hosts}: A tuple with :ok and a list of hosts.
+  {:not_found, []}: If no hosts are found.
+
+  Examples
+
+  ```elixir
+  actor_id = %ActorId{parent: "parent", name: "name"}
+  opts = [parent: true]
+  {:ok, hosts} = Actors.Registry.ActorRegistry.get_hosts_by_actor(actor_id, opts)
+
+  ```
+  """
   @spec get_hosts_by_actor(ActorId.t(), Keyword.t()) :: {:ok, Member.t()} | {:not_found, []}
   def get_hosts_by_actor(
         %ActorId{parent: parent, name: name} = actor_id,
@@ -153,27 +175,23 @@ defmodule Actors.Registry.ActorRegistry do
         {:not_found, []}
 
       hosts ->
-        Enum.filter(hosts, fn ac -> ac.actor.id.name == actor_name end)
+        Enum.filter(hosts, &(&1.actor.id.name == actor_name))
         |> then(fn
-          [] ->
-            {:not_found, []}
-
-          hosts ->
-            {:ok, hosts}
+          [] -> {:not_found, []}
+          hosts -> {:ok, hosts}
         end)
     end
   end
 
-  defp filter(hosts, filter_by_parent?, %ActorId{name: actor_name} = _id, parent_name) do
-    case filter_by_parent? do
-      true ->
-        Enum.filter(hosts, fn ac ->
-          ac.actor.id.parent == parent_name
-        end)
-
-      _ ->
-        Enum.filter(hosts, fn ac -> ac.actor.id.name == actor_name end)
-    end
+  # This version combines the conditions into a single expression for brevity while retaining the core logic.
+  # It uses the && and || operators to express the conditions more succinctly.
+  # It's important to note that this optimization sacrifices some readability for brevity.
+  # As always, when prioritizing performance,
+  defp filter(hosts, filter_by_parent?, %ActorId{name: actor_name, parent: parent_name}) do
+    Enum.filter(hosts, fn ac ->
+      (filter_by_parent? && ac.actor.id.parent == parent_name) ||
+        (not filter_by_parent? && ac.actor.id.name == actor_name)
+    end)
   end
 
   defp choose_hosts(hosts, filter_by_parent?, %ActorId{name: _actor_name} = _id, parent_name) do

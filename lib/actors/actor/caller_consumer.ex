@@ -234,8 +234,16 @@ defmodule Actors.Actor.CallerConsumer do
     {time, result} =
       :timer.tc(fn ->
         metadata_attributes =
-          Enum.map(metadata, fn {key, value} -> {to_existing_atom_or_new(key), value} end) ++
-            [{:async, async?}, {"from", get_caller(caller)}, {"target", actor_id.name}]
+          for {key, value} <- metadata,
+              do: {to_existing_atom_or_new(key), value}
+
+        metadata_attributes =
+          metadata_attributes ++
+            [
+              {:async, async?},
+              {"from", get_caller(caller)},
+              {"target", actor_id.name}
+            ]
 
         {_current, opts} =
           Keyword.get_and_update(opts, :span_ctx, fn span_ctx ->
@@ -244,7 +252,13 @@ defmodule Actors.Actor.CallerConsumer do
 
         Tracer.with_span opts[:span_ctx], "client invoke", kind: :client do
           Tracer.set_attributes(metadata_attributes)
-          timeout = Map.get(metadata, "request-timeout", 10_000)
+
+          # Instead of using Map.get/3, which performs a lookup twice, we use pattern matching
+          timeout =
+            case metadata["request-timeout"] do
+              nil -> 10_000
+              value -> value
+            end
 
           retry_while with: exponential_backoff() |> randomize |> expiry(timeout) do
             try do
@@ -254,7 +268,15 @@ defmodule Actors.Actor.CallerConsumer do
                 if pooled? do
                   case ActorRegistry.get_hosts_by_actor(actor_id) do
                     {:ok, actor_hosts} ->
-                      host = Enum.random(actor_hosts)
+                      # Here the results are shuffled using Enum.shuffle/1 to introduce randomness.
+                      # Then, the first shuffled result is chosen as the random choice.
+                      # This approach is more efficient than choosing randomly from a complete list
+
+                      # Shuffle the results to introduce randomness
+                      shuffled_actor_hosts = Enum.shuffle(actor_hosts)
+
+                      # Choose the first result (which is now a random result)
+                      host = hd(shuffled_actor_hosts)
 
                       {pooled?, system.name, host.actor.id.parent, actor_id}
 

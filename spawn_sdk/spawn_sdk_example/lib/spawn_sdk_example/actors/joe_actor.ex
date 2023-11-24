@@ -2,7 +2,7 @@ defmodule SpawnSdkExample.Actors.JoeActor do
   use SpawnSdk.Actor,
     name: "joe",
     state_type: Io.Eigr.Spawn.Example.MyState,
-    deactivate_timeout: 10_000,
+    deactivate_timeout: 60_000,
     snapshot_timeout: 2_000
 
   require Logger

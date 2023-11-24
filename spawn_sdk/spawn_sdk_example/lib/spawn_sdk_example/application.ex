@@ -16,10 +16,10 @@ defmodule SpawnSdkExample.Application do
           SpawnSdkExample.Actors.PubSubActor
           # Pooled Actors have been removed and will be restructured in the future
           # SpawnSdkExample.Actors.PooledActor
-        ],
-        extenal_subscribers: [
-          {SpawnSdkExample.Subscriber, []}
         ]
+        # extenal_subscribers: [
+        #   {SpawnSdkExample.Subscriber, []}
+        # ]
       }
     ]
 
