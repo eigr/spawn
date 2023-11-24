@@ -97,7 +97,7 @@ defmodule Actors.Actor.CallerConsumer do
   end
 
   defp dispatch_to_actor({from, {:invoke, request, opts}} = _producer_event) do
-    if request.register_ref != "" do
+    if request.register_ref != "" and not is_nil(request.register_ref) do
       spawn_req = %SpawnRequest{
         actors: [%ActorId{request.actor.id | parent: request.register_ref}]
       }
@@ -542,7 +542,7 @@ defmodule Actors.Actor.CallerConsumer do
   defp is_selectable?(
          {_actor_name,
           %Actor{
-            metadata: %Metadata{channel_group: channel},
+            metadata: %Metadata{channel_group: channel_group},
             settings: %ActorSettings{stateful: stateful, kind: kind}
           } = _actor}
        ) do
@@ -553,7 +553,7 @@ defmodule Actors.Actor.CallerConsumer do
       match?(true, stateful) and kind != :UNAMED ->
         true
 
-      not is_nil(channel) and byte_size(channel) > 0 ->
+      not is_nil(channel_group) and length(channel_group) > 0 ->
         true
 
       true ->

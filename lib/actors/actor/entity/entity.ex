@@ -206,12 +206,6 @@ defmodule Actors.Actor.Entity do
       {:invoke_timer_action, action} ->
         Invocation.timer_invoke(action, state)
 
-      {:receive, cmd, payload, invocation} ->
-        Invocation.broadcast_invoke(cmd, payload, invocation, state)
-
-      {:receive, payload} ->
-        Invocation.broadcast_invoke(payload, state)
-
       action ->
         do_handle_info(action, state)
     end

@@ -21,7 +21,9 @@ defmodule SpawnSdk.System.SpawnSystem do
     FixedTimerAction,
     Metadata,
     Registry,
-    TimeoutStrategy
+    TimeoutStrategy,
+    ActorDeactivationStrategy,
+    Channel
   }
 
   alias Eigr.Functions.Protocol.{
@@ -335,23 +337,13 @@ defmodule SpawnSdk.System.SpawnSystem do
 
   defp handle_broadcast(
          %SpawnSdk.Value{
-           broadcast:
-             %SpawnSdk.Flow.Broadcast{channel: channel, action: action, payload: payload} =
-               _broadcast
+           broadcast: %SpawnSdk.Flow.Broadcast{channel: channel, payload: payload} = _broadcast
          } = _value
        ) do
-    cmd =
-      cond do
-        is_nil(action) -> action
-        is_atom(action) -> Atom.to_string(action)
-        true -> action
-      end
-
     payload = parse_payload(payload)
 
     %Eigr.Functions.Protocol.Broadcast{
       channel_group: channel,
-      action_name: cmd,
       payload: payload
     }
   end
@@ -518,7 +510,6 @@ defmodule SpawnSdk.System.SpawnSystem do
     actors
     |> Enum.into(%{}, fn actor ->
       name = actor.__meta__(:name)
-      channel = actor.__meta__(:channel)
       kind = actor.__meta__(:kind)
       actions = actor.__meta__(:actions)
       stateful = actor.__meta__(:stateful)
@@ -538,10 +529,17 @@ defmodule SpawnSdk.System.SpawnSystem do
         strategy: {:timeout, %TimeoutStrategy{timeout: deactivate_timeout}}
       }
 
+      channel_group =
+        actor.__meta__(:channel_group)
+        |> Enum.map(fn
+          {topic, action} -> %Channel{topic: topic, action: action}
+          topic when is_binary(topic) -> %Channel{topic: topic, action: "receive"}
+        end)
+
       {name,
        %Actor{
          id: %ActorId{system: system, name: name},
-         metadata: %Metadata{channel_group: channel},
+         metadata: %Metadata{channel_group: channel_group},
          settings: %ActorSettings{
            kind: decode_kind(kind),
            stateful: stateful,

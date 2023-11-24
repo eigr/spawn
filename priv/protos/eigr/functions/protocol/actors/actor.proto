@@ -66,13 +66,22 @@ message ActorState {
     google.protobuf.Any state = 2;
 }
 
-// TODO doc here
+// Metadata represents a set of key-value pairs that can be used to 
+// provide additional information about an Actor.
 message Metadata {
     // A channel group represents a way to send actions to various actors 
-    // that belong to a certain semantic group.
-    string channel_group = 1;
+    // that belong to a certain semantic group. Following the Pub-Sub pattern.
+    repeated Channel channel_group = 1;
 
     map<string, string> tags = 2;
+}
+
+// Represents a Pub-Sub binding, where a actor can be subscribed to a channel 
+// and map a specific action to a specific topic if necessary
+// if the action is not informed, the default action will be "receive".
+message Channel {
+    string topic = 1;
+    string action = 2;
 }
 
 // The type that defines the runtime characteristics of the Actor.

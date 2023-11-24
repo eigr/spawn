@@ -7,8 +7,6 @@ defmodule SpawnSdk.Flow do
     defmodule Fleet.Actors.Driver do
       use SpawnSdk.Actor,
         kind: :abstract,
-        # Set ´driver´ channel for all actors of the same type (Fleet.Actors.Driver)
-        channel: "drivers",
         state_type: Fleet.Domain.Driver
 
       alias Fleet.Domain.{
@@ -30,11 +28,28 @@ defmodule SpawnSdk.Flow do
         |> Value.broadcast(
           Broadcast.to(
             @brain_actor_channel,
-            "driver_position",
             driver_state
           )
         )
         |> Value.reply!()
+      end
+    end
+
+    defmodule Fleet.Actors.FleetControllersActor do
+      use SpawnSdk.Actor,
+        kind: :unamed,
+        channels: [
+          {"fleet.controllers.topic", "update_position_receive"}
+        ] # or just ["fleet.controllers.topic"] and it will forward to a action called receive
+
+      alias Fleet.Domain.Point
+
+      defact update_position_receive(%Point{} = position, _ctx) do
+        Logger.info(
+          "Received Update Position Event. Position: [{inspect(position)}]"
+        )
+
+        Value.of()
       end
     end
 
@@ -45,30 +60,16 @@ defmodule SpawnSdk.Flow do
     using the transport mechanism based on Phoenix.PubSub in memory or
     Phoenix.PubSub over Nats Broker.
     """
-    defstruct channel: nil, action: nil, payload: nil
+    defstruct channel: nil, payload: nil
 
     @type t :: %__MODULE__{
             channel: String.t(),
-            action: String.t() | atom(),
             payload: module()
           }
 
     @type channel :: String.t()
 
-    @type action :: String.t() | atom()
-
     @type payload :: module() | nil
-
-    @spec to(channel(), action(), payload()) :: Broadcast.t()
-    def to(channel, action, payload) do
-      action_name = if is_atom(action), do: Atom.to_string(action), else: action
-
-      %__MODULE__{
-        channel: channel,
-        action: action_name,
-        payload: payload
-      }
-    end
 
     @spec to(channel(), payload()) :: Broadcast.t()
     def to(channel, payload) do

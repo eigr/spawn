@@ -365,8 +365,6 @@ Actors can also send messages to a group of actors at once as an action callback
 defmodule Fleet.Actors.Driver do
   use SpawnSdk.Actor,
     kind: :unamed,
-    # Set ´driver´ channel for all actors of the same type (Fleet.Actors.Driver)
-    channel: "drivers",
     state_type: Fleet.Domain.Driver
 
   alias Fleet.Domain.{
@@ -378,11 +376,11 @@ defmodule Fleet.Actors.Driver do
 
   require Logger
 
-  @brain_actor_channel "fleet-controllers"
+  @brain_actor_channel "fleet.controllers.topic"
 
   defact update_position(%Point{} = position, %Context{state: %Driver{id: name} = driver} = ctx) do
     Logger.info(
-      "Driver [#{name}] Received Update Position Event. Position: [#{inspect(position)}]. Context: #{inspect(ctx)}"
+      "Received Update Position Event. Position: [{inspect(position)}]. Context: #{inspect(ctx)}"
     )
 
     driver_state = %Driver{driver | position: position}
@@ -392,10 +390,27 @@ defmodule Fleet.Actors.Driver do
     |> Value.broadcast(
       Broadcast.to(
         @brain_actor_channel,
-        "driver_position",
         driver_state
       )
     )
+  end
+end
+
+defmodule Fleet.Actors.FleetControllersActor do
+  use SpawnSdk.Actor,
+    kind: :unamed,
+    channels: [
+      {"fleet.controllers.topic", "update_position_receive"}
+    ] # or just ["fleet.controllers.topic"] and it will forward to a action called receive
+
+  alias Fleet.Domain.Point
+
+  defact update_position_receive(%Point{} = position, _ctx) do
+    Logger.info(
+      "Driver [#{name}] Received Update Position Event. Position: [#{inspect(position)}]"
+    )
+
+    Value.of()
   end
 end
 ```

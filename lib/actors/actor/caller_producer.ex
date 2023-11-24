@@ -60,7 +60,7 @@ defmodule Actors.Actor.CallerProducer do
         GenStage.call(__MODULE__, {:enqueue, {:invoke, request, opts}}, :infinity)
       end
     else
-      if request.register_ref != "" do
+      if request.register_ref != "" and not is_nil(request.register_ref) do
         spawn_req = %SpawnRequest{
           actors: [%ActorId{request.actor.id | parent: request.register_ref}]
         }

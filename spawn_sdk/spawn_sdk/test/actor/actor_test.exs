@@ -167,6 +167,26 @@ defmodule Actor.ActorTest do
     end
   end
 
+  defmodule Actor.BroadcastActor do
+    use SpawnSdk.Actor,
+      name: "broadcastActor",
+      stateful: true,
+      state_type: Eigr.Spawn.Actor.MyState,
+      channels: ["topics"],
+      deactivate_timeout: 30_000,
+      snapshot_timeout: 2_000
+
+    defact publish(request, %Context{} = _ctx) do
+      Value.of()
+      |> Value.broadcast(Broadcast.to("topics", request))
+    end
+
+    defact receive(request, %Context{} = _ctx) do
+      %Value{}
+      |> Value.state(%Eigr.Spawn.Actor.MyState{id: request.data})
+    end
+  end
+
   setup_all do
     system = "spawn-system"
 
@@ -180,7 +200,8 @@ defmodule Actor.ActorTest do
             Actor.OtherActor,
             Actor.ThirdActor,
             Actor.PooledActor,
-            Actor.JsonActor
+            Actor.JsonActor,
+            Actor.BroadcastActor
           ]
         }
       ],
@@ -399,6 +420,30 @@ defmodule Actor.ActorTest do
                )
 
       assert %{data: "something"} = response
+    end
+  end
+
+  describe "broadcast" do
+    test "invoke broadcasting a simple state", ctx do
+      system = ctx.system
+
+      fake_payload_data = Faker.Pokemon.name() <> "_fake_payload"
+      payload = %Eigr.Spawn.Actor.MyMessageRequest{data: fake_payload_data}
+
+      assert {:ok, _} =
+               SpawnSdk.invoke("broadcastActor",
+                 system: system,
+                 payload: payload,
+                 action: "publish"
+               )
+
+      Process.sleep(100)
+
+      assert {:ok, %{id: ^fake_payload_data}} =
+               SpawnSdk.invoke("broadcastActor",
+                 system: system,
+                 action: "get"
+               )
     end
   end
 
