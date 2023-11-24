@@ -274,11 +274,8 @@ message SideEffect {
 // https://www.enterpriseintegrationpatterns.com/patterns/messaging/PublishSubscribeChannel.html
 // https://www.enterpriseintegrationpatterns.com/patterns/messaging/BroadcastAggregate.html
 message Broadcast {
-    // Channel of target Actors
+    // Target topic or channel
     string channel_group = 1;
-
-    // Action. Only Actors that have this action will run successfully
-    string action_name = 2;
 
     // Payload
     oneof payload {

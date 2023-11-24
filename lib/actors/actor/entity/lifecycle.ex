@@ -6,7 +6,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
   require Logger
 
   alias Actors.Actor.{Entity.EntityState, Entity.Invocation, StateManager}
-
+  alias Actors.Actor.Pubsub
   alias Actors.Exceptions.NetworkPartitionException
 
   alias Eigr.Functions.Protocol.Actors.{
@@ -20,8 +20,6 @@ defmodule Actors.Actor.Entity.Lifecycle do
     TimeoutStrategy
   }
 
-  alias Phoenix.PubSub
-
   alias Sidecar.Measurements
 
   import Spawn.Utils.Common, only: [return_and_maybe_hibernate: 1]
@@ -29,13 +27,12 @@ defmodule Actors.Actor.Entity.Lifecycle do
   @deactivated_status "DEACTIVATED"
   @default_deactivate_timeout 10_000
   @default_snapshot_timeout 2_000
-  @default_pubsub_group :actor_channel
-  @pubsub Application.compile_env(:spawn, :pubsub_group, @default_pubsub_group)
   @min_snapshot_threshold 100
   @timeout_jitter 3000
 
   def init(
         %EntityState{
+          system: system,
           actor: %Actor{
             id: %ActorId{name: name, parent: parent} = _id,
             metadata: metadata,
@@ -66,7 +63,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
         name
       end
 
-    :ok = handle_metadata(name, metadata)
+    :ok = handle_metadata(name, system, metadata)
     :ok = Invocation.handle_timers(timer_actions)
 
     :ok =
@@ -356,20 +353,30 @@ defmodule Actors.Actor.Entity.Lifecycle do
     stateful && !is_nil(actor_state)
   end
 
-  defp handle_metadata(_actor, metadata) when is_nil(metadata) or metadata == %{} do
+  defp handle_metadata(_actor, _system, metadata) when is_nil(metadata) or metadata == %{} do
     :ok
   end
 
-  defp handle_metadata(actor, %Metadata{channel_group: channel, tags: _tags} = _metadata) do
-    :ok = subscribe(actor, channel)
+  defp handle_metadata(
+         actor,
+         system,
+         %Metadata{channel_group: channel_group, tags: _tags} = _metadata
+       ) do
+    :ok = subscribe(actor, system, channel_group)
     :ok
   end
 
-  defp subscribe(_actor, channel) when is_nil(channel), do: :ok
+  defp subscribe(_actor, _system, nil), do: :ok
+  defp subscribe(_actor, _system, []), do: :ok
 
-  defp subscribe(actor, channel) do
-    Logger.debug("Actor [#{actor}] is subscribing to channel [#{channel}]")
-    PubSub.subscribe(@pubsub, channel)
+  defp subscribe(actor, system, channel_group) do
+    Logger.debug(
+      "Actor [#{actor}] from system [#{system}] is subscribing to channel_group [#{inspect(channel_group)}]"
+    )
+
+    Enum.each(channel_group, fn %{topic: topic, action: action} ->
+      Pubsub.subscribe(topic, actor, system, action)
+    end)
   end
 
   # Timeout private functions

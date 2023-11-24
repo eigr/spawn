@@ -330,7 +330,7 @@ defmodule SpawnSdk.Actor do
     actor_name = Keyword.get(opts, :name, Atom.to_string(__CALLER__.module))
     actor_kind = Keyword.get(opts, :kind, :NAMED) |> SpawnSdk.System.SpawnSystem.decode_kind()
     caller_module = __CALLER__.module
-    channel_group = Keyword.get(opts, :channel, nil)
+    channel_group = Keyword.get(opts, :channels, [])
 
     min_pool_size = Keyword.get(opts, :min_pool_size, 1)
     max_pool_size = Keyword.get(opts, :max_pool_size, 0)
@@ -339,6 +339,29 @@ defmodule SpawnSdk.Actor do
     stateful = Keyword.get(opts, :stateful, true)
 
     tags = Keyword.get(opts, :tags, nil)
+
+    Enum.each(channel_group, fn
+      {topic, action} ->
+        if String.contains?(topic, "*") do
+          raise "Channels doesn't support wildcard subscriptions"
+        end
+
+        if "#{action}" not in Enum.map(actions, fn {action, _} -> "#{action}" end) do
+          raise "Channel action #{action} is not implemented in current Actor."
+        end
+
+      topic when is_binary(topic) ->
+        if String.contains?(topic, "*") do
+          raise "Channels doesn't support wildcard subscriptions"
+        end
+
+        if "receive" not in Enum.map(actions, fn {action, _} -> "#{action}" end) do
+          raise "Found a registered topic but no action named receive was found."
+        end
+
+      _ ->
+        raise "Channels is not invalid, use list(topic) or list({topic, action})"
+    end)
 
     if stateful and !Code.ensure_loaded?(Statestores.Supervisor) do
       raise """
@@ -374,7 +397,7 @@ defmodule SpawnSdk.Actor do
         |> Enum.map(fn {action, %{timer: timer}} -> {action, timer} end)
       end
 
-      def __meta__(:channel), do: unquote(channel_group)
+      def __meta__(:channel_group), do: unquote(channel_group)
       def __meta__(:name), do: unquote(actor_name)
       def __meta__(:kind), do: unquote(actor_kind)
       def __meta__(:stateful), do: unquote(stateful)

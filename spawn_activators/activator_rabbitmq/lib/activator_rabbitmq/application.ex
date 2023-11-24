@@ -4,7 +4,7 @@ defmodule ActivatorRabbitMQ.Application do
   use Application
   require Logger
 
-  Actors.Config.PersistentTermConfig as: Config
+  alias Actors.Config.PersistentTermConfig, as: Config
   alias ActivatorRabbitmq.Supervisor, as: RabbitMQConsumerSupervisor
 
   @impl true

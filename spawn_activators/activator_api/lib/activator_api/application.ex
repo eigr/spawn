@@ -3,7 +3,7 @@ defmodule ActivatorAPI.Application do
 
   use Application
 
-  Actors.Config.PersistentTermConfig as: Config
+  alias Actors.Config.PersistentTermConfig, as: Config
   alias ActivatorAPI.Api.Discovery
   alias ActivatorAPI.GrpcServer, as: Server
 

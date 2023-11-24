@@ -31,9 +31,7 @@ defmodule Actors.Actor.Entity.Invocation do
     Noop
   }
 
-  alias Phoenix.PubSub
-
-  alias Spawn.Utils.AnySerializer
+  alias Actors.Actor.Pubsub
 
   import Spawn.Utils.Common, only: [return_and_maybe_hibernate: 1]
 
@@ -96,47 +94,6 @@ defmodule Actors.Actor.Entity.Invocation do
   def handle_timers(nil), do: :ok
 
   def handle_timers([]), do: :ok
-
-  def broadcast_invoke(
-        action,
-        payload,
-        %ActorInvocation{actor: %ActorId{name: caller_actor_name, system: actor_system}},
-        %EntityState{
-          system: actor_system,
-          actor: %Actor{id: %ActorId{name: actor_name} = _id} = actor
-        } = state
-      ) do
-    Logger.debug(
-      "Actor [#{actor_name}] Received Broadcast Event [#{inspect(payload)}] to perform Action [#{action}]"
-    )
-
-    invocation = %InvocationRequest{
-      actor: actor,
-      action_name: action,
-      payload: payload,
-      async: true,
-      caller: %ActorId{name: caller_actor_name, system: actor_system}
-    }
-
-    case invoke({invocation, []}, state) do
-      {:reply, _res, state} -> {:noreply, state}
-      {:reply, _res, state, opts} -> {:noreply, state, opts}
-    end
-  end
-
-  def broadcast_invoke(
-        payload,
-        %EntityState{
-          system: _actor_system,
-          actor: %Actor{id: %ActorId{name: actor_name} = _id} = _actor
-        } = state
-      ) do
-    Logger.debug(
-      "Actor [#{actor_name}] Received Broadcast Event [#{inspect(payload)}] without action. Just ignoring"
-    )
-
-    {:noreply, state}
-  end
 
   def invoke_init(
         %EntityState{
@@ -482,14 +439,13 @@ defmodule Actors.Actor.Entity.Invocation do
 
   def do_broadcast(
         request,
-        %Broadcast{channel_group: channel, action_name: action, payload: payload} = _broadcast,
+        %Broadcast{channel_group: channel, payload: payload} = _broadcast,
         _opts
       ) do
     Tracer.with_span "run-broadcast" do
       Tracer.add_event("publish", [{"channel", channel}])
-      Tracer.set_attributes([{:action, action}])
 
-      spawn(fn -> publish(channel, action, payload, request) end)
+      Pubsub.publish(channel, payload, request)
     end
   end
 
@@ -501,28 +457,6 @@ defmodule Actors.Actor.Entity.Invocation do
     spawn(fn -> GenServer.reply(from, callback.()) end)
     :noreply
   end
-
-  defp publish(channel, action, payload, _request) when is_nil(action) or action == "" do
-    PubSub.broadcast(
-      :actor_channel,
-      channel,
-      {:receive, parse_external_broadcast_message(payload)}
-    )
-  end
-
-  defp publish(channel, action, payload, request) do
-    PubSub.broadcast(
-      :actor_channel,
-      channel,
-      {:receive, action, payload, request}
-    )
-  end
-
-  defp parse_external_broadcast_message({:value, %Google.Protobuf.Any{} = any}) do
-    AnySerializer.unpack_unknown(any)
-  end
-
-  defp parse_external_broadcast_message(_any), do: %{}
 
   def do_side_effects(effects, opts \\ [])
 

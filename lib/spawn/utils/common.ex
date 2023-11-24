@@ -10,8 +10,9 @@ defmodule Spawn.Utils.Common do
       String.to_atom(string)
   end
 
-  @spec generate_key(ActorId.t()) :: integer()
-  def generate_key(id), do: :erlang.phash2({id.name, id.system})
+  @spec generate_key(ActorId.t() | String.t()) :: integer()
+  def generate_key(id) when is_integer(id), do: id
+  def generate_key(%{name: name, system: system}), do: :erlang.phash2({name, system})
 
   def return_and_maybe_hibernate(tuple) do
     queue_length = Process.info(self(), :message_queue_len)

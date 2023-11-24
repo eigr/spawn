@@ -38,6 +38,7 @@ defmodule Actors.Supervisors.ActorSupervisor do
     children =
       [
         get_pubsub_adapter(opts),
+        Actors.Actor.Pubsub,
         Actors.Actor.Entity.Supervisor.child_spec(opts)
       ] ++
         maybe_add_invocation_scheduler(opts) ++

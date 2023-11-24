@@ -12,7 +12,8 @@ defmodule SpawnSdkExample.Application do
           SpawnSdkExample.Actors.JoeActor,
           SpawnSdkExample.Actors.JsonActor,
           # SpawnSdkExample.Actors.ClockActor,
-          SpawnSdkExample.Actors.UnamedActor
+          SpawnSdkExample.Actors.UnamedActor,
+          SpawnSdkExample.Actors.PubSubActor
           # Pooled Actors have been removed and will be restructured in the future
           # SpawnSdkExample.Actors.PooledActor
         ],

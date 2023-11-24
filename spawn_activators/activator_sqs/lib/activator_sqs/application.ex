@@ -3,7 +3,7 @@ defmodule ActivatorSQS.Application do
 
   use Application
 
-  Actors.Config.PersistentTermConfig as: Config
+  alias Actors.Config.PersistentTermConfig, as: Config
   import Activator, only: [get_http_port: 1]
 
   @impl true
