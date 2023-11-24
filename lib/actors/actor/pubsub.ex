@@ -33,16 +33,21 @@ defmodule Actors.Actor.Pubsub do
 
   @impl true
   def init(_opts) do
-    {:ok, nil}
+    {:ok, %{}}
   end
 
   @impl true
   def handle_cast({:subscribe, topic, actor_name, system, action_handler}, state) do
     metadata = %{actor_name: actor_name, system: system, action: action_handler}
+    key = :erlang.phash2(metadata)
 
-    Phoenix.PubSub.subscribe(@pubsub, topic, metadata: metadata)
+    if Map.get(state, key) do
+      {:noreply, state}
+    else
+      Phoenix.PubSub.subscribe(@pubsub, topic, metadata: metadata)
 
-    {:noreply, state}
+      {:noreply, Map.put(state, key, true)}
+    end
   end
 
   @impl true
