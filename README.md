@@ -42,7 +42,9 @@ You can see some talks on Youtube about Eigr Community or Spawn in the links bel
 - **Adriano Santos ElugSP 2023**: https://www.youtube.com/watch?v=MKTqiAtpK1E _in Portuguese_
 - **Elias Arruda on Elixir CWB (Curitiba)**: https://www.youtube.com/live/yE_uWbPEWnI?si=5L3SORG3PERZpQ4V&t=463 _in Portuguese_
 
-## Our mascot
+## Nice to meet you, my name is Sepp
+
+Our cyberpunk mascot is called Sepp, he is an [Ibex](https://alpshiking.swisshikingvacations.com/spotlight-on-the-ibex/), an animal typical of the Swiss Alps, who loves to walk through the Eiger mountains. His name is Sepp, which is the German form of Joseph or Joe. Sepp and his lineage, specifically, go back to Viking times which is why he can sometimes be a little rude, but he's a good guy and loves helping his friends.
 
 ![Sepp Rules](docs/images/sepp-rules-254-400.png#gh-light-mode-only)
 ![Sepp Rules](docs/images/sepp-rules-254-400.png#gh-dark-mode-only)
