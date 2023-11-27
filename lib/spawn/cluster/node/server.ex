@@ -36,7 +36,7 @@ defmodule Spawn.Cluster.Node.Server do
     Tracer.with_span opts[:span_ctx], "Handle Actor Invoke", kind: :server do
       request = InvocationRequest.decode(body)
 
-      Actors.Actor.CallerConsumer.invoke_with_span(request, opts)
+      Actors.invoke(request, opts)
       |> handle_reply(reply_to)
     end
   end

@@ -114,7 +114,7 @@ defmodule Actors do
       {:ok, :async} ->
         {:ok, :async}
 
-      {:ok, %{body: :async}} ->
+      {:ok, %{body: body}} when body in ["async", :async] ->
         {:ok, :async}
 
       {:ok, %{body: body}} when is_binary(body) ->
