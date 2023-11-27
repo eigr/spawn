@@ -2,8 +2,8 @@
 
 <!-- MDOC !-->
 
-<img title="Sepp Elixir" alt="Sepp Elixir" src="ocs/images/sepp-elixir.png" width="200" height="100">
-
+![Sepp](docs/images/sepp-elixir-254-400.png#gh-light-mode-only)
+![Sepp](docs/images/sepp-elixir-254-400.png#gh-dark-mode-only)
 
 **Actor Mesh Serverless Platform**
 
@@ -15,7 +15,8 @@
 
 ### **[Website](https://eigr.io)** • **[Getting Started](docs/getting_started.md)** • **[SDKs](docs/sdks.md)** • **[Documentation](https://eigr.io/docs/projects-spawn/spawn-introduction/)** • **[Blog](https://eigr.io/blog/)**
 
-## Overview
+
+## Overview 
 
 Since UC Berkeley published its [Cloud Programming Simplified: A Berkeley View on
 Serverless Computing](https://www2.eecs.berkeley.edu/Pubs/TechRpts/2019/EECS-2019-3.pdf) in the year of 2019, several solutions for Stateful Serverless and Durable Computing are emerging on the market.
