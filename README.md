@@ -2,6 +2,9 @@
 
 <!-- MDOC !-->
 
+<img title="Sepp Elixir" alt="Sepp Elixir" src="ocs/images/sepp-elixir.png" width="200" height="100">
+
+
 **Actor Mesh Serverless Platform**
 
 ![ci](https://github.com/eigr/spawn/actions/workflows/ci.yaml/badge.svg)
