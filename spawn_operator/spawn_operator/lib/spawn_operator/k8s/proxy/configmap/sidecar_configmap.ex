@@ -147,6 +147,7 @@ defmodule SpawnOperator.K8s.Proxy.CM.Configmap do
         "SPAWN_PUBSUB_NATS_AUTH_USER" => annotations.pubsub_nats_auth_user,
         "SPAWN_PUBSUB_NATS_AUTH_PASS" => annotations.pubsub_nats_auth_pass,
         "SPAWN_PUBSUB_NATS_AUTH_JWT" => annotations.pubsub_nats_auth_jwt,
+        "SPAWN_PROXY_LOGGER_LEVEL" => annotations.logger_level,
         "SPAWN_DELAYED_INVOKES" => annotations.delayed_invokes,
         "SPAWN_CRDT_SYNC_INTERVAL" => annotations.sync_interval,
         "SPAWN_CRDT_SHIP_INTERVAL" => annotations.ship_interval,

@@ -43,30 +43,31 @@ spec:
 | .metadata.annotations.spawn-eigr.io/sidecar-http-pool-max-idle-timeout    | [See 15](#15-sidecar-http-pool-max-idle-timeout)   | No        | 1000                  |                 |
 | .metadata.annotations.spawn-eigr.io/sidecar-http-port                     | [See 16](#16-sidecar-http-port)                    | No        | 9001                  |                 |
 | .metadata.annotations.spawn-eigr.io/sidecar-image-tag                     | [See 17](#17-sidecar-image-tag)                    | No        | latest                |                 |
-| .metadata.annotations.spawn-eigr.io/sidecar-metrics-disabled              | [See 18](#18-sidecar-metrics-disabled)             | No        | false                 |                 |
-| .metadata.annotations.spawn-eigr.io/sidecar-metrics-port                  | [See 19](#19-sidecar-metrics-port)                 | No        | 9001                  |                 |
-| .metadata.annotations.spawn-eigr.io/sidecar-metrics-log-console           | [See 20](#20-sidecar-metrics-log-console)          | No        | true                  |                 |
-| .metadata.annotations.spawn-eigr.io/sidecar-mode                          | [See 21](#21-sidecar-mode)                         | No        | sidecar               | sidecar, daemon |
-| .metadata.annotations.spawn-eigr.io/sidecar-pubsub-adapter                | [See 22](#22-sidecar-pubsub-adapter)               | No        | native                |                 |
-| .metadata.annotations.spawn-eigr.io/sidecar-pubsub-nats-hosts             | [See 23](#23-sidecar-pubsub-nats-hosts)            | No        | nats://127.0.0.1:4222 |                 |
-| .metadata.annotations.spawn-eigr.io/sidecar-state-handoff-sync-interval   | [See 24](#24-sidecar-state-handoff-sync-interval)  | No        | 60                    |                 |
-| .metadata.annotations.spawn-eigr.io/sidecar-uds-enabled                   | [See 25](#25-sidecar-uds-enabled)                  | No        | false                 |                 |
-| .metadata.annotations.spawn-eigr.io/sidecar-uds-socket-path               | [See 26](#26-sidecar-uds-socket-path)              | No        | /var/run/spawn.sock   |                 |
-| .metadata.annotations.spawn-eigr.io/supervisors-state-handoff-controller  | [See 27](#27-supervisors-state-handoff-controller) | No        | persistent            |                 |
-| .metadata.name                                                            | [See 28](#28-metadataname)                         | Yes       |                       |                 |
-| .metadata.namespace                                                       | [See 29](#29-metadatanamespace)                    | No        | default               |                 |
-| .spec.autoscaler.max                                                      | [See 30](#30-specautoscalermax)                    | No        | length(nodes) * 2     |                 |
-| .spec.autoscaler.min                                                      | [See 31](#31-specautoscalermin)                    | No        | 1                     |                 |
-| .spec.host.affinity                                                       | [See 32](#32-spechostaffinity)                     | No        |                       |                 |
-| .spec.host.embedded                                                       | [See 33](#33-spechostembedded)                     | No        | false                 |                 |
-| .spec.host.env                                                            | [See 34](#34-spechostenv)                          | No        |                       |                 |
-| .spec.host.image                                                          | [See 35](#35-spechostimage)                        | Yes       |                       |                 |
-| .spec.host.ports                                                          | [See 36](#36-spechostports)                        | No        |                       |                 |
-| .spec.host.resources                                                      | [See 37](#37-spechostresources)                    | No        |                       |                 |
-| .spec.host.volumeMounts                                                   | [See 38](#38-spechostvolumemounts)                 | No        |                       |                 |
-| .spec.replicas                                                            | [See 39](#39-specreplicas)                         | No        | 1                     |                 |
-| .spec.terminationGracePeriodSeconds                                       | [See 40](#40-specterminationgraceperiodseconds)    | No        | 405                   |                 |
-| .spec.volumes                                                             | [See 41](#41-specvolumes)                          | No        |                       |                 |
+| .metadata.annotations.spawn-eigr.io/sidecar-logger-level                  | [See 18](#18-sidecar-logger-level)                 | No        | info                  | info, debug     |
+| .metadata.annotations.spawn-eigr.io/sidecar-metrics-disabled              | [See 19](#19-sidecar-metrics-disabled)             | No        | false                 |                 |
+| .metadata.annotations.spawn-eigr.io/sidecar-metrics-port                  | [See 20](#20-sidecar-metrics-port)                 | No        | 9001                  |                 |
+| .metadata.annotations.spawn-eigr.io/sidecar-metrics-log-console           | [See 21](#21-sidecar-metrics-log-console)          | No        | true                  |                 |
+| .metadata.annotations.spawn-eigr.io/sidecar-mode                          | [See 22](#22-sidecar-mode)                         | No        | sidecar               | sidecar, daemon |
+| .metadata.annotations.spawn-eigr.io/sidecar-pubsub-adapter                | [See 23](#23-sidecar-pubsub-adapter)               | No        | native                |                 |
+| .metadata.annotations.spawn-eigr.io/sidecar-pubsub-nats-hosts             | [See 24](#24-sidecar-pubsub-nats-hosts)            | No        | nats://127.0.0.1:4222 |                 |
+| .metadata.annotations.spawn-eigr.io/sidecar-state-handoff-sync-interval   | [See 25](#25-sidecar-state-handoff-sync-interval)  | No        | 60                    |                 |
+| .metadata.annotations.spawn-eigr.io/sidecar-uds-enabled                   | [See 26](#26-sidecar-uds-enabled)                  | No        | false                 |                 |
+| .metadata.annotations.spawn-eigr.io/sidecar-uds-socket-path               | [See 27](#27-sidecar-uds-socket-path)              | No        | /var/run/spawn.sock   |                 |
+| .metadata.annotations.spawn-eigr.io/supervisors-state-handoff-controller  | [See 28](#28-supervisors-state-handoff-controller) | No        | persistent            |                 |
+| .metadata.name                                                            | [See 29](#29-metadataname)                         | Yes       |                       |                 |
+| .metadata.namespace                                                       | [See 30](#30-metadatanamespace)                    | No        | default               |                 |
+| .spec.autoscaler.max                                                      | [See 31](#31-specautoscalermax)                    | No        | length(nodes) * 2     |                 |
+| .spec.autoscaler.min                                                      | [See 32](#32-specautoscalermin)                    | No        | 1                     |                 |
+| .spec.host.affinity                                                       | [See 33](#33-spechostaffinity)                     | No        |                       |                 |
+| .spec.host.embedded                                                       | [See 34](#34-spechostembedded)                     | No        | false                 |                 |
+| .spec.host.env                                                            | [See 35](#35-spechostenv)                          | No        |                       |                 |
+| .spec.host.image                                                          | [See 36](#36-spechostimage)                        | Yes       |                       |                 |
+| .spec.host.ports                                                          | [See 37](#37-spechostports)                        | No        |                       |                 |
+| .spec.host.resources                                                      | [See 38](#38-spechostresources)                    | No        |                       |                 |
+| .spec.host.volumeMounts                                                   | [See 39](#39-spechostvolumemounts)                 | No        |                       |                 |
+| .spec.replicas                                                            | [See 40](#40-specreplicas)                         | No        | 1                     |                 |
+| .spec.terminationGracePeriodSeconds                                       | [See 41](#41-specterminationgraceperiodseconds)    | No        | 405                   |                 |
+| .spec.volumes                                                             | [See 42](#42-specvolumes)                          | No        |                       |                 |
 
 
 ### 1. actors-global-backpressure-max-demand
@@ -120,76 +121,79 @@ TODO
 ### 17. sidecar-image-tag
 TODO
 
-### 18. sidecar-metrics-disabled
+### 18. sidecar-logger-level
 TODO
 
-### 19. sidecar-metrics-port
+### 19. sidecar-metrics-disabled
 TODO
 
-### 20. sidecar-metrics-log-console
+### 20. sidecar-metrics-port
 TODO
 
-### 21. sidecar-mode 
+### 21. sidecar-metrics-log-console
 TODO
 
-### 22. sidecar-pubsub-adapter
+### 22. sidecar-mode 
 TODO
 
-### 23. sidecar-pubsub-nats-hosts
+### 23. sidecar-pubsub-adapter
 TODO
 
-### 24. sidecar-state-handoff-sync-interval
+### 24. sidecar-pubsub-nats-hosts
 TODO
 
-### 25. sidecar-uds-enabled
+### 25. sidecar-state-handoff-sync-interval
 TODO
 
-### 26. sidecar-uds-socket-path
+### 26. sidecar-uds-enabled
 TODO
 
-### 27. supervisors-state-handoff-controller
+### 27. sidecar-uds-socket-path
 TODO
 
-### 28. metadata.name
+### 28. supervisors-state-handoff-controller
 TODO
 
-### 29. metadata.namespace
+### 29. metadata.name
 TODO
 
-### 30. spec.autoscaler.max
+### 30. metadata.namespace
 TODO
 
-### 31. spec.autoscaler.min
+### 31. spec.autoscaler.max
 TODO
 
-### 32. spec.host.affinity 
+### 32. spec.autoscaler.min
 TODO
 
-### 33. spec.host.embedded 
+### 33. spec.host.affinity 
 TODO
 
-### 34. spec.host.env
+### 34. spec.host.embedded 
 TODO
 
-### 35. spec.host.image
+### 35. spec.host.env
 TODO
 
-### 36. spec.host.ports 
+### 36. spec.host.image
 TODO
 
-### 37. spec.host.resources 
+### 37. spec.host.ports 
 TODO
 
-### 38. spec.host.volumeMounts
+### 38. spec.host.resources 
 TODO
 
-### 39. spec.replicas
+### 39. spec.host.volumeMounts
 TODO
 
-### 40. spec.terminationGracePeriodSeconds 
+### 40. spec.replicas
 TODO
 
-### 41. spec.volumes
+### 41. spec.terminationGracePeriodSeconds 
+TODO
+
+### 42. spec.volumes
 TODO
 
 [Next: Activator Resource](activator.md)

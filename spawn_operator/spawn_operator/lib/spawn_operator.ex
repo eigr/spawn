@@ -36,6 +36,7 @@ defmodule SpawnOperator do
       user_function_port: Map.get(annotations, "spawn-eigr.io/app-port", "8090"),
       cluster_poling_interval:
         Map.get(annotations, "spawn-eigr.io/cluster-poling-interval", "3000"),
+      logger_level: Map.get(annotations, "spawn-eigr.io/sidecar-logger-level", "info"),
       proxy_mode: Map.get(annotations, "spawn-eigr.io/sidecar-mode", "sidecar"),
       proxy_http_port: Map.get(annotations, "spawn-eigr.io/sidecar-http-port", "9001"),
       proxy_http_client_adapter_pool_schedulers:
