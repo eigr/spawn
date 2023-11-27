@@ -1,5 +1,5 @@
-![Sepp Rules](docs/images/sepp-rules-origin.png#gh-light-mode-only)
-![Sepp Rules](docs/images/sepp-rules-origin.png#gh-dark-mode-only)
+![Sepp Rules](docs/images/sepp-rules-origin.png)
+![Sepp Rules](docs/images/sepp-rules-origin.png)
 
 # Table of Contents
 
