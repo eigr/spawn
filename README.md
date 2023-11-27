@@ -41,3 +41,6 @@ You can see some talks on Youtube about Eigr Community or Spawn in the links bel
 - **Adriano Santos on Code Beam BR 2022**: https://www.youtube.com/watch?v=dXp0lyfmV_0&list=PLa5zLmv3pgCCiyWq8gltVAt2vTGuHz3eG&index=3 _in Portuguese_
 - **Adriano Santos ElugSP 2023**: https://www.youtube.com/watch?v=MKTqiAtpK1E _in Portuguese_
 - **Elias Arruda on Elixir CWB (Curitiba)**: https://www.youtube.com/live/yE_uWbPEWnI?si=5L3SORG3PERZpQ4V&t=463 _in Portuguese_
+
+![Sepp Rules](docs/images/sepp-rules-254-400.png#gh-light-mode-only)
+![Sepp Rules](docs/images/sepp-rules-254-400.png#gh-dark-mode-only)

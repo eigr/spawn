@@ -1,8 +1,5 @@
 # Table of Contents
 
-![Sepp Rules](docs/images/sepp-rules-origin.png#gh-light-mode-only)
-![Sepp Rules](docs/images/sepp-rules-origin.png#gh-dark-mode-only)
-
 01. [Overview](overview.md)
 02. [Architecture](architecture.md)
 03. [Features](features.md)
