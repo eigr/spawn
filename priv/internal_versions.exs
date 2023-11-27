@@ -1,23 +1,23 @@
 defmodule InternalVersions do
-  # The order here is also the deploy order, its important to keep this way1.0.0-rc.31
+  # The order here is also the deploy order, its important to keep this way1.0.0-rc.32
   @versions [
-    spawn_statestores: "1.0.0-rc.31",
-    spawn_statestores_mariadb: "1.0.0-rc.31",
-    spawn_statestores_mysql: "1.0.0-rc.31",
-    spawn_statestores_mssql: "1.0.0-rc.31",
-    spawn_statestores_postgres: "1.0.0-rc.31",
-    spawn_statestores_sqlite: "1.0.0-rc.31",
-    spawn_statestores_cockroachdb: "1.0.0-rc.31",
-    spawn: "1.0.0-rc.31",
-    spawn_sdk: "1.0.0-rc.31",
-    activator: "1.0.0-rc.31",
-    activator_api: "1.0.0-rc.31",
-    activator_kafka: "1.0.0-rc.31",
-    activator_pubsub: "1.0.0-rc.31",
-    activator_rabbitmq: "1.0.0-rc.31",
-    activator_sqs: "1.0.0-rc.31",
-    proxy: "1.0.0-rc.31",
-    spawn_operator: "1.0.0-rc.31"
+    spawn_statestores: "1.0.0-rc.32",
+    spawn_statestores_mariadb: "1.0.0-rc.32",
+    spawn_statestores_mysql: "1.0.0-rc.32",
+    spawn_statestores_mssql: "1.0.0-rc.32",
+    spawn_statestores_postgres: "1.0.0-rc.32",
+    spawn_statestores_sqlite: "1.0.0-rc.32",
+    spawn_statestores_cockroachdb: "1.0.0-rc.32",
+    spawn: "1.0.0-rc.32",
+    spawn_sdk: "1.0.0-rc.32",
+    activator: "1.0.0-rc.32",
+    activator_api: "1.0.0-rc.32",
+    activator_kafka: "1.0.0-rc.32",
+    activator_pubsub: "1.0.0-rc.32",
+    activator_rabbitmq: "1.0.0-rc.32",
+    activator_sqs: "1.0.0-rc.32",
+    proxy: "1.0.0-rc.32",
+    spawn_operator: "1.0.0-rc.32"
   ]
 
   @doc """
