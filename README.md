@@ -42,5 +42,7 @@ You can see some talks on Youtube about Eigr Community or Spawn in the links bel
 - **Adriano Santos ElugSP 2023**: https://www.youtube.com/watch?v=MKTqiAtpK1E _in Portuguese_
 - **Elias Arruda on Elixir CWB (Curitiba)**: https://www.youtube.com/live/yE_uWbPEWnI?si=5L3SORG3PERZpQ4V&t=463 _in Portuguese_
 
+## Our mascot
+
 ![Sepp Rules](docs/images/sepp-rules-254-400.png#gh-light-mode-only)
 ![Sepp Rules](docs/images/sepp-rules-254-400.png#gh-dark-mode-only)
