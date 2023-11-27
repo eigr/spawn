@@ -111,6 +111,9 @@ defmodule Actors do
       {:ok, %{body: {:error, error}}} ->
         {:error, error}
 
+      {:ok, :async} ->
+        {:ok, :async}
+
       {:ok, %{body: :async}} ->
         {:ok, :async}
 
