@@ -14,6 +14,7 @@ defmodule Actors.Actor.Entity.Supervisor do
   alias Eigr.Functions.Protocol.Actors.{Actor, ActorSystem}
 
   @default_number_of_partitions 8
+  @shutdown_timeout_ms 330_000
 
   def child_spec(_opts) do
     {
@@ -30,7 +31,6 @@ defmodule Actors.Actor.Entity.Supervisor do
     DynamicSupervisor.start_link(
       __MODULE__,
       [
-        shutdown: 120_000,
         strategy: :one_for_one
       ],
       name: __MODULE__
@@ -63,7 +63,9 @@ defmodule Actors.Actor.Entity.Supervisor do
     child_spec = %{
       id: Actors.Actor.Entity,
       start: {Actors.Actor.Entity, :start_link, [entity_state]},
-      restart: :transient
+      restart: :transient,
+      # wait until for 5 and a half minutes
+      shutdown: @shutdown_timeout_ms
     }
 
     case DynamicSupervisor.start_child(via(child_spec), child_spec) do

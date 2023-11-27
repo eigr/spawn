@@ -2,8 +2,6 @@ defmodule Sidecar.ProcessSupervisor do
   @moduledoc false
   use Supervisor
 
-  @shutdown_timeout_ms 330_000
-
   @impl true
   def init(opts) do
     children =
@@ -24,8 +22,6 @@ defmodule Sidecar.ProcessSupervisor do
       __MODULE__,
       opts,
       name: __MODULE__,
-      # wait until for 5 and a half minutes
-      shutdown: @shutdown_timeout_ms,
       strategy: :one_for_one
     )
   end
