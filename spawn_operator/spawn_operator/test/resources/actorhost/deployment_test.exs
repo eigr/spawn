@@ -385,14 +385,14 @@ defmodule DeploymentTest do
                          ],
                          "image" => _image_version,
                          "livenessProbe" => %{
-                           "failureThreshold" => 10,
                            "httpGet" => %{
                              "path" => "/health/liveness",
                              "port" => 9001,
                              "scheme" => "HTTP"
                            },
-                           "initialDelaySeconds" => 5,
-                           "periodSeconds" => 60,
+                           "failureThreshold" => 3,
+                           "initialDelaySeconds" => 10,
+                           "periodSeconds" => 10,
                            "successThreshold" => 1,
                            "timeoutSeconds" => 30
                          },
@@ -407,6 +407,7 @@ defmodule DeploymentTest do
                              "port" => 9001,
                              "scheme" => "HTTP"
                            },
+                           "failureThreshold" => 1,
                            "initialDelaySeconds" => 5,
                            "periodSeconds" => 5,
                            "successThreshold" => 1,
