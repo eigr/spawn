@@ -20,7 +20,7 @@ defmodule Sidecar.GracefulShutdown do
   defmodule State do
     @moduledoc false
 
-    defstruct init_stop?: true, shutdown_delay_ms: 15_000, notify_pid: nil
+    defstruct init_stop?: true, shutdown_delay_ms: 336_000, notify_pid: nil
 
     def new(opts) do
       Map.merge(%__MODULE__{}, Enum.into(opts, %{}))
@@ -121,6 +121,8 @@ defmodule Sidecar.GracefulShutdown do
 
   @impl :gen_event
   def handle_event(msg, state) do
+    Logger.info("Received system signal message: #{inspect(msg)}")
+
     # Proxy all the events that are not `SIGTERM` to the default implementation of `:erl_signal_handler`.
     :erl_signal_handler.handle_event(msg, state)
     {:ok, state}

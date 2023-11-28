@@ -40,7 +40,7 @@ RUN cd spawn_proxy/proxy \
 # ---- Application Stage ----
 FROM alpine:3.17.3
 
-RUN apk add --no-cache --update zstd ncurses-libs libstdc++ libgcc libcrypto1.1
+RUN apk add --no-cache --update zstd ncurses-libs libstdc++ libgcc libcrypto1.1 tini bash
 
 WORKDIR /app
 RUN chown nobody /app
@@ -50,12 +50,16 @@ ENV MIX_ENV=prod
 ENV HOME=/app
 
 COPY rel/overlays/mtls.ssl.conf .
+COPY proxy-entrypoint.sh .
 COPY --from=builder --chown=nobody:root /app/_build/${MIX_ENV}/rel/bakeware/ ./
 
+RUN chmod +x proxy-entrypoint.sh
 RUN mkdir -p /app/.cache/bakeware/ && chmod 777 /app/.cache/bakeware/
 RUN touch /.erlang.cookie && chmod 777 /.erlang.cookie
 RUN touch /app/.erlang.cookie && chmod 777 /app/.erlang.cookie
 
 USER nobody
 
-ENTRYPOINT ["./proxy", "start"]
+ENTRYPOINT ["/tini", "-g", "-vv", "--"]
+
+CMD ["/bin/bash", "/proxy-entrypoint.sh"]
