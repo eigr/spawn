@@ -36,6 +36,16 @@ defmodule Actors.Actor.Entity do
   - `handle_info/2`: Handles informational messages.
   - `terminate/2`: Terminates the actor entity.
 
+  ## Client APIs
+
+  start_link/1: Starts the entity for a given actor state.
+
+  get_state/2: Retrieves the actor state directly from memory.
+
+  invoke/3: Synchronously invokes an action on an actor.
+
+  invoke_async/3: Asynchronously invokes an action on an actor.
+
   ## Usage
 
   To use this module, start the actor by calling `start_link/1` with an initial actor state.
@@ -50,16 +60,6 @@ defmodule Actors.Actor.Entity do
   ```
 
   Note: Ensure proper configuration and integration with the distributed system for seamless actor interactions.
-
-  ## Client APIs
-
-    start_link/1: Starts the entity for a given actor state.
-
-    get_state/2: Retrieves the actor state directly from memory.
-
-    invoke/3: Synchronously invokes an action on an actor.
-
-    invoke_async/3: Asynchronously invokes an action on an actor.
 
   """
   use GenServer, restart: :transient
