@@ -8,16 +8,14 @@ defmodule Spawn.Supervisor do
   @shutdown_timeout_ms 330_000
 
   def start_link(opts) do
-    Supervisor.start_link(__MODULE__, opts,
-      name: __MODULE__,
-      shutdown: @shutdown_timeout_ms
-    )
+    Supervisor.start_link(__MODULE__, opts, name: __MODULE__)
   end
 
   def child_spec(opts) do
     %{
       id: __MODULE__,
-      start: {__MODULE__, :start_link, [opts]}
+      start: {__MODULE__, :start_link, [opts]},
+      shutdown: @shutdown_timeout_ms
     }
   end
 
