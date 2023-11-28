@@ -27,7 +27,7 @@ spec:
           name: spawn-operator
           ports:
             - containerPort: 9090
-          image: eigr/spawn-operator:1.0.0-rc.33
+          image: eigr/spawn-operator:1.0.0-rc.34
           resources:
             requests:
               cpu: 200m

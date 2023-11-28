@@ -1,4 +1,4 @@
-version=1.0.0-rc.33
+version=1.0.0-rc.34
 registry=eigr
 
 CLUSTER_NAME=spawn-k8s
