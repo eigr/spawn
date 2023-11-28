@@ -7,7 +7,7 @@ defmodule Spawn.Cluster.ClusterSupervisor do
 
   def start_link(opts) do
     Supervisor.start_link(__MODULE__, opts,
-      name: String.to_atom("#{String.capitalize(Config.get(:app_name))}.Cluster")
+      name: String.to_atom("#{String.capitalize(Config.get(:app_name))}.ClusterSupervisor")
     )
   end
 
@@ -44,7 +44,7 @@ defmodule Spawn.Cluster.ClusterSupervisor do
       {Cluster.Supervisor,
        [
          topologies,
-         [name: String.to_atom("#{String.capitalize(Config.get(:app_name))}.${__MODULE__}")]
+         [name: String.to_atom("#{String.capitalize(Config.get(:app_name))}.Cluster")]
        ]}
     end
   end
