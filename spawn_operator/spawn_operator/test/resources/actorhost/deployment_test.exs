@@ -57,35 +57,44 @@ defmodule DeploymentTest do
                    "spec" => %{
                      "affinity" => %{
                        "podAffinity" => %{
-                         "preferredDuringSchedulingIgnoredDuringExecution" => %{
-                           "labelSelector" => %{
-                             "matchExpressions" => [
-                               %{
-                                 "key" => "actor-system",
-                                 "operator" => "In",
-                                 "values" => ["spawn-system"]
-                               }
-                             ]
-                           },
-                           "topologyKey" => "kubernetes.io/hostname"
-                         }
+                         "preferredDuringSchedulingIgnoredDuringExecution" => [
+                           %{
+                             "weight" => 50,
+                             "podAffinityTerm" => %{
+                               "labelSelector" => %{
+                                 "matchExpressions" => [
+                                   %{
+                                     "key" => "actor-system",
+                                     "operator" => "In",
+                                     "values" => [
+                                       "spawn-system"
+                                     ]
+                                   }
+                                 ]
+                               },
+                               "topologyKey" => "kubernetes.io/hostname"
+                             }
+                           }
+                         ]
                        },
                        "podAntiAffinity" => %{
                          "preferredDuringSchedulingIgnoredDuringExecution" => [
                            %{
+                             "weight" => 100,
                              "podAffinityTerm" => %{
                                "labelSelector" => %{
                                  "matchExpressions" => [
                                    %{
                                      "key" => "app",
                                      "operator" => "In",
-                                     "values" => ["spawn-test"]
+                                     "values" => [
+                                       "spawn-test"
+                                     ]
                                    }
                                  ]
                                },
                                "topologyKey" => "kubernetes.io/hostname"
-                             },
-                             "weight" => 100
+                             }
                            }
                          ]
                        }
@@ -195,35 +204,44 @@ defmodule DeploymentTest do
                    "spec" => %{
                      "affinity" => %{
                        "podAffinity" => %{
-                         "preferredDuringSchedulingIgnoredDuringExecution" => %{
-                           "labelSelector" => %{
-                             "matchExpressions" => [
-                               %{
-                                 "key" => "actor-system",
-                                 "operator" => "In",
-                                 "values" => ["spawn-system"]
-                               }
-                             ]
-                           },
-                           "topologyKey" => "kubernetes.io/hostname"
-                         }
+                         "preferredDuringSchedulingIgnoredDuringExecution" => [
+                           %{
+                             "weight" => 50,
+                             "podAffinityTerm" => %{
+                               "labelSelector" => %{
+                                 "matchExpressions" => [
+                                   %{
+                                     "key" => "actor-system",
+                                     "operator" => "In",
+                                     "values" => [
+                                       "spawn-system"
+                                     ]
+                                   }
+                                 ]
+                               },
+                               "topologyKey" => "kubernetes.io/hostname"
+                             }
+                           }
+                         ]
                        },
                        "podAntiAffinity" => %{
                          "preferredDuringSchedulingIgnoredDuringExecution" => [
                            %{
+                             "weight" => 100,
                              "podAffinityTerm" => %{
                                "labelSelector" => %{
                                  "matchExpressions" => [
                                    %{
                                      "key" => "app",
                                      "operator" => "In",
-                                     "values" => ["spawn-test"]
+                                     "values" => [
+                                       "spawn-test"
+                                     ]
                                    }
                                  ]
                                },
                                "topologyKey" => "kubernetes.io/hostname"
-                             },
-                             "weight" => 100
+                             }
                            }
                          ]
                        }
