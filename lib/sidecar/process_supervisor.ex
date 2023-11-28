@@ -6,11 +6,11 @@ defmodule Sidecar.ProcessSupervisor do
   def init(opts) do
     children =
       [
-        {Sidecar.MetricsSupervisor, opts},
         statestores(),
+        {Sidecar.MetricsSupervisor, opts},
+        Actors.Supervisors.ActorSupervisor.child_spec(opts),
         Spawn.Supervisor.child_spec(opts),
-        Actors.Supervisors.ProtocolSupervisor.child_spec(opts),
-        Actors.Supervisors.ActorSupervisor.child_spec(opts)
+        Actors.Supervisors.ProtocolSupervisor.child_spec(opts)
       ]
       |> Enum.reject(&is_nil/1)
 
