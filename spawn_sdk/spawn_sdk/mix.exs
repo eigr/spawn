@@ -57,10 +57,11 @@ defmodule SpawnSdk.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:spawn, path: "../.."},
+      {:nimble_parsec, "~> 1.2.3"},
       {:faker, "~> 0.17", only: :test},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
-      {:spawn, path: "../.."},
-      {:nimble_parsec, "~> 1.2.3"}
+      {:spawn_statestores, path: "../../spawn_statestores/statestores", only: :test}
     ]
   end
 

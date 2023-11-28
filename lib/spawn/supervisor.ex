@@ -23,9 +23,9 @@ defmodule Spawn.Supervisor do
   def init(opts) do
     children =
       [
-        {Spawn.Cluster.ClusterSupervisor, []},
         {Spawn.Cache.LookupCache, []},
         Spawn.Cluster.StateHandoff.ManagerSupervisor.child_spec(opts),
+        {Spawn.Cluster.ClusterSupervisor, []},
         Spawn.Cluster.Node.Registry.child_spec()
       ]
       |> maybe_start_internal_nats(opts)
