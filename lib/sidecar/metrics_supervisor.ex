@@ -2,6 +2,7 @@ defmodule Sidecar.MetricsSupervisor do
   @moduledoc false
   use Supervisor
   import Telemetry.Metrics
+  import Spawn.Utils.Common, only: [supervisor_process_logger: 1]
 
   alias Actors.Config.PersistentTermConfig, as: Config
 
@@ -11,7 +12,9 @@ defmodule Sidecar.MetricsSupervisor do
 
   def init(opts) do
     children =
-      if Config.get(:proxy_disable_metrics), do: [], else: get_metrics_supervisor_tree(opts)
+      if Config.get(:proxy_disable_metrics),
+        do: [supervisor_process_logger(__MODULE__)],
+        else: [supervisor_process_logger(__MODULE__)] ++ get_metrics_supervisor_tree(opts)
 
     Supervisor.init(children, strategy: :one_for_one)
   end

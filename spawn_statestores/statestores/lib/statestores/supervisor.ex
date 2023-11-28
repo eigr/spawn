@@ -1,6 +1,7 @@
 defmodule Statestores.Supervisor do
   @moduledoc false
   use Supervisor
+  import Spawn.Utils.Common, only: [supervisor_process_logger: 1]
 
   @shutdown_timeout_ms 330_000
 
@@ -25,6 +26,7 @@ defmodule Statestores.Supervisor do
     Statestores.Migrator.migrate(lookup_adapter)
 
     children = [
+      supervisor_process_logger(__MODULE__),
       Statestores.Vault,
       snapshot_adapter,
       lookup_adapter

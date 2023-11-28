@@ -3,6 +3,8 @@ defmodule Spawn.Cluster.ClusterSupervisor do
   use Supervisor
   require Logger
 
+  import Spawn.Utils.Common, only: [supervisor_process_logger: 1]
+
   alias Actors.Config.PersistentTermConfig, as: Config
 
   def start_link(opts) do
@@ -14,6 +16,7 @@ defmodule Spawn.Cluster.ClusterSupervisor do
   @impl true
   def init(opts) do
     children = [
+      supervisor_process_logger(__MODULE__),
       cluster_supervisor(opts)
     ]
 

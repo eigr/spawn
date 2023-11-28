@@ -1,8 +1,9 @@
 defmodule Spawn.Cluster.Node.ConnectionSupervisor do
   @moduledoc false
   use Supervisor
-
   require Logger
+
+  import Spawn.Utils.Common, only: [supervisor_process_logger: 1]
 
   alias Spawn.Utils.Nats
   alias Actors.Config.PersistentTermConfig, as: Config

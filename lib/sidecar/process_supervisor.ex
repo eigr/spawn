@@ -1,11 +1,15 @@
 defmodule Sidecar.ProcessSupervisor do
   @moduledoc false
   use Supervisor
+  require Logger
+
+  import Spawn.Utils.Common, only: [supervisor_process_logger: 1]
 
   @impl true
   def init(opts) do
     children =
       [
+        supervisor_process_logger(__MODULE__),
         statestores(),
         {Sidecar.MetricsSupervisor, opts},
         Actors.Supervisors.ActorSupervisor.child_spec(opts),

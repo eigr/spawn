@@ -2,6 +2,7 @@ defmodule Activator.Supervisor do
   @moduledoc false
   use Supervisor
   require Logger
+  import Spawn.Utils.Common, only: [supervisor_process_logger: 1]
 
   alias Spawn.Cluster.Node.ConnectionSupervisor
 
@@ -19,6 +20,7 @@ defmodule Activator.Supervisor do
   @impl true
   def init(opts) do
     children = [
+      supervisor_process_logger(__MODULE__),
       ConnectionSupervisor.child_spec(opts)
     ]
 

@@ -3,6 +3,8 @@ defmodule Actors.Supervisors.ProtocolSupervisor do
   use Supervisor
   require Logger
 
+  import Spawn.Utils.Common, only: [supervisor_process_logger: 1]
+
   alias Actors.Config.PersistentTermConfig, as: Config
 
   def start_link(opts) do
@@ -21,6 +23,7 @@ defmodule Actors.Supervisors.ProtocolSupervisor do
     Protobuf.load_extensions()
 
     children = [
+      supervisor_process_logger(__MODULE__),
       {Registry, keys: :unique, name: Actors.NodeRegistry},
       http_client_adapter()
     ]

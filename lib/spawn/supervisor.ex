@@ -3,6 +3,8 @@ defmodule Spawn.Supervisor do
   use Supervisor
   require Logger
 
+  import Spawn.Utils.Common, only: [supervisor_process_logger: 1]
+
   alias Actors.Config.PersistentTermConfig, as: Config
 
   @shutdown_timeout_ms 330_000
@@ -23,6 +25,7 @@ defmodule Spawn.Supervisor do
   def init(opts) do
     children =
       [
+        supervisor_process_logger(__MODULE__),
         {Spawn.Cache.LookupCache, []},
         Spawn.Cluster.StateHandoff.ManagerSupervisor.child_spec(opts),
         {Spawn.Cluster.ClusterSupervisor, []},

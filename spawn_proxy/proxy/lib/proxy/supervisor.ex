@@ -3,6 +3,7 @@ defmodule Proxy.Supervisor do
   Proxy Application Root Supervisor.
   """
   use Supervisor
+  import Spawn.Utils.Common, only: [supervisor_process_logger: 1]
 
   alias Actors.Config.PersistentTermConfig, as: Config
 
@@ -24,6 +25,7 @@ defmodule Proxy.Supervisor do
   @impl true
   def init(opts) do
     children = [
+      supervisor_process_logger(__MODULE__),
       {Sidecar.Supervisor, opts},
       {Bandit, get_bandit_options(opts)}
     ]

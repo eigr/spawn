@@ -1,8 +1,8 @@
 defmodule Spawn.Cluster.Node.ServerSupervisor do
   @moduledoc false
   use Supervisor
-
   require Logger
+  import Spawn.Utils.Common, only: [supervisor_process_logger: 1]
 
   alias Actors.Config.PersistentTermConfig, as: Config
   alias Spawn.Utils.Nats
@@ -40,6 +40,7 @@ defmodule Spawn.Cluster.Node.ServerSupervisor do
     }
 
     children = [
+      supervisor_process_logger(__MODULE__),
       {Gnat.ConsumerSupervisor, connection_params}
     ]
 

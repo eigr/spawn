@@ -1,6 +1,9 @@
 defmodule Sidecar.Supervisor do
   @moduledoc false
   use Supervisor
+  require Logger
+
+  import Spawn.Utils.Common, only: [supervisor_process_logger: 1]
 
   @shutdown_timeout_ms 342_000
 
@@ -8,6 +11,7 @@ defmodule Sidecar.Supervisor do
   def init(opts) do
     children =
       [
+        supervisor_process_logger(__MODULE__),
         {Sidecar.GracefulShutdown, opts},
         {Sidecar.ProcessSupervisor, opts}
       ]

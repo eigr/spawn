@@ -3,6 +3,8 @@ defmodule Actors.Supervisors.ActorSupervisor do
   use Supervisor
   require Logger
 
+  import Spawn.Utils.Common, only: [supervisor_process_logger: 1]
+
   @max_consumers 64
   @shutdown_timeout_ms 330_000
 
@@ -38,6 +40,7 @@ defmodule Actors.Supervisors.ActorSupervisor do
 
     children =
       [
+        supervisor_process_logger(__MODULE__),
         get_pubsub_adapter(opts),
         Actors.Actor.Pubsub,
         Actors.Actor.Entity.Supervisor.child_spec(opts)

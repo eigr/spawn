@@ -2,6 +2,7 @@ defmodule Spawn.Cluster.StateHandoff.ManagerSupervisor do
   @moduledoc false
   use Supervisor
   require Logger
+  import Spawn.Utils.Common, only: [supervisor_process_logger: 1]
 
   alias Actors.Config.PersistentTermConfig, as: Config
 
@@ -19,6 +20,7 @@ defmodule Spawn.Cluster.StateHandoff.ManagerSupervisor do
   @impl true
   def init(opts) do
     children = [
+      supervisor_process_logger(__MODULE__),
       Spawn.Cluster.StateHandoff.Manager.child_spec(:state_handoff_manager, opts)
     ]
 
