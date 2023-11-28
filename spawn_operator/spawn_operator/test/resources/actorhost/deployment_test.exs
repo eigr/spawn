@@ -57,20 +57,18 @@ defmodule DeploymentTest do
                    "spec" => %{
                      "affinity" => %{
                        "podAffinity" => %{
-                         "preferredDuringSchedulingIgnoredDuringExecution" => [
-                           %{
-                             "labelSelector" => %{
-                               "matchExpressions" => [
-                                 %{
-                                   "key" => "actor-system",
-                                   "operator" => "In",
-                                   "values" => ["spawn-system"]
-                                 }
-                               ]
-                             },
-                             "topologyKey" => "kubernetes.io/hostname"
-                           }
-                         ]
+                         "preferredDuringSchedulingIgnoredDuringExecution" => %{
+                           "labelSelector" => %{
+                             "matchExpressions" => [
+                               %{
+                                 "key" => "actor-system",
+                                 "operator" => "In",
+                                 "values" => ["spawn-system"]
+                               }
+                             ]
+                           },
+                           "topologyKey" => "kubernetes.io/hostname"
+                         }
                        },
                        "podAntiAffinity" => %{
                          "preferredDuringSchedulingIgnoredDuringExecution" => [
@@ -197,20 +195,18 @@ defmodule DeploymentTest do
                    "spec" => %{
                      "affinity" => %{
                        "podAffinity" => %{
-                         "preferredDuringSchedulingIgnoredDuringExecution" => [
-                           %{
-                             "labelSelector" => %{
-                               "matchExpressions" => [
-                                 %{
-                                   "key" => "actor-system",
-                                   "operator" => "In",
-                                   "values" => ["spawn-system"]
-                                 }
-                               ]
-                             },
-                             "topologyKey" => "kubernetes.io/hostname"
-                           }
-                         ]
+                         "preferredDuringSchedulingIgnoredDuringExecution" => %{
+                           "labelSelector" => %{
+                             "matchExpressions" => [
+                               %{
+                                 "key" => "actor-system",
+                                 "operator" => "In",
+                                 "values" => ["spawn-system"]
+                               }
+                             ]
+                           },
+                           "topologyKey" => "kubernetes.io/hostname"
+                         }
                        },
                        "podAntiAffinity" => %{
                          "preferredDuringSchedulingIgnoredDuringExecution" => [

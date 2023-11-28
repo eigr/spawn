@@ -139,24 +139,23 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
   end
 
   defp build_affinity(system, app_name) do
+    # .spec.template.spec.affinity.podAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].labelSelector
     %{
       "podAffinity" => %{
-        "preferredDuringSchedulingIgnoredDuringExecution" => [
-          %{
-            "labelSelector" => %{
-              "matchExpressions" => [
-                %{
-                  "key" => "actor-system",
-                  "operator" => "In",
-                  "values" => [
-                    system
-                  ]
-                }
-              ]
-            },
-            "topologyKey" => "kubernetes.io/hostname"
-          }
-        ]
+        "preferredDuringSchedulingIgnoredDuringExecution" => %{
+          "labelSelector" => %{
+            "matchExpressions" => [
+              %{
+                "key" => "actor-system",
+                "operator" => "In",
+                "values" => [
+                  system
+                ]
+              }
+            ]
+          },
+          "topologyKey" => "kubernetes.io/hostname"
+        }
       },
       "podAntiAffinity" => %{
         "preferredDuringSchedulingIgnoredDuringExecution" => [
