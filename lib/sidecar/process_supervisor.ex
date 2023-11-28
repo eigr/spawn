@@ -12,8 +12,8 @@ defmodule Sidecar.ProcessSupervisor do
         supervisor_process_logger(__MODULE__),
         statestores(),
         {Sidecar.MetricsSupervisor, opts},
-        Spawn.Supervisor.child_spec(opts),
         Actors.Supervisors.ActorSupervisor.child_spec(opts),
+        Spawn.Supervisor.child_spec(opts),
         Actors.Supervisors.ProtocolSupervisor.child_spec(opts)
       ]
       |> Enum.reject(&is_nil/1)

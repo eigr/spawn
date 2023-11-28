@@ -161,6 +161,10 @@ defmodule Actors.Actor.CallerProducer do
   def invoke(request, opts \\ [])
 
   def invoke(%InvocationRequest{} = request, opts) do
+    if Sidecar.GracefulShutdown.get_status() in [:draining, :stopping] do
+      raise ErlangError, "The system is shutting down and can no longer receive invocations"
+    end
+
     if Config.get(:actors_global_backpressure_enabled) do
       if request.async do
         GenStage.cast(__MODULE__, {:enqueue, {:invoke, request, opts}})
