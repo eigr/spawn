@@ -60,8 +60,7 @@ defmodule SpawnSdk.MixProject do
       {:spawn, path: "../.."},
       {:nimble_parsec, "~> 1.2.3"},
       {:faker, "~> 0.17", only: :test},
-      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
-      {:spawn_statestores, path: "../../spawn_statestores/statestores", only: :test}
+      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false}
     ]
   end
 
