@@ -7,7 +7,7 @@ defmodule Actors.Security.Tls.Initializer do
     - args:
         - eval
         - Kompost.Webhooks.bootstrap_tls(:prod, "tls-certs")
-      image: docker.io/eigr/spawn-proxy:1.0.0-rc.32
+      image: docker.io/eigr/spawn-proxy:1.0.0-rc.33
       name: init-certificates
   serviceAccountName: kompost
   volumes:
