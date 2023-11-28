@@ -26,6 +26,7 @@ defmodule Spawn.Cluster.Node.ConnectionSupervisor do
     Logger.debug("Creating Nats Connection #{inspect(connection_name)}")
 
     children = [
+      supervisor_process_logger(__MODULE__),
       {Gnat.ConnectionSupervisor, connection_settings(connection_name, opts)}
     ]
 

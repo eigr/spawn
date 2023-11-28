@@ -1,5 +1,7 @@
 defmodule Statestores.Util do
   @moduledoc false
+  require Logger
+
   @otp_app :spawn_statestores
 
   @type adapter :: term()
@@ -7,6 +9,30 @@ defmodule Statestores.Util do
   @spec load_app :: :ok | {:error, any}
   def load_app do
     Application.load(@otp_app)
+  end
+
+  def supervisor_process_logger(module) do
+    %{
+      id: Module.concat([module, Logger]),
+      start:
+        {Task, :start,
+         [
+           fn ->
+             Process.flag(:trap_exit, true)
+
+             Logger.info("[SUPERVISOR] #{inspect(module)} is up")
+
+             receive do
+               {:EXIT, _pid, reason} ->
+                 Logger.info(
+                   "[SUPERVISOR] #{inspect(module)}:#{inspect(self())} is successfully down with reason #{inspect(reason)}"
+                 )
+
+                 :ok
+             end
+           end
+         ]}
+    }
   end
 
   @spec load_lookup_adapter :: adapter()
