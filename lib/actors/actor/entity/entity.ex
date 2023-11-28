@@ -1,8 +1,67 @@
 defmodule Actors.Actor.Entity do
   @moduledoc """
-  `Entity` controls the entire lifecycle of the Host Actor.
-  """
+  Manages the lifecycle of the Host Actor through the `Entity` module.
 
+  The `Entity` module provides a GenServer-based implementation for controlling the
+  lifecycle of actors, handling various actions, and interacting with the underlying
+  actor system.
+
+  ## Behavior
+
+  The module implements GenServer behavior with transient restart semantics.
+
+  - **Initialization:** The module initializes the actor state and handles the loading of persisted states.
+
+  - **State Handling:** Manages the lifecycle of the actor, including state transitions, initialization actions, and periodic snapshots.
+
+  - **Interaction:** Exposes client APIs for retrieving actor state, synchronously invoking actions, and asynchronously triggering actions.
+
+  - **Terminating:** Ensures that the actor's state will be saved and performs all necessary cleanups.
+
+  ## Client APIs
+
+  The following client APIs are available for interaction:
+
+  - `start_link/1`: Starts the entity for a given actor state.
+  - `get_state/2`: Retrieves the actor state directly from memory.
+  - `invoke/3`: Synchronously invokes an action on an actor.
+  - `invoke_async/3`: Asynchronously invokes an action on an actor.
+
+  ### Callbacks
+
+  - `init/1`: Initializes the actor entity.
+  - `handle_continue/2`: Handles asynchronous events during the actor lifecycle.
+  - `handle_call/3`: Handles synchronous calls to the actor.
+  - `handle_cast/2`: Handles asynchronous casts to the actor.
+  - `handle_info/2`: Handles informational messages.
+  - `terminate/2`: Terminates the actor entity.
+
+  ## Usage
+
+  To use this module, start the actor by calling `start_link/1` with an initial actor state.
+  Interaction with the actor is facilitated through the provided client APIs such as `get_state/2`, `invoke/3`, and `invoke_async/3`.
+
+  ## Example
+
+  ```elixir
+  {:ok, actor} = Actors.Actor.Entity.start_link(%EntityState{actor: %Actor{id: %ActorId{name: "example"}}})
+  state = Actors.Actor.Entity.get_state(actor)
+  {:ok, result} = Actors.Actor.Entity.invoke(actor, %InvocationRequest{action: :some_action})
+  ```
+
+  Note: Ensure proper configuration and integration with the distributed system for seamless actor interactions.
+
+  ## Client APIs
+
+    start_link/1: Starts the entity for a given actor state.
+
+    get_state/2: Retrieves the actor state directly from memory.
+
+    invoke/3: Synchronously invokes an action on an actor.
+
+    invoke_async/3: Asynchronously invokes an action on an actor.
+
+  """
   use GenServer, restart: :transient
   require Logger
 
@@ -273,6 +332,10 @@ defmodule Actors.Actor.Entity do
   end
 
   ## Client APIs
+
+  @doc """
+  Starts the entity for a given actor state.
+  """
   def start_link(%EntityState{actor: %Actor{id: %ActorId{name: name} = _id}} = state) do
     GenServer.start_link(__MODULE__, state,
       name: via(name),
