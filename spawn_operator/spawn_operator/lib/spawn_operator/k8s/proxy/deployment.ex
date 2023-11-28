@@ -252,14 +252,14 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
         "env" => @default_actor_host_function_env,
         "ports" => proxy_actor_host_function_ports,
         "livenessProbe" => %{
-          "failureThreshold" => 10,
           "httpGet" => %{
             "path" => "/health/liveness",
             "port" => proxy_http_port,
             "scheme" => "HTTP"
           },
-          "initialDelaySeconds" => 5,
-          "periodSeconds" => 60,
+          "failureThreshold" => 3,
+          "initialDelaySeconds" => 10,
+          "periodSeconds" => 10,
           "successThreshold" => 1,
           "timeoutSeconds" => 30
         },
@@ -269,6 +269,7 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
             "port" => proxy_http_port,
             "scheme" => "HTTP"
           },
+          "failureThreshold" => 1,
           "initialDelaySeconds" => 5,
           "periodSeconds" => 5,
           "successThreshold" => 1,
