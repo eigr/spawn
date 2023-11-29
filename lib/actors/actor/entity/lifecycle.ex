@@ -126,7 +126,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
           Keyword.get(opts, :split_brain_detector, Actors.Node.DefaultSplitBrainDetector)
 
         with {:partition_check, {:ok, :continue}} <-
-               {:partition_check, split_brain_detector.check_network_partition(status, node)} do
+               {:partition_check, split_brain_detector.check_network_partition(id, status, node)} do
           {:noreply,
            %EntityState{
              state
