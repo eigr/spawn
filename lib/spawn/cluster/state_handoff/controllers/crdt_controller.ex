@@ -13,6 +13,7 @@ defmodule Spawn.Cluster.StateHandoff.Controllers.CrdtController do
   require Logger
 
   alias Actors.Config.PersistentTermConfig, as: Config
+  alias Eigr.Functions.Protocol.Actors.Actor
 
   import Spawn.Utils.Common, only: [generate_key: 1]
 
@@ -47,16 +48,15 @@ defmodule Spawn.Cluster.StateHandoff.Controllers.CrdtController do
   def clean(node, %{crdt_pid: crdt_pid} = data) do
     Logger.debug("Received cleanup action from Node #{inspect(node)}")
 
-    new_values =
+    keys =
       crdt_pid
       |> DeltaCrdt.to_map()
       |> Iter.filter(fn {_key, [host]} -> host.node == node end)
-      |> Iter.map(fn {key, _value} -> {key, nil} end)
-      |> Iter.into(%{})
+      |> Iter.map(fn {key, _value} -> key end)
 
-    DeltaCrdt.merge(crdt_pid, new_values)
+    DeltaCrdt.drop(crdt_pid, keys)
 
-    Logger.debug("Hosts cleaned for node #{inspect(node)}")
+    Logger.debug("Hosts (#{Enum.count(keys)}) cleaned for node #{inspect(node)}")
 
     data
   end
@@ -66,7 +66,14 @@ defmodule Spawn.Cluster.StateHandoff.Controllers.CrdtController do
   def get_by_id(id, %{crdt_pid: crdt_pid} = data) do
     key = generate_key(id)
 
-    hosts = DeltaCrdt.get(crdt_pid, key, :infinity)
+    hosts =
+      case DeltaCrdt.get(crdt_pid, key, :infinity) do
+        [host] ->
+          [%{host | actor: Actor.decode(host.actor)}]
+
+        nil ->
+          []
+      end
 
     {data, hosts}
   end
@@ -133,7 +140,11 @@ defmodule Spawn.Cluster.StateHandoff.Controllers.CrdtController do
 
   @impl true
   @spec handle_nodedown_event(node(), node_type(), data()) :: new_data()
-  def handle_nodedown_event(_node, _node_type, %{crdt_pid: crdt_pid} = _data) do
+  def handle_nodedown_event(node, _node_type, %{crdt_pid: crdt_pid} = _data) do
+    if Sidecar.GracefulShutdown.running?() do
+      take_ownership(node, crdt_pid)
+    end
+
     do_set_neighbours(crdt_pid)
     %{crdt_pid: crdt_pid}
   end
@@ -143,9 +154,28 @@ defmodule Spawn.Cluster.StateHandoff.Controllers.CrdtController do
   def set(id, _node, host, %{crdt_pid: crdt_pid} = data) do
     key = generate_key(id)
 
+    host = %{host | actor: Actor.encode(host.actor)}
+
     DeltaCrdt.put(crdt_pid, key, [host], :infinity)
 
     data
+  end
+
+  defp take_ownership(node, crdt_pid) do
+    Logger.debug("Taking ownership of registers from #{inspect(node)}")
+
+    registers =
+      crdt_pid
+      |> DeltaCrdt.to_map()
+      |> Iter.filter(fn {_key, [host]} -> host.node == node end)
+      |> Iter.map(fn {key, [value]} -> {key, [%{value | node: Node.self()}]} end)
+      |> Iter.into(%{})
+
+    DeltaCrdt.merge(crdt_pid, registers)
+
+    Logger.debug(
+      "Took ownership of (#{Enum.count(registers)}) registers from node #{inspect(node)}"
+    )
   end
 
   defp do_set_neighbours(this_crdt_pid) do

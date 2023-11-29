@@ -51,7 +51,8 @@ defmodule Spawn.Cluster.StateHandoff.Manager do
 
   @impl true
   def terminate(_reason, %State{controller: controller, data: data} = state) do
-    Logger.debug("Calling StateHandoff Manager terminate")
+    Logger.debug("Calling StateHandoff Manager terminate for controller #{inspect(controller)}")
+
     node = Node.self()
     new_data = controller.handle_terminate(node, data)
 
