@@ -168,7 +168,7 @@ defmodule Spawn.Cluster.StateHandoff.Controllers.CrdtController do
       crdt_pid
       |> DeltaCrdt.to_map()
       |> Iter.filter(fn {_key, [host]} ->
-        host.node == node and Keyword.get(host.opts, :hash) == Common.actor_host_hash()
+        host.node == node and Keyword.get(host.opts, :hash) == actor_host_hash()
       end)
       |> Iter.map(fn {key, [value]} -> {key, [%{value | node: Node.self()}]} end)
       |> Iter.into(%{})
