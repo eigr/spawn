@@ -2,6 +2,7 @@ defmodule Spawn.Utils.Common do
   @moduledoc false
   require Logger
 
+  alias Actors.Config.PersistentTermConfig, as: Config
   alias Eigr.Functions.Protocol.Actors.ActorId
 
   def supervisor_process_logger(module) do
@@ -33,6 +34,13 @@ defmodule Spawn.Utils.Common do
   rescue
     _e ->
       String.to_atom(string)
+  end
+
+  def actor_host_hash do
+    system = Config.get(:actor_system_name)
+    actorhost_name = Config.get(:app_name)
+
+    :erlang.phash2({system, actorhost_name})
   end
 
   @spec generate_key(ActorId.t() | String.t()) :: integer()

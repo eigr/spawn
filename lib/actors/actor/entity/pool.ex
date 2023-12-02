@@ -13,6 +13,8 @@ defmodule Actors.Actor.Pool do
     ActorSettings
   }
 
+  alias Spawn.Utils.Common
+
   @http_host_interface Actors.Actor.Interface.Http
 
   @doc """
@@ -30,6 +32,8 @@ defmodule Actors.Actor.Pool do
         %Actor{id: %ActorId{} = id, settings: %ActorSettings{} = settings} = actor,
         opts
       ) do
+    opts = Keyword.merge(opts, hash: Common.actor_host_hash())
+
     case ActorRegistry.get_hosts_by_actor(id) do
       {:ok, actor_hosts} ->
         if settings.kind == :POOLED do
