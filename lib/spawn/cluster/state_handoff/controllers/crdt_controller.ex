@@ -162,7 +162,7 @@ defmodule Spawn.Cluster.StateHandoff.Controllers.CrdtController do
   end
 
   defp take_ownership(node, crdt_pid) do
-    Logger.debug("Taking ownership of registers from #{inspect(node)}")
+    Logger.debug(" #{inspect(node)}")
 
     registers =
       crdt_pid
