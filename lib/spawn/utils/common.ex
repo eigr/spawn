@@ -2,6 +2,7 @@ defmodule Spawn.Utils.Common do
   @moduledoc false
   require Logger
 
+  alias Actors.Config.PersistentTermConfig, as: Config
   alias Eigr.Functions.Protocol.Actors.ActorId
 
   def supervisor_process_logger(module) do
