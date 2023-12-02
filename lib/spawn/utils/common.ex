@@ -35,6 +35,13 @@ defmodule Spawn.Utils.Common do
       String.to_atom(string)
   end
 
+  def actor_host_hash do
+    system = Config.get(:actor_system_name)
+    actorhost_name = Config.get(:app_name)
+
+    :erlang.phash2({system, actorhost_name})
+  end
+
   @spec generate_key(ActorId.t() | String.t()) :: integer()
   def generate_key(id) when is_integer(id), do: id
   def generate_key(%{name: name, system: system}), do: :erlang.phash2({name, system})

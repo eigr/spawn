@@ -15,7 +15,7 @@ defmodule Spawn.Cluster.StateHandoff.Controllers.CrdtController do
   alias Actors.Config.PersistentTermConfig, as: Config
   alias Eigr.Functions.Protocol.Actors.Actor
 
-  import Spawn.Utils.Common, only: [generate_key: 1]
+  import Spawn.Utils.Common, only: [generate_key: 1, actor_host_hash: 0]
 
   @behaviour Spawn.Cluster.StateHandoff.ControllerBehaviour
 
@@ -167,7 +167,9 @@ defmodule Spawn.Cluster.StateHandoff.Controllers.CrdtController do
     registers =
       crdt_pid
       |> DeltaCrdt.to_map()
-      |> Iter.filter(fn {_key, [host]} -> host.node == node end)
+      |> Iter.filter(fn {_key, [host]} ->
+        host.node == node and Keyword.get(host.opts, :hash) == Common.actor_host_hash()
+      end)
       |> Iter.map(fn {key, [value]} -> {key, [%{value | node: Node.self()}]} end)
       |> Iter.into(%{})
 
