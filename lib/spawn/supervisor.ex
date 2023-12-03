@@ -38,7 +38,7 @@ defmodule Spawn.Supervisor do
 
   defp maybe_start_internal_nats(children, opts) do
     case Config.get(:use_internal_nats) do
-      "false" ->
+      false ->
         children
 
       _ ->
