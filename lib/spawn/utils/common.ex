@@ -5,6 +5,19 @@ defmodule Spawn.Utils.Common do
   alias Actors.Config.PersistentTermConfig, as: Config
   alias Eigr.Functions.Protocol.Actors.ActorId
 
+  @spec actor_host_hash() :: integer()
+  def actor_host_hash() do
+    system = Config.get(:actor_system_name)
+    actorhost_name = Config.get(:app_name)
+
+    :erlang.phash2({system, actorhost_name})
+  end
+
+  @spec generate_key(String.t() | ActorId.t()) :: integer()
+  def generate_key(id) when is_integer(id), do: id
+  def generate_key(%{name: name, system: system}), do: :erlang.phash2({name, system})
+
+  @spec supervisor_process_logger(module()) :: term()
   def supervisor_process_logger(module) do
     %{
       id: Module.concat([module, Logger]),
@@ -29,6 +42,7 @@ defmodule Spawn.Utils.Common do
     }
   end
 
+  @spec to_existing_atom_or_new(String.t()) :: atom()
   def to_existing_atom_or_new(string) do
     String.to_existing_atom(string)
   rescue
@@ -36,17 +50,7 @@ defmodule Spawn.Utils.Common do
       String.to_atom(string)
   end
 
-  def actor_host_hash do
-    system = Config.get(:actor_system_name)
-    actorhost_name = Config.get(:app_name)
-
-    :erlang.phash2({system, actorhost_name})
-  end
-
-  @spec generate_key(ActorId.t() | String.t()) :: integer()
-  def generate_key(id) when is_integer(id), do: id
-  def generate_key(%{name: name, system: system}), do: :erlang.phash2({name, system})
-
+  @spec return_and_maybe_hibernate(tuple()) :: tuple()
   def return_and_maybe_hibernate(tuple) do
     queue_length = Process.info(self(), :message_queue_len)
 
