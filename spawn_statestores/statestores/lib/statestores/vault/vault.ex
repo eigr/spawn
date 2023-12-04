@@ -13,10 +13,8 @@ defmodule Statestores.Vault do
   def init(config) do
     config =
       Keyword.put(config, :ciphers,
-        default:
-          {Cloak.Ciphers.AES.GCM, tag: "AES.GCM.V1", key: Util.get_statestore_key()},
-        secondary:
-          {Cloak.Ciphers.AES.CTR, tag: "AES.CTR.V1", key: Util.get_statestore_key()}
+        default: {Cloak.Ciphers.AES.GCM, tag: "AES.GCM.V1", key: Util.get_statestore_key()},
+        secondary: {Cloak.Ciphers.AES.CTR, tag: "AES.CTR.V1", key: Util.get_statestore_key()}
       )
 
     {:ok, config}

@@ -164,8 +164,18 @@ defmodule Statestores.Util do
   def generate_key(id), do: :erlang.phash2({id.name, id.system})
 
   def get_statestore_key do
-    System.get_env("SPAWN_STATESTORE_KEY", Base.encode64("spawn_statestore_default_key"))
-    |> Base.decode64!()
+    key =
+      System.get_env(
+        "SPAWN_STATESTORE_KEY",
+        Base.encode64(Application.get_env(:spawn_statestores, :statestore_key, ""))
+      )
+      |> Base.decode64!()
+
+    if key == "" do
+      raise "Missing SPAWN_STATESTORE_KEY environment variable."
+    end
+
+    key
   end
 
   # Lookup Adapters
