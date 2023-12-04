@@ -112,10 +112,6 @@ defmodule Actors.Registry.ActorRegistry do
   Fetch current entities of the service.
   Returns `HostActor` with Host and specific actor.
   """
-  @doc """
-  Fetch current entities of the service.
-  Returns `HostActor` with Host and specific actor.
-  """
   @doc since: "0.1.0"
   @spec lookup(ActorId.t(), Keyword.t()) :: {:ok, HostActor.t()} | {:not_found, []}
   def lookup(id, opts \\ []) do

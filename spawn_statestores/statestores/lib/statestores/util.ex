@@ -69,10 +69,10 @@ defmodule Statestores.Util do
 
   def get_default_database_type do
     cond do
+      Code.ensure_loaded?(Statestores.Adapters.PostgresSnapshotAdapter) -> "postgres"
       Code.ensure_loaded?(Statestores.Adapters.MySQLSnapshotAdapter) -> "mysql"
       Code.ensure_loaded?(Statestores.Adapters.MariaDBSnapshotAdapter) -> "mariadb"
       Code.ensure_loaded?(Statestores.Adapters.CockroachDBSnapshotAdapter) -> "cockroachdb"
-      Code.ensure_loaded?(Statestores.Adapters.PostgresSnapshotAdapter) -> "postgres"
       Code.ensure_loaded?(Statestores.Adapters.SQLite3SnapshotAdapter) -> "sqlite"
       Code.ensure_loaded?(Statestores.Adapters.MSSQLSnapshotAdapter) -> "mssql"
       true -> nil
@@ -97,7 +97,7 @@ defmodule Statestores.Util do
 
     config = Keyword.put(config, :password, System.get_env("PROXY_DATABASE_SECRET", "admin"))
 
-    hostname = System.get_env("PROXY_DATABASE_HOST", "localhost")
+    hostname = System.get_env("PROXY_DATABASE_HOST", "127.0.0.1")
 
     config = Keyword.put(config, :hostname, hostname)
     config = Keyword.put(config, :migration_lock, nil)
@@ -162,6 +162,21 @@ defmodule Statestores.Util do
 
   @spec generate_key(any()) :: String.t()
   def generate_key(id), do: :erlang.phash2({id.name, id.system})
+
+  def get_statestore_key do
+    key =
+      System.get_env(
+        "SPAWN_STATESTORE_KEY",
+        Base.encode64(Application.get_env(:spawn_statestores, :statestore_key, ""))
+      )
+      |> Base.decode64!()
+
+    if key == "" do
+      raise "Missing SPAWN_STATESTORE_KEY environment variable."
+    end
+
+    key
+  end
 
   # Lookup Adapters
   defp load_lookup_adapter_by_type(:mysql), do: Statestores.Adapters.MySQLLookupAdapter

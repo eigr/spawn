@@ -7,14 +7,14 @@ defmodule Statestores.Vault do
   """
   use Cloak.Vault, otp_app: :spawn_statestores
 
+  alias Statestores.Util
+
   @impl GenServer
   def init(config) do
     config =
       Keyword.put(config, :ciphers,
-        default:
-          {Cloak.Ciphers.AES.GCM, tag: "AES.GCM.V1", key: decode_env!("SPAWN_STATESTORE_KEY")},
-        secondary:
-          {Cloak.Ciphers.AES.CTR, tag: "AES.CTR.V1", key: decode_env!("SPAWN_STATESTORE_KEY")}
+        default: {Cloak.Ciphers.AES.GCM, tag: "AES.GCM.V1", key: Util.get_statestore_key()},
+        secondary: {Cloak.Ciphers.AES.CTR, tag: "AES.CTR.V1", key: Util.get_statestore_key()}
       )
 
     {:ok, config}
