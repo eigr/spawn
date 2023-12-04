@@ -21,7 +21,6 @@ defmodule SpawnSdk.System.Supervisor do
     end
   """
   use Supervisor
-  import Spawn.Utils.Common, only: [supervisor_process_logger: 1]
 
   alias Actors.Config.PersistentTermConfig, as: Config
 
