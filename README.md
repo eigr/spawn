@@ -37,7 +37,7 @@ The key features of serverless computing include automatic scaling, pay-per-exec
 
 Spawn extends this Serverless computing model by considering that there is an infrastructure layer in all application code, such as state management, configuration management, integration flows with other applications, connection pooling, and so on, and that this code infrastructure must also be managed by the runtime, freeing the developer so that he can focus much more on his business objectives directly.
 
-This also brings security to CEOs and CTOS as well as product managers that the central objectives of their companies will be achieved within a shorter period of time, thus increasing their competitiveness against their competitors. This without compromising technical quality and scalability to support your products running in production.
+This also brings security to CEOs and CTOs as well as product managers that the central objectives of their companies will be achieved within a shorter period of time, thus increasing their competitiveness against their competitors. This without compromising technical quality and scalability to support your products running in production.
 
 ## Latest Blogs
 
