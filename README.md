@@ -23,7 +23,7 @@ Originally coming from some contributors to the [Cloudstate](https://github.com/
 
 Unlike serverless runtimes hidden in cloud providers' black boxes, Spawn is an open-source serverless runtime designed for both cloud and on-premises environments. Powered by [BEAM](https://www.erlang.org/blog/a-brief-beam-primer/) and [ERTS](https://www.erlang.org/doc/apps/erts/), Spawn offers a polyglot programming model for crafting versatile applications. It's **BEAM** for all.
 
-Explore the potential of Erlang, regardless of your preferred programming language, to swiftly accomplish your business objectives. Check out our [documentation](docs/index.md) to get started.
+Explore the potential of Erlang, regardless of your preferred programming language, to swiftly accomplish your business objectives. Check out our [documentation](docs/index.md) to [get started](docs/getting_started.md).
 
 ## Demystifying the Serverless Computing Model
 
