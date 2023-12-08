@@ -95,6 +95,53 @@ defmodule Actors.Actor.Entity.Invocation do
 
   def handle_timers([]), do: :ok
 
+  @doc """
+  Handles the initialization invocation for an Actor Entity.
+
+  ## Parameters
+
+  - `state` (%EntityState{}): The current state of the Actor Entity.
+
+  ## Returns
+
+  - `{:noreply, new_state}`: If the initialization is successful.
+  - `{:noreply, new_state}`: If the actor has not registered any actions, indicating a warning.
+  - `{:error, reason, new_state}`: If there is an error during the initialization, returns a tuple with the reason for the error and the updated entity state.
+
+  ## Behavior
+
+  The `invoke_init/1` function is responsible for handling the initialization invocation of an Actor Entity. It checks if the actor has registered any actions and performs the following steps:
+
+  1. **Action Registration Check:** Checks if the actor has registered any actions. If not, it logs a warning and returns `{:noreply, new_state}`.
+
+  2. **Init Action Selection:** Filters the registered actions to find the initialization action (`init` or similar) and selects the first matching action.
+
+  3. **Interface Invocation:** Invokes the selected initialization action using the appropriate interface.
+
+  4. **Handling Initialization Result:** Processes the result of the initialization, updating the entity state accordingly.
+
+  ## Example
+
+  ```elixir
+  state = %EntityState{
+    system: %ActorSystem{name: "example_system"},
+    actor: %Actor{
+      id: %ActorId{name: "example_actor"},
+      actions: ["init", "perform_action"],
+      state: %{}
+    },
+    opts: %{}
+  }
+
+  case Actors.Actor.Entity.Invocation.invoke_init(state) do
+    {:noreply, new_state} ->
+      IO.puts("Initialization successful!")
+    {:error, reason, new_state} ->
+      IO.puts("Initialization failed. Reason: #{reason}")
+  end
+  ```
+
+  """
   def invoke_init(
         %EntityState{
           system: actor_system,
@@ -156,78 +203,143 @@ defmodule Actors.Actor.Entity.Invocation do
   end
 
   @doc """
-  Invoke function, receives a request and calls invoke host with the response
+  Handles the invocation of actions on an Actor Entity.
+
+  ## Parameters
+
+  - `invocation` (%InvocationRequest{}): A struct representing the invocation request, including details about the actor, action, and payload.
+  - `opts` (Keyword.t): Additional options for the invocation.
+
+  ## Returns
+
+  - `{:reply, result, new_state}`: If the invocation is successful, returns a tuple containing the reply result, and the updated entity state.
+  - `{:noreply, new_state}`: If the invocation is successful, but there is no specific reply result.
+  - `{:noreply, new_state, opts}`: If the invocation is successful and includes additional options.
+  - `{:error, reason, new_state}`: If there is an error during the invocation, returns a tuple with the reason for the error and the updated entity state.
+
+  ## Behavior
+
+  The `invoke/2` function is responsible for handling the invocation of actions on an Actor Entity.
+  It verifies authorization, finds the appropriate action to execute, and delegates the invocation to the corresponding interface.
+
+  The function performs the following steps:
+
+  1. **Authorization Check:** Checks if the invocation is authorized based on the actor's actions and timers.
+
+  2. **Span Context Handling:** Uses OpenTelemetry for tracing and creates a new span for the invocation.
+
+  3. **Find Request by Action:** Determines the appropriate interface and builds the request based on the action.
+
+  4. **Invocation Host Handling:** Delegates the invocation to the selected interface's `invoke_host/3` function.
+
+  5. **Handle Response:** Processes the response from the invocation, handles side effects, and updates the entity state.
+
+  6. **Checkpoint:** Optionally performs a checkpoint operation to record the state revision.
+
+  ## Example
+
+  ```elixir
+  invocation = %InvocationRequest{
+    actor: %Actor{id: %ActorId{name: "example_actor"}},
+    action_name: "perform_action",
+    payload: {:data, %{}},
+    caller: %ActorId{name: "caller_actor"}
+  }
+
+  opts = [span_ctx: OpenTelemetry.Ctx.new()]
+
+  case Actors.Actor.Entity.Invocation.invoke({invocation, opts}, entity_state) do
+    {:reply, result, new_state} ->
+      IO.puts("Invocation successful! Result: #{result}")
+    {:noreply, new_state} ->
+      IO.puts("Invocation successful! No specific reply.")
+    {:error, reason, new_state} ->
+      IO.puts("Invocation failed. Reason: #{reason}")
+  end
+  ```
+
   """
   def invoke(
         {%InvocationRequest{
-           actor:
-             %Actor{
-               id: %ActorId{name: actor_name} = _id
-             } = _actor,
-           action_name: action
+           actor: %Actor{id: %ActorId{name: actor_name} = _id} = _actor,
+           action_name: action_name
          } = invocation, opts},
         %EntityState{
-          system: _actor_system,
           actor: %Actor{state: actor_state, actions: actions, timer_actions: timers},
           opts: actor_opts
         } = state
       ) do
-    if get_acl_manager().get_policies!()
-       |> get_acl_manager().is_authorized?(invocation) do
+    if is_authorized?(invocation, actions, timers) do
+      all_opts = Keyword.merge(actor_opts, opts)
       ctx = Keyword.get(opts, :span_ctx, OpenTelemetry.Ctx.new())
 
       Tracer.with_span ctx, "#{actor_name} invocation handler", kind: :server do
-        if length(actions) <= 0 do
-          Logger.warning("Actor [#{actor_name}] has not registered any Actions")
-        end
-
-        all_actions =
-          actions ++
-            Enum.map(timers, fn %FixedTimerAction{action: cmd} = _timer_cmd -> cmd end)
-
-        Tracer.set_attributes([
-          {:invoked_action, action},
-          {:actor_declared_actions, length(all_actions)}
-        ])
-
-        case Enum.member?(@default_actions, action) or
-               Enum.any?(all_actions, fn cmd -> cmd.name == action end) do
-          true ->
-            interface = get_interface(actor_opts)
-
-            request = build_request(invocation, actor_state, opts)
-
+        case find_request_by_action(
+               invocation,
+               actor_state,
+               action_name,
+               actions,
+               timers,
+               all_opts
+             ) do
+          {true, interface, request} ->
             Tracer.with_span "invoke-host" do
-              interface.invoke_host(request, state, @default_actions)
-              |> case do
-                {:ok, response, new_state} ->
-                  Tracer.add_event("successful-invocation", [
-                    {:ok, "#{inspect(response.updated_context.metadata)}"}
-                  ])
-
-                  handle_response(request, response, new_state, opts)
-
-                {:error, reason, new_state} ->
-                  Tracer.add_event("failure-invocation", [
-                    {:error, "#{inspect(reason)}"}
-                  ])
-
-                  {:reply, {:error, reason}, new_state}
-                  |> return_and_maybe_hibernate()
-              end
+              handle_invocation(interface, request, state, all_opts)
             end
 
-          false ->
-            Logger.warning("Action [#{action}] not found for Actor [#{actor_name}]")
-
-            {:reply,
-             {:error, :action_not_found,
-              "Action [#{action}] not found for Actor [#{actor_name}]"}, state, :hibernate}
+          {false, _} ->
+            handle_not_found_action(action_name, actor_name, state)
         end
       end
     else
       raise NotAuthorizedException
     end
+  end
+
+  defp is_authorized?(invocation, actions, timers) do
+    acl_manager = get_acl_manager()
+
+    acl_manager.get_policies!()
+    |> acl_manager.is_authorized?(invocation) and
+      length(actions ++ timers) > 0
+  end
+
+  defp find_request_by_action(invocation, actor_state, action, actions, timers, actor_opts) do
+    all_actions = actions ++ Enum.map(timers, & &1.action)
+
+    case member_action?(action, all_actions) do
+      true ->
+        interface = get_interface(actor_opts)
+        request = build_request(invocation, actor_state, actor_opts)
+        {true, interface, request}
+
+      false ->
+        {false, nil}
+    end
+  end
+
+  defp member_action?(action, actions) do
+    Enum.member?(@default_actions, action) or Enum.any?(actions, &(&1.name == action))
+  end
+
+  defp handle_invocation(interface, request, state, opts) do
+    Tracer.with_span "invoke-host" do
+      case interface.invoke_host(request, state, @default_actions) do
+        {:ok, response, new_state} ->
+          handle_response(request, response, new_state, opts)
+
+        {:error, reason, new_state} ->
+          {:reply, {:error, reason}, new_state} |> return_and_maybe_hibernate()
+      end
+    end
+  end
+
+  defp handle_not_found_action(action, actor_name, state) do
+    Logger.warning("Action [#{action}] not found for Actor [#{actor_name}]")
+
+    {:reply,
+     {:error, :action_not_found, "Action [#{action}] not found for Actor [#{actor_name}]"}, state,
+     :hibernate}
   end
 
   defp build_request(
@@ -284,11 +396,15 @@ defmodule Actors.Actor.Entity.Invocation do
           |> return_and_maybe_hibernate()
       end
 
+    response_checkpoint(response, checkpoint, revision, state)
+  end
+
+  defp response_checkpoint(response, checkpoint, revision, state) do
     if checkpoint do
       Lifecycle.checkpoint(revision, state)
+    else
+      response
     end
-
-    response
   end
 
   defp do_response(
@@ -366,7 +482,9 @@ defmodule Actors.Actor.Entity.Invocation do
         }
 
         try do
-          case Actors.invoke(invocation, span_ctx: OpenTelemetry.Tracer.current_span_ctx()) do
+          case Actors.invoke(invocation,
+                 span_ctx: OpenTelemetry.Tracer.current_span_ctx()
+               ) do
             {:ok, response} ->
               {:ok, response}
 
@@ -412,7 +530,9 @@ defmodule Actors.Actor.Entity.Invocation do
         }
 
         try do
-          case Actors.invoke(invocation, span_ctx: OpenTelemetry.Tracer.current_span_ctx()) do
+          case Actors.invoke(invocation,
+                 span_ctx: OpenTelemetry.Tracer.current_span_ctx()
+               ) do
             {:ok, response} ->
               {:ok, response}
 
@@ -433,7 +553,8 @@ defmodule Actors.Actor.Entity.Invocation do
 
   def do_broadcast(_request, broadcast, _opts \\ [])
 
-  def do_broadcast(_request, broadcast, _opts) when is_nil(broadcast) or broadcast == %{} do
+  def do_broadcast(_request, broadcast, _opts)
+      when is_nil(broadcast) or broadcast == %{} do
     :ok
   end
 
