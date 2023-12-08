@@ -124,7 +124,7 @@ kubectl get actorhosts
 Once you have done the initial setup you can start developing your actors in several available languages. See below how easy it is to do this:
 
 <details open>
-  <summary>JS</summary>
+  <summary>NodeJS/Bun</summary>
 
   ```js
   import spawn, { ActorContext, Value } from '@eigr/spawn-sdk'
