@@ -137,7 +137,7 @@ defmodule Actors.Actor.Entity.Invocation do
     {:noreply, new_state} ->
       IO.puts("Initialization successful!")
     {:error, reason, new_state} ->
-      IO.puts("Initialization failed. Reason: #{reason}")
+      IO.puts("Initialization failed. Reason: {reason}")
   end
   ```
 
@@ -250,11 +250,11 @@ defmodule Actors.Actor.Entity.Invocation do
 
   case Actors.Actor.Entity.Invocation.invoke({invocation, opts}, entity_state) do
     {:reply, result, new_state} ->
-      IO.puts("Invocation successful! Result: #{result}")
+      IO.puts("Invocation successful! Result: {result}")
     {:noreply, new_state} ->
       IO.puts("Invocation successful! No specific reply.")
     {:error, reason, new_state} ->
-      IO.puts("Invocation failed. Reason: #{reason}")
+      IO.puts("Invocation failed. Reason: {reason}")
   end
   ```
 
