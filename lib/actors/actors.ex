@@ -117,6 +117,9 @@ defmodule Actors do
       {:ok, %{body: body}} when body in ["async", :async] ->
         {:ok, :async}
 
+      {:ok, %{body: "no_content"}} ->
+        {:error, :bad_response}
+
       {:ok, %{body: body}} when is_binary(body) ->
         {:ok, ActorInvocationResponse.decode(body)}
 

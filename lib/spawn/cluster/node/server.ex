@@ -62,6 +62,9 @@ defmodule Spawn.Cluster.Node.Server do
       {:ok, response} ->
         {:reply, ActorInvocationResponse.encode(response)}
 
+      {:error, :no_content} ->
+        {:reply, "no_content"}
+
       {:error, error} ->
         {:reply, error}
     end
