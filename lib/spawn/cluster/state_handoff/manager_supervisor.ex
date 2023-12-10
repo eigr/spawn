@@ -21,7 +21,8 @@ defmodule Spawn.Cluster.StateHandoff.ManagerSupervisor do
   def init(opts) do
     children = [
       supervisor_process_logger(__MODULE__),
-      Spawn.Cluster.StateHandoff.Manager.child_spec(:state_handoff_manager, opts)
+      Spawn.Cluster.StateHandoff.Manager.child_spec(:state_handoff_manager, opts),
+      Spawn.Cluster.StateHandoff.InvocationSchedulerState.child_spec(opts)
     ]
 
     Supervisor.init(children,

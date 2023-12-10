@@ -11,8 +11,7 @@ defmodule Actors.Actor.InvocationScheduler do
 
   require Logger
 
-  alias Actors.Registry.ActorRegistry
-  alias Eigr.Functions.Protocol.InvocationRequest
+  alias Spawn.Cluster.StateHandoff.InvocationSchedulerState
 
   @hibernate_delay 20_000
   @hibernate_jitter 30_000
@@ -26,11 +25,11 @@ defmodule Actors.Actor.InvocationScheduler do
 
   @impl true
   def handle_continue(:init_invocations, state) do
-    # TODO: Fix this module
-    # schedule_hibernate()
-    # stored_invocations = ActorRegistry.get_all_invocations()
+    schedule_hibernate()
 
-    # Enum.each(stored_invocations, &call_invoke/1)
+    Node.self()
+    |> InvocationSchedulerState.all()
+    |> Enum.each(&call_invoke/1)
 
     {:noreply, state}
   end
@@ -41,16 +40,24 @@ defmodule Actors.Actor.InvocationScheduler do
   end
 
   @impl true
-  def handle_info({:invoke, decoded_request}, state) do
-    ActorRegistry.remove_invocation_request(
-      decoded_request.actor.id,
-      InvocationRequest.encode(decoded_request)
-    )
+  def handle_info({:invoke, decoded_request, repeat_in}, state) do
+    if is_nil(repeat_in) do
+      scheduled_to =
+        DateTime.utc_now()
+        |> DateTime.add(repeat_in, :millisecond)
 
-    spawn(fn ->
-      request_to_invoke = %InvocationRequest{decoded_request | scheduled_to: nil, async: true}
-      Actors.invoke(request_to_invoke)
-    end)
+      request = %InvocationRequest{decoded_request | scheduled_to: scheduled_to}
+
+      GenServer.cast(self(), {:schedule, request, repeat_in, false})
+    else
+      InvocationSchedulerState.remove(
+        Node.self(),
+        {InvocationRequest.encode(decoded_request), nil}
+      )
+    end
+
+    request_to_invoke = %InvocationRequest{decoded_request | scheduled_to: 0, async: true}
+    Actors.invoke(request_to_invoke)
 
     {:noreply, state}
   end
@@ -61,23 +68,41 @@ defmodule Actors.Actor.InvocationScheduler do
   end
 
   @impl true
-  def handle_cast({:schedule, request}, state) do
-    encoded_request = InvocationRequest.encode(request)
+  def handle_cast({:schedule, request, repeat_in, set_state?}, state) do
+    if set_state? do
+      encoded_request = InvocationRequest.encode(request)
 
-    spawn(fn ->
-      ActorRegistry.register_invocation_request(request.actor.id, encoded_request)
-    end)
+      InvocationSchedulerState.put(encoded_request, repeat_in)
+    end
 
-    call_invoke(request)
+    call_invoke({request, repeat_in})
 
     {:noreply, state}
   end
 
-  defp call_invoke(encoded_request) when is_binary(encoded_request) do
-    InvocationRequest.decode(encoded_request) |> call_invoke()
+  @impl true
+  def handle_cast({:schedule_many, requests}, state) do
+    requests =
+      Enum.map(requests, fn {request, repeat_in} ->
+        encoded_request = InvocationRequest.encode(request)
+
+        call_invoke({request, repeat_in})
+
+        {encoded_request, repeat_in}
+      end)
+
+    InvocationSchedulerState.put_many(requests)
+
+    {:noreply, state}
   end
 
-  defp call_invoke(%InvocationRequest{} = decoded_request) do
+  defp call_invoke({encoded_request, repeat_in}) when is_binary(encoded_request) do
+    decoded = encoded_request |> InvocationRequest.decode()
+
+    call_invoke({decoded, repeat_in})
+  end
+
+  defp call_invoke({%InvocationRequest{} = decoded_request, repeat_in}) do
     delay_in_ms =
       decoded_request.scheduled_to
       |> DateTime.from_unix!(:millisecond)
@@ -85,9 +110,9 @@ defmodule Actors.Actor.InvocationScheduler do
 
     if delay_in_ms <= 0 do
       Logger.warn("Received negative delayed invocation request (#{delay_in_ms}), invoking now")
-      Process.send(self(), {:invoke, decoded_request}, [])
+      Process.send(self(), {:invoke, decoded_request, repeat_in}, [])
     else
-      Process.send_after(self(), {:invoke, decoded_request}, delay_in_ms)
+      Process.send_after(self(), {:invoke, decoded_request, repeat_in}, delay_in_ms)
     end
   end
 
@@ -99,8 +124,12 @@ defmodule Actors.Actor.InvocationScheduler do
 
   # Client
 
-  def schedule_invoke(%InvocationRequest{} = invocation_request) do
-    GenServer.cast({:global, __MODULE__}, {:schedule, invocation_request})
+  def schedule_invocations(requests) do
+    GenServer.cast({:global, __MODULE__}, {:schedule_many, requests})
+  end
+
+  def schedule_invoke(%InvocationRequest{} = invocation_request, repeat_in \\ nil) do
+    GenServer.cast({:global, __MODULE__}, {:schedule, invocation_request, repeat_in, true})
   end
 
   def child_spec do

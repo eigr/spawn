@@ -34,7 +34,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
         %EntityState{
           system: system,
           actor: %Actor{
-            id: %ActorId{name: name, parent: parent} = _id,
+            id: %ActorId{name: name, parent: parent} = id,
             metadata: metadata,
             settings:
               %ActorSettings{
@@ -64,7 +64,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
       end
 
     :ok = handle_metadata(name, system, metadata)
-    :ok = Invocation.handle_timers(timer_actions)
+    :ok = Invocation.handle_timers(timer_actions, state.actor)
 
     :ok =
       Spawn.Cluster.Node.Registry.update_entry_value(
@@ -198,46 +198,12 @@ defmodule Actors.Actor.Entity.Lifecycle do
   def snapshot(
         %EntityState{
           system: system,
-          actor:
-            %Actor{
-              id: %ActorId{name: name} = _id,
-              state: actor_state,
-              settings: %ActorSettings{
-                stateful: true,
-                snapshot_strategy: %ActorSnapshotStrategy{
-                  strategy: {:timeout, %TimeoutStrategy{timeout: _timeout}} = snapshot_strategy
-                }
-              }
-            } = _actor,
-          opts: opts
-        } = state
-      )
-      when is_nil(actor_state) or actor_state == %{} do
-    {:message_queue_len, size} = Process.info(self(), :message_queue_len)
-    Measurements.dispatch_actor_inflights(system, name, size)
-
-    state =
-      case schedule_snapshot(snapshot_strategy, opts) do
-        {:ok, timer} ->
-          %EntityState{state | opts: Keyword.merge(opts, timer: timer)}
-
-        _ ->
-          state
-      end
-
-    {:noreply, state}
-    |> return_and_maybe_hibernate()
-  end
-
-  def snapshot(
-        %EntityState{
-          system: system,
           state_hash: old_hash,
           revision: revision,
           actor:
             %Actor{
               id: %ActorId{name: name} = id,
-              state: %ActorState{} = actor_state,
+              state: actor_state,
               settings: %ActorSettings{
                 stateful: true,
                 snapshot_strategy: %ActorSnapshotStrategy{
@@ -253,7 +219,8 @@ defmodule Actors.Actor.Entity.Lifecycle do
 
     # Persist State only when necessary
     new_state =
-      if StateManager.is_new?(old_hash, actor_state.state) do
+      if not is_nil(actor_state) and actor_state != %{} and
+           StateManager.is_new?(old_hash, actor_state.state) do
         Logger.debug("Snapshotting actor #{name}")
         revision = revision + 1
 

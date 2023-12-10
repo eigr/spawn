@@ -8,6 +8,7 @@ defmodule Actors.Actor.Entity.Invocation do
 
   alias Actors.Actor.Entity.{EntityState, Lifecycle}
   alias Actors.Exceptions.NotAuthorizedException
+  alias Actors.Actor.InvocationScheduler
 
   alias Eigr.Functions.Protocol.Actors.{
     Actor,
@@ -77,23 +78,30 @@ defmodule Actors.Actor.Entity.Invocation do
     end
   end
 
-  def handle_timers(timers) when is_list(timers) do
-    if length(timers) > 0 do
-      timers
-      |> Stream.map(fn %FixedTimerAction{seconds: delay} = timer_action ->
-        Process.send_after(self(), {:invoke_timer_action, timer_action}, delay)
+  def handle_timers([], _actor), do: :ok
+
+  def handle_timers(timers, actor) when is_list(timers) do
+    invocations =
+      Enum.map(timers, fn %FixedTimerAction{action: %Action{name: action}, seconds: delay} ->
+        invocation_request = %InvocationRequest{
+          actor: actor,
+          action_name: action,
+          payload: {:noop, %Noop{}},
+          async: true,
+          caller: actor.id
+        }
+
+        {invocation_request, delay}
       end)
-      |> Stream.run()
-    end
+
+    InvocationScheduler.schedule_invocations(invocations)
 
     :ok
   catch
     error -> Logger.error("Error on handle timers #{inspect(error)}")
   end
 
-  def handle_timers(nil), do: :ok
-
-  def handle_timers([]), do: :ok
+  def handle_timers(nil, _actor), do: :ok
 
   @doc """
   Handles the initialization invocation for an Actor Entity.
