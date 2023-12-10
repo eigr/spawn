@@ -282,7 +282,7 @@ defmodule Actors.Actor.CallerConsumer do
 
           error ->
             raise ArgumentError,
-                  "You are trying to create an actor from an Unamed actor that has never been registered before. ActorId: #{inspect(id)}. Details. #{inspect(error)}"
+                  "You are trying to create an actor from an Unnamed actor that has never been registered before. ActorId: #{inspect(id)}. Details. #{inspect(error)}"
         end
       end)
       |> List.flatten()
@@ -449,10 +449,10 @@ defmodule Actors.Actor.CallerConsumer do
   defp to_spawn_hosts(id, actor_hosts, spawned_opts) do
     Enum.map(actor_hosts, fn %HostActor{
                                node: node,
-                               actor: %Actor{} = unamed_actor,
+                               actor: %Actor{} = unnamed_actor,
                                opts: opts
                              } = _host ->
-      spawned_actor = %Actor{unamed_actor | id: id}
+      spawned_actor = %Actor{unnamed_actor | id: id}
 
       new_opts =
         if Keyword.has_key?(spawned_opts, :revision) do
@@ -721,7 +721,7 @@ defmodule Actors.Actor.CallerConsumer do
       kind == :POOLED ->
         false
 
-      match?(true, stateful) and kind != :UNAMED ->
+      match?(true, stateful) and kind != :UNNAMED ->
         true
 
       not is_nil(channel_group) and length(channel_group) > 0 ->

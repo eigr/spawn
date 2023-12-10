@@ -19,7 +19,7 @@ Benchee.run(
     "Async Non Parallel Actor - Update State" => fn ->
       async_invoke_update_state()
     end,
-    # "Non Parallel Unamed Spawn and Invoke Actor  - Update State" => fn ->
+    # "Non Parallel Unnamed Spawn and Invoke Actor  - Update State" => fn ->
     #   spawn_and_invoke()
     # end
     # "Non Parallel Stateless Pooled Actor                    - Call Action " => fn ->
@@ -58,7 +58,7 @@ Benchee.run(
 #     "Async Non Parallel Actor - Update State" => fn ->
 #       async_invoke_update_state()
 #     end,
-#     # "Non Parallel Unamed Spawn and Invoke Actor  - Update State" => fn ->
+#     # "Non Parallel Unnamed Spawn and Invoke Actor  - Update State" => fn ->
 #     #   spawn_and_invoke()
 #     # end
 #     # "Non Parallel Stateless Pooled Actor                    - Call Action " => fn ->

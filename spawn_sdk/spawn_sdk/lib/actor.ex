@@ -115,7 +115,7 @@ defmodule SpawnSdk.Actor do
   Example:
 
   ```
-  iex(spawn_a@127.0.0.1)1> SpawnSdk.Actor.spawn("spawn-system", "joe", "unamed_actor")
+  iex(spawn_a@127.0.0.1)1> SpawnSdk.Actor.spawn("spawn-system", "joe", "unnamed_actor")
   %SpawnSdk.ActorRef{system: "spawn-system", name: "joe", opts: []}
   ```
 
@@ -126,7 +126,7 @@ defmodule SpawnSdk.Actor do
 
   my_data = %MyData{value: 1}
 
-  Actor.spawn("spawn-system", "joe", "unamed_actor")
+  Actor.spawn("spawn-system", "joe", "unnamed_actor")
   |> Actor.invoke(action: "sum", data: my_data)
   ```
   """

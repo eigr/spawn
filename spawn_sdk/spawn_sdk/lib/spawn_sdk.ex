@@ -51,7 +51,7 @@ defmodule SpawnSdk do
   ```elixir
   iex> SpawnSdk.invoke(
     "actor_name",
-    ref: SpawnSdkExample.Actors.UnamedActor,
+    ref: SpawnSdkExample.Actors.UnnamedActor,
     system: "spawn-system",
     action: "sum", # "sum" or :sum
     payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 5}
@@ -66,9 +66,9 @@ defmodule SpawnSdk do
   defdelegate invoke(actor_name, invoke_opts), to: SpawnSdk.System.SpawnSystem
 
   @doc """
-  Spawns a Unamed actor
+  Spawns a Unnamed actor
 
-  A Unamed actor means that you can spawn dynamically the same actor for multiple different names.
+  A Unnamed actor means that you can spawn dynamically the same actor for multiple different names.
   It is analog to `DynamicSupervisor`
 
   ## Opts
@@ -82,7 +82,7 @@ defmodule SpawnSdk do
   iex> SpawnSdk.spawn_actor(
     "actor_name",
     system: "spawn-system",
-    actor: SpawnSdkExample.Actors.UnamedActor
+    actor: SpawnSdkExample.Actors.UnnamedActor
   )
   ```
   """

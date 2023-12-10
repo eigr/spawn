@@ -168,10 +168,10 @@ pub enum Kind {
     UnknowKind = 0,
     /// NAMED actors are used to create children of this based actor at runtime
     Named = 1,
-    /// UNAMED actors as the name suggests have only one real instance of themselves running 
+    /// UNNAMED actors as the name suggests have only one real instance of themselves running 
     /// during their entire lifecycle. That is, they are the opposite of the NAMED type Actors.
-    Unamed = 2,
-    /// Pooled Actors are similar to Unamed actors, but unlike them, 
+    Unnamed = 2,
+    /// Pooled Actors are similar to Unnamed actors, but unlike them, 
     /// their identifying name will always be the one registered at the system initialization stage. 
     /// The great advantage of Pooled actors is that they have multiple instances of themselves 
     /// acting as a request service pool.
@@ -195,7 +195,7 @@ impl Kind {
         match self {
             Kind::UnknowKind => "UNKNOW_KIND",
             Kind::Named => "NAMED",
-            Kind::Unamed => "UNAMED",
+            Kind::Unnamed => "UNNAMED",
             Kind::Pooled => "POOLED",
             Kind::Proxy => "PROXY",
         }
@@ -205,7 +205,7 @@ impl Kind {
         match value {
             "UNKNOW_KIND" => Some(Self::UnknowKind),
             "NAMED" => Some(Self::Named),
-            "UNAMED" => Some(Self::Unamed),
+            "UNNAMED" => Some(Self::Unnamed),
             "POOLED" => Some(Self::Pooled),
             "PROXY" => Some(Self::Proxy),
             _ => None,

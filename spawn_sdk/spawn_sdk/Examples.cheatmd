@@ -7,7 +7,7 @@
 defmodule SpawnSdkExample.Actors.MyActor do
   use SpawnSdk.Actor,
     name: "jose", # Default is Full Qualified Module name a.k.a __MODULE__
-    kind: :named, # Default is already :u«named. Valid are :named | :unamed | :pooled
+    kind: :named, # Default is already :u«named. Valid are :named | :unnamed | :pooled
     stateful: true, # Default is already true
     state_type: Io.Eigr.Spawn.Example.MyState,
     deactivate_timeout: 30_000,
@@ -53,14 +53,14 @@ SpawnSdk.invoke("joe", system: "spawn-system", action: "ping", scheduled_to: ~U[
   {:ok, :async}
 ```
 
-## Using Unamed Actors
+## Using Unnamed Actors
 
 ```elixir
-# Unamed.ex
-defmodule SpawnSdkExample.Actors.UnamedActor do
+# Unnamed.ex
+defmodule SpawnSdkExample.Actors.UnnamedActor do
   use SpawnSdk.Actor,
-    name: "unamed_actor",
-    kind: :unamed,
+    name: "unnamed_actor",
+    kind: :unnamed,
     state_type: Io.Eigr.Spawn.Example.MyState
 
   require Logger
@@ -81,8 +81,8 @@ defmodule SpawnSdkExample.Actors.UnamedActor do
   end
 end
 
-# Spawning Unamed actors
-SpawnSdk.spawn_actor("robert", system: "spawn-system", actor: "unamed_actor")
+# Spawning Unnamed actors
+SpawnSdk.spawn_actor("robert", system: "spawn-system", actor: "unnamed_actor")
   :ok
 
 #  Invoke Spawned Actors
@@ -90,7 +90,7 @@ SpawnSdk.invoke("robert", system: "spawn-system", action: "sum", payload: %Io.Ei
   {:ok, %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 16}}
 
 #  Invoke Actors in a lazy way without having to spawn them before
-SpawnSdk.invoke("robert_lazy", ref: SpawnSdkExample.Actors.UnamedActor, system: "spawn-system", action: "sum", payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1})
+SpawnSdk.invoke("robert_lazy", ref: SpawnSdkExample.Actors.UnnamedActor, system: "spawn-system", action: "sum", payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1})
   {:ok, %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1}}  
 ```
 
@@ -150,9 +150,9 @@ end
 
 ```elixir
 # side_effect.ex
-defmodule SpawnSdkExample.Actors.UnamedActor do
+defmodule SpawnSdkExample.Actors.UnnamedActor do
   use SpawnSdk.Actor,
-    kind: :unamed,
+    kind: :unnamed,
     stateful: false,
     state_type: Io.Eigr.Spawn.Example.MyState
 
@@ -251,7 +251,7 @@ end
 # driver.ex
 defmodule Fleet.Actors.Driver do
   use SpawnSdk.Actor,
-    kind: :unamed,
+    kind: :unnamed,
     state_type: Fleet.Domain.Driver
 
   alias Fleet.Domain.{
@@ -285,7 +285,7 @@ end
 
 defmodule Fleet.Actors.FleetControllersActor do
   use SpawnSdk.Actor,
-    kind: :unamed,
+    kind: :unnamed,
     channels: [
       {"fleet.controllers.topic", "update_position_receive"}
     ] # or just ["fleet.controllers.topic"] and it will forward to a action called receive
@@ -319,7 +319,7 @@ defmodule SpawnSdkExample.Application do
         actors: [
           # your actors here
           SpawnSdkExample.Actors.MyActor,
-          SpawnSdkExample.Actors.UnamedActor,
+          SpawnSdkExample.Actors.UnnamedActor,
           SpawnSdkExample.Actors.ClockActor,
           SpawnSdkExample.Actors.PooledActor
         ]

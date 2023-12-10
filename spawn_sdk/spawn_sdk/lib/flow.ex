@@ -37,7 +37,7 @@ defmodule SpawnSdk.Flow do
 
     defmodule Fleet.Actors.FleetControllersActor do
       use SpawnSdk.Actor,
-        kind: :unamed,
+        kind: :unnamed,
         channels: [
           {"fleet.controllers.topic", "update_position_receive"}
         ] # or just ["fleet.controllers.topic"] and it will forward to a action called receive

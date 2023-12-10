@@ -556,9 +556,11 @@ defmodule SpawnSdk.System.SpawnSystem do
     end)
   end
 
-  def decode_kind(:abstract), do: :UNAMED
-  def decode_kind(:ABSTRACT), do: :UNAMED
-  def decode_kind(:unamed), do: :UNAMED
+  def decode_kind(:abstract), do: :UNNAMED
+  def decode_kind(:ABSTRACT), do: :UNNAMED
+  def decode_kind(:unnamed), do: :UNNAMED
+  def decode_kind(:unamed), do: :UNNAMED
+  def decode_kind(:UNAMED), do: :UNNAMED
   def decode_kind(:SINGLETON), do: :NAMED
   def decode_kind(:singleton), do: :NAMED
   def decode_kind(:named), do: :NAMED

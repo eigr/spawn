@@ -122,10 +122,10 @@ The Spawn protocol is very simple to implement but it is necessary for the devel
    
    For a more complete understanding, see the example in Java of how the Actors are registered and how the Spawning of these Actors is performed on the fly:
 
-      * First an Actor is defined and its identity is defined as Unamed.
-        https://github.com/eigr/spawn-springboot-sdk/blob/main/spawn-springboot-examples/src/main/java/io/eigr/spawn/example/UnamedActor.java
+      * First an Actor is defined and its identity is defined as Unnamed.
+        https://github.com/eigr/spawn-springboot-sdk/blob/main/spawn-springboot-examples/src/main/java/io/eigr/spawn/example/UnnamedActor.java
 
-      * Then, when you really want to create a concrete instance of this Actor, a real name is given and this name is associated with the unamed type of the Actor.  
+      * Then, when you really want to create a concrete instance of this Actor, a real name is given and this name is associated with the unnamed type of the Actor.  
         https://github.com/eigr/spawn-springboot-sdk/blob/e88b59f1505647a867adb9607a4d39baa249ebb2/spawn-springboot-examples/src/main/java/io/eigr/spawn/example/App.java#L36
 
 6. **Raise your hand and seek help:**

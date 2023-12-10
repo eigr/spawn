@@ -58,7 +58,7 @@
 //
 // Actors are usually created at the beginning of the SDK's communication flow with the Proxy by the registration step described above. 
 // However, some use cases require that Actors can be created ***on the fly***. 
-// In other words, Spawn is used to bring to life Actors previously registered as Unameds, giving them a name and thus creating a concrete instance 
+// In other words, Spawn is used to bring to life Actors previously registered as Unnameds, giving them a name and thus creating a concrete instance 
 // at runtime for that Actor. Actors created with the Spawn feature are generally used when you want to share a behavior while maintaining 
 // the isolation characteristics of the actors.
 // For these situations we have the Spawning flow described below. 

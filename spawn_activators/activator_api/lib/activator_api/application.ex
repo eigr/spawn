@@ -53,7 +53,7 @@ defmodule ActivatorAPI.Application do
       #   system: "spawn-system",
       #   actor: "robert",
       #   action: "sum",
-      #   parent_actor: "unamed_actor",
+      #   parent_actor: "unnamed_actor",
       #   options: %{
       #     # valids are: "invoke", "spawn-invoke"
       #     invocation_type: "spawn-invoke",
