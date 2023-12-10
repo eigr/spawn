@@ -94,11 +94,11 @@ enum Kind {
     // NAMED actors are used to create children of this based actor at runtime
     NAMED = 1;
 
-    // UNAMED actors as the name suggests have only one real instance of themselves running 
+    // UNNAMED actors as the name suggests have only one real instance of themselves running 
     // during their entire lifecycle. That is, they are the opposite of the NAMED type Actors.
-    UNAMED = 2;
+    UNNAMED = 2;
     
-    // Pooled Actors are similar to Unamed actors, but unlike them, 
+    // Pooled Actors are similar to Unnamed actors, but unlike them, 
     // their identifying name will always be the one registered at the system initialization stage. 
     // The great advantage of Pooled actors is that they have multiple instances of themselves 
     // acting as a request service pool.
@@ -143,7 +143,7 @@ message ActorId {
     // Name of a ActorSystem
     string system = 2;
 
-    // When the Actor is of the Unamed type, 
+    // When the Actor is of the Unnamed type, 
     // the name of the parent Actor must be informed here.
     string parent = 3;
 }

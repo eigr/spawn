@@ -5,7 +5,7 @@ defmodule SpawnSdkExample do
   require Logger
 
   alias Io.Eigr.Spawn.Example.MyBusinessMessage
-  alias SpawnSdkExample.Actors.UnamedActor
+  alias SpawnSdkExample.Actors.UnnamedActor
 
   def invoke_update_state() do
     try do
@@ -46,7 +46,7 @@ defmodule SpawnSdkExample do
   def spawn_and_invoke() do
     try do
       SpawnSdk.invoke("robert_lazy",
-        ref: UnamedActor,
+        ref: UnnamedActor,
         system: "spawn-system",
         action: "sum",
         payload: %MyBusinessMessage{value: 1}

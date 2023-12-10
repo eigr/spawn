@@ -72,7 +72,7 @@ In this example we are creating an actor in a Named way, that is, it is a known 
 defmodule SpawnSdkExample.Actors.MyActor do
   use SpawnSdk.Actor,
     name: "jose", # Default is Full Qualified Module name a.k.a __MODULE__
-    kind: :named, # Default is already :named. Valid are :named | :unamed | :pooled
+    kind: :named, # Default is already :named. Valid are :named | :unnamed | :pooled
     stateful: true, # Default is already true
     state_type: Io.Eigr.Spawn.Example.MyState, # or :json if you don't care about protobuf types
     deactivate_timeout: 30_000,
@@ -109,15 +109,15 @@ Note Keep in mind that any Action that has the names present in the list below w
 
 Defaults inicialization Action names: "**init**", "**Init**", "**setup**", "**Setup**"
 
-## Unamed Actor
+## Unnamed Actor
 
-We can also create Unnamed Dynamic/Lazy actors, that is, despite having its unamed behavior defined at compile time, a Lazy actor will only have a concrete instance when it is associated with an identifier/name at runtime. Below follows the same previous actor being defined as Unamed.
+We can also create Unnamed Dynamic/Lazy actors, that is, despite having its unnamed behavior defined at compile time, a Lazy actor will only have a concrete instance when it is associated with an identifier/name at runtime. Below follows the same previous actor being defined as Unnamed.
 
 ```elixir
-defmodule SpawnSdkExample.Actors.UnamedActor do
+defmodule SpawnSdkExample.Actors.UnnamedActor do
   use SpawnSdk.Actor,
-    name: "unamed_actor",
-    kind: :unamed,
+    name: "unnamed_actor",
+    kind: :unnamed,
     state_type: Io.Eigr.Spawn.Example.MyState
 
   require Logger
@@ -137,9 +137,9 @@ defmodule SpawnSdkExample.Actors.UnamedActor do
 end
 ```
 
-Notice that the only thing that has changed is the the kind of actor, in this case the kind is set to :unamed.
+Notice that the only thing that has changed is the the kind of actor, in this case the kind is set to :unnamed.
 
-> **_NOTE:_** Can Elixir programmers think in terms of Named vs Unamed actors as more or less known at startup vs dynamically supervised/registered? That is, defining your actors directly in the supervision tree or using a Dynamic Supervisor for that.
+> **_NOTE:_** Can Elixir programmers think in terms of Named vs Unnamed actors as more or less known at startup vs dynamically supervised/registered? That is, defining your actors directly in the supervision tree or using a Dynamic Supervisor for that.
 
 ## Pooled Actors
 
@@ -242,9 +242,9 @@ end
 Actors can also emit side effects to other Actors as part of their response. See an example:
 
 ```elixir
-defmodule SpawnSdkExample.Actors.UnamedActor do
+defmodule SpawnSdkExample.Actors.UnnamedActor do
   use SpawnSdk.Actor,
-    kind: :unamed,
+    kind: :unnamed,
     stateful: false,
     state_type: Io.Eigr.Spawn.Example.MyState
 
@@ -364,7 +364,7 @@ Actors can also send messages to a group of actors at once as an action callback
 ```elixir
 defmodule Fleet.Actors.Driver do
   use SpawnSdk.Actor,
-    kind: :unamed,
+    kind: :unnamed,
     state_type: Fleet.Domain.Driver
 
   alias Fleet.Domain.{
@@ -398,7 +398,7 @@ end
 
 defmodule Fleet.Actors.FleetControllersActor do
   use SpawnSdk.Actor,
-    kind: :unamed,
+    kind: :unnamed,
     channels: [
       {"fleet.controllers.topic", "update_position_receive"}
     ] # or just ["fleet.controllers.topic"] and it will forward to a action called receive
@@ -575,7 +575,7 @@ defmodule SpawnSdkExample.Application do
         system: "spawn-system",
         actors: [
           SpawnSdkExample.Actors.MyActor,
-          SpawnSdkExample.Actors.UnamedActor,
+          SpawnSdkExample.Actors.UnnamedActor,
           SpawnSdkExample.Actors.ClockActor,
           SpawnSdkExample.Actors.PooledActor
         ]
@@ -637,14 +637,14 @@ SpawnSdk.invoke("joe", system: "spawn-system", action: "get")
 Spawning Actors:
 
 ```elixir
-iex> SpawnSdk.spawn_actor("robert", system: "spawn-system", actor: "unamed_actor")
+iex> SpawnSdk.spawn_actor("robert", system: "spawn-system", actor: "unnamed_actor")
 :ok
 ```
 
 You can also create Actors so that they are initialized from a certain revision number, that is, initialize actors from a specific point in time.
 
 ```elixir
-iex> SpawnSdk.spawn_actor("robert", system: "spawn-system", actor: "unamed_actor", revision: 2)
+iex> SpawnSdk.spawn_actor("robert", system: "spawn-system", actor: "unnamed_actor", revision: 2)
 :ok
 ```
 
@@ -660,7 +660,7 @@ iex> SpawnSdk.invoke("robert", system: "spawn-system", action: "sum", payload: %
 Invoke Actors in a lazy way without having to spawn them before:
 
 ```elixir
-iex> SpawnSdk.invoke("robert_lazy", ref: SpawnSdkExample.Actors.UnamedActor, system: "spawn-system", action: "sum", payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1})
+iex> SpawnSdk.invoke("robert_lazy", ref: SpawnSdkExample.Actors.UnnamedActor, system: "spawn-system", action: "sum", payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1})
 {:ok, %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1}}
 ```
 

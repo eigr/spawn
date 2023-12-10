@@ -20,7 +20,7 @@ defmodule Eigr.Functions.Protocol.Actors.Kind do
           __unknown_fields__: []
         },
         %Google.Protobuf.EnumValueDescriptorProto{
-          name: "UNAMED",
+          name: "UNNAMED",
           number: 2,
           options: nil,
           __unknown_fields__: []
@@ -47,7 +47,7 @@ defmodule Eigr.Functions.Protocol.Actors.Kind do
 
   field(:UNKNOW_KIND, 0)
   field(:NAMED, 1)
-  field(:UNAMED, 2)
+  field(:UNNAMED, 2)
   field(:POOLED, 3)
   field(:PROXY, 4)
 end

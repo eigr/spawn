@@ -6,7 +6,7 @@ defmodule Actor.ActorTest do
   defmodule Actor.MyActor do
     use SpawnSdk.Actor,
       name: "my_actor_ref",
-      kind: :unamed,
+      kind: :unnamed,
       stateful: false,
       state_type: Eigr.Spawn.Actor.MyState,
       tags: [{"foo", "none"}, {"bar", "unchanged"}]
@@ -219,7 +219,7 @@ defmodule Actor.ActorTest do
     end
 
     test "get defaults" do
-      assert :UNAMED == Actor.MyActor.__meta__(:kind)
+      assert :UNNAMED == Actor.MyActor.__meta__(:kind)
       assert false == Actor.MyActor.__meta__(:stateful)
       assert 10_000 == Actor.MyActor.__meta__(:deactivate_timeout)
       assert 2_000 == Actor.MyActor.__meta__(:snapshot_timeout)

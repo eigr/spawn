@@ -1,7 +1,7 @@
-defmodule SpawnSdkExample.Actors.UnamedActor do
+defmodule SpawnSdkExample.Actors.UnnamedActor do
   use SpawnSdk.Actor,
-    name: "unamed_actor",
-    kind: :unamed,
+    name: "unnamed_actor",
+    kind: :unnamed,
     deactivate_timeout: 60_000,
     state_type: Io.Eigr.Spawn.Example.MyState
 
@@ -10,7 +10,7 @@ defmodule SpawnSdkExample.Actors.UnamedActor do
   alias Io.Eigr.Spawn.Example.{MyState, MyBusinessMessage}
 
   defact sum(%MyBusinessMessage{value: value} = data, %Context{state: state} = ctx) do
-    Logger.info("[Unamed Actor] Received Request: #{inspect(data)}. Context: #{inspect(ctx)}")
+    Logger.info("[Unnamed Actor] Received Request: #{inspect(data)}. Context: #{inspect(ctx)}")
 
     new_value =
       if is_nil(state) do

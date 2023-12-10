@@ -47,8 +47,8 @@ defmodule Actors do
     * `opts` - The options to create Actors
 
   spawn_actor must be used when you want to create a concrete instance of an actor
-  previously registered as unamed.
-  That is, when an Actorid is associated with an actor of unamed type.
+  previously registered as unnamed.
+  That is, when an Actorid is associated with an actor of unnamed type.
   This function only registers the metadata of the new actor, not activating it.
   This will occur when the sprite is first invoked.
   ##
