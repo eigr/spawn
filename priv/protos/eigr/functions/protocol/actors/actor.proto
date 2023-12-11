@@ -91,11 +91,11 @@ enum Kind {
     // When no type is informed, the default to be assumed will be the Named pattern.
     UNKNOW_KIND = 0;
 
-    // NAMED actors are used to create children of this based actor at runtime
+    // NAMED actors as the name suggests have only one real instance of themselves running 
+    // during their entire lifecycle. That is, they are the opposite of the UNNAMED type Actors.
     NAMED = 1;
-
-    // UNNAMED actors as the name suggests have only one real instance of themselves running 
-    // during their entire lifecycle. That is, they are the opposite of the NAMED type Actors.
+    
+    // UNNAMED actors are used to create children of this based actor at runtime
     UNNAMED = 2;
     
     // Pooled Actors are similar to Unnamed actors, but unlike them, 
