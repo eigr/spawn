@@ -329,7 +329,6 @@ defmodule SpawnSdk.Actor do
 
     actor_name = Keyword.get(opts, :name, Atom.to_string(__CALLER__.module))
     actor_kind = Keyword.get(opts, :kind, :NAMED) |> SpawnSdk.System.SpawnSystem.decode_kind()
-    caller_module = __CALLER__.module
     channel_group = Keyword.get(opts, :channels, [])
 
     min_pool_size = Keyword.get(opts, :min_pool_size, 1)

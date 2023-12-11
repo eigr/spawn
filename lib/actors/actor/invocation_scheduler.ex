@@ -12,6 +12,7 @@ defmodule Actors.Actor.InvocationScheduler do
   require Logger
 
   alias Spawn.Cluster.StateHandoff.InvocationSchedulerState
+  alias Eigr.Functions.Protocol.InvocationRequest
 
   @hibernate_delay 20_000
   @hibernate_jitter 30_000
@@ -75,9 +76,9 @@ defmodule Actors.Actor.InvocationScheduler do
   def handle_cast({:schedule_fixed, requests}, state) do
     requests =
       Enum.reduce(requests, [], fn {request, scheduled_to, repeat_in}, acc ->
-        if is_nil(InvocationSchedulerState.get(request)) do
-          encoded_request = InvocationRequest.encode(request)
+        encoded_request = InvocationRequest.encode(request)
 
+        if is_nil(InvocationSchedulerState.get(encoded_request)) do
           call_invoke({request, {scheduled_to, repeat_in}})
 
           acc ++ [{encoded_request, scheduled_to, repeat_in}]
@@ -119,7 +120,7 @@ defmodule Actors.Actor.InvocationScheduler do
     |> DateTime.from_unix!(:millisecond)
   end
 
-  def get_scheduled_to_datetime(scheduled_to), do: scheduled_to
+  defp get_scheduled_to_datetime(scheduled_to), do: scheduled_to
 
   def next_hibernate_delay(), do: @hibernate_delay + :rand.uniform(@hibernate_jitter)
 

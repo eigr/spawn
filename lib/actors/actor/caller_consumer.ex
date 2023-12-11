@@ -721,7 +721,10 @@ defmodule Actors.Actor.CallerConsumer do
       kind == :POOLED ->
         false
 
-      match?(true, stateful) and kind != :UNNAMED ->
+      kind == :UNNAMED ->
+        false
+
+      match?(true, stateful) ->
         true
 
       not is_nil(channel_group) and length(channel_group) > 0 ->

@@ -14,7 +14,6 @@ defmodule Actors.Actor.Entity.Lifecycle do
     ActorId,
     ActorDeactivationStrategy,
     ActorSettings,
-    ActorState,
     ActorSnapshotStrategy,
     Metadata,
     TimeoutStrategy
@@ -34,7 +33,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
         %EntityState{
           system: system,
           actor: %Actor{
-            id: %ActorId{name: name, parent: parent} = id,
+            id: %ActorId{name: name, parent: parent} = _id,
             metadata: metadata,
             settings:
               %ActorSettings{
@@ -64,7 +63,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
       end
 
     :ok = handle_metadata(name, system, metadata)
-    :ok = Invocation.handle_timers(timer_actions, state.actor)
+    :ok = Invocation.handle_timers(timer_actions, system, state.actor)
 
     :ok =
       Spawn.Cluster.Node.Registry.update_entry_value(

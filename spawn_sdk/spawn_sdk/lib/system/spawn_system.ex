@@ -559,12 +559,15 @@ defmodule SpawnSdk.System.SpawnSystem do
   def decode_kind(:abstract), do: :UNNAMED
   def decode_kind(:ABSTRACT), do: :UNNAMED
   def decode_kind(:unnamed), do: :UNNAMED
+  def decode_kind(:UNNAMED), do: :UNNAMED
   def decode_kind(:unamed), do: :UNNAMED
   def decode_kind(:UNAMED), do: :UNNAMED
   def decode_kind(:SINGLETON), do: :NAMED
   def decode_kind(:singleton), do: :NAMED
   def decode_kind(:named), do: :NAMED
+  def decode_kind(:NAMED), do: :NAMED
   def decode_kind(:pooled), do: :POOLED
+  def decode_kind(:POOLED), do: :POOLED
   def decode_kind(_), do: :UNKNOW_KIND
 
   defp get_action(action_atom) do

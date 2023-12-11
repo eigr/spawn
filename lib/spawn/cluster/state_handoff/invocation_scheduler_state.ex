@@ -24,6 +24,10 @@ defmodule Spawn.Cluster.StateHandoff.InvocationSchedulerState do
     }
   end
 
+  def start_link(opts) do
+    GenServer.start_link(__MODULE__, opts, name: __MODULE__)
+  end
+
   @impl true
   def init(_opts) do
     Process.flag(:trap_exit, true)
@@ -67,10 +71,10 @@ defmodule Spawn.Cluster.StateHandoff.InvocationSchedulerState do
   def put_many(invocations) do
     new_data =
       Enum.reduce(invocations, %{}, fn {invocation, scheduled_to, cycle_in}, acc ->
-        %{acc | invocation => {scheduled_to, cycle_in}}
+        Map.put(acc, invocation, {scheduled_to, cycle_in})
       end)
 
-    DeltaCrdt.merge(get_crdt_pid(), new_data)
+    DeltaCrdt.merge(get_crdt_pid(), new_data, :infinity)
   end
 
   def put(invocation, scheduled_to, repeat_in) do
@@ -82,7 +86,7 @@ defmodule Spawn.Cluster.StateHandoff.InvocationSchedulerState do
   end
 
   def remove(key) do
-    DeltaCrdt.delete(get_crdt_pid(), key)
+    DeltaCrdt.delete(get_crdt_pid(), key, :infinity)
   end
 
   @impl true
@@ -103,7 +107,7 @@ defmodule Spawn.Cluster.StateHandoff.InvocationSchedulerState do
     {:noreply, crdt_pid}
   end
 
-  def handle_info({:nodeup, node, node_type}, crdt_pid) do
+  def handle_info({:nodeup, node, _node_type}, crdt_pid) do
     Logger.debug("InvocationSchedulerState :nodeup event from #{inspect(node)}")
 
     if Sidecar.GracefulShutdown.running?() do
@@ -113,7 +117,7 @@ defmodule Spawn.Cluster.StateHandoff.InvocationSchedulerState do
     {:noreply, crdt_pid}
   end
 
-  def handle_info({:nodedown, node, node_type}, crdt_pid) do
+  def handle_info({:nodedown, node, _node_type}, crdt_pid) do
     Logger.debug("InvocationSchedulerState :nodedown event from #{inspect(node)}")
 
     if Sidecar.GracefulShutdown.running?() do
