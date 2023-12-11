@@ -57,35 +57,32 @@ defmodule Spawn.Cluster.StateHandoff.InvocationSchedulerState do
     :persistent_term.get(__MODULE__, {:error, Node.self()})
   end
 
-  @spec all(node()) :: map()
-  def all(node) do
-    DeltaCrdt.get(get_crdt_pid(), node, :infinity) || []
+  @spec all() :: map()
+  def all() do
+    DeltaCrdt.to_map(get_crdt_pid()) || %{}
   end
+
+  def put_many([]), do: :ok
 
   def put_many(invocations) do
-    current_mapset = all(Node.self())
-
-    new_mapset =
-      Enum.reduce(invocations, current_mapset, fn element, acc ->
-        MapSet.put(acc, element)
+    new_data =
+      Enum.reduce(invocations, %{}, fn {invocation, scheduled_to, cycle_in}, acc ->
+        %{acc | invocation => {scheduled_to, cycle_in}}
       end)
 
-    if MapSet.size(current_mapset) != MapSet.size(new_mapset) do
-      DeltaCrdt.set(get_crdt_pid(), Node.self(), new_mapset)
-    end
+    DeltaCrdt.merge(get_crdt_pid(), new_data)
   end
 
-  def put(invocation, repeat_in) do
-    put_many([{invocation, repeat_in}])
+  def put(invocation, scheduled_to, repeat_in) do
+    put_many([{invocation, scheduled_to, repeat_in}])
   end
 
-  def remove(node, key) do
-    new_mapset =
-      Node.self()
-      |> all()
-      |> MapSet.delete(key)
+  def get(invocation) do
+    DeltaCrdt.get(get_crdt_pid(), invocation, :infinity)
+  end
 
-    DeltaCrdt.set(get_crdt_pid(), Node.self(), new_mapset)
+  def remove(key) do
+    DeltaCrdt.delete(get_crdt_pid(), key)
   end
 
   @impl true
@@ -98,7 +95,9 @@ defmodule Spawn.Cluster.StateHandoff.InvocationSchedulerState do
 
   @impl true
   def handle_info(:sync, crdt_pid) do
-    do_set_neighbours(crdt_pid)
+    if Sidecar.GracefulShutdown.running?() do
+      do_set_neighbours(crdt_pid)
+    end
 
     Process.send_after(self(), :sync, Config.get(:neighbours_sync_interval))
     {:noreply, crdt_pid}
@@ -106,7 +105,10 @@ defmodule Spawn.Cluster.StateHandoff.InvocationSchedulerState do
 
   def handle_info({:nodeup, node, node_type}, crdt_pid) do
     Logger.debug("InvocationSchedulerState :nodeup event from #{inspect(node)}")
-    do_set_neighbours(crdt_pid)
+
+    if Sidecar.GracefulShutdown.running?() do
+      do_set_neighbours(crdt_pid)
+    end
 
     {:noreply, crdt_pid}
   end
@@ -115,23 +117,10 @@ defmodule Spawn.Cluster.StateHandoff.InvocationSchedulerState do
     Logger.debug("InvocationSchedulerState :nodedown event from #{inspect(node)}")
 
     if Sidecar.GracefulShutdown.running?() do
-      take_ownership(node, crdt_pid)
+      do_set_neighbours(crdt_pid)
     end
 
-    do_set_neighbours(crdt_pid)
-
     {:noreply, crdt_pid}
-  end
-
-  defp take_ownership(node, crdt_pid) do
-    other_node_schedules = all(node)
-    my_schedules = all(Node.self())
-
-    DeltaCrdt.set(crdt_pid, Node.self(), other_node_schedules ++ my_schedules)
-
-    Logger.debug(
-      "Took ownership of (#{Enum.count(other_node_schedules)}) schedules from node #{inspect(node)}"
-    )
   end
 
   defp do_set_neighbours(this_crdt_pid) do

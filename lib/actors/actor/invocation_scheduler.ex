@@ -27,8 +27,7 @@ defmodule Actors.Actor.InvocationScheduler do
   def handle_continue(:init_invocations, state) do
     schedule_hibernate()
 
-    Node.self()
-    |> InvocationSchedulerState.all()
+    InvocationSchedulerState.all()
     |> Enum.each(&call_invoke/1)
 
     {:noreply, state}
@@ -40,20 +39,13 @@ defmodule Actors.Actor.InvocationScheduler do
   end
 
   @impl true
-  def handle_info({:invoke, decoded_request, repeat_in}, state) do
+  def handle_info({:invoke, decoded_request, scheduled_to, repeat_in}, state) do
     if is_nil(repeat_in) do
-      scheduled_to =
-        DateTime.utc_now()
-        |> DateTime.add(repeat_in, :millisecond)
-
-      request = %InvocationRequest{decoded_request | scheduled_to: scheduled_to}
-
-      GenServer.cast(self(), {:schedule, request, repeat_in, false})
+      InvocationSchedulerState.remove(InvocationRequest.encode(decoded_request))
     else
-      InvocationSchedulerState.remove(
-        Node.self(),
-        {InvocationRequest.encode(decoded_request), nil}
-      )
+      scheduled_to = DateTime.add(scheduled_to, repeat_in, :millisecond)
+
+      GenServer.cast(self(), {:schedule, decoded_request, scheduled_to, repeat_in})
     end
 
     request_to_invoke = %InvocationRequest{decoded_request | scheduled_to: 0, async: true}
@@ -68,27 +60,30 @@ defmodule Actors.Actor.InvocationScheduler do
   end
 
   @impl true
-  def handle_cast({:schedule, request, repeat_in, set_state?}, state) do
-    if set_state? do
-      encoded_request = InvocationRequest.encode(request)
+  def handle_cast({:schedule, request, scheduled_to, repeat_in}, state) do
+    encoded_request =
+      InvocationRequest.encode(%InvocationRequest{request | scheduled_to: 0, async: true})
 
-      InvocationSchedulerState.put(encoded_request, repeat_in)
-    end
+    InvocationSchedulerState.put(encoded_request, scheduled_to, repeat_in)
 
-    call_invoke({request, repeat_in})
+    call_invoke({request, {scheduled_to, repeat_in}})
 
     {:noreply, state}
   end
 
   @impl true
-  def handle_cast({:schedule_many, requests}, state) do
+  def handle_cast({:schedule_fixed, requests}, state) do
     requests =
-      Enum.map(requests, fn {request, repeat_in} ->
-        encoded_request = InvocationRequest.encode(request)
+      Enum.reduce(requests, [], fn {request, scheduled_to, repeat_in}, acc ->
+        if is_nil(InvocationSchedulerState.get(request)) do
+          encoded_request = InvocationRequest.encode(request)
 
-        call_invoke({request, repeat_in})
+          call_invoke({request, {scheduled_to, repeat_in}})
 
-        {encoded_request, repeat_in}
+          acc ++ [{encoded_request, scheduled_to, repeat_in}]
+        else
+          acc
+        end
       end)
 
     InvocationSchedulerState.put_many(requests)
@@ -96,23 +91,22 @@ defmodule Actors.Actor.InvocationScheduler do
     {:noreply, state}
   end
 
-  defp call_invoke({encoded_request, repeat_in}) when is_binary(encoded_request) do
+  defp call_invoke({encoded_request, {scheduled_to, repeat_in}})
+       when is_binary(encoded_request) do
     decoded = encoded_request |> InvocationRequest.decode()
 
-    call_invoke({decoded, repeat_in})
+    call_invoke({decoded, {scheduled_to, repeat_in}})
   end
 
-  defp call_invoke({%InvocationRequest{} = decoded_request, repeat_in}) do
-    delay_in_ms =
-      decoded_request.scheduled_to
-      |> DateTime.from_unix!(:millisecond)
-      |> DateTime.diff(DateTime.utc_now(), :millisecond)
+  defp call_invoke({%InvocationRequest{} = decoded_request, {scheduled_to, repeat_in}}) do
+    scheduled_to = get_scheduled_to_datetime(scheduled_to)
+    delay_in_ms = DateTime.diff(scheduled_to, DateTime.utc_now(), :millisecond)
 
     if delay_in_ms <= 0 do
       Logger.warn("Received negative delayed invocation request (#{delay_in_ms}), invoking now")
-      Process.send(self(), {:invoke, decoded_request, repeat_in}, [])
+      Process.send(self(), {:invoke, decoded_request, scheduled_to, repeat_in}, [])
     else
-      Process.send_after(self(), {:invoke, decoded_request, repeat_in}, delay_in_ms)
+      Process.send_after(self(), {:invoke, decoded_request, scheduled_to, repeat_in}, delay_in_ms)
     end
   end
 
@@ -120,16 +114,26 @@ defmodule Actors.Actor.InvocationScheduler do
     Process.send_after(self(), :hibernate, next_hibernate_delay())
   end
 
+  defp get_scheduled_to_datetime(scheduled_to) when is_number(scheduled_to) do
+    scheduled_to
+    |> DateTime.from_unix!(:millisecond)
+  end
+
+  def get_scheduled_to_datetime(scheduled_to), do: scheduled_to
+
   def next_hibernate_delay(), do: @hibernate_delay + :rand.uniform(@hibernate_jitter)
 
   # Client
 
-  def schedule_invocations(requests) do
-    GenServer.cast({:global, __MODULE__}, {:schedule_many, requests})
+  def schedule_fixed_invocations(requests) do
+    GenServer.cast({:global, __MODULE__}, {:schedule_fixed, requests})
   end
 
   def schedule_invoke(%InvocationRequest{} = invocation_request, repeat_in \\ nil) do
-    GenServer.cast({:global, __MODULE__}, {:schedule, invocation_request, repeat_in, true})
+    GenServer.cast(
+      {:global, __MODULE__},
+      {:schedule, invocation_request, invocation_request.scheduled_to, repeat_in}
+    )
   end
 
   def child_spec do

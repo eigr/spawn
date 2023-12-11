@@ -260,6 +260,27 @@ defmodule Actor.ActorTest do
              ) == {:ok, %{value: 0}}
     end
 
+    test "simple scheduled at changing state", ctx do
+      system = ctx.system
+      dynamic_actor_name = Faker.Pokemon.name() <> "json_actor_scheduled_change_state"
+
+      SpawnSdk.invoke(dynamic_actor_name,
+        ref: "json_actor_ref",
+        action: "sum",
+        system: system,
+        payload: %{value: 999},
+        scheduled_to: 1
+      )
+
+      Process.sleep(10)
+
+      assert SpawnSdk.invoke(dynamic_actor_name,
+               ref: "json_actor_ref",
+               action: "getState",
+               system: system
+             ) == {:ok, %{value: 999}}
+    end
+
     test "simple call using maps with no proto", ctx do
       system = ctx.system
       dynamic_actor_name = Faker.Pokemon.name() <> "json_actor_call"

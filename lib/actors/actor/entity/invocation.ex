@@ -91,10 +91,14 @@ defmodule Actors.Actor.Entity.Invocation do
           caller: actor.id
         }
 
-        {invocation_request, delay}
+        scheduled_to =
+          DateTime.utc_now()
+          |> DateTime.add(delay, :millisecond)
+
+        {invocation_request, scheduled_to, delay}
       end)
 
-    InvocationScheduler.schedule_invocations(invocations)
+    InvocationScheduler.schedule_fixed_invocations(invocations)
 
     :ok
   catch
