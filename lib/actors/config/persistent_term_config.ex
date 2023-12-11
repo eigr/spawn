@@ -747,7 +747,7 @@ if Code.ensure_loaded?(:persistent_term) do
       env(key_str, default)
     end
 
-    defp env(key, default \\ nil)
+    defp env(key, default)
 
     defp env(key, default) when is_binary(key) do
       case System.get_env(key, default) do

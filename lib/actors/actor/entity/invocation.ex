@@ -8,6 +8,7 @@ defmodule Actors.Actor.Entity.Invocation do
 
   alias Actors.Actor.Entity.{EntityState, Lifecycle}
   alias Actors.Exceptions.NotAuthorizedException
+  alias Actors.Actor.InvocationScheduler
 
   alias Eigr.Functions.Protocol.Actors.{
     Actor,
@@ -52,48 +53,36 @@ defmodule Actors.Actor.Entity.Invocation do
 
   @http_host_interface Actors.Actor.Interface.Http
 
-  def timer_invoke(
-        %FixedTimerAction{action: %Action{name: cmd} = _action} = timer,
-        %EntityState{
-          system: _actor_system,
-          actor: %Actor{id: caller_actor_id} = actor
-        } = state
-      ) do
-    invocation = %InvocationRequest{
-      actor: actor,
-      action_name: cmd,
-      payload: {:noop, %Noop{}},
-      async: true,
-      caller: caller_actor_id
-    }
+  def handle_timers([], _system, _actor), do: :ok
 
-    invoke_result = invoke({invocation, []}, state)
+  def handle_timers(timers, system, actor) when is_list(timers) do
+    invocations =
+      Enum.map(timers, fn %FixedTimerAction{action: %Action{name: action}, seconds: delay} ->
+        invocation_request = %InvocationRequest{
+          actor: actor,
+          action_name: action,
+          payload: {:noop, %Noop{}},
+          async: true,
+          scheduled_to: 0,
+          caller: actor.id,
+          system: %ActorSystem{name: system}
+        }
 
-    :ok = handle_timers([timer])
+        scheduled_to =
+          DateTime.utc_now()
+          |> DateTime.add(delay, :millisecond)
 
-    case invoke_result do
-      {:reply, _res, state} -> {:noreply, state}
-      {:reply, _res, state, opts} -> {:noreply, state, opts}
-    end
-  end
-
-  def handle_timers(timers) when is_list(timers) do
-    if length(timers) > 0 do
-      timers
-      |> Stream.map(fn %FixedTimerAction{seconds: delay} = timer_action ->
-        Process.send_after(self(), {:invoke_timer_action, timer_action}, delay)
+        {invocation_request, scheduled_to, delay}
       end)
-      |> Stream.run()
-    end
+
+    InvocationScheduler.schedule_fixed_invocations(invocations)
 
     :ok
   catch
     error -> Logger.error("Error on handle timers #{inspect(error)}")
   end
 
-  def handle_timers(nil), do: :ok
-
-  def handle_timers([]), do: :ok
+  def handle_timers(nil, _system, _actor), do: :ok
 
   @doc """
   Handles the initialization invocation for an Actor Entity.

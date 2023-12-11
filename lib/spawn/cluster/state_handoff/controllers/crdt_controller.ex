@@ -124,7 +124,9 @@ defmodule Spawn.Cluster.StateHandoff.Controllers.CrdtController do
         :set_neighbours_sync,
         %{crdt_pid: crdt_pid, neighbours_sync_interval: pooling_interval} = data
       ) do
-    do_set_neighbours(crdt_pid)
+    if Sidecar.GracefulShutdown.running?() do
+      do_set_neighbours(crdt_pid)
+    end
 
     {data, {:set_neighbours_sync, pooling_interval}}
   end
@@ -134,7 +136,10 @@ defmodule Spawn.Cluster.StateHandoff.Controllers.CrdtController do
   @impl true
   @spec handle_nodeup_event(node(), node_type(), data()) :: new_data()
   def handle_nodeup_event(_node, _node_type, %{crdt_pid: crdt_pid} = _data) do
-    do_set_neighbours(crdt_pid)
+    if Sidecar.GracefulShutdown.running?() do
+      do_set_neighbours(crdt_pid)
+    end
+
     %{crdt_pid: crdt_pid}
   end
 

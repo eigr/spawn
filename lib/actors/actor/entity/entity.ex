@@ -262,9 +262,6 @@ defmodule Actors.Actor.Entity do
       :deactivate ->
         Lifecycle.deactivate(state)
 
-      {:invoke_timer_action, action} ->
-        Invocation.timer_invoke(action, state)
-
       action ->
         do_handle_info(action, state)
     end
