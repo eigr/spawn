@@ -5,7 +5,7 @@
 ![Sepp](docs/images/sepp-elixir-254-400.png#gh-light-mode-only)
 ![Sepp](docs/images/sepp-elixir-254-400.png#gh-dark-mode-only)
 
-**Actor Mesh Distributed Runtime**
+**Actor Mesh Runtime**
 
 ![ci](https://github.com/eigr/spawn/actions/workflows/ci.yaml/badge.svg)
 ![last commit](https://img.shields.io/github/last-commit/eigr/spawn?style=social)
