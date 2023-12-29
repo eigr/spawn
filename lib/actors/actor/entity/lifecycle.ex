@@ -100,61 +100,52 @@ defmodule Actors.Actor.Entity.Lifecycle do
     {:ok, state, {:continue, :load_state}}
   end
 
-  def load_state(
-        %EntityState{
-          actor:
-            %Actor{settings: %ActorSettings{stateful: true}, id: %ActorId{name: name} = id} =
-              actor,
-          revision: revision,
-          opts: opts
-        } = state
-      ) do
-    if is_nil(actor.state) or (!is_nil(actor.state) and is_nil(actor.state.state)) do
-      "Internal state is empty for Actor #{name}. Getting state from state manager."
-    else
-      # This is currently not in use by any SDK. In other words, nobody starts the Actors via SDK with some initial state.
-      "Internal state is not empty for Actor #{name}. Trying to reconcile the state with state manager."
-    end
-    |> Logger.debug()
+  def load_state(%EntityState{actor: actor, revision: revision, opts: opts} = state) do
+    loaded = get_state(actor.id, revision)
 
-    loaded = get_state(id, revision)
+    actual_state =
+      case {actor.state, loaded} do
+        {nil, {:ok, current_state, _, _, _}} ->
+          Logger.debug(
+            "Actor #{inspect(actor.id)} was created with an empty state. Trying to fetch Actor data from persistent storage."
+          )
+
+          current_state
+
+        {state, _} when is_map(state) ->
+          Logger.debug(
+            "Internal state is not empty for Actor #{inspect(actor.id)}. Trying to reconcile the state with state manager."
+          )
+
+          state
+
+        _ ->
+          nil
+      end
 
     case loaded do
-      {:ok, current_state, current_revision, status, node} ->
+      {:ok, _current_state, current_revision, status, node} ->
         split_brain_detector =
           Keyword.get(opts, :split_brain_detector, Actors.Node.DefaultSplitBrainDetector)
 
-        with {:partition_check, {:ok, :continue}} <-
-               {:partition_check, split_brain_detector.check_network_partition(id, status, node)} do
-          {:noreply,
-           %EntityState{
-             state
-             | actor: %Actor{actor | state: current_state},
-               revision: current_revision
-           }, {:continue, :call_init_action}}
-        else
-          {:partition_check, {:error, :network_partition_detected}} ->
-            Logger.warning(
-              "We have detected a possible network partition issue and therefore this actor will not start"
-            )
+        case check_partition(actor.id, status, node, split_brain_detector) do
+          {:continue} ->
+            {:noreply, updated_state(state, actual_state, current_revision),
+             {:continue, :call_init_action}}
 
-            raise NetworkPartitionException
+          {:network_partition_detected, _error} ->
+            handle_network_partition(actor.id)
 
           error ->
-            Logger.warning(
-              "We have detected a possible network partition issue and therefore this actor will not start. Details: #{inspect(error)}"
-            )
-
-            raise NetworkPartitionException
+            handle_network_partition(actor.id, error)
         end
 
       {:not_found, %{}, _current_revision} ->
-        Logger.debug("Not found state on statestore for Actor #{name}.")
-        {:noreply, state, {:continue, :call_init_action}}
+        Logger.debug("Not found state on statestore for Actor #{inspect(actor.id)}.")
+        {:noreply, updated_state(state, actual_state, revision), {:continue, :call_init_action}}
 
       error ->
-        Logger.error("Error on load state for Actor #{name}. Error: #{inspect(error)}")
-        {:noreply, state, {:continue, :call_init_action}}
+        handle_load_state_error(actor.name, state, error)
     end
   end
 
@@ -310,6 +301,38 @@ defmodule Actors.Actor.Entity.Lifecycle do
     end
   end
 
+  # Private functions
+
+  defp updated_state(%EntityState{actor: actor} = state, actual_state, revision) do
+    %EntityState{state | actor: %Actor{actor | state: actual_state}, revision: revision}
+  end
+
+  defp check_partition(id, status, node, split_brain_detector) do
+    case split_brain_detector.check_network_partition(id, status, node) do
+      {:ok, :continue} ->
+        :continue
+
+      {:error, :network_partition_detected} ->
+        {:network_partition_detected, :network_partition_detected}
+
+      error ->
+        {:network_partition_detected, error}
+    end
+  end
+
+  defp handle_network_partition(id, error \\ nil) do
+    Logger.warning(
+      "We have detected a possible network partition issue for Actor #{id}. This actor will not start. Details: #{inspect(error)}"
+    )
+
+    raise NetworkPartitionException
+  end
+
+  defp handle_load_state_error(id, state, error) do
+    Logger.error("Error on load state for Actor #{id}. Error: #{inspect(error)}")
+    {:noreply, state, {:continue, :call_init_action}}
+  end
+
   defp is_actor_valid?(
          %Actor{
            settings: %ActorSettings{stateful: stateful},
@@ -344,8 +367,6 @@ defmodule Actors.Actor.Entity.Lifecycle do
       Pubsub.subscribe(topic, actor, system, action)
     end)
   end
-
-  # Timeout private functions
 
   defp schedule_snapshot(snapshot_strategy, opts) do
     timeout_factor = Keyword.get(opts, :timeout_factor, 0)
