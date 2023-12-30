@@ -7,50 +7,50 @@ metadata:
 spec:
   activator:
     kind: deployment # Optional. Default is Deployment. Valid values are [deployment | daemonset]
-    type: AMQP
-    paramsSecretRef: rabbitmq-connection-secret
+    replicas: 1 # Optional. If kind is deployment then default replicas is 1.
+    connector:
+      type: AMQP
+      connectionSecretRef: rabbitmq-connection-secret
     externalConnectorRef: invocation-connection-ref
-    settings:
+    settings: # Optional
       backpressure:
         maxDemand: 2
         prefetchCount: 50 # Default to: processorConcurrency * maxDemand
       processorConcurrency: 50
       producerConcurrency: 1
   bindings:
-    sources:
-      - name: amqp-source
+    - name: test-queue-config
+      source:
         queue: test.queue
-    sinks:
-      - name: robert-sink # name of the sink component
-        to: # Send to channel or to actor
-          #channel: my-actors-channel
-          actor:
-            type: unnamed # valid are named, unnamed, pooled
-            action: setLanguage # Name of an Actor Action to call
-            actorId:
-              parent: abs_actor # if actors are abstract or pooled then this property is mandatory
-              bindWith: amqp-source
-              #system: spawn-system
-              systemFrom:
-                # Below we use metadataNamingStrategy for map message headers to actor name.
-                # valid entries are: [app_id, user_id, message_id, correlation_id, or any key present on amqp headers key]
-                metadataNamingStrategy:
-                  # Example in the Elixir programming language of how to define the actor's system name when sending a message via amqp:
-                  #   Below we use app_id to get name of the actorsystem.
-                  #   AMQP.Basic.publish(chan, "my_exchange", "my_routing_key", "Hello World!", app_id: "spawn-system")
-                  key: "app_id"
-              #name: robert # Name of an Actor to send queue event message
-              nameFrom:
-                #queueNamingStrategy:
-                #  queue: test.queue
-                # Below we use metadataNamingStrategy for map message headers to actor name.
-                # valid entries are: [app_id, user_id, message_id, correlation_id, or any key present on amqp headers key]
-                metadataNamingStrategy:
-                  # Example in the Java programming language of how to define the actor's name when sending a message via amqp:
-                  #   Below we use user_id to get name of the actor.
-                  #   AMQP.BasicProperties properties = new AMQP.BasicProperties();
-                  #   properties.setUserId("robert");
-                  #   channel.basicPublish("test.queue", "", properties, "test".getBytes());
-                  key: "user_id"
-                #suffixWith: -actor
-                #prefixWith: actor-
+      sinks:
+        - name: robert-sink # name of the sink component
+          to: # Send to channel or to actor
+            #channel: my-actors-channel
+            actor:
+              type: unnamed # valid are named, unnamed, pooled
+              action: setLanguage # Name of an Actor Action to call
+              actorId:
+                parent: abs_actor # if actors are abstract or pooled then this property is mandatory
+                #system: spawn-system
+                systemFrom:
+                  # Below we use metadataNamingStrategy for map message headers to actor name.
+                  # valid entries are: [app_id, user_id, message_id, correlation_id, or any key present on amqp headers key]
+                  strategy:
+                    type: "metadata"
+                    # Example in the Elixir programming language of how to define the actor's system name when sending a message via amqp:
+                    #   Below we use app_id to get name of the actorsystem.
+                    #   AMQP.Basic.publish(chan, "my_exchange", "my_routing_key", "Hello World!", app_id: "spawn-system")
+                    value: "app_id"
+                nameFrom:
+                  type: "metadata"
+                  # Below we use metadataNamingStrategy for map message headers to actor name.
+                  # valid entries are: [app_id, user_id, message_id, correlation_id, or any key present on amqp headers key]
+                  strategy:
+                    # Example in the Java programming language of how to define the actor's name when sending a message via amqp:
+                    #   Below we use user_id to get name of the actor.
+                    #   AMQP.BasicProperties properties = new AMQP.BasicProperties();
+                    #   properties.setUserId("robert");
+                    #   channel.basicPublish("test.queue", "", properties, "test".getBytes());
+                    value: "user_id"
+                  #suffixWith: -actor
+                  #prefixWith: actor-

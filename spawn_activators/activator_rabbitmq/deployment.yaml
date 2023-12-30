@@ -1,0 +1,105 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rabbitmq-activator
+  namespace: default
+  labels:
+    k8s-app: rabbitmq-activator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: rabbitmq-activator
+  template:
+    metadata:
+      labels:
+        k8s-app: rabbitmq-activator
+    spec:
+      containers:
+        - image: eigr/spawn-activator-rabbitmq:1.1.1
+          name: spawn-activator
+          env:
+            - name: MIX_ENV
+              value: prod
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: SPAWN_INTERNAL_NATS_AUTH_USER
+              valueFrom:
+                secretKeyRef:
+                  name: invocation-connection-ref
+                  key: username
+            - name: SPAWN_INTERNAL_NATS_AUTH_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: invocation-connection-ref
+                  key: password
+            - name: SPAWN_INTERNAL_NATS_HOSTS
+              valueFrom:
+                secretKeyRef:
+                  name: invocation-connection-ref
+                  key: url
+            - name: SPAWN_INTERNAL_NATS_AUTH
+              valueFrom:
+                secretKeyRef:
+                  name: invocation-connection-ref
+                  key: authEnabled
+                  optional: true
+            - name: SPAWN_INTERNAL_NATS_TLS
+              valueFrom:
+                secretKeyRef:
+                  name: invocation-connection-ref
+                  key: tlsEnabled
+                  optional: true
+            - name: SPAWN_ACTIVATOR_SOURCE_PROVIDER_HOST
+              value: broker.default.svc.cluster.local
+            - name: SPAWN_ACTIVATOR_SOURCE_PROVIDER_PORT
+              value: "5672"
+            - name: SPAWN_ACTIVATOR_SOURCE_PROVIDER_AUTH_USER
+              valueFrom:
+                secretKeyRef:
+                  name: rabbitmq-connection-secret
+                  key: username
+            - name: SPAWN_ACTIVATOR_SOURCE_PROVIDER_AUTH_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: rabbitmq-connection-secret
+                  key: password
+          envFrom:
+            - configMapRef:
+                name: system-config
+            - secretRef:
+                name: rabbitmq-connection-secret
+          resources:
+            limits:
+              cpu: 1
+            requests:
+              cpu: 50m
+              memory: 128Mi
+          volumeMounts:
+            - name: settings-volume
+              mountPath: /opt/activator/data/config.json
+              subPath: config.json
+            - mountPath: /app/.cache/bakeware/
+              name: bakeware-cache
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 65534
+      volumes:
+        - name: settings-cm
+          configMap:
+            name: rabbitmq-activator-settings-cm
+        - name: bakeware-cache
+          emptyDir: {}

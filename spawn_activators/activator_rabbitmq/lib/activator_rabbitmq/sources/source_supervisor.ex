@@ -1,54 +1,28 @@
 defmodule ActivatorRabbitmq.Sources.SourceSupervisor do
-  use DynamicSupervisor
+  use Supervisor
 
-  def child_spec() do
-    {
-      PartitionSupervisor,
-      child_spec: DynamicSupervisor, name: __MODULE__
+  def child_spec(config) do
+    name = Map.get(config, :name, "rabbitmq-activator-#{inspect(:rand.uniform(1000))}")
+
+    %{
+      id: Atom.to_string(name),
+      start: {__MODULE__, :start_link, [config]}
     }
   end
 
-  def start_link(_args) do
-    DynamicSupervisor.start_link(
-      __MODULE__,
-      [
-        shutdown: 120_000,
-        strategy: :one_for_one
-      ],
-      name: __MODULE__
-    )
+  def start_link(config) do
+    name = Map.get(config, :name, "rabbitmq-activator-#{inspect(:rand.uniform(1000))}")
+    Supervisor.start_link(__MODULE__, config, name: Atom.to_string(name))
   end
 
   @impl true
-  def init(args), do: DynamicSupervisor.init(args)
+  def init(config) do
+    children = [
+      {ActivatorRabbitMQ.Sources.RabbitMQ, [config]}
+    ]
 
-  def start_consumer(key, config) do
-    opts = make_opts(config)
-
-    child_spec = %{
-      id: ActivatorRabbitMQ.Sources.RabbitMQ,
-      start: {ActivatorRabbitMQ.Sources.RabbitMQ, :start_link, [opts]},
-      restart: :transient
-    }
-
-    case DynamicSupervisor.start_child(via(key), child_spec) do
-      {:error, {:already_started, pid}} ->
-        {:ok, pid}
-
-      {:ok, pid} ->
-        {:ok, pid}
-
-      {:error, {:name_conflict, {{mod, name}, _f}, _registry, pid}} ->
-        Logger.warning(
-          "Name conflict on start Activator Consumer #{name} from PID #{inspect(pid)}."
-        )
-
-        :ignore
-    end
+    Supervisor.init(children, strategy: :one_for_one)
   end
-
-  defp via(key), do: {:via, PartitionSupervisor, {__MODULE__, get_hashkey(key)}}
-  defp get_hashkey(key), do: :erlang.phash2(key)
 
   defp make_opts(_config) do
     [
