@@ -76,10 +76,8 @@ spec:
                   name: rabbitmq-connection-secret
                   key: password
           envFrom:
-            - configMapRef:
-                name: system-config
             - secretRef:
-                name: rabbitmq-connection-secret
+                name: system-secret
           resources:
             limits:
               cpu: 1
