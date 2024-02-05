@@ -10,7 +10,7 @@ defmodule SpawnCli.Commands.New do
     default: "Hello <%= @message %>!!!"
   )
 
-  def run(%{message: message}, %{template: template}, _) do
+  def run(%{message: message}, %{template: template}, _context) do
     IO.puts(EEx.eval_string(template, assigns: [message: message]))
   end
 end

@@ -7,25 +7,25 @@ metadata:
 spec:
   activator:
     kind: deployment # Optional. Default is Deployment. Valid values are [deployment | daemonset]
+    type: AMQP
     replicas: 1 # Optional. If kind is deployment then default replicas is 1.
-    connector:
-      type: AMQP
-      connectionSecretRef: rabbitmq-connection-secret
     externalConnectorRef: invocation-connection-ref
-    settings: # Optional
-      backpressure:
+    settings:
+      host: broker.default.svc.cluster.local
+      port: 5672
+      credentialsSecretRef: rabbitmq-connection-secret
+      processorConcurrency: 50 # Optional
+      producerConcurrency: 1 # Optional
+      backpressure: # Optional
         maxDemand: 2
         prefetchCount: 50 # Default to: processorConcurrency * maxDemand
-      processorConcurrency: 50
-      producerConcurrency: 1
   bindings:
     - name: test-queue-config
       source:
         queue: test.queue
       sinks:
-        - name: robert-sink # name of the sink component
-          to: # Send to channel or to actor
-            #channel: my-actors-channel
+        - name: robert-sink # name of the sink
+          to:
             actor:
               type: unnamed # valid are named, unnamed, pooled
               action: setLanguage # Name of an Actor Action to call

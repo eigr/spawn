@@ -6,4 +6,6 @@ defmodule SpawnCli do
   use DoIt.MainCommand,
     description: "Spawn CLI Tool",
     version: "1.1.1"
+
+  command(SpawnCli.Commands.New)
 end
