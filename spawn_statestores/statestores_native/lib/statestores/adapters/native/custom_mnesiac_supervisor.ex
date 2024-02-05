@@ -5,7 +5,9 @@ defmodule Statestores.Adapters.Native.CustomMnesiacSupervisor do
   use Supervisor
 
   def start_link(_) do
-    Supervisor.start_link(__MODULE__, [], name: Statestores.Adapters.Native.CustomMnesiacSupervisor)
+    Supervisor.start_link(__MODULE__, [],
+      name: Statestores.Adapters.Native.CustomMnesiacSupervisor
+    )
   end
 
   @impl true

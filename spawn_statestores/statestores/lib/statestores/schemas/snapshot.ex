@@ -41,7 +41,8 @@ defmodule Statestores.Schemas.Snapshot do
   @spec from_record_tuple(term()) :: t()
   def from_record_tuple(tuple) do
     # Do not change the order here
-    {_, actor, id, system, status, revision, tags, data_type, data, updated_at, inserted_at} = tuple
+    {_, actor, id, system, status, revision, tags, data_type, data, updated_at, inserted_at} =
+      tuple
 
     %__MODULE__{
       actor: actor,
