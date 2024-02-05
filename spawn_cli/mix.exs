@@ -32,24 +32,11 @@ defmodule SpawnCli.MixProject do
     [
       {:bonny, "~> 1.1"},
       {:castore, "~> 1.0"},
-      {:do_it, "~> 0.4"},
-      {:burrito, github: "burrito-elixir/burrito"}
+      #{:do_it, "~> 0.6"},
+      {:do_it, git: "https://github.com/sleipnir/do_it.git", branch: "feat/use-defaults"},
+      {:burrito, "~> 1.0"}
     ]
   end
-
-  # defp releases do
-  #   [
-  #     spawn_cli: [
-  #       include_executables_for: [:unix],
-  #       applications: [spawn_cli: :permanent],
-  #       steps: [
-  #         :assemble,
-  #         &Bakeware.assemble/1
-  #       ],
-  #       bakeware: [compression_level: 19]
-  #     ]
-  #   ]
-  # end
 
   def releases do
     [
@@ -59,8 +46,8 @@ defmodule SpawnCli.MixProject do
           targets: [
             linux: [os: :linux, cpu: :x86_64],
             linux_musl: [os: :linux, cpu: :x86_64, libc: :musl],
-            macos: [os: :darwin, cpu: :x86_64],
-            windows: [os: :windows, cpu: :x86_64]
+            #macos: [os: :darwin, cpu: :x86_64],
+            #windows: [os: :windows, cpu: :x86_64]
           ]
         ]
       ]
