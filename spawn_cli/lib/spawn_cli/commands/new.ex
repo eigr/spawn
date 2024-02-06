@@ -1,16 +1,18 @@
 defmodule SpawnCli.Commands.New do
   use DoIt.Command,
     name: "new",
-    description: "Create new Spawn project with specifi target language"
+    description: "Create new Spawn project with specific target language"
 
-  argument(:message, :string, "Say hello to...")
+  require Logger
 
-  option(:template, :string, "Hello message template",
-    alias: :t,
-    default: "Hello <%= @message %>!!!"
+  # argument(:language, :string, "elixir")
+
+  option(:language, :string, "elixir",
+    alias: :l,
+    default: "elixir"
   )
 
-  def run(%{message: message}, %{template: template}, _context) do
-    IO.puts(EEx.eval_string(template, assigns: [message: message]))
+  def run(_, %{language: language}, _context) do
+    Logger.info("Creating project using #{language}")
   end
 end

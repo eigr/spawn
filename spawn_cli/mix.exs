@@ -8,10 +8,10 @@ defmodule SpawnCli.MixProject do
     [
       app: @app,
       version: @version,
-      build_path: "../../_build",
+      build_path: "../_build",
       config_path: "config/config.exs",
-      deps_path: "../../deps",
-      lockfile: "../../mix.lock",
+      deps_path: "../deps",
+      lockfile: "../mix.lock",
       elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
@@ -32,8 +32,7 @@ defmodule SpawnCli.MixProject do
     [
       {:bonny, "~> 1.1"},
       {:castore, "~> 1.0"},
-      #{:do_it, "~> 0.6"},
-      {:do_it, git: "https://github.com/sleipnir/do_it.git", branch: "feat/use-defaults"},
+      {:do_it, "~> 0.6"},
       {:burrito, "~> 1.0"}
     ]
   end
