@@ -58,7 +58,7 @@ defmodule Statestores.Adapters.NativeSnapshotAdapter do
   end
 
   @impl true
-  def default_port, do: <<00_000_000::32>>
+  def default_port, do: "0"
 
   def child_spec(_),
     do: %{
