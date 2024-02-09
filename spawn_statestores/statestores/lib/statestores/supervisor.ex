@@ -25,13 +25,21 @@ defmodule Statestores.Supervisor do
     Statestores.Migrator.migrate(snapshot_adapter)
     Statestores.Migrator.migrate(lookup_adapter)
 
-    children = [
-      supervisor_process_logger(__MODULE__),
-      Statestores.Vault,
-      snapshot_adapter,
-      lookup_adapter
-    ]
+    children =
+      [
+        supervisor_process_logger(__MODULE__),
+        Statestores.Vault,
+        snapshot_adapter,
+        lookup_adapter
+      ]
+      |> maybe_add_native_children(snapshot_adapter)
 
     Supervisor.init(children, strategy: :one_for_one)
   end
+
+  def maybe_add_native_children(children, Statestores.Adapters.NativeSnapshotAdapter) do
+    children ++ Statestores.Adapters.Native.Children.get_children()
+  end
+
+  def maybe_add_native_children(children, _), do: children
 end

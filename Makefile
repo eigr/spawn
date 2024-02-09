@@ -75,6 +75,9 @@ test-statestores_mssql:
 test-statestores_sqlite:
 	cd spawn_statestores/statestores_sqlite && MIX_ENV=test mix deps.get && MIX_ENV=test PROXY_CLUSTER_STRATEGY=gossip PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
 
+test-statestores_native:
+	cd spawn_statestores/statestores_native && MIX_ENV=test mix deps.get && MIX_ENV=test PROXY_CLUSTER_STRATEGY=gossip PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
+
 test-spawn-sdk:
 	cd spawn_sdk/spawn_sdk && MIX_ENV=test mix deps.get && MIX_ENV=test PROXY_DATABASE_TYPE=mariadb PROXY_DATABASE_PORT=3307 PROXY_CLUSTER_STRATEGY=gossip PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= PROXY_ACTOR_SYSTEM_NAME=spawn-system elixir --name spawn_test@127.0.0.1 -S mix test
 

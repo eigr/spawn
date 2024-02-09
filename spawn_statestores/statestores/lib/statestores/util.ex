@@ -75,6 +75,7 @@ defmodule Statestores.Util do
       Code.ensure_loaded?(Statestores.Adapters.CockroachDBSnapshotAdapter) -> "cockroachdb"
       Code.ensure_loaded?(Statestores.Adapters.SQLite3SnapshotAdapter) -> "sqlite"
       Code.ensure_loaded?(Statestores.Adapters.MSSQLSnapshotAdapter) -> "mssql"
+      Code.ensure_loaded?(Statestores.Adapters.NativeSnapshotAdapter) -> "native"
       true -> nil
     end
   end
@@ -160,7 +161,7 @@ defmodule Statestores.Util do
     load_snapshot_adapter().default_port()
   end
 
-  @spec generate_key(any()) :: String.t()
+  @spec generate_key(any()) :: integer()
   def generate_key(id), do: :erlang.phash2({id.name, id.system})
 
   def get_statestore_key do
@@ -192,6 +193,8 @@ defmodule Statestores.Util do
 
   defp load_lookup_adapter_by_type(:mssql), do: Statestores.Adapters.MSSQLLookupAdapter
 
+  defp load_lookup_adapter_by_type(:native), do: Statestores.Adapters.NativeLookupAdapter
+
   # Snapshot Adapters
   defp load_snapshot_adapter_by_type(:mysql), do: Statestores.Adapters.MySQLSnapshotAdapter
 
@@ -205,4 +208,6 @@ defmodule Statestores.Util do
   defp load_snapshot_adapter_by_type(:sqlite), do: Statestores.Adapters.SQLite3SnapshotAdapter
 
   defp load_snapshot_adapter_by_type(:mssql), do: Statestores.Adapters.MSSQLSnapshotAdapter
+
+  defp load_snapshot_adapter_by_type(:native), do: Statestores.Adapters.NativeSnapshotAdapter
 end

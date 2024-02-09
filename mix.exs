@@ -107,6 +107,8 @@ defmodule Spawn.MixProject do
        path: "./spawn_statestores/statestores_sqlite", optional: false},
       {:spawn_statestores_cockroachdb,
        path: "./spawn_statestores/statestores_cockroachdb", optional: false},
+      {:spawn_statestores_native,
+       path: "./spawn_statestores/statestores_native", optional: false},
       {:pluggable, "~> 1.0"},
       # Non runtime deps
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
