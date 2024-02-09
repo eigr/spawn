@@ -5,8 +5,6 @@ defmodule SpawnCli.Commands.New do
 
   require Logger
 
-  # argument(:language, :string, "elixir")
-
   option(:language, :string, "elixir",
     alias: :l,
     default: "elixir"
