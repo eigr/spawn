@@ -10,9 +10,9 @@ defmodule Sidecar.ProcessSupervisor do
     children =
       [
         supervisor_process_logger(__MODULE__),
-        statestores(),
         {Sidecar.MetricsSupervisor, opts},
         Spawn.Supervisor.child_spec(opts),
+        statestores(),
         Actors.Supervisors.ActorSupervisor.child_spec(opts),
         Actors.Supervisors.ProtocolSupervisor.child_spec(opts)
       ]
