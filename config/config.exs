@@ -66,6 +66,9 @@ config :spawn, Spawn.Cache.LookupCache,
   gc_cleanup_min_timeout: :timer.seconds(60),
   gc_cleanup_max_timeout: :timer.minutes(10)
 
+config :mnesia,
+  dir: to_charlist(Path.join(File.cwd!(), "data/#{to_string(node())}"))
+
 config :mnesiac,
   stores: [Statestores.Adapters.Native.SnapshotStore],
   schema_type: :disc_copies,
