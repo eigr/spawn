@@ -52,7 +52,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
       Application.get_env(:spawn, :split_brain_detector, Actors.Node.DefaultSplitBrainDetector)
 
     Logger.notice(
-      "Activating Actor #{name} with Parent #{parent} in Node #{inspect(Node.self())}. Persistence #{stateful?}."
+      "Activating Actor #{inspect(name)} with Parent #{inspect(parent)} in Node #{inspect(Node.self())}. Persistence #{inspect(stateful?)}."
     )
 
     actor_name_key =
@@ -160,7 +160,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
       }) do
     response =
       if is_actor_valid?(actor) do
-        Logger.debug("Doing Actor checkpoint to Actor [#{name}]")
+        Logger.debug("Doing Actor checkpoint to Actor [#{inspect(name)}]")
 
         StateManager.save(id, actor_state, revision: revision)
       else
@@ -182,7 +182,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
       StateManager.save(id, actor_state, revision: revision, status: @deactivated_status)
     end
 
-    Logger.debug("Terminating Actor [#{name}] with reason #{inspect(reason)}")
+    Logger.debug("Terminating Actor [#{inspect(name)}] with reason #{inspect(reason)}")
   end
 
   def snapshot(
@@ -211,7 +211,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
     new_state =
       if not is_nil(actor_state) and actor_state != %{} and
            StateManager.is_new?(old_hash, actor_state.state) do
-        Logger.debug("Snapshotting actor #{name}")
+        Logger.debug("Snapshotting actor #{inspect(name)}")
         revision = revision + 1
 
         # Execute with timeout equals timeout strategy - 1 to avoid mailbox congestions
@@ -267,7 +267,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
 
     case queue_length do
       {:message_queue_len, 0} ->
-        Logger.debug("Deactivating actor #{name} for timeout")
+        Logger.debug("Deactivating actor #{inspect(name)} for timeout")
         {:stop, :shutdown, state}
 
       _ ->
@@ -288,8 +288,8 @@ defmodule Actors.Actor.Entity.Lifecycle do
         {:ok, _current_state, current_revision, _status, _node} ->
           if current_revision != revision do
             Logger.warning("""
-            It looks like you're looking to travel back in time. Starting state by review #{revision}.
-            Previously the review was #{current_revision}. Be careful as this type of operation can cause your actor to terminate if the attributes of its previous state schema is different from the current schema.
+            It looks like you're looking to travel back in time. Starting state by review #{inspect(revision)}.
+            Previously the review was #{inspect(current_revision)}. Be careful as this type of operation can cause your actor to terminate if the attributes of its previous state schema is different from the current schema.
             """)
           end
 
@@ -322,14 +322,14 @@ defmodule Actors.Actor.Entity.Lifecycle do
 
   defp handle_network_partition(id, error \\ nil) do
     Logger.warning(
-      "We have detected a possible network partition issue for Actor #{id}. This actor will not start. Details: #{inspect(error)}"
+      "We have detected a possible network partition issue for Actor #{inspect(id)}. This actor will not start. Details: #{inspect(error)}"
     )
 
     raise NetworkPartitionException
   end
 
   defp handle_load_state_error(id, state, error) do
-    Logger.error("Error on load state for Actor #{id}. Error: #{inspect(error)}")
+    Logger.error("Error on load state for Actor #{inspect(id)}. Error: #{inspect(error)}")
     {:noreply, state, {:continue, :call_init_action}}
   end
 
@@ -360,7 +360,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
 
   defp subscribe(actor, system, channel_group) do
     Logger.debug(
-      "Actor [#{actor}] from system [#{system}] is subscribing to channel_group [#{inspect(channel_group)}]"
+      "Actor [#{inspect(actor)}] from system [#{inspect(system)}] is subscribing to channel_group [#{inspect(channel_group)}]"
     )
 
     Enum.each(channel_group, fn %{topic: topic, action: action} ->

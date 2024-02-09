@@ -5,6 +5,7 @@ defmodule InternalVersions do
     spawn_statestores_mariadb: "1.2.1",
     spawn_statestores_mysql: "1.2.1",
     spawn_statestores_mssql: "1.2.1",
+    spawn_statestores_native: "1.2.1",
     spawn_statestores_postgres: "1.2.1",
     spawn_statestores_sqlite: "1.2.1",
     spawn_statestores_cockroachdb: "1.2.1",
