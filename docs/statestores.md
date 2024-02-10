@@ -34,15 +34,15 @@ It is also worth mentioning that this feature depends on the implementation of e
 
 ### Statestore Features
 
-| Feature                                   | CockroachDB          | MariaDB              | Mnesia | MSSQL                | MySQL                | Postgres             | SQLite               |
-| ------------------------------------------| -------------------- | -------------------- | ------ | -------------------- | -------------------- | -------------------- | -------------------- |
-| Actor Fast key lookup                     | :white_check_mark:   | :white_check_mark:   | :x:    | :white_check_mark:   | :white_check_mark:   | :white_check_mark:   | :white_check_mark:   |
-| Actor State restore from Revision         | :x:                  | :white_check_mark:   | :x:    | :x:                  | :x:                  | :x:                  | :x:                  |
-| Search by Actors Metadata                 | :x:                  | :x:                  | :x:    | :x:                  | :x:                  | :x:                  | :x:                  |
-| Search by all changes of Actor states     | :x:                  | :white_check_mark:   | :x:    | :x:                  | :x:                  | :x:                  | :x:                  |
-| Search by all Actor state changes by date | :x:                  | :white_check_mark:   | :x:    | :x:                  | :x:                  | :x:                  | :x:                  |
-| Snapshot Data Partition                   | :x:                  | :white_check_mark:   | :x:    | :x:                  | :x:                  | :x:                  | :x:                  |
-| State AES Encryption                      | :white_check_mark:   | :white_check_mark:   | :x:    | :white_check_mark:   | :white_check_mark:   | :white_check_mark:   | :white_check_mark:   |
+| Feature                                   | CockroachDB          | MariaDB              | Mnesia             | MSSQL                | MySQL                | Postgres             | SQLite               |
+| ------------------------------------------| -------------------- | -------------------- | ------------------ | -------------------- | -------------------- | -------------------- | -------------------- |
+| Actor Fast key lookup                     | :white_check_mark:   | :white_check_mark:   | :white_check_mark: | :white_check_mark:   | :white_check_mark:   | :white_check_mark:   | :white_check_mark:   |
+| Actor State restore from Revision         | :x:                  | :white_check_mark:   | :x:                | :x:                  | :x:                  | :x:                  | :x:                  |
+| Search by Actors Metadata                 | :x:                  | :x:                  | :x:                | :x:                  | :x:                  | :x:                  | :x:                  |
+| Search by all changes of Actor states     | :x:                  | :white_check_mark:   | :x:                | :x:                  | :x:                  | :x:                  | :x:                  |
+| Search by all Actor state changes by date | :x:                  | :white_check_mark:   | :x:                | :x:                  | :x:                  | :x:                  | :x:                  |
+| Snapshot Data Partition                   | :x:                  | :white_check_mark:   | :x:                | :x:                  | :x:                  | :x:                  | :x:                  |
+| State AES Encryption                      | :white_check_mark:   | :white_check_mark:   | :white_check_mark: | :white_check_mark:   | :white_check_mark:   | :white_check_mark:   | :white_check_mark:   |
 
 
 [Next: Activators](activators.md)

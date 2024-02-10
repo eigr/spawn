@@ -11,6 +11,7 @@
     - [x] Sqlite
     - [x] MariaDB
     - [x] MySql
+    - [x] Native (Distributed Mnesia with disk persistence)
     - [x] Postgres
     - [x] CockroachDB
     - [x] MSSQL
