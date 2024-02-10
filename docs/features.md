@@ -15,7 +15,6 @@
     - [x] Postgres
     - [x] CockroachDB
     - [x] MSSQL
-    - [ ] Native via Mnesia
   - [x] Write behind during execution and Write ahead during deactivation.
   - [x] Point in time Recovery. See Statestore for more information.
 - [x] Automatic activation and deactivation of Actors.
