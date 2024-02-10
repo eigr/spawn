@@ -322,7 +322,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
 
   defp handle_network_partition(id, error \\ nil) do
     Logger.warning(
-      "We have detected a possible network partition issue for Actor #{id}. This actor will not start. Details: #{inspect(error)}"
+      "We have detected a possible network partition issue for Actor #{inspect(id)}. This actor will not start. Details: #{inspect(error)}"
     )
 
     raise NetworkPartitionException

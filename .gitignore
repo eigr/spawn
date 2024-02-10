@@ -36,3 +36,5 @@ eigr-functions-db.db
 eigr-functions-db.db-shm
 
 eigr-functions-db.db-wal
+
+*Mnesia.*
