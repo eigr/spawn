@@ -83,7 +83,7 @@ defmodule Spawn.MixProject do
       {:k8s_webhoox, "~> 0.2"},
       {:flow, "~> 1.2"},
       {:libcluster, "~> 3.3"},
-      {:horde, "~> 0.8"},
+      {:horde, "~> 0.9"},
       {:highlander, "~> 0.2.1"},
       {:phoenix_pubsub, "~> 2.1"},
       {:phoenix_pubsub_nats, "~> 0.2"},
