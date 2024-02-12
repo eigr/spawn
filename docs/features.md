@@ -8,13 +8,13 @@
 - [x] Configuration management via Kubernetes [CRDs](https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definitions/) and Envinronment Variables.
 - [x] State Management. 
   - [x] Supported database adapters for persistent storage using multiple database providers.
-    - [x] Sqlite
+    - [x] Sqlite (Beta)
     - [x] MariaDB
     - [x] MySql
     - [x] Native (Distributed Mnesia with disk persistence)
     - [x] Postgres
-    - [x] CockroachDB
-    - [x] MSSQL
+    - [x] CockroachDB (Beta)
+    - [x] MSSQL (Beta)
   - [x] Write behind during execution and Write ahead during deactivation.
   - [x] Point in time Recovery. See Statestore for more information.
 - [x] Automatic activation and deactivation of Actors.
