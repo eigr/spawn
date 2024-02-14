@@ -166,6 +166,4 @@ message Actor {
 
     // The registered timer actions for an actor.
     repeated FixedTimerAction timer_actions = 5;
-
-    string service_name = 7;
 }

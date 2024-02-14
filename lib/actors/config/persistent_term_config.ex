@@ -50,6 +50,7 @@ if Code.ensure_loaded?(:persistent_term) do
       {:proxy_http_client_adapter_pool_schedulers, "0"},
       {:proxy_http_client_adapter_pool_size, "30"},
       {:proxy_http_client_adapter_pool_max_idle_timeout, "1000"},
+      {:proxy_proto_descriptor_path, "/app/protos/user-function.desc"},
       {:proxy_cluster_strategy, "gossip"},
       {:proxy_headless_service, "proxy-headless"},
       {:proxy_cluster_polling_interval, "3000"},
@@ -421,6 +422,15 @@ if Code.ensure_loaded?(:persistent_term) do
         |> String.to_integer()
 
       :persistent_term.put({__MODULE__, :proxy_http_client_adapter_pool_max_idle_timeout}, value)
+
+      value
+    end
+
+    defp load_env({:proxy_proto_descriptor_path, default}) do
+      value =
+        env("PROXY_PROTO_DESCRIPTOR_PATH", default)
+
+      :persistent_term.put({__MODULE__, :proxy_proto_descriptor_path}, value)
 
       value
     end

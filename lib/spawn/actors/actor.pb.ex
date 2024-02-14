@@ -1155,20 +1155,6 @@ defmodule Eigr.Functions.Protocol.Actors.Actor do
           proto3_optional: nil,
           type: :TYPE_MESSAGE,
           type_name: ".eigr.functions.protocol.actors.FixedTimerAction"
-        },
-        %Google.Protobuf.FieldDescriptorProto{
-          __unknown_fields__: [],
-          default_value: nil,
-          extendee: nil,
-          json_name: "serviceName",
-          label: :LABEL_OPTIONAL,
-          name: "service_name",
-          number: 7,
-          oneof_index: nil,
-          options: nil,
-          proto3_optional: nil,
-          type: :TYPE_STRING,
-          type_name: nil
         }
       ],
       name: "Actor",
@@ -1190,6 +1176,4 @@ defmodule Eigr.Functions.Protocol.Actors.Actor do
     repeated: true,
     type: Eigr.Functions.Protocol.Actors.FixedTimerAction,
     json_name: "timerActions"
-
-  field :service_name, 7, type: :string, json_name: "serviceName"
 end
