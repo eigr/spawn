@@ -32,6 +32,7 @@ defmodule Proxy.MixProject do
       {:spawn, path: "../../"},
       {:bakeware, "~> 0.2"},
       {:bandit, "~> 1.1"},
+      {:grpc, "~> 0.7"},
       {:observer_cli, "~> 1.7"},
       {:sobelow, "~> 0.13", only: [:dev, :test], runtime: false}
     ]

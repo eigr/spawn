@@ -1,92 +1,91 @@
 defmodule Eigr.Functions.Protocol.State.Revision do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
     %Google.Protobuf.DescriptorProto{
-      name: "Revision",
+      __unknown_fields__: [],
+      enum_type: [],
+      extension: [],
+      extension_range: [],
       field: [
         %Google.Protobuf.FieldDescriptorProto{
-          name: "value",
-          extendee: nil,
-          number: 1,
-          label: :LABEL_OPTIONAL,
-          type: :TYPE_INT64,
-          type_name: nil,
+          __unknown_fields__: [],
           default_value: nil,
-          options: nil,
-          oneof_index: nil,
+          extendee: nil,
           json_name: "value",
+          label: :LABEL_OPTIONAL,
+          name: "value",
+          number: 1,
+          oneof_index: nil,
+          options: nil,
           proto3_optional: nil,
-          __unknown_fields__: []
+          type: :TYPE_INT64,
+          type_name: nil
         }
       ],
+      name: "Revision",
       nested_type: [],
-      enum_type: [],
-      extension_range: [],
-      extension: [],
-      options: nil,
       oneof_decl: [],
-      reserved_range: [],
+      options: nil,
       reserved_name: [],
-      __unknown_fields__: []
+      reserved_range: []
     }
   end
 
-  field(:value, 1, type: :int64)
+  field :value, 1, type: :int64
 end
-
 defmodule Eigr.Functions.Protocol.State.Checkpoint do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
     %Google.Protobuf.DescriptorProto{
-      name: "Checkpoint",
+      __unknown_fields__: [],
+      enum_type: [],
+      extension: [],
+      extension_range: [],
       field: [
         %Google.Protobuf.FieldDescriptorProto{
-          name: "revision",
-          extendee: nil,
-          number: 1,
-          label: :LABEL_OPTIONAL,
-          type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.state.Revision",
+          __unknown_fields__: [],
           default_value: nil,
-          options: nil,
-          oneof_index: nil,
+          extendee: nil,
           json_name: "revision",
+          label: :LABEL_OPTIONAL,
+          name: "revision",
+          number: 1,
+          oneof_index: nil,
+          options: nil,
           proto3_optional: nil,
-          __unknown_fields__: []
+          type: :TYPE_MESSAGE,
+          type_name: ".eigr.functions.protocol.state.Revision"
         },
         %Google.Protobuf.FieldDescriptorProto{
-          name: "state",
-          extendee: nil,
-          number: 2,
-          label: :LABEL_OPTIONAL,
-          type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.ActorState",
+          __unknown_fields__: [],
           default_value: nil,
-          options: nil,
-          oneof_index: nil,
+          extendee: nil,
           json_name: "state",
+          label: :LABEL_OPTIONAL,
+          name: "state",
+          number: 2,
+          oneof_index: nil,
+          options: nil,
           proto3_optional: nil,
-          __unknown_fields__: []
+          type: :TYPE_MESSAGE,
+          type_name: ".eigr.functions.protocol.actors.ActorState"
         }
       ],
+      name: "Checkpoint",
       nested_type: [],
-      enum_type: [],
-      extension_range: [],
-      extension: [],
-      options: nil,
       oneof_decl: [],
-      reserved_range: [],
+      options: nil,
       reserved_name: [],
-      __unknown_fields__: []
+      reserved_range: []
     }
   end
 
-  field(:revision, 1, type: Eigr.Functions.Protocol.State.Revision)
-  field(:state, 2, type: Eigr.Functions.Protocol.Actors.ActorState)
+  field :revision, 1, type: Eigr.Functions.Protocol.State.Revision
+  field :state, 2, type: Eigr.Functions.Protocol.Actors.ActorState
 end

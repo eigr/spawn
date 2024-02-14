@@ -55,7 +55,7 @@ defmodule Proxy.Supervisor do
     [
       port: Config.get(:http_port),
       thousand_island_options: [
-        num_acceptors: 150,
+        num_acceptors: Config.get(:http_num_acceptors),
         max_connections_retry_wait: 2000,
         max_connections_retry_count: 10,
         shutdown_timeout: 120_000

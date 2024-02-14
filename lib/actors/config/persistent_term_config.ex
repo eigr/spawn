@@ -26,6 +26,7 @@ if Code.ensure_loaded?(:persistent_term) do
       {:delayed_invokes, "true"},
       {:deployment_mode, "sidecar"},
       {:http_port, "9001"},
+      {:http_num_acceptors, "150"}
       {:internal_nats_hosts, "nats://127.0.0.1:4222"},
       {:internal_nats_tls, "false"},
       {:internal_nats_auth, "false"},
@@ -217,6 +218,16 @@ if Code.ensure_loaded?(:persistent_term) do
         |> String.to_integer()
 
       :persistent_term.put({__MODULE__, :http_port}, value)
+
+      value
+    end
+
+    defp load_env({:http_num_acceptors, default}) do
+      value =
+        env("PROXY_HTTP_NUM_ACCEPTORS", default)
+        |> String.to_integer()
+
+      :persistent_term.put({__MODULE__, :http_num_acceptors}, value)
 
       value
     end
