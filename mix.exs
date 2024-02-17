@@ -76,6 +76,8 @@ defmodule Spawn.MixProject do
       {:telemetry, "~> 1.0"},
       {:castore, "~> 1.0"},
       {:protobuf, "~> 0.11"},
+      {:protobuf_generate, "~> 0.1"},
+      {:grpc, "~> 0.7"},
       {:finch, "~> 0.16"},
       {:retry, "~> 0.17"},
       {:tesla, "~> 1.6"},

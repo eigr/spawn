@@ -1,4 +1,4 @@
-defmodule Proxy.Grpc.Reflection do
+defmodule Sidecar.Grpc.Reflection do
   @moduledoc """
   This module is responsible for handling all requests
   with a view to contract reflection (reflection.proto)
@@ -94,7 +94,7 @@ defmodule Proxy.Grpc.Reflection do
           response
       end
 
-    {:reply, response, state}
+    {:reply, resp, state}
   end
 
   # Client API

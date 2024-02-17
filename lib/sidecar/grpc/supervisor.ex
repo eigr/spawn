@@ -1,4 +1,4 @@
-defmodule Proxy.Grpc.Supervisor do
+defmodule Sidecar.Grpc.Supervisor do
   @moduledoc false
   use Supervisor
   require Logger
@@ -9,14 +9,16 @@ defmodule Proxy.Grpc.Supervisor do
     Logger.info("Starting gRPC Server...")
     Application.put_env(:grpc, :start_server, true, persistent: true)
 
-    descriptor = Keyword.fetch!(:file_descriptor)
-    actors = Keyword.fetch!(:actors)
+    # descriptor = Keyword.fetch!(:file_descriptor)
+    # actors = Keyword.fetch!(:actors)
 
-    children =
-      descriptor
-      |> GrpcGenerator.compile(actors)
-      |> GrpcGenerator.build_spec()
-      |> maybe_start_reflection(descriptor)
+    # children =
+    #   descriptor
+    #   |> GrpcGenerator.compile(actors)
+    #   |> GrpcGenerator.build_spec()
+    #   |> maybe_start_reflection(descriptor)
+
+    children = []
 
     Supervisor.init(children, strategy: :rest_for_one)
   end

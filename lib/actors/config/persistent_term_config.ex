@@ -26,7 +26,7 @@ if Code.ensure_loaded?(:persistent_term) do
       {:delayed_invokes, "true"},
       {:deployment_mode, "sidecar"},
       {:http_port, "9001"},
-      {:http_num_acceptors, "150"}
+      {:http_num_acceptors, "150"},
       {:internal_nats_hosts, "nats://127.0.0.1:4222"},
       {:internal_nats_tls, "false"},
       {:internal_nats_auth, "false"},
@@ -427,8 +427,7 @@ if Code.ensure_loaded?(:persistent_term) do
     end
 
     defp load_env({:proxy_proto_descriptor_path, default}) do
-      value =
-        env("PROXY_PROTO_DESCRIPTOR_PATH", default)
+      value = env("PROXY_PROTO_DESCRIPTOR_PATH", default)
 
       :persistent_term.put({__MODULE__, :proxy_proto_descriptor_path}, value)
 

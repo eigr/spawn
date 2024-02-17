@@ -1,4 +1,4 @@
-defmodule Proxy.Grpc.Reflection.Service do
+defmodule Sidecar.Grpc.Reflection.Service do
   @moduledoc """
   This module implement gRPC Reflection
   """
