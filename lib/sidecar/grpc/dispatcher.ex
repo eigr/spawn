@@ -1,11 +1,11 @@
-defmodule Sidecar.Grpc.Dispatcher do
+defmodule Sidecar.GRPC.Dispatcher do
   @moduledoc false
   require Logger
 
   def dispatch(
         %{
           system: system_name,
-          actor: actor_name,
+          actor_name: actor_name,
           input: message,
           stream: stream,
           descriptor: descriptor

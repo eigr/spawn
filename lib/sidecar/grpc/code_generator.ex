@@ -1,4 +1,4 @@
-defmodule Sidecar.Grpc.CodeGenerator do
+defmodule Sidecar.GRPC.CodeGenerator do
   @moduledoc """
   Module for generating gRPC code from Protobuf files.
 
@@ -37,9 +37,9 @@ defmodule Sidecar.Grpc.CodeGenerator do
     {grpc_generator_plugin, handler_generator_plugin} =
       if transcoding_enabled? do
         {ProtobufGenerate.Plugins.GRPCWithOptions,
-         Sidecar.Grpc.Generators.HandlerTranscodingGenerator}
+         Sidecar.GRPC.Generators.HandlerTranscodingGenerator}
       else
-        {ProtobufGenerate.Plugins.GRPC, Sidecar.Grpc.Generators.HandlerGenerator}
+        {ProtobufGenerate.Plugins.GRPC, Sidecar.GRPC.Generators.HandlerGenerator}
       end
 
     user_defined_proto_files =
@@ -54,11 +54,22 @@ defmodule Sidecar.Grpc.CodeGenerator do
       "--output-path=#{output_path}",
       "--plugins=#{grpc_generator_plugin}",
       "--plugins=#{handler_generator_plugin}",
-      # "--plugins=Sidecar.Grpc.Generators.ServiceGenerator",
+      "--plugins=Sidecar.GRPC.Generators.ServiceGenerator",
       "#{include_path}/#{user_defined_proto_files}"
     ]
 
     _ = Generate.run(protoc_options)
+  end
+
+  def load_modules(opts) do
+    path = Keyword.get(opts, :output_path, "#{File.cwd!()}/priv/protos/modules")
+
+    user_defined_modules_files = list_files_with_extension(path, ".pb.ex")
+
+    Enum.map(user_defined_modules_files, fn file ->
+      full_path = Path.join(path, file)
+      File.read!(full_path)
+    end)
   end
 
   @doc """
@@ -75,14 +86,16 @@ defmodule Sidecar.Grpc.CodeGenerator do
   ### Example:
 
   ```elixir
-  module_code = Sidecar.Grpc.CodeGenerator.compile_module(generated_code)
+  module_code = Sidecar.Grpc.CodeGenerator.compile_modules(generated_code)
 
   Raises:
 
   Raises an error if there are issues during the compilation process.
 
   """
-  def compile_module(module), do: do_compile(module)
+  def compile_modules(modules) when is_list(modules), do: Enum.each(modules, &do_compile/1)
+
+  def compile_modules(module), do: do_compile(module)
 
   defp do_compile(module) do
     Code.compile_string(module)
@@ -101,15 +114,4 @@ defmodule Sidecar.Grpc.CodeGenerator do
     files
     |> Enum.filter(&String.ends_with?(&1, extension))
   end
-
-  defp normalize_service_name(name) do
-    name
-    |> String.split(".")
-    |> Stream.map(&Macro.camelize(&1))
-    |> Enum.join(".")
-  end
-
-  defp normalize_method_name(name), do: Macro.underscore(name)
-
-  defp get_module(filename, bindings \\ []), do: EEx.eval_file(filename, bindings)
 end

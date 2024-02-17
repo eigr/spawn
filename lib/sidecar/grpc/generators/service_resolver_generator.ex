@@ -1,15 +1,16 @@
-defmodule Sidecar.Grpc.Generators.ServiceResolverGenerator do
+defmodule Sidecar.GRPC.Generators.ServiceResolverGenerator do
   @moduledoc """
   TODO
   """
   @behaviour ProtobufGenerate.Plugin
 
+  alias Actors.Config.PersistentTermConfig, as: Config
   alias Protobuf.Protoc.Generator.Util
 
   @impl true
   def template do
     """
-    defmodule Sidecar.Grpc.ServiceResolver do
+    defmodule Sidecar.GRPC.ServiceResolver do
       @moduledoc since: "1.2.1"
 
 
@@ -26,8 +27,7 @@ defmodule Sidecar.Grpc.Generators.ServiceResolverGenerator do
     for svc <- svcs do
       mod_name = Util.mod_name(ctx, [Macro.camelize(svc.name)])
       actor_name = Macro.camelize(svc.name)
-      # TODO get system name here from configuration
-      actor_system = "spawn-system"
+      actor_system = Config.get(:actor_system_name)
       name = Util.prepend_package_prefix(ctx.package, svc.name)
 
       methods =

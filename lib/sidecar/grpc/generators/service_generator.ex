@@ -1,4 +1,4 @@
-defmodule Sidecar.Grpc.Generators.ServiceGenerator do
+defmodule Sidecar.GRPC.Generators.ServiceGenerator do
   @moduledoc """
   TODO
   """
@@ -9,16 +9,15 @@ defmodule Sidecar.Grpc.Generators.ServiceGenerator do
   @impl true
   def template do
     """
-    defmodule Sidecar.Grpc.ProxyEndpoint do
+    defmodule Sidecar.GRPC.ProxyEndpoint do
       @moduledoc false
       use GRPC.Endpoint
 
-      intercept(GRPC.Logger.Server)
+      intercept(GRPC.Server.Interceptors.Logger)
 
       services = [
-        #MassProxy.Reflection.Service,
     <%= for service_name <- @services do %>
-      <%= service_name %>,
+      <%= service_name %>.Service,
     <% end %>
       ]
 
@@ -28,28 +27,12 @@ defmodule Sidecar.Grpc.Generators.ServiceGenerator do
   end
 
   @impl true
-  def generate(ctx, %Google.Protobuf.FileDescriptorProto{service: svcs} = desc) do
-    for svc <- svcs do
-      mod_name = Util.mod_name(ctx, [Macro.camelize(svc.name)])
+  def generate(ctx, %Google.Protobuf.FileDescriptorProto{service: svcs} = _desc) do
+    services = Enum.map(svcs, fn svc -> Util.mod_name(ctx, [Macro.camelize(svc.name)]) end)
 
-      {mod_name,
-       [
-         service_name: mod_name
-       ]}
-    end
-  end
-
-  defp service_arg(type, _streaming? = true), do: "stream(#{type})"
-  defp service_arg(type, _streaming?), do: type
-
-  defp opts(%Google.Protobuf.MethodOptions{__pb_extensions__: extensions})
-       when extensions == %{} do
-    %{}
-  end
-
-  defp opts(%Google.Protobuf.MethodOptions{__pb_extensions__: extensions}) do
-    for {{type, field}, value} <- extensions, into: %{} do
-      {field, %{type: type, value: value}}
-    end
+    {List.first(services),
+     [
+       services: services
+     ]}
   end
 end

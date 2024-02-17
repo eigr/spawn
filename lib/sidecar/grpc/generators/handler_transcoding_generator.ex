@@ -1,9 +1,10 @@
-defmodule Sidecar.Grpc.Generators.HandlerTranscodingGenerator do
+defmodule Sidecar.GRPC.Generators.HandlerTranscodingGenerator do
   @moduledoc """
   TODO
   """
   @behaviour ProtobufGenerate.Plugin
 
+  alias Actors.Config.PersistentTermConfig, as: Config
   alias Protobuf.Protoc.Generator.Util
 
   @impl true
@@ -11,9 +12,9 @@ defmodule Sidecar.Grpc.Generators.HandlerTranscodingGenerator do
     """
     defmodule <%= @module %>.ActorDispatcher do
       @moduledoc since: "1.2.1"
-      use GRPC.Server, service: <%= @service_name %>, http_transcode: true
+      use GRPC.Server, service: <%= @service_name %>.Service, http_transcode: true
 
-      alias Sidecar.Grpc.Dispatcher
+      alias Sidecar.GRPC.Dispatcher
 
       <%= for {method_name, input, output, _options} <- @methods do %>
         @spec <%= Macro.underscore(method_name) %>(<%= input %>.t(), GRPC.Server.Stream.t()) :: <%= output %>.t()
@@ -36,13 +37,11 @@ defmodule Sidecar.Grpc.Generators.HandlerTranscodingGenerator do
   end
 
   @impl true
-  def generate(ctx, %Google.Protobuf.FileDescriptorProto{service: svcs} = desc) do
+  def generate(ctx, %Google.Protobuf.FileDescriptorProto{service: svcs} = _desc) do
     for svc <- svcs do
       mod_name = Util.mod_name(ctx, [Macro.camelize(svc.name)])
       actor_name = Macro.camelize(svc.name)
-      # TODO get system name here from configuration
-      actor_system = "spawn-system"
-      name = Util.prepend_package_prefix(ctx.package, svc.name)
+      actor_system = Config.get(:actor_system_name)
 
       methods =
         for m <- svc.method do

@@ -779,16 +779,16 @@ defmodule Helloworld.GreeterService.Service do
     }
   end
 
-  rpc(:SayHello, Helloworld.HelloRequest, Helloworld.HelloReply, %{})
+  rpc(:SayHello, Helloworld.HelloRequest, Helloworld.HelloReply)
 
-  rpc(:SayHelloFrom, Helloworld.HelloRequestFrom, Helloworld.HelloReply, %{})
+  rpc(:SayHelloFrom, Helloworld.HelloRequestFrom, Helloworld.HelloReply)
 end
 
 defmodule Helloworld.GreeterService.ActorDispatcher do
   @moduledoc since: "1.2.1"
-  use GRPC.Server, service: Helloworld.GreeterService, http_transcode: true
+  use GRPC.Server, service: Helloworld.GreeterService.Service, http_transcode: true
 
-  alias Sidecar.Grpc.Dispatcher
+  alias Sidecar.GRPC.Dispatcher
 
   @spec say_hello(Helloworld.HelloRequest.t(), GRPC.Server.Stream.t()) ::
           Helloworld.HelloReply.t()
@@ -819,4 +819,17 @@ defmodule Helloworld.GreeterService.ActorDispatcher do
 
     Dispatcher.dispatch(request)
   end
+end
+
+defmodule Sidecar.GRPC.ProxyEndpoint do
+  @moduledoc false
+  use GRPC.Endpoint
+
+  intercept(GRPC.Server.Interceptors.Logger)
+
+  services = [
+    Helloworld.GreeterService.Service
+  ]
+
+  run(services)
 end
