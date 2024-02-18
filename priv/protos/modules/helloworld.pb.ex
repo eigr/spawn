@@ -833,3 +833,37 @@ defmodule Sidecar.GRPC.ProxyEndpoint do
 
   run(services)
 end
+
+defmodule Sidecar.GRPC.ServiceResolver do
+  @moduledoc since: "1.2.1"
+
+  @actors [
+    {
+      "GreeterService",
+      %{
+        service_name: "Helloworld.GreeterService",
+        service_module: Helloworld.GreeterService.Service
+      }
+    }
+  ]
+
+  def has_actor?(actor_name) do
+    Enum.any?(@actors, fn {name, _} -> actor_name == name end)
+  end
+
+  def get_descriptor(actor_name) do
+    actor_attributes =
+      Enum.filter(@actors, fn {name, _} -> actor_name == name end)
+      |> Enum.map(fn {_name, attributes} -> attributes end)
+      |> List.first()
+
+    mod = Map.get(actor_attributes, :service_module)
+    file_descriptor = mod.descriptor()
+
+    Map.get(file_descriptor, :service)
+    |> Enum.filter(fn %Google.Protobuf.ServiceDescriptorProto{name: name} ->
+      actor_name == name
+    end)
+    |> List.first()
+  end
+end

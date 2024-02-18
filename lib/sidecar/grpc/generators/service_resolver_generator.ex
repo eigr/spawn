@@ -13,10 +13,34 @@ defmodule Sidecar.GRPC.Generators.ServiceResolverGenerator do
     defmodule Sidecar.GRPC.ServiceResolver do
       @moduledoc since: "1.2.1"
 
+      @actors [
+        <%= for {actor_name, %{service_name: service_name}} <- @actors do %>
+          {
+            <%= inspect(actor_name) %>,
+            %{
+              service_name: <%= inspect(service_name) %>,
+              service_module: <%= service_name %>.Service
+            }
+          }
+        <% end %>
+      ]
 
-      <%= for {method_name, input, output, _options} <- @methods do %>
+      def has_actor?(actor_name) do
+        Enum.any?(@actors, fn {name, _} -> actor_name == name end)
+      end
 
-      <% end %>
+      def get_descriptor(actor_name) do
+        actor_attributes =
+          Enum.filter(@actors, fn {name, _} -> actor_name == name end)
+          |> Enum.map(fn {_name, attributes} -> attributes end)
+          |> List.first()
+
+        mod = Map.get(actor_attributes, :service_module)
+        mod.descriptor()
+        |> Map.get(:service)
+        |> Enum.filter(fn %Google.Protobuf.ServiceDescriptorProto{name: name} -> actor_name == name end)
+        |> List.first()
+      end
 
     end
     """
@@ -24,34 +48,40 @@ defmodule Sidecar.GRPC.Generators.ServiceResolverGenerator do
 
   @impl true
   def generate(ctx, %Google.Protobuf.FileDescriptorProto{service: svcs} = _desc) do
-    for svc <- svcs do
-      mod_name = Util.mod_name(ctx, [Macro.camelize(svc.name)])
-      actor_name = Macro.camelize(svc.name)
-      actor_system = Config.get(:actor_system_name)
-      name = Util.prepend_package_prefix(ctx.package, svc.name)
+    actors =
+      Enum.map(svcs, fn svc ->
+        service_name = Util.mod_name(ctx, [Macro.camelize(svc.name)])
+        actor_name = Macro.camelize(svc.name)
+        name = Util.prepend_package_prefix(ctx.package, svc.name)
 
-      methods =
-        for m <- svc.method do
-          input = service_arg(Util.type_from_type_name(ctx, m.input_type), m.client_streaming)
-          output = service_arg(Util.type_from_type_name(ctx, m.output_type), m.server_streaming)
+        methods =
+          for m <- svc.method do
+            input = service_arg(Util.type_from_type_name(ctx, m.input_type), m.client_streaming)
+            output = service_arg(Util.type_from_type_name(ctx, m.output_type), m.server_streaming)
 
-          options =
-            m.options
-            |> opts()
-            |> inspect(limit: :infinity)
+            options =
+              m.options
+              |> opts()
+              |> inspect(limit: :infinity)
 
-          {Macro.underscore(m.name), input, output, options}
-        end
+            {m.name, input, output, options, m.client_streaming, m.server_streaming}
+          end
 
-      {mod_name,
-       [
-         module: mod_name,
-         actor_name: actor_name,
-         service_name: mod_name,
-         methods: methods,
-         version: Util.version()
-       ]}
-    end
+        {
+          actor_name,
+          %{
+            service_name: service_name,
+            methods: methods
+          }
+        }
+      end)
+
+    {name, _} = List.first(actors)
+
+    {name,
+     [
+       actors: actors
+     ]}
   end
 
   defp service_arg(type, _streaming? = true), do: "stream(#{type})"

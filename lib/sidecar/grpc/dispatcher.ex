@@ -9,6 +9,7 @@ defmodule Sidecar.GRPC.Dispatcher do
   require Logger
 
   alias GRPC.Server
+  alias Sidecar.GRPC.ServiceResolver, as: ActorResolver
 
   @doc """
     Dispatches a gRPC message to the specified actor.
@@ -66,6 +67,11 @@ defmodule Sidecar.GRPC.Dispatcher do
     Logger.debug(
       "Dispatching gRPC message to Actor #{system_name}:#{actor_name}. Params: #{inspect(request)}"
     )
+
+    # TODO
+    # Before forwading the request, we must find out through the ServiceResolver module what type of RPC
+    # it is (unary, client streaming, server streaming, etc...). This way we will know how to forward
+    # the request correctly (synchronously or asynchronously), as well as how to properly handle the GRPC response.
   end
 
   def dispatch(
