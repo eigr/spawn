@@ -63,6 +63,28 @@ defmodule Sidecar.GRPC.CodeGenerator do
     _ = Generate.run(protoc_options)
   end
 
+  @doc """
+  Loads Elixir modules from the specified directory with a '.pb.ex' file extension.
+
+  ## Parameters
+
+  - `opts` (KeywordList): Options for loading modules.
+    - `:output_path` (String): Path to the directory containing the modules. Default is "#{File.cwd!()}/priv/protos/modules".
+
+  ## Returns
+
+  A list of strings, where each string represents the content of an Elixir module file.
+
+  ## Examples
+
+  ```elixir
+  opts = [output_path: "/path/to/modules"]
+  modules = load_modules(opts)
+  IO.inspect(modules)
+
+  This example loads Elixir modules from the specified directory "/path/to/modules" and prints the content of each module.
+
+  """
   def load_modules(opts) do
     path = Keyword.get(opts, :output_path, "#{File.cwd!()}/priv/protos/modules")
 
