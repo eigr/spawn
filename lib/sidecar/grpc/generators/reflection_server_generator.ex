@@ -1,6 +1,10 @@
 defmodule Sidecar.Grpc.Generators.ReflectionServerGenerator do
   @moduledoc """
-  TODO
+  Module for generating a gRPC reflection server module.
+
+  This module implements the `ProtobufGenerate.Plugin` behaviour to generate a gRPC reflection server
+  module that includes specified gRPC services for reflection purposes.
+
   """
   @behaviour ProtobufGenerate.Plugin
 

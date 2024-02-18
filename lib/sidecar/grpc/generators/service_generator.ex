@@ -1,6 +1,10 @@
 defmodule Sidecar.GRPC.Generators.ServiceGenerator do
   @moduledoc """
-  TODO
+  Module for generating a gRPC proxy endpoint module.
+
+  This module implements the `ProtobufGenerate.Plugin` behaviour to generate a gRPC proxy endpoint
+  module that includes specified gRPC services.
+
   """
   @behaviour ProtobufGenerate.Plugin
 

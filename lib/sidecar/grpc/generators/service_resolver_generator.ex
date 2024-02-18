@@ -1,6 +1,10 @@
 defmodule Sidecar.GRPC.Generators.ServiceResolverGenerator do
   @moduledoc """
-  TODO
+  Module for generating a gRPC service resolver module.
+
+  This module implements the `ProtobufGenerate.Plugin` behaviour to generate a gRPC service resolver
+  module that provides methods for resolving gRPC services and their descriptors.
+
   """
   @behaviour ProtobufGenerate.Plugin
 
