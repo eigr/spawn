@@ -11,7 +11,7 @@ defmodule Proxy.MixProject do
       build_path: "../../_build",
       deps_path: "../../deps",
       lockfile: "../../mix.lock",
-      elixir: "~> 1.14",
+      elixir: "~> 1.15",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       releases: releases()

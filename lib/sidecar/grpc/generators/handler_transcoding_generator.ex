@@ -1,6 +1,10 @@
 defmodule Sidecar.GRPC.Generators.HandlerTranscodingGenerator do
   @moduledoc """
-  TODO
+  Module for generating an actor dispatcher with transcoding capabilities for gRPC methods.
+
+  This module implements the `ProtobufGenerate.Plugin` behaviour to generate an actor dispatcher
+  with transcoding capabilities for each gRPC method defined in the Protobuf service.
+
   """
   @behaviour ProtobufGenerate.Plugin
 

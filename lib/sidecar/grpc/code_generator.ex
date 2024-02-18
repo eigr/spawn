@@ -56,6 +56,7 @@ defmodule Sidecar.GRPC.CodeGenerator do
       "--plugins=#{handler_generator_plugin}",
       "--plugins=Sidecar.GRPC.Generators.ServiceGenerator",
       "--plugins=Sidecar.GRPC.Generators.ServiceResolverGenerator",
+      "--plugins=Sidecar.Grpc.Generators.ReflectionServerGenerator",
       "#{include_path}/#{user_defined_proto_files}"
     ]
 

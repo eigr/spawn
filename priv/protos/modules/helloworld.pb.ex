@@ -353,7 +353,7 @@ defmodule Helloworld.GreeterService.Service do
             __unknown_fields__: []
           },
           %Google.Protobuf.SourceCodeInfo.Location{
-            path: '\f',
+            path: ~c"\f",
             span: [0, 0, 18],
             leading_comments: nil,
             trailing_comments: nil,
@@ -361,7 +361,7 @@ defmodule Helloworld.GreeterService.Service do
             __unknown_fields__: []
           },
           %Google.Protobuf.SourceCodeInfo.Location{
-            path: '\b',
+            path: ~c"\b",
             span: [2, 0, 34],
             leading_comments: nil,
             trailing_comments: nil,
@@ -369,7 +369,7 @@ defmodule Helloworld.GreeterService.Service do
             __unknown_fields__: []
           },
           %Google.Protobuf.SourceCodeInfo.Location{
-            path: '\b\n',
+            path: ~c"\b\n",
             span: [2, 0, 34],
             leading_comments: nil,
             trailing_comments: nil,
@@ -377,7 +377,7 @@ defmodule Helloworld.GreeterService.Service do
             __unknown_fields__: []
           },
           %Google.Protobuf.SourceCodeInfo.Location{
-            path: '\b',
+            path: ~c"\b",
             span: [3, 0, 52],
             leading_comments: nil,
             trailing_comments: nil,
@@ -393,7 +393,7 @@ defmodule Helloworld.GreeterService.Service do
             __unknown_fields__: []
           },
           %Google.Protobuf.SourceCodeInfo.Location{
-            path: '\b',
+            path: ~c"\b",
             span: [4, 0, 48],
             leading_comments: nil,
             trailing_comments: nil,
@@ -401,7 +401,7 @@ defmodule Helloworld.GreeterService.Service do
             __unknown_fields__: []
           },
           %Google.Protobuf.SourceCodeInfo.Location{
-            path: '\b\b',
+            path: ~c"\b\b",
             span: [4, 0, 48],
             leading_comments: nil,
             trailing_comments: nil,
@@ -409,7 +409,7 @@ defmodule Helloworld.GreeterService.Service do
             __unknown_fields__: []
           },
           %Google.Protobuf.SourceCodeInfo.Location{
-            path: '\b',
+            path: ~c"\b",
             span: [5, 0, 33],
             leading_comments: nil,
             trailing_comments: nil,
@@ -417,7 +417,7 @@ defmodule Helloworld.GreeterService.Service do
             __unknown_fields__: []
           },
           %Google.Protobuf.SourceCodeInfo.Location{
-            path: '\b$',
+            path: ~c"\b$",
             span: [5, 0, 33],
             leading_comments: nil,
             trailing_comments: nil,
@@ -642,7 +642,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 1, 2, 0, 1],
-            span: '%\t\r',
+            span: ~c"%\t\r",
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -674,7 +674,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 1, 2, 1, 1],
-            span: '\'\t\r',
+            span: ~c"'\t\r",
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -762,7 +762,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 2, 2, 1, 3],
-            span: '-$%',
+            span: ~c"-$%",
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -858,12 +858,21 @@ defmodule Sidecar.GRPC.ServiceResolver do
       |> List.first()
 
     mod = Map.get(actor_attributes, :service_module)
-    file_descriptor = mod.descriptor()
 
-    Map.get(file_descriptor, :service)
+    mod.descriptor()
+    |> Map.get(:service)
     |> Enum.filter(fn %Google.Protobuf.ServiceDescriptorProto{name: name} ->
       actor_name == name
     end)
     |> List.first()
   end
+end
+
+defmodule Sidecar.GRPC.Reflection.Server do
+  @moduledoc since: "1.2.1"
+  use GrpcReflection.Server,
+    version: :v1,
+    services: [
+      Helloworld.GreeterService.Service
+    ]
 end
