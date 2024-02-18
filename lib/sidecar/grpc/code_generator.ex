@@ -90,10 +90,13 @@ defmodule Sidecar.GRPC.CodeGenerator do
 
     user_defined_modules_files = list_files_with_extension(path, ".pb.ex")
 
-    Enum.map(user_defined_modules_files, fn file ->
-      full_path = Path.join(path, file)
-      File.read!(full_path)
-    end)
+    modules =
+      Enum.map(user_defined_modules_files, fn file ->
+        full_path = Path.join(path, file)
+        File.read!(full_path)
+      end)
+
+    {:ok, modules}
   end
 
   @doc """

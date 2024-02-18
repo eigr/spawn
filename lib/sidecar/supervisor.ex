@@ -13,7 +13,8 @@ defmodule Sidecar.Supervisor do
       [
         supervisor_process_logger(__MODULE__),
         {Sidecar.GracefulShutdown, opts},
-        {Sidecar.ProcessSupervisor, opts}
+        {Sidecar.ProcessSupervisor, opts},
+        {Sidecar.GRPC.Supervisor, opts}
       ]
       |> Enum.reject(&is_nil/1)
 

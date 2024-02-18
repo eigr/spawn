@@ -27,6 +27,7 @@ if Code.ensure_loaded?(:persistent_term) do
       {:deployment_mode, "sidecar"},
       {:http_port, "9001"},
       {:http_num_acceptors, "150"},
+      {:grpc_port, "9980"},
       {:internal_nats_hosts, "nats://127.0.0.1:4222"},
       {:internal_nats_tls, "false"},
       {:internal_nats_auth, "false"},
@@ -219,6 +220,16 @@ if Code.ensure_loaded?(:persistent_term) do
         |> String.to_integer()
 
       :persistent_term.put({__MODULE__, :http_port}, value)
+
+      value
+    end
+
+    defp load_env({:grpc_port, default}) do
+      value =
+        env("PROXY_GRPC_PORT", default)
+        |> String.to_integer()
+
+      :persistent_term.put({__MODULE__, :grpc_port}, value)
 
       value
     end
