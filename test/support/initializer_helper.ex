@@ -11,7 +11,7 @@ defmodule Spawn.InitializerHelper do
   end
 
   def spawn_peer(name) do
-    node = Spawn.NodeHelper.spawn_peer(name, applications: [:spawn])
+    node = Spawn.NodeHelper.spawn_peer(name, applications: [:spawn, :mimic_app])
 
     case Spawn.NodeHelper.rpc(node, Spawn.InitializerHelper, :setup, []) do
       {:error, error} ->

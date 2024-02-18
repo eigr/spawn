@@ -1,3 +1,5 @@
+Application.ensure_all_started(:mimic)
+
 Mimic.copy(Actors.Node.Client)
 
 Spawn.InitializerHelper.setup()
