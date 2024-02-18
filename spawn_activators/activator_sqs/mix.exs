@@ -12,7 +12,7 @@ defmodule ActivatorSQS.MixProject do
       config_path: "../../config/config.exs",
       deps_path: "../activator/deps",
       lockfile: "../activator/mix.lock",
-      elixir: "~> 1.14",
+      elixir: "~> 1.15",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       releases: releases()
