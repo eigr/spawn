@@ -45,9 +45,7 @@ defmodule Operator.MixProject do
       {:bakeware, ">= 0.0.0", runtime: false},
       {:bonny, "~> 1.1"},
       {:castore, "~> 1.0"},
-      {:spawn, path: "../../"},
-      {:k8s, "~> 2.2"},
-      {:k8s_webhoox, "~> 0.2"}
+      {:spawn, path: "../../"}
     ]
   end
 

@@ -86,6 +86,8 @@ defmodule Spawn.MixProject do
       {:phoenix_pubsub_nats, "~> 0.2"},
       {:jason, "~> 1.3"},
       {:gnat, "~> 1.7"},
+      {:k8s, "~> 2.2"},
+      {:k8s_webhoox, "~> 0.2"},
       # Metrics & Tracing deps
       {:telemetry_poller, "~> 1.0"},
       {:telemetry_metrics, "~> 0.6"},
