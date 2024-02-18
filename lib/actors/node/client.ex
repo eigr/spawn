@@ -19,7 +19,7 @@ defmodule Actors.Node.Client do
   def invoke_host_actor(body, opts \\ []) do
     with {:ok, client} <- client(body, opts) do
       # seems useless but Finch doesn't have the request timeout spec specified
-      opts = Keyword.merge([], request_timeout: @req_timeout)
+      opts = Keyword.merge([], request_timeout: @req_timeout, receive_timeout: @req_timeout)
 
       Finch.request(client, SpawnHTTPClient, opts)
     end
