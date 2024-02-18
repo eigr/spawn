@@ -336,7 +336,11 @@ defmodule Google.Api.AuthProvider do
   field(:audiences, 4, type: :string)
   field(:authorization_url, 5, type: :string, json_name: "authorizationUrl")
 
-  field(:jwt_locations, 6, repeated: true, type: Google.Api.JwtLocation, json_name: "jwtLocations")
+  field(:jwt_locations, 6,
+    repeated: true,
+    type: Google.Api.JwtLocation,
+    json_name: "jwtLocations"
+  )
 end
 
 defmodule Google.Api.OAuthRequirements do

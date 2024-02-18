@@ -368,7 +368,7 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
     |> Map.get("volumeMounts", [])
     |> Enum.each(fn mount ->
       if !Enum.find(volumes, &(&1["name"] == mount["name"])) do
-        Logger.warn("Not found volume registered for #{mount["name"]}")
+        Logger.warning("Not found volume registered for #{mount["name"]}")
       end
     end)
   end
