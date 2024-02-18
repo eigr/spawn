@@ -8,10 +8,12 @@ defmodule Actors.MockTest do
 
       setup do
         Agent.start_link(fn -> nil end, name: Actors.MockTest)
+
+        :ok
       end
 
       def mock_invoke_host_actor_with_ok_response(response) do
-        Agent.put(Actors.MockTest, response)
+        Agent.update(Actors.MockTest, fn _ -> response end)
       end
     end
   end
