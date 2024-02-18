@@ -129,14 +129,11 @@ defmodule Actors.Actor.Entity.Lifecycle do
           Keyword.get(opts, :split_brain_detector, Actors.Node.DefaultSplitBrainDetector)
 
         case check_partition(actor.id, status, node, split_brain_detector) do
-          {:continue} ->
+          :continue ->
             {:noreply, updated_state(state, actual_state, current_revision),
              {:continue, :call_init_action}}
 
-          {:network_partition_detected, _error} ->
-            handle_network_partition(actor.id)
-
-          error ->
+          {:network_partition_detected, error} ->
             handle_network_partition(actor.id, error)
         end
 
@@ -320,7 +317,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
     end
   end
 
-  defp handle_network_partition(id, error \\ nil) do
+  defp handle_network_partition(id, error) do
     Logger.warning(
       "We have detected a possible network partition issue for Actor #{inspect(id)}. This actor will not start. Details: #{inspect(error)}"
     )

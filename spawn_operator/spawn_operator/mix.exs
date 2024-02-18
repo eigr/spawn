@@ -8,10 +8,10 @@ defmodule Operator.MixProject do
     [
       app: @app,
       version: @version,
-      build_path: "../../_build",
+      build_path: "_build",
       config_path: "config/config.exs",
-      deps_path: "../../deps",
-      lockfile: "../../mix.lock",
+      deps_path: "deps",
+      lockfile: "mix.lock",
       elixir: "~> 1.14",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
@@ -45,7 +45,9 @@ defmodule Operator.MixProject do
       {:bakeware, ">= 0.0.0", runtime: false},
       {:bonny, "~> 1.1"},
       {:castore, "~> 1.0"},
-      {:spawn, path: "../../"}
+      {:spawn, path: "../../"},
+      {:k8s, "~> 2.2"},
+      {:k8s_webhoox, "~> 0.2"}
     ]
   end
 
