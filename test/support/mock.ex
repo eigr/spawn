@@ -4,8 +4,6 @@ defmodule Actors.MockTest do
   @doc false
   defmacro __using__(_opts \\ []) do
     quote do
-      alias Eigr.Functions.Protocol.ActorInvocationResponse
-
       setup do
         Agent.start_link(fn -> nil end, name: Actors.MockTest)
 
