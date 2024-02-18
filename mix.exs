@@ -111,8 +111,6 @@ defmodule Spawn.MixProject do
       {:pluggable, "~> 1.0"},
       # Non runtime deps
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
-      {:faker, "~> 0.17", only: :test},
-      {:mimic, "~> 1.7", only: :test},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false}
     ]
   end

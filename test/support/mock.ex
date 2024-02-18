@@ -4,17 +4,14 @@ defmodule Actors.MockTest do
   @doc false
   defmacro __using__(_opts \\ []) do
     quote do
-      use Mimic
-
-      setup :set_mimic_global
-
       alias Eigr.Functions.Protocol.ActorInvocationResponse
 
+      setup do
+        Agent.start_link(fn -> nil end, name: Actors.MockTest)
+      end
+
       def mock_invoke_host_actor_with_ok_response(response) do
-        Actors.Node.Client
-        |> stub(:invoke_host_actor, fn _payload ->
-          {:ok, %Finch.Response{body: ActorInvocationResponse.encode(response)}}
-        end)
+        Agent.put(Actors.MockTest, response)
       end
     end
   end

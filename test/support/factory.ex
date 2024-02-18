@@ -84,7 +84,7 @@ defmodule Actors.FactoryTest do
   end
 
   def build_actor_entry(attrs \\ []) do
-    default_name = Faker.Superhero.name()
+    default_name = "#{inspect(make_ref())}"
 
     %{
       (attrs[:name] || default_name) =>
@@ -93,7 +93,7 @@ defmodule Actors.FactoryTest do
   end
 
   def build_actor(attrs \\ []) do
-    actor_name = attrs[:name] || "#{Faker.Superhero.name()} #{Faker.StarWars.character()}"
+    actor_name = attrs[:name] || "#{inspect(make_ref())}"
 
     %Actor{
       id: %ActorId{name: actor_name, system: attrs[:system]},
@@ -115,7 +115,7 @@ defmodule Actors.FactoryTest do
 
   def build_actor_state(attrs \\ []) do
     state =
-      any_pack!(%Actors.Protos.StateTest{name: "example_state_name_#{Faker.Superhero.name()}"})
+      any_pack!(%Actors.Protos.StateTest{name: "example_state_name_#{inspect(make_ref())}"})
 
     %ActorState{state: Any.new(attrs[:state] || state)}
   end
