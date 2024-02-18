@@ -8,11 +8,11 @@ defmodule ActivatorAPI.MixProject do
     [
       app: @app,
       version: @version,
-      build_path: "../../_build",
+      build_path: "../activator/_build",
       config_path: "../../config/config.exs",
-      deps_path: "../../deps",
-      lockfile: "../../mix.lock",
-      elixir: "~> 1.14",
+      deps_path: "../activator/deps",
+      lockfile: "../activator/mix.lock",
+      elixir: "~> 1.15",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       releases: releases()
@@ -31,7 +31,6 @@ defmodule ActivatorAPI.MixProject do
   defp deps do
     [
       {:activator, path: "../activator"},
-      {:spawn, path: "../../"},
       {:grpc, "~> 0.5"},
       {:gun, "~> 2.0", override: true},
       {:cowlib, "~> 2.11", override: true}

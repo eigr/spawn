@@ -104,7 +104,10 @@ defmodule Actors.Actor.InvocationScheduler do
     delay_in_ms = DateTime.diff(scheduled_to, DateTime.utc_now(), :millisecond)
 
     if delay_in_ms <= 0 do
-      Logger.warn("Received negative delayed invocation request (#{delay_in_ms}), invoking now")
+      Logger.warning(
+        "Received negative delayed invocation request (#{delay_in_ms}), invoking now"
+      )
+
       Process.send(self(), {:invoke, decoded_request, scheduled_to, repeat_in}, [])
     else
       Process.send_after(self(), {:invoke, decoded_request, scheduled_to, repeat_in}, delay_in_ms)

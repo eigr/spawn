@@ -249,8 +249,8 @@ defmodule Actor.ActorTest do
 
   describe "handle_action/2" do
     test "simple call for valid pattern match" do
-      id = Faker.Superhero.name()
-      data = Faker.StarWars.character()
+      id = "#{inspect(make_ref())}"
+      data = "#{inspect(make_ref())}"
 
       ctx = %SpawnSdk.Context{
         caller: nil,
@@ -272,7 +272,7 @@ defmodule Actor.ActorTest do
   describe "invoke json actor" do
     test "simple default function call returning only map without payload", ctx do
       system = ctx.system
-      dynamic_actor_name = Faker.Pokemon.name() <> "json_actor_get_state"
+      dynamic_actor_name = "#{inspect(make_ref())}" <> "json_actor_get_state"
 
       assert SpawnSdk.invoke(dynamic_actor_name,
                ref: "json_actor_ref",
@@ -283,7 +283,7 @@ defmodule Actor.ActorTest do
 
     test "simple delay invoke changing state", ctx do
       system = ctx.system
-      dynamic_actor_name = Faker.Pokemon.name() <> "json_actor_delay_change_state"
+      dynamic_actor_name = "#{inspect(make_ref())}" <> "json_actor_delay_change_state"
 
       SpawnSdk.invoke(dynamic_actor_name,
         ref: "json_actor_ref",
@@ -304,7 +304,7 @@ defmodule Actor.ActorTest do
 
     test "simple scheduled_at invoke changing state", ctx do
       system = ctx.system
-      dynamic_actor_name = Faker.Pokemon.name() <> "json_actor_scheduled_change_state"
+      dynamic_actor_name = "#{inspect(make_ref())}" <> "json_actor_scheduled_change_state"
 
       SpawnSdk.invoke(dynamic_actor_name,
         ref: "json_actor_ref",
@@ -325,7 +325,7 @@ defmodule Actor.ActorTest do
 
     test "simple call using maps with no proto", ctx do
       system = ctx.system
-      dynamic_actor_name = Faker.Pokemon.name() <> "json_actor_call"
+      dynamic_actor_name = "#{inspect(make_ref())}" <> "json_actor_call"
 
       payload = %{value: 2}
 
@@ -341,7 +341,9 @@ defmodule Actor.ActorTest do
   describe "invoke timer actor" do
     test "simple state check", ctx do
       system = ctx.system
-      dynamic_actor_name = Faker.Pokemon.name() <> "#{Ecto.UUID.generate()}_timer_actor_ref_new"
+
+      dynamic_actor_name =
+        "#{inspect(make_ref())}" <> "#{Ecto.UUID.generate()}_timer_actor_ref_new"
 
       assert SpawnSdk.invoke(dynamic_actor_name,
                ref: "timer_actor_ref",
@@ -368,7 +370,7 @@ defmodule Actor.ActorTest do
 
       payload = %Eigr.Spawn.Actor.MyMessageRequest{data: "non_intended_data"}
 
-      dynamic_actor_name = Faker.Pokemon.name() <> "piping"
+      dynamic_actor_name = "#{inspect(make_ref())}" <> "piping"
 
       assert {:ok, response} =
                SpawnSdk.invoke(dynamic_actor_name,
@@ -383,7 +385,7 @@ defmodule Actor.ActorTest do
 
     test "calling a function that sets wrong state type", ctx do
       system = ctx.system
-      dynamic_actor_name = Faker.Pokemon.name() <> "wrong_state"
+      dynamic_actor_name = "#{inspect(make_ref())}" <> "wrong_state"
 
       assert SpawnSdk.invoke(dynamic_actor_name,
                ref: "my_actor_ref",
@@ -400,7 +402,7 @@ defmodule Actor.ActorTest do
 
     test "calling a function that sets wrong state type to json", ctx do
       system = ctx.system
-      dynamic_actor_name = Faker.Pokemon.name() <> "wrong_state_json"
+      dynamic_actor_name = "#{inspect(make_ref())}" <> "wrong_state_json"
 
       assert SpawnSdk.invoke(dynamic_actor_name,
                ref: "my_actor_ref",
@@ -417,7 +419,7 @@ defmodule Actor.ActorTest do
 
     test "calling a function that returns json in response", ctx do
       system = ctx.system
-      dynamic_actor_name = Faker.Pokemon.name() <> "json_return"
+      dynamic_actor_name = "#{inspect(make_ref())}" <> "json_return"
 
       assert SpawnSdk.invoke(dynamic_actor_name,
                ref: "my_actor_ref",
@@ -431,7 +433,7 @@ defmodule Actor.ActorTest do
 
       payload = %Eigr.Spawn.Actor.MyMessageRequest{data: "initial_calling"}
 
-      dynamic_actor_name = Faker.Pokemon.name() <> "forward_caller"
+      dynamic_actor_name = "#{inspect(make_ref())}" <> "forward_caller"
 
       assert {:ok, response} =
                SpawnSdk.invoke(dynamic_actor_name,
@@ -454,7 +456,7 @@ defmodule Actor.ActorTest do
 
       payload = %Eigr.Spawn.Actor.MyMessageRequest{data: "non_intended_data"}
 
-      dynamic_actor_name = Faker.Pokemon.name() <> "_side_effect"
+      dynamic_actor_name = "#{inspect(make_ref())}" <> "_side_effect"
 
       assert {:ok, response} =
                SpawnSdk.invoke(dynamic_actor_name,
@@ -472,7 +474,7 @@ defmodule Actor.ActorTest do
     test "simple call verifying that tags is changed", ctx do
       system = ctx.system
 
-      dynamic_actor_name = Faker.Pokemon.name() <> "_tags"
+      dynamic_actor_name = "#{inspect(make_ref())}" <> "_tags"
 
       assert {:ok, response} =
                SpawnSdk.invoke(dynamic_actor_name,
@@ -514,7 +516,7 @@ defmodule Actor.ActorTest do
     test "invoke broadcasting a simple state", ctx do
       system = ctx.system
 
-      fake_payload_data = Faker.Pokemon.name() <> "_fake_payload"
+      fake_payload_data = "#{inspect(make_ref())}" <> "_fake_payload"
       payload = %Eigr.Spawn.Actor.MyMessageRequest{data: fake_payload_data}
 
       assert {:ok, _} =
@@ -552,7 +554,7 @@ defmodule Actor.ActorTest do
       |> Stream.map(fn {:ok, number} ->
         payload = %Eigr.Spawn.Actor.MyMessageRequest{data: "#{number}"}
 
-        dynamic_actor_name = "#{Faker.Pokemon.name()}-piping-#{number}"
+        dynamic_actor_name = "#{inspect(make_ref())}-piping-#{number}"
 
         # assert {:ok, :async} =
         #          SpawnSdk.invoke(dynamic_actor_name,

@@ -7,7 +7,6 @@ contributors are expected to adhere to.
 
 [code-of-conduct]: https://github.com/eigr/spawn/blob/master/CODE_OF_CONDUCT.md
 
-
 ## Contributing bug reports
 
 If you have found a bug in eigr/spawn please check to see if there is an open
@@ -19,7 +18,6 @@ find an existing ticket for the bug please open a new one.
 A bug may be a technical problem such or a user experience issue such as
 unclear or absent documentation. If you are unsure if your problem is a bug
 please open a ticket and we will work it out together.
-
 
 ## Contributing code changes
 
@@ -46,7 +44,7 @@ This sections below describes the process for running and development this appli
 First of all you will need to have some tools installed on your computer:
 
 1. Erlang/OTP 24 or newest.
-2. Elixir 1.14 or newest.
+2. Elixir 1.15 or newest.
 3. Minikube, kind, K3s, or other Kubernetes flavor for local development.
 4. MySQL, Postgres or other supported database running in local environment.
 
@@ -62,44 +60,44 @@ make
 
 > **_NOTE:_** Compiling, test and building all applications and containers can take some time so this is the time when you stop and go have a delicious coffee **;-)**
 
-There are many Make tasks to help during development for example to run the proxy locally via the elixir console there is a make task called ***run-proxy-local***, or to run all tests there is another called ***test***. Take a good look at the **Makefile** file to know all the tasks.
+There are many Make tasks to help during development for example to run the proxy locally via the elixir console there is a make task called **_run-proxy-local_**, or to run all tests there is another called **_test_**. Take a good look at the **Makefile** file to know all the tasks.
 
 ## Tour
 
 The Spawn repository is divided into many directories and even though it is an Umbrella-type project it is also composed of many apps. Next, we will talk a little about the main directories and apps.
 
-* **docs:** Where we try to keep important documents for understanding the platform.
+- **docs:** Where we try to keep important documents for understanding the platform.
 
-* **config:** Where are all the default settings for the different applications that make up Spawn.
+- **config:** Where are all the default settings for the different applications that make up Spawn.
 
-* ***priv:*** Contains the protobuf files and some helpers files.
+- **_priv:_** Contains the protobuf files and some helpers files.
 
-* ***lib:*** Contains the core of Spawn like compiled modules of the Spawn protocol and all stuff to make cluster works. So with the basis of our tests.
+- **_lib:_** Contains the core of Spawn like compiled modules of the Spawn protocol and all stuff to make cluster works. So with the basis of our tests.
 
-* ***actors:*** This app concentrates all of the Spawn Actors logic and is where a lot of the magic happens.
+- **_actors:_** This app concentrates all of the Spawn Actors logic and is where a lot of the magic happens.
 
-* ***spawn_proxy:*** This is the application that will act as a sidecar of the user functions. It contains the http server responsible for implementing the Spawn HTTP/Protobuf Protocol.
+- **_spawn_proxy:_** This is the application that will act as a sidecar of the user functions. It contains the http server responsible for implementing the Spawn HTTP/Protobuf Protocol.
 
-* ***spawn_statestores:*** Includes all data persistence logic and access to different databases and providers.
+- **_spawn_statestores:_** Includes all data persistence logic and access to different databases and providers.
 
-* ***spawn_operator:*** This is the Kubernetes Controller/Operator that controls the provisioning of the sidecars and user functions.
+- **_spawn_operator:_** This is the Kubernetes Controller/Operator that controls the provisioning of the sidecars and user functions.
 
-* ***spawn_activators:*** It has the behaviors/contracts and implementation of the event handlers to be used by the different providers of the Activators. Also each application that starts with activator and follows the name of a given event provider implements in turn the connection logic and event management of that specific provider.
+- **_spawn_activators:_** It has the behaviors/contracts and implementation of the event handlers to be used by the different providers of the Activators. Also each application that starts with activator and follows the name of a given event provider implements in turn the connection logic and event management of that specific provider.
 
-* **examples:** Where you can find some examples of using our CRDs and user applications.
+- **examples:** Where you can find some examples of using our CRDs and user applications.
 
 ## Guide for implementing new SDKs
 
 The Spawn protocol is very simple to implement but it is necessary for the developer of a new support language (we will use the term SDK from now on) to be aware of some important details. Below are some tips that can be useful to you during your journey of developing a new SDK or maintaining an existing SDK:
 
-1. **Make sure you understand the request flow:** 
+1. **Make sure you understand the request flow:**
 
    Before starting to develop an API around the protocol in your desired language, first try to understand how all the parts relate to each other. A good way to acquire this knowledge is to create a simple test that just fills in the protobuf objects and makes a simple request to the proxy. Here we have some example:
-   
+
    https://github.com/eigr/spawn-springboot-sdk/blob/main/spawn-springboot-starter/src/test/java/io/eigr/spawn/springboot/starter/SpawnTest.java
 
 2. **Spawn is both a Client and an HTTP Server:**
-   
+
    To implement an SDK for Spawn you will have to implement both an http client side and an http server side. [This file](docs/protocol.md) contains the general flow of requests that occur on each side and when they should occur, but a read of the source code of other SDKs can help better understand how things connect.
 
 3. **At first, pay attention to the main:**
@@ -117,16 +115,16 @@ The Spawn protocol is very simple to implement but it is necessary for the devel
 5. **Note on Spawning:**
 
    The Spawning Actors on the Fly feature is very similar to the SDK registration feature on the Proxy but it has an important feature that must be considered and that refers to the previous item in this guide.
-   
+
    Basically, an Actor to be created on the fly must, even in these cases, be created in the SDK in advance, that is, the dynamic Actor must have a template of itself previously registered in the registration step. This is necessary because this way the proxy will know how to optimize the initialization and the way these Actors will actually be created in the future. It is important for the proxy to know which are all the functions that a Host Function will define.
-   
+
    For a more complete understanding, see the example in Java of how the Actors are registered and how the Spawning of these Actors is performed on the fly:
 
-      * First an Actor is defined and its identity is defined as Unnamed.
-        https://github.com/eigr/spawn-springboot-sdk/blob/main/spawn-springboot-examples/src/main/java/io/eigr/spawn/example/UnnamedActor.java
+   - First an Actor is defined and its identity is defined as Unnamed.
+     https://github.com/eigr/spawn-springboot-sdk/blob/main/spawn-springboot-examples/src/main/java/io/eigr/spawn/example/UnnamedActor.java
 
-      * Then, when you really want to create a concrete instance of this Actor, a real name is given and this name is associated with the unnamed type of the Actor.  
-        https://github.com/eigr/spawn-springboot-sdk/blob/e88b59f1505647a867adb9607a4d39baa249ebb2/spawn-springboot-examples/src/main/java/io/eigr/spawn/example/App.java#L36
+   - Then, when you really want to create a concrete instance of this Actor, a real name is given and this name is associated with the unnamed type of the Actor.  
+     https://github.com/eigr/spawn-springboot-sdk/blob/e88b59f1505647a867adb9607a4d39baa249ebb2/spawn-springboot-examples/src/main/java/io/eigr/spawn/example/App.java#L36
 
 6. **Raise your hand and seek help:**
 

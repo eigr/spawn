@@ -12,7 +12,7 @@ defmodule Statestores.Manager.StateManager do
   def load_all(id), do: load_snapshot_adapter().get_all_snapshots_by_key(id)
 
   def load_by_interval(id, time_start, time_end),
-    do: load_snapshot_adapter().get_snapshots_by_interval()
+    do: load_snapshot_adapter().get_snapshots_by_interval(id, time_start, time_end)
 
   def save(event), do: load_snapshot_adapter().save(event)
 end

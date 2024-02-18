@@ -16,7 +16,7 @@ defmodule SpawnSdk.MixProject do
       config_path: "../../config/config.exs",
       deps_path: "../../deps",
       lockfile: "../../mix.lock",
-      elixir: "~> 1.14",
+      elixir: "~> 1.15",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
@@ -58,7 +58,6 @@ defmodule SpawnSdk.MixProject do
   defp deps do
     [
       {:spawn, path: "../.."},
-      {:faker, "~> 0.17", only: :test},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false}
     ]
   end

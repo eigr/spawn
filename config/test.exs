@@ -7,3 +7,5 @@ config :spawn_statestores, Statestores.Adapters.MySQLSnapshotAdapter,
   prepare: :unnamed,
   queue_target: 5_000,
   queue_interval: 500
+
+config :spawn, http_node_client: NodeClientMock

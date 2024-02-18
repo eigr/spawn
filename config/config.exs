@@ -50,7 +50,7 @@ config :opentelemetry, :resource, service: %{name: "spawn"}
 config :opentelemetry,
        :processors,
        otel_batch_processor: %{
-         exporter: {:opentelemetry_exporter, %{endpoints: [{:http, 'localhost', 55681, []}]}}
+         exporter: {:opentelemetry_exporter, %{endpoints: [{:http, ~c"localhost", 55681, []}]}}
        }
 
 config :spawn,

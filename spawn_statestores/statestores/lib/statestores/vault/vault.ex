@@ -19,10 +19,4 @@ defmodule Statestores.Vault do
 
     {:ok, config}
   end
-
-  defp decode_env!(var) do
-    var
-    |> System.get_env()
-    |> Base.decode64!()
-  end
 end

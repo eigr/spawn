@@ -16,7 +16,7 @@ defmodule Statestores.MixProject do
       config_path: "../../config/config.exs",
       deps_path: "../../deps",
       lockfile: "../../mix.lock",
-      elixir: "~> 1.14",
+      elixir: "~> 1.15",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       elixirc_paths: elixirc_paths(Mix.env()),
@@ -58,6 +58,7 @@ defmodule Statestores.MixProject do
       {:castore, "~> 1.0"},
       {:cloak_ecto, "~> 1.2"},
       {:ecto_sql, "~> 3.10"},
+      {:jason, "~> 1.3"},
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false}
     ]

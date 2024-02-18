@@ -8,11 +8,11 @@ defmodule SpawnCli.MixProject do
     [
       app: @app,
       version: @version,
-      build_path: "../_build",
+      build_path: "_build",
       config_path: "config/config.exs",
-      deps_path: "../deps",
-      lockfile: "../mix.lock",
-      elixir: "~> 1.14",
+      deps_path: "deps",
+      lockfile: "mix.lock",
+      elixir: "~> 1.15",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       releases: releases()
@@ -30,8 +30,6 @@ defmodule SpawnCli.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:bonny, "~> 1.1"},
-      {:castore, "~> 1.0"},
       {:do_it, "~> 0.6"},
       {:burrito, "~> 1.0"}
     ]

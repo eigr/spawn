@@ -50,7 +50,7 @@ defmodule Actors.Supervisors.ProtocolSupervisor do
       Finch,
       name: SpawnHTTPClient,
       pools: %{
-        :default => [
+        default: [
           count: pool_schedulers,
           pool_max_idle_time: pool_max_idle_time,
           size: size
