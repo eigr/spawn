@@ -779,9 +779,9 @@ defmodule Helloworld.GreeterService.Service do
     }
   end
 
-  rpc(:SayHello, Helloworld.HelloRequest, Helloworld.HelloReply)
+  rpc(:SayHello, Helloworld.HelloRequest, Helloworld.HelloReply, %{})
 
-  rpc(:SayHelloFrom, Helloworld.HelloRequestFrom, Helloworld.HelloReply)
+  rpc(:SayHelloFrom, Helloworld.HelloRequestFrom, Helloworld.HelloReply, %{})
 end
 
 defmodule Helloworld.GreeterService.ActorDispatcher do

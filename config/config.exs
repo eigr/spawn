@@ -19,9 +19,8 @@ config :do_it, DoIt.Commfig,
 
 config :logger,
   backends: [:console],
-  truncate: 65536
-
-# level: :info
+  truncate: 65536,
+  level: :debug
 
 #  compile_time_purge_matching: [
 #    [level_lower_than: :info]
@@ -74,4 +73,4 @@ config :mnesiac,
   schema_type: :disc_copies,
   table_load_timeout: 600_000
 
-#import_config "#{config_env()}.exs"
+# import_config "#{config_env()}.exs"

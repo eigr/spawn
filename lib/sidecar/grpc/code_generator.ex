@@ -31,6 +31,7 @@ defmodule Sidecar.GRPC.CodeGenerator do
 
   """
   def compile_protos(opts \\ []) do
+    Logger.debug("Compiling ActorHost Protocol Buffers...")
     include_path = "#{File.cwd!()}/priv/protos"
     output_path = Keyword.get(opts, :output_path, Config.get(:grpc_compiled_modules_path))
 
@@ -72,9 +73,7 @@ defmodule Sidecar.GRPC.CodeGenerator do
   ## Parameters
 
   - `opts` (KeywordList): Options for loading modules.
-    - `:output_path` (String): Path to the directory containing the modules. Default is "#{
-    File.cwd!()
-  }/priv/protos/modules".
+    - `:output_path` (String): Path to the directory containing the modules. Default is "#{File.cwd!()}/priv/protos/modules".
 
   ## Returns
 
@@ -91,6 +90,7 @@ defmodule Sidecar.GRPC.CodeGenerator do
 
   """
   def load_modules(opts \\ []) do
+    Logger.debug("Loading ActorHost contract modules...")
     path = Keyword.get(opts, :output_path, Config.get(:grpc_compiled_modules_path))
 
     user_defined_modules_files = list_files_with_extension(path, ".pb.ex")
@@ -125,7 +125,10 @@ defmodule Sidecar.GRPC.CodeGenerator do
   Raises an error if there are issues during the compilation process.
 
   """
-  def compile_modules(modules) when is_list(modules), do: Enum.each(modules, &do_compile/1)
+  def compile_modules(modules) when is_list(modules) do
+    Logger.debug("Compiling ActorHost contract modules...")
+    Enum.each(modules, &compile_modules/1)
+  end
 
   def compile_modules(module), do: do_compile(module)
 

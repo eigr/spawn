@@ -19,6 +19,7 @@ defmodule Sidecar.GRPC.Dispatcher do
     - `request` - A map containing the following parameters:
       - `system: system_name` - The name of the actor system.
       - `actor_name: actor_name` - The name of the actor.
+      - `action_name: action_name` - The name of action to call.
       - `input: message` - The input message.
       - `stream: stream` - The stream (optional).
       - `descriptor: descriptor` - The service descriptor.
@@ -57,31 +58,10 @@ defmodule Sidecar.GRPC.Dispatcher do
         %{
           system: system_name,
           actor_name: actor_name,
-          action_name: action_name,
-          input: message,
-          stream: stream,
           descriptor: descriptor
-        } = request
+        } = _request
       )
-      when not is_nil(descriptor) do
-    Logger.debug(
-      "Dispatching gRPC message to Actor #{system_name}:#{actor_name}. Params: #{inspect(request)}"
-    )
-
-    # TODO
-    # Before forwading the request, we must find out through the ServiceResolver module what type of RPC
-    # it is (unary, client streaming, server streaming, etc...). This way we will know how to forward
-    # the request correctly (synchronously or asynchronously), as well as how to properly handle the GRPC response.
-  end
-
-  def dispatch(
-        %{
-          system: system_name,
-          actor_name: actor_name,
-          descriptor: descriptor
-        } = request
-      )
-      when not is_nil(descriptor) do
+      when is_nil(descriptor) do
     Logger.error(
       "Service descriptor not found. Impossible to call Actor #{system_name}:#{actor_name}"
     )
@@ -90,5 +70,25 @@ defmodule Sidecar.GRPC.Dispatcher do
       status: GRPC.Status.failed_precondition(),
       message:
         "Service descriptor not found. Impossible to call Actor #{system_name}:#{actor_name}"
+  end
+
+  def dispatch(
+        %{
+          system: system_name,
+          actor_name: actor_name,
+          action_name: action_name,
+          input: message,
+          stream: stream,
+          descriptor: descriptor
+        } = request
+      ) do
+    Logger.debug(
+      "Dispatching gRPC message to Actor #{system_name}:#{actor_name}. Params: #{inspect(request)}"
+    )
+
+    # TODO
+    # Before forwading the request, we must find out through the ServiceResolver module what type of RPC
+    # it is (unary, client streaming, server streaming, etc...). This way we will know how to forward
+    # the request correctly (synchronously or asynchronously), as well as how to properly handle the GRPC response.
   end
 end
