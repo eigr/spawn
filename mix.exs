@@ -78,7 +78,7 @@ defmodule Spawn.MixProject do
       {:protobuf, "~> 0.11"},
       {:protobuf_generate, "~> 0.1"},
       {:grpc, "~> 0.7"},
-      {:grpc_reflection, git: "https://github.com/elixir-grpc/grpc-reflection"},
+      {:grpc_reflection, "~> 0.1"},
       {:finch, "~> 0.16"},
       {:retry, "~> 0.17"},
       {:flow, "~> 1.2"},

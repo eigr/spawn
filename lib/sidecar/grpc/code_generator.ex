@@ -13,6 +13,7 @@ defmodule Sidecar.GRPC.CodeGenerator do
   """
   require Logger
 
+  alias Actors.Config.PersistentTermConfig, as: Config
   alias Mix.Tasks.Protobuf.Generate
 
   @doc """
@@ -31,8 +32,10 @@ defmodule Sidecar.GRPC.CodeGenerator do
   """
   def compile_protos(opts \\ []) do
     include_path = "#{File.cwd!()}/priv/protos"
-    output_path = Keyword.get(opts, :output_path, "#{File.cwd!()}/priv/protos/modules")
-    transcoding_enabled? = Keyword.get(opts, :http_transcoding_enabled, true)
+    output_path = Keyword.get(opts, :output_path, Config.get(:grpc_compiled_modules_path))
+
+    transcoding_enabled? =
+      Keyword.get(opts, :http_transcoding_enabled, Config.get(:grpc_http_transcoding_enabled))
 
     {grpc_generator_plugin, handler_generator_plugin} =
       if transcoding_enabled? do
@@ -69,7 +72,9 @@ defmodule Sidecar.GRPC.CodeGenerator do
   ## Parameters
 
   - `opts` (KeywordList): Options for loading modules.
-    - `:output_path` (String): Path to the directory containing the modules. Default is "#{File.cwd!()}/priv/protos/modules".
+    - `:output_path` (String): Path to the directory containing the modules. Default is "#{
+    File.cwd!()
+  }/priv/protos/modules".
 
   ## Returns
 
@@ -85,8 +90,8 @@ defmodule Sidecar.GRPC.CodeGenerator do
   This example loads Elixir modules from the specified directory "/path/to/modules" and prints the content of each module.
 
   """
-  def load_modules(opts) do
-    path = Keyword.get(opts, :output_path, "#{File.cwd!()}/priv/protos/modules")
+  def load_modules(opts \\ []) do
+    path = Keyword.get(opts, :output_path, Config.get(:grpc_compiled_modules_path))
 
     user_defined_modules_files = list_files_with_extension(path, ".pb.ex")
 

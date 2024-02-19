@@ -28,6 +28,8 @@ if Code.ensure_loaded?(:persistent_term) do
       {:http_port, "9001"},
       {:http_num_acceptors, "150"},
       {:grpc_port, "9980"},
+      {:grpc_http_transcoding_enabled, "true"},
+      {:grpc_compiled_modules_path, "#{File.cwd!()}/priv/protos/modules"},
       {:internal_nats_hosts, "nats://127.0.0.1:4222"},
       {:internal_nats_tls, "false"},
       {:internal_nats_auth, "false"},
@@ -230,6 +232,23 @@ if Code.ensure_loaded?(:persistent_term) do
         |> String.to_integer()
 
       :persistent_term.put({__MODULE__, :grpc_port}, value)
+
+      value
+    end
+
+    defp load_env({:grpc_http_transcoding_enabled, default}) do
+      value =
+        env("PROXY_GRPC_HTTP_TRANSCODING_ENABLED", default)
+        |> to_bool()
+
+      :persistent_term.put({__MODULE__, :grpc_http_transcoding_enabled}, value)
+
+      value
+    end
+
+    defp load_env({:grpc_compiled_modules_path, default}) do
+      value = env("PROXY_GRPC_COMPILED_MODULES_PATH", default)
+      :persistent_term.put({__MODULE__, :grpc_compiled_modules_path}, value)
 
       value
     end
