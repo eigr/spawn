@@ -6,10 +6,7 @@ defmodule Actors.Actor.Interface.Http do
   use Actors.Actor.Interface
   require Logger
 
-  alias Actors.{
-    Actor.Entity.EntityState,
-    Node.Client
-  }
+  alias Actors.Actor.Entity.EntityState
 
   alias Eigr.Functions.Protocol.Actors.{
     Actor,
@@ -23,6 +20,8 @@ defmodule Actors.Actor.Interface.Http do
   }
 
   alias Google.Protobuf.Any
+
+  @http_node_client Application.compile_env(:spawn, :http_node_client, Actors.Node.Client)
 
   @impl true
   def invoke_host(
@@ -72,17 +71,17 @@ defmodule Actors.Actor.Interface.Http do
   defp do_invoke_host(payload, state) do
     payload
     |> ActorInvocation.encode()
-    |> Client.invoke_host_actor()
+    |> @http_node_client.invoke_host_actor()
     |> case do
-      {:ok, %Tesla.Env{body: ""}} ->
+      {:ok, %Finch.Response{body: ""}} ->
         Logger.error("User Function Actor response Invocation body is empty")
         {:error, :no_content, state}
 
-      {:ok, %Tesla.Env{body: nil}} ->
+      {:ok, %Finch.Response{body: nil}} ->
         Logger.error("User Function Actor response Invocation body is nil")
         {:error, :no_content, state}
 
-      {:ok, %Tesla.Env{body: body}} ->
+      {:ok, %Finch.Response{body: body}} ->
         case ActorInvocationResponse.decode(body) do
           %ActorInvocationResponse{
             updated_context: %Context{} = user_ctx

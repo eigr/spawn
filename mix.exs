@@ -81,9 +81,6 @@ defmodule Spawn.MixProject do
       {:grpc_reflection, git: "https://github.com/elixir-grpc/grpc-reflection"},
       {:finch, "~> 0.16"},
       {:retry, "~> 0.17"},
-      {:tesla, "~> 1.6"},
-      {:k8s, "~> 2.2"},
-      {:k8s_webhoox, "~> 0.2"},
       {:flow, "~> 1.2"},
       {:libcluster, "~> 3.3"},
       {:horde, "~> 0.9"},
@@ -91,10 +88,12 @@ defmodule Spawn.MixProject do
       {:phoenix_pubsub, "~> 2.1"},
       {:phoenix_pubsub_nats, "~> 0.2"},
       {:jason, "~> 1.3"},
-      {:gnat, "~> 1.7.1"},
+      {:gnat, "~> 1.7"},
+      {:k8s, "~> 2.2"},
+      {:k8s_webhoox, "~> 0.2"},
       # Metrics & Tracing deps
       {:telemetry_poller, "~> 1.0"},
-      {:telemetry_metrics, "~> 0.6.1"},
+      {:telemetry_metrics, "~> 0.6"},
       {:telemetry_metrics_prometheus_core, "~> 1.1"},
       {:opentelemetry_api, "~> 1.0"},
       {:opentelemetry, "~> 1.0"},
@@ -115,10 +114,7 @@ defmodule Spawn.MixProject do
       {:pluggable, "~> 1.0"},
       # Non runtime deps
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
-      {:faker, "~> 0.17", only: :test},
-      {:mimic, "~> 1.7", only: :test},
-      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
-      {:exvcr, "~> 0.8", runtime: false}
+      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false}
     ]
   end
 

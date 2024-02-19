@@ -2,7 +2,6 @@ defmodule Actors.ActorRegistryTest do
   use Actors.DataCase, async: false
 
   alias Actors.Registry.ActorRegistry
-  alias Eigr.Functions.Protocol.ActorInvocationResponse
   alias Eigr.Functions.Protocol.RegistrationResponse
 
   setup do

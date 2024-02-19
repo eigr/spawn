@@ -38,7 +38,7 @@ defmodule Statestores.Supervisor do
   end
 
   def maybe_add_native_children(children, Statestores.Adapters.NativeSnapshotAdapter) do
-    children ++ Statestores.Adapters.Native.Children.get_children()
+    children ++ Kernel.apply(Statestores.Adapters.Native.Children, :get_children, [])
   end
 
   def maybe_add_native_children(children, _), do: children
