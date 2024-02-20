@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package eigr.functions.protocol.actors;
+
+import "google/protobuf/descriptor.proto";
+
+extend google.protobuf.FieldOptions {
+    bool actor_id = 9999;
+}
