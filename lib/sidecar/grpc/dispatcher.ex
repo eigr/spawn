@@ -8,7 +8,11 @@ defmodule Sidecar.GRPC.Dispatcher do
   """
   require Logger
 
+  alias Actors.Registry.ActorRegistry
+  alias Actors.Registry.HostActor
+  alias Eigr.Functions.Protocol.Actors.Actor
   alias Eigr.Functions.Protocol.Actors.ActorId
+  alias Eigr.Functions.Protocol.Actors.ActorSettings
 
   alias GRPC.Server
   alias Sidecar.GRPC.ServiceResolver, as: ActorResolver
@@ -35,22 +39,22 @@ defmodule Sidecar.GRPC.Dispatcher do
       action_name: "SayHello",
       input: %{data: "some_data"},
       stream: %GRPC.Server.Stream{},
-        descriptor: %Google.Protobuf.FileDescriptorProto{
-          name: "helloworld.proto",
-          package: "helloworld"},
-          service: [
-            %Google.Protobuf.ServiceDescriptorProto{
-              name: "GreeterService",
-              method: [
-                %Google.Protobuf.MethodDescriptorProto{
-                  name: "SayHello",
-                  input_type: ".helloworld.HelloRequest",
-                  output_type: ".helloworld.HelloReply",
-                }
-              ]
-            }
-          ]
-        }
+      descriptor: %Google.Protobuf.FileDescriptorProto{
+        name: "helloworld.proto",
+        package: "helloworld"},
+        service: [
+          %Google.Protobuf.ServiceDescriptorProto{
+            name: "GreeterActor",
+            method: [
+              %Google.Protobuf.MethodDescriptorProto{
+                name: "SayHello",
+                input_type: ".helloworld.HelloRequest",
+                output_type: ".helloworld.HelloReply",
+              }
+            ]
+          }
+        ]
+      }
     }
 
     Sidecar.GRPC.Dispatcher.dispatch(request)
@@ -145,75 +149,78 @@ defmodule Sidecar.GRPC.Dispatcher do
       |> build_request(message)
   end
 
+  # %Google.Protobuf.DescriptorProto{
+  #   name: "HelloRequest",
+  #   field: [
+  #     %Google.Protobuf.FieldDescriptorProto{
+  #       name: "name",
+  #       extendee: nil,
+  #       number: 1,
+  #       label: :LABEL_OPTIONAL,
+  #       type: :TYPE_STRING,
+  #       type_name: nil,
+  #       default_value: nil,
+  #       options: %Google.Protobuf.FieldOptions{
+  #         ctype: :STRING,
+  #         packed: nil,
+  #         deprecated: false,
+  #         lazy: false,
+  #         jstype: :JS_NORMAL,
+  #         weak: false,
+  #         unverified_lazy: false,
+  #         debug_redact: false,
+  #         uninterpreted_option: [],
+  #         __pb_extensions__: %{
+  #           {Eigr.Functions.Protocol.Actors.PbExtension, :actor_id} => true
+  #         },
+  #         __unknown_fields__: []
+  #       },
+  #       oneof_index: nil,
+  #       json_name: "name",
+  #       proto3_optional: nil,
+  #       __unknown_fields__: []
+  #     }
+  #   ],
+  #   nested_type: [],
+  #   enum_type: [],
+  #   extension_range: [],
+  #   extension: [],
+  #   options: nil,
+  #   oneof_decl: [],
+  #   reserved_range: [],
+  #   reserved_name: [],
+  #   __unknown_fields__: []
+  # }
   defp build_id(system_name, actor_name, message) do
-    %Google.Protobuf.DescriptorProto{field: attributes} = message.descriptor()
+    actor_id = %ActorId{system: system_name, name: actor_name}
+    host_actor = ActorRegistry.lookup(actor_id)
 
-    # %Google.Protobuf.DescriptorProto{
-    #   name: "HelloRequest",
-    #   field: [
-    #     %Google.Protobuf.FieldDescriptorProto{
-    #       name: "name",
-    #       extendee: nil,
-    #       number: 1,
-    #       label: :LABEL_OPTIONAL,
-    #       type: :TYPE_STRING,
-    #       type_name: nil,
-    #       default_value: nil,
-    #       options: %Google.Protobuf.FieldOptions{
-    #         ctype: :STRING,
-    #         packed: nil,
-    #         deprecated: false,
-    #         lazy: false,
-    #         jstype: :JS_NORMAL,
-    #         weak: false,
-    #         unverified_lazy: false,
-    #         debug_redact: false,
-    #         uninterpreted_option: [],
-    #         __pb_extensions__: %{
-    #           {Eigr.Functions.Protocol.Actors.PbExtension, :actor_id} => true
-    #         },
-    #         __unknown_fields__: []
-    #       },
-    #       oneof_index: nil,
-    #       json_name: "name",
-    #       proto3_optional: nil,
-    #       __unknown_fields__: []
-    #     }
-    #   ],
-    #   nested_type: [],
-    #   enum_type: [],
-    #   extension_range: [],
-    #   extension: [],
-    #   options: nil,
-    #   oneof_decl: [],
-    #   reserved_range: [],
-    #   reserved_name: [],
-    #   __unknown_fields__: []
-    # }
+    case host_actor do
+      {:ok, %HostActor{actor: %Actor{settings: %ActorSettings{kind: :NAMED}}}} ->
+        actor_id
 
-    name =
-      Enum.map(attributes, fn %Google.Protobuf.FieldDescriptorProto{name: name, options: options} =
-                                _field ->
-        if not is_nil(options) do
-          extension = options.__pb_extensions__
+      {:ok, %HostActor{actor: %Actor{settings: %ActorSettings{kind: :UNNAMED}}}} ->
+        name =
+          Enum.find_value(message.descriptor().field, fn %Google.Protobuf.FieldDescriptorProto{
+                                                           name: name,
+                                                           options:
+                                                             %{__pb_extensions__: ext} = _options
+                                                         } ->
+            Map.get(ext, {Eigr.Functions.Protocol.Actors.PbExtension, :actor_id}, false) && name
+          end)
 
-          if not is_nil(extension) and
-               Map.has_key?(extension, {Eigr.Functions.Protocol.Actors.PbExtension, :actor_id}) do
-            String.to_atom(name)
+        id =
+          if not is_nil(name) and Map.has_key?(message, name) do
+            %ActorId{system: system_name, name: Map.get(message, name), parent: actor_name}
           else
             nil
           end
-        else
-          nil
-        end
-      end)
 
-    id =
-      if Map.has_key?(message, name) do
-        %ActorId{system: system_name, name: Map.get(message, name), parent: actor_name}
-      else
-        %ActorId{system: system_name, name: actor_name}
-      end
+        id
+
+      _ ->
+        nil
+    end
   end
 
   def build_request(actor_id, message) do
