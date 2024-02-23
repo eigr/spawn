@@ -7,9 +7,9 @@ defmodule Sidecar.GRPC.Dispatcher do
   """
   require Logger
 
+  alias Actors.Actor.CallerProducer
   alias Actors.Registry.ActorRegistry
   alias Actors.Registry.HostActor
-  alias Actors.Actor.CallerProducer
 
   alias Eigr.Functions.Protocol.Actors.Actor
   alias Eigr.Functions.Protocol.Actors.ActorId
@@ -17,10 +17,14 @@ defmodule Sidecar.GRPC.Dispatcher do
   alias Eigr.Functions.Protocol.Actors.ActorSystem
   alias Eigr.Functions.Protocol.InvocationRequest
 
+  alias Google.Protobuf.Any
+
   alias GRPC.Server
   alias GRPC.Server.Stream, as: GRPCStream
 
   alias Sidecar.GRPC.ServiceResolver, as: ActorResolver
+
+  import alias Spawn.Utils.AnySerializer, only: [any_pack!: 1]
 
   @doc """
   Dispatches a gRPC message to the specified actor.
@@ -216,7 +220,7 @@ defmodule Sidecar.GRPC.Dispatcher do
       system: %ActorSystem{},
       actor: %Actor{id: actor_id},
       action_name: action_name,
-      payload: {:value, nil}
+      payload: {:value, any_pack!(message)}
     }
   end
 
