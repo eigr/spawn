@@ -20,8 +20,6 @@ defmodule Sidecar.GRPC.Dispatcher do
   alias GRPC.Server
   alias GRPC.Server.Stream, as: GRPCStream
 
-  alias Sidecar.GRPC.ServiceResolver, as: ActorResolver
-
   import Spawn.Utils.AnySerializer, only: [any_pack!: 1]
 
   @doc """
@@ -210,6 +208,8 @@ defmodule Sidecar.GRPC.Dispatcher do
   defp get_actor_id_name(_ctype, message, attribute),
     do: "#{inspect(Map.get(message, attribute))}"
 
+  defp build_request(nil, _, _, _, _), do: nil
+
   defp build_request(actor_id, actor_system, action_name, message, opts) do
     async = Keyword.get(opts, :async, false)
 
@@ -223,6 +223,7 @@ defmodule Sidecar.GRPC.Dispatcher do
   end
 
   defp invoke_request(nil), do: {:error, :invalid_payload}
+
   defp invoke_request(request), do: CallerProducer.invoke(request)
 
   defp log_and_raise_error(message, status) do
