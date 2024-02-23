@@ -10,11 +10,16 @@ defmodule Sidecar.GRPC.Dispatcher do
 
   alias Actors.Registry.ActorRegistry
   alias Actors.Registry.HostActor
+  alias Actors.Actor.CallerProducer
+
   alias Eigr.Functions.Protocol.Actors.Actor
   alias Eigr.Functions.Protocol.Actors.ActorId
   alias Eigr.Functions.Protocol.Actors.ActorSettings
+  alias Eigr.Functions.Protocol.Actors.ActorSystem
+  alias Eigr.Functions.Protocol.InvocationRequest
 
   alias GRPC.Server
+
   alias Sidecar.GRPC.ServiceResolver, as: ActorResolver
 
   @doc """
@@ -92,10 +97,6 @@ defmodule Sidecar.GRPC.Dispatcher do
       "Dispatching gRPC message to Actor #{system_name}:#{actor_name}. Params: #{inspect(request)}"
     )
 
-    # TODO
-    # Before forwading the request, we must find out through the ServiceResolver module what type of RPC
-    # it is (unary, client streaming, server streaming, etc...). This way we will know how to forward
-    # the request correctly (synchronously or asynchronously), as well as how to properly handle the GRPC response.
     case grpc_type do
       :client_stream ->
         handle_client_stream(system_name, actor_name, action_name, message, stream, descriptor)
@@ -121,19 +122,22 @@ defmodule Sidecar.GRPC.Dispatcher do
   defp handle_unary(system_name, actor_name, action_name, message, stream, descriptor) do
     req =
       build_id(system_name, actor_name, message)
-      |> build_request(message)
+      |> build_request(message, action_name, async: false)
+      |> request(async: false)
   end
 
   defp handle_client_stream(system_name, actor_name, action_name, message, stream, descriptor) do
     req =
       build_id(system_name, actor_name, message)
-      |> build_request(message)
+      |> build_request(message, action_name, async: true)
+      |> request(async: true)
   end
 
   defp handle_server_stream(system_name, actor_name, action_name, message, stream, descriptor) do
     req =
       build_id(system_name, actor_name, message)
-      |> build_request(message)
+      |> build_request(message, action_name, async: true)
+      |> request(async: true)
   end
 
   defp handle_bidirectional_stream(
@@ -146,7 +150,8 @@ defmodule Sidecar.GRPC.Dispatcher do
        ) do
     req =
       build_id(system_name, actor_name, message)
-      |> build_request(message)
+      |> build_request(message, action_name, async: false)
+      |> request(async: false)
   end
 
   # %Google.Protobuf.DescriptorProto{
@@ -200,29 +205,49 @@ defmodule Sidecar.GRPC.Dispatcher do
         actor_id
 
       {:ok, %HostActor{actor: %Actor{settings: %ActorSettings{kind: :UNNAMED}}}} ->
-        name =
+        {ctype, name} =
           Enum.find_value(message.descriptor().field, fn %Google.Protobuf.FieldDescriptorProto{
                                                            name: name,
+                                                           ctype: ctype,
                                                            options:
                                                              %{__pb_extensions__: ext} = _options
                                                          } ->
-            Map.get(ext, {Eigr.Functions.Protocol.Actors.PbExtension, :actor_id}, false) && name
+            Map.get(ext, {Eigr.Functions.Protocol.Actors.PbExtension, :actor_id}, false) &&
+              {ctype, name}
           end)
 
-        id =
-          if not is_nil(name) and Map.has_key?(message, name) do
-            %ActorId{system: system_name, name: Map.get(message, name), parent: actor_name}
-          else
-            nil
-          end
-
-        id
+        if not is_nil(name) and Map.has_key?(message, name) do
+          %ActorId{system: system_name, name: get_name(ctype, message, name), parent: actor_name}
+        else
+          nil
+        end
 
       _ ->
         nil
     end
   end
 
-  def build_request(actor_id, message) do
+  defp get_name(:STRING, message, attribute), do: Map.get(message, attribute)
+
+  defp get_name(_ctype, message, attribute), do: "#{inspect(Map.get(message, attribute))}"
+
+  def build_request(actor_id, message, action_name, opts \\ []) do
+    async = Keyword.get(opts, :async, false)
+
+    %InvocationRequest{
+      async: async,
+      system: %ActorSystem{},
+      actor: %Actor{id: actor_id},
+      action_name: action_name,
+      payload: {:value, nil}
+    }
+  end
+
+  def request(nil, opts \\ [])
+
+  def request(nil, _opts), do: {:error, :invalid_payload}
+
+  def request(%InvocationRequest{} = message, opts) do
+    CallerProducer.invoke(message)
   end
 end
