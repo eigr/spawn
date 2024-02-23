@@ -17,14 +17,12 @@ defmodule Sidecar.GRPC.Dispatcher do
   alias Eigr.Functions.Protocol.Actors.ActorSystem
   alias Eigr.Functions.Protocol.InvocationRequest
 
-  alias Google.Protobuf.Any
-
   alias GRPC.Server
   alias GRPC.Server.Stream, as: GRPCStream
 
   alias Sidecar.GRPC.ServiceResolver, as: ActorResolver
 
-  import alias Spawn.Utils.AnySerializer, only: [any_pack!: 1]
+  import Spawn.Utils.AnySerializer, only: [any_pack!: 1]
 
   @doc """
   Dispatches a gRPC message to the specified actor.
@@ -135,7 +133,7 @@ defmodule Sidecar.GRPC.Dispatcher do
 
   defp dispatch_sync(system_name, actor_name, action_name, message, stream) do
     build_actor_id(system_name, actor_name, message)
-    |> build_request(action_name, message, async: false)
+    |> build_request(system_name, action_name, message, async: false)
     |> invoke_request()
     |> case do
       {:ok, response} ->
@@ -151,7 +149,7 @@ defmodule Sidecar.GRPC.Dispatcher do
 
   defp dispatch_async(system_name, actor_name, action_name, message, stream) do
     build_actor_id(system_name, actor_name, message)
-    |> build_request(action_name, message, async: true)
+    |> build_request(system_name, action_name, message, async: true)
     |> invoke_request()
     |> case do
       {:ok, :async} ->
@@ -212,12 +210,12 @@ defmodule Sidecar.GRPC.Dispatcher do
   defp get_actor_id_name(_ctype, message, attribute),
     do: "#{inspect(Map.get(message, attribute))}"
 
-  defp build_request(actor_id, action_name, message, opts) do
+  defp build_request(actor_id, actor_system, action_name, message, opts) do
     async = Keyword.get(opts, :async, false)
 
     %InvocationRequest{
       async: async,
-      system: %ActorSystem{},
+      system: %ActorSystem{name: actor_system},
       actor: %Actor{id: actor_id},
       action_name: action_name,
       payload: {:value, any_pack!(message)}
