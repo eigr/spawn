@@ -8,7 +8,6 @@ defmodule Sidecar.GRPC.Generators.ServiceResolverGenerator do
   """
   @behaviour ProtobufGenerate.Plugin
 
-  alias Actors.Config.PersistentTermConfig, as: Config
   alias Protobuf.Protoc.Generator.Util
 
   @impl true
@@ -56,7 +55,6 @@ defmodule Sidecar.GRPC.Generators.ServiceResolverGenerator do
       Enum.map(svcs, fn svc ->
         service_name = Util.mod_name(ctx, [Macro.camelize(svc.name)])
         actor_name = Macro.camelize(svc.name)
-        name = Util.prepend_package_prefix(ctx.package, svc.name)
 
         methods =
           for m <- svc.method do
