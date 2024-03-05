@@ -40,13 +40,20 @@ defmodule SpawnSdk.Defact do
       )
 
       def handle_action({unquote(action_name), payload}, context) do
-        {:arity, arity} = :erlang.fun_info(unquote(block_fn), :arity)
-
         try do
-          case arity do
-            0 -> unquote(block_fn).()
-            1 -> unquote(block_fn).(context)
-            2 -> unquote(block_fn).(context, payload)
+          case :erlang.fun_info(unquote(block_fn), :arity) do
+            {:arity, 0} ->
+              unquote(block_fn).()
+
+            {:arity, 1} ->
+              unquote(block_fn).(context)
+
+            {:arity, 2} ->
+              unquote(block_fn).(context, payload)
+
+            {:arity, arity} ->
+              raise SpawnSdk.Actor.MalformedActor,
+                    "Invalid callback arity #{arity} needs to be in (0, 1, 2) for action=#{unquote(action_name)}"
           end
           |> case do
             %SpawnSdk.Value{} = value ->
