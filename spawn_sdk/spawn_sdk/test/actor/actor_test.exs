@@ -19,7 +19,7 @@ defmodule Actor.ActorTest do
       |> Value.void()
     end
 
-    action "sum", fn %Context{} = ctx, %MyMessageRequest{id: id, data: data} ->
+    action("sum", fn %Context{} = ctx, %MyMessageRequest{id: id, data: data} ->
       current_state = ctx.state
       new_state = current_state
 
@@ -28,7 +28,7 @@ defmodule Actor.ActorTest do
 
       result
       |> Value.noreply!()
-    end
+    end)
 
     defact change_tags(%Context{} = ctx) do
       %{"bar" => "unchanged"} = ctx.tags
@@ -197,12 +197,14 @@ defmodule Actor.ActorTest do
       deactivate_timeout: 30_000,
       snapshot_timeout: 2_000
 
-    defact publish(request, %Context{} = _ctx) do
+    action("publish", fn %Context{}, request ->
       Value.of()
       |> Value.broadcast(Broadcast.to("topics", request))
-    end
+    end)
 
-    defact receive(request, %Context{} = _ctx) do
+    action("receive", &receive_handler/2)
+
+    defp receive_handler(%Context{}, request) do
       %Value{}
       |> Value.state(%Eigr.Spawn.Actor.MyState{id: request.data})
     end
@@ -262,11 +264,10 @@ defmodule Actor.ActorTest do
       request = %Eigr.Spawn.Actor.MyMessageRequest{id: id, data: data}
       Actor.MyActor.handle_action({"sum", request}, ctx)
 
-      assert {:ok,
-              %SpawnSdk.Value{
-                state: %Eigr.Spawn.Actor.MyState{id: "1", value: 1},
-                value: %Eigr.Spawn.Actor.MyMessageResponse{}
-              }} = Actor.MyActor.handle_action({"sum", request}, ctx)
+      assert %SpawnSdk.Value{
+               state: %Eigr.Spawn.Actor.MyState{id: "1", value: 1},
+               value: %Eigr.Spawn.Actor.MyMessageResponse{}
+             } = Actor.MyActor.handle_action({"sum", request}, ctx)
     end
   end
 

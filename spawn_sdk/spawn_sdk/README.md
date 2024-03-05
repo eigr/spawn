@@ -82,17 +82,19 @@ defmodule SpawnSdkExample.Actors.MyActor do
 
   alias Io.Eigr.Spawn.Example.{MyState, MyBusinessMessage}
 
-  defact init(%Context{state: state} = ctx) do
+  # The callback could also be referenced to an existing function:
+  # action "init", &some_defp_handler/0
+  # action "init", &SomeModule.handler/1
+  # action "init", &SomeModule.handler/2
+
+  action "init", fn %Context{state: state} = ctx ->
     Logger.info("[joe] Received InitRequest. Context: #{inspect(ctx)}")
 
     Value.of()
     |> Value.state(state)
   end
 
-  defact sum(
-           %MyBusinessMessage{value: value} = data,
-           %Context{state: state} = ctx
-         ) do
+  action "sum", fn %Context{state: state} = ctx, %MyBusinessMessage{value: value} = data ->
     Logger.info("Received Request: #{inspect(data)}. Context: #{inspect(ctx)}")
 
     new_value = if is_nil(state), do: value, else: (state.value || 0) + value
@@ -124,10 +126,7 @@ defmodule SpawnSdkExample.Actors.UnnamedActor do
 
   alias Io.Eigr.Spawn.Example.{MyState, MyBusinessMessage}
 
-  defact sum(
-           %MyBusinessMessage{value: value} = data,
-           %Context{state: state} = ctx
-         ) do
+  action "sum", fn %Context{state: state} = ctx, %MyBusinessMessage{value: value} = data ->
     Logger.info("Received Request: #{inspect(data)}. Context: #{inspect(ctx)}")
 
     new_value = if is_nil(state), do: value, else: (state.value || 0) + value
@@ -156,7 +155,7 @@ defmodule SpawnSdkExample.Actors.PooledActor do
 
   require Logger
 
-  defact ping(_data, %Context{} = ctx) do
+  action "ping", fn %Context{} = ctx ->
     Logger.info("Received Request. Context: #{inspect(ctx)}")
 
     Value.void()
@@ -254,7 +253,7 @@ defmodule SpawnSdkExample.Actors.UnnamedActor do
 
   alias SpawnSdk.Flow.SideEffect
 
-  defact sum(%MyBusinessMessage{value: value} = data, %Context{state: state} = ctx) do
+  action "sum", fn %MyBusinessMessage{value: value} = data, %Context{state: state} = ctx ->
     Logger.info("Received Request: #{inspect(data)}. Context: #{inspect(ctx)}")
 
     new_value = if is_nil(state), do: value, else: (state.value || 0) + value
@@ -299,7 +298,7 @@ defmodule SpawnSdkExample.Actors.ForwardPipeActor do
 
   alias Io.Eigr.Spawn.Example.MyBusinessMessage
 
-  defact forward_example(%MyBusinessMessage{} = msg, _ctx) do
+  action "forward_example", fn _ctx, %MyBusinessMessage{} = msg ->
     Logger.info("Received request with #{msg.value}")
 
     Value.of()
@@ -309,7 +308,7 @@ defmodule SpawnSdkExample.Actors.ForwardPipeActor do
     |> Value.void()
   end
 
-  defact pipe_example(%MyBusinessMessage{} = msg, _ctx) do
+  action "pipe_example", fn _ctx, %MyBusinessMessage{} = msg ->
     Logger.info("Received request with #{msg.value}")
 
     Value.of()
@@ -330,7 +329,7 @@ defmodule SpawnSdkExample.Actors.SecondActorExample do
 
   alias Io.Eigr.Spawn.Example.MyBusinessMessage
 
-  defact sum_plus_one(%MyBusinessMessage{} = msg, _ctx) do
+  action "sum_plus_one", fn _ctx, %MyBusinessMessage{} = msg ->
     Logger.info("Received request with #{msg.value}")
 
     Value.of()
@@ -378,7 +377,7 @@ defmodule Fleet.Actors.Driver do
 
   @brain_actor_channel "fleet.controllers.topic"
 
-  defact update_position(%Point{} = position, %Context{state: %Driver{id: name} = driver} = ctx) do
+  action "update_position", fn %Context{state: %Driver{id: name} = driver} = ctx, %Point{} = position ->
     Logger.info(
       "Received Update Position Event. Position: [{inspect(position)}]. Context: #{inspect(ctx)}"
     )
@@ -405,7 +404,7 @@ defmodule Fleet.Actors.FleetControllersActor do
 
   alias Fleet.Domain.Point
 
-  defact update_position_receive(%Point{} = position, _ctx) do
+  action "update_position_receive", fn _ctx, %Point{} = position ->
     Logger.info(
       "Driver [#{name}] Received Update Position Event. Position: [#{inspect(position)}]"
     )
@@ -507,7 +506,7 @@ defmodule SpawnSdkExample.Actors.JoeActor do
   require Logger
   alias Io.Eigr.Spawn.Example.{MyState, MyBusinessMessage}
 
-  defact sum(%MyBusinessMessage{value: value} = data, %Context{state: state} = ctx) do
+  action "sum", fn %Context{state: state} = ctx, %MyBusinessMessage{value: value} = data ->
     Logger.info("[joe] Received Request: #{inspect(data)}. Context: #{inspect(ctx)}")
 
     new_value =
@@ -541,8 +540,7 @@ defmodule SpawnSdkExample.Actors.ClockActor do
 
   alias Io.Eigr.Spawn.Example.MyState
 
-  @set_timer 15_000
-  defact clock(%Context{state: state} = ctx) do
+  action "clock", [timer: 15_000], fn %Context{state: state} = ctx ->
     Logger.info("[clock] Clock Actor Received Request. Context: #{inspect(ctx)}")
 
     new_value = if is_nil(state), do: 0, else: state.value + 1
