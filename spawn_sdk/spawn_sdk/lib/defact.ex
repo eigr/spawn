@@ -19,6 +19,59 @@ defmodule SpawnSdk.Defact do
     end
   end
 
+  defmacro action(action_name, opts, block_fn) do
+    action_name = parse_action_name(action_name)
+
+    define_action(action_name, block_fn, opts)
+  end
+
+  defmacro action(action_name, block_fn) do
+    action_name = parse_action_name(action_name)
+
+    define_action(action_name, block_fn)
+  end
+
+  defp define_action(action_name, block_fn, opts \\ []) do
+    quote do
+      Module.put_attribute(
+        __MODULE__,
+        :defact_exports,
+        Macro.escape({unquote(action_name), %{timer: Keyword.get(unquote(opts), :timer)}})
+      )
+
+      def handle_action({unquote(action_name), payload}, context) do
+        {:arity, arity} = :erlang.fun_info(unquote(block_fn), :arity)
+
+        try do
+          case arity do
+            0 -> unquote(block_fn).()
+            1 -> unquote(block_fn).(context)
+            2 -> unquote(block_fn).(context, payload)
+          end
+          |> case do
+            %SpawnSdk.Value{} = value ->
+              value
+
+            {:reply, %SpawnSdk.Value{} = value} ->
+              value
+
+            _ ->
+              raise SpawnSdk.Actor.MalformedActor,
+                    "Return value for action=#{unquote(action_name)} must be a %Value{} struct"
+          end
+        rescue
+          e ->
+            reraise SpawnSdk.Actor.MalformedActor,
+                    [
+                      message: "Error in action=#{unquote(action_name)} error=#{inspect(e)}",
+                      exception: e
+                    ],
+                    __STACKTRACE__
+        end
+      end
+    end
+  end
+
   defmacro defact(call, do: block) do
     define_defact(:def, call, block, __CALLER__)
   end

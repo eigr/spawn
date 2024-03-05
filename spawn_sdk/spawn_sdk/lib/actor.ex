@@ -66,6 +66,10 @@ defmodule SpawnSdk.Actor do
   @callback handle_action({action(), data()}, context()) ::
               value() | {:reply, value()} | {:error, error()} | {:error, error(), value()}
 
+  defmodule MalformedActor do
+    defexception message: "Something is wrong with the actor implementation"
+  end
+
   @spec channel(ActorChannel.t(), opts()) :: ActorChannel.t()
   def channel(channel, opts), do: %ActorChannel{channel: channel, opts: opts}
 

@@ -19,14 +19,15 @@ defmodule Actor.ActorTest do
       |> Value.void()
     end
 
-    defact sum(%MyMessageRequest{id: id, data: data}, %Context{} = ctx) do
+    action "sum", fn %Context{} = ctx, %MyMessageRequest{id: id, data: data} ->
       current_state = ctx.state
       new_state = current_state
 
       response = %MyMessageResponse{id: id, data: data}
       result = %Value{state: new_state, value: response}
 
-      {:ok, result}
+      result
+      |> Value.noreply!()
     end
 
     defact change_tags(%Context{} = ctx) do
