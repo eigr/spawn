@@ -12,7 +12,7 @@ defmodule SpawnSdkExample.Actors.JoeActor do
     MyBusinessMessage
   }
 
-  defact init(%Context{state: state} = ctx) do
+  init(fn %Context{state: state} = ctx ->
     Logger.info("[joe] Received InitRequest. Context: #{inspect(ctx)}")
 
     new_state =
@@ -25,9 +25,9 @@ defmodule SpawnSdkExample.Actors.JoeActor do
     %Value{}
     |> Value.state(new_state)
     |> Value.reply!()
-  end
+  end)
 
-  defact sum(%MyBusinessMessage{value: value} = data, %Context{state: state} = ctx) do
+  action("sum", fn %Context{state: state} = ctx, %MyBusinessMessage{value: value} = data ->
     Logger.info("[joe] Received Request: #{inspect(data)}. Context: #{inspect(ctx)}")
 
     new_value =
@@ -44,9 +44,9 @@ defmodule SpawnSdkExample.Actors.JoeActor do
     |> Value.broadcast(Broadcast.to("external.channel", response))
     # |> Value.broadcast(Broadcast.to("liveview.channel", response))
     |> Value.reply!()
-  end
+  end)
 
-  defact ping(_data, %Context{state: state} = ctx) do
+  action("ping", fn %Context{state: state} = ctx ->
     Logger.info("Received Request PING. Context: #{inspect(ctx)}")
 
     new_state =
@@ -59,5 +59,5 @@ defmodule SpawnSdkExample.Actors.JoeActor do
     Value.of()
     |> Value.state(new_state)
     |> Value.noreply!()
-  end
+  end)
 end

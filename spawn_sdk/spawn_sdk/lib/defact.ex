@@ -9,6 +9,8 @@ defmodule SpawnSdk.Defact do
   ]
   """
 
+  @default_actions ~w(get Get get_state getState GetState)
+
   defmacro __using__(_args) do
     quote do
       import SpawnSdk.Defact
@@ -17,6 +19,12 @@ defmodule SpawnSdk.Defact do
 
       @set_timer nil
     end
+  end
+
+  defmacro init(block_fn) do
+    action_name = "init"
+
+    define_action(action_name, block_fn)
   end
 
   defmacro action(action_name, opts, block_fn) do
@@ -32,6 +40,10 @@ defmodule SpawnSdk.Defact do
   end
 
   defp define_action(action_name, block_fn, opts \\ []) do
+    if action_name in @default_actions do
+      raise SpawnSdk.Actor.MalformedActor, "Action name #{action_name} is reserved"
+    end
+
     quote do
       Module.put_attribute(
         __MODULE__,
@@ -41,19 +53,16 @@ defmodule SpawnSdk.Defact do
 
       def handle_action({unquote(action_name), payload}, context) do
         try do
-          case :erlang.fun_info(unquote(block_fn), :arity) do
-            {:arity, 0} ->
-              unquote(block_fn).()
-
-            {:arity, 1} ->
+          case {:erlang.fun_info(unquote(block_fn), :arity), unquote(action_name)} do
+            {{:arity, 1}, _name} ->
               unquote(block_fn).(context)
 
-            {:arity, 2} ->
+            {{:arity, 2}, action} when action not in ~w(init Init Setup setup) ->
               unquote(block_fn).(context, payload)
 
-            {:arity, arity} ->
+            {{:arity, arity}, _} ->
               raise SpawnSdk.Actor.MalformedActor,
-                    "Invalid callback arity #{arity} needs to be in (0, 1, 2) for action=#{unquote(action_name)}"
+                    "Invalid callback arity #{arity} needs to be in (1, 2) for action=#{unquote(action_name)}"
           end
           |> case do
             %SpawnSdk.Value{} = value ->

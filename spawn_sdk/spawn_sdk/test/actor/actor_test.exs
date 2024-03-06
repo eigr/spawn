@@ -13,11 +13,11 @@ defmodule Actor.ActorTest do
 
     alias Eigr.Spawn.Actor.{MyMessageRequest, MyMessageResponse}
 
-    defact init(%Context{} = ctx) do
+    init(fn %Context{} = ctx ->
       %Value{}
       |> Value.tags(Map.put(ctx.tags, "foo", "initial"))
       |> Value.void()
-    end
+    end)
 
     action("sum", fn %Context{} = ctx, %MyMessageRequest{id: id, data: data} ->
       current_state = ctx.state
@@ -89,9 +89,9 @@ defmodule Actor.ActorTest do
       stateful: false,
       state_type: :json
 
-    defact init(_) do
+    init(fn _ctx ->
       Value.noreply_state!(%{value: 0})
-    end
+    end)
 
     defact sum(%{value: new_value}, %Context{state: %{value: old_value}}) do
       total = old_value + new_value

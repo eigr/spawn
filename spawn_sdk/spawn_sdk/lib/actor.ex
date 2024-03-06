@@ -343,42 +343,54 @@ defmodule SpawnSdk.Actor do
 
     tags = Keyword.get(opts, :tags, nil)
 
+    init? = Enum.any?(actions, fn {action, _} -> String.downcase(action) == "init" end)
+    setup? = Enum.any?(actions, fn {action, _} -> String.downcase(action) == "setup" end)
+
+    if init? and setup? do
+      raise SpawnSdk.Actor.MalformedActor,
+            "You can't have both init and setup actions implemented, they are reserved and do the same thing"
+    end
+
     Enum.each(channel_group, fn
       {topic, action} ->
         if String.contains?(topic, "*") do
-          raise "Channels doesn't support wildcard subscriptions"
+          raise SpawnSdk.Actor.MalformedActor, "Channels doesn't support wildcard subscriptions"
         end
 
         if "#{action}" not in Enum.map(actions, fn {action, _} -> "#{action}" end) do
-          raise "Channel action #{action} is not implemented in current Actor."
+          raise SpawnSdk.Actor.MalformedActor,
+                "Channel action #{action} is not implemented in current Actor."
         end
 
       topic when is_binary(topic) ->
         if String.contains?(topic, "*") do
-          raise "Channels doesn't support wildcard subscriptions"
+          raise SpawnSdk.Actor.MalformedActor, "Channels doesn't support wildcard subscriptions"
         end
 
         if "receive" not in Enum.map(actions, fn {action, _} -> "#{action}" end) do
-          raise "Found a registered topic but no action named receive was found."
+          raise SpawnSdk.Actor.MalformedActor,
+                "Found a registered topic but no action named receive was found."
         end
 
       _ ->
-        raise "Channels is not invalid, use list(topic) or list({topic, action})"
+        raise SpawnSdk.Actor.MalformedActor,
+              "Channels is not invalid, use list(topic) or list({topic, action})"
     end)
 
     if stateful and !Code.ensure_loaded?(Statestores.Supervisor) do
-      raise """
+      raise SpawnSdk.Actor.MalformedActor, """
       ArgumentError. You need to add :spawn_statestores to your dependency if you are going to use persistent actors.
       Otherwise, set `stateful: false` in your Actor attributes
       """
     end
 
     if state_type == nil and stateful do
-      raise "ArgumentError. State type is mandatory if stateful is true"
+      raise SpawnSdk.Actor.MalformedActor,
+            "ArgumentError. State type is mandatory if stateful is true"
     end
 
     if stateful and actor_kind == :POOLED do
-      raise ArgumentError, """
+      raise SpawnSdk.Actor.MalformedActor, """
       Pooled Actors cannot be stateful.
       Please set stateful attribute to false to be able to register Actor #{actor_name}
       """

@@ -72,7 +72,7 @@ In this example we are creating an actor in a Named way, that is, it is a known 
 defmodule SpawnSdkExample.Actors.MyActor do
   use SpawnSdk.Actor,
     name: "jose", # Default is Full Qualified Module name a.k.a __MODULE__
-    kind: :named, # Default is already :named. Valid are :named | :unnamed | :pooled
+    kind: :named, # Default is already :named. Valid are :named | :unnamed
     stateful: true, # Default is already true
     state_type: Io.Eigr.Spawn.Example.MyState, # or :json if you don't care about protobuf types
     deactivate_timeout: 30_000,
@@ -83,18 +83,18 @@ defmodule SpawnSdkExample.Actors.MyActor do
   alias Io.Eigr.Spawn.Example.{MyState, MyBusinessMessage}
 
   # The callback could also be referenced to an existing function:
-  # action "init", &some_defp_handler/0
-  # action "init", &SomeModule.handler/1
-  # action "init", &SomeModule.handler/2
+  # action "SomeAction", &some_defp_handler/0
+  # action "SomeAction", &SomeModule.handler/1
+  # action "SomeAction", &SomeModule.handler/2
 
-  action "init", fn %Context{state: state} = ctx ->
+  init fn %Context{state: state} = ctx ->
     Logger.info("[joe] Received InitRequest. Context: #{inspect(ctx)}")
 
     Value.of()
     |> Value.state(state)
   end
 
-  action "sum", fn %Context{state: state} = ctx, %MyBusinessMessage{value: value} = data ->
+  action "Sum", fn %Context{state: state} = ctx, %MyBusinessMessage{value: value} = data ->
     Logger.info("Received Request: #{inspect(data)}. Context: #{inspect(ctx)}")
 
     new_value = if is_nil(state), do: value, else: (state.value || 0) + value
@@ -126,7 +126,7 @@ defmodule SpawnSdkExample.Actors.UnnamedActor do
 
   alias Io.Eigr.Spawn.Example.{MyState, MyBusinessMessage}
 
-  action "sum", fn %Context{state: state} = ctx, %MyBusinessMessage{value: value} = data ->
+  action "Sum", fn %Context{state: state} = ctx, %MyBusinessMessage{value: value} = data ->
     Logger.info("Received Request: #{inspect(data)}. Context: #{inspect(ctx)}")
 
     new_value = if is_nil(state), do: value, else: (state.value || 0) + value
@@ -139,102 +139,6 @@ end
 Notice that the only thing that has changed is the the kind of actor, in this case the kind is set to :unnamed.
 
 > **_NOTE:_** Can Elixir programmers think in terms of Named vs Unnamed actors as more or less known at startup vs dynamically supervised/registered? That is, defining your actors directly in the supervision tree or using a Dynamic Supervisor for that.
-
-## Pooled Actors
-
-Sometimes we want a particular actor to be able to serve requests concurrently,
-however actors will always serve one request at a time using buffering mechanisms to receive requests in their mailbox and serve each request one by one.
-So to get around this behaviour you can configure your Actor as a Pooled Actor, this way the system will generate a pool of actors to meet certain requests. See an example below:
-
-```elixir
-defmodule SpawnSdkExample.Actors.PooledActor do
-  use SpawnSdk.Actor,
-    name: "pooled_actor",
-    kind: :pooled,
-    stateful: false
-
-  require Logger
-
-  action "ping", fn %Context{} = ctx ->
-    Logger.info("Received Request. Context: #{inspect(ctx)}")
-
-    Value.void()
-  end
-end
-```
-
-> **_NOTE:_** It is important to mention that Pooled Actors cannot be stateful because concurrent accesses for Stateful actors could generate undesired inconsistencies.
-
-To invoke a pooled actor, it is necessary to pass the pooled: true option to the invoke function. See an example:
-
-```elixir
-iex(spawn_a1@127.0.0.1)16> for _n <- 0..8, do: SpawnSdk.invoke("pooled_actor", system: "spawn-system", action: "ping", pooled: true)
-```
-
-In the logs you will see that even though you have invoked the actor by the registered name more than one instance of the actor will be created. As we can see below:
-
-```elixir
-iex(spawn_a1@127.0.0.1)16> for _n <- 0..8, do: SpawnSdk.invoke("pooled_actor", system: "spawn-system", action: "ping", pooled: true)
-
-2022-11-25 11:21:53.758 [spawn_a1@127.0.0.1]:[pid=<0.1392.0> ]:[notice]:Activating Actor pooled_actor-5 with Parent pooled_actor-5 in Node :"spawn_a1@127.0.0.1". Persistence false.
-2022-11-25 11:21:53.759 [spawn_a1@127.0.0.1]:[pid=<0.1391.0> ]:[debug]:Actor pooled_actor-5 reactivated. ActorRef PID: #PID<0.1392.0>
-2022-11-25 11:21:53.760 [spawn_a1@127.0.0.1]:[pid=<0.1392.0> ]:[info]:Received Request. Context: %SpawnSdk.Context{state: nil, caller: nil, self: %Eigr.Functions.Protocol.Actors.ActorId{name: "pooled_actor-5", system: "spawn-system", parent: "pooled_actor-5", __unknown_fields__: []}, metadata: %{}}
-2022-11-25 11:21:53.763 [spawn_a1@127.0.0.1]:[pid=<0.1394.0> ]:[notice]:Activating Actor pooled_actor-4 with Parent pooled_actor-4 in Node :"spawn_a1@127.0.0.1". Persistence false.
-2022-11-25 11:21:53.763 [spawn_a1@127.0.0.1]:[pid=<0.1393.0> ]:[debug]:Actor pooled_actor-4 reactivated. ActorRef PID: #PID<0.1394.0>
-2022-11-25 11:21:53.765 [spawn_a1@127.0.0.1]:[pid=<0.1394.0> ]:[info]:Received Request. Context: %SpawnSdk.Context{state: nil, caller: nil, self: %Eigr.Functions.Protocol.Actors.ActorId{name: "pooled_actor-4", system: "spawn-system", parent: "pooled_actor-4", __unknown_fields__: []}, metadata: %{}}
-2022-11-25 11:21:53.767 [spawn_a1@127.0.0.1]:[pid=<0.1396.0> ]:[notice]:Activating Actor pooled_actor-7 with Parent pooled_actor-7 in Node :"spawn_a1@127.0.0.1". Persistence false.
-2022-11-25 11:21:53.767 [spawn_a1@127.0.0.1]:[pid=<0.1395.0> ]:[debug]:Actor pooled_actor-7 reactivated. ActorRef PID: #PID<0.1396.0>
-2022-11-25 11:21:53.768 [spawn_a1@127.0.0.1]:[pid=<0.1396.0> ]:[info]:Received Request. Context: %SpawnSdk.Context{state: nil, caller: nil, self: %Eigr.Functions.Protocol.Actors.ActorId{name: "pooled_actor-7", system: "spawn-system", parent: "pooled_actor-7", __unknown_fields__: []}, metadata: %{}}
-2022-11-25 11:21:53.770 [spawn_a1@127.0.0.1]:[pid=<0.1398.0> ]:[notice]:Activating Actor pooled_actor-2 with Parent pooled_actor-2 in Node :"spawn_a1@127.0.0.1". Persistence false.
-2022-11-25 11:21:53.771 [spawn_a1@127.0.0.1]:[pid=<0.1397.0> ]:[debug]:Actor pooled_actor-2 reactivated. ActorRef PID: #PID<0.1398.0>
-2022-11-25 11:21:53.772 [spawn_a1@127.0.0.1]:[pid=<0.1398.0> ]:[info]:Received Request. Context: %SpawnSdk.Context{state: nil, caller: nil, self: %Eigr.Functions.Protocol.Actors.ActorId{name: "pooled_actor-2", system: "spawn-system", parent: "pooled_actor-2", __unknown_fields__: []}, metadata: %{}}
-2022-11-25 11:21:53.774 [spawn_a1@127.0.0.1]:[pid=<0.1400.0> ]:[notice]:Activating Actor pooled_actor-8 with Parent pooled_actor-8 in Node :"spawn_a1@127.0.0.1". Persistence false.
-2022-11-25 11:21:53.775 [spawn_a1@127.0.0.1]:[pid=<0.1399.0> ]:[debug]:Actor pooled_actor-8 reactivated. ActorRef PID: #PID<0.1400.0>
-2022-11-25 11:21:53.776 [spawn_a1@127.0.0.1]:[pid=<0.1400.0> ]:[info]:Received Request. Context: %SpawnSdk.Context{state: nil, caller: nil, self: %Eigr.Functions.Protocol.Actors.ActorId{name: "pooled_actor-8", system: "spawn-system", parent: "pooled_actor-8", __unknown_fields__: []}, metadata: %{}}
-2022-11-25 11:21:53.777 [spawn_a1@127.0.0.1]:[pid=<0.1402.0> ]:[notice]:Activating Actor pooled_actor-9 with Parent pooled_actor-9 in Node :"spawn_a1@127.0.0.1". Persistence false.
-2022-11-25 11:21:53.778 [spawn_a1@127.0.0.1]:[pid=<0.1401.0> ]:[debug]:Actor pooled_actor-9 reactivated. ActorRef PID: #PID<0.1402.0>
-2022-11-25 11:21:53.778 [spawn_a1@127.0.0.1]:[pid=<0.1402.0> ]:[info]:Received Request. Context: %SpawnSdk.Context{state: nil, caller: nil, self: %Eigr.Functions.Protocol.Actors.ActorId{name: "pooled_actor-9", system: "spawn-system", parent: "pooled_actor-9", __unknown_fields__: []}, metadata: %{}}
-2022-11-25 11:21:53.779 [spawn_a1@127.0.0.1]:[pid=<0.1212.0> ]:[debug]:Lookup Actor pooled_actor. PID: #PID<0.1400.0>
-2022-11-25 11:21:53.780 [spawn_a1@127.0.0.1]:[pid=<0.1400.0> ]:[info]:Received Request. Context: %SpawnSdk.Context{state: nil, caller: nil, self: %Eigr.Functions.Protocol.Actors.ActorId{name: "pooled_actor-8", system: "spawn-system", parent: "pooled_actor-8", __unknown_fields__: []}, metadata: %{}}
-2022-11-25 11:21:53.780 [spawn_a1@127.0.0.1]:[pid=<0.1212.0> ]:[debug]:Lookup Actor pooled_actor. PID: #PID<0.1392.0>
-2022-11-25 11:21:53.781 [spawn_a1@127.0.0.1]:[pid=<0.1392.0> ]:[info]:Received Request. Context: %SpawnSdk.Context{state: nil, caller: nil, self: %Eigr.Functions.Protocol.Actors.ActorId{name: "pooled_actor-5", system: "spawn-system", parent: "pooled_actor-5", __unknown_fields__: []}, metadata: %{}}
-2022-11-25 11:21:53.781 [spawn_a1@127.0.0.1]:[pid=<0.1212.0> ]:[debug]:Lookup Actor pooled_actor. PID: #PID<0.1394.0>
-[
-  ok: nil,
-  ok: nil,
-  ok: nil,
-  ok: nil,
-  ok: nil,
-  ok: nil,
-  ok: nil,
-  ok: nil,
-  ok: nil
-]
-iex(spawn_a1@127.0.0.1)17> 2022-11-25 11:21:53.782 [spawn_a1@127.0.0.1]:[pid=<0.1394.0> ]:[info]:Received Request. Context: %SpawnSdk.Context{state: nil, caller: nil, self: %Eigr.Functions.Protocol.Actors.ActorId{name: "pooled_actor-4", system: "spawn-system", parent: "pooled_actor-4", __unknown_fields__: []}, metadata: %{}}
-2022-11-25 11:22:03.999 [spawn_a1@127.0.0.1]:[pid=<0.1402.0> ]:[debug]:Deactivating actor pooled_actor-9 for timeout
-2022-11-25 11:22:04.226 [spawn_a1@127.0.0.1]:[pid=<0.1392.0> ]:[debug]:Deactivating actor pooled_actor-5 for timeout
-2022-11-25 11:22:07.271 [spawn_a1@127.0.0.1]:[pid=<0.1400.0> ]:[debug]:Deactivating actor pooled_actor-8 for timeout
-2022-11-25 11:22:10.167 [spawn_a1@127.0.0.1]:[pid=<0.1396.0> ]:[debug]:Deactivating actor pooled_actor-7 for timeout
-2022-11-25 11:22:12.038 [spawn_a1@127.0.0.1]:[pid=<0.1394.0> ]:[debug]:Deactivating actor pooled_actor-4 for timeout
-2022-11-25 11:22:12.613 [spawn_a1@127.0.0.1]:[pid=<0.1398.0> ]:[debug]:Deactivating actor pooled_actor-2 for timeout
-```
-
-It is possible to configure the minimum and maximum pool size by passing the min_pool_size and max_pool_size options. The actor below would create a pool of a maximum of 100 Actors:
-
-```elixir
-defmodule SpawnSdkExample.Actors.PooledActor do
-  use SpawnSdk.Actor,
-    name: "pooled_actor",
-    kind: :pooled,
-    min_pool_size: 1,
-    max_pool_size: 10,
-    stateful: false
-
-  # Code omitted for brevity
-end
-```
-
-> **_ALERT:_** Keep in mind that a large pool size does not always mean better performance. In fact, smaller pool sizes sometimes often have a much greater effect in this regard. It is interesting that you experiment with different pool sizes until you find the one that best suits your workload.
 
 ## Side Effects
 
@@ -253,7 +157,7 @@ defmodule SpawnSdkExample.Actors.UnnamedActor do
 
   alias SpawnSdk.Flow.SideEffect
 
-  action "sum", fn %MyBusinessMessage{value: value} = data, %Context{state: state} = ctx ->
+  action "Sum", fn %MyBusinessMessage{value: value} = data, %Context{state: state} = ctx ->
     Logger.info("Received Request: #{inspect(data)}. Context: #{inspect(ctx)}")
 
     new_value = if is_nil(state), do: value, else: (state.value || 0) + value
@@ -298,7 +202,7 @@ defmodule SpawnSdkExample.Actors.ForwardPipeActor do
 
   alias Io.Eigr.Spawn.Example.MyBusinessMessage
 
-  action "forward_example", fn _ctx, %MyBusinessMessage{} = msg ->
+  action "ForwardExampleAction", fn _ctx, %MyBusinessMessage{} = msg ->
     Logger.info("Received request with #{msg.value}")
 
     Value.of()
@@ -308,7 +212,7 @@ defmodule SpawnSdkExample.Actors.ForwardPipeActor do
     |> Value.void()
   end
 
-  action "pipe_example", fn _ctx, %MyBusinessMessage{} = msg ->
+  action "PipeExampleAction", fn _ctx, %MyBusinessMessage{} = msg ->
     Logger.info("Received request with #{msg.value}")
 
     Value.of()
@@ -329,7 +233,7 @@ defmodule SpawnSdkExample.Actors.SecondActorExample do
 
   alias Io.Eigr.Spawn.Example.MyBusinessMessage
 
-  action "sum_plus_one", fn _ctx, %MyBusinessMessage{} = msg ->
+  action "SumPlusOne", fn _ctx, %MyBusinessMessage{} = msg ->
     Logger.info("Received request with #{msg.value}")
 
     Value.of()
@@ -377,7 +281,7 @@ defmodule Fleet.Actors.Driver do
 
   @brain_actor_channel "fleet.controllers.topic"
 
-  action "update_position", fn %Context{state: %Driver{id: name} = driver} = ctx, %Point{} = position ->
+  action "UpdatePosition", fn %Context{state: %Driver{id: name} = driver} = ctx, %Point{} = position ->
     Logger.info(
       "Received Update Position Event. Position: [{inspect(position)}]. Context: #{inspect(ctx)}"
     )
@@ -404,7 +308,7 @@ defmodule Fleet.Actors.FleetControllersActor do
 
   alias Fleet.Domain.Point
 
-  action "update_position_receive", fn _ctx, %Point{} = position ->
+  action "UpdatePositionReceive", fn _ctx, %Point{} = position ->
     Logger.info(
       "Driver [#{name}] Received Update Position Event. Position: [#{inspect(position)}]"
     )
@@ -506,7 +410,7 @@ defmodule SpawnSdkExample.Actors.JoeActor do
   require Logger
   alias Io.Eigr.Spawn.Example.{MyState, MyBusinessMessage}
 
-  action "sum", fn %Context{state: state} = ctx, %MyBusinessMessage{value: value} = data ->
+  action "Sum", fn %Context{state: state} = ctx, %MyBusinessMessage{value: value} = data ->
     Logger.info("[joe] Received Request: #{inspect(data)}. Context: #{inspect(ctx)}")
 
     new_value =
@@ -540,7 +444,7 @@ defmodule SpawnSdkExample.Actors.ClockActor do
 
   alias Io.Eigr.Spawn.Example.MyState
 
-  action "clock", [timer: 15_000], fn %Context{state: state} = ctx ->
+  action "Clock", [timer: 15_000], fn %Context{state: state} = ctx ->
     Logger.info("[clock] Clock Actor Received Request. Context: #{inspect(ctx)}")
 
     new_value = if is_nil(state), do: 0, else: state.value + 1
@@ -622,7 +526,7 @@ And links to other examples can be found in our github [readme page](https://git
 To invoke Actors, use:
 
 ```elixir
-iex> SpawnSdk.invoke("joe", system: "spawn-system", action: "sum", payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1})
+iex> SpawnSdk.invoke("joe", system: "spawn-system", action: "Sum", payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1})
 {:ok, %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 12}}
 ```
 
