@@ -9,6 +9,10 @@ defmodule Sidecar.Supervisor do
 
   @impl true
   def init(opts) do
+    if function_exported?(:proc_lib, :set_label, 1) do
+      apply(:proc_lib, :set_label, ["Spawn.Sidecar"])
+    end
+
     children =
       [
         supervisor_process_logger(__MODULE__),

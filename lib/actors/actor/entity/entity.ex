@@ -86,6 +86,10 @@ defmodule Actors.Actor.Entity do
   @spec init(EntityState.t()) ::
           {:ok, EntityState.t(), {:continue, :load_state}}
   def init(initial_state) do
+    if function_exported?(:proc_lib, :set_label, 1) do
+      apply(:proc_lib, :set_label, ["Spawn.Actor.Entity"])
+    end
+
     initial_state
     |> EntityState.unpack()
     |> Lifecycle.init()

@@ -11,6 +11,10 @@ defmodule Proxy.Application do
   defp do_start(_type, _args) do
     {u_secs, reply} =
       :timer.tc(fn ->
+        if function_exported?(:proc_lib, :set_label, 1) do
+          apply(:proc_lib, :set_label, ["Spawn.Proxy.Application"])
+        end
+
         Config.load()
         Logger.configure(level: Config.get(:logger_level))
 
