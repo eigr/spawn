@@ -9,6 +9,8 @@ defmodule SpawnSdk.Defact do
   ]
   """
 
+  @default_actions ~w(get Get get_state getState GetState)
+
   defmacro __using__(_args) do
     quote do
       import SpawnSdk.Defact
@@ -16,6 +18,73 @@ defmodule SpawnSdk.Defact do
       Module.register_attribute(__MODULE__, :defact_exports, accumulate: true)
 
       @set_timer nil
+    end
+  end
+
+  defmacro init(block_fn) do
+    action_name = "init"
+
+    define_action(action_name, block_fn)
+  end
+
+  defmacro action(action_name, opts, block_fn) do
+    action_name = parse_action_name(action_name)
+
+    define_action(action_name, block_fn, opts)
+  end
+
+  defmacro action(action_name, block_fn) do
+    action_name = parse_action_name(action_name)
+
+    define_action(action_name, block_fn)
+  end
+
+  defp define_action(action_name, block_fn, opts \\ []) do
+    if action_name in @default_actions do
+      raise SpawnSdk.Actor.MalformedActor, "Action name #{action_name} is reserved"
+    end
+
+    quote do
+      Module.put_attribute(
+        __MODULE__,
+        :defact_exports,
+        Macro.escape({unquote(action_name), %{timer: Keyword.get(unquote(opts), :timer)}})
+      )
+
+      def handle_action({unquote(action_name), payload}, context) do
+        try do
+          case {:erlang.fun_info(unquote(block_fn), :arity), unquote(action_name)} do
+            {{:arity, 1}, _name} ->
+              unquote(block_fn).(context)
+
+            {{:arity, 2}, action} when action not in ~w(init Init Setup setup) ->
+              unquote(block_fn).(context, payload)
+
+            {{:arity, arity}, _} ->
+              raise SpawnSdk.Actor.MalformedActor,
+                    "Invalid callback arity #{arity} needs to be in (1, 2) for action=#{unquote(action_name)}"
+          end
+          |> case do
+            %SpawnSdk.Value{} = value ->
+              value
+
+            {:reply, %SpawnSdk.Value{} = value} ->
+              value
+
+            _ ->
+              raise SpawnSdk.Actor.MalformedActor,
+                    "Return value for action=#{unquote(action_name)} must be a %Value{} struct"
+          end
+        rescue
+          e ->
+            reraise SpawnSdk.Actor.MalformedActor,
+                    [
+                      message: "Error in action=#{unquote(action_name)} error=#{inspect(e)}",
+                      exception: e
+                    ],
+                    __STACKTRACE__
+        end
+      end
     end
   end
 
