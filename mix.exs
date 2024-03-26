@@ -90,7 +90,7 @@ defmodule Spawn.MixProject do
       {:k8s_webhoox, "~> 0.2"},
       # Metrics & Tracing deps
       {:telemetry_poller, "~> 1.0"},
-      {:telemetry_metrics, "~> 0.6"},
+      {:telemetry_metrics, "~> 1.0"},
       {:telemetry_metrics_prometheus_core, "~> 1.1"},
       {:opentelemetry_api, "~> 1.0"},
       {:opentelemetry, "~> 1.0"},
