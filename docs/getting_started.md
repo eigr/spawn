@@ -162,7 +162,7 @@ Once you have done the initial setup you can start developing your actors in sev
     require Logger
     alias Io.Eigr.Spawn.Example.{MyState, MyBusinessMessage}
 
-    defact sum(%MyBusinessMessage{value: value} = data, %Context{state: state} = ctx) do
+    action "Sum", fn %Context{state: state} = ctx, %MyBusinessMessage{value: value} = data ->
       Logger.info("Received Request: #{inspect(data)}. Context: #{inspect(ctx)}")
       new_value = if is_nil(state), do: value, else: (state.value || 0) + value
 
