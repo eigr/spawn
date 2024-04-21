@@ -15,15 +15,15 @@ by adding `spawn_sdk` and `spawn_statestores_*` to your list of dependencies in 
 ```elixir
 def deps do
   [
-    {:spawn_sdk, "~> 1.2.2"},
+    {:spawn_sdk, "~> 1.3.0"},
 
     # You can uncomment one of those dependencies if you are going to use Persistent Actors
-    #{:spawn_statestores_mariadb, "~> 1.2.2"},
-    #{:spawn_statestores_mysql, "~> 1.2.2"},
-    #{:spawn_statestores_postgres, "~> 1.2.2"},
-    #{:spawn_statestores_mssql, "~> 1.2.2"},
-    #{:spawn_statestores_cockroachdb, "~> 1.2.2"},
-    #{:spawn_statestores_sqlite, "~> 1.2.2"},
+    #{:spawn_statestores_mariadb, "~> 1.3.0"},
+    #{:spawn_statestores_mysql, "~> 1.3.0"},
+    #{:spawn_statestores_postgres, "~> 1.3.0"},
+    #{:spawn_statestores_mssql, "~> 1.3.0"},
+    #{:spawn_statestores_cockroachdb, "~> 1.3.0"},
+    #{:spawn_statestores_sqlite, "~> 1.3.0"},
   ]
 end
 ```
