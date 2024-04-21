@@ -18,15 +18,31 @@ defmodule Spawn.Utils.AnySerializer do
   def unpack_unknown({:noop, any}), do: unpack_unknown(any)
 
   def unpack_unknown(%{type_url: type_url} = any) do
-    package_name =
-      type_url
-      |> String.replace("type.googleapis.com/", "")
-      |> String.split(".")
-      |> Enum.map_join(".", &upcase_first/1)
-      |> then(fn package -> Enum.join(["Elixir", package], ".") end)
+    package_name = normalize_package_name(type_url)
 
     any_unpack!(any, to_existing_atom_or_new(package_name))
     |> maybe_unpack_json!
+  end
+
+  defp normalize_package_name(type_url) do
+    type_url
+    |> String.replace("type.googleapis.com/", "")
+    |> normalize_and_capitalize()
+    |> then(fn package -> Enum.join(["Elixir", package], ".") end)
+  end
+
+  defp normalize_and_capitalize(str) do
+    str
+    |> String.split(".")
+    |> Enum.map_join(".", &normalize_part/1)
+  end
+
+  defp normalize_part(part) do
+    if String.contains?(part, "_") do
+      Enum.join(Enum.map(String.split(part, "_"), &upcase_first/1), "")
+    else
+      upcase_first(part)
+    end
   end
 
   def unpack_unknown(_), do: nil

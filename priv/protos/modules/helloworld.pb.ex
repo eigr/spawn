@@ -15,19 +15,7 @@ defmodule Helloworld.HelloRequest do
           type: :TYPE_STRING,
           type_name: nil,
           default_value: nil,
-          options: %Google.Protobuf.FieldOptions{
-            ctype: :STRING,
-            packed: nil,
-            deprecated: false,
-            lazy: false,
-            jstype: :JS_NORMAL,
-            weak: false,
-            unverified_lazy: false,
-            debug_redact: false,
-            uninterpreted_option: [],
-            __pb_extensions__: %{{Eigr.Functions.Protocol.Actors.PbExtension, :actor_id} => true},
-            __unknown_fields__: []
-          },
+          options: nil,
           oneof_index: nil,
           json_name: "name",
           proto3_optional: nil,
@@ -46,7 +34,7 @@ defmodule Helloworld.HelloRequest do
     }
   end
 
-  field :name, 1, type: :string, deprecated: false
+  field :name, 1, type: :string
 end
 
 defmodule Helloworld.HelloRequestFrom do
@@ -66,19 +54,7 @@ defmodule Helloworld.HelloRequestFrom do
           type: :TYPE_STRING,
           type_name: nil,
           default_value: nil,
-          options: %Google.Protobuf.FieldOptions{
-            ctype: :STRING,
-            packed: nil,
-            deprecated: false,
-            lazy: false,
-            jstype: :JS_NORMAL,
-            weak: false,
-            unverified_lazy: false,
-            debug_redact: false,
-            uninterpreted_option: [],
-            __pb_extensions__: %{{Eigr.Functions.Protocol.Actors.PbExtension, :actor_id} => true},
-            __unknown_fields__: []
-          },
+          options: nil,
           oneof_index: nil,
           json_name: "name",
           proto3_optional: nil,
@@ -111,7 +87,7 @@ defmodule Helloworld.HelloRequestFrom do
     }
   end
 
-  field :name, 1, type: :string, deprecated: false
+  field :name, 1, type: :string
   field :from, 2, type: :string
 end
 
@@ -178,11 +154,7 @@ defmodule Helloworld.GreeterService.Service do
     %Google.Protobuf.FileDescriptorProto{
       name: "helloworld.proto",
       package: "helloworld",
-      dependency: [
-        "google/api/annotations.proto",
-        "google/protobuf/timestamp.proto",
-        "eigr/functions/protocol/actors/extensions.proto"
-      ],
+      dependency: ["google/api/annotations.proto", "google/protobuf/timestamp.proto"],
       message_type: [
         %Google.Protobuf.DescriptorProto{
           name: "HelloRequest",
@@ -195,21 +167,7 @@ defmodule Helloworld.GreeterService.Service do
               type: :TYPE_STRING,
               type_name: nil,
               default_value: nil,
-              options: %Google.Protobuf.FieldOptions{
-                ctype: :STRING,
-                packed: nil,
-                deprecated: false,
-                lazy: false,
-                jstype: :JS_NORMAL,
-                weak: false,
-                unverified_lazy: false,
-                debug_redact: false,
-                uninterpreted_option: [],
-                __pb_extensions__: %{
-                  {Eigr.Functions.Protocol.Actors.PbExtension, :actor_id} => true
-                },
-                __unknown_fields__: []
-              },
+              options: nil,
               oneof_index: nil,
               json_name: "name",
               proto3_optional: nil,
@@ -237,21 +195,7 @@ defmodule Helloworld.GreeterService.Service do
               type: :TYPE_STRING,
               type_name: nil,
               default_value: nil,
-              options: %Google.Protobuf.FieldOptions{
-                ctype: :STRING,
-                packed: nil,
-                deprecated: false,
-                lazy: false,
-                jstype: :JS_NORMAL,
-                weak: false,
-                unverified_lazy: false,
-                debug_redact: false,
-                uninterpreted_option: [],
-                __pb_extensions__: %{
-                  {Eigr.Functions.Protocol.Actors.PbExtension, :actor_id} => true
-                },
-                __unknown_fields__: []
-              },
+              options: nil,
               oneof_index: nil,
               json_name: "name",
               proto3_optional: nil,
@@ -338,12 +282,17 @@ defmodule Helloworld.GreeterService.Service do
                 deprecated: false,
                 idempotency_level: :IDEMPOTENCY_UNKNOWN,
                 uninterpreted_option: [],
-                __pb_extensions__: %{},
-                __unknown_fields__: [
-                  {72_295_728, 2,
-                   <<18, 18, 47, 118, 49, 47, 103, 114, 101, 101, 116, 101, 114, 47, 123, 110, 97,
-                     109, 101, 125>>}
-                ]
+                __pb_extensions__: %{
+                  {Google.Api.PbExtension, :http} => %Google.Api.HttpRule{
+                    selector: "",
+                    body: "",
+                    additional_bindings: [],
+                    response_body: "",
+                    pattern: {:get, "/v1/greeter/{name}"},
+                    __unknown_fields__: []
+                  }
+                },
+                __unknown_fields__: []
               },
               client_streaming: false,
               server_streaming: false,
@@ -357,11 +306,17 @@ defmodule Helloworld.GreeterService.Service do
                 deprecated: false,
                 idempotency_level: :IDEMPOTENCY_UNKNOWN,
                 uninterpreted_option: [],
-                __pb_extensions__: %{},
-                __unknown_fields__: [
-                  {72_295_728, 2,
-                   <<34, 11, 47, 118, 49, 47, 103, 114, 101, 101, 116, 101, 114, 58, 1, 42>>}
-                ]
+                __pb_extensions__: %{
+                  {Google.Api.PbExtension, :http} => %Google.Api.HttpRule{
+                    selector: "",
+                    body: "*",
+                    additional_bindings: [],
+                    response_body: "",
+                    pattern: {:post, "/v1/greeter"},
+                    __unknown_fields__: []
+                  }
+                },
+                __unknown_fields__: []
               },
               client_streaming: false,
               server_streaming: false,
@@ -402,7 +357,7 @@ defmodule Helloworld.GreeterService.Service do
         location: [
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [],
-            span: [0, 0, 47, 1],
+            span: [0, 0, 46, 1],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -497,16 +452,8 @@ defmodule Helloworld.GreeterService.Service do
             __unknown_fields__: []
           },
           %Google.Protobuf.SourceCodeInfo.Location{
-            path: [3, 2],
-            span: [9, 0, 57],
-            leading_comments: nil,
-            trailing_comments: nil,
-            leading_detached_comments: [],
-            __unknown_fields__: []
-          },
-          %Google.Protobuf.SourceCodeInfo.Location{
             path: [2],
-            span: [11, 0, 19],
+            span: [10, 0, 19],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -514,7 +461,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0],
-            span: [14, 0, 28, 1],
+            span: [13, 0, 27, 1],
             leading_comments: " The greeting service definition.\n",
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -522,7 +469,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 1],
-            span: [14, 8, 22],
+            span: [13, 8, 22],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -530,7 +477,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 0],
-            span: [16, 2, 20, 3],
+            span: [15, 2, 19, 3],
             leading_comments: " Sends a greeting\n",
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -538,7 +485,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 0, 1],
-            span: [16, 6, 14],
+            span: [15, 6, 14],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -546,7 +493,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 0, 2],
-            span: [16, 16, 28],
+            span: [15, 16, 28],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -554,7 +501,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 0, 3],
-            span: [16, 39, 49],
+            span: [15, 39, 49],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -562,7 +509,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 0, 4],
-            span: [17, 4, 19, 6],
+            span: [16, 4, 18, 6],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -570,7 +517,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 0, 4, 72_295_728],
-            span: [17, 4, 19, 6],
+            span: [16, 4, 18, 6],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -578,7 +525,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 1],
-            span: [22, 2, 27, 3],
+            span: [21, 2, 26, 3],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -586,7 +533,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 1, 1],
-            span: [22, 6, 18],
+            span: [21, 6, 18],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -594,7 +541,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 1, 2],
-            span: [22, 20, 36],
+            span: [21, 20, 36],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -602,7 +549,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 1, 3],
-            span: [22, 47, 57],
+            span: [21, 47, 57],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -610,7 +557,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 1, 4],
-            span: [23, 4, 26, 6],
+            span: [22, 4, 25, 6],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -618,7 +565,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 1, 4, 72_295_728],
-            span: [23, 4, 26, 6],
+            span: [22, 4, 25, 6],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -626,7 +573,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 0],
-            span: [31, 0, 33, 1],
+            span: [30, 0, 32, 1],
             leading_comments: " The request message containing the user's name.\n",
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -634,7 +581,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 0, 1],
-            span: [31, 8, 20],
+            span: [30, 8, 20],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -642,7 +589,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 0, 2, 0],
-            span: [32, 2, 70],
+            span: [31, 2, 18],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -650,7 +597,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 0, 2, 0, 5],
-            span: [32, 2, 8],
+            span: [31, 2, 8],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -658,7 +605,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 0, 2, 0, 1],
-            span: ~c" \t\r",
+            span: [31, 9, 13],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -666,23 +613,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 0, 2, 0, 3],
-            span: [32, 16, 17],
-            leading_comments: nil,
-            trailing_comments: nil,
-            leading_detached_comments: [],
-            __unknown_fields__: []
-          },
-          %Google.Protobuf.SourceCodeInfo.Location{
-            path: [4, 0, 2, 0, 8],
-            span: [32, 18, 69],
-            leading_comments: nil,
-            trailing_comments: nil,
-            leading_detached_comments: [],
-            __unknown_fields__: []
-          },
-          %Google.Protobuf.SourceCodeInfo.Location{
-            path: [4, 0, 2, 0, 8, 9999],
-            span: [32, 19, 68],
+            span: [31, 16, 17],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -690,7 +621,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 1],
-            span: [36, 0, 41, 1],
+            span: [35, 0, 40, 1],
             leading_comments: " HelloRequestFrom!\n",
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -698,7 +629,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 1, 1],
-            span: [36, 8, 24],
+            span: [35, 8, 24],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -706,7 +637,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 1, 2, 0],
-            span: [38, 2, 70],
+            span: [37, 2, 18],
             leading_comments: " Name!\n",
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -714,7 +645,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 1, 2, 0, 5],
-            span: [38, 2, 8],
+            span: [37, 2, 8],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -722,7 +653,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 1, 2, 0, 1],
-            span: ~c"&\t\r",
+            span: ~c"%\t\r",
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -730,23 +661,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 1, 2, 0, 3],
-            span: [38, 16, 17],
-            leading_comments: nil,
-            trailing_comments: nil,
-            leading_detached_comments: [],
-            __unknown_fields__: []
-          },
-          %Google.Protobuf.SourceCodeInfo.Location{
-            path: [4, 1, 2, 0, 8],
-            span: [38, 18, 69],
-            leading_comments: nil,
-            trailing_comments: nil,
-            leading_detached_comments: [],
-            __unknown_fields__: []
-          },
-          %Google.Protobuf.SourceCodeInfo.Location{
-            path: [4, 1, 2, 0, 8, 9999],
-            span: [38, 19, 68],
+            span: [37, 16, 17],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -754,7 +669,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 1, 2, 1],
-            span: [40, 2, 18],
+            span: [39, 2, 18],
             leading_comments: " From!\n",
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -762,7 +677,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 1, 2, 1, 5],
-            span: [40, 2, 8],
+            span: [39, 2, 8],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -770,7 +685,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 1, 2, 1, 1],
-            span: ~c"(\t\r",
+            span: ~c"'\t\r",
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -778,7 +693,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 1, 2, 1, 3],
-            span: [40, 16, 17],
+            span: [39, 16, 17],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -786,7 +701,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 2],
-            span: [44, 0, 47, 1],
+            span: [43, 0, 46, 1],
             leading_comments: " The response message containing the greetings\n",
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -794,7 +709,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 2, 1],
-            span: [44, 8, 18],
+            span: [43, 8, 18],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -802,7 +717,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 2, 2, 0],
-            span: [45, 2, 21],
+            span: [44, 2, 21],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -810,7 +725,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 2, 2, 0, 5],
-            span: [45, 2, 8],
+            span: [44, 2, 8],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -818,7 +733,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 2, 2, 0, 1],
-            span: [45, 9, 16],
+            span: [44, 9, 16],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -826,7 +741,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 2, 2, 0, 3],
-            span: [45, 19, 20],
+            span: [44, 19, 20],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -834,7 +749,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 2, 2, 1],
-            span: [46, 2, 38],
+            span: [45, 2, 38],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -842,7 +757,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 2, 2, 1, 6],
-            span: [46, 2, 27],
+            span: [45, 2, 27],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -850,7 +765,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 2, 2, 1, 1],
-            span: [46, 28, 33],
+            span: [45, 28, 33],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -858,7 +773,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 2, 2, 1, 3],
-            span: ~c".$%",
+            span: ~c"-$%",
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -875,9 +790,33 @@ defmodule Helloworld.GreeterService.Service do
     }
   end
 
-  rpc(:SayHello, Helloworld.HelloRequest, Helloworld.HelloReply)
+  rpc(:SayHello, Helloworld.HelloRequest, Helloworld.HelloReply, %{
+    http: %{
+      type: Google.Api.PbExtension,
+      value: %Google.Api.HttpRule{
+        selector: "",
+        body: "",
+        additional_bindings: [],
+        response_body: "",
+        pattern: {:get, "/v1/greeter/{name}"},
+        __unknown_fields__: []
+      }
+    }
+  })
 
-  rpc(:SayHelloFrom, Helloworld.HelloRequestFrom, Helloworld.HelloReply)
+  rpc(:SayHelloFrom, Helloworld.HelloRequestFrom, Helloworld.HelloReply, %{
+    http: %{
+      type: Google.Api.PbExtension,
+      value: %Google.Api.HttpRule{
+        selector: "",
+        body: "*",
+        additional_bindings: [],
+        response_body: "",
+        pattern: {:post, "/v1/greeter"},
+        __unknown_fields__: []
+      }
+    }
+  })
 end
 
 defmodule Helloworld.GreeterService.ActorDispatcher do

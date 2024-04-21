@@ -1,24 +1,24 @@
 defmodule InternalVersions do
   # The order here is also the deploy order, its important to keep this way
   @versions [
-    spawn_statestores: "1.2.1",
-    spawn_statestores_mariadb: "1.2.1",
-    spawn_statestores_mysql: "1.2.1",
-    spawn_statestores_mssql: "1.2.1",
-    spawn_statestores_native: "1.2.1",
-    spawn_statestores_postgres: "1.2.1",
-    spawn_statestores_sqlite: "1.2.1",
-    spawn_statestores_cockroachdb: "1.2.1",
-    spawn: "1.2.1",
-    spawn_sdk: "1.2.1",
-    activator: "1.2.1",
-    activator_api: "1.2.1",
-    activator_kafka: "1.2.1",
-    activator_pubsub: "1.2.1",
-    activator_rabbitmq: "1.2.1",
-    activator_sqs: "1.2.1",
-    proxy: "1.2.1",
-    spawn_operator: "1.2.1"
+    spawn_statestores: "1.2.2",
+    spawn_statestores_mariadb: "1.2.2",
+    spawn_statestores_mysql: "1.2.2",
+    spawn_statestores_mssql: "1.2.2",
+    spawn_statestores_native: "1.2.2",
+    spawn_statestores_postgres: "1.2.2",
+    spawn_statestores_sqlite: "1.2.2",
+    spawn_statestores_cockroachdb: "1.2.2",
+    spawn: "1.2.2",
+    spawn_sdk: "1.2.2",
+    activator: "1.2.2",
+    activator_api: "1.2.2",
+    activator_kafka: "1.2.2",
+    activator_pubsub: "1.2.2",
+    activator_rabbitmq: "1.2.2",
+    activator_sqs: "1.2.2",
+    proxy: "1.2.2",
+    spawn_operator: "1.2.2"
   ]
 
   @doc """

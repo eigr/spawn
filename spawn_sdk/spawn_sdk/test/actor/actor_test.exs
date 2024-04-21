@@ -13,21 +13,22 @@ defmodule Actor.ActorTest do
 
     alias Eigr.Spawn.Actor.{MyMessageRequest, MyMessageResponse}
 
-    defact init(%Context{} = ctx) do
+    init(fn %Context{} = ctx ->
       %Value{}
       |> Value.tags(Map.put(ctx.tags, "foo", "initial"))
       |> Value.void()
-    end
+    end)
 
-    defact sum(%MyMessageRequest{id: id, data: data}, %Context{} = ctx) do
+    action("sum", fn %Context{} = ctx, %MyMessageRequest{id: id, data: data} ->
       current_state = ctx.state
       new_state = current_state
 
       response = %MyMessageResponse{id: id, data: data}
       result = %Value{state: new_state, value: response}
 
-      {:ok, result}
-    end
+      result
+      |> Value.noreply!()
+    end)
 
     defact change_tags(%Context{} = ctx) do
       %{"bar" => "unchanged"} = ctx.tags
@@ -88,9 +89,9 @@ defmodule Actor.ActorTest do
       stateful: false,
       state_type: :json
 
-    defact init(_) do
+    init(fn _ctx ->
       Value.noreply_state!(%{value: 0})
-    end
+    end)
 
     defact sum(%{value: new_value}, %Context{state: %{value: old_value}}) do
       total = old_value + new_value
@@ -196,12 +197,14 @@ defmodule Actor.ActorTest do
       deactivate_timeout: 30_000,
       snapshot_timeout: 2_000
 
-    defact publish(request, %Context{} = _ctx) do
+    action("publish", fn %Context{}, request ->
       Value.of()
       |> Value.broadcast(Broadcast.to("topics", request))
-    end
+    end)
 
-    defact receive(request, %Context{} = _ctx) do
+    action("receive", &receive_handler/2)
+
+    defp receive_handler(%Context{}, request) do
       %Value{}
       |> Value.state(%Eigr.Spawn.Actor.MyState{id: request.data})
     end
@@ -261,11 +264,10 @@ defmodule Actor.ActorTest do
       request = %Eigr.Spawn.Actor.MyMessageRequest{id: id, data: data}
       Actor.MyActor.handle_action({"sum", request}, ctx)
 
-      assert {:ok,
-              %SpawnSdk.Value{
-                state: %Eigr.Spawn.Actor.MyState{id: "1", value: 1},
-                value: %Eigr.Spawn.Actor.MyMessageResponse{}
-              }} = Actor.MyActor.handle_action({"sum", request}, ctx)
+      assert %SpawnSdk.Value{
+               state: %Eigr.Spawn.Actor.MyState{id: "1", value: 1},
+               value: %Eigr.Spawn.Actor.MyMessageResponse{}
+             } = Actor.MyActor.handle_action({"sum", request}, ctx)
     end
   end
 
