@@ -114,7 +114,7 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
               "initContainers" => [
                 %{
                   "name" => "init-certificates",
-                  "image" => "docker.io/eigr/spawn-initializer:1.3.0",
+                  "image" => "docker.io/eigr/spawn-initializer:1.3.1",
                   "args" => [
                     "--environment",
                     :prod,
