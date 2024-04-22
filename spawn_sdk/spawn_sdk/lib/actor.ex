@@ -57,7 +57,7 @@ defmodule SpawnSdk.Actor do
 
   @type context :: Context.t()
 
-  @type data :: module()
+  @type data :: term()
 
   @type error :: any()
 
