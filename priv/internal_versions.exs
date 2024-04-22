@@ -182,6 +182,7 @@ defmodule InternalVersions do
     match_spawn_postgres_with_path = ~r(\{:spawn_statestores_postgres,\s*path:.*\})
     match_spawn_cockroachdb_with_path = ~r(\{:spawn_statestores_cockroachdb,\s*path:.*\})
     match_spawn_sqlite_with_path = ~r(\{:spawn_statestores_sqlite,\s*path:.*\})
+    match_spawn_native_with_path = ~r(\{:spawn_statestores_native,\s*path:.*\})
 
     mix_file
     |> String.replace(match_spawn_with_path, dep_for("spawn"), global: false)
@@ -216,6 +217,11 @@ defmodule InternalVersions do
     |> String.replace(
       match_spawn_sqlite_with_path,
       dep_for("spawn_statestores_sqlite", optional?),
+      global: false
+    )
+    |> String.replace(
+      match_spawn_native_with_path,
+      dep_for("spawn_statestores_native", optional?),
       global: false
     )
     |> String.replace("0.0.0-local.dev", version)
