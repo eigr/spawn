@@ -49,7 +49,7 @@ RUN chown nobody /app
 ENV MIX_ENV=prod
 ENV HOME=/app
 
-COPY --from=builder --chown=nobody:root /app/_build/${MIX_ENV}/rel/bakeware/ ./
+COPY --from=builder --chown=nobody:root /app/spawn_operator/spawn_operator/_build/${MIX_ENV}/rel/bakeware/ ./
 
 RUN mkdir -p /app/.cache/bakeware/ && chmod 777 /app/.cache/bakeware/
 RUN touch /.erlang.cookie && chmod 777 /.erlang.cookie
