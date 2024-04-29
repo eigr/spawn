@@ -9,7 +9,7 @@ metadata:
     spawn-eigr.io/sidecar-http-port: "9001"
     spawn-eigr.io/sidecar-pubsub-adapter: "nats"
     spawn-eigr.io/sidecar-pubsub-nats-hosts: "nats://spawn-nats:4222"
-    spawn-eigr.io/sidecar-image-tag: "docker.io/eigr/spawn-proxy:1.3.1"
+    spawn-eigr.io/sidecar-image-tag: "docker.io/eigr/spawn-proxy:1.3.2"
 spec:
   autoscaler:
     max: 3
