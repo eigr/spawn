@@ -35,6 +35,7 @@ build:
 	mix deps.get && mix compile
 
 build-proxy-image:
+	# When we migrate to new version of buildx we can do: docker buildx build -f Dockerfile-proxy --tag ${proxy-image} --attest type=provenance,mode=max .
 	docker build --no-cache -f Dockerfile-proxy -t ${proxy-image} .
 
 build-operator-image:
