@@ -15,8 +15,8 @@ defmodule SpawnSdk.Value do
             tags: nil
 
   @type t :: %__MODULE__{
-          state: module(),
-          value: module(),
+          state: term(),
+          value: term(),
           tags: map(),
           broadcast: Broadcast.t(),
           pipe: Pipe.t(),
@@ -34,9 +34,9 @@ defmodule SpawnSdk.Value do
 
   @type forward :: Forward.t()
 
-  @type response :: module()
+  @type response :: term()
 
-  @type new_state :: module()
+  @type new_state :: term()
 
   @type tags :: map()
 

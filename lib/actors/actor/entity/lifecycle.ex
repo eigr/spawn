@@ -101,36 +101,14 @@ defmodule Actors.Actor.Entity.Lifecycle do
   end
 
   def load_state(%EntityState{actor: actor, revision: revision, opts: opts} = state) do
-    loaded = get_state(actor.id, revision)
-
-    actual_state =
-      case {actor.state, loaded} do
-        {nil, {:ok, current_state, _, _, _}} ->
-          Logger.debug(
-            "Actor #{inspect(actor.id)} was created with an empty state. Trying to fetch Actor data from persistent storage."
-          )
-
-          current_state
-
-        {state, _} when is_map(state) ->
-          Logger.debug(
-            "Internal state is not empty for Actor #{inspect(actor.id)}. Trying to reconcile the state with state manager."
-          )
-
-          state
-
-        _ ->
-          nil
-      end
-
-    case loaded do
-      {:ok, _current_state, current_revision, status, node} ->
+    case get_state(actor.id, revision) do
+      {:ok, current_state, current_revision, status, node} ->
         split_brain_detector =
           Keyword.get(opts, :split_brain_detector, Actors.Node.DefaultSplitBrainDetector)
 
         case check_partition(actor.id, status, node, split_brain_detector) do
           :continue ->
-            {:noreply, updated_state(state, actual_state, current_revision),
+            {:noreply, updated_state(state, current_state, current_revision),
              {:continue, :call_init_action}}
 
           {:network_partition_detected, error} ->
@@ -139,7 +117,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
 
       {:not_found, %{}, _current_revision} ->
         Logger.debug("Not found state on statestore for Actor #{inspect(actor.id)}.")
-        {:noreply, updated_state(state, actual_state, revision), {:continue, :call_init_action}}
+        {:noreply, updated_state(state, state.actor.state, revision), {:continue, :call_init_action}}
 
       error ->
         handle_load_state_error(actor.name, state, error)

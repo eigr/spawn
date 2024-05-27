@@ -1,4 +1,4 @@
-version=1.2.2
+version=1.3.3
 registry=eigr
 
 CLUSTER_NAME=spawn-k8s
@@ -35,6 +35,7 @@ build:
 	mix deps.get && mix compile
 
 build-proxy-image:
+	# When we migrate to new version of buildx we can do: docker buildx build -f Dockerfile-proxy --tag ${proxy-image} --attest type=provenance,mode=max .
 	docker build --no-cache -f Dockerfile-proxy -t ${proxy-image} .
 
 build-operator-image:
@@ -107,7 +108,7 @@ test.integration: ## Run integration tests using k3d `make cluster`
 	cd spawn_operator/spawn_operator && PROXY_CLUSTER_STRATEGY=gossip PROXY_DATABASE_TYPE=mysql  PROXY_DATABASE_POOL_SIZE=10 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= TEST_KUBECONFIG=${K3D_KUBECONFIG_PATH} mix test --only integration
 
 push-all-images:
-	#docker push ${proxy-image}
+	docker push ${proxy-image}
 	docker push ${proxy-initializer}
 	docker push ${operator-image}
 	#docker push ${activator-api-image}
@@ -214,3 +215,6 @@ run-proxy-image:
 
 run-operator-image:
 	docker run --rm --name=spawn-operator --net=host ${operator-image}
+
+run-initializer-image:
+	docker run --rm --name=spawn-operator --net=host ${proxy-initializer}

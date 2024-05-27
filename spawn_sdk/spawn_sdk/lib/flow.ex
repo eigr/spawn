@@ -69,7 +69,7 @@ defmodule SpawnSdk.Flow do
 
     @type channel :: String.t()
 
-    @type payload :: module() | nil
+    @type payload :: term() | nil
 
     @spec to(channel(), payload()) :: Broadcast.t()
     def to(channel, payload) do
@@ -163,7 +163,7 @@ defmodule SpawnSdk.Flow do
 
     @type action :: String.t() | atom()
 
-    @type payload :: module() | nil
+    @type payload :: term() | nil
 
     @spec of() :: list(SideEffect.t())
     def of(), do: []

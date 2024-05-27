@@ -27,9 +27,13 @@ defmodule Spawn.Utils.AnySerializer do
   defp normalize_package_name(type_url) do
     type_url
     |> String.replace("type.googleapis.com/", "")
+    |> normalize_no_package()
     |> normalize_and_capitalize()
     |> then(fn package -> Enum.join(["Elixir", package], ".") end)
   end
+
+  defp normalize_no_package("." <> rest), do: rest
+  defp normalize_no_package(rest), do: rest
 
   defp normalize_and_capitalize(str) do
     str
@@ -93,7 +97,11 @@ defmodule Spawn.Utils.AnySerializer do
 
     type_name = parts |> List.last()
 
-    "type.googleapis.com/#{package_name}.#{type_name}"
+    if String.trim(package_name) == "" do
+      "type.googleapis.com/#{type_name}"
+    else
+      "type.googleapis.com/#{package_name}.#{type_name}"
+    end
   end
 
   defp upcase_first(<<first::utf8, rest::binary>>), do: String.upcase(<<first::utf8>>) <> rest

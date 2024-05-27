@@ -1,24 +1,24 @@
 defmodule InternalVersions do
   # The order here is also the deploy order, its important to keep this way
   @versions [
-    spawn_statestores: "1.2.2",
-    spawn_statestores_mariadb: "1.2.2",
-    spawn_statestores_mysql: "1.2.2",
-    spawn_statestores_mssql: "1.2.2",
-    spawn_statestores_native: "1.2.2",
-    spawn_statestores_postgres: "1.2.2",
-    spawn_statestores_sqlite: "1.2.2",
-    spawn_statestores_cockroachdb: "1.2.2",
-    spawn: "1.2.2",
-    spawn_sdk: "1.2.2",
-    activator: "1.2.2",
-    activator_api: "1.2.2",
-    activator_kafka: "1.2.2",
-    activator_pubsub: "1.2.2",
-    activator_rabbitmq: "1.2.2",
-    activator_sqs: "1.2.2",
-    proxy: "1.2.2",
-    spawn_operator: "1.2.2"
+    spawn_statestores: "1.3.3",
+    spawn_statestores_mariadb: "1.3.3",
+    spawn_statestores_mysql: "1.3.3",
+    spawn_statestores_mssql: "1.3.3",
+    spawn_statestores_native: "1.3.3",
+    spawn_statestores_postgres: "1.3.3",
+    spawn_statestores_sqlite: "1.3.3",
+    spawn_statestores_cockroachdb: "1.3.3",
+    spawn: "1.3.3",
+    spawn_sdk: "1.3.3",
+    activator: "1.3.3",
+    activator_api: "1.3.3",
+    activator_kafka: "1.3.3",
+    activator_pubsub: "1.3.3",
+    activator_rabbitmq: "1.3.3",
+    activator_sqs: "1.3.3",
+    proxy: "1.3.3",
+    spawn_operator: "1.3.3"
   ]
 
   @doc """
@@ -182,6 +182,7 @@ defmodule InternalVersions do
     match_spawn_postgres_with_path = ~r(\{:spawn_statestores_postgres,\s*path:.*\})
     match_spawn_cockroachdb_with_path = ~r(\{:spawn_statestores_cockroachdb,\s*path:.*\})
     match_spawn_sqlite_with_path = ~r(\{:spawn_statestores_sqlite,\s*path:.*\})
+    match_spawn_native_with_path = ~r(\{:spawn_statestores_native,\s*path:.*\})
 
     mix_file
     |> String.replace(match_spawn_with_path, dep_for("spawn"), global: false)
@@ -216,6 +217,11 @@ defmodule InternalVersions do
     |> String.replace(
       match_spawn_sqlite_with_path,
       dep_for("spawn_statestores_sqlite", optional?),
+      global: false
+    )
+    |> String.replace(
+      match_spawn_native_with_path,
+      dep_for("spawn_statestores_native", optional?),
       global: false
     )
     |> String.replace("0.0.0-local.dev", version)
