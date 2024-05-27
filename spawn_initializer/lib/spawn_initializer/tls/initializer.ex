@@ -7,7 +7,7 @@ defmodule SpawnInitializer.Tls.Initializer do
     - args:
         - eval
         - SpawnInitializer.Tls.Initializer.bootstrap_tls(:prod, "tls-certs")
-      image: docker.io/eigr/spawn-proxy:1.3.2
+      image: docker.io/eigr/spawn-proxy:1.3.3
       name: init-certificates
   serviceAccountName: kompost
   volumes:

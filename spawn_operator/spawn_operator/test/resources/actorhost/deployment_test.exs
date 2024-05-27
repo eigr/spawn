@@ -153,7 +153,7 @@ defmodule DeploymentTest do
                            "--to",
                            "default"
                          ],
-                         "image" => "docker.io/eigr/spawn-initializer:1.3.2",
+                         "image" => "docker.io/eigr/spawn-initializer:1.3.3",
                          "name" => "init-certificates"
                        }
                      ],
@@ -310,7 +310,7 @@ defmodule DeploymentTest do
                            "--to",
                            "default"
                          ],
-                         "image" => "docker.io/eigr/spawn-initializer:1.3.2",
+                         "image" => "docker.io/eigr/spawn-initializer:1.3.3",
                          "name" => "init-certificates"
                        }
                      ],
