@@ -48,7 +48,7 @@ build-activator-simple-image:
 	docker build --no-cache -f Dockerfile-activator-simple -t ${activator-simple-image} .
 
 build-all-images:
-	docker build --no-cache -f Dockerfile-proxy -t ${proxy-image} .
+	#docker build --no-cache -f Dockerfile-proxy -t ${proxy-image} .
 	docker build --no-cache -f Dockerfile-initializer -t ${proxy-initializer} .
 	docker build --no-cache -f Dockerfile-operator -t ${operator-image} .
 	#docker build --no-cache -f Dockerfile-activator-api -t ${activator-api-image} .
@@ -215,3 +215,6 @@ run-proxy-image:
 
 run-operator-image:
 	docker run --rm --name=spawn-operator --net=host ${operator-image}
+
+run-initializer-image:
+	docker run --rm --name=spawn-operator --net=host ${proxy-initializer}
