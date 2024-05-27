@@ -38,9 +38,9 @@ RUN cd spawn_operator/spawn_operator \
     && mix release spawn_operator
 
 # ---- Application Stage ----
-FROM alpine:3.17.3
+FROM alpine:3.19.1
 
-RUN apk add --no-cache --update zstd ncurses-libs libstdc++ libgcc libcrypto1.1
+RUN apk add --no-cache --update zstd ncurses-libs libstdc++ libgcc
 
 WORKDIR /app
 RUN chown nobody /app
