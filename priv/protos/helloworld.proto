@@ -7,7 +7,6 @@ option objc_class_prefix = "HLW";
 
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
-import "eigr/functions/protocol/actors/extensions.proto";
 
 package helloworld;
 
@@ -30,13 +29,13 @@ service GreeterService {
 
 // The request message containing the user's name.
 message HelloRequest {
-  string name = 1 [(.eigr.functions.protocol.actors.actor_id) = true];
+  string name = 1;
 }
 
 // HelloRequestFrom!
 message HelloRequestFrom {
   // Name!
-  string name = 1 [(.eigr.functions.protocol.actors.actor_id) = true];
+  string name = 1;
   // From!
   string from = 2;
 }
