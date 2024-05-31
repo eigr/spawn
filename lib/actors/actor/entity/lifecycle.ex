@@ -117,7 +117,9 @@ defmodule Actors.Actor.Entity.Lifecycle do
 
       {:not_found, %{}, _current_revision} ->
         Logger.debug("Not found state on statestore for Actor #{inspect(actor.id)}.")
-        {:noreply, updated_state(state, state.actor.state, revision), {:continue, :call_init_action}}
+
+        {:noreply, updated_state(state, state.actor.state, revision),
+         {:continue, :call_init_action}}
 
       error ->
         handle_load_state_error(actor.name, state, error)

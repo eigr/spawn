@@ -326,6 +326,30 @@ defmodule Actors.Actor.Entity do
   end
 
   @impl true
+  def format_status(_reason, pdict_and_state) do
+    [_pdict, state] = pdict_and_state
+
+    {:state, Map.delete(state, :state_hash)}
+  end
+
+  # TODO: Use below after Elixir 1.17.0 release
+  # @impl true
+  # def format_status(status) do
+  #   Map.new(status, fn
+  #     {:state, state} ->
+  #       formatted_state =
+  #         state
+  #         |> Map.delete(:state_hash)
+  #         |> Map.delete(:opts)
+
+  #       {:state, formatted_state}
+
+  #     value ->
+  #       value
+  #   end)
+  # end
+
+  @impl true
   def terminate(action, state) do
     state = EntityState.unpack(state)
 
