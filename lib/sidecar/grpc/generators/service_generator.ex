@@ -21,9 +21,15 @@ defmodule Sidecar.GRPC.Generators.ServiceGenerator do
 
       services = [
     <%= for service_name <- @services do %>
-      <%= service_name %>.Service,
+      <%= service_name %>.ActorDispatcher,
     <% end %>
       ]
+
+      services =
+        [
+          Sidecar.GRPC.Reflection.Server.V1,
+          Sidecar.GRPC.Reflection.Server.V1Alpha
+        ] ++ services
 
       run(services)
     end

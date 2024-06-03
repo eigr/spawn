@@ -40,6 +40,7 @@ defmodule Sidecar.GRPC.Supervisor do
   defp maybe_start_reflection(children, false), do: children
 
   defp maybe_start_reflection(children, true) do
+    Logger.info("Starting gRPC Reflection...")
     (children ++ [{GrpcReflection, []}]) |> List.flatten()
   end
 

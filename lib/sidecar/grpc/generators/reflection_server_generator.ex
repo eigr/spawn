@@ -15,12 +15,22 @@ defmodule Sidecar.Grpc.Generators.ReflectionServerGenerator do
     """
     defmodule Sidecar.GRPC.Reflection.Server do
       @moduledoc since: "1.2.1"
-      use GrpcReflection.Server, version: :v1, services: [
-        <%= for service_name <- @services do %>
-          <%= service_name %>.Service,
-        <% end %>
-      ]
 
+      defmodule V1 do
+        use GrpcReflection.Server, version: :v1, services: [
+          <%= for service_name <- @services do %>
+            <%= service_name %>.Service,
+          <% end %>
+        ]
+      end
+
+      defmodule V1Alpha do
+        use GrpcReflection.Server, version: :v1alpha, services: [
+          <%= for service_name <- @services do %>
+            <%= service_name %>.Service,
+          <% end %>
+        ]
+      end
     end
     """
   end
