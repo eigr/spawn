@@ -1,91 +1,28 @@
-defmodule Helloworld.HelloRequest do
+defmodule Pinger.PingPongState do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
     %Google.Protobuf.DescriptorProto{
-      name: "HelloRequest",
+      name: "PingPongState",
       field: [
         %Google.Protobuf.FieldDescriptorProto{
-          name: "name",
+          name: "actual_name",
           extendee: nil,
           number: 1,
           label: :LABEL_OPTIONAL,
           type: :TYPE_STRING,
           type_name: nil,
           default_value: nil,
-          options: %Google.Protobuf.FieldOptions{
-            ctype: :STRING,
-            packed: nil,
-            deprecated: false,
-            lazy: false,
-            jstype: :JS_NORMAL,
-            weak: false,
-            unverified_lazy: false,
-            debug_redact: false,
-            uninterpreted_option: [],
-            __pb_extensions__: %{{Eigr.Functions.Protocol.Actors.PbExtension, :actor_id} => true},
-            __unknown_fields__: []
-          },
+          options: nil,
           oneof_index: nil,
-          json_name: "name",
-          proto3_optional: nil,
-          __unknown_fields__: []
-        }
-      ],
-      nested_type: [],
-      enum_type: [],
-      extension_range: [],
-      extension: [],
-      options: nil,
-      oneof_decl: [],
-      reserved_range: [],
-      reserved_name: [],
-      __unknown_fields__: []
-    }
-  end
-
-  field :name, 1, type: :string, deprecated: false
-end
-
-defmodule Helloworld.HelloRequestFrom do
-  @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
-
-  def descriptor do
-    # credo:disable-for-next-line
-    %Google.Protobuf.DescriptorProto{
-      name: "HelloRequestFrom",
-      field: [
-        %Google.Protobuf.FieldDescriptorProto{
-          name: "name",
-          extendee: nil,
-          number: 1,
-          label: :LABEL_OPTIONAL,
-          type: :TYPE_STRING,
-          type_name: nil,
-          default_value: nil,
-          options: %Google.Protobuf.FieldOptions{
-            ctype: :STRING,
-            packed: nil,
-            deprecated: false,
-            lazy: false,
-            jstype: :JS_NORMAL,
-            weak: false,
-            unverified_lazy: false,
-            debug_redact: false,
-            uninterpreted_option: [],
-            __pb_extensions__: %{{Eigr.Functions.Protocol.Actors.PbExtension, :actor_id} => true},
-            __unknown_fields__: []
-          },
-          oneof_index: nil,
-          json_name: "name",
+          json_name: "actualName",
           proto3_optional: nil,
           __unknown_fields__: []
         },
         %Google.Protobuf.FieldDescriptorProto{
-          name: "from",
+          name: "previous_name",
           extendee: nil,
           number: 2,
           label: :LABEL_OPTIONAL,
@@ -94,7 +31,74 @@ defmodule Helloworld.HelloRequestFrom do
           default_value: nil,
           options: nil,
           oneof_index: nil,
-          json_name: "from",
+          json_name: "previousName",
+          proto3_optional: nil,
+          __unknown_fields__: []
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "updated_at",
+          extendee: nil,
+          number: 3,
+          label: :LABEL_OPTIONAL,
+          type: :TYPE_MESSAGE,
+          type_name: ".google.protobuf.Timestamp",
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "updatedAt",
+          proto3_optional: nil,
+          __unknown_fields__: []
+        }
+      ],
+      nested_type: [],
+      enum_type: [],
+      extension_range: [],
+      extension: [],
+      options: nil,
+      oneof_decl: [],
+      reserved_range: [],
+      reserved_name: [],
+      __unknown_fields__: []
+    }
+  end
+
+  field :actual_name, 1, type: :string, json_name: "actualName"
+  field :previous_name, 2, type: :string, json_name: "previousName"
+  field :updated_at, 3, type: Google.Protobuf.Timestamp, json_name: "updatedAt"
+end
+
+defmodule Pinger.PingRequest do
+  @moduledoc false
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
+
+  def descriptor do
+    # credo:disable-for-next-line
+    %Google.Protobuf.DescriptorProto{
+      name: "PingRequest",
+      field: [
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "name",
+          extendee: nil,
+          number: 1,
+          label: :LABEL_OPTIONAL,
+          type: :TYPE_STRING,
+          type_name: nil,
+          default_value: nil,
+          options: %Google.Protobuf.FieldOptions{
+            ctype: :STRING,
+            packed: nil,
+            deprecated: false,
+            lazy: false,
+            jstype: :JS_NORMAL,
+            weak: false,
+            unverified_lazy: false,
+            debug_redact: false,
+            uninterpreted_option: [],
+            __pb_extensions__: %{{Eigr.Functions.Protocol.Actors.PbExtension, :actor_id} => true},
+            __unknown_fields__: []
+          },
+          oneof_index: nil,
+          json_name: "name",
           proto3_optional: nil,
           __unknown_fields__: []
         }
@@ -112,17 +116,16 @@ defmodule Helloworld.HelloRequestFrom do
   end
 
   field :name, 1, type: :string, deprecated: false
-  field :from, 2, type: :string
 end
 
-defmodule Helloworld.HelloReply do
+defmodule Pinger.PongReply do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
     %Google.Protobuf.DescriptorProto{
-      name: "HelloReply",
+      name: "PongReply",
       field: [
         %Google.Protobuf.FieldDescriptorProto{
           name: "message",
@@ -169,96 +172,41 @@ defmodule Helloworld.HelloReply do
   field :today, 2, type: Google.Protobuf.Timestamp
 end
 
-defmodule Helloworld.GreeterService.Service do
+defmodule Pinger.PingPongActor.Service do
   @moduledoc false
-  use GRPC.Service, name: "helloworld.GreeterService", protoc_gen_elixir_version: "0.12.0"
+  use GRPC.Service, name: "pinger.PingPongActor", protoc_gen_elixir_version: "0.12.0"
 
   def descriptor do
     # credo:disable-for-next-line
     %Google.Protobuf.FileDescriptorProto{
-      name: "helloworld.proto",
-      package: "helloworld",
+      name: "pinger.proto",
+      package: "pinger",
       dependency: [
         "google/api/annotations.proto",
+        "google/protobuf/empty.proto",
         "google/protobuf/timestamp.proto",
         "eigr/functions/protocol/actors/extensions.proto"
       ],
       message_type: [
         %Google.Protobuf.DescriptorProto{
-          name: "HelloRequest",
+          name: "PingPongState",
           field: [
             %Google.Protobuf.FieldDescriptorProto{
-              name: "name",
+              name: "actual_name",
               extendee: nil,
               number: 1,
               label: :LABEL_OPTIONAL,
               type: :TYPE_STRING,
               type_name: nil,
               default_value: nil,
-              options: %Google.Protobuf.FieldOptions{
-                ctype: :STRING,
-                packed: nil,
-                deprecated: false,
-                lazy: false,
-                jstype: :JS_NORMAL,
-                weak: false,
-                unverified_lazy: false,
-                debug_redact: false,
-                uninterpreted_option: [],
-                __pb_extensions__: %{
-                  {Eigr.Functions.Protocol.Actors.PbExtension, :actor_id} => true
-                },
-                __unknown_fields__: []
-              },
+              options: nil,
               oneof_index: nil,
-              json_name: "name",
-              proto3_optional: nil,
-              __unknown_fields__: []
-            }
-          ],
-          nested_type: [],
-          enum_type: [],
-          extension_range: [],
-          extension: [],
-          options: nil,
-          oneof_decl: [],
-          reserved_range: [],
-          reserved_name: [],
-          __unknown_fields__: []
-        },
-        %Google.Protobuf.DescriptorProto{
-          name: "HelloRequestFrom",
-          field: [
-            %Google.Protobuf.FieldDescriptorProto{
-              name: "name",
-              extendee: nil,
-              number: 1,
-              label: :LABEL_OPTIONAL,
-              type: :TYPE_STRING,
-              type_name: nil,
-              default_value: nil,
-              options: %Google.Protobuf.FieldOptions{
-                ctype: :STRING,
-                packed: nil,
-                deprecated: false,
-                lazy: false,
-                jstype: :JS_NORMAL,
-                weak: false,
-                unverified_lazy: false,
-                debug_redact: false,
-                uninterpreted_option: [],
-                __pb_extensions__: %{
-                  {Eigr.Functions.Protocol.Actors.PbExtension, :actor_id} => true
-                },
-                __unknown_fields__: []
-              },
-              oneof_index: nil,
-              json_name: "name",
+              json_name: "actualName",
               proto3_optional: nil,
               __unknown_fields__: []
             },
             %Google.Protobuf.FieldDescriptorProto{
-              name: "from",
+              name: "previous_name",
               extendee: nil,
               number: 2,
               label: :LABEL_OPTIONAL,
@@ -267,7 +215,21 @@ defmodule Helloworld.GreeterService.Service do
               default_value: nil,
               options: nil,
               oneof_index: nil,
-              json_name: "from",
+              json_name: "previousName",
+              proto3_optional: nil,
+              __unknown_fields__: []
+            },
+            %Google.Protobuf.FieldDescriptorProto{
+              name: "updated_at",
+              extendee: nil,
+              number: 3,
+              label: :LABEL_OPTIONAL,
+              type: :TYPE_MESSAGE,
+              type_name: ".google.protobuf.Timestamp",
+              default_value: nil,
+              options: nil,
+              oneof_index: nil,
+              json_name: "updatedAt",
               proto3_optional: nil,
               __unknown_fields__: []
             }
@@ -283,7 +245,49 @@ defmodule Helloworld.GreeterService.Service do
           __unknown_fields__: []
         },
         %Google.Protobuf.DescriptorProto{
-          name: "HelloReply",
+          name: "PingRequest",
+          field: [
+            %Google.Protobuf.FieldDescriptorProto{
+              name: "name",
+              extendee: nil,
+              number: 1,
+              label: :LABEL_OPTIONAL,
+              type: :TYPE_STRING,
+              type_name: nil,
+              default_value: nil,
+              options: %Google.Protobuf.FieldOptions{
+                ctype: :STRING,
+                packed: nil,
+                deprecated: false,
+                lazy: false,
+                jstype: :JS_NORMAL,
+                weak: false,
+                unverified_lazy: false,
+                debug_redact: false,
+                uninterpreted_option: [],
+                __pb_extensions__: %{
+                  {Eigr.Functions.Protocol.Actors.PbExtension, :actor_id} => true
+                },
+                __unknown_fields__: []
+              },
+              oneof_index: nil,
+              json_name: "name",
+              proto3_optional: nil,
+              __unknown_fields__: []
+            }
+          ],
+          nested_type: [],
+          enum_type: [],
+          extension_range: [],
+          extension: [],
+          options: nil,
+          oneof_decl: [],
+          reserved_range: [],
+          reserved_name: [],
+          __unknown_fields__: []
+        },
+        %Google.Protobuf.DescriptorProto{
+          name: "PongReply",
           field: [
             %Google.Protobuf.FieldDescriptorProto{
               name: "message",
@@ -328,36 +332,12 @@ defmodule Helloworld.GreeterService.Service do
       enum_type: [],
       service: [
         %Google.Protobuf.ServiceDescriptorProto{
-          name: "GreeterService",
+          name: "PingPongActor",
           method: [
             %Google.Protobuf.MethodDescriptorProto{
-              name: "SayHello",
-              input_type: ".helloworld.HelloRequest",
-              output_type: ".helloworld.HelloReply",
-              options: %Google.Protobuf.MethodOptions{
-                deprecated: false,
-                idempotency_level: :IDEMPOTENCY_UNKNOWN,
-                uninterpreted_option: [],
-                __pb_extensions__: %{
-                  {Google.Api.PbExtension, :http} => %Google.Api.HttpRule{
-                    selector: "",
-                    body: "",
-                    additional_bindings: [],
-                    response_body: "",
-                    pattern: {:get, "/v1/greeter/{name}"},
-                    __unknown_fields__: []
-                  }
-                },
-                __unknown_fields__: []
-              },
-              client_streaming: false,
-              server_streaming: false,
-              __unknown_fields__: []
-            },
-            %Google.Protobuf.MethodDescriptorProto{
-              name: "SayHelloFrom",
-              input_type: ".helloworld.HelloRequestFrom",
-              output_type: ".helloworld.HelloReply",
+              name: "Ping",
+              input_type: ".pinger.PingRequest",
+              output_type: ".pinger.PongReply",
               options: %Google.Protobuf.MethodOptions{
                 deprecated: false,
                 idempotency_level: :IDEMPOTENCY_UNKNOWN,
@@ -368,7 +348,31 @@ defmodule Helloworld.GreeterService.Service do
                     body: "*",
                     additional_bindings: [],
                     response_body: "",
-                    pattern: {:post, "/v1/greeter"},
+                    pattern: {:post, "/v1/ping/{name}"},
+                    __unknown_fields__: []
+                  }
+                },
+                __unknown_fields__: []
+              },
+              client_streaming: false,
+              server_streaming: false,
+              __unknown_fields__: []
+            },
+            %Google.Protobuf.MethodDescriptorProto{
+              name: "Pong",
+              input_type: ".google.protobuf.Empty",
+              output_type: ".pinger.PingPongState",
+              options: %Google.Protobuf.MethodOptions{
+                deprecated: false,
+                idempotency_level: :IDEMPOTENCY_UNKNOWN,
+                uninterpreted_option: [],
+                __pb_extensions__: %{
+                  {Google.Api.PbExtension, :http} => %Google.Api.HttpRule{
+                    selector: "",
+                    body: "",
+                    additional_bindings: [],
+                    response_body: "",
+                    pattern: {:get, "/v1/pong/{name}"},
                     __unknown_fields__: []
                   }
                 },
@@ -385,10 +389,10 @@ defmodule Helloworld.GreeterService.Service do
       ],
       extension: [],
       options: %Google.Protobuf.FileOptions{
-        java_package: "io.grpc.examples.helloworld",
-        java_outer_classname: "HelloWorldProto",
+        java_package: nil,
+        java_outer_classname: nil,
         optimize_for: :SPEED,
-        java_multiple_files: true,
+        java_multiple_files: false,
         go_package: nil,
         cc_generic_services: false,
         java_generic_services: false,
@@ -413,7 +417,7 @@ defmodule Helloworld.GreeterService.Service do
         location: [
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [],
-            span: [0, 0, 47, 1],
+            span: [0, 0, 45, 1],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -429,55 +433,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: ~c"\b",
-            span: [2, 0, 34],
-            leading_comments: nil,
-            trailing_comments: nil,
-            leading_detached_comments: [],
-            __unknown_fields__: []
-          },
-          %Google.Protobuf.SourceCodeInfo.Location{
-            path: ~c"\b\n",
-            span: [2, 0, 34],
-            leading_comments: nil,
-            trailing_comments: nil,
-            leading_detached_comments: [],
-            __unknown_fields__: []
-          },
-          %Google.Protobuf.SourceCodeInfo.Location{
-            path: ~c"\b",
-            span: [3, 0, 52],
-            leading_comments: nil,
-            trailing_comments: nil,
-            leading_detached_comments: [],
-            __unknown_fields__: []
-          },
-          %Google.Protobuf.SourceCodeInfo.Location{
-            path: [8, 1],
-            span: [3, 0, 52],
-            leading_comments: nil,
-            trailing_comments: nil,
-            leading_detached_comments: [],
-            __unknown_fields__: []
-          },
-          %Google.Protobuf.SourceCodeInfo.Location{
-            path: ~c"\b",
-            span: [4, 0, 48],
-            leading_comments: nil,
-            trailing_comments: nil,
-            leading_detached_comments: [],
-            __unknown_fields__: []
-          },
-          %Google.Protobuf.SourceCodeInfo.Location{
-            path: ~c"\b\b",
-            span: [4, 0, 48],
-            leading_comments: nil,
-            trailing_comments: nil,
-            leading_detached_comments: [],
-            __unknown_fields__: []
-          },
-          %Google.Protobuf.SourceCodeInfo.Location{
-            path: ~c"\b",
-            span: [5, 0, 33],
+            span: [2, 0, 33],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -485,7 +441,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: ~c"\b$",
-            span: [5, 0, 33],
+            span: [2, 0, 33],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -493,7 +449,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [3, 0],
-            span: [7, 0, 38],
+            span: [4, 0, 38],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -501,7 +457,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [3, 1],
-            span: [8, 0, 41],
+            span: [5, 0, 37],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -509,7 +465,15 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [3, 2],
-            span: [9, 0, 57],
+            span: [6, 0, 41],
+            leading_comments: nil,
+            trailing_comments: nil,
+            leading_detached_comments: [],
+            __unknown_fields__: []
+          },
+          %Google.Protobuf.SourceCodeInfo.Location{
+            path: [3, 3],
+            span: [7, 0, 57],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -517,119 +481,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [2],
-            span: [11, 0, 19],
-            leading_comments: nil,
-            trailing_comments: nil,
-            leading_detached_comments: [],
-            __unknown_fields__: []
-          },
-          %Google.Protobuf.SourceCodeInfo.Location{
-            path: [6, 0],
-            span: [14, 0, 28, 1],
-            leading_comments: " The greeting service definition.\n",
-            trailing_comments: nil,
-            leading_detached_comments: [],
-            __unknown_fields__: []
-          },
-          %Google.Protobuf.SourceCodeInfo.Location{
-            path: [6, 0, 1],
-            span: [14, 8, 22],
-            leading_comments: nil,
-            trailing_comments: nil,
-            leading_detached_comments: [],
-            __unknown_fields__: []
-          },
-          %Google.Protobuf.SourceCodeInfo.Location{
-            path: [6, 0, 2, 0],
-            span: [16, 2, 20, 3],
-            leading_comments: " Sends a greeting\n",
-            trailing_comments: nil,
-            leading_detached_comments: [],
-            __unknown_fields__: []
-          },
-          %Google.Protobuf.SourceCodeInfo.Location{
-            path: [6, 0, 2, 0, 1],
-            span: [16, 6, 14],
-            leading_comments: nil,
-            trailing_comments: nil,
-            leading_detached_comments: [],
-            __unknown_fields__: []
-          },
-          %Google.Protobuf.SourceCodeInfo.Location{
-            path: [6, 0, 2, 0, 2],
-            span: [16, 16, 28],
-            leading_comments: nil,
-            trailing_comments: nil,
-            leading_detached_comments: [],
-            __unknown_fields__: []
-          },
-          %Google.Protobuf.SourceCodeInfo.Location{
-            path: [6, 0, 2, 0, 3],
-            span: [16, 39, 49],
-            leading_comments: nil,
-            trailing_comments: nil,
-            leading_detached_comments: [],
-            __unknown_fields__: []
-          },
-          %Google.Protobuf.SourceCodeInfo.Location{
-            path: [6, 0, 2, 0, 4],
-            span: [17, 4, 19, 6],
-            leading_comments: nil,
-            trailing_comments: nil,
-            leading_detached_comments: [],
-            __unknown_fields__: []
-          },
-          %Google.Protobuf.SourceCodeInfo.Location{
-            path: [6, 0, 2, 0, 4, 72_295_728],
-            span: [17, 4, 19, 6],
-            leading_comments: nil,
-            trailing_comments: nil,
-            leading_detached_comments: [],
-            __unknown_fields__: []
-          },
-          %Google.Protobuf.SourceCodeInfo.Location{
-            path: [6, 0, 2, 1],
-            span: [22, 2, 27, 3],
-            leading_comments: nil,
-            trailing_comments: nil,
-            leading_detached_comments: [],
-            __unknown_fields__: []
-          },
-          %Google.Protobuf.SourceCodeInfo.Location{
-            path: [6, 0, 2, 1, 1],
-            span: [22, 6, 18],
-            leading_comments: nil,
-            trailing_comments: nil,
-            leading_detached_comments: [],
-            __unknown_fields__: []
-          },
-          %Google.Protobuf.SourceCodeInfo.Location{
-            path: [6, 0, 2, 1, 2],
-            span: [22, 20, 36],
-            leading_comments: nil,
-            trailing_comments: nil,
-            leading_detached_comments: [],
-            __unknown_fields__: []
-          },
-          %Google.Protobuf.SourceCodeInfo.Location{
-            path: [6, 0, 2, 1, 3],
-            span: [22, 47, 57],
-            leading_comments: nil,
-            trailing_comments: nil,
-            leading_detached_comments: [],
-            __unknown_fields__: []
-          },
-          %Google.Protobuf.SourceCodeInfo.Location{
-            path: [6, 0, 2, 1, 4],
-            span: [23, 4, 26, 6],
-            leading_comments: nil,
-            trailing_comments: nil,
-            leading_detached_comments: [],
-            __unknown_fields__: []
-          },
-          %Google.Protobuf.SourceCodeInfo.Location{
-            path: [6, 0, 2, 1, 4, 72_295_728],
-            span: [23, 4, 26, 6],
+            span: [9, 0, 15],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -637,15 +489,15 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 0],
-            span: [31, 0, 33, 1],
-            leading_comments: " The request message containing the user's name.\n",
+            span: [12, 0, 16, 1],
+            leading_comments: " The ping-pong state of PingPongActor\n",
             trailing_comments: nil,
             leading_detached_comments: [],
             __unknown_fields__: []
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 0, 1],
-            span: [31, 8, 20],
+            span: [12, 8, 21],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -653,7 +505,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 0, 2, 0],
-            span: [32, 2, 70],
+            span: [13, 2, 25],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -661,7 +513,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 0, 2, 0, 5],
-            span: [32, 2, 8],
+            span: [13, 2, 8],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -669,7 +521,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 0, 2, 0, 1],
-            span: ~c" \t\r",
+            span: [13, 9, 20],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -677,23 +529,71 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 0, 2, 0, 3],
-            span: [32, 16, 17],
+            span: [13, 23, 24],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
             __unknown_fields__: []
           },
           %Google.Protobuf.SourceCodeInfo.Location{
-            path: [4, 0, 2, 0, 8],
-            span: [32, 18, 69],
+            path: [4, 0, 2, 1],
+            span: [14, 2, 27],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
             __unknown_fields__: []
           },
           %Google.Protobuf.SourceCodeInfo.Location{
-            path: [4, 0, 2, 0, 8, 9999],
-            span: [32, 19, 68],
+            path: [4, 0, 2, 1, 5],
+            span: [14, 2, 8],
+            leading_comments: nil,
+            trailing_comments: nil,
+            leading_detached_comments: [],
+            __unknown_fields__: []
+          },
+          %Google.Protobuf.SourceCodeInfo.Location{
+            path: [4, 0, 2, 1, 1],
+            span: [14, 9, 22],
+            leading_comments: nil,
+            trailing_comments: nil,
+            leading_detached_comments: [],
+            __unknown_fields__: []
+          },
+          %Google.Protobuf.SourceCodeInfo.Location{
+            path: [4, 0, 2, 1, 3],
+            span: [14, 25, 26],
+            leading_comments: nil,
+            trailing_comments: nil,
+            leading_detached_comments: [],
+            __unknown_fields__: []
+          },
+          %Google.Protobuf.SourceCodeInfo.Location{
+            path: [4, 0, 2, 2],
+            span: [15, 2, 43],
+            leading_comments: nil,
+            trailing_comments: nil,
+            leading_detached_comments: [],
+            __unknown_fields__: []
+          },
+          %Google.Protobuf.SourceCodeInfo.Location{
+            path: [4, 0, 2, 2, 6],
+            span: [15, 2, 27],
+            leading_comments: nil,
+            trailing_comments: nil,
+            leading_detached_comments: [],
+            __unknown_fields__: []
+          },
+          %Google.Protobuf.SourceCodeInfo.Location{
+            path: [4, 0, 2, 2, 1],
+            span: [15, 28, 38],
+            leading_comments: nil,
+            trailing_comments: nil,
+            leading_detached_comments: [],
+            __unknown_fields__: []
+          },
+          %Google.Protobuf.SourceCodeInfo.Location{
+            path: [4, 0, 2, 2, 3],
+            span: [15, 41, 42],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -701,15 +601,15 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 1],
-            span: [36, 0, 41, 1],
-            leading_comments: " HelloRequestFrom!\n",
+            span: [19, 0, 21, 1],
+            leading_comments: " The request message containing the actor name.\n",
             trailing_comments: nil,
             leading_detached_comments: [],
             __unknown_fields__: []
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 1, 1],
-            span: [36, 8, 24],
+            span: [19, 8, 19],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -717,15 +617,15 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 1, 2, 0],
-            span: [38, 2, 70],
-            leading_comments: " Name!\n",
+            span: [20, 2, 72],
+            leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
             __unknown_fields__: []
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 1, 2, 0, 5],
-            span: [38, 2, 8],
+            span: [20, 2, 8],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -733,7 +633,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 1, 2, 0, 1],
-            span: ~c"&\t\r",
+            span: [20, 9, 13],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -741,7 +641,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 1, 2, 0, 3],
-            span: [38, 16, 17],
+            span: [20, 16, 17],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -749,7 +649,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 1, 2, 0, 8],
-            span: [38, 18, 69],
+            span: [20, 18, 71],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -757,39 +657,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 1, 2, 0, 8, 9999],
-            span: [38, 19, 68],
-            leading_comments: nil,
-            trailing_comments: nil,
-            leading_detached_comments: [],
-            __unknown_fields__: []
-          },
-          %Google.Protobuf.SourceCodeInfo.Location{
-            path: [4, 1, 2, 1],
-            span: [40, 2, 18],
-            leading_comments: " From!\n",
-            trailing_comments: nil,
-            leading_detached_comments: [],
-            __unknown_fields__: []
-          },
-          %Google.Protobuf.SourceCodeInfo.Location{
-            path: [4, 1, 2, 1, 5],
-            span: [40, 2, 8],
-            leading_comments: nil,
-            trailing_comments: nil,
-            leading_detached_comments: [],
-            __unknown_fields__: []
-          },
-          %Google.Protobuf.SourceCodeInfo.Location{
-            path: [4, 1, 2, 1, 1],
-            span: ~c"(\t\r",
-            leading_comments: nil,
-            trailing_comments: nil,
-            leading_detached_comments: [],
-            __unknown_fields__: []
-          },
-          %Google.Protobuf.SourceCodeInfo.Location{
-            path: [4, 1, 2, 1, 3],
-            span: [40, 16, 17],
+            span: [20, 20, 69],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -797,15 +665,15 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 2],
-            span: [44, 0, 47, 1],
-            leading_comments: " The response message containing the greetings\n",
+            span: [24, 0, 27, 1],
+            leading_comments: " The response message containing the pong\n",
             trailing_comments: nil,
             leading_detached_comments: [],
             __unknown_fields__: []
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 2, 1],
-            span: [44, 8, 18],
+            span: [24, 8, 17],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -813,7 +681,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 2, 2, 0],
-            span: [45, 2, 21],
+            span: [25, 2, 21],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -821,7 +689,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 2, 2, 0, 5],
-            span: [45, 2, 8],
+            span: [25, 2, 8],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -829,7 +697,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 2, 2, 0, 1],
-            span: [45, 9, 16],
+            span: [25, 9, 16],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -837,7 +705,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 2, 2, 0, 3],
-            span: [45, 19, 20],
+            span: [25, 19, 20],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -845,7 +713,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 2, 2, 1],
-            span: [46, 2, 38],
+            span: [26, 2, 38],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -853,7 +721,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 2, 2, 1, 6],
-            span: [46, 2, 27],
+            span: [26, 2, 27],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -861,7 +729,7 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 2, 2, 1, 1],
-            span: [46, 28, 33],
+            span: [26, 28, 33],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -869,7 +737,119 @@ defmodule Helloworld.GreeterService.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 2, 2, 1, 3],
-            span: ~c".$%",
+            span: [26, 36, 37],
+            leading_comments: nil,
+            trailing_comments: nil,
+            leading_detached_comments: [],
+            __unknown_fields__: []
+          },
+          %Google.Protobuf.SourceCodeInfo.Location{
+            path: [6, 0],
+            span: [30, 0, 45, 1],
+            leading_comments: " The PingPong actor service definition.\n",
+            trailing_comments: nil,
+            leading_detached_comments: [],
+            __unknown_fields__: []
+          },
+          %Google.Protobuf.SourceCodeInfo.Location{
+            path: [6, 0, 1],
+            span: [30, 8, 21],
+            leading_comments: nil,
+            trailing_comments: nil,
+            leading_detached_comments: [],
+            __unknown_fields__: []
+          },
+          %Google.Protobuf.SourceCodeInfo.Location{
+            path: [6, 0, 2, 0],
+            span: [32, 2, 37, 3],
+            leading_comments: nil,
+            trailing_comments: nil,
+            leading_detached_comments: [],
+            __unknown_fields__: []
+          },
+          %Google.Protobuf.SourceCodeInfo.Location{
+            path: [6, 0, 2, 0, 1],
+            span: [32, 6, 10],
+            leading_comments: nil,
+            trailing_comments: nil,
+            leading_detached_comments: [],
+            __unknown_fields__: []
+          },
+          %Google.Protobuf.SourceCodeInfo.Location{
+            path: [6, 0, 2, 0, 2],
+            span: [32, 11, 22],
+            leading_comments: nil,
+            trailing_comments: nil,
+            leading_detached_comments: [],
+            __unknown_fields__: []
+          },
+          %Google.Protobuf.SourceCodeInfo.Location{
+            path: [6, 0, 2, 0, 3],
+            span: ~c" !*",
+            leading_comments: nil,
+            trailing_comments: nil,
+            leading_detached_comments: [],
+            __unknown_fields__: []
+          },
+          %Google.Protobuf.SourceCodeInfo.Location{
+            path: [6, 0, 2, 0, 4],
+            span: [33, 4, 36, 6],
+            leading_comments: nil,
+            trailing_comments: nil,
+            leading_detached_comments: [],
+            __unknown_fields__: []
+          },
+          %Google.Protobuf.SourceCodeInfo.Location{
+            path: [6, 0, 2, 0, 4, 72_295_728],
+            span: [33, 4, 36, 6],
+            leading_comments: nil,
+            trailing_comments: nil,
+            leading_detached_comments: [],
+            __unknown_fields__: []
+          },
+          %Google.Protobuf.SourceCodeInfo.Location{
+            path: [6, 0, 2, 1],
+            span: [40, 2, 44, 3],
+            leading_comments: " Get Pong Message\n",
+            trailing_comments: nil,
+            leading_detached_comments: [],
+            __unknown_fields__: []
+          },
+          %Google.Protobuf.SourceCodeInfo.Location{
+            path: [6, 0, 2, 1, 1],
+            span: [40, 6, 10],
+            leading_comments: nil,
+            trailing_comments: nil,
+            leading_detached_comments: [],
+            __unknown_fields__: []
+          },
+          %Google.Protobuf.SourceCodeInfo.Location{
+            path: [6, 0, 2, 1, 2],
+            span: ~c"(\v ",
+            leading_comments: nil,
+            trailing_comments: nil,
+            leading_detached_comments: [],
+            __unknown_fields__: []
+          },
+          %Google.Protobuf.SourceCodeInfo.Location{
+            path: [6, 0, 2, 1, 3],
+            span: ~c"(+8",
+            leading_comments: nil,
+            trailing_comments: nil,
+            leading_detached_comments: [],
+            __unknown_fields__: []
+          },
+          %Google.Protobuf.SourceCodeInfo.Location{
+            path: [6, 0, 2, 1, 4],
+            span: [41, 4, 43, 6],
+            leading_comments: nil,
+            trailing_comments: nil,
+            leading_detached_comments: [],
+            __unknown_fields__: []
+          },
+          %Google.Protobuf.SourceCodeInfo.Location{
+            path: [6, 0, 2, 1, 4, 72_295_728],
+            span: [41, 4, 43, 6],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -886,21 +866,7 @@ defmodule Helloworld.GreeterService.Service do
     }
   end
 
-  rpc(:SayHello, Helloworld.HelloRequest, Helloworld.HelloReply, %{
-    http: %{
-      type: Google.Api.PbExtension,
-      value: %Google.Api.HttpRule{
-        selector: "",
-        body: "",
-        additional_bindings: [],
-        response_body: "",
-        pattern: {:get, "/v1/greeter/{name}"},
-        __unknown_fields__: []
-      }
-    }
-  })
-
-  rpc(:SayHelloFrom, Helloworld.HelloRequestFrom, Helloworld.HelloReply, %{
+  rpc(:Ping, Pinger.PingRequest, Pinger.PongReply, %{
     http: %{
       type: Google.Api.PbExtension,
       value: %Google.Api.HttpRule{
@@ -908,44 +874,56 @@ defmodule Helloworld.GreeterService.Service do
         body: "*",
         additional_bindings: [],
         response_body: "",
-        pattern: {:post, "/v1/greeter"},
+        pattern: {:post, "/v1/ping/{name}"},
+        __unknown_fields__: []
+      }
+    }
+  })
+
+  rpc(:Pong, Google.Protobuf.Empty, Pinger.PingPongState, %{
+    http: %{
+      type: Google.Api.PbExtension,
+      value: %Google.Api.HttpRule{
+        selector: "",
+        body: "",
+        additional_bindings: [],
+        response_body: "",
+        pattern: {:get, "/v1/pong/{name}"},
         __unknown_fields__: []
       }
     }
   })
 end
 
-defmodule Helloworld.GreeterService.ActorDispatcher do
+defmodule Pinger.PingPongActor.ActorDispatcher do
   @moduledoc since: "1.2.1"
-  use GRPC.Server, service: Helloworld.GreeterService.Service, http_transcode: true
+  use GRPC.Server, service: Pinger.PingPongActor.Service, http_transcode: true
 
   alias Sidecar.GRPC.Dispatcher
 
-  @spec say_hello(Helloworld.HelloRequest.t(), GRPC.Server.Stream.t()) ::
-          Helloworld.HelloReply.t()
-  def say_hello(message, stream) do
+  @spec ping(Pinger.PingRequest.t(), GRPC.Server.Stream.t()) :: Pinger.PongReply.t()
+  def ping(message, stream) do
     request = %{
       system: "spawn-system",
-      actor_name: "GreeterService",
-      action_name: "SayHello",
+      actor_name: "PingPongActor",
+      action_name: "Ping",
       input: message,
       stream: stream,
-      descriptor: Helloworld.GreeterService.Service.descriptor()
+      descriptor: Pinger.PingPongActor.Service.descriptor()
     }
 
     Dispatcher.dispatch(request)
   end
 
-  @spec say_hello_from(Helloworld.HelloRequestFrom.t(), GRPC.Server.Stream.t()) ::
-          Helloworld.HelloReply.t()
-  def say_hello_from(message, stream) do
+  @spec pong(Google.Protobuf.Empty.t(), GRPC.Server.Stream.t()) :: Pinger.PingPongState.t()
+  def pong(message, stream) do
     request = %{
       system: "spawn-system",
-      actor_name: "GreeterService",
-      action_name: "SayHelloFrom",
+      actor_name: "PingPongActor",
+      action_name: "Pong",
       input: message,
       stream: stream,
-      descriptor: Helloworld.GreeterService.Service.descriptor()
+      descriptor: Pinger.PingPongActor.Service.descriptor()
     }
 
     Dispatcher.dispatch(request)
@@ -959,7 +937,7 @@ defmodule Sidecar.GRPC.ProxyEndpoint do
   intercept(GRPC.Server.Interceptors.Logger)
 
   services = [
-    Helloworld.GreeterService.ActorDispatcher
+    Pinger.PingPongActor.ActorDispatcher
   ]
 
   services =
@@ -976,10 +954,10 @@ defmodule Sidecar.GRPC.ServiceResolver do
 
   @actors [
     {
-      "GreeterService",
+      "PingPongActor",
       %{
-        service_name: "Helloworld.GreeterService",
-        service_module: Helloworld.GreeterService.Service
+        service_name: "Pinger.PingPongActor",
+        service_module: Pinger.PingPongActor.Service
       }
     }
   ]
@@ -1012,7 +990,7 @@ defmodule Sidecar.GRPC.Reflection.Server do
     use GrpcReflection.Server,
       version: :v1,
       services: [
-        Helloworld.GreeterService.Service
+        Pinger.PingPongActor.Service
       ]
   end
 
@@ -1020,7 +998,7 @@ defmodule Sidecar.GRPC.Reflection.Server do
     use GrpcReflection.Server,
       version: :v1alpha,
       services: [
-        Helloworld.GreeterService.Service
+        Pinger.PingPongActor.Service
       ]
   end
 end

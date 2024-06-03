@@ -81,7 +81,7 @@ defmodule Sidecar.GRPC.Dispatcher do
           descriptor: _descriptor
         } = request
       ) do
-    Logger.debug(
+    Logger.info(
       "Dispatching gRPC message to Actor #{system_name}:#{actor_name}. Params: #{inspect(request)}"
     )
 
