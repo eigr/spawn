@@ -162,10 +162,18 @@ defmodule Sidecar.GRPC.Dispatcher do
   end
 
   defp build_actor_id(system_name, actor_name, message) do
-    {:ok, %HostActor{actor: %Actor{settings: %ActorSettings{} = actor_settings}}} =
-      ActorRegistry.lookup(%ActorId{system: system_name, name: actor_name})
+    with {:ok, %HostActor{actor: %Actor{settings: %ActorSettings{} = actor_settings}}} <-
+           ActorRegistry.lookup(%ActorId{system: system_name, name: actor_name}) do
+      build_actor_id_from_settings(system_name, actor_name, actor_settings, message)
+    else
+      {:not_found, []} ->
+        Logger.warning(
+          "Actor Not Found. The Actor probably does not exist or not implemented or the request params are incorrect!"
+        )
 
-    build_actor_id_from_settings(system_name, actor_name, actor_settings, message)
+        raise ArgumentError,
+              "Actor Not Found. The id of this Actor does not exist!"
+    end
   end
 
   defp build_actor_id_from_settings(

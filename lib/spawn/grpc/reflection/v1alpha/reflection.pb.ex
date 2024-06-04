@@ -110,27 +110,24 @@ defmodule Grpc.Reflection.V1alpha.ServerReflectionRequest do
     }
   end
 
-  oneof(:message_request, 0)
+  oneof :message_request, 0
 
-  field(:host, 1, type: :string)
-  field(:file_by_filename, 3, type: :string, json_name: "fileByFilename", oneof: 0)
-  field(:file_containing_symbol, 4, type: :string, json_name: "fileContainingSymbol", oneof: 0)
+  field :host, 1, type: :string
+  field :file_by_filename, 3, type: :string, json_name: "fileByFilename", oneof: 0
+  field :file_containing_symbol, 4, type: :string, json_name: "fileContainingSymbol", oneof: 0
 
-  field(:file_containing_extension, 5,
+  field :file_containing_extension, 5,
     type: Grpc.Reflection.V1alpha.ExtensionRequest,
     json_name: "fileContainingExtension",
     oneof: 0
-  )
 
-  field(:all_extension_numbers_of_type, 6,
+  field :all_extension_numbers_of_type, 6,
     type: :string,
     json_name: "allExtensionNumbersOfType",
     oneof: 0
-  )
 
-  field(:list_services, 7, type: :string, json_name: "listServices", oneof: 0)
+  field :list_services, 7, type: :string, json_name: "listServices", oneof: 0
 end
-
 defmodule Grpc.Reflection.V1alpha.ExtensionRequest do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
@@ -181,10 +178,9 @@ defmodule Grpc.Reflection.V1alpha.ExtensionRequest do
     }
   end
 
-  field(:containing_type, 1, type: :string, json_name: "containingType")
-  field(:extension_number, 2, type: :int32, json_name: "extensionNumber")
+  field :containing_type, 1, type: :string, json_name: "containingType"
+  field :extension_number, 2, type: :int32, json_name: "extensionNumber"
 end
-
 defmodule Grpc.Reflection.V1alpha.ServerReflectionResponse do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
@@ -297,40 +293,34 @@ defmodule Grpc.Reflection.V1alpha.ServerReflectionResponse do
     }
   end
 
-  oneof(:message_response, 0)
+  oneof :message_response, 0
 
-  field(:valid_host, 1, type: :string, json_name: "validHost")
+  field :valid_host, 1, type: :string, json_name: "validHost"
 
-  field(:original_request, 2,
+  field :original_request, 2,
     type: Grpc.Reflection.V1alpha.ServerReflectionRequest,
     json_name: "originalRequest"
-  )
 
-  field(:file_descriptor_response, 4,
+  field :file_descriptor_response, 4,
     type: Grpc.Reflection.V1alpha.FileDescriptorResponse,
     json_name: "fileDescriptorResponse",
     oneof: 0
-  )
 
-  field(:all_extension_numbers_response, 5,
+  field :all_extension_numbers_response, 5,
     type: Grpc.Reflection.V1alpha.ExtensionNumberResponse,
     json_name: "allExtensionNumbersResponse",
     oneof: 0
-  )
 
-  field(:list_services_response, 6,
+  field :list_services_response, 6,
     type: Grpc.Reflection.V1alpha.ListServiceResponse,
     json_name: "listServicesResponse",
     oneof: 0
-  )
 
-  field(:error_response, 7,
+  field :error_response, 7,
     type: Grpc.Reflection.V1alpha.ErrorResponse,
     json_name: "errorResponse",
     oneof: 0
-  )
 end
-
 defmodule Grpc.Reflection.V1alpha.FileDescriptorResponse do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
@@ -367,9 +357,8 @@ defmodule Grpc.Reflection.V1alpha.FileDescriptorResponse do
     }
   end
 
-  field(:file_descriptor_proto, 1, repeated: true, type: :bytes, json_name: "fileDescriptorProto")
+  field :file_descriptor_proto, 1, repeated: true, type: :bytes, json_name: "fileDescriptorProto"
 end
-
 defmodule Grpc.Reflection.V1alpha.ExtensionNumberResponse do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
@@ -420,10 +409,9 @@ defmodule Grpc.Reflection.V1alpha.ExtensionNumberResponse do
     }
   end
 
-  field(:base_type_name, 1, type: :string, json_name: "baseTypeName")
-  field(:extension_number, 2, repeated: true, type: :int32, json_name: "extensionNumber")
+  field :base_type_name, 1, type: :string, json_name: "baseTypeName"
+  field :extension_number, 2, repeated: true, type: :int32, json_name: "extensionNumber"
 end
-
 defmodule Grpc.Reflection.V1alpha.ListServiceResponse do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
@@ -460,9 +448,8 @@ defmodule Grpc.Reflection.V1alpha.ListServiceResponse do
     }
   end
 
-  field(:service, 1, repeated: true, type: Grpc.Reflection.V1alpha.ServiceResponse)
+  field :service, 1, repeated: true, type: Grpc.Reflection.V1alpha.ServiceResponse
 end
-
 defmodule Grpc.Reflection.V1alpha.ServiceResponse do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
@@ -499,9 +486,8 @@ defmodule Grpc.Reflection.V1alpha.ServiceResponse do
     }
   end
 
-  field(:name, 1, type: :string)
+  field :name, 1, type: :string
 end
-
 defmodule Grpc.Reflection.V1alpha.ErrorResponse do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
@@ -552,10 +538,9 @@ defmodule Grpc.Reflection.V1alpha.ErrorResponse do
     }
   end
 
-  field(:error_code, 1, type: :int32, json_name: "errorCode")
-  field(:error_message, 2, type: :string, json_name: "errorMessage")
+  field :error_code, 1, type: :int32, json_name: "errorCode"
+  field :error_message, 2, type: :string, json_name: "errorMessage"
 end
-
 defmodule Grpc.Reflection.V1alpha.ServerReflection.Service do
   @moduledoc false
   use GRPC.Service,
@@ -582,11 +567,9 @@ defmodule Grpc.Reflection.V1alpha.ServerReflection.Service do
     }
   end
 
-  rpc(
-    :ServerReflectionInfo,
-    stream(Grpc.Reflection.V1alpha.ServerReflectionRequest),
-    stream(Grpc.Reflection.V1alpha.ServerReflectionResponse)
-  )
+  rpc :ServerReflectionInfo,
+      stream(Grpc.Reflection.V1alpha.ServerReflectionRequest),
+      stream(Grpc.Reflection.V1alpha.ServerReflectionResponse)
 end
 
 defmodule Grpc.Reflection.V1alpha.ServerReflection.Stub do

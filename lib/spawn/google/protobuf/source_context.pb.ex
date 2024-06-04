@@ -1,4 +1,4 @@
-defmodule Google.Protobuf.Any do
+defmodule Google.Protobuf.SourceContext do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
 
@@ -14,32 +14,18 @@ defmodule Google.Protobuf.Any do
           __unknown_fields__: [],
           default_value: nil,
           extendee: nil,
-          json_name: "typeUrl",
+          json_name: "fileName",
           label: :LABEL_OPTIONAL,
-          name: "type_url",
+          name: "file_name",
           number: 1,
           oneof_index: nil,
           options: nil,
           proto3_optional: nil,
           type: :TYPE_STRING,
           type_name: nil
-        },
-        %Google.Protobuf.FieldDescriptorProto{
-          __unknown_fields__: [],
-          default_value: nil,
-          extendee: nil,
-          json_name: "value",
-          label: :LABEL_OPTIONAL,
-          name: "value",
-          number: 2,
-          oneof_index: nil,
-          options: nil,
-          proto3_optional: nil,
-          type: :TYPE_BYTES,
-          type_name: nil
         }
       ],
-      name: "Any",
+      name: "SourceContext",
       nested_type: [],
       oneof_decl: [],
       options: nil,
@@ -48,6 +34,5 @@ defmodule Google.Protobuf.Any do
     }
   end
 
-  field :type_url, 1, type: :string, json_name: "typeUrl"
-  field :value, 2, type: :bytes
+  field :file_name, 1, type: :string, json_name: "fileName"
 end

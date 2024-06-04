@@ -28,7 +28,8 @@ defmodule Sidecar.GRPC.Generators.ServiceGenerator do
       services =
         [
           Sidecar.GRPC.Reflection.Server.V1,
-          Sidecar.GRPC.Reflection.Server.V1Alpha
+          Sidecar.GRPC.Reflection.Server.V1Alpha,
+          Sidecar.Grpc.Healthcheck.HealthcheckHandler.Actordispatcher
         ] ++ services
 
       run(services)
