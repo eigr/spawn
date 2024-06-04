@@ -18,7 +18,7 @@ message PingPongState {
 
 // The request message containing the actor name.
 message PingRequest {
-  string name = 1 [ (.eigr.functions.protocol.actors.actor_id) = true ];
+  string name = 1 [(.eigr.functions.protocol.actors.actor_id) = true];
 }
 
 // The response message containing the pong
@@ -30,17 +30,12 @@ message PongReply {
 // The PingPong actor service definition.
 service PingPongActor {
 
-  rpc Ping(PingRequest) returns (PongReply) {
-    option (google.api.http) = {
-      post : "/v1/ping/{name}"
-      body : "*"
-    };
+  rpc Ping(PingRequest) returns(PongReply) {
+    option(google.api.http) = {post : "/v1/ping/{name}" body : "*"};
   }
 
   // Get Pong Message
-  rpc Pong(google.protobuf.Empty) returns (PingPongState) {
-    option (google.api.http) = {
-      get : "/v1/pong/{name}"
-    };
+  rpc Pong(google.protobuf.Empty) returns(PingPongState) {
+    option(google.api.http) = {get : "/v1/pong/{name}"};
   }
 }

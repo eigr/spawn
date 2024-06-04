@@ -254,6 +254,7 @@ defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service do
               options: %Google.Protobuf.MethodOptions{
                 deprecated: false,
                 idempotency_level: :IDEMPOTENCY_UNKNOWN,
+                features: nil,
                 uninterpreted_option: [],
                 __pb_extensions__: %{
                   {Google.Api.PbExtension, :http} => %Google.Api.HttpRule{
@@ -278,6 +279,7 @@ defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service do
               options: %Google.Protobuf.MethodOptions{
                 deprecated: false,
                 idempotency_level: :IDEMPOTENCY_UNKNOWN,
+                features: nil,
                 uninterpreted_option: [],
                 __pb_extensions__: %{
                   {Google.Api.PbExtension, :http} => %Google.Api.HttpRule{
@@ -319,9 +321,9 @@ defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service do
         swift_prefix: nil,
         php_class_prefix: nil,
         php_namespace: nil,
-        php_generic_services: false,
         php_metadata_namespace: nil,
         ruby_package: nil,
+        features: nil,
         uninterpreted_option: [],
         __pb_extensions__: %{},
         __unknown_fields__: []
@@ -814,7 +816,8 @@ defmodule Sidecar.GRPC.ProxyEndpoint do
   services =
     [
       Sidecar.GRPC.Reflection.Server.V1,
-      Sidecar.GRPC.Reflection.Server.V1Alpha
+      Sidecar.GRPC.Reflection.Server.V1Alpha,
+      Sidecar.Grpc.Healthcheck.HealthcheckHandler.Actordispatcher
     ] ++ services
 
   run(services)

@@ -130,32 +130,74 @@ defmodule Sidecar.GRPC.Dispatcher do
   end
 
   defp dispatch_sync(system_name, actor_name, action_name, message, stream) do
-    build_actor_id(system_name, actor_name, message)
-    |> build_request(system_name, action_name, message, async: false)
-    |> invoke_request()
-    |> case do
-      {:ok, response} ->
-        Server.send_reply(stream, response)
-
-      error ->
+    with {:actor_id, actor_id} <- {:actor_id, build_actor_id(system_name, actor_name, message)},
+         {:request, {:ok, request}} <-
+           {:request, build_request(actor_id, system_name, action_name, message, async: false)},
+         {:response, {:ok, response}} <- {:response, invoke_request(request)} do
+      Server.send_reply(stream, response)
+    else
+      {:actor_id, {:not_found, _}} ->
         log_and_raise_error(
-          "Failure during Actor processing. Actor #{system_name}:#{actor_name}. Details: #{inspect(error)}",
+          :warning,
+          "Actor Not Found. The Actor probably does not exist or not implemented or the request params are incorrect!",
+          GRPC.Status.not_found()
+        )
+
+      {:actor_id, error} ->
+        log_and_raise_error(
+          :error,
+          "Failed to build actor ID for Actor #{system_name}:#{actor_name}. Details: #{inspect(error)}",
+          GRPC.Status.unknown()
+        )
+
+      {:request, error} ->
+        log_and_raise_error(
+          :error,
+          "Failed to build request for Actor #{system_name}:#{actor_name}. Details: #{inspect(error)}",
+          GRPC.Status.failed_precondition()
+        )
+
+      {:response, error} ->
+        log_and_raise_error(
+          :error,
+          "Failed to invoke request for Actor #{system_name}:#{actor_name}. Details: #{inspect(error)}",
           GRPC.Status.unknown()
         )
     end
   end
 
   defp dispatch_async(system_name, actor_name, action_name, message, stream) do
-    build_actor_id(system_name, actor_name, message)
-    |> build_request(system_name, action_name, message, async: true)
-    |> invoke_request()
-    |> case do
-      {:ok, :async} ->
-        Server.send_reply(stream, %{})
-
-      error ->
+    with {:actor_id, actor_id} <- {:actor_id, build_actor_id(system_name, actor_name, message)},
+         {:request, {:ok, request}} <-
+           {:request, build_request(actor_id, system_name, action_name, message, async: true)},
+         {:response, {:ok, :async}} <- {:response, invoke_request(request)} do
+      Server.send_reply(stream, %{})
+    else
+      {:actor_id, {:not_found, _}} ->
         log_and_raise_error(
-          "Failure during Actor processing. Actor #{system_name}:#{actor_name}. Details: #{inspect(error)}",
+          :warning,
+          "Actor Not Found. The Actor probably does not exist or not implemented or the request params are incorrect!",
+          GRPC.Status.not_found()
+        )
+
+      {:actor_id, error} ->
+        log_and_raise_error(
+          :error,
+          "Failed to build actor ID for Actor #{system_name}:#{actor_name}. Details: #{inspect(error)}",
+          GRPC.Status.unknown()
+        )
+
+      {:request, error} ->
+        log_and_raise_error(
+          :error,
+          "Failed to build request for Actor #{system_name}:#{actor_name}. Details: #{inspect(error)}",
+          GRPC.Status.unknown()
+        )
+
+      {:response, error} ->
+        log_and_raise_error(
+          :error,
+          "Failed to invoke request for Actor #{system_name}:#{actor_name}. Details: #{inspect(error)}",
           GRPC.Status.unknown()
         )
     end
@@ -166,13 +208,12 @@ defmodule Sidecar.GRPC.Dispatcher do
            ActorRegistry.lookup(%ActorId{system: system_name, name: actor_name}) do
       build_actor_id_from_settings(system_name, actor_name, actor_settings, message)
     else
-      {:not_found, []} ->
-        Logger.warning(
-          "Actor Not Found. The Actor probably does not exist or not implemented or the request params are incorrect!"
+      {:not_found, _} ->
+        log_and_raise_error(
+          :warning,
+          "Actor Not Found. The Actor probably does not exist or not implemented or the request params are incorrect!",
+          GRPC.Status.not_found()
         )
-
-        raise ArgumentError,
-              "Actor Not Found. The id of this Actor does not exist!"
     end
   end
 
@@ -234,12 +275,12 @@ defmodule Sidecar.GRPC.Dispatcher do
 
   defp invoke_request(request), do: CallerProducer.invoke(request)
 
-  defp log_and_raise_error(message, status) do
-    Logger.error(message)
+  defp log_and_raise_error(level, message, status) do
+    Logger.log(level, message)
     raise GRPC.RPCError, status: status, message: message
   end
 
   defp handle_error(message, status) do
-    log_and_raise_error(message, status)
+    log_and_raise_error(:error, message, status)
   end
 end

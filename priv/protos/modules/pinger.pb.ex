@@ -427,7 +427,7 @@ defmodule Pinger.PingPongActor.Service do
         location: [
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [],
-            span: [0, 0, 45, 1],
+            span: [0, 0, 40, 1],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -627,7 +627,7 @@ defmodule Pinger.PingPongActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 1, 2, 0],
-            span: [20, 2, 72],
+            span: [20, 2, 70],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -659,7 +659,7 @@ defmodule Pinger.PingPongActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 1, 2, 0, 8],
-            span: [20, 18, 71],
+            span: [20, 18, 69],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -667,7 +667,7 @@ defmodule Pinger.PingPongActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 1, 2, 0, 8, 9999],
-            span: [20, 20, 69],
+            span: [20, 19, 68],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -755,7 +755,7 @@ defmodule Pinger.PingPongActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0],
-            span: [30, 0, 45, 1],
+            span: [30, 0, 40, 1],
             leading_comments: " The PingPong actor service definition.\n",
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -771,7 +771,7 @@ defmodule Pinger.PingPongActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 0],
-            span: [32, 2, 37, 3],
+            span: [32, 2, 34, 3],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -795,7 +795,7 @@ defmodule Pinger.PingPongActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 0, 3],
-            span: ~c" !*",
+            span: ~c"  )",
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -803,7 +803,7 @@ defmodule Pinger.PingPongActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 0, 4],
-            span: [33, 4, 36, 6],
+            span: [33, 4, 68],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -811,7 +811,7 @@ defmodule Pinger.PingPongActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 0, 4, 72_295_728],
-            span: [33, 4, 36, 6],
+            span: [33, 4, 68],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -819,7 +819,7 @@ defmodule Pinger.PingPongActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 1],
-            span: [40, 2, 44, 3],
+            span: [37, 2, 39, 3],
             leading_comments: " Get Pong Message\n",
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -827,7 +827,7 @@ defmodule Pinger.PingPongActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 1, 1],
-            span: [40, 6, 10],
+            span: [37, 6, 10],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -835,7 +835,7 @@ defmodule Pinger.PingPongActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 1, 2],
-            span: ~c"(\v ",
+            span: ~c"%\v ",
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -843,7 +843,7 @@ defmodule Pinger.PingPongActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 1, 3],
-            span: ~c"(+8",
+            span: ~c"%*7",
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -851,7 +851,7 @@ defmodule Pinger.PingPongActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 1, 4],
-            span: [41, 4, 43, 6],
+            span: [38, 4, 56],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -859,7 +859,7 @@ defmodule Pinger.PingPongActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 1, 4, 72_295_728],
-            span: [41, 4, 43, 6],
+            span: [38, 4, 56],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
