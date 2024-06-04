@@ -1,14 +1,14 @@
-defmodule Pinger.PingPongState do
+defmodule Eigr.Functions.Protocol.Actors.Healthcheck.Status do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
     %Google.Protobuf.DescriptorProto{
-      name: "PingPongState",
+      name: "Status",
       field: [
         %Google.Protobuf.FieldDescriptorProto{
-          name: "actual_name",
+          name: "status",
           extendee: nil,
           number: 1,
           label: :LABEL_OPTIONAL,
@@ -17,12 +17,12 @@ defmodule Pinger.PingPongState do
           default_value: nil,
           options: nil,
           oneof_index: nil,
-          json_name: "actualName",
+          json_name: "status",
           proto3_optional: nil,
           __unknown_fields__: []
         },
         %Google.Protobuf.FieldDescriptorProto{
-          name: "previous_name",
+          name: "details",
           extendee: nil,
           number: 2,
           label: :LABEL_OPTIONAL,
@@ -31,7 +31,7 @@ defmodule Pinger.PingPongState do
           default_value: nil,
           options: nil,
           oneof_index: nil,
-          json_name: "previousName",
+          json_name: "details",
           proto3_optional: nil,
           __unknown_fields__: []
         },
@@ -62,96 +62,45 @@ defmodule Pinger.PingPongState do
     }
   end
 
-  field :actual_name, 1, type: :string, json_name: "actualName"
-  field :previous_name, 2, type: :string, json_name: "previousName"
+  field :status, 1, type: :string
+  field :details, 2, type: :string
   field :updated_at, 3, type: Google.Protobuf.Timestamp, json_name: "updatedAt"
 end
 
-defmodule Pinger.PingRequest do
+defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckState do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
     %Google.Protobuf.DescriptorProto{
-      name: "PingRequest",
+      name: "HealthCheckState",
       field: [
         %Google.Protobuf.FieldDescriptorProto{
-          name: "name",
+          name: "status",
           extendee: nil,
           number: 1,
           label: :LABEL_OPTIONAL,
-          type: :TYPE_STRING,
-          type_name: nil,
-          default_value: nil,
-          options: %Google.Protobuf.FieldOptions{
-            ctype: :STRING,
-            packed: nil,
-            deprecated: false,
-            lazy: false,
-            jstype: :JS_NORMAL,
-            weak: false,
-            unverified_lazy: false,
-            debug_redact: false,
-            uninterpreted_option: [],
-            __pb_extensions__: %{{Eigr.Functions.Protocol.Actors.PbExtension, :actor_id} => true},
-            __unknown_fields__: []
-          },
-          oneof_index: nil,
-          json_name: "name",
-          proto3_optional: nil,
-          __unknown_fields__: []
-        }
-      ],
-      nested_type: [],
-      enum_type: [],
-      extension_range: [],
-      extension: [],
-      options: nil,
-      oneof_decl: [],
-      reserved_range: [],
-      reserved_name: [],
-      __unknown_fields__: []
-    }
-  end
-
-  field :name, 1, type: :string, deprecated: false
-end
-
-defmodule Pinger.PongReply do
-  @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
-
-  def descriptor do
-    # credo:disable-for-next-line
-    %Google.Protobuf.DescriptorProto{
-      name: "PongReply",
-      field: [
-        %Google.Protobuf.FieldDescriptorProto{
-          name: "message",
-          extendee: nil,
-          number: 1,
-          label: :LABEL_OPTIONAL,
-          type: :TYPE_STRING,
-          type_name: nil,
+          type: :TYPE_MESSAGE,
+          type_name: ".eigr.functions.protocol.actors.healthcheck.Status",
           default_value: nil,
           options: nil,
           oneof_index: nil,
-          json_name: "message",
+          json_name: "status",
           proto3_optional: nil,
           __unknown_fields__: []
         },
         %Google.Protobuf.FieldDescriptorProto{
-          name: "today",
+          name: "previous_status",
           extendee: nil,
           number: 2,
-          label: :LABEL_OPTIONAL,
+          label: :LABEL_REPEATED,
           type: :TYPE_MESSAGE,
-          type_name: ".google.protobuf.Timestamp",
+          type_name: ".eigr.functions.protocol.actors.healthcheck.Status",
           default_value: nil,
           options: nil,
           oneof_index: nil,
-          json_name: "today",
+          json_name: "previousStatus",
           proto3_optional: nil,
           __unknown_fields__: []
         }
@@ -168,19 +117,25 @@ defmodule Pinger.PongReply do
     }
   end
 
-  field :message, 1, type: :string
-  field :today, 2, type: Google.Protobuf.Timestamp
+  field :status, 1, type: Eigr.Functions.Protocol.Actors.Healthcheck.Status
+
+  field :previous_status, 2,
+    repeated: true,
+    type: Eigr.Functions.Protocol.Actors.Healthcheck.Status,
+    json_name: "previousStatus"
 end
 
-defmodule Pinger.PingPongActor.Service do
+defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service do
   @moduledoc false
-  use GRPC.Service, name: "pinger.PingPongActor", protoc_gen_elixir_version: "0.12.0"
+  use GRPC.Service,
+    name: "eigr.functions.protocol.actors.healthcheck.HealthCheckActor",
+    protoc_gen_elixir_version: "0.12.0"
 
   def descriptor do
     # credo:disable-for-next-line
     %Google.Protobuf.FileDescriptorProto{
-      name: "pinger.proto",
-      package: "pinger",
+      name: "healthcheck.proto",
+      package: "eigr.functions.protocol.actors.healthcheck",
       dependency: [
         "google/api/annotations.proto",
         "google/protobuf/empty.proto",
@@ -189,10 +144,10 @@ defmodule Pinger.PingPongActor.Service do
       ],
       message_type: [
         %Google.Protobuf.DescriptorProto{
-          name: "PingPongState",
+          name: "Status",
           field: [
             %Google.Protobuf.FieldDescriptorProto{
-              name: "actual_name",
+              name: "status",
               extendee: nil,
               number: 1,
               label: :LABEL_OPTIONAL,
@@ -201,12 +156,12 @@ defmodule Pinger.PingPongActor.Service do
               default_value: nil,
               options: nil,
               oneof_index: nil,
-              json_name: "actualName",
+              json_name: "status",
               proto3_optional: nil,
               __unknown_fields__: []
             },
             %Google.Protobuf.FieldDescriptorProto{
-              name: "previous_name",
+              name: "details",
               extendee: nil,
               number: 2,
               label: :LABEL_OPTIONAL,
@@ -215,7 +170,7 @@ defmodule Pinger.PingPongActor.Service do
               default_value: nil,
               options: nil,
               oneof_index: nil,
-              json_name: "previousName",
+              json_name: "details",
               proto3_optional: nil,
               __unknown_fields__: []
             },
@@ -245,75 +200,33 @@ defmodule Pinger.PingPongActor.Service do
           __unknown_fields__: []
         },
         %Google.Protobuf.DescriptorProto{
-          name: "PingRequest",
+          name: "HealthCheckState",
           field: [
             %Google.Protobuf.FieldDescriptorProto{
-              name: "name",
+              name: "status",
               extendee: nil,
               number: 1,
               label: :LABEL_OPTIONAL,
-              type: :TYPE_STRING,
-              type_name: nil,
-              default_value: nil,
-              options: %Google.Protobuf.FieldOptions{
-                ctype: :STRING,
-                packed: nil,
-                deprecated: false,
-                lazy: false,
-                jstype: :JS_NORMAL,
-                weak: false,
-                unverified_lazy: false,
-                debug_redact: false,
-                uninterpreted_option: [],
-                __pb_extensions__: %{
-                  {Eigr.Functions.Protocol.Actors.PbExtension, :actor_id} => true
-                },
-                __unknown_fields__: []
-              },
-              oneof_index: nil,
-              json_name: "name",
-              proto3_optional: nil,
-              __unknown_fields__: []
-            }
-          ],
-          nested_type: [],
-          enum_type: [],
-          extension_range: [],
-          extension: [],
-          options: nil,
-          oneof_decl: [],
-          reserved_range: [],
-          reserved_name: [],
-          __unknown_fields__: []
-        },
-        %Google.Protobuf.DescriptorProto{
-          name: "PongReply",
-          field: [
-            %Google.Protobuf.FieldDescriptorProto{
-              name: "message",
-              extendee: nil,
-              number: 1,
-              label: :LABEL_OPTIONAL,
-              type: :TYPE_STRING,
-              type_name: nil,
+              type: :TYPE_MESSAGE,
+              type_name: ".eigr.functions.protocol.actors.healthcheck.Status",
               default_value: nil,
               options: nil,
               oneof_index: nil,
-              json_name: "message",
+              json_name: "status",
               proto3_optional: nil,
               __unknown_fields__: []
             },
             %Google.Protobuf.FieldDescriptorProto{
-              name: "today",
+              name: "previous_status",
               extendee: nil,
               number: 2,
-              label: :LABEL_OPTIONAL,
+              label: :LABEL_REPEATED,
               type: :TYPE_MESSAGE,
-              type_name: ".google.protobuf.Timestamp",
+              type_name: ".eigr.functions.protocol.actors.healthcheck.Status",
               default_value: nil,
               options: nil,
               oneof_index: nil,
-              json_name: "today",
+              json_name: "previousStatus",
               proto3_optional: nil,
               __unknown_fields__: []
             }
@@ -332,36 +245,12 @@ defmodule Pinger.PingPongActor.Service do
       enum_type: [],
       service: [
         %Google.Protobuf.ServiceDescriptorProto{
-          name: "PingPongActor",
+          name: "HealthCheckActor",
           method: [
             %Google.Protobuf.MethodDescriptorProto{
-              name: "Ping",
-              input_type: ".pinger.PingRequest",
-              output_type: ".pinger.PongReply",
-              options: %Google.Protobuf.MethodOptions{
-                deprecated: false,
-                idempotency_level: :IDEMPOTENCY_UNKNOWN,
-                uninterpreted_option: [],
-                __pb_extensions__: %{
-                  {Google.Api.PbExtension, :http} => %Google.Api.HttpRule{
-                    selector: "",
-                    body: "*",
-                    additional_bindings: [],
-                    response_body: "",
-                    pattern: {:post, "/v1/ping/{name}"},
-                    __unknown_fields__: []
-                  }
-                },
-                __unknown_fields__: []
-              },
-              client_streaming: false,
-              server_streaming: false,
-              __unknown_fields__: []
-            },
-            %Google.Protobuf.MethodDescriptorProto{
-              name: "Pong",
+              name: "Liveness",
               input_type: ".google.protobuf.Empty",
-              output_type: ".pinger.PingPongState",
+              output_type: ".eigr.functions.protocol.actors.healthcheck.HealthCheckState",
               options: %Google.Protobuf.MethodOptions{
                 deprecated: false,
                 idempotency_level: :IDEMPOTENCY_UNKNOWN,
@@ -372,7 +261,31 @@ defmodule Pinger.PingPongActor.Service do
                     body: "",
                     additional_bindings: [],
                     response_body: "",
-                    pattern: {:get, "/v1/pong/{name}"},
+                    pattern: {:get, "/v1/health/liveness"},
+                    __unknown_fields__: []
+                  }
+                },
+                __unknown_fields__: []
+              },
+              client_streaming: false,
+              server_streaming: false,
+              __unknown_fields__: []
+            },
+            %Google.Protobuf.MethodDescriptorProto{
+              name: "Readiness",
+              input_type: ".google.protobuf.Empty",
+              output_type: ".eigr.functions.protocol.actors.healthcheck.HealthCheckState",
+              options: %Google.Protobuf.MethodOptions{
+                deprecated: false,
+                idempotency_level: :IDEMPOTENCY_UNKNOWN,
+                uninterpreted_option: [],
+                __pb_extensions__: %{
+                  {Google.Api.PbExtension, :http} => %Google.Api.HttpRule{
+                    selector: "",
+                    body: "",
+                    additional_bindings: [],
+                    response_body: "",
+                    pattern: {:get, "/v1/health/readiness"},
                     __unknown_fields__: []
                   }
                 },
@@ -417,7 +330,7 @@ defmodule Pinger.PingPongActor.Service do
         location: [
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [],
-            span: [0, 0, 45, 1],
+            span: [0, 0, 38, 1],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -481,7 +394,7 @@ defmodule Pinger.PingPongActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [2],
-            span: [9, 0, 15],
+            span: [9, 0, 51],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -489,15 +402,15 @@ defmodule Pinger.PingPongActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 0],
-            span: [12, 0, 16, 1],
-            leading_comments: " The ping-pong state of PingPongActor\n",
+            span: [11, 0, 15, 1],
+            leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
             __unknown_fields__: []
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 0, 1],
-            span: [12, 8, 21],
+            span: [11, 8, 14],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -505,7 +418,7 @@ defmodule Pinger.PingPongActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 0, 2, 0],
-            span: [13, 2, 25],
+            span: [12, 2, 20],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -513,7 +426,7 @@ defmodule Pinger.PingPongActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 0, 2, 0, 5],
-            span: [13, 2, 8],
+            span: [12, 2, 8],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -521,7 +434,7 @@ defmodule Pinger.PingPongActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 0, 2, 0, 1],
-            span: [13, 9, 20],
+            span: [12, 9, 15],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -529,7 +442,7 @@ defmodule Pinger.PingPongActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 0, 2, 0, 3],
-            span: [13, 23, 24],
+            span: [12, 18, 19],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -537,7 +450,7 @@ defmodule Pinger.PingPongActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 0, 2, 1],
-            span: [14, 2, 27],
+            span: [13, 2, 21],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -545,7 +458,7 @@ defmodule Pinger.PingPongActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 0, 2, 1, 5],
-            span: [14, 2, 8],
+            span: [13, 2, 8],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -553,7 +466,7 @@ defmodule Pinger.PingPongActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 0, 2, 1, 1],
-            span: [14, 9, 22],
+            span: [13, 9, 16],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -561,7 +474,7 @@ defmodule Pinger.PingPongActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 0, 2, 1, 3],
-            span: [14, 25, 26],
+            span: [13, 19, 20],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -569,7 +482,7 @@ defmodule Pinger.PingPongActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 0, 2, 2],
-            span: [15, 2, 43],
+            span: [14, 2, 43],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -577,7 +490,7 @@ defmodule Pinger.PingPongActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 0, 2, 2, 6],
-            span: [15, 2, 27],
+            span: [14, 2, 27],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -585,7 +498,7 @@ defmodule Pinger.PingPongActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 0, 2, 2, 1],
-            span: [15, 28, 38],
+            span: [14, 28, 38],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -593,7 +506,7 @@ defmodule Pinger.PingPongActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 0, 2, 2, 3],
-            span: [15, 41, 42],
+            span: [14, 41, 42],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -601,15 +514,15 @@ defmodule Pinger.PingPongActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 1],
-            span: [19, 0, 21, 1],
-            leading_comments: " The request message containing the actor name.\n",
+            span: [18, 0, 21, 1],
+            leading_comments: " The state of HealthCheckActor\n",
             trailing_comments: nil,
             leading_detached_comments: [],
             __unknown_fields__: []
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 1, 1],
-            span: [19, 8, 19],
+            span: [18, 8, 24],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -617,15 +530,15 @@ defmodule Pinger.PingPongActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 1, 2, 0],
-            span: [20, 2, 72],
+            span: [19, 2, 20],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
             __unknown_fields__: []
           },
           %Google.Protobuf.SourceCodeInfo.Location{
-            path: [4, 1, 2, 0, 5],
-            span: [20, 2, 8],
+            path: [4, 1, 2, 0, 6],
+            span: [19, 2, 8],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -633,7 +546,7 @@ defmodule Pinger.PingPongActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 1, 2, 0, 1],
-            span: [20, 9, 13],
+            span: [19, 9, 15],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -641,103 +554,47 @@ defmodule Pinger.PingPongActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 1, 2, 0, 3],
-            span: [20, 16, 17],
+            span: [19, 18, 19],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
             __unknown_fields__: []
           },
           %Google.Protobuf.SourceCodeInfo.Location{
-            path: [4, 1, 2, 0, 8],
-            span: [20, 18, 71],
+            path: [4, 1, 2, 1],
+            span: [20, 2, 38],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
             __unknown_fields__: []
           },
           %Google.Protobuf.SourceCodeInfo.Location{
-            path: [4, 1, 2, 0, 8, 9999],
-            span: [20, 20, 69],
+            path: [4, 1, 2, 1, 4],
+            span: [20, 2, 10],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
             __unknown_fields__: []
           },
           %Google.Protobuf.SourceCodeInfo.Location{
-            path: [4, 2],
-            span: [24, 0, 27, 1],
-            leading_comments: " The response message containing the pong\n",
-            trailing_comments: nil,
-            leading_detached_comments: [],
-            __unknown_fields__: []
-          },
-          %Google.Protobuf.SourceCodeInfo.Location{
-            path: [4, 2, 1],
-            span: [24, 8, 17],
+            path: [4, 1, 2, 1, 6],
+            span: [20, 11, 17],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
             __unknown_fields__: []
           },
           %Google.Protobuf.SourceCodeInfo.Location{
-            path: [4, 2, 2, 0],
-            span: [25, 2, 21],
+            path: [4, 1, 2, 1, 1],
+            span: [20, 18, 33],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
             __unknown_fields__: []
           },
           %Google.Protobuf.SourceCodeInfo.Location{
-            path: [4, 2, 2, 0, 5],
-            span: [25, 2, 8],
-            leading_comments: nil,
-            trailing_comments: nil,
-            leading_detached_comments: [],
-            __unknown_fields__: []
-          },
-          %Google.Protobuf.SourceCodeInfo.Location{
-            path: [4, 2, 2, 0, 1],
-            span: [25, 9, 16],
-            leading_comments: nil,
-            trailing_comments: nil,
-            leading_detached_comments: [],
-            __unknown_fields__: []
-          },
-          %Google.Protobuf.SourceCodeInfo.Location{
-            path: [4, 2, 2, 0, 3],
-            span: [25, 19, 20],
-            leading_comments: nil,
-            trailing_comments: nil,
-            leading_detached_comments: [],
-            __unknown_fields__: []
-          },
-          %Google.Protobuf.SourceCodeInfo.Location{
-            path: [4, 2, 2, 1],
-            span: [26, 2, 38],
-            leading_comments: nil,
-            trailing_comments: nil,
-            leading_detached_comments: [],
-            __unknown_fields__: []
-          },
-          %Google.Protobuf.SourceCodeInfo.Location{
-            path: [4, 2, 2, 1, 6],
-            span: [26, 2, 27],
-            leading_comments: nil,
-            trailing_comments: nil,
-            leading_detached_comments: [],
-            __unknown_fields__: []
-          },
-          %Google.Protobuf.SourceCodeInfo.Location{
-            path: [4, 2, 2, 1, 1],
-            span: [26, 28, 33],
-            leading_comments: nil,
-            trailing_comments: nil,
-            leading_detached_comments: [],
-            __unknown_fields__: []
-          },
-          %Google.Protobuf.SourceCodeInfo.Location{
-            path: [4, 2, 2, 1, 3],
-            span: [26, 36, 37],
+            path: [4, 1, 2, 1, 3],
+            span: [20, 36, 37],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -745,15 +602,15 @@ defmodule Pinger.PingPongActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0],
-            span: [30, 0, 45, 1],
-            leading_comments: " The PingPong actor service definition.\n",
+            span: [24, 0, 38, 1],
+            leading_comments: " The HealthCheck actor service definition.\n",
             trailing_comments: nil,
             leading_detached_comments: [],
             __unknown_fields__: []
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 1],
-            span: [30, 8, 21],
+            span: [24, 8, 24],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -761,15 +618,15 @@ defmodule Pinger.PingPongActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 0],
-            span: [32, 2, 37, 3],
-            leading_comments: nil,
+            span: [27, 2, 31, 3],
+            leading_comments: " Get Pong Message\n",
             trailing_comments: nil,
             leading_detached_comments: [],
             __unknown_fields__: []
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 0, 1],
-            span: [32, 6, 10],
+            span: [27, 6, 14],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -777,7 +634,7 @@ defmodule Pinger.PingPongActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 0, 2],
-            span: [32, 11, 22],
+            span: [27, 15, 36],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -785,7 +642,7 @@ defmodule Pinger.PingPongActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 0, 3],
-            span: ~c" !*",
+            span: ~c"\e/?",
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -793,7 +650,7 @@ defmodule Pinger.PingPongActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 0, 4],
-            span: [33, 4, 36, 6],
+            span: [28, 4, 30, 6],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -801,7 +658,7 @@ defmodule Pinger.PingPongActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 0, 4, 72_295_728],
-            span: [33, 4, 36, 6],
+            span: [28, 4, 30, 6],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -809,15 +666,15 @@ defmodule Pinger.PingPongActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 1],
-            span: [40, 2, 44, 3],
-            leading_comments: " Get Pong Message\n",
+            span: [33, 2, 37, 3],
+            leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
             __unknown_fields__: []
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 1, 1],
-            span: [40, 6, 10],
+            span: [33, 6, 15],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -825,7 +682,7 @@ defmodule Pinger.PingPongActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 1, 2],
-            span: ~c"(\v ",
+            span: [33, 16, 37],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -833,7 +690,7 @@ defmodule Pinger.PingPongActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 1, 3],
-            span: ~c"(+8",
+            span: ~c"!0@",
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -841,7 +698,7 @@ defmodule Pinger.PingPongActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 1, 4],
-            span: [41, 4, 43, 6],
+            span: [34, 4, 36, 6],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -849,7 +706,7 @@ defmodule Pinger.PingPongActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 1, 4, 72_295_728],
-            span: [41, 4, 43, 6],
+            span: [34, 4, 36, 6],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -866,64 +723,78 @@ defmodule Pinger.PingPongActor.Service do
     }
   end
 
-  rpc(:Ping, Pinger.PingRequest, Pinger.PongReply, %{
-    http: %{
-      type: Google.Api.PbExtension,
-      value: %Google.Api.HttpRule{
-        selector: "",
-        body: "*",
-        additional_bindings: [],
-        response_body: "",
-        pattern: {:post, "/v1/ping/{name}"},
-        __unknown_fields__: []
+  rpc(
+    :Liveness,
+    Google.Protobuf.Empty,
+    Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckState,
+    %{
+      http: %{
+        type: Google.Api.PbExtension,
+        value: %Google.Api.HttpRule{
+          selector: "",
+          body: "",
+          additional_bindings: [],
+          response_body: "",
+          pattern: {:get, "/v1/health/liveness"},
+          __unknown_fields__: []
+        }
       }
     }
-  })
+  )
 
-  rpc(:Pong, Google.Protobuf.Empty, Pinger.PingPongState, %{
-    http: %{
-      type: Google.Api.PbExtension,
-      value: %Google.Api.HttpRule{
-        selector: "",
-        body: "",
-        additional_bindings: [],
-        response_body: "",
-        pattern: {:get, "/v1/pong/{name}"},
-        __unknown_fields__: []
+  rpc(
+    :Readiness,
+    Google.Protobuf.Empty,
+    Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckState,
+    %{
+      http: %{
+        type: Google.Api.PbExtension,
+        value: %Google.Api.HttpRule{
+          selector: "",
+          body: "",
+          additional_bindings: [],
+          response_body: "",
+          pattern: {:get, "/v1/health/readiness"},
+          __unknown_fields__: []
+        }
       }
     }
-  })
+  )
 end
 
-defmodule Pinger.PingPongActor.ActorDispatcher do
+defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.ActorDispatcher do
   @moduledoc since: "1.2.1"
-  use GRPC.Server, service: Pinger.PingPongActor.Service, http_transcode: true
+  use GRPC.Server,
+    service: Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service,
+    http_transcode: true
 
   alias Sidecar.GRPC.Dispatcher
 
-  @spec ping(Pinger.PingRequest.t(), GRPC.Server.Stream.t()) :: Pinger.PongReply.t()
-  def ping(message, stream) do
+  @spec liveness(Google.Protobuf.Empty.t(), GRPC.Server.Stream.t()) ::
+          Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckState.t()
+  def liveness(message, stream) do
     request = %{
       system: "spawn-system",
-      actor_name: "PingPongActor",
-      action_name: "Ping",
+      actor_name: "HealthCheckActor",
+      action_name: "Liveness",
       input: message,
       stream: stream,
-      descriptor: Pinger.PingPongActor.Service.descriptor()
+      descriptor: Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service.descriptor()
     }
 
     Dispatcher.dispatch(request)
   end
 
-  @spec pong(Google.Protobuf.Empty.t(), GRPC.Server.Stream.t()) :: Pinger.PingPongState.t()
-  def pong(message, stream) do
+  @spec readiness(Google.Protobuf.Empty.t(), GRPC.Server.Stream.t()) ::
+          Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckState.t()
+  def readiness(message, stream) do
     request = %{
       system: "spawn-system",
-      actor_name: "PingPongActor",
-      action_name: "Pong",
+      actor_name: "HealthCheckActor",
+      action_name: "Readiness",
       input: message,
       stream: stream,
-      descriptor: Pinger.PingPongActor.Service.descriptor()
+      descriptor: Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service.descriptor()
     }
 
     Dispatcher.dispatch(request)
@@ -937,7 +808,7 @@ defmodule Sidecar.GRPC.ProxyEndpoint do
   intercept(GRPC.Server.Interceptors.Logger)
 
   services = [
-    Pinger.PingPongActor.ActorDispatcher
+    Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.ActorDispatcher
   ]
 
   services =
@@ -954,10 +825,10 @@ defmodule Sidecar.GRPC.ServiceResolver do
 
   @actors [
     {
-      "PingPongActor",
+      "HealthCheckActor",
       %{
-        service_name: "Pinger.PingPongActor",
-        service_module: Pinger.PingPongActor.Service
+        service_name: "Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor",
+        service_module: Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service
       }
     }
   ]
@@ -990,7 +861,7 @@ defmodule Sidecar.GRPC.Reflection.Server do
     use GrpcReflection.Server,
       version: :v1,
       services: [
-        Pinger.PingPongActor.Service
+        Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service
       ]
   end
 
@@ -998,7 +869,7 @@ defmodule Sidecar.GRPC.Reflection.Server do
     use GrpcReflection.Server,
       version: :v1alpha,
       services: [
-        Pinger.PingPongActor.Service
+        Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service
       ]
   end
 end

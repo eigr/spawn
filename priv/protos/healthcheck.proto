@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+option objc_class_prefix = "HLW";
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+import "eigr/functions/protocol/actors/extensions.proto";
+
+package eigr.functions.protocol.actors.healthcheck;
+
+message Status {
+  string status = 1;
+  string details = 2;
+  google.protobuf.Timestamp updated_at = 3;
+}
+
+// The state of HealthCheckActor
+message HealthCheckState {
+  Status status = 1;
+  repeated Status previous_status = 2;
+}
+
+// The HealthCheck actor service definition.
+service HealthCheckActor {
+
+  // Get Pong Message
+  rpc Liveness(google.protobuf.Empty) returns (HealthCheckState) {
+    option (google.api.http) = {
+      get : "/v1/health/liveness"
+    };
+  }
+
+  rpc Readiness(google.protobuf.Empty) returns (HealthCheckState) {
+    option (google.api.http) = {
+      get : "/v1/health/readiness"
+    };
+  }
+}
