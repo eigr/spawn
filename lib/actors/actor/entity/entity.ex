@@ -66,13 +66,15 @@ defmodule Actors.Actor.Entity do
   require Logger
 
   alias Actors.Actor.StateManager
-  alias Actors.Actor.Entity.{EntityState, Lifecycle, Invocation}
+  alias Actors.Actor.Entity.EntityState
+  alias Actors.Actor.Entity.Lifecycle
+  alias Actors.Actor.Entity.Invocation
 
-  alias Eigr.Functions.Protocol.Actors.{
-    Actor,
-    ActorId,
-    ActorState
-  }
+  alias Eigr.Functions.Protocol.Actors.Actor
+  alias Eigr.Functions.Protocol.Actors.ActorId
+  alias Eigr.Functions.Protocol.Actors.ActorState
+  alias Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckReply
+  alias Eigr.Functions.Protocol.Actors.Healthcheck.Status, as: HealthcheckStatus
 
   alias Eigr.Functions.Protocol.State.Checkpoint
   alias Eigr.Functions.Protocol.State.Revision
@@ -141,12 +143,60 @@ defmodule Actors.Actor.Entity do
       :get_state ->
         do_handle_get_state(action, from, state)
 
+      :readiness ->
+        do_handle_readiness(action, from, state)
+
+      :liveness ->
+        do_handle_liveness(action, from, state)
+
       :checkpoint ->
         do_handle_checkpoint(action, from, state)
 
       {:restore, checkpoint} ->
         do_handle_restore(checkpoint, from, state)
     end
+  end
+
+  defp do_handle_readiness(
+         _action,
+         _from,
+         %EntityState{
+           actor: %Actor{} = _actor
+         } = state
+       ) do
+    {:reply,
+     {:ok,
+      %HealthCheckReply{
+        status: %HealthcheckStatus{
+          status: "OK",
+          details: "I'm alive!",
+          updated_at: %Google.Protobuf.Timestamp{
+            seconds: DateTime.to_unix(DateTime.utc_now(:second))
+          }
+        }
+      }}, state}
+    |> return_and_maybe_hibernate()
+  end
+
+  defp do_handle_liveness(
+         _action,
+         _from,
+         %EntityState{
+           actor: %Actor{} = _actor
+         } = state
+       ) do
+    {:reply,
+     {:ok,
+      %HealthCheckReply{
+        status: %HealthcheckStatus{
+          status: "OK",
+          details: "I'm still alive!",
+          updated_at: %Google.Protobuf.Timestamp{
+            seconds: DateTime.to_unix(DateTime.utc_now(:second))
+          }
+        }
+      }}, state}
+    |> return_and_maybe_hibernate()
   end
 
   defp do_handle_checkpoint(
@@ -358,6 +408,38 @@ defmodule Actors.Actor.Entity do
   def get_state(ref, opts) do
     timeout = Keyword.get(opts, :timeout, @default_call_timeout)
     GenServer.call(via(ref), :get_state, timeout)
+  end
+
+  @doc """
+  Retrieve the health check readiness status.
+  """
+  @spec readiness(any, any) :: {:error, term()} | {:ok, term()}
+  def readiness(ref, opts \\ [])
+
+  def readiness(ref, opts) when is_pid(ref) do
+    timeout = Keyword.get(opts, :timeout, @default_call_timeout)
+    GenServer.call(ref, :readiness, timeout)
+  end
+
+  def readiness(ref, opts) do
+    timeout = Keyword.get(opts, :timeout, @default_call_timeout)
+    GenServer.call(via(ref), :readiness, timeout)
+  end
+
+  @doc """
+  Retrieve the health check liveness status.
+  """
+  @spec readiness(any, any) :: {:error, term()} | {:ok, term()}
+  def liveness(ref, opts \\ [])
+
+  def liveness(ref, opts) when is_pid(ref) do
+    timeout = Keyword.get(opts, :timeout, @default_call_timeout)
+    GenServer.call(ref, :liveness, timeout)
+  end
+
+  def liveness(ref, opts) do
+    timeout = Keyword.get(opts, :timeout, @default_call_timeout)
+    GenServer.call(via(ref), :liveness, timeout)
   end
 
   @doc """

@@ -49,6 +49,40 @@ defmodule ActorsTest do
     end
   end
 
+  describe "readiness/2" do
+    test "readiness for a newly registered actor" do
+      actor_name = "readiness_actor_test_" <> Ecto.UUID.generate()
+
+      actor_entry = build_actor_entry(name: actor_name)
+      registry = build_registry_with_actors(actors: actor_entry)
+      system = build_system(registry: registry)
+
+      request = build_registration_request(actor_system: system)
+
+      {:ok, %RegistrationResponse{}} = Actors.register(request)
+
+      assert {:ok, %HealthCheckReply{status: %HealthcheckStatus{}}} =
+               Actors.readiness(%ActorId{name: actor_name, system: system.name})
+    end
+  end
+
+  describe "liveness/2" do
+    test "liveness for a newly registered actor" do
+      actor_name = "liveness_actor_test_" <> Ecto.UUID.generate()
+
+      actor_entry = build_actor_entry(name: actor_name)
+      registry = build_registry_with_actors(actors: actor_entry)
+      system = build_system(registry: registry)
+
+      request = build_registration_request(actor_system: system)
+
+      {:ok, %RegistrationResponse{}} = Actors.register(request)
+
+      assert {:ok, %HealthCheckReply{status: %HealthcheckStatus{}}} =
+               Actors.liveness(%ActorId{name: actor_name, system: system.name})
+    end
+  end
+
   describe "invoke/2" do
     test "invoke actor function for a newly registered actor" do
       actor_name = "newly_actor_test_" <> Ecto.UUID.generate()
