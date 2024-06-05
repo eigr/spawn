@@ -62,19 +62,19 @@ defmodule Eigr.Functions.Protocol.Actors.Healthcheck.Status do
     }
   end
 
-  field :status, 1, type: :string
-  field :details, 2, type: :string
-  field :updated_at, 3, type: Google.Protobuf.Timestamp, json_name: "updatedAt"
+  field(:status, 1, type: :string)
+  field(:details, 2, type: :string)
+  field(:updated_at, 3, type: Google.Protobuf.Timestamp, json_name: "updatedAt")
 end
 
-defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckState do
+defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckReply do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
     %Google.Protobuf.DescriptorProto{
-      name: "HealthCheckState",
+      name: "HealthCheckReply",
       field: [
         %Google.Protobuf.FieldDescriptorProto{
           name: "status",
@@ -87,20 +87,6 @@ defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckState do
           options: nil,
           oneof_index: nil,
           json_name: "status",
-          proto3_optional: nil,
-          __unknown_fields__: []
-        },
-        %Google.Protobuf.FieldDescriptorProto{
-          name: "previous_status",
-          extendee: nil,
-          number: 2,
-          label: :LABEL_REPEATED,
-          type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.healthcheck.Status",
-          default_value: nil,
-          options: nil,
-          oneof_index: nil,
-          json_name: "previousStatus",
           proto3_optional: nil,
           __unknown_fields__: []
         }
@@ -117,12 +103,7 @@ defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckState do
     }
   end
 
-  field :status, 1, type: Eigr.Functions.Protocol.Actors.Healthcheck.Status
-
-  field :previous_status, 2,
-    repeated: true,
-    type: Eigr.Functions.Protocol.Actors.Healthcheck.Status,
-    json_name: "previousStatus"
+  field(:status, 1, type: Eigr.Functions.Protocol.Actors.Healthcheck.Status)
 end
 
 defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service do
@@ -200,7 +181,7 @@ defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service do
           __unknown_fields__: []
         },
         %Google.Protobuf.DescriptorProto{
-          name: "HealthCheckState",
+          name: "HealthCheckReply",
           field: [
             %Google.Protobuf.FieldDescriptorProto{
               name: "status",
@@ -213,20 +194,6 @@ defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service do
               options: nil,
               oneof_index: nil,
               json_name: "status",
-              proto3_optional: nil,
-              __unknown_fields__: []
-            },
-            %Google.Protobuf.FieldDescriptorProto{
-              name: "previous_status",
-              extendee: nil,
-              number: 2,
-              label: :LABEL_REPEATED,
-              type: :TYPE_MESSAGE,
-              type_name: ".eigr.functions.protocol.actors.healthcheck.Status",
-              default_value: nil,
-              options: nil,
-              oneof_index: nil,
-              json_name: "previousStatus",
               proto3_optional: nil,
               __unknown_fields__: []
             }
@@ -250,7 +217,7 @@ defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service do
             %Google.Protobuf.MethodDescriptorProto{
               name: "Liveness",
               input_type: ".google.protobuf.Empty",
-              output_type: ".eigr.functions.protocol.actors.healthcheck.HealthCheckState",
+              output_type: ".eigr.functions.protocol.actors.healthcheck.HealthCheckReply",
               options: %Google.Protobuf.MethodOptions{
                 deprecated: false,
                 idempotency_level: :IDEMPOTENCY_UNKNOWN,
@@ -262,7 +229,7 @@ defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service do
                     body: "",
                     additional_bindings: [],
                     response_body: "",
-                    pattern: {:get, "/v1/health/liveness"},
+                    pattern: {:get, "/health/liveness"},
                     __unknown_fields__: []
                   }
                 },
@@ -275,7 +242,7 @@ defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service do
             %Google.Protobuf.MethodDescriptorProto{
               name: "Readiness",
               input_type: ".google.protobuf.Empty",
-              output_type: ".eigr.functions.protocol.actors.healthcheck.HealthCheckState",
+              output_type: ".eigr.functions.protocol.actors.healthcheck.HealthCheckReply",
               options: %Google.Protobuf.MethodOptions{
                 deprecated: false,
                 idempotency_level: :IDEMPOTENCY_UNKNOWN,
@@ -287,7 +254,7 @@ defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service do
                     body: "",
                     additional_bindings: [],
                     response_body: "",
-                    pattern: {:get, "/v1/health/readiness"},
+                    pattern: {:get, "/health/readiness"},
                     __unknown_fields__: []
                   }
                 },
@@ -332,7 +299,7 @@ defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service do
         location: [
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [],
-            span: [0, 0, 38, 1],
+            span: [0, 0, 35, 1],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -516,7 +483,7 @@ defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 1],
-            span: [18, 0, 21, 1],
+            span: [18, 0, 47],
             leading_comments: " The state of HealthCheckActor\n",
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -532,7 +499,7 @@ defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 1, 2, 0],
-            span: [19, 2, 20],
+            span: [18, 27, 45],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -540,7 +507,7 @@ defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 1, 2, 0, 6],
-            span: [19, 2, 8],
+            span: [18, 27, 33],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -548,7 +515,7 @@ defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 1, 2, 0, 1],
-            span: [19, 9, 15],
+            span: [18, 34, 40],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -556,47 +523,7 @@ defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [4, 1, 2, 0, 3],
-            span: [19, 18, 19],
-            leading_comments: nil,
-            trailing_comments: nil,
-            leading_detached_comments: [],
-            __unknown_fields__: []
-          },
-          %Google.Protobuf.SourceCodeInfo.Location{
-            path: [4, 1, 2, 1],
-            span: [20, 2, 38],
-            leading_comments: nil,
-            trailing_comments: nil,
-            leading_detached_comments: [],
-            __unknown_fields__: []
-          },
-          %Google.Protobuf.SourceCodeInfo.Location{
-            path: [4, 1, 2, 1, 4],
-            span: [20, 2, 10],
-            leading_comments: nil,
-            trailing_comments: nil,
-            leading_detached_comments: [],
-            __unknown_fields__: []
-          },
-          %Google.Protobuf.SourceCodeInfo.Location{
-            path: [4, 1, 2, 1, 6],
-            span: [20, 11, 17],
-            leading_comments: nil,
-            trailing_comments: nil,
-            leading_detached_comments: [],
-            __unknown_fields__: []
-          },
-          %Google.Protobuf.SourceCodeInfo.Location{
-            path: [4, 1, 2, 1, 1],
-            span: [20, 18, 33],
-            leading_comments: nil,
-            trailing_comments: nil,
-            leading_detached_comments: [],
-            __unknown_fields__: []
-          },
-          %Google.Protobuf.SourceCodeInfo.Location{
-            path: [4, 1, 2, 1, 3],
-            span: [20, 36, 37],
+            span: [18, 43, 44],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -604,7 +531,7 @@ defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0],
-            span: [24, 0, 38, 1],
+            span: [21, 0, 35, 1],
             leading_comments: " The HealthCheck actor service definition.\n",
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -612,7 +539,7 @@ defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 1],
-            span: [24, 8, 24],
+            span: [21, 8, 24],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -620,7 +547,7 @@ defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 0],
-            span: [27, 2, 31, 3],
+            span: [24, 2, 28, 3],
             leading_comments: " Get Pong Message\n",
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -628,7 +555,7 @@ defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 0, 1],
-            span: [27, 6, 14],
+            span: [24, 6, 14],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -636,7 +563,7 @@ defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 0, 2],
-            span: [27, 15, 36],
+            span: [24, 15, 36],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -644,7 +571,7 @@ defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 0, 3],
-            span: ~c"\e/?",
+            span: [24, 47, 63],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -652,7 +579,7 @@ defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 0, 4],
-            span: [28, 4, 30, 6],
+            span: [25, 4, 27, 6],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -660,7 +587,7 @@ defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 0, 4, 72_295_728],
-            span: [28, 4, 30, 6],
+            span: [25, 4, 27, 6],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -668,7 +595,7 @@ defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 1],
-            span: [33, 2, 37, 3],
+            span: [30, 2, 34, 3],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -676,7 +603,7 @@ defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 1, 1],
-            span: [33, 6, 15],
+            span: [30, 6, 15],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -684,7 +611,7 @@ defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 1, 2],
-            span: [33, 16, 37],
+            span: [30, 16, 37],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -692,7 +619,7 @@ defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 1, 3],
-            span: ~c"!0@",
+            span: [30, 48, 64],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -700,7 +627,7 @@ defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 1, 4],
-            span: [34, 4, 36, 6],
+            span: [31, 4, 33, 6],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -708,7 +635,7 @@ defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 1, 4, 72_295_728],
-            span: [34, 4, 36, 6],
+            span: [31, 4, 33, 6],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -728,7 +655,7 @@ defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service do
   rpc(
     :Liveness,
     Google.Protobuf.Empty,
-    Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckState,
+    Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckReply,
     %{
       http: %{
         type: Google.Api.PbExtension,
@@ -737,7 +664,7 @@ defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service do
           body: "",
           additional_bindings: [],
           response_body: "",
-          pattern: {:get, "/v1/health/liveness"},
+          pattern: {:get, "/health/liveness"},
           __unknown_fields__: []
         }
       }
@@ -747,7 +674,7 @@ defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service do
   rpc(
     :Readiness,
     Google.Protobuf.Empty,
-    Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckState,
+    Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckReply,
     %{
       http: %{
         type: Google.Api.PbExtension,
@@ -756,123 +683,10 @@ defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service do
           body: "",
           additional_bindings: [],
           response_body: "",
-          pattern: {:get, "/v1/health/readiness"},
+          pattern: {:get, "/health/readiness"},
           __unknown_fields__: []
         }
       }
     }
   )
-end
-
-defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.ActorDispatcher do
-  @moduledoc since: "1.2.1"
-  use GRPC.Server,
-    service: Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service,
-    http_transcode: true
-
-  alias Sidecar.GRPC.Dispatcher
-
-  @spec liveness(Google.Protobuf.Empty.t(), GRPC.Server.Stream.t()) ::
-          Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckState.t()
-  def liveness(message, stream) do
-    request = %{
-      system: "spawn-system",
-      actor_name: "HealthCheckActor",
-      action_name: "Liveness",
-      input: message,
-      stream: stream,
-      descriptor: Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service.descriptor()
-    }
-
-    Dispatcher.dispatch(request)
-  end
-
-  @spec readiness(Google.Protobuf.Empty.t(), GRPC.Server.Stream.t()) ::
-          Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckState.t()
-  def readiness(message, stream) do
-    request = %{
-      system: "spawn-system",
-      actor_name: "HealthCheckActor",
-      action_name: "Readiness",
-      input: message,
-      stream: stream,
-      descriptor: Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service.descriptor()
-    }
-
-    Dispatcher.dispatch(request)
-  end
-end
-
-defmodule Sidecar.GRPC.ProxyEndpoint do
-  @moduledoc false
-  use GRPC.Endpoint
-
-  intercept(GRPC.Server.Interceptors.Logger)
-
-  services = [
-    Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.ActorDispatcher
-  ]
-
-  services =
-    [
-      Sidecar.GRPC.Reflection.Server.V1,
-      Sidecar.GRPC.Reflection.Server.V1Alpha,
-      Sidecar.Grpc.Healthcheck.HealthcheckHandler.Actordispatcher
-    ] ++ services
-
-  run(services)
-end
-
-defmodule Sidecar.GRPC.ServiceResolver do
-  @moduledoc since: "1.2.1"
-
-  @actors [
-    {
-      "HealthCheckActor",
-      %{
-        service_name: "Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor",
-        service_module: Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service
-      }
-    }
-  ]
-
-  def has_actor?(actor_name) do
-    Enum.any?(@actors, fn {name, _} -> actor_name == name end)
-  end
-
-  def get_descriptor(actor_name) do
-    actor_attributes =
-      Enum.filter(@actors, fn {name, _} -> actor_name == name end)
-      |> Enum.map(fn {_name, attributes} -> attributes end)
-      |> List.first()
-
-    mod = Map.get(actor_attributes, :service_module)
-
-    mod.descriptor()
-    |> Map.get(:service)
-    |> Enum.filter(fn %Google.Protobuf.ServiceDescriptorProto{name: name} ->
-      actor_name == name
-    end)
-    |> List.first()
-  end
-end
-
-defmodule Sidecar.GRPC.Reflection.Server do
-  @moduledoc since: "1.2.1"
-
-  defmodule V1 do
-    use GrpcReflection.Server,
-      version: :v1,
-      services: [
-        Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service
-      ]
-  end
-
-  defmodule V1Alpha do
-    use GrpcReflection.Server,
-      version: :v1alpha,
-      services: [
-        Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service
-      ]
-  end
 end

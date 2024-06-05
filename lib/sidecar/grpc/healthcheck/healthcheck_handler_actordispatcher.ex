@@ -1,4 +1,4 @@
-defmodule Sidecar.Grpc.Healthcheck.HealthcheckHandler.Actordispatcher do
+defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.ActorDispatcher do
   @moduledoc since: "1.2.1"
   use GRPC.Server,
     service: Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service,
@@ -7,7 +7,7 @@ defmodule Sidecar.Grpc.Healthcheck.HealthcheckHandler.Actordispatcher do
   alias Sidecar.GRPC.Dispatcher
 
   @spec liveness(Google.Protobuf.Empty.t(), GRPC.Server.Stream.t()) ::
-          Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckState.t()
+          Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckReply.t()
   def liveness(message, stream) do
     request = %{
       system: "spawn-system",
@@ -22,7 +22,7 @@ defmodule Sidecar.Grpc.Healthcheck.HealthcheckHandler.Actordispatcher do
   end
 
   @spec readiness(Google.Protobuf.Empty.t(), GRPC.Server.Stream.t()) ::
-          Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckState.t()
+          Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckReply.t()
   def readiness(message, stream) do
     request = %{
       system: "spawn-system",

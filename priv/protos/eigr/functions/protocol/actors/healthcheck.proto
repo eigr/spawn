@@ -16,24 +16,21 @@ message Status {
 }
 
 // The state of HealthCheckActor
-message HealthCheckState {
-  Status status = 1;
-  repeated Status previous_status = 2;
-}
+message HealthCheckReply { Status status = 1; }
 
 // The HealthCheck actor service definition.
 service HealthCheckActor {
 
   // Get Pong Message
-  rpc Liveness(google.protobuf.Empty) returns (HealthCheckState) {
+  rpc Liveness(google.protobuf.Empty) returns (HealthCheckReply) {
     option (google.api.http) = {
-      get : "/v1/health/liveness"
+      get : "/health/liveness"
     };
   }
 
-  rpc Readiness(google.protobuf.Empty) returns (HealthCheckState) {
+  rpc Readiness(google.protobuf.Empty) returns (HealthCheckReply) {
     option (google.api.http) = {
-      get : "/v1/health/readiness"
+      get : "/health/readiness"
     };
   }
 }
