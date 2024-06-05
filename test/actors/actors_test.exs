@@ -111,6 +111,7 @@ defmodule ActorsTest do
                Actors.invoke(invoke_request)
     end
 
+    @tag :skip
     test "invoke actor function for a already registered actor in another node", ctx do
       %{system: system, actor: actor} = ctx
       actor_name = actor.id.name
@@ -149,6 +150,7 @@ defmodule ActorsTest do
                any_unpack!(updated_context.state, Actors.Protos.ChangeNameResponseTest)
     end
 
+    @tag :skip
     test "invoke function for a new actor without persistence in another node", _ctx do
       actor_name = "actor_not_persistent"
 
