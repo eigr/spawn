@@ -5,6 +5,7 @@ defmodule ActorsTest do
   alias Eigr.Functions.Protocol.Actors.ActorState
   alias Eigr.Functions.Protocol.Actors.ActorId
   alias Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckReply
+  alias Eigr.Functions.Protocol.Actors.Healthcheck.Status, as: HealthcheckStatus
 
   alias Eigr.Functions.Protocol.RegistrationResponse
 
