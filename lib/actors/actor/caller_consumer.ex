@@ -106,6 +106,14 @@ defmodule Actors.Actor.CallerConsumer do
     reply_to_producer(from, get_state(event))
   end
 
+  defp dispatch_to_actor({from, {:readiness, event, _opts}} = _producer_event) do
+    reply_to_producer(from, readiness(event))
+  end
+
+  defp dispatch_to_actor({from, {:liveness, event, _opts}} = _producer_event) do
+    reply_to_producer(from, liveness(event))
+  end
+
   defp dispatch_to_actor({from, {:spawn_actor, event, opts}} = _producer_event) do
     reply_to_producer(from, spawn_actor(event, opts))
   end
@@ -143,6 +151,7 @@ defmodule Actors.Actor.CallerConsumer do
         opts
       ) do
     if Sidecar.GracefulShutdown.running?() do
+      # actors ++ [%Actor{id: %ActorId{} = id, settings: %ActorSettings{} = settings}]
       actors
       |> Map.values()
       |> Enum.map(fn actor -> ActorPool.create_actor_host_pool(actor, opts) end)

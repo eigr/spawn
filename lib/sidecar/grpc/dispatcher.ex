@@ -129,6 +129,62 @@ defmodule Sidecar.GRPC.Dispatcher do
     dispatch_sync(system_name, actor_name, action_name, message, stream)
   end
 
+  defp dispatch_sync(system_name, actor_name, "Readiness", message, stream) do
+    with {:actor_id, actor_id} <- {:actor_id, build_actor_id(system_name, actor_name, message)},
+         {:response, {:ok, response}} <- {:response, invoke_readiness(actor_id)} do
+      Server.send_reply(stream, response)
+    else
+      {:actor_id, {:not_found, _}} ->
+        log_and_raise_error(
+          :warning,
+          "Actor Not Found. The Actor probably does not exist or not implemented or the request params are incorrect!",
+          GRPC.Status.not_found()
+        )
+
+      {:actor_id, error} ->
+        log_and_raise_error(
+          :error,
+          "Failed to build actor ID for Actor #{system_name}:#{actor_name}. Details: #{inspect(error)}",
+          GRPC.Status.unknown()
+        )
+
+      {:response, error} ->
+        log_and_raise_error(
+          :error,
+          "Failed to invoke request for Actor #{system_name}:#{actor_name}. Details: #{inspect(error)}",
+          GRPC.Status.unknown()
+        )
+    end
+  end
+
+  defp dispatch_sync(system_name, actor_name, "Liveness", message, stream) do
+    with {:actor_id, actor_id} <- {:actor_id, build_actor_id(system_name, actor_name, message)},
+         {:response, {:ok, response}} <- {:response, invoke_liveness(actor_id)} do
+      Server.send_reply(stream, response)
+    else
+      {:actor_id, {:not_found, _}} ->
+        log_and_raise_error(
+          :warning,
+          "Actor Not Found. The Actor probably does not exist or not implemented or the request params are incorrect!",
+          GRPC.Status.not_found()
+        )
+
+      {:actor_id, error} ->
+        log_and_raise_error(
+          :error,
+          "Failed to build actor ID for Actor #{system_name}:#{actor_name}. Details: #{inspect(error)}",
+          GRPC.Status.unknown()
+        )
+
+      {:response, error} ->
+        log_and_raise_error(
+          :error,
+          "Failed to invoke request for Actor #{system_name}:#{actor_name}. Details: #{inspect(error)}",
+          GRPC.Status.unknown()
+        )
+    end
+  end
+
   defp dispatch_sync(system_name, actor_name, action_name, message, stream) do
     with {:actor_id, actor_id} <- {:actor_id, build_actor_id(system_name, actor_name, message)},
          {:request, {:ok, request}} <-
@@ -270,6 +326,17 @@ defmodule Sidecar.GRPC.Dispatcher do
       payload: {:value, any_pack!(message)}
     }
   end
+
+  defp build_healthcheck_request(_actor_id, _actor_system, _action_name, _opts),
+    do: %Google.Protobuf.Empty{}
+
+  defp invoke_readiness(nil), do: {:error, :invalid_payload}
+
+  defp invoke_readiness(request), do: CallerProducer.readiness(request)
+
+  defp invoke_liveness(nil), do: {:error, :invalid_payload}
+
+  defp invoke_liveness(request), do: CallerProducer.liveness(request)
 
   defp invoke_request(nil), do: {:error, :invalid_payload}
 
