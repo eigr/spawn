@@ -1,6 +1,6 @@
 defmodule SpawnSdkExample.Actors.JoeActor do
   use SpawnSdk.Actor,
-    name: "joe",
+    name: "Joe",
     state_type: Io.Eigr.Spawn.Example.MyState,
     deactivate_timeout: 60_000,
     snapshot_timeout: 2_000
@@ -27,7 +27,7 @@ defmodule SpawnSdkExample.Actors.JoeActor do
     |> Value.reply!()
   end)
 
-  action("sum", fn %Context{state: state} = ctx, %MyBusinessMessage{value: value} = data ->
+  action("Sum", fn %Context{state: state} = ctx, %MyBusinessMessage{value: value} = data ->
     Logger.info("[joe] Received Request: #{inspect(data)}. Context: #{inspect(ctx)}")
 
     new_value =
@@ -41,12 +41,12 @@ defmodule SpawnSdkExample.Actors.JoeActor do
 
     %Value{}
     |> Value.of(response, %MyState{value: new_value})
-    |> Value.broadcast(Broadcast.to("external.channel", response))
+    # |> Value.broadcast(Broadcast.to("external.channel", response))
     # |> Value.broadcast(Broadcast.to("liveview.channel", response))
     |> Value.reply!()
   end)
 
-  action("ping", fn %Context{state: state} = ctx ->
+  action("Ping", fn %Context{state: state} = ctx ->
     Logger.info("Received Request PING. Context: #{inspect(ctx)}")
 
     new_state =

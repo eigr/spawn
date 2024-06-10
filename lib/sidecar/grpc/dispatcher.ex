@@ -11,6 +11,7 @@ defmodule Sidecar.GRPC.Dispatcher do
   alias Actors.Registry.ActorRegistry
   alias Actors.Registry.HostActor
 
+  alias Eigr.Functions.Protocol.ActorInvocationResponse
   alias Eigr.Functions.Protocol.Actors.Actor
   alias Eigr.Functions.Protocol.Actors.ActorId
   alias Eigr.Functions.Protocol.Actors.ActorSettings
@@ -20,7 +21,7 @@ defmodule Sidecar.GRPC.Dispatcher do
   alias GRPC.Server
   alias GRPC.Server.Stream, as: GRPCStream
 
-  import Spawn.Utils.AnySerializer, only: [any_pack!: 1]
+  import Spawn.Utils.AnySerializer, only: [any_pack!: 1, unpack_unknown: 1]
 
   @doc """
   Dispatches a gRPC message to the specified actor.
@@ -81,9 +82,7 @@ defmodule Sidecar.GRPC.Dispatcher do
           descriptor: _descriptor
         } = request
       ) do
-    Logger.info(
-      "Dispatching gRPC message to Actor #{system_name}:#{actor_name}. Params: #{inspect(request)}"
-    )
+    Logger.info("Dispatching gRPC message to Actor #{system_name}:#{actor_name}.")
 
     handle_dispatch(system_name, actor_name, action_name, message, stream, grpc_type)
   end
@@ -313,18 +312,19 @@ defmodule Sidecar.GRPC.Dispatcher do
   defp get_actor_id_name(_ctype, message, attribute),
     do: "#{inspect(Map.get(message, attribute))}"
 
-  defp build_request(nil, _, _, _, _), do: nil
+  defp build_request(nil, _, _, _, _), do: {:error, nil}
 
   defp build_request(actor_id, actor_system, action_name, message, opts) do
     async = Keyword.get(opts, :async, false)
 
-    %InvocationRequest{
-      async: async,
-      system: %ActorSystem{name: actor_system},
-      actor: %Actor{id: actor_id},
-      action_name: action_name,
-      payload: {:value, any_pack!(message)}
-    }
+    {:ok,
+     %InvocationRequest{
+       async: async,
+       system: %ActorSystem{name: actor_system},
+       actor: %Actor{id: actor_id},
+       action_name: action_name,
+       payload: {:value, any_pack!(message)}
+     }}
   end
 
   defp build_healthcheck_request(_actor_id, _actor_system, _action_name, _opts),
@@ -340,7 +340,26 @@ defmodule Sidecar.GRPC.Dispatcher do
 
   defp invoke_request(nil), do: {:error, :invalid_payload}
 
-  defp invoke_request(request), do: CallerProducer.invoke(request)
+  defp invoke_request(request) do
+    case CallerProducer.invoke(request) do
+      {:ok, %ActorInvocationResponse{payload: {:value, %Google.Protobuf.Any{} = response}}} ->
+        {:ok, unpack_unknown(response)}
+
+      {:ok, %ActorInvocationResponse{payload: %Google.Protobuf.Any{} = response}} ->
+        {:ok, unpack_unknown(response)}
+
+      {:ok,
+       %ActorInvocationResponse{payload: {:noop, %Eigr.Functions.Protocol.Noop{}} = response}} ->
+        {:ok, %Google.Protobuf.Empty{}}
+
+      :async ->
+        {:ok, %Google.Protobuf.Empty{}}
+
+      error ->
+        Logger.warning("Error during parse response. Details: #{inspect(error)}")
+        {:error, error}
+    end
+  end
 
   defp log_and_raise_error(level, message, status) do
     Logger.log(level, message)

@@ -34,5 +34,5 @@ defmodule Google.Protobuf.SourceContext do
     }
   end
 
-  field :file_name, 1, type: :string, json_name: "fileName"
+  field(:file_name, 1, type: :string, json_name: "fileName")
 end

@@ -115,7 +115,7 @@ defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service do
   def descriptor do
     # credo:disable-for-next-line
     %Google.Protobuf.FileDescriptorProto{
-      name: "healthcheck.proto",
+      name: "eigr/functions/protocol/actors/healthcheck.proto",
       package: "eigr.functions.protocol.actors.healthcheck",
       dependency: [
         "google/api/annotations.proto",

@@ -9,71 +9,38 @@ defmodule Sidecar.GRPC.Supervisor do
   def init(opts) do
     Logger.debug("Parser and compiling Protocol Buffers...")
 
-    with {:compiling_protos, :ok} <- {:compiling_protos, Generator.compile_protos()},
-         {:load_modules, {:ok, modules}} <- {:load_modules, Generator.load_modules(opts)},
-         {:compiling_modules, :ok} <- {:compiling_modules, Generator.compile_modules(modules)} do
-      children =
-        []
-        # |> start_healthcheck_actor()
-        |> maybe_start_reflection(Config.get(:grpc_reflection_enabled))
-        |> maybe_start_grpc_server(Config.get(:grpc_server_enabled))
+    children =
+      with {:compiling_protos, :ok} <-
+             {:compiling_protos, Generator.compile_protos()},
+           {:load_modules, {:ok, modules}} <- {:load_modules, Generator.load_modules(opts)},
+           {:compiling_modules, :ok} <- {:compiling_modules, Generator.compile_modules(modules)} do
+        children =
+          []
+          |> maybe_start_reflection(Config.get(:grpc_reflection_enabled))
+          |> maybe_start_grpc_server(Config.get(:grpc_server_enabled))
+      else
+        {:compiling_protos, {:ok, :nothing_to_compile}} ->
+          []
 
-      Supervisor.init(children, strategy: :one_for_one)
-    else
-      {:compiling_protos, error} ->
-        raise ArgumentError,
-              "Failed during compilation of ActorHost Protobufs files. Details: #{inspect(error)}"
+        {:compiling_protos, error} ->
+          raise ArgumentError,
+                "Failed during compilation of ActorHost Protobufs files. Details: #{inspect(error)}"
 
-      {:load_modules, error} ->
-        raise ArgumentError,
-              "Failed on load of ActorHost Protobufs modules. Details: #{inspect(error)}"
+        {:load_modules, error} ->
+          raise ArgumentError,
+                "Failed on load of ActorHost Protobufs modules. Details: #{inspect(error)}"
 
-      {:compiling_modules, error} ->
-        raise ArgumentError,
-              "Failed during compilation of ActorHost protobufs modules. Details: #{inspect(error)}"
+        {:compiling_modules, error} ->
+          raise ArgumentError,
+                "Failed during compilation of ActorHost protobufs modules. Details: #{inspect(error)}"
 
-      error ->
-        raise ArgumentError,
-              "Failed to load ActorHost Protobufs modules. Details: #{inspect(error)}"
-    end
+        error ->
+          raise ArgumentError,
+                "Failed to load ActorHost Protobufs modules. Details: #{inspect(error)}"
+      end
+
+    Supervisor.init(children, strategy: :one_for_one)
   end
-
-  # defp start_healthcheck_actor(children) do
-  #   Logger.info("Initializing HealthCheckActor...")
-
-  #   (children ++
-  #      [
-  #        [
-  #          %{
-  #            id: :healthcheck_actor_init,
-  #            start:
-  #              {Task, :start,
-  #               [
-  #                 fn ->
-  #                   Process.flag(:trap_exit, true)
-
-  #                   Logger.info("[SUPERVISOR] HealthCheckActor is up")
-  #                   registration =  %RegistrationRequest{
-  #                       service_info: attrs[:service_info] || build_service_info(),
-  #                       actor_system: attrs[:actor_system] || build_system()
-  #                     }
-  #                   Actors.register()
-
-  #                   receive do
-  #                     {:EXIT, _pid, reason} ->
-  #                       Logger.info(
-  #                         "[SUPERVISOR] HealthCheckActor:#{inspect(self())} is successfully down with reason #{inspect(reason)}"
-  #                       )
-
-  #                       :ok
-  #                   end
-  #                 end
-  #               ]}
-  #          }
-  #        ]
-  #      ])
-  #   |> List.flatten()
-  # end
 
   defp maybe_start_reflection(children, false), do: children
 

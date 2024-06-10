@@ -12,17 +12,16 @@ message MyState { int32 value = 1; }
 
 message MyBusinessMessage { int32 value = 1; }
 
-service PingPongService {
-  // Sends a greeting
+service Joe {
   rpc Ping(MyBusinessMessage) returns (MyBusinessMessage) {
     option (google.api.http) = {
-      get : "/v1/ping/{name}"
+      get : "/v1/ping"
     };
   }
 
   rpc Sum(MyBusinessMessage) returns (MyBusinessMessage) {
     option (google.api.http) = {
-      post : "/v1/sum/{name}"
+      post : "/v1/sum"
       body : "*"
     };
   }

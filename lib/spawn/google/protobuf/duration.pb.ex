@@ -48,6 +48,6 @@ defmodule Google.Protobuf.Duration do
     }
   end
 
-  field :seconds, 1, type: :int64
-  field :nanos, 2, type: :int32
+  field(:seconds, 1, type: :int64)
+  field(:nanos, 2, type: :int32)
 end

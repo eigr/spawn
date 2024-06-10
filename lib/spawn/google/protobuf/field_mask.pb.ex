@@ -34,5 +34,5 @@ defmodule Google.Protobuf.FieldMask do
     }
   end
 
-  field :paths, 1, repeated: true, type: :string
+  field(:paths, 1, repeated: true, type: :string)
 end

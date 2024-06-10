@@ -48,23 +48,31 @@ defmodule Sidecar.GRPC.CodeGenerator do
 
     user_defined_proto_files =
       list_files_with_extension(include_path, ".proto")
-      |> Enum.join(" ")
 
-    protoc_options = [
-      "--include-path=#{include_path}",
-      "--include-path=#{File.cwd!()}/priv/protos/google/protobuf",
-      "--include-path=#{File.cwd!()}/priv/protos/google/api",
-      "--generate-descriptors=true",
-      "--output-path=#{output_path}",
-      "--plugins=#{grpc_generator_plugin}",
-      "--plugins=#{handler_generator_plugin}",
-      "--plugins=Sidecar.GRPC.Generators.ServiceGenerator",
-      "--plugins=Sidecar.GRPC.Generators.ServiceResolverGenerator",
-      "--plugins=Sidecar.Grpc.Generators.ReflectionServerGenerator",
-      "#{include_path}/#{user_defined_proto_files}"
-    ]
+    mod_numbers = length(user_defined_proto_files)
 
-    _ = Generate.run(protoc_options)
+    user_defined_proto_files = user_defined_proto_files |> Enum.join(" ")
+
+    if mod_numbers > 0 do
+      protoc_options = [
+        "--include-path=#{include_path}",
+        "--include-path=#{File.cwd!()}/priv/protos/google/protobuf",
+        "--include-path=#{File.cwd!()}/priv/protos/google/api",
+        "--generate-descriptors=true",
+        "--output-path=#{output_path}",
+        "--plugins=#{grpc_generator_plugin}",
+        "--plugins=#{handler_generator_plugin}",
+        "--plugins=Sidecar.GRPC.Generators.ServiceGenerator",
+        "--plugins=Sidecar.GRPC.Generators.ServiceResolverGenerator",
+        "--plugins=Sidecar.Grpc.Generators.ReflectionServerGenerator",
+        "#{include_path}/#{user_defined_proto_files}"
+      ]
+
+      _ = Generate.run(protoc_options)
+      :ok
+    else
+      {:ok, :nothing_to_compile}
+    end
   end
 
   @doc """
@@ -100,6 +108,8 @@ defmodule Sidecar.GRPC.CodeGenerator do
         full_path = Path.join(path, file)
         File.read!(full_path)
       end)
+
+    Logger.debug("Found #{length(modules)} ActorHost contract modules to compiling...")
 
     {:ok, modules}
   end

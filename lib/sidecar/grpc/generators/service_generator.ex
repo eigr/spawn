@@ -9,6 +9,7 @@ defmodule Sidecar.GRPC.Generators.ServiceGenerator do
   @behaviour ProtobufGenerate.Plugin
 
   alias Protobuf.Protoc.Generator.Util
+  require Logger
 
   @impl true
   def template do
@@ -40,6 +41,7 @@ defmodule Sidecar.GRPC.Generators.ServiceGenerator do
   @impl true
   def generate(ctx, %Google.Protobuf.FileDescriptorProto{service: svcs} = _desc) do
     services = Enum.map(svcs, fn svc -> Util.mod_name(ctx, [Macro.camelize(svc.name)]) end)
+    Logger.debug("Generate follow services #{inspect(services)}")
 
     {List.first(services),
      [
