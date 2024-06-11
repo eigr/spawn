@@ -31,7 +31,10 @@ if Code.ensure_loaded?(:persistent_term) do
       {:grpc_server_enabled, "true"},
       {:grpc_reflection_enabled, "true"},
       {:grpc_http_transcoding_enabled, "true"},
-      {:grpc_compiled_modules_path, "#{File.cwd!()}/priv/protos/modules"},
+      # default values are evaluated at runtime.
+      {:grpc_compiled_modules_path, :runtime},
+      {:grpc_actors_protos_path, :runtime},
+      {:grpc_include_protos_path, :runtime},
       {:internal_nats_hosts, "nats://127.0.0.1:4222"},
       {:internal_nats_tls, "false"},
       {:internal_nats_auth, "false"},
@@ -268,8 +271,28 @@ if Code.ensure_loaded?(:persistent_term) do
       value
     end
 
-    defp load_env({:grpc_compiled_modules_path, default}) do
-      value = env("PROXY_GRPC_COMPILED_MODULES_PATH", default)
+    defp load_env({:grpc_actors_protos_path, :runtime}) do
+      default_value = "#{File.cwd!()}/priv/protos/actors"
+
+      value = env("PROXY_GRPC_ACTORS_PROTOS_PATH", default_value)
+      :persistent_term.put({__MODULE__, :grpc_actors_protos_path}, value)
+
+      value
+    end
+
+    defp load_env({:grpc_include_protos_path, :runtime}) do
+      default_value = "#{File.cwd!()}/priv/protos"
+
+      value = env("PROXY_GRPC_INCLUDE_PROTOS_PATH", default_value)
+      :persistent_term.put({__MODULE__, :grpc_include_protos_path}, value)
+
+      value
+    end
+
+    defp load_env({:grpc_compiled_modules_path, :runtime}) do
+      default_value = "#{File.cwd!()}/priv/protos/modules"
+
+      value = env("PROXY_GRPC_COMPILED_MODULES_PATH", default_value)
       :persistent_term.put({__MODULE__, :grpc_compiled_modules_path}, value)
 
       value

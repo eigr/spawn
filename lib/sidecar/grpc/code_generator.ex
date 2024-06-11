@@ -21,6 +21,7 @@ defmodule Sidecar.GRPC.CodeGenerator do
 
     ### Options:
 
+    - `:protos_path` - Include path of protobufs to generate (default: "priv/protos").
     - `:output_path` - Output path for generated code (default: "priv/protos/modules").
     - `:http_transcoding_enabled` - Enable HTTP transcoding (default: true).
 
@@ -32,7 +33,9 @@ defmodule Sidecar.GRPC.CodeGenerator do
   """
   def compile_protos(opts \\ []) do
     Logger.debug("Compiling ActorHost Protocol Buffers...")
-    include_path = "#{File.cwd!()}/priv/protos"
+
+    actors_path = Keyword.get(opts, :protos_path, Config.get(:grpc_actors_protos_path))
+    include_path = Keyword.get(opts, :protos_path, Config.get(:grpc_include_protos_path))
     output_path = Keyword.get(opts, :output_path, Config.get(:grpc_compiled_modules_path))
 
     transcoding_enabled? =
@@ -46,12 +49,11 @@ defmodule Sidecar.GRPC.CodeGenerator do
         {ProtobufGenerate.Plugins.GRPC, Sidecar.GRPC.Generators.HandlerGenerator}
       end
 
-    user_defined_proto_files_list =
-      list_files_with_extension(include_path, ".proto")
+    user_defined_proto_files_list = list_files_with_full_path_by_extensions(actors_path, ".proto")
 
-    files =
-      user_defined_proto_files_list
-      |> Enum.map(fn file -> "#{include_path}/#{file}" end)
+    Logger.info(
+      "Found #{length(user_defined_proto_files_list)} ActorHost Protocol Buffers to compile... (#{inspect(user_defined_proto_files_list)})"
+    )
 
     if length(user_defined_proto_files_list) > 0 do
       protoc_options =
@@ -64,10 +66,9 @@ defmodule Sidecar.GRPC.CodeGenerator do
           "--plugins=#{grpc_generator_plugin}",
           "--plugins=#{handler_generator_plugin}",
           "--plugins=Sidecar.GRPC.Generators.ServiceGenerator",
-          "--plugins=Sidecar.GRPC.Generators.ServiceResolverGenerator",
           "--plugins=Sidecar.Grpc.Generators.ReflectionServerGenerator"
         ] ++
-          files
+          user_defined_proto_files_list
 
       _ = Generate.run(protoc_options)
 
@@ -100,18 +101,13 @@ defmodule Sidecar.GRPC.CodeGenerator do
 
   """
   def load_modules(opts \\ []) do
-    Logger.debug("Loading ActorHost contract modules...")
     path = Keyword.get(opts, :output_path, Config.get(:grpc_compiled_modules_path))
 
-    user_defined_modules_files = list_files_with_extension(path, ".pb.ex")
+    user_defined_modules_files = list_files_with_full_path_by_extensions(path, ".pb.ex")
 
-    modules =
-      Enum.map(user_defined_modules_files, fn file ->
-        full_path = Path.join(path, file)
-        File.read!(full_path)
-      end)
+    modules = Enum.map(user_defined_modules_files, fn full_path -> File.read!(full_path) end)
 
-    Logger.debug("Found #{length(modules)} ActorHost contract modules to compiling...")
+    Logger.info("Found #{length(modules)} ActorHost Contract Modules to compile...")
 
     {:ok, modules}
   end
@@ -155,10 +151,30 @@ defmodule Sidecar.GRPC.CodeGenerator do
       Logger.error("Error during Service compilation phase #{inspect(error)}")
   end
 
-  defp list_files_with_extension(directory, extension) do
-    {:ok, files} = File.ls(directory)
+  defp list_files_with_full_path_by_extensions(directory, extension) do
+    case ls_r(directory) do
+      [] ->
+        Logger.warning("Not found any protos on #{inspect(directory)}")
 
-    files
-    |> Enum.filter(&String.ends_with?(&1, extension))
+      files ->
+        files
+        |> Enum.filter(&String.ends_with?(&1, extension))
+    end
+  end
+
+  def ls_r(path \\ ".") do
+    cond do
+      File.regular?(path) ->
+        [path]
+
+      File.dir?(path) ->
+        File.ls!(path)
+        |> Enum.map(&Path.join(path, &1))
+        |> Enum.map(&ls_r/1)
+        |> Enum.concat()
+
+      true ->
+        []
+    end
   end
 end

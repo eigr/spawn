@@ -1,23 +1,158 @@
-defmodule Io.Eigr.Spawn.Example.ClockActor.Service do
+defmodule Io.Eigr.Spawn.Example.MyState do
   @moduledoc false
-  use GRPC.Service, name: "io.eigr.spawn.example.ClockActor", protoc_gen_elixir_version: "0.12.0"
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
+
+  def descriptor do
+    # credo:disable-for-next-line
+    %Google.Protobuf.DescriptorProto{
+      name: "MyState",
+      field: [
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "value",
+          extendee: nil,
+          number: 1,
+          label: :LABEL_OPTIONAL,
+          type: :TYPE_INT32,
+          type_name: nil,
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "value",
+          proto3_optional: nil,
+          __unknown_fields__: []
+        }
+      ],
+      nested_type: [],
+      enum_type: [],
+      extension_range: [],
+      extension: [],
+      options: nil,
+      oneof_decl: [],
+      reserved_range: [],
+      reserved_name: [],
+      __unknown_fields__: []
+    }
+  end
+
+  field :value, 1, type: :int32
+end
+
+defmodule Io.Eigr.Spawn.Example.MyBusinessMessage do
+  @moduledoc false
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
+
+  def descriptor do
+    # credo:disable-for-next-line
+    %Google.Protobuf.DescriptorProto{
+      name: "MyBusinessMessage",
+      field: [
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "value",
+          extendee: nil,
+          number: 1,
+          label: :LABEL_OPTIONAL,
+          type: :TYPE_INT32,
+          type_name: nil,
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "value",
+          proto3_optional: nil,
+          __unknown_fields__: []
+        }
+      ],
+      nested_type: [],
+      enum_type: [],
+      extension_range: [],
+      extension: [],
+      options: nil,
+      oneof_decl: [],
+      reserved_range: [],
+      reserved_name: [],
+      __unknown_fields__: []
+    }
+  end
+
+  field :value, 1, type: :int32
+end
+
+defmodule Io.Eigr.Spawn.Example.Joe.Service do
+  @moduledoc false
+  use GRPC.Service, name: "io.eigr.spawn.example.Joe", protoc_gen_elixir_version: "0.12.0"
 
   def descriptor do
     # credo:disable-for-next-line
     %Google.Protobuf.FileDescriptorProto{
-      name: "clock.proto",
+      name: "actors/example.proto",
       package: "io.eigr.spawn.example",
       dependency: ["google/api/annotations.proto", "google/protobuf/empty.proto"],
-      message_type: [],
+      message_type: [
+        %Google.Protobuf.DescriptorProto{
+          name: "MyState",
+          field: [
+            %Google.Protobuf.FieldDescriptorProto{
+              name: "value",
+              extendee: nil,
+              number: 1,
+              label: :LABEL_OPTIONAL,
+              type: :TYPE_INT32,
+              type_name: nil,
+              default_value: nil,
+              options: nil,
+              oneof_index: nil,
+              json_name: "value",
+              proto3_optional: nil,
+              __unknown_fields__: []
+            }
+          ],
+          nested_type: [],
+          enum_type: [],
+          extension_range: [],
+          extension: [],
+          options: nil,
+          oneof_decl: [],
+          reserved_range: [],
+          reserved_name: [],
+          __unknown_fields__: []
+        },
+        %Google.Protobuf.DescriptorProto{
+          name: "MyBusinessMessage",
+          field: [
+            %Google.Protobuf.FieldDescriptorProto{
+              name: "value",
+              extendee: nil,
+              number: 1,
+              label: :LABEL_OPTIONAL,
+              type: :TYPE_INT32,
+              type_name: nil,
+              default_value: nil,
+              options: nil,
+              oneof_index: nil,
+              json_name: "value",
+              proto3_optional: nil,
+              __unknown_fields__: []
+            }
+          ],
+          nested_type: [],
+          enum_type: [],
+          extension_range: [],
+          extension: [],
+          options: nil,
+          oneof_decl: [],
+          reserved_range: [],
+          reserved_name: [],
+          __unknown_fields__: []
+        }
+      ],
       enum_type: [],
       service: [
         %Google.Protobuf.ServiceDescriptorProto{
-          name: "ClockActor",
+          name: "Joe",
           method: [
             %Google.Protobuf.MethodDescriptorProto{
-              name: "Clock",
+              name: "Ping",
               input_type: ".google.protobuf.Empty",
-              output_type: ".google.protobuf.Empty",
+              output_type: ".io.eigr.spawn.example.MyBusinessMessage",
               options: %Google.Protobuf.MethodOptions{
                 deprecated: false,
                 idempotency_level: :IDEMPOTENCY_UNKNOWN,
@@ -29,7 +164,7 @@ defmodule Io.Eigr.Spawn.Example.ClockActor.Service do
                     body: "",
                     additional_bindings: [],
                     response_body: "",
-                    pattern: {:get, "/v1/clock"},
+                    pattern: {:get, "/v1/ping"},
                     __unknown_fields__: []
                   }
                 },
@@ -40,9 +175,9 @@ defmodule Io.Eigr.Spawn.Example.ClockActor.Service do
               __unknown_fields__: []
             },
             %Google.Protobuf.MethodDescriptorProto{
-              name: "SecondClock",
-              input_type: ".google.protobuf.Empty",
-              output_type: ".google.protobuf.Empty",
+              name: "Sum",
+              input_type: ".io.eigr.spawn.example.MyBusinessMessage",
+              output_type: ".io.eigr.spawn.example.MyBusinessMessage",
               options: %Google.Protobuf.MethodOptions{
                 deprecated: false,
                 idempotency_level: :IDEMPOTENCY_UNKNOWN,
@@ -54,7 +189,7 @@ defmodule Io.Eigr.Spawn.Example.ClockActor.Service do
                     body: "*",
                     additional_bindings: [],
                     response_body: "",
-                    pattern: {:post, "/v1/second_clock"},
+                    pattern: {:post, "/v1/sum"},
                     __unknown_fields__: []
                   }
                 },
@@ -99,7 +234,7 @@ defmodule Io.Eigr.Spawn.Example.ClockActor.Service do
         location: [
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [],
-            span: [0, 0, 24, 1],
+            span: [0, 0, 28, 1],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -186,8 +321,104 @@ defmodule Io.Eigr.Spawn.Example.ClockActor.Service do
             __unknown_fields__: []
           },
           %Google.Protobuf.SourceCodeInfo.Location{
+            path: [4, 0],
+            span: [11, 0, 36],
+            leading_comments: nil,
+            trailing_comments: nil,
+            leading_detached_comments: [],
+            __unknown_fields__: []
+          },
+          %Google.Protobuf.SourceCodeInfo.Location{
+            path: [4, 0, 1],
+            span: [11, 8, 15],
+            leading_comments: nil,
+            trailing_comments: nil,
+            leading_detached_comments: [],
+            __unknown_fields__: []
+          },
+          %Google.Protobuf.SourceCodeInfo.Location{
+            path: [4, 0, 2, 0],
+            span: [11, 18, 34],
+            leading_comments: nil,
+            trailing_comments: nil,
+            leading_detached_comments: [],
+            __unknown_fields__: []
+          },
+          %Google.Protobuf.SourceCodeInfo.Location{
+            path: [4, 0, 2, 0, 5],
+            span: [11, 18, 23],
+            leading_comments: nil,
+            trailing_comments: nil,
+            leading_detached_comments: [],
+            __unknown_fields__: []
+          },
+          %Google.Protobuf.SourceCodeInfo.Location{
+            path: [4, 0, 2, 0, 1],
+            span: [11, 24, 29],
+            leading_comments: nil,
+            trailing_comments: nil,
+            leading_detached_comments: [],
+            __unknown_fields__: []
+          },
+          %Google.Protobuf.SourceCodeInfo.Location{
+            path: [4, 0, 2, 0, 3],
+            span: ~c"\v !",
+            leading_comments: nil,
+            trailing_comments: nil,
+            leading_detached_comments: [],
+            __unknown_fields__: []
+          },
+          %Google.Protobuf.SourceCodeInfo.Location{
+            path: [4, 1],
+            span: [13, 0, 46],
+            leading_comments: nil,
+            trailing_comments: nil,
+            leading_detached_comments: [],
+            __unknown_fields__: []
+          },
+          %Google.Protobuf.SourceCodeInfo.Location{
+            path: [4, 1, 1],
+            span: [13, 8, 25],
+            leading_comments: nil,
+            trailing_comments: nil,
+            leading_detached_comments: [],
+            __unknown_fields__: []
+          },
+          %Google.Protobuf.SourceCodeInfo.Location{
+            path: [4, 1, 2, 0],
+            span: [13, 28, 44],
+            leading_comments: nil,
+            trailing_comments: nil,
+            leading_detached_comments: [],
+            __unknown_fields__: []
+          },
+          %Google.Protobuf.SourceCodeInfo.Location{
+            path: [4, 1, 2, 0, 5],
+            span: [13, 28, 33],
+            leading_comments: nil,
+            trailing_comments: nil,
+            leading_detached_comments: [],
+            __unknown_fields__: []
+          },
+          %Google.Protobuf.SourceCodeInfo.Location{
+            path: [4, 1, 2, 0, 1],
+            span: ~c"\r\"'",
+            leading_comments: nil,
+            trailing_comments: nil,
+            leading_detached_comments: [],
+            __unknown_fields__: []
+          },
+          %Google.Protobuf.SourceCodeInfo.Location{
+            path: [4, 1, 2, 0, 3],
+            span: ~c"\r*+",
+            leading_comments: nil,
+            trailing_comments: nil,
+            leading_detached_comments: [],
+            __unknown_fields__: []
+          },
+          %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0],
-            span: [11, 0, 24, 1],
+            span: [15, 0, 28, 1],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -195,7 +426,7 @@ defmodule Io.Eigr.Spawn.Example.ClockActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 1],
-            span: [11, 8, 18],
+            span: [15, 8, 11],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -203,7 +434,7 @@ defmodule Io.Eigr.Spawn.Example.ClockActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 0],
-            span: [12, 2, 16, 3],
+            span: [16, 2, 20, 3],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -211,7 +442,7 @@ defmodule Io.Eigr.Spawn.Example.ClockActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 0, 1],
-            span: [12, 6, 11],
+            span: [16, 6, 10],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -219,7 +450,7 @@ defmodule Io.Eigr.Spawn.Example.ClockActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 0, 2],
-            span: ~c"\f\f!",
+            span: [16, 11, 32],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -227,7 +458,7 @@ defmodule Io.Eigr.Spawn.Example.ClockActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 0, 3],
-            span: ~c"\f,A",
+            span: [16, 43, 60],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -235,7 +466,7 @@ defmodule Io.Eigr.Spawn.Example.ClockActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 0, 4],
-            span: [13, 4, 15, 6],
+            span: [17, 4, 19, 6],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -243,7 +474,7 @@ defmodule Io.Eigr.Spawn.Example.ClockActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 0, 4, 72_295_728],
-            span: [13, 4, 15, 6],
+            span: [17, 4, 19, 6],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -251,7 +482,7 @@ defmodule Io.Eigr.Spawn.Example.ClockActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 1],
-            span: [18, 2, 23, 3],
+            span: [22, 2, 27, 3],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -259,7 +490,7 @@ defmodule Io.Eigr.Spawn.Example.ClockActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 1, 1],
-            span: [18, 6, 17],
+            span: [22, 6, 9],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -267,7 +498,7 @@ defmodule Io.Eigr.Spawn.Example.ClockActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 1, 2],
-            span: [18, 18, 39],
+            span: [22, 10, 27],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -275,7 +506,7 @@ defmodule Io.Eigr.Spawn.Example.ClockActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 1, 3],
-            span: [18, 50, 71],
+            span: [22, 38, 55],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -283,7 +514,7 @@ defmodule Io.Eigr.Spawn.Example.ClockActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 1, 4],
-            span: [19, 4, 22, 6],
+            span: [23, 4, 26, 6],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -291,7 +522,7 @@ defmodule Io.Eigr.Spawn.Example.ClockActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 1, 4, 72_295_728],
-            span: [19, 4, 22, 6],
+            span: [23, 4, 26, 6],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -308,7 +539,7 @@ defmodule Io.Eigr.Spawn.Example.ClockActor.Service do
     }
   end
 
-  rpc(:Clock, Google.Protobuf.Empty, Google.Protobuf.Empty, %{
+  rpc(:Ping, Google.Protobuf.Empty, Io.Eigr.Spawn.Example.MyBusinessMessage, %{
     http: %{
       type: Google.Api.PbExtension,
       value: %Google.Api.HttpRule{
@@ -316,13 +547,13 @@ defmodule Io.Eigr.Spawn.Example.ClockActor.Service do
         body: "",
         additional_bindings: [],
         response_body: "",
-        pattern: {:get, "/v1/clock"},
+        pattern: {:get, "/v1/ping"},
         __unknown_fields__: []
       }
     }
   })
 
-  rpc(:SecondClock, Google.Protobuf.Empty, Google.Protobuf.Empty, %{
+  rpc(:Sum, Io.Eigr.Spawn.Example.MyBusinessMessage, Io.Eigr.Spawn.Example.MyBusinessMessage, %{
     http: %{
       type: Google.Api.PbExtension,
       value: %Google.Api.HttpRule{
@@ -330,43 +561,44 @@ defmodule Io.Eigr.Spawn.Example.ClockActor.Service do
         body: "*",
         additional_bindings: [],
         response_body: "",
-        pattern: {:post, "/v1/second_clock"},
+        pattern: {:post, "/v1/sum"},
         __unknown_fields__: []
       }
     }
   })
 end
 
-defmodule Io.Eigr.Spawn.Example.ClockActor.ActorDispatcher do
+defmodule Io.Eigr.Spawn.Example.Joe.ActorDispatcher do
   @moduledoc since: "1.2.1"
-  use GRPC.Server, service: Io.Eigr.Spawn.Example.ClockActor.Service, http_transcode: true
+  use GRPC.Server, service: Io.Eigr.Spawn.Example.Joe.Service, http_transcode: true
 
   alias Sidecar.GRPC.Dispatcher
 
-  @spec clock(Google.Protobuf.Empty.t(), GRPC.Server.Stream.t()) :: Google.Protobuf.Empty.t()
-  def clock(message, stream) do
+  @spec ping(Google.Protobuf.Empty.t(), GRPC.Server.Stream.t()) ::
+          Io.Eigr.Spawn.Example.MyBusinessMessage.t()
+  def ping(message, stream) do
     request = %{
       system: "spawn-system",
-      actor_name: "ClockActor",
-      action_name: "Clock",
+      actor_name: "Joe",
+      action_name: "Ping",
       input: message,
       stream: stream,
-      descriptor: Io.Eigr.Spawn.Example.ClockActor.Service.descriptor()
+      descriptor: Io.Eigr.Spawn.Example.Joe.Service.descriptor()
     }
 
     Dispatcher.dispatch(request)
   end
 
-  @spec second_clock(Google.Protobuf.Empty.t(), GRPC.Server.Stream.t()) ::
-          Google.Protobuf.Empty.t()
-  def second_clock(message, stream) do
+  @spec sum(Io.Eigr.Spawn.Example.MyBusinessMessage.t(), GRPC.Server.Stream.t()) ::
+          Io.Eigr.Spawn.Example.MyBusinessMessage.t()
+  def sum(message, stream) do
     request = %{
       system: "spawn-system",
-      actor_name: "ClockActor",
-      action_name: "SecondClock",
+      actor_name: "Joe",
+      action_name: "Sum",
       input: message,
       stream: stream,
-      descriptor: Io.Eigr.Spawn.Example.ClockActor.Service.descriptor()
+      descriptor: Io.Eigr.Spawn.Example.Joe.Service.descriptor()
     }
 
     Dispatcher.dispatch(request)
@@ -380,7 +612,6 @@ defmodule Sidecar.GRPC.ProxyEndpoint do
   intercept(GRPC.Server.Interceptors.Logger)
 
   services = [
-    Io.Eigr.Spawn.Example.ClockActor.ActorDispatcher,
     Io.Eigr.Spawn.Example.Joe.ActorDispatcher
   ]
 
@@ -394,40 +625,6 @@ defmodule Sidecar.GRPC.ProxyEndpoint do
   run(services)
 end
 
-defmodule Sidecar.GRPC.ServiceResolver do
-  @moduledoc since: "1.2.1"
-
-  @actors [
-    {
-      "ClockActor",
-      %{
-        service_name: "Io.Eigr.Spawn.Example.ClockActor",
-        service_module: Io.Eigr.Spawn.Example.ClockActor.Service
-      }
-    }
-  ]
-
-  def has_actor?(actor_name) do
-    Enum.any?(@actors, fn {name, _} -> actor_name == name end)
-  end
-
-  def get_descriptor(actor_name) do
-    actor_attributes =
-      Enum.filter(@actors, fn {name, _} -> actor_name == name end)
-      |> Enum.map(fn {_name, attributes} -> attributes end)
-      |> List.first()
-
-    mod = Map.get(actor_attributes, :service_module)
-
-    mod.descriptor()
-    |> Map.get(:service)
-    |> Enum.filter(fn %Google.Protobuf.ServiceDescriptorProto{name: name} ->
-      actor_name == name
-    end)
-    |> List.first()
-  end
-end
-
 defmodule Sidecar.GRPC.Reflection.Server do
   @moduledoc since: "1.2.1"
 
@@ -435,7 +632,7 @@ defmodule Sidecar.GRPC.Reflection.Server do
     use GrpcReflection.Server,
       version: :v1,
       services: [
-        Io.Eigr.Spawn.Example.ClockActor.Service
+        Io.Eigr.Spawn.Example.Joe.Service
       ]
   end
 
@@ -443,7 +640,7 @@ defmodule Sidecar.GRPC.Reflection.Server do
     use GrpcReflection.Server,
       version: :v1alpha,
       services: [
-        Io.Eigr.Spawn.Example.ClockActor.Service
+        Io.Eigr.Spawn.Example.Joe.Service
       ]
   end
 end
