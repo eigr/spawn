@@ -14,10 +14,9 @@ defmodule Sidecar.GRPC.Supervisor do
              {:compiling_protos, Generator.compile_protos()},
            {:load_modules, {:ok, modules}} <- {:load_modules, Generator.load_modules(opts)},
            {:compiling_modules, :ok} <- {:compiling_modules, Generator.compile_modules(modules)} do
-        children =
-          []
-          |> maybe_start_reflection(Config.get(:grpc_reflection_enabled))
-          |> maybe_start_grpc_server(Config.get(:grpc_server_enabled))
+        []
+        |> maybe_start_reflection(Config.get(:grpc_reflection_enabled))
+        |> maybe_start_grpc_server(Config.get(:grpc_server_enabled))
       else
         {:compiling_protos, {:ok, :nothing_to_compile}} ->
           []
