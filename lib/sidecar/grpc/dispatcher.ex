@@ -80,9 +80,9 @@ defmodule Sidecar.GRPC.Dispatcher do
           input: message,
           stream: %GRPCStream{grpc_type: grpc_type} = stream,
           descriptor: _descriptor
-        } = request
+        } = _request
       ) do
-    Logger.info("Dispatching gRPC message to Actor #{system_name}:#{actor_name}.")
+    Logger.info("Dispatching gRPC message to Actor #{system_name}:#{actor_name}. with grpc_type: #{grpc_type}")
 
     handle_dispatch(system_name, actor_name, action_name, message, stream, grpc_type)
   end
@@ -103,7 +103,7 @@ defmodule Sidecar.GRPC.Dispatcher do
        ),
        do: handle_bidirectional_stream(system_name, actor_name, action_name, message, stream)
 
-  defp handle_dispatch(system_name, actor_name, action_name, message, stream, _),
+  defp handle_dispatch(system_name, actor_name, action_name, message, stream, :unary),
     do: handle_unary(system_name, actor_name, action_name, message, stream)
 
   defp handle_client_stream(system_name, actor_name, action_name, message, stream) do
@@ -131,7 +131,7 @@ defmodule Sidecar.GRPC.Dispatcher do
   defp dispatch_sync(system_name, actor_name, "Readiness", message, stream) do
     with {:actor_id, actor_id} <- {:actor_id, build_actor_id(system_name, actor_name, message)},
          {:response, {:ok, response}} <- {:response, invoke_readiness(actor_id)} do
-      Server.send_reply(stream, response)
+      server_send_reply(stream, response)
     else
       {:actor_id, {:not_found, _}} ->
         log_and_raise_error(
@@ -159,7 +159,7 @@ defmodule Sidecar.GRPC.Dispatcher do
   defp dispatch_sync(system_name, actor_name, "Liveness", message, stream) do
     with {:actor_id, actor_id} <- {:actor_id, build_actor_id(system_name, actor_name, message)},
          {:response, {:ok, response}} <- {:response, invoke_liveness(actor_id)} do
-      Server.send_reply(stream, response)
+      server_send_reply(stream, response)
     else
       {:actor_id, {:not_found, _}} ->
         log_and_raise_error(
@@ -189,7 +189,7 @@ defmodule Sidecar.GRPC.Dispatcher do
          {:request, {:ok, request}} <-
            {:request, build_request(actor_id, system_name, action_name, message, async: false)},
          {:response, {:ok, response}} <- {:response, invoke_request(request)} do
-      Server.send_reply(stream, response)
+      server_send_reply(stream, response)
     else
       {:actor_id, {:not_found, _}} ->
         log_and_raise_error(
@@ -226,7 +226,7 @@ defmodule Sidecar.GRPC.Dispatcher do
          {:request, {:ok, request}} <-
            {:request, build_request(actor_id, system_name, action_name, message, async: true)},
          {:response, {:ok, :async}} <- {:response, invoke_request(request)} do
-      Server.send_reply(stream, %{})
+      server_send_reply(stream, %{})
     else
       {:actor_id, {:not_found, _}} ->
         log_and_raise_error(
@@ -255,6 +255,14 @@ defmodule Sidecar.GRPC.Dispatcher do
           "Failed to invoke request for Actor #{system_name}:#{actor_name}. Details: #{inspect(error)}",
           GRPC.Status.unknown()
         )
+    end
+  end
+
+  defp server_send_reply(stream, response) do
+    if stream.grpc_type == :unary do
+      response
+    else
+      Server.send_reply(stream, response)
     end
   end
 
