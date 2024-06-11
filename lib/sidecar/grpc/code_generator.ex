@@ -46,12 +46,16 @@ defmodule Sidecar.GRPC.CodeGenerator do
         {ProtobufGenerate.Plugins.GRPC, Sidecar.GRPC.Generators.HandlerGenerator}
       end
 
-    user_defined_proto_files =
+    user_defined_proto_files_list =
       list_files_with_extension(include_path, ".proto")
 
-    mod_numbers = length(user_defined_proto_files)
+    mod_numbers = length(user_defined_proto_files_list)
 
-    user_defined_proto_files = user_defined_proto_files |> Enum.join(" ")
+    user_defined_proto_files = user_defined_proto_files_list |> Enum.join(" ")
+
+    files =
+      Enum.map(user_defined_proto_files_list, fn file -> "#{include_path}/#{file}" end)
+      |> Enum.join(" ")
 
     if mod_numbers > 0 do
       protoc_options = [
@@ -65,10 +69,11 @@ defmodule Sidecar.GRPC.CodeGenerator do
         "--plugins=Sidecar.GRPC.Generators.ServiceGenerator",
         "--plugins=Sidecar.GRPC.Generators.ServiceResolverGenerator",
         "--plugins=Sidecar.Grpc.Generators.ReflectionServerGenerator",
-        "#{include_path}/#{user_defined_proto_files}"
+        files
       ]
 
       _ = Generate.run(protoc_options)
+
       :ok
     else
       {:ok, :nothing_to_compile}
