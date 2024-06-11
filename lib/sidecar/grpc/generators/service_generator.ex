@@ -40,8 +40,14 @@ defmodule Sidecar.GRPC.Generators.ServiceGenerator do
 
   @impl true
   def generate(ctx, %Google.Protobuf.FileDescriptorProto{service: svcs} = _desc) do
-    services = Enum.map(svcs, fn svc -> Util.mod_name(ctx, [Macro.camelize(svc.name)]) end)
-    Logger.debug("Generate follow services #{inspect(services)}")
+    current_services = :persistent_term.get(:grpc_services, [])
+
+    services =
+      svcs
+      |> Enum.map(fn svc -> Util.mod_name(ctx, [Macro.camelize(svc.name)]) end)
+      |> Kernel.++(current_services)
+
+    :persistent_term.put(:grpc_services, services)
 
     {List.first(services),
      [

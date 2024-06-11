@@ -49,28 +49,25 @@ defmodule Sidecar.GRPC.CodeGenerator do
     user_defined_proto_files_list =
       list_files_with_extension(include_path, ".proto")
 
-    mod_numbers = length(user_defined_proto_files_list)
-
-    user_defined_proto_files = user_defined_proto_files_list |> Enum.join(" ")
-
     files =
-      Enum.map(user_defined_proto_files_list, fn file -> "#{include_path}/#{file}" end)
-      |> Enum.join(" ")
+      user_defined_proto_files_list
+      |> Enum.map(fn file -> "#{include_path}/#{file}" end)
 
-    if mod_numbers > 0 do
-      protoc_options = [
-        "--include-path=#{include_path}",
-        "--include-path=#{File.cwd!()}/priv/protos/google/protobuf",
-        "--include-path=#{File.cwd!()}/priv/protos/google/api",
-        "--generate-descriptors=true",
-        "--output-path=#{output_path}",
-        "--plugins=#{grpc_generator_plugin}",
-        "--plugins=#{handler_generator_plugin}",
-        "--plugins=Sidecar.GRPC.Generators.ServiceGenerator",
-        "--plugins=Sidecar.GRPC.Generators.ServiceResolverGenerator",
-        "--plugins=Sidecar.Grpc.Generators.ReflectionServerGenerator",
-        files
-      ]
+    if length(user_defined_proto_files_list) > 0 do
+      protoc_options =
+        [
+          "--include-path=#{include_path}",
+          "--include-path=#{File.cwd!()}/priv/protos/google/protobuf",
+          "--include-path=#{File.cwd!()}/priv/protos/google/api",
+          "--generate-descriptors=true",
+          "--output-path=#{output_path}",
+          "--plugins=#{grpc_generator_plugin}",
+          "--plugins=#{handler_generator_plugin}",
+          "--plugins=Sidecar.GRPC.Generators.ServiceGenerator",
+          "--plugins=Sidecar.GRPC.Generators.ServiceResolverGenerator",
+          "--plugins=Sidecar.Grpc.Generators.ReflectionServerGenerator"
+        ] ++
+          files
 
       _ = Generate.run(protoc_options)
 

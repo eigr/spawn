@@ -17,7 +17,6 @@ service Joe {
   rpc Ping(google.protobuf.Empty) returns (MyBusinessMessage) {
     option (google.api.http) = {
       get : "/v1/ping"
-      body : "*"
     };
   }
 
