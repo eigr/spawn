@@ -106,6 +106,14 @@ defmodule Actors.Actor.CallerConsumer do
     reply_to_producer(from, get_state(event))
   end
 
+  defp dispatch_to_actor({from, {:readiness, event, _opts}} = _producer_event) do
+    reply_to_producer(from, readiness(event))
+  end
+
+  defp dispatch_to_actor({from, {:liveness, event, _opts}} = _producer_event) do
+    reply_to_producer(from, liveness(event))
+  end
+
   defp dispatch_to_actor({from, {:spawn_actor, event, opts}} = _producer_event) do
     reply_to_producer(from, spawn_actor(event, opts))
   end
@@ -143,6 +151,7 @@ defmodule Actors.Actor.CallerConsumer do
         opts
       ) do
     if Sidecar.GracefulShutdown.running?() do
+      # actors ++ [%Actor{id: %ActorId{} = id, settings: %ActorSettings{} = settings}]
       actors
       |> Map.values()
       |> Enum.map(fn actor -> ActorPool.create_actor_host_pool(actor, opts) end)
@@ -220,6 +229,148 @@ defmodule Actors.Actor.CallerConsumer do
           nil,
           fn actor_ref, _actor_ref_id ->
             ActorEntity.get_state(actor_ref)
+          end
+        )
+      rescue
+        e ->
+          Logger.error("Failure to make a call to actor #{inspect(actor_name)} #{inspect(e)}")
+
+          reraise e, __STACKTRACE__
+      end
+    after
+      result -> result
+    else
+      error -> error
+    end
+  end
+
+  @doc """
+  Performs a readiness check for a given actor identified by `%ActorId{}`.
+
+  This function uses a retry mechanism with exponential backoff, randomization, and a 30-second expiry to handle errors and failures gracefully.
+  It attempts to check the readiness of the specified actor, logging any errors encountered during the process.
+
+  ## Parameters
+
+    - `id`: An `%ActorId{}` struct that contains:
+      - `name`: The name of the actor.
+      - `system`: The name of the system the actor belongs to.
+
+  ## Returns
+
+    - `{:ok, %HealthCheckReply{}}` if the readiness check is successful. The `HealthCheckReply` struct contains:
+      - `status`: A `HealthcheckStatus` struct with:
+        - `status`: A string indicating the status, e.g., "OK".
+        - `details`: A string providing additional details, e.g., "I'm alive!".
+        - `updated_at`: A `Google.Protobuf.Timestamp` indicating the last update time.
+    - An error tuple (e.g., `{:error, :noproc}`) if the readiness check fails after all retry attempts.
+
+  ## Examples
+
+      iex> readiness(%ActorId{name: "actor1", system: "system1"})
+      {:ok,
+        %HealthCheckReply{
+          status: %HealthcheckStatus{
+            status: "OK",
+            details: "I'm alive!",
+            updated_at: %Google.Protobuf.Timestamp{seconds: 1717606730}
+          }
+        }}
+
+      iex> readiness(%ActorId{name: "nonexistent_actor", system: "system1"})
+      {:error, :noproc}
+
+  ## Notes
+
+  The retry mechanism handles the following cases: `:error`, `:exit`, `:noproc`, `:erpc`, `:noconnection`, and `:timeout`. It rescues only `ErlangError`.
+
+  The readiness check is performed by calling `ActorEntity.readiness/2` on the actor reference obtained through `do_lookup_action/4`.
+
+  Any errors during the readiness check are logged with a message indicating the actor's name and the error encountered.
+  """
+  @spec readiness(ActorId.t()) :: {:ok, HealthCheckReply.t()} | {:error, any()}
+  def readiness(%ActorId{name: actor_name, system: system_name} = id) do
+    retry with: exponential_backoff() |> randomize |> expiry(30_000),
+          atoms: [:error, :exit, :noproc, :erpc, :noconnection, :timeout],
+          rescue_only: [ErlangError] do
+      try do
+        do_lookup_action(
+          system_name,
+          {false, system_name, actor_name, id},
+          nil,
+          fn actor_ref, _actor_ref_id ->
+            ActorEntity.readiness(actor_ref)
+          end
+        )
+      rescue
+        e ->
+          Logger.error("Failure to make a call to actor #{inspect(actor_name)} #{inspect(e)}")
+
+          reraise e, __STACKTRACE__
+      end
+    after
+      result -> result
+    else
+      error -> error
+    end
+  end
+
+  @doc """
+  Performs a liveness check for a given actor identified by `%ActorId{}`.
+
+  This function uses a retry mechanism with exponential backoff, randomization, and a 30-second expiry to handle errors and failures gracefully.
+  It attempts to check the liveness of the specified actor, logging any errors encountered during the process.
+
+  ## Parameters
+
+    - `id`: An `%ActorId{}` struct that contains:
+      - `name`: The name of the actor.
+      - `system`: The name of the system the actor belongs to.
+
+  ## Returns
+
+    - `{:ok, %HealthCheckReply{}}` if the liveness check is successful. The `HealthCheckReply` struct contains:
+      - `status`: A `HealthcheckStatus` struct with:
+        - `status`: A string indicating the status, e.g., "OK".
+        - `details`: A string providing additional details, e.g., "I'm alive!".
+        - `updated_at`: A `Google.Protobuf.Timestamp` indicating the last update time.
+    - An error tuple (e.g., `{:error, :noproc}`) if the liveness check fails after all retry attempts.
+
+  ## Examples
+
+      iex> liveness(%ActorId{name: "actor1", system: "system1"})
+      {:ok,
+        %HealthCheckReply{
+          status: %HealthcheckStatus{
+            status: "OK",
+            details: "I'm still alive!",
+            updated_at: %Google.Protobuf.Timestamp{seconds: 1717606837}
+          }
+        }}
+
+      iex> liveness(%ActorId{name: "nonexistent_actor", system: "system1"})
+      {:error, :noproc}
+
+  ## Notes
+
+  The retry mechanism handles the following cases: `:error`, `:exit`, `:noproc`, `:erpc`, `:noconnection`, and `:timeout`. It rescues only `ErlangError`.
+
+  The liveness check is performed by calling `ActorEntity.liveness/2` on the actor reference obtained through `do_lookup_action/4`.
+
+  Any errors during the liveness check are logged with a message indicating the actor's name and the error encountered.
+  """
+  @spec liveness(ActorId.t()) :: {:ok, HealthCheckReply.t()} | {:error, any()}
+  def liveness(%ActorId{name: actor_name, system: system_name} = id) do
+    retry with: exponential_backoff() |> randomize |> expiry(30_000),
+          atoms: [:error, :exit, :noproc, :erpc, :noconnection, :timeout],
+          rescue_only: [ErlangError] do
+      try do
+        do_lookup_action(
+          system_name,
+          {false, system_name, actor_name, id},
+          nil,
+          fn actor_ref, _actor_ref_id ->
+            ActorEntity.liveness(actor_ref)
           end
         )
       rescue

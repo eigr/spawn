@@ -1,6 +1,6 @@
 defmodule Eigr.Functions.Protocol.Actors.Kind do
   @moduledoc false
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -54,7 +54,7 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.Registry.ActorsEntry do
   @moduledoc false
-  use Protobuf, map: true, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, map: true, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -99,6 +99,8 @@ defmodule Eigr.Functions.Protocol.Actors.Registry.ActorsEntry do
         no_standard_descriptor_accessor: false,
         deprecated: false,
         map_entry: true,
+        deprecated_legacy_json_field_conflicts: nil,
+        # features: nil,
         uninterpreted_option: [],
         __pb_extensions__: %{},
         __unknown_fields__: []
@@ -116,7 +118,7 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.Registry do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -180,6 +182,8 @@ defmodule Eigr.Functions.Protocol.Actors.Registry do
             no_standard_descriptor_accessor: false,
             deprecated: false,
             map_entry: true,
+            deprecated_legacy_json_field_conflicts: nil,
+            # features: nil,
             uninterpreted_option: [],
             __pb_extensions__: %{},
             __unknown_fields__: []
@@ -210,7 +214,7 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.ActorSystem do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -264,7 +268,7 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.ActorSnapshotStrategy do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -311,7 +315,7 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.ActorDeactivationStrategy do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -358,7 +362,7 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.TimeoutStrategy do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -397,7 +401,7 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.Action do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -436,7 +440,7 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.FixedTimerAction do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -490,7 +494,7 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.ActorState.TagsEntry do
   @moduledoc false
-  use Protobuf, map: true, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, map: true, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -535,6 +539,8 @@ defmodule Eigr.Functions.Protocol.Actors.ActorState.TagsEntry do
         no_standard_descriptor_accessor: false,
         deprecated: false,
         map_entry: true,
+        deprecated_legacy_json_field_conflicts: nil,
+        # features: nil,
         uninterpreted_option: [],
         __pb_extensions__: %{},
         __unknown_fields__: []
@@ -552,7 +558,7 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.ActorState do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -630,6 +636,8 @@ defmodule Eigr.Functions.Protocol.Actors.ActorState do
             no_standard_descriptor_accessor: false,
             deprecated: false,
             map_entry: true,
+            deprecated_legacy_json_field_conflicts: nil,
+            # features: nil,
             uninterpreted_option: [],
             __pb_extensions__: %{},
             __unknown_fields__: []
@@ -662,7 +670,7 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.Metadata.TagsEntry do
   @moduledoc false
-  use Protobuf, map: true, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, map: true, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -707,6 +715,8 @@ defmodule Eigr.Functions.Protocol.Actors.Metadata.TagsEntry do
         no_standard_descriptor_accessor: false,
         deprecated: false,
         map_entry: true,
+        deprecated_legacy_json_field_conflicts: nil,
+        # features: nil,
         uninterpreted_option: [],
         __pb_extensions__: %{},
         __unknown_fields__: []
@@ -724,7 +734,7 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.Metadata do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -802,6 +812,8 @@ defmodule Eigr.Functions.Protocol.Actors.Metadata do
             no_standard_descriptor_accessor: false,
             deprecated: false,
             map_entry: true,
+            deprecated_legacy_json_field_conflicts: nil,
+            # features: nil,
             uninterpreted_option: [],
             __pb_extensions__: %{},
             __unknown_fields__: []
@@ -838,7 +850,7 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.Channel do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -892,7 +904,7 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.ActorSettings do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -1015,7 +1027,7 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.ActorId do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -1084,7 +1096,7 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.Actor do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.11.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line

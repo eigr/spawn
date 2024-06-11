@@ -96,6 +96,52 @@ defmodule Actors.Actor.CallerProducer do
   end
 
   @doc """
+  Performs a readiness check for a given actor.
+
+  ## Parameters
+
+  - `actor_id` (ActorId.t()): The ID of the actor.
+  - `opts` (any): Additional options.
+
+  ## Returns
+
+  - `{:ok, response}`: If the response is successfully.
+  - `{:error, reason}`: If an error occurs during the operation.
+
+  """
+  @spec readiness(ActorId.t()) :: {:ok, term()} | {:error, term()}
+  def readiness(actor_id, opts \\ []) do
+    if Config.get(:actors_global_backpressure_enabled) do
+      GenStage.call(__MODULE__, {:enqueue, {:readiness, actor_id, opts}}, :infinity)
+    else
+      CallerConsumer.readiness(actor_id)
+    end
+  end
+
+  @doc """
+  Performs a liveness check for a given actor.
+
+  ## Parameters
+
+  - `actor_id` (ActorId.t()): The ID of the actor.
+  - `opts` (any): Additional options.
+
+  ## Returns
+
+  - `{:ok, response}`: If the response is successfully.
+  - `{:error, reason}`: If an error occurs during the operation.
+
+  """
+  @spec liveness(ActorId.t()) :: {:ok, term()} | {:error, term()}
+  def liveness(actor_id, opts \\ []) do
+    if Config.get(:actors_global_backpressure_enabled) do
+      GenStage.call(__MODULE__, {:enqueue, {:liveness, actor_id, opts}}, :infinity)
+    else
+      CallerConsumer.liveness(actor_id)
+    end
+  end
+
+  @doc """
   Registers an actor with the specified registration request.
 
   ## Parameters

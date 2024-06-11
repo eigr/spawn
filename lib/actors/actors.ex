@@ -41,6 +41,40 @@ defmodule Actors do
   defdelegate get_state(id), to: CallerProducer
 
   @doc """
+  Performs a readiness check for a given actor.
+
+  ## Parameters
+
+  - `actor_id` (ActorId.t()): The ID of the actor.
+  - `opts` (any): Additional options.
+
+  ## Returns
+
+  - `{:ok, response}`: If the response is successfully.
+  - `{:error, reason}`: If an error occurs during the operation.
+
+  """
+  @spec readiness(ActorId.t()) :: {:ok, term()} | {:error, term()}
+  defdelegate readiness(id), to: CallerProducer
+
+  @doc """
+  Performs a liveness check for a given actor.
+
+  ## Parameters
+
+  - `actor_id` (ActorId.t()): The ID of the actor.
+  - `opts` (any): Additional options.
+
+  ## Returns
+
+  - `{:ok, response}`: If the response is successfully.
+  - `{:error, reason}`: If an error occurs during the operation.
+
+  """
+  @spec liveness(ActorId.t()) :: {:ok, term()} | {:error, term()}
+  defdelegate liveness(id), to: CallerProducer
+
+  @doc """
   Spawn actors defined in HostActor.
 
     * `registration` - The SpawnRequest

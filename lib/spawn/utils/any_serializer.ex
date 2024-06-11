@@ -24,6 +24,8 @@ defmodule Spawn.Utils.AnySerializer do
     |> maybe_unpack_json!
   end
 
+  def unpack_unknown(_), do: nil
+
   defp normalize_package_name(type_url) do
     type_url
     |> String.replace("type.googleapis.com/", "")
@@ -48,8 +50,6 @@ defmodule Spawn.Utils.AnySerializer do
       upcase_first(part)
     end
   end
-
-  def unpack_unknown(_), do: nil
 
   defp maybe_unpack_json!(%JSONType{} = json) do
     Jason.decode!(json.content, keys: :atoms)

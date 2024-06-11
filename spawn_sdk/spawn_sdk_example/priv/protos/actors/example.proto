@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package io.eigr.spawn.example;
+
+option java_multiple_files = true;
+option java_package = "io.eigr.spawn.example";
+option java_outer_classname = "ExampleProtos";
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+message MyState { int32 value = 1; }
+
+message MyBusinessMessage { int32 value = 1; }
+
+service Joe {
+  rpc Ping(google.protobuf.Empty) returns (MyBusinessMessage) {
+    option (google.api.http) = {
+      get : "/v1/ping"
+    };
+  }
+
+  rpc Sum(MyBusinessMessage) returns (MyBusinessMessage) {
+    option (google.api.http) = {
+      post : "/v1/sum"
+      body : "*"
+    };
+  }
+}

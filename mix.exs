@@ -75,8 +75,11 @@ defmodule Spawn.MixProject do
       {:shards, "~> 1.1"},
       {:telemetry, "~> 1.0"},
       {:castore, "~> 1.0"},
-      {:protobuf, "~> 0.11"},
-      {:finch, "~> 0.16"},
+      {:protobuf, "~> 0.12"},
+      {:protobuf_generate, "~> 0.1"},
+      {:grpc, "~> 0.8"},
+      {:grpc_reflection, "~> 0.1"},
+      {:finch, "~> 0.18"},
       {:retry, "~> 0.17"},
       {:flow, "~> 1.2"},
       {:libcluster, "~> 3.3"},
@@ -88,6 +91,8 @@ defmodule Spawn.MixProject do
       {:gnat, "~> 1.7"},
       {:k8s, "~> 2.2"},
       {:k8s_webhoox, "~> 0.2"},
+      # temporary until bandit releases 1.5.4
+      {:hpax, "~> 0.1.1"},
       # Metrics & Tracing deps
       {:telemetry_poller, "~> 1.0"},
       {:telemetry_metrics, "~> 1.0"},

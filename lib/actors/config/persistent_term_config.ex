@@ -26,6 +26,15 @@ if Code.ensure_loaded?(:persistent_term) do
       {:delayed_invokes, "true"},
       {:deployment_mode, "sidecar"},
       {:http_port, "9001"},
+      {:http_num_acceptors, "150"},
+      {:grpc_port, "9980"},
+      {:grpc_server_enabled, "true"},
+      {:grpc_reflection_enabled, "true"},
+      {:grpc_http_transcoding_enabled, "true"},
+      # default values are evaluated at runtime.
+      {:grpc_compiled_modules_path, :runtime},
+      {:grpc_actors_protos_path, :runtime},
+      {:grpc_include_protos_path, :runtime},
       {:internal_nats_hosts, "nats://127.0.0.1:4222"},
       {:internal_nats_tls, "false"},
       {:internal_nats_auth, "false"},
@@ -49,6 +58,7 @@ if Code.ensure_loaded?(:persistent_term) do
       {:proxy_http_client_adapter_pool_schedulers, "0"},
       {:proxy_http_client_adapter_pool_size, "30"},
       {:proxy_http_client_adapter_pool_max_idle_timeout, "1000"},
+      {:proxy_proto_descriptor_path, "/app/protos/user-function.desc"},
       {:proxy_cluster_strategy, "gossip"},
       {:proxy_headless_service, "proxy-headless"},
       {:proxy_cluster_polling_interval, "3000"},
@@ -217,6 +227,83 @@ if Code.ensure_loaded?(:persistent_term) do
         |> String.to_integer()
 
       :persistent_term.put({__MODULE__, :http_port}, value)
+
+      value
+    end
+
+    defp load_env({:grpc_port, default}) do
+      value =
+        env("PROXY_GRPC_PORT", default)
+        |> String.to_integer()
+
+      :persistent_term.put({__MODULE__, :grpc_port}, value)
+
+      value
+    end
+
+    defp load_env({:grpc_server_enabled, default}) do
+      value =
+        env("PROXY_GRPC_SERVER_ENABLED", default)
+        |> to_bool()
+
+      :persistent_term.put({__MODULE__, :grpc_server_enabled}, value)
+
+      value
+    end
+
+    defp load_env({:grpc_reflection_enabled, default}) do
+      value =
+        env("PROXY_GRPC_REFLECTION_ENABLED", default)
+        |> to_bool()
+
+      :persistent_term.put({__MODULE__, :grpc_reflection_enabled}, value)
+
+      value
+    end
+
+    defp load_env({:grpc_http_transcoding_enabled, default}) do
+      value =
+        env("PROXY_GRPC_HTTP_TRANSCODING_ENABLED", default)
+        |> to_bool()
+
+      :persistent_term.put({__MODULE__, :grpc_http_transcoding_enabled}, value)
+
+      value
+    end
+
+    defp load_env({:grpc_actors_protos_path, :runtime}) do
+      default_value = "#{File.cwd!()}/priv/protos/actors"
+
+      value = env("PROXY_GRPC_ACTORS_PROTOS_PATH", default_value)
+      :persistent_term.put({__MODULE__, :grpc_actors_protos_path}, value)
+
+      value
+    end
+
+    defp load_env({:grpc_include_protos_path, :runtime}) do
+      default_value = "#{File.cwd!()}/priv/protos"
+
+      value = env("PROXY_GRPC_INCLUDE_PROTOS_PATH", default_value)
+      :persistent_term.put({__MODULE__, :grpc_include_protos_path}, value)
+
+      value
+    end
+
+    defp load_env({:grpc_compiled_modules_path, :runtime}) do
+      default_value = "#{File.cwd!()}/priv/protos/modules"
+
+      value = env("PROXY_GRPC_COMPILED_MODULES_PATH", default_value)
+      :persistent_term.put({__MODULE__, :grpc_compiled_modules_path}, value)
+
+      value
+    end
+
+    defp load_env({:http_num_acceptors, default}) do
+      value =
+        env("PROXY_HTTP_NUM_ACCEPTORS", default)
+        |> String.to_integer()
+
+      :persistent_term.put({__MODULE__, :http_num_acceptors}, value)
 
       value
     end
@@ -410,6 +497,14 @@ if Code.ensure_loaded?(:persistent_term) do
         |> String.to_integer()
 
       :persistent_term.put({__MODULE__, :proxy_http_client_adapter_pool_max_idle_timeout}, value)
+
+      value
+    end
+
+    defp load_env({:proxy_proto_descriptor_path, default}) do
+      value = env("PROXY_PROTO_DESCRIPTOR_PATH", default)
+
+      :persistent_term.put({__MODULE__, :proxy_proto_descriptor_path}, value)
 
       value
     end

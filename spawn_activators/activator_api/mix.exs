@@ -31,7 +31,7 @@ defmodule ActivatorAPI.MixProject do
   defp deps do
     [
       {:activator, path: "../activator"},
-      {:grpc, "~> 0.5"},
+      {:grpc, "~> 0.8"},
       {:gun, "~> 2.0", override: true},
       {:cowlib, "~> 2.11", override: true}
     ]
