@@ -155,6 +155,7 @@ defmodule Sidecar.GRPC.CodeGenerator do
     case ls_r(directory) do
       [] ->
         Logger.warning("Not found any protos on #{inspect(directory)}")
+        []
 
       files ->
         files
