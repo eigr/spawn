@@ -73,4 +73,4 @@ config :mnesiac,
   schema_type: :disc_copies,
   table_load_timeout: 600_000
 
-# import_config "#{config_env()}.exs"
+import_config "#{config_env()}.exs"

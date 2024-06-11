@@ -82,7 +82,9 @@ defmodule Sidecar.GRPC.Dispatcher do
           descriptor: _descriptor
         } = _request
       ) do
-    Logger.info("Dispatching gRPC message to Actor #{system_name}:#{actor_name}. with grpc_type: #{grpc_type}")
+    Logger.info(
+      "Dispatching gRPC message to Actor #{system_name}:#{actor_name}. with grpc_type: #{grpc_type}"
+    )
 
     handle_dispatch(system_name, actor_name, action_name, message, stream, grpc_type)
   end
@@ -335,9 +337,6 @@ defmodule Sidecar.GRPC.Dispatcher do
      }}
   end
 
-  defp build_healthcheck_request(_actor_id, _actor_system, _action_name, _opts),
-    do: %Google.Protobuf.Empty{}
-
   defp invoke_readiness(nil), do: {:error, :invalid_payload}
 
   defp invoke_readiness(request), do: CallerProducer.readiness(request)
@@ -356,8 +355,7 @@ defmodule Sidecar.GRPC.Dispatcher do
       {:ok, %ActorInvocationResponse{payload: %Google.Protobuf.Any{} = response}} ->
         {:ok, unpack_unknown(response)}
 
-      {:ok,
-       %ActorInvocationResponse{payload: {:noop, %Eigr.Functions.Protocol.Noop{}} = response}} ->
+      {:ok, %ActorInvocationResponse{payload: {:noop, %Eigr.Functions.Protocol.Noop{}}}} ->
         {:ok, %Google.Protobuf.Empty{}}
 
       :async ->
