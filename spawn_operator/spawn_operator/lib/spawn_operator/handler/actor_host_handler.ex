@@ -22,7 +22,7 @@ defmodule SpawnOperator.Handler.ActorHostHandler do
           spawn-eigr.io.sidecar.containerImage: "docker.io/eigr/spawn-proxy"
 
           # Optional
-          spawn-eigr.io.sidecar.containerVersion: "1.3.3"
+          spawn-eigr.io.sidecar.containerVersion: "1.4.0"
 
           # Optional. Default 9001
           spawn-eigr.io.sidecar.httpPort: 9001

@@ -27,7 +27,7 @@ RUN mix deps.get \
     && mix release spawn_initializer
 
 # ---- Application Stage ----
-FROM alpine:3.19.1
+FROM alpine:3.20
 
 RUN apk add --no-cache --update zstd ncurses-libs libstdc++ libgcc
 

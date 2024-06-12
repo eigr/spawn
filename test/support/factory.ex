@@ -137,7 +137,7 @@ defmodule Actors.FactoryTest do
   def build_service_info(attrs \\ []) do
     %ServiceInfo{
       service_name: attrs[:service_name] || "test_service",
-      service_version: attrs[:service_version] || "1.3.3",
+      service_version: attrs[:service_version] || "1.4.0",
       service_runtime: attrs[:service_runtime] || "test_runtime",
       support_library_name: attrs[:support_library_name] || "",
       support_library_version: attrs[:support_library_version] || "",
