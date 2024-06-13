@@ -160,6 +160,7 @@ defmodule Sidecar.GRPC.CodeGenerator do
       files ->
         files
         |> Enum.filter(&String.ends_with?(&1, extension))
+        |> Enum.sort()
     end
   end
 
