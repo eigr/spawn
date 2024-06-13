@@ -63,10 +63,10 @@ defmodule Sidecar.GRPC.CodeGenerator do
           "--include-path=#{File.cwd!()}/priv/protos/google/api",
           "--generate-descriptors=true",
           "--output-path=#{output_path}",
-          "--plugins=#{grpc_generator_plugin}",
-          "--plugins=#{handler_generator_plugin}",
-          "--plugins=Sidecar.GRPC.Generators.ServiceGenerator",
-          "--plugins=Sidecar.Grpc.Generators.ReflectionServerGenerator"
+          "--plugin=#{grpc_generator_plugin}",
+          "--plugin=#{handler_generator_plugin}",
+          "--plugin=Sidecar.GRPC.Generators.ServiceGenerator",
+          "--plugin=Sidecar.Grpc.Generators.ReflectionServerGenerator"
         ] ++
           user_defined_proto_files_list
 
