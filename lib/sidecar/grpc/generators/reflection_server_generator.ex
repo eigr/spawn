@@ -14,7 +14,6 @@ defmodule Sidecar.Grpc.Generators.ReflectionServerGenerator do
   def template do
     """
     defmodule Sidecar.GRPC.Reflection.Server do
-      @moduledoc since: "1.2.1"
 
       defmodule V1 do
         use GrpcReflection.Server, version: :v1, services: [

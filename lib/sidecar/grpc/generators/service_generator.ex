@@ -15,7 +15,6 @@ defmodule Sidecar.GRPC.Generators.ServiceGenerator do
   def template do
     """
     defmodule Sidecar.GRPC.ProxyEndpoint do
-      @moduledoc false
       use GRPC.Endpoint
 
       intercept(GRPC.Server.Interceptors.Logger)

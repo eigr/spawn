@@ -15,7 +15,6 @@ defmodule Sidecar.GRPC.Generators.HandlerGenerator do
   def template do
     """
     defmodule <%= @module %>.ActorDispatcher do
-      @moduledoc since: "1.2.1"
       use GRPC.Server, service: <%= @service_name %>
 
       alias Sidecar.GRPC.Dispatcher
