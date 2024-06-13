@@ -107,7 +107,7 @@ defmodule Sidecar.GRPC.CodeGenerator do
 
     modules = Enum.map(user_defined_modules_files, fn full_path -> File.read!(full_path) end)
 
-    Logger.info("Found #{length(modules)} ActorHost Contract Modules to compile...")
+    Logger.info("Found #{length(modules)} ActorHost Contract Modules to load...")
 
     {:ok, modules}
   end

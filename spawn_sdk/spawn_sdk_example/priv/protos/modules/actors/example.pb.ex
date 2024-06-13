@@ -156,7 +156,6 @@ defmodule Io.Eigr.Spawn.Example.Joe.Service do
               options: %Google.Protobuf.MethodOptions{
                 deprecated: false,
                 idempotency_level: :IDEMPOTENCY_UNKNOWN,
-                features: nil,
                 uninterpreted_option: [],
                 __pb_extensions__: %{
                   {Google.Api.PbExtension, :http} => %Google.Api.HttpRule{
@@ -181,7 +180,6 @@ defmodule Io.Eigr.Spawn.Example.Joe.Service do
               options: %Google.Protobuf.MethodOptions{
                 deprecated: false,
                 idempotency_level: :IDEMPOTENCY_UNKNOWN,
-                features: nil,
                 uninterpreted_option: [],
                 __pb_extensions__: %{
                   {Google.Api.PbExtension, :http} => %Google.Api.HttpRule{
@@ -223,9 +221,9 @@ defmodule Io.Eigr.Spawn.Example.Joe.Service do
         swift_prefix: nil,
         php_class_prefix: nil,
         php_namespace: nil,
+        php_generic_services: false,
         php_metadata_namespace: nil,
         ruby_package: nil,
-        features: nil,
         uninterpreted_option: [],
         __pb_extensions__: %{},
         __unknown_fields__: []
@@ -612,7 +610,8 @@ defmodule Sidecar.GRPC.ProxyEndpoint do
   intercept(GRPC.Server.Interceptors.Logger)
 
   services = [
-    Io.Eigr.Spawn.Example.Joe.ActorDispatcher
+    Io.Eigr.Spawn.Example.Joe.ActorDispatcher,
+    Io.Eigr.Spawn.Example.ClockActor.ActorDispatcher
   ]
 
   services =
@@ -632,7 +631,8 @@ defmodule Sidecar.GRPC.Reflection.Server do
     use GrpcReflection.Server,
       version: :v1,
       services: [
-        Io.Eigr.Spawn.Example.Joe.Service
+        Io.Eigr.Spawn.Example.Joe.Service,
+        Io.Eigr.Spawn.Example.ClockActor.Service
       ]
   end
 
@@ -640,7 +640,8 @@ defmodule Sidecar.GRPC.Reflection.Server do
     use GrpcReflection.Server,
       version: :v1alpha,
       services: [
-        Io.Eigr.Spawn.Example.Joe.Service
+        Io.Eigr.Spawn.Example.Joe.Service,
+        Io.Eigr.Spawn.Example.ClockActor.Service
       ]
   end
 end
