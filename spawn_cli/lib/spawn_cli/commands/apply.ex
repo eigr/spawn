@@ -1,37 +1,35 @@
 defmodule SpawnCli.Commands.Apply do
   use DoIt.Command,
     name: "apply",
-    description: "Apply Actors resources in Kubernetes cluster"
+    description: "Apply Actors resources in Kubernetes cluster."
 
-  require Logger
-
-  option(:all, :string, "all",
-    alias: :A,
-    default: "default"
-  )
-
-  option(:actorsystem, :string, "actorsystem",
-    alias: :S,
-    default: "spawn-system"
-  )
-
-  option(:actorhost, :string, "actorhost",
-    alias: :S,
-    keep: false
-  )
-
-  option(:context, :string, "context",
+  option(:context, :string, "Apply manifest on specified Kubernetes Context.",
     alias: :c,
     default: "default"
   )
 
-  option(:kubeconfig, :string, "~/.kube/config",
+  option(:dryrun, :string, "Flag to preview the object that would be sent to your cluster, without really submitting it.",
+    alias: :d,
+    default: "client"
+  )
+
+  option(:file, :string, "Applies only the specified resource file or path (does not try to find files automatically).",
+    alias: :f,
+    default: ".k8s"
+  )
+
+  option(:kubeconfig, :string, "Load a Kubernetes kube config file.",
     alias: :k,
     default: "~/.kube/config"
   )
 
-  def run(_, %{kubeconfig: kubeconfig}, context) do
-    Logger.info("Installing Spawn with context #{context} file...")
-    Logger.info("Apply Spawn manifest using #{kubeconfig} file...")
+  option(:namespace, :string, "Apply manifests no specified Kubernetes namespace.",
+    alias: :n,
+    default: "default"
+  )
+
+  def run(_, %{kubeconfig: kubeconfig }= _opts, context) do
+    IO.inspect(context, label: "Installing Spawn with context file: ")
+    IO.inspect(kubeconfig, label: "Apply Spawn manifest using file: ")
   end
 end

@@ -30,9 +30,12 @@ defmodule SpawnCli.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:do_it, "~> 0.6"},
       {:burrito, "~> 1.0"},
-      {:k8s, "~> 2.6"}
+      {:do_it, "~> 0.6"},
+      {:k8s, "~> 2.6"},
+      {:req, "~> 0.4"},
+      # Non runtime deps
+      {:credo, "~> 1.6", runtime: false},
     ]
   end
 
