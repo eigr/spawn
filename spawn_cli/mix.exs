@@ -31,7 +31,8 @@ defmodule SpawnCli.MixProject do
   defp deps do
     [
       {:do_it, "~> 0.6"},
-      {:burrito, "~> 1.0"}
+      {:burrito, "~> 1.0"},
+      {:k8s, "~> 2.6"}
     ]
   end
 
@@ -42,9 +43,9 @@ defmodule SpawnCli.MixProject do
         burrito: [
           targets: [
             linux: [os: :linux, cpu: :x86_64],
-            linux_musl: [os: :linux, cpu: :x86_64, libc: :musl],
-            #macos: [os: :darwin, cpu: :x86_64],
-            #windows: [os: :windows, cpu: :x86_64]
+            linux_musl: [os: :linux, cpu: :x86_64, libc: :musl]
+            # macos: [os: :darwin, cpu: :x86_64],
+            # windows: [os: :windows, cpu: :x86_64]
           ]
         ]
       ]
