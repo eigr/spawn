@@ -8,12 +8,18 @@ defmodule SpawnCli.Commands.Apply do
     default: "default"
   )
 
-  option(:dryrun, :string, "Flag to preview the object that would be sent to your cluster, without really submitting it.",
+  option(
+    :dryrun,
+    :string,
+    "Flag to preview the object that would be sent to your cluster, without really submitting it.",
     alias: :d,
     default: "client"
   )
 
-  option(:file, :string, "Applies only the specified resource file or path (does not try to find files automatically).",
+  option(
+    :file,
+    :string,
+    "Applies only the specified resource file or path (does not try to find files automatically).",
     alias: :f,
     default: ".k8s"
   )
@@ -28,7 +34,7 @@ defmodule SpawnCli.Commands.Apply do
     default: "default"
   )
 
-  def run(_, %{kubeconfig: kubeconfig }= _opts, context) do
+  def run(_, %{kubeconfig: kubeconfig} = _opts, context) do
     IO.inspect(context, label: "Installing Spawn with context file: ")
     IO.inspect(kubeconfig, label: "Apply Spawn manifest using file: ")
   end
