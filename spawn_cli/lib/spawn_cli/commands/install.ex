@@ -35,29 +35,54 @@ defmodule SpawnCli.Commands.Install do
   def run(_, %{context: ctx, kubeconfig: cfg, version: version, envconfig: env} = _opts, _context) do
     IO.inspect(cfg, label: "Installing Spawn using file: ")
     tmp_file = Path.join(@workspace, @manifest_filename)
-
-    release_version =
-      if version == @vsn do
-        @vsn
-      else
-        version
-      end
-
     opts = [namespace: "spawn-system"]
 
     manifest_url =
-      "https://github.com/eigr/spawn/releases/download/#{release_version}/manifest.yaml"
+      "https://github.com/eigr/spawn/releases/download/#{version}/manifest.yaml"
 
     with conn <- K8sConn.get(:prod, cfg, ctx),
          {:ok, response} <- Req.get(manifest_url),
          :ok <- File.write!(tmp_file, response.body),
-         {:ok, resource} <- K8s.Resource.from_file(tmp_file, opts),
-         operation <- K8s.Client.create(resource),
-         {:ok, deployment} <- K8s.Client.run(conn, operation) do
-      IO.inspect(deployment, label: "Deployment")
-      IO.puts("Spawn Operator installed with success!")
+         {:ok, resources} <- K8s.Resource.all_from_file(tmp_file, opts) do
+      # Create ns eigr-functions if not exists
+      ns = %{
+        "apiVersion" => "v1",
+        "kind" => "Namespace",
+        "metadata" => %{"name" => "eigr-functions"}
+      }
+
+      resources = [ns] ++ resources
+
+      Enum.each(
+        resources,
+        fn %{"kind" => kind, "metadata" => %{"name" => name}} = resource ->
+          operation = K8s.Client.create(resource)
+
+          case K8s.Client.run(conn, operation) do
+            {:ok, _deployment} ->
+              IO.puts("Resource #{name} of type #{kind} created successfully")
+
+            {:error, %K8s.Client.APIError{message: _message, reason: "AlreadyExists"}} ->
+              IO.puts("Resource #{name} of type #{kind} already installed. Nothing to do!")
+
+            {:error, %K8s.Client.APIError{message: message, reason: "NotFound"}} ->
+              IO.puts(
+                :stderr,
+                "Error. Not found dependant resource. Details: #{inspect(message)}"
+              )
+
+            error ->
+              IO.puts(
+                :stderr,
+                "Failure to install Resource #{name} of type #{kind}. Details: #{inspect(error)}"
+              )
+          end
+        end
+      )
+
+      IO.puts("Done!")
     else
-      error -> IO.inspect(error, label: "Failure occurring during install")
+      error -> IO.puts(:stderr, "Failure occurring during install. Details: #{inspect(error)}")
     end
   end
 end
