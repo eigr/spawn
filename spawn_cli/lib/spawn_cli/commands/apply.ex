@@ -5,7 +5,7 @@ defmodule SpawnCli.Commands.Apply do
 
   option(:context, :string, "Apply manifest on specified Kubernetes Context.",
     alias: :c,
-    default: "default"
+    default: "minikube"
   )
 
   option(
