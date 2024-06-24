@@ -16,7 +16,7 @@ defmodule SpawnCli.Commands.Install do
 
   option(:envconfig, :string, "Load a Kubernetes kube config from environment variable.",
     alias: :e,
-    default: "KUBECONFIG"
+    default: "none"
   )
 
   option(:context, :string, "Apply manifest on specified Kubernetes Context.",
@@ -32,10 +32,29 @@ defmodule SpawnCli.Commands.Install do
     ]
   )
 
-  def run(_, %{context: ctx, kubeconfig: cfg, version: version, envconfig: env} = _opts, _context) do
-    IO.inspect(cfg, label: "Installing Spawn using file: ")
+  def run(_, %{context: ctx, kubeconfig: cfg, version: version, envconfig: env} = _opts, context) do
     tmp_file = Path.join(@workspace, @manifest_filename)
-    opts = [namespace: "spawn-system"]
+    opts = [namespace: "eigr-functions"]
+    IO.inspect(cfg, label: "Installing Spawn using file ")
+
+    kubeconfig =
+      if env == "none" && File.exists?(cfg) do
+        cfg
+      else
+        kcfg = System.get_env(env)
+
+        if not is_nil(kcfg) && File.exists?(kcfg) do
+          kcfg
+        else
+          IO.puts(
+            :stderr,
+            "You need to specify a valid kubeconfig file or kubeconfig environment variable. See options: [--kubeconfig, --envconfig] "
+          )
+
+          help(context)
+          System.stop(1)
+        end
+      end
 
     manifest_url =
       "https://github.com/eigr/spawn/releases/download/#{version}/manifest.yaml"
@@ -74,7 +93,7 @@ defmodule SpawnCli.Commands.Install do
             error ->
               IO.puts(
                 :stderr,
-                "Failure to install Resource #{name} of type #{kind}. Details: #{inspect(error)}"
+                "Failure to install Resource #{name} of type #{kind}. Details #{inspect(error)}"
               )
           end
         end
@@ -82,7 +101,7 @@ defmodule SpawnCli.Commands.Install do
 
       IO.puts("Done!")
     else
-      error -> IO.puts(:stderr, "Failure occurring during install. Details: #{inspect(error)}")
+      error -> IO.puts(:stderr, "Failure occurring during install. Details #{inspect(error)}")
     end
   end
 end
