@@ -9,7 +9,7 @@ defmodule SpawnCli.Commands.Apply do
   )
 
   option(
-    :dryrun,
+    :dry_run,
     :string,
     "Flag to preview the object that would be sent to your cluster, without really submitting it.",
     alias: :d,

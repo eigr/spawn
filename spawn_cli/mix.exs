@@ -36,6 +36,7 @@ defmodule SpawnCli.MixProject do
       {:jason, "~> 1.4"},
       {:k8s, "~> 2.6"},
       {:req, "~> 0.4"},
+      {:testcontainers, "~> 1.8"},
       # Non runtime deps
       {:credo, "~> 1.6", runtime: false}
     ]

@@ -3,14 +3,9 @@ defmodule SpawnCli.Commands.New do
     name: "new",
     description: "Create new Spawn project with specific target language."
 
-  option(:actorsystem, :string, "Defines the name of the ActorSystem.",
+  option(:actor_system, :string, "Defines the name of the ActorSystem.",
     alias: :s,
     default: "spawn-system",
-    keep: false
-  )
-
-  option(:actorhost, :string, "Defines the name of the ActorHost.",
-    alias: :h,
     keep: false
   )
 

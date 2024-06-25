@@ -3,6 +3,11 @@ defmodule SpawnCli.Commands.Install do
     name: "install",
     description: "Install Spawn Operator in Kubernetes cluster."
 
+  alias SpawnCli.K8s.K8sConn
+  alias SpawnCli.Util.Emoji
+
+  import SpawnCli.Util, only: [log: 3]
+
   @vsn "v1.4.1"
   @workspace System.tmp_dir!()
   @manifest_filename "spawn-manifest.yaml"
@@ -10,17 +15,12 @@ defmodule SpawnCli.Commands.Install do
   @kubecfg_default_dir Path.join(@user_home, ".kube")
   @kubecfg_default_file Path.join(@kubecfg_default_dir, "config")
 
-  alias SpawnCli.K8s.K8sConn
-  alias SpawnCli.Util.Emoji
-
-  import SpawnCli.Util, only: [log: 3]
-
   option(:kubeconfig, :string, "Load a Kubernetes kube config file.",
     alias: :k,
     default: @kubecfg_default_file
   )
 
-  option(:envconfig, :string, "Load a Kubernetes kube config from environment variable.",
+  option(:env_config, :string, "Load a Kubernetes kube config from environment variable.",
     alias: :e,
     default: "none"
   )
@@ -42,7 +42,6 @@ defmodule SpawnCli.Commands.Install do
     tmp_file = Path.join(@workspace, @manifest_filename)
     opts = [namespace: "eigr-functions"]
 
-    # IO.puts("#{Emoji.runner()} Installing Spawn using file: #{cfg}")
     log(:info, Emoji.hourglass(), "Installing Spawn using file: #{cfg}")
 
     kubeconfig =
@@ -57,7 +56,7 @@ defmodule SpawnCli.Commands.Install do
           log(
             :error,
             Emoji.tired_face(),
-            "You need to specify a valid kubeconfig file or kubeconfig environment variable. See options: [--kubeconfig, --envconfig]"
+            "You need to specify a valid kubeconfig file or kubeconfig environment variable. See options: [--kubeconfig, --env-config]"
           )
 
           help(context)
