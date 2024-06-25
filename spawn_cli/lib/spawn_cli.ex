@@ -10,4 +10,5 @@ defmodule SpawnCli do
   command(SpawnCli.Commands.Install)
   command(SpawnCli.Commands.New)
   command(SpawnCli.Commands.Apply)
+  command(SpawnCli.Commands.Dev)
 end

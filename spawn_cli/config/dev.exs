@@ -13,5 +13,3 @@ config :logger, :console,
 config :do_it, DoIt.Commfig,
   dirname: System.user_home(),
   filename: "spawn_cli.json"
-
-import_config "#{config_env()}.exs"

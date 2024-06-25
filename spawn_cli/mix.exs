@@ -32,6 +32,8 @@ defmodule SpawnCli.MixProject do
     [
       {:burrito, "~> 1.0"},
       {:do_it, "~> 0.6"},
+      {:exmoji, "~> 0.3"},
+      {:jason, "~> 1.4"},
       {:k8s, "~> 2.6"},
       {:req, "~> 0.4"},
       # Non runtime deps

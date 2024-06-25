@@ -6,12 +6,18 @@ defmodule SpawnCli.Commands.Install do
   @vsn "v1.4.1"
   @workspace System.tmp_dir!()
   @manifest_filename "spawn-manifest.yaml"
+  @user_home System.user_home!()
+  @kubecfg_default_dir Path.join(@user_home, ".kube")
+  @kubecfg_default_file Path.join(@kubecfg_default_dir, "config")
 
   alias SpawnCli.K8s.K8sConn
+  alias SpawnCli.Util.Emoji
+
+  import SpawnCli.Util, only: [log: 3]
 
   option(:kubeconfig, :string, "Load a Kubernetes kube config file.",
     alias: :k,
-    default: "~/.kube/config"
+    default: @kubecfg_default_file
   )
 
   option(:envconfig, :string, "Load a Kubernetes kube config from environment variable.",
@@ -35,7 +41,9 @@ defmodule SpawnCli.Commands.Install do
   def run(_, %{context: ctx, kubeconfig: cfg, version: version, envconfig: env} = _opts, context) do
     tmp_file = Path.join(@workspace, @manifest_filename)
     opts = [namespace: "eigr-functions"]
-    IO.inspect(cfg, label: "Installing Spawn using file ")
+
+    # IO.puts("#{Emoji.runner()} Installing Spawn using file: #{cfg}")
+    log(:info, Emoji.hourglass(), "Installing Spawn using file: #{cfg}")
 
     kubeconfig =
       if env == "none" && File.exists?(cfg) do
@@ -46,9 +54,10 @@ defmodule SpawnCli.Commands.Install do
         if not is_nil(kcfg) && File.exists?(kcfg) do
           kcfg
         else
-          IO.puts(
-            :stderr,
-            "You need to specify a valid kubeconfig file or kubeconfig environment variable. See options: [--kubeconfig, --envconfig] "
+          log(
+            :error,
+            Emoji.tired_face(),
+            "You need to specify a valid kubeconfig file or kubeconfig environment variable. See options: [--kubeconfig, --envconfig]"
           )
 
           help(context)
@@ -79,29 +88,44 @@ defmodule SpawnCli.Commands.Install do
 
           case K8s.Client.run(conn, operation) do
             {:ok, _deployment} ->
-              IO.puts("Resource #{name} of type #{kind} created successfully")
+              log(
+                :info,
+                Emoji.floppy_disk(),
+                "Resource #{name} of type #{kind} created successfully"
+              )
 
             {:error, %K8s.Client.APIError{message: _message, reason: "AlreadyExists"}} ->
-              IO.puts("Resource #{name} of type #{kind} already installed. Nothing to do!")
+              log(
+                :info,
+                Emoji.ok(),
+                "Resource #{name} of type #{kind} already installed. Nothing to do!"
+              )
 
             {:error, %K8s.Client.APIError{message: message, reason: "NotFound"}} ->
-              IO.puts(
-                :stderr,
+              log(
+                :error,
+                Emoji.tired_face(),
                 "Error. Not found dependant resource. Details: #{inspect(message)}"
               )
 
             error ->
-              IO.puts(
-                :stderr,
+              log(
+                :error,
+                Emoji.tired_face(),
                 "Failure to install Resource #{name} of type #{kind}. Details #{inspect(error)}"
               )
           end
         end
       )
 
-      IO.puts("Done!")
+      log(:info, Emoji.rocket(), "Done!")
     else
-      error -> IO.puts(:stderr, "Failure occurring during install. Details #{inspect(error)}")
+      error ->
+        log(
+          :error,
+          Emoji.exclamation(),
+          "Failure occurring during install. Details #{inspect(error)}"
+        )
     end
   end
 end
