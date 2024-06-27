@@ -4,6 +4,7 @@ defmodule SpawnCli.Commands.Dev.Run do
     description: "Run Spawn proxy in dev mode."
 
   alias SpawnCli.Util.Emoji
+  alias Testcontainers.Container
 
   import SpawnCli.Util, only: [log: 3]
 
@@ -14,7 +15,7 @@ defmodule SpawnCli.Commands.Dev.Run do
 
   option(:proto_definitions, :string, "Local where your protobuf files reside.",
     alias: :P,
-    default: "./priv/protos"
+    default: "/fakepath"
   )
 
   option(:proxy_bind_address, :string, "Defines the proxy host address.",
@@ -42,9 +43,9 @@ defmodule SpawnCli.Commands.Dev.Run do
     default: true
   )
 
-  option(:database_host, :boolean, "Defines the Database hostname.",
+  option(:database_host, :string, "Defines the Database hostname.",
     alias: :dh,
-    default: false
+    default: "mariadb"
   )
 
   option(:database_port, :integer, "Defines the Database port number.",
@@ -64,7 +65,7 @@ defmodule SpawnCli.Commands.Dev.Run do
 
   option(:statestore_key, :string, "Defines the Statestore Key.",
     alias: :K,
-    keep: false
+    default: "myfake-key-3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE="
   )
 
   option(:log_level, :string, "Defines the Logger level.",
@@ -82,24 +83,59 @@ defmodule SpawnCli.Commands.Dev.Run do
     default: false
   )
 
-  def run(_, %{actor_system: system, proxy_image: proxy_image} = opts, _context) do
+  def run(
+        _,
+        %{
+          actor_host_port: actor_host_port,
+          actor_system: actor_system,
+          database_host: database_host,
+          database_pool: database_pool,
+          database_port: database_port,
+          database_self_provisioning: database_self_provisioning,
+          database_type: database_type,
+          enable_nats: enable_nats,
+          log_level: log_level,
+          name: name,
+          proto_definitions: proto_definitions,
+          proxy_bind_address: proxy_bind_address,
+          proxy_bind_port: proxy_bind_port,
+          proxy_image: proxy_image,
+          statestore_key: statestore_key
+        } =
+          opts,
+        _context
+      ) do
     log(:info, Emoji.runner(), "Starting Spawn Proxy in dev mode...")
     {:ok, info} = Testcontainers.start_link()
 
-    proxy_container_config = %Testcontainers.Container{
-      image: proxy_image
-      # wait_strategies: [
-      #   %Testcontainers.PortWaitStrategy{
-      #     ip: opts.proxy_bind_address,
-      #     port: opts.proxy_bind_port,
-      #     timeout: 20000
-      #   }
-      # ]
-    }
+    proxy_container_config =
+      Container.new(proxy_image)
+      |> Container.with_environment("PROXY_CLUSTER_STRATEGY", "gossip")
+      |> Container.with_environment("PROXY_DATABASE_TYPE", database_type)
+      |> Container.with_environment("PROXY_DATABASE_PORT", "#{database_port}")
+      |> Container.with_environment("PROXY_DATABASE_POOL_SIZE", "#{database_pool}")
+      |> Container.with_environment("PROXY_HTTP_PORT", "#{proxy_bind_port}")
+      |> Container.with_environment("SPAWN_USE_INTERNAL_NATS", "#{enable_nats}")
+      |> Container.with_environment("SPAWN_PROXY_LOGGER_LEVEL", log_level)
+      |> Container.with_environment("SPAWN_STATESTORE_KEY", statestore_key)
+      |> Container.with_environment("USER_FUNCTION_PORT", "#{actor_host_port}")
+      |> Container.with_exposed_ports([proxy_bind_port, database_port])
+      |> Container.with_label("spawn.actorsystem.name", actor_system)
+      |> Container.with_label("spawn.proxy.name", name)
+      |> Container.with_label("spawn.proxy.database.type", database_type)
+      |> Container.with_label("spawn.proxy.logger.level", log_level)
+      |> maybe_put_proto_definitions(proto_definitions)
 
     case Testcontainers.start_container(proxy_container_config) do
       {:ok, container} ->
-        IO.inspect(container)
+        log(
+          :info,
+          Emoji.floppy_disk(),
+          "Spawn Proxy uses the following mapped ports: [
+      Proxy: #{inspect(Container.mapped_port(container, proxy_bind_port))}:#{proxy_bind_port},
+      Database: #{inspect(Container.mapped_port(container, database_port))}:#{database_port}
+    ]"
+        )
 
         log(
           :info,
@@ -126,5 +162,12 @@ defmodule SpawnCli.Commands.Dev.Run do
           "Failure occurring during Spawn Proxy start phase. Details: #{inspect(error)}"
         )
     end
+  end
+
+  defp maybe_put_proto_definitions(container, "/fakepath"), do: container
+
+  defp maybe_put_proto_definitions(container, protopath) do
+    container
+    |> Container.with_bind_mount("PROXY_CLUSTER_STRATEGY", protopath)
   end
 end
