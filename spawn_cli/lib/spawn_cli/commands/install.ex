@@ -67,7 +67,7 @@ defmodule SpawnCli.Commands.Install do
     manifest_url =
       "https://github.com/eigr/spawn/releases/download/#{version}/manifest.yaml"
 
-    with conn <- K8sConn.get(:prod, cfg, ctx),
+    with conn <- K8sConn.get(:prod, kubeconfig, ctx),
          {:ok, response} <- Req.get(manifest_url),
          :ok <- File.write!(tmp_file, response.body),
          {:ok, resources} <- K8s.Resource.all_from_file(tmp_file, opts) do

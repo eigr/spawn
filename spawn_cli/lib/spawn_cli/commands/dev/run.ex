@@ -193,38 +193,108 @@ defmodule SpawnCli.Commands.Dev.Run do
 
   This function starts the Spawn proxy container with the provided options.
   """
-  def run(_, opts, _context) do
+  def run(_, opts, ctx) do
     log(:info, Emoji.runner(), "Starting Spawn Proxy in dev mode...")
-    {:ok, _status} = Testcontainers.start_link()
 
+    if opts.proto_changes_watcher do
+      {:ok, pid} = FileSystem.start_link(dirs: [opts.proto_files])
+      FileSystem.subscribe(pid)
+
+      watch(nil, opts, ctx)
+    else
+      {:ok, _container} = start_container(opts, ctx)
+
+      case start_container(opts, ctx) do
+        {:ok, _container} ->
+          Process.sleep(:infinity)
+
+        {:error, _error} ->
+          System.stop(1)
+      end
+    end
+  end
+
+  defp start_container(opts, _ctx) do
     build_proxy_container(opts)
     |> Testcontainers.start_container()
     |> case do
       {:ok, container} ->
-        log_success(container, opts.proxy_bind_port, opts.database_port)
+        log_success(container, opts)
         setup_exit_handler(container)
+        {:ok, container}
 
-        if opts.proto_changes_watcher do
-          {:ok, pid} = FileSystem.start_link(dirs: [opts.proto_files])
-          FileSystem.subscribe(pid)
-          watch(container, opts)
-        else
-          Process.sleep(:infinity)
+      error ->
+        log_failure(error)
+        {:error, error}
+    end
+  end
+
+  defp watch(nil, opts, ctx) do
+    case Testcontainers.start_link() do
+      {:ok, _docker_pid} ->
+        case start_container(opts, ctx) do
+          {:ok, container} ->
+            receive do
+              {:file_event, _worker_pid, {_path, _events}} = evt ->
+                IO.inspect(evt, label: "File Watcher event")
+
+                log(
+                  :info,
+                  Emoji.floppy_disk(),
+                  "Detected changes in your files. Restarting Spawn proxy now..."
+                )
+
+                Testcontainers.stop_container(container.container_id)
+                Process.sleep(2000)
+                watch(nil, opts, ctx)
+
+              _other ->
+                watch(container, opts, ctx)
+            end
+
+          {:error, _error} ->
+            System.stop(1)
         end
+
+      {:error, {:already_started, pid}} ->
+        log(:info, Emoji.winking(), "Stopping docker setup...")
+
+        Process.exit(pid, :normal)
+        if Process.alive?(pid) do
+          Process.sleep(2000)
+        end
+
+        watch(nil, opts, ctx)
+
+      {:error, {:error, {:failed_to_register_ryuk_filter, :closed}}} ->
+        log(
+          :error,
+          Emoji.tired_face(),
+          "Failed to start a dependency. This appears to be a transient fault. Try running again!"
+        )
+        watch(nil, opts, ctx)
 
       error ->
         log_failure(error)
     end
   end
 
-  defp watch(container, opts) do
+  defp watch(container, opts, ctx) do
     receive do
-      {:file_event, worker_pid, {path, events}} = evt ->
+      {:file_event, _worker_pid, {_path, _events}} = evt ->
         IO.inspect(evt, label: "File Watcher event")
-        watch(container, opts)
 
-      other ->
-        watch(container, opts)
+        log(
+          :info,
+          Emoji.hourglass(),
+          "Detected changes in your files. Restarting Spawn proxy now..."
+        )
+
+        Testcontainers.stop_container(container.container_id)
+        watch(nil, opts, ctx)
+
+      _other ->
+        watch(container, opts, ctx)
     end
   end
 
@@ -244,7 +314,8 @@ defmodule SpawnCli.Commands.Dev.Run do
     |> Container.with_label("spawn.proxy.name", opts.name)
     |> Container.with_label("spawn.proxy.database.type", opts.database_type)
     |> Container.with_label("spawn.proxy.logger.level", opts.log_level)
-    #|> maybe_put_proto_files(opts.proto_files)
+
+    # |> maybe_put_proto_files(opts.proto_files)
   end
 
   defp maybe_put_proto_files(container, "/fakepath"), do: container
@@ -254,19 +325,19 @@ defmodule SpawnCli.Commands.Dev.Run do
     |> Container.with_bind_mount("PROXY_CLUSTER_STRATEGY", protopath)
   end
 
-  defp log_success(container, proxy_bind_port, database_port) do
+  defp log_success(container, opts) do
     log(
       :info,
-      Emoji.floppy_disk(),
+      Emoji.exclamation(),
       "Spawn Proxy uses the following mapped ports: [
-        Proxy: #{inspect(Container.mapped_port(container, proxy_bind_port))}:#{proxy_bind_port},
-        Database: #{inspect(Container.mapped_port(container, database_port))}:#{database_port}
+        Proxy: #{inspect(Container.mapped_port(container, opts.proxy_bind_port))}:#{opts.proxy_bind_port},
+        Database: #{inspect(Container.mapped_port(container, opts.database_port))}:#{opts.database_port}
       ]"
     )
 
     log(
       :info,
-      Emoji.check(),
+      Emoji.rocket(),
       "Spawn Proxy started successfuly in dev mode. Container Id: #{container.container_id}"
     )
   end
