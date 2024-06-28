@@ -38,7 +38,7 @@ defmodule SpawnCli.Commands.Install do
     ]
   )
 
-  def run(_, %{context: ctx, kubeconfig: cfg, version: version, envconfig: env} = _opts, context) do
+  def run(_, %{context: ctx, kubeconfig: cfg, version: version, env_config: env} = _opts, context) do
     tmp_file = Path.join(@workspace, @manifest_filename)
     opts = [namespace: "eigr-functions"]
 
