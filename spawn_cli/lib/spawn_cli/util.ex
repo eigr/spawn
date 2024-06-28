@@ -1,6 +1,29 @@
 defmodule SpawnCli.Util do
   @moduledoc false
 
+  @extension_blacklist ~w(.swp .swx)
+
+  def is_valid?(file) do
+    ext =
+      file
+      |> Path.extname()
+      |> String.downcase()
+
+    cond do
+      String.last(file) == "~" ->
+        false
+
+      ext == "" ->
+        false
+
+      Enum.member?(@extension_blacklist, ext) ->
+        false
+
+      true ->
+        true
+    end
+  end
+
   def log(:info, emoji, msg), do: IO.puts(IO.ANSI.blue() <> "#{emoji}  " <> msg)
   def log(:error, emoji, msg), do: IO.puts(:stderr, IO.ANSI.red() <> "#{emoji}  " <> msg)
 
