@@ -318,7 +318,6 @@ defmodule SpawnCtl.Commands.Dev.Run do
   defp build_proxy_container(opts) do
     Container.new(opts.proxy_image)
     |> maybe_mount_proto_files(opts.proto_files)
-    |> Container.with_environment("MIX_BUILD_PATH", "/tmp/prd")
     |> Container.with_environment("PROXY_CLUSTER_STRATEGY", "gossip")
     |> Container.with_environment("PROXY_DATABASE_TYPE", opts.database_type)
     |> Container.with_environment("PROXY_DATABASE_PORT", "#{opts.database_port}")
