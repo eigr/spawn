@@ -45,7 +45,7 @@ defmodule SpawnCtl.MixProject do
 
   def releases do
     [
-      spawn_cli: [
+      spawnctl: [
         steps: [:assemble, &Burrito.wrap/1],
         burrito: [
           targets: [

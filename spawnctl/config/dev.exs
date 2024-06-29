@@ -12,4 +12,4 @@ config :logger, :console,
 
 config :do_it, DoIt.Commfig,
   dirname: System.user_home(),
-  filename: "spawn_cli.json"
+  filename: "spawnctl.json"
