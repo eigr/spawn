@@ -127,8 +127,6 @@ defmodule SpawnCtl.Commands.New.Elixir do
     app_module_name = Macro.camelize(name)
     app_hyphenized_name = String.replace(name, "_", "-")
 
-    # Additional logic for creating the project goes here
-
     log(:info, "#{Emoji.rocket()} Project #{name} created successfully.")
   end
 end
