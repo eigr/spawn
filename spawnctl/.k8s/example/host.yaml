@@ -1,0 +1,16 @@
+---
+apiVersion: spawn-eigr.io/v1
+kind: ActorHost
+metadata:
+  name: spawn-springboot-example
+  namespace: default
+  annotations:
+    spawn-eigr.io/actor-system: spawn-system
+spec:
+  host:
+    image: eigr/spawn-springboot-examples:0.5.4
+    ports:
+      - name: http
+        containerPort: 8091
+  autoscaler:
+    max: 3
