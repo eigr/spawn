@@ -67,9 +67,13 @@ defmodule SpawnCtl.Commands.Dev.Run do
           --name "custom-proxy"
   """
 
-  use DoIt.Command, name: "run", description: "Run Spawn proxy in dev mode."
+  use DoIt.Command,
+    name: "run",
+    description: "Run Spawn proxy in dev mode."
+
   alias SpawnCtl.Util.Emoji
   alias Testcontainers.Container
+
   import SpawnCtl.Util, only: [is_valid?: 1, log: 3]
 
   @default_opts %{

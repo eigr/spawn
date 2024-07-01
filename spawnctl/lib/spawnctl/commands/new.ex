@@ -3,28 +3,11 @@ defmodule SpawnCtl.Commands.New do
     name: "new",
     description: "Create new Spawn project with specific target language."
 
-  option(:actor_system, :string, "Defines the name of the ActorSystem.",
-    alias: :s,
-    default: "spawn-system",
-    keep: false
-  )
-
-  option(:language, :string, "Defines the language and SDK to be used.",
-    alias: :l,
-    default: "elixir",
-    allowed_values: [
-      "dart",
-      "elixir",
-      "java-std",
-      "java-springboot",
-      "nodejs",
-      "python"
-    ]
-  )
-
-  argument(:name, :string, "Name of the project to be created.")
-
-  def run(_, %{language: language} = _opts, _context) do
-    IO.inspect(language, label: "Creating project using program language: ")
-  end
+  subcommand(SpawnCtl.Commands.New.Dart)
+  subcommand(SpawnCtl.Commands.New.Elixir)
+  subcommand(SpawnCtl.Commands.New.Go)
+  subcommand(SpawnCtl.Commands.New.Java)
+  subcommand(SpawnCtl.Commands.New.Node)
+  subcommand(SpawnCtl.Commands.New.Python)
+  subcommand(SpawnCtl.Commands.New.Rust)
 end
