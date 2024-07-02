@@ -84,6 +84,11 @@ defmodule SpawnCtl.Commands.New.Elixir do
     ]
   )
 
+  option(:template_version, :string, "Spawn CLI Language templates version.",
+    alias: :t,
+    default: "v#{@vsn}"
+  )
+
   option(:statestore_type, :string, "Spawn statestore provider.",
     alias: :S,
     allowed_values: [
@@ -123,10 +128,44 @@ defmodule SpawnCtl.Commands.New.Elixir do
 
   The `name` argument is used to create the project with the given name.
   """
-  def run(%{name: name} = _args, %{actor_system: actor_system} = _opts, _context) do
+  def run(
+        %{name: name} = _args,
+        %{
+          actor_system: actor_system,
+          sdk_version: sdk_version,
+          template_version: template_version
+        } = _opts,
+        _context
+      ) do
     app_module_name = Macro.camelize(name)
     app_hyphenized_name = String.replace(name, "_", "-")
 
-    log(:info, "#{Emoji.rocket()} Project #{name} created successfully.")
+    template_project_url =
+      "https://github.com/eigr/spawn-templates/releases/download/#{template_version}/elixir-v#{sdk_version}.tar.gz"
+
+    pwd = File.cwd!()
+    tmp_file = Path.join(pwd, "elixir-v#{sdk_version}.tar.gz")
+
+    with {:ok, response} <- Req.get(template_project_url),
+         :ok <- File.write!(tmp_file, response.body),
+         {:ok, response} <- extract_tar_gz("#{pwd}/elixir-v#{sdk_version}.tar.gz") do
+      IO.puts("Done!")
+    end
+
+    # log(:info, "#{Emoji.rocket()} Project #{name} created successfully.")
+  end
+
+  def extract_tar_gz(file_path) do
+    current_path = File.cwd!()
+    tar_command = "tar -xzf #{file_path} -C #{current_path}"
+
+    case System.cmd("sh", ["-c", tar_command], stderr_to_stdout: true) do
+      {output, 0} ->
+        IO.puts(output)
+        {:ok, "File extracted successfully"}
+
+      {output, exit_code} ->
+        {:error, "Failed to extract file, exit code: #{exit_code}, output: #{output}"}
+    end
   end
 end
