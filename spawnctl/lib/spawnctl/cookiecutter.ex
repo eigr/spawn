@@ -2,6 +2,8 @@ defmodule Spawnctl.Cookiecutter do
   @moduledoc """
   A module to call the cookiecutter Python application from Elixir within a virtual environment.
   """
+  alias SpawnCtl.Util.Emoji
+  import SpawnCtl.Util, only: [log: 3]
 
   @venv_dir "#{File.cwd!()}/.venv"
   @cookiecutter_path "#{@venv_dir}/bin/cookiecutter"
@@ -22,6 +24,8 @@ defmodule Spawnctl.Cookiecutter do
           ] ++ extra_context_args
 
         # Run the cookiecutter command
+        log(:info, Emoji.runner(), "Generating project...")
+
         {output, exit_code} =
           System.cmd(@cookiecutter_path, args, stderr_to_stdout: true)
 
@@ -36,6 +40,49 @@ defmodule Spawnctl.Cookiecutter do
     end
   end
 
+  def cleanup(template_path, lang, opts) do
+    pwd = File.cwd!()
+    tmp_file = Path.join(pwd, "#{lang}-v#{opts.sdk_version}.tar.gz")
+
+    with {:drop_template_path, {:ok, _files}} <-
+           {:drop_template_path, drop_template(template_path)},
+         {:drop_venv_path, {:ok, _files}} <- {:drop_venv_path, drop_virtualenv(@venv_dir)},
+         {:drop_pkg, :ok} <- {:drop_pkg, drop_pkgs(tmp_file)} do
+      :ok
+    else
+      {:drop_template_path, {:error, detail, _file}} ->
+        message = "Unable to delete some resources [#{detail}]"
+        {:error, message}
+
+      {:drop_venv_path, {:error, detail, file}} ->
+        message = "Unable to delete virtual environment [#{detail}]"
+        {:error, message}
+
+      {:drop_pkg, {:error, detail}} ->
+        message = "Unable to delete pkgs [#{detail}]"
+        {:error, message}
+
+      error ->
+        message = "Unknown [#{error}]"
+        {:error, message}
+    end
+  end
+
+  defp drop_template(template_path) do
+    log(:info, Emoji.floppy_disk(), "Deleting temporary templating...")
+    File.rm_rf(template_path)
+  end
+
+  defp drop_virtualenv(venv_dir) do
+    log(:info, Emoji.floppy_disk(), "Deleting virtual environment...")
+    File.rm_rf(venv_dir)
+  end
+
+  defp drop_pkgs(pkg_file) do
+    log(:info, Emoji.floppy_disk(), "Deleting temporary packages...")
+    File.rm(pkg_file)
+  end
+
   defp convert_extra_context_to_args(extra_context) do
     Enum.flat_map(extra_context, fn {key, value} ->
       ["#{key}=#{value}"]
@@ -46,10 +93,11 @@ defmodule Spawnctl.Cookiecutter do
     case find_python_executable() do
       {:ok, python_executable} ->
         # Create virtual environment
+        log(:info, Emoji.floppy_disk(), "Creating virtual environment to build template...")
         {output, exit_code} = System.cmd(python_executable, ["-m", "venv", @venv_dir])
 
         if exit_code == 0 do
-          IO.puts("Virtual environment created successfully")
+          log(:info, Emoji.check(), "Virtual environment created successfully!")
           install_cookiecutter()
         else
           {:error, "Failed to create virtual environment: #{output}"}
@@ -75,7 +123,12 @@ defmodule Spawnctl.Cookiecutter do
 
   defp install_cookiecutter do
     # Install cookiecutter in virtual environment
-    {output, exit_code} = System.cmd("#{@venv_dir}/bin/pip", ["install", "cookiecutter"])
+    {output, exit_code} =
+      System.cmd("#{@venv_dir}/bin/pip", [
+        "install",
+        "--disable-pip-version-check",
+        "cookiecutter"
+      ])
 
     if exit_code == 0 do
       {:ok, "cookiecutter installed successfully"}

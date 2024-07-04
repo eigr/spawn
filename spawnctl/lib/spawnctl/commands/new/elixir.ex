@@ -133,61 +133,25 @@ defmodule SpawnCtl.Commands.New.Elixir do
 
   The `name` argument is used to create the project with the given name.
   """
-  def run(
-        %{name: name} = _args,
-        %{
-          actor_system: actor_system,
-          sdk_version: sdk_version
-        } = opts,
-        _context
-      ) do
-    app_module_name = Macro.camelize(name)
-    app_hyphenized_name = String.replace(name, "_", "-")
-
-    elixir_version =
-      if is_nil(opts.elixir_version) || opts.elixir_version == "" do
-        "1.14"
-      else
-        IO.inspect(opts.elixir_version, label: "Elixir Version")
-        opts.elixir_version
-      end
-
-    statestore_type =
-      if is_nil(opts.statestore_type) || opts.statestore_type == "" do
-        "postgres"
-      else
-        IO.inspect(opts.statestore_type, label: "statestore_type")
-        opts.statestore_type
-      end
+  def run(args, opts, _context) do
+    log(:info, Emoji.exclamation(), "Generating project for Elixir #{get_elixir_version(opts)}")
 
     opts
     |> prepare()
+    |> render(args, opts)
     |> then(fn
-      {:ok, input_dir} ->
-        output_dir = File.cwd!()
-        IO.puts("Name of application: #{name}")
-
-        extra_context = %{
-          "elixir_version" => elixir_version,
-          "app_name" => name,
-          "app_description" => opts.app_description,
-          "app_image_tag" => opts.app_image_tag,
-          "app_module_name" => app_module_name,
-          "app_name_hyphenate" => app_hyphenized_name,
-          "app_port" => 8090,
-          "spawn_app_spawm_system" => opts.actor_system,
-          "spawn_app_namespace" => opts.app_namespace,
-          "spawn_app_statestore_type" => statestore_type,
-          "spawn_sdk_version" => opts.sdk_version
-        }
-
-        case Cookiecutter.generate_project(input_dir, output_dir, extra_context) do
-          {:ok, output} ->
-            IO.puts("Project generated successfully")
-            IO.puts(output)
+      {:ok, template_path} ->
+        case Cookiecutter.cleanup(template_path, "elixir", opts) do
+          :ok ->
+            log(:info, Emoji.check(), "Clean up done!")
+            log(:info, Emoji.rocket(), "Project generated successfully")
 
           {:error, message} ->
-            log(:error, Emoji.exclamation(), message)
+            log(
+              :error,
+              Emoji.tired_face(),
+              "Failure when trying to clean up resources. Details: #{inspect(message)}"
+            )
         end
 
       {:error, message} ->
@@ -196,14 +160,18 @@ defmodule SpawnCtl.Commands.New.Elixir do
   end
 
   defp prepare(opts) do
+    log(:info, Emoji.exclamation(), "Starting preparation phase...")
+
     case :os.type() do
       {:unix, _} ->
         %UnixNewCommand{opts: opts}
         |> Runtime.prepare("elixir", fn
           {:ok, template_path} ->
+            log(:info, Emoji.check(), "Preparation phase carried out successfully!")
             {:ok, template_path}
 
           {:error, message} ->
+            log(:error, Emoji.wink(), "Failure in the preparation phase!")
             {:error, message}
         end)
 
@@ -216,6 +184,54 @@ defmodule SpawnCtl.Commands.New.Elixir do
           {:error, message} ->
             {:error, message}
         end)
+    end
+  end
+
+  def render({:error, message}, _args, _opts), do: {:error, message}
+
+  def render({:ok, template_path}, %{name: name} = _args, opts) do
+    app_module_name = Macro.camelize(name)
+    app_hyphenized_name = String.replace(name, "_", "-")
+
+    output_dir = File.cwd!()
+
+    elixir_version = get_elixir_version(opts)
+
+    statestore_type =
+      if is_nil(opts.statestore_type) || opts.statestore_type == "" do
+        "postgres"
+      else
+        opts.statestore_type
+      end
+
+    extra_context = %{
+      "elixir_version" => elixir_version,
+      "app_name" => name,
+      "app_description" => opts.app_description,
+      "app_image_tag" => opts.app_image_tag,
+      "app_module_name" => app_module_name,
+      "app_name_hyphenate" => app_hyphenized_name,
+      "app_port" => 8090,
+      "spawn_app_spawm_system" => opts.actor_system,
+      "spawn_app_namespace" => opts.app_namespace,
+      "spawn_app_statestore_type" => statestore_type,
+      "spawn_sdk_version" => opts.sdk_version
+    }
+
+    case Cookiecutter.generate_project(template_path, output_dir, extra_context) do
+      {:ok, _output} ->
+        {:ok, template_path}
+
+      {:error, message} ->
+        {:error, message}
+    end
+  end
+
+  defp get_elixir_version(opts) do
+    if is_nil(opts.elixir_version) || opts.elixir_version == "" do
+      "1.14"
+    else
+      opts.elixir_version
     end
   end
 end

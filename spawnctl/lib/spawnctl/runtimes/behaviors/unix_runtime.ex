@@ -6,8 +6,9 @@ defmodule Spawnctl.Runtimes.Behaviors.UnixRuntime do
     @moduledoc """
 
     """
+    alias SpawnCtl.Util.Emoji
     alias Spawnctl.Runtimes.Behaviors.UnixRuntime.New, as: UnixNewCommand
-    import SpawnCtl.Util, only: [extract_tar_gz: 1]
+    import SpawnCtl.Util, only: [extract_tar_gz: 1, log: 3]
 
     defstruct opts: %{}
 
@@ -22,11 +23,11 @@ defmodule Spawnctl.Runtimes.Behaviors.UnixRuntime do
         pkg = "#{pwd}/#{lang}-v#{opts.sdk_version}.tar.gz"
         tmp_file = Path.join(pwd, "#{lang}-v#{opts.sdk_version}.tar.gz")
 
-        with {:download, {:ok, response}} <- {:download, Req.get(template_project_url)},
+        with {:download, {:ok, response}} <- {:download, download_pkg(template_project_url)},
              {:generate_temporary_data, :ok} <-
-               {:generate_temporary_data, File.write!(tmp_file, response.body)},
+               {:generate_temporary_data, create_temporary_files!(tmp_file, response.body)},
              {:extract_files, {:ok, response}} <-
-               {:extract_files, extract_tar_gz(pkg)} do
+               {:extract_files, extract_files!(pkg)} do
           callback.({:ok, "#{pwd}/#{lang}"})
         else
           {:download, error} ->
@@ -45,6 +46,21 @@ defmodule Spawnctl.Runtimes.Behaviors.UnixRuntime do
             message = "Unknown error. Details: #{inspect(error)}"
             callback.({:error, message})
         end
+      end
+
+      def download_pkg(template_project_url) do
+        log(:info, Emoji.runner(), "Downloading template package...")
+        Req.get(template_project_url)
+      end
+
+      def create_temporary_files!(tmp_file, body) do
+        log(:info, Emoji.floppy_disk(), "Saving template package on disk...")
+        File.write!(tmp_file, body)
+      end
+
+      def extract_files!(pkg) do
+        log(:info, Emoji.floppy_disk(), "Extracting template package...")
+        extract_tar_gz(pkg)
       end
     end
   end
