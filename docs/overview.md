@@ -1,87 +1,27 @@
 # Overview
 
-**_What is Spawn?_**
+Since UC Berkeley published its [Cloud Programming Simplified: A Berkeley View on
+Serverless Computing](https://www2.eecs.berkeley.edu/Pubs/TechRpts/2019/EECS-2019-3.pdf) in the year of 2019, several solutions for Stateful Serverless and Durable Computing are emerging on the market.
+Originally coming from some contributors to the [Cloudstate](https://github.com/cloudstateio/cloudstate), Spawn stands as the Erlang world's answer to the challenges of durable serverless computing. 
 
-There are two ways to answer this question, the short form would be something like:
+Unlike serverless runtimes hidden in cloud providers' black boxes, Spawn is an open-source serverless runtime designed for both cloud and on-premises environments. Powered by [BEAM](https://www.erlang.org/blog/a-brief-beam-primer/) and [ERTS](https://www.erlang.org/doc/apps/erts/), Spawn offers a polyglot programming model for crafting versatile applications. It's **BEAM** for all.
 
-> "Spawn is an Actor Model framework and Serverless Platform, which does a lot, really lot, of cool stuff that allows you to quickly deliver software oriented to your business domain."
+Explore the potential of Erlang, regardless of your preferred programming language, to swiftly accomplish your business objectives. Check out our [documentation](docs/index.md) to [get started](docs/getting_started.md).
 
-Well since this answer doesn't say much, let's go the long way.
+## Demystifying the Serverless Computing Model
 
-Spawn's main goal is to remove the complexity in developing services or microservices, providing simple and intuitive APIs, as well as a declarative deployment and configuration model and based on a Serverless architecture and Actor Model.
-This leaves the developer to focus on developing the business domain while the platform deals with the complexities and infrastructure needed to support the scalable, resilient, distributed, and event-driven architecture that modern systems requires.
+> **_Tip:_** Serverless is not just FaaS
 
-Spawn is based on the sidecar proxy pattern to provide a polyglot Actor Model framework and platform.
-Spawn's technology stack, built on the [BEAM VM](https://www.erlang.org/blog/a-brief-beam-primer/) (Erlang's virtual machine) and [OTP](https://www.erlang.org/doc/design_principles/des_princ.html), provides support for different languages from its native Actor model.
+Serverless computing is a cloud computing execution model characterized by the automatic management of infrastructure, allowing developers to focus solely on code without the need to provision or manage servers explicitly. While commonly associated with cloud services, it's important to note that some serverless products operate independently of specific cloud providers, like Spawn. In these cases, the fundamental principles of automatic scaling, pay-per-execution pricing, and the abstraction of infrastructure complexities still apply, offering developers a serverless experience without exclusive reliance on a particular cloud platform.
 
-Spawn is made up of the following components:
+While serverless is often associated with Function as a Service (FaaS), where functions are the unit of deployment and execution, serverless computing can extend beyond just FaaS. In a broader sense, serverless includes services like backend-as-a-service (BaaS) and other cloud offerings where developers can build and deploy applications without dealing with the underlying infrastructure.
 
-- A semantic protocol based on Protocol Buffers
-- A Sidecar Proxy, written in Elixir, that implements this protocol and persistent storage
-  adapters.
-- Support libraries in different programming languages.
+The key features of serverless computing include automatic scaling, pay-per-execution pricing, and a shift of operational responsibilities from the developer to the cloud provider or underlying runtime. Developers can focus more on writing code and implementing business logic, leaving the infrastructure management, scaling, and maintenance to the upper runtime.
 
-These are the main concepts:
+Spawn extends this Serverless computing model by considering that there is an infrastructure layer in all application code, such as state management, configuration management, integration flows with other applications, connection pooling, and so on, and that this code infrastructure must also be managed by the runtime, freeing the developer so that he can focus much more on his business objectives directly.
 
-1. **A Stateful Serverless Platform** running on top of Kubernetes, based on the Sidecar pattern and built on top of the BEAM VM.
+This also brings security to CEOs and CTOs as well as product managers that the central objectives of their companies will be achieved within a shorter period of time, thus increasing their competitiveness against their competitors. This without compromising technical quality and scalability to support your products running in production.
 
-2. **Inversion of State**. This means that unlike conventional Serverless architectures where the developer fetches state from persistent storage we on the other hand send the state as the context of the event the function is receiving. Bringing state closer to computing.
-
-3. **Polyglot**. The platform must embrace as many software communities as possible. That's why the polyglot language model is adopted with SDK development for various programming languages.
-
-4. **Less Infrastructure**. This means that our platform will give the developer the tools to focus only on their business without worrying about issues such as:
-
-   - Resource allocation
-   - Definition of connections and Pools
-   - Service discovery
-   - Source/Sink of Events
-   - Other infrastructure issues
-
-5. **The basic primitive is the Actor** (from the actors model) and **_not_** the Function (from the traditional serverless architectures).
-
-6. Horizontal scalability with automatic **Activation** and **Deactivation** of Actors on demand.
-
-Watch the video explaining how it works:
-
-[![asciicast](https://asciinema.org/a/V2zUGsRmOjs0kI7swVTsKg7BQ.svg)](https://asciinema.org/a/V2zUGsRmOjs0kI7swVTsKg7BQ)
-
-> **_NOTE:_** This video was recorded with an old version of the SDK for Java. That's why errors are seen in Deployment
-
-### What problem Spawn solves
-
-The advancement of Cloud Computing, Edge computing, Containers, Orchestrators, Data-
-Oriented Services, and global-scale products aimed at serving audiences in various regions of
-our world make the development of software today a task of enormous complexity. It is not
-uncommon to see dozens, if not hundreds, of non-functional requirements that must be met
-to build a system. All this complexity falls on the developer, who often does not have all the
-knowledge or time to create such systems satisfactorily.
-
-When studying this scenario, we realize that many of these current problems belong to the following groups:
-
-- Fast business oriented software delivery.
-- State management.
-- Scalability.
-- Resilience and fault tolerance.
-- Distributed and/or regionally distributed computing.
-- Integration Services.
-- Polyglot services.
-
-The actor model on which Spawn is based can solve almost all the problems on this list, with
-Scalability, resilience, fault tolerance, and state management by far the top success stories of
-different known actor model implementations. So what we needed to do was add Integration
-
-Services, fast, business-oriented delivery, distributed computing, and polyglot services to the
-recipe so we could revolutionize software development as we know it today.
-
-That's precisely what we did with our platform called Eigr Functions Spawn.
-
-Spawn takes care of the entire infrastructure layer by abstracting all the complex issues that
-are not part of the business domain it is intended to address.
-
-Particularly domains such as game development, machine learning pipelines, complex event
-processing, real-time data ingestion, service integrations, financial or transactional services,
-and logistics are some of the domains that can be mastered by the Eigr Functions Spawn
-platform.
 
 [Next: Architecture](architecture.md)
 

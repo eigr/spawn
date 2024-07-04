@@ -1,11 +1,12 @@
 defmodule Io.Eigr.Spawn.Example.ClockActor.Service do
   @moduledoc false
+
   use GRPC.Service, name: "io.eigr.spawn.example.ClockActor", protoc_gen_elixir_version: "0.12.0"
 
   def descriptor do
     # credo:disable-for-next-line
     %Google.Protobuf.FileDescriptorProto{
-      name: "clock.proto",
+      name: "actors/inside_folder/clock.proto",
       package: "io.eigr.spawn.example",
       dependency: ["google/api/annotations.proto", "google/protobuf/empty.proto"],
       message_type: [],
@@ -21,7 +22,6 @@ defmodule Io.Eigr.Spawn.Example.ClockActor.Service do
               options: %Google.Protobuf.MethodOptions{
                 deprecated: false,
                 idempotency_level: :IDEMPOTENCY_UNKNOWN,
-                # features: nil,
                 uninterpreted_option: [],
                 __pb_extensions__: %{
                   {Google.Api.PbExtension, :http} => %Google.Api.HttpRule{
@@ -46,7 +46,6 @@ defmodule Io.Eigr.Spawn.Example.ClockActor.Service do
               options: %Google.Protobuf.MethodOptions{
                 deprecated: false,
                 idempotency_level: :IDEMPOTENCY_UNKNOWN,
-                # features: nil,
                 uninterpreted_option: [],
                 __pb_extensions__: %{
                   {Google.Api.PbExtension, :http} => %Google.Api.HttpRule{
@@ -88,9 +87,9 @@ defmodule Io.Eigr.Spawn.Example.ClockActor.Service do
         swift_prefix: nil,
         php_class_prefix: nil,
         php_namespace: nil,
+        php_generic_services: false,
         php_metadata_namespace: nil,
         ruby_package: nil,
-        # features: nil,
         uninterpreted_option: [],
         __pb_extensions__: %{},
         __unknown_fields__: []
@@ -335,4 +334,10 @@ defmodule Io.Eigr.Spawn.Example.ClockActor.Service do
       }
     }
   })
+end
+
+defmodule Io.Eigr.Spawn.Example.ClockActor.Stub do
+  @moduledoc false
+
+  use GRPC.Stub, service: Io.Eigr.Spawn.Example.ClockActor.Service
 end
