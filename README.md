@@ -53,7 +53,7 @@ To get started, you'll need to install the Spawn Actor Orchestrator runtime. The
 
 2. **Install the Operator**   
 
-   ![Setting Up Operator](docs/gifs/install-k8s-operator.gif)
+   ![Setting Up Operator](docs/gifs/install.gif)
 
 ### Step 2: Create Your First Project
 
