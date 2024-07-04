@@ -3,6 +3,20 @@ defmodule SpawnCtl.Util do
 
   @extension_blacklist ~w(.swp .swx)
 
+  def extract_tar_gz(file_path) do
+    current_path = File.cwd!()
+    tar_command = "tar -xzf #{file_path} -C #{current_path}"
+
+    case System.cmd("sh", ["-c", tar_command], stderr_to_stdout: true) do
+      {output, 0} ->
+        IO.puts(output)
+        {:ok, "File extracted successfully"}
+
+      {output, exit_code} ->
+        {:error, "Failed to extract file, exit code: #{exit_code}, output: #{output}"}
+    end
+  end
+
   def is_valid?(file) do
     ext =
       file

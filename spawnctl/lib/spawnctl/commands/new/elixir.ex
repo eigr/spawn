@@ -32,6 +32,11 @@ defmodule SpawnCtl.Commands.New.Elixir do
     description: "Generate a Spawn Elixir project."
 
   alias SpawnCtl.Util.Emoji
+  alias Spawnctl.Cookiecutter
+  alias SpawnCtl.Commands.New.Behavior.Runtime
+  alias Spawnctl.Runtimes.Behaviors.UnixRuntime.New, as: UnixNewCommand
+  alias Spawnctl.Runtimes.Behaviors.WindowsRuntime.New, as: WindowsNewCommand
+
   import SpawnCtl.Util, only: [log: 3]
 
   @vsn "1.4.1"
@@ -132,40 +137,85 @@ defmodule SpawnCtl.Commands.New.Elixir do
         %{name: name} = _args,
         %{
           actor_system: actor_system,
-          sdk_version: sdk_version,
-          template_version: template_version
-        } = _opts,
+          sdk_version: sdk_version
+        } = opts,
         _context
       ) do
     app_module_name = Macro.camelize(name)
     app_hyphenized_name = String.replace(name, "_", "-")
 
-    template_project_url =
-      "https://github.com/eigr/spawn-templates/releases/download/#{template_version}/elixir-v#{sdk_version}.tar.gz"
+    elixir_version =
+      if is_nil(opts.elixir_version) || opts.elixir_version == "" do
+        "1.14"
+      else
+        IO.inspect(opts.elixir_version, label: "Elixir Version")
+        opts.elixir_version
+      end
 
-    pwd = File.cwd!()
-    tmp_file = Path.join(pwd, "elixir-v#{sdk_version}.tar.gz")
+    statestore_type =
+      if is_nil(opts.statestore_type) || opts.statestore_type == "" do
+        "postgres"
+      else
+        IO.inspect(opts.statestore_type, label: "statestore_type")
+        opts.statestore_type
+      end
 
-    with {:ok, response} <- Req.get(template_project_url),
-         :ok <- File.write!(tmp_file, response.body),
-         {:ok, response} <- extract_tar_gz("#{pwd}/elixir-v#{sdk_version}.tar.gz") do
-      IO.puts("Done!")
-    end
+    opts
+    |> prepare()
+    |> then(fn
+      {:ok, input_dir} ->
+        output_dir = File.cwd!()
+        IO.puts("Name of application: #{name}")
 
-    # log(:info, "#{Emoji.rocket()} Project #{name} created successfully.")
+        extra_context = %{
+          "elixir_version" => elixir_version,
+          "app_name" => name,
+          "app_description" => opts.app_description,
+          "app_image_tag" => opts.app_image_tag,
+          "app_module_name" => app_module_name,
+          "app_name_hyphenate" => app_hyphenized_name,
+          "app_port" => 8090,
+          "spawn_app_spawm_system" => opts.actor_system,
+          "spawn_app_namespace" => opts.app_namespace,
+          "spawn_app_statestore_type" => statestore_type,
+          "spawn_sdk_version" => opts.sdk_version
+        }
+
+        case Cookiecutter.generate_project(input_dir, output_dir, extra_context) do
+          {:ok, output} ->
+            IO.puts("Project generated successfully")
+            IO.puts(output)
+
+          {:error, message} ->
+            log(:error, Emoji.exclamation(), message)
+        end
+
+      {:error, message} ->
+        log(:error, Emoji.exclamation(), message)
+    end)
   end
 
-  def extract_tar_gz(file_path) do
-    current_path = File.cwd!()
-    tar_command = "tar -xzf #{file_path} -C #{current_path}"
+  defp prepare(opts) do
+    case :os.type() do
+      {:unix, _} ->
+        %UnixNewCommand{opts: opts}
+        |> Runtime.prepare("elixir", fn
+          {:ok, template_path} ->
+            {:ok, template_path}
 
-    case System.cmd("sh", ["-c", tar_command], stderr_to_stdout: true) do
-      {output, 0} ->
-        IO.puts(output)
-        {:ok, "File extracted successfully"}
+          {:error, message} ->
+            {:error, message}
+        end)
 
-      {output, exit_code} ->
-        {:error, "Failed to extract file, exit code: #{exit_code}, output: #{output}"}
+      {:win32, _} ->
+        %WindowsNewCommand{opts: opts}
+        |> Runtime.prepare("elixir", fn
+          {:ok, template_path} ->
+            {:ok, template_path}
+
+          {:error, message} ->
+            {:error, message}
+        end)
     end
   end
 end
