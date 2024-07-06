@@ -21,7 +21,7 @@ defmodule SpawnCtl.Commands.New.Elixir do
     - `-t`, `--app-image-tag`: Defines the OCI Container image tag. (Default: "spawn-elixir-example:#{@vsn}")
     - `-t`, `--app-namespace`: Defines the Kubernetes namespace to install app. (Default: "default")
     - `-e`, `--elixir-version`: Defines the Elixir version. (Allowed Values: "1.14", "1.15", "1.16", "1.17")
-    - `-v`, `--sdk-version`: Spawn Elixir SDK version. (Allowed Values: "#{@main_sdk_version}")
+    - `-v`, `--sdk-version`: Spawn Elixir SDK version. (Allowed Values: "1.4.1")
     - `-S`, `--statestore-type`: Spawn statestore provider. (Allowed Values: "cockroachdb", "mariadb", "mssql", "mysql", "postgres", "sqlite")
     - `-U`, `--statestore-user`: Spawn statestore username. (Default: "admin")
     - `-P`, `--statestore-pwd`: Spawn statestore password. (Default: "admin")
@@ -171,7 +171,7 @@ defmodule SpawnCtl.Commands.New.Elixir do
             {:ok, template_path}
 
           {:error, message} ->
-            log(:error, Emoji.wink(), "Failure in the preparation phase!")
+            log(:error, Emoji.winking(), "Failure in the preparation phase!")
             {:error, message}
         end)
 

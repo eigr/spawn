@@ -54,7 +54,7 @@ defmodule Spawnctl.Cookiecutter do
         message = "Unable to delete some resources [#{detail}]"
         {:error, message}
 
-      {:drop_venv_path, {:error, detail, file}} ->
+      {:drop_venv_path, {:error, detail, _file}} ->
         message = "Unable to delete virtual environment [#{detail}]"
         {:error, message}
 

@@ -26,7 +26,7 @@ defmodule Spawnctl.Runtimes.Behaviors.UnixRuntime do
         with {:download, {:ok, response}} <- {:download, download_pkg(template_project_url)},
              {:generate_temporary_data, :ok} <-
                {:generate_temporary_data, create_temporary_files!(tmp_file, response.body)},
-             {:extract_files, {:ok, response}} <-
+             {:extract_files, {:ok, _response}} <-
                {:extract_files, extract_files!(pkg)} do
           callback.({:ok, "#{pwd}/#{lang}"})
         else

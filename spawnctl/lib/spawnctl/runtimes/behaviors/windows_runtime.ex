@@ -10,8 +10,9 @@ defmodule Spawnctl.Runtimes.Behaviors.WindowsRuntime do
 
     defimpl SpawnCtl.Commands.New.Behavior.Runtime, for: __MODULE__ do
       @impl true
-      def prepare(%WindowsNewCommand{} = _strategy, callback)
+      def prepare(%WindowsNewCommand{} = _strategy, _lang, callback)
           when is_function(callback, 1) do
+        raise ArgumentError, "Not implemented"
       end
     end
   end
