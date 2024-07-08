@@ -351,6 +351,20 @@ defmodule SpawnCtl.Commands.Dev.Run do
     |> Container.with_label("spawn.proxy.logger.level", opts.log_level)
   end
 
+  defp maybe_use_host_network(container, _opts) do
+    case :os.type() do
+      {:win32, _} ->
+        container
+
+      {:unix, :darwin} ->
+        container
+
+      {:unix, _} ->
+        container
+        |> Container.with_network_mode("host")
+    end
+  end
+
   defp maybe_mount_proto_files(container, proto_files) do
     if proto_files == @default_opts.proto_files do
       container
