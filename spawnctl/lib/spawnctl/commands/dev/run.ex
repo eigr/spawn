@@ -103,12 +103,12 @@ defmodule SpawnCtl.Commands.Dev.Run do
   )
 
   option(:manifest_files, :string, "Local where your Actor k8s manifest files reside.",
-    alias: :P,
+    alias: :M,
     default: @default_opts.manifest_files
   )
 
   option(:proto_files, :string, "Local where your protobuf files reside.",
-    alias: :P,
+    alias: :p,
     default: @default_opts.proto_files
   )
 
@@ -118,17 +118,17 @@ defmodule SpawnCtl.Commands.Dev.Run do
   )
 
   option(:proxy_bind_address, :string, "Defines the proxy host address.",
-    alias: :ba,
+    alias: :A,
     default: @default_opts.proxy_bind_address
   )
 
   option(:proxy_bind_port, :integer, "Defines the proxy host port.",
-    alias: :bp,
+    alias: :P,
     default: @default_opts.proxy_bind_port
   )
 
   option(:proxy_bind_grpc_port, :integer, "Defines the proxy gRPC host port.",
-    alias: :bp,
+    alias: :G,
     default: @default_opts.proxy_bind_grpc_port
   )
 
@@ -138,7 +138,7 @@ defmodule SpawnCtl.Commands.Dev.Run do
   )
 
   option(:actor_host_port, :integer, "Defines the ActorHost (your program) port.",
-    alias: :ap,
+    alias: :H,
     default: @default_opts.actor_host_port
   )
 
@@ -148,22 +148,22 @@ defmodule SpawnCtl.Commands.Dev.Run do
   )
 
   option(:database_host, :string, "Defines the Database hostname.",
-    alias: :dh,
+    alias: :h,
     default: @default_opts.database_host
   )
 
   option(:database_port, :integer, "Defines the Database port number.",
-    alias: :dp,
+    alias: :D,
     default: @default_opts.database_port
   )
 
   option(:database_type, :string, "Defines the Database provider.",
-    alias: :dt,
+    alias: :T,
     default: @default_opts.database_type
   )
 
   option(:database_pool, :integer, "Defines the Database pool size.",
-    alias: :dP,
+    alias: :O,
     default: @default_opts.database_pool
   )
 
