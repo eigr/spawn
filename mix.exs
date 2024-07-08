@@ -92,7 +92,7 @@ defmodule Spawn.MixProject do
       {:k8s, "~> 2.2"},
       {:k8s_webhoox, "~> 0.2"},
       # temporary until bandit releases 1.5.4
-      {:hpax, "~> 0.1.1"},
+      {:hpax, "~> 0.2.0"},
       # Metrics & Tracing deps
       {:telemetry_poller, "~> 1.0"},
       {:telemetry_metrics, "~> 1.0"},
