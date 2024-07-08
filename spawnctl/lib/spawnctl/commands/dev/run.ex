@@ -205,9 +205,20 @@ defmodule SpawnCtl.Commands.Dev.Run do
       FileSystem.subscribe(pid)
       watch(nil, opts, ctx)
     else
-      case start_container(opts, ctx) do
-        {:ok, _container} -> Process.sleep(:infinity)
-        {:error, _error} -> System.stop(1)
+      case Testcontainers.start_link() do
+        {:ok, _docker_pid} ->
+          case start_container(opts, ctx) do
+            {:ok, _container} ->
+              Process.sleep(:infinity)
+
+            {:error, error} ->
+              log_failure(error)
+              System.stop(1)
+          end
+
+        error ->
+          log_failure(error)
+          System.stop(1)
       end
     end
   end
