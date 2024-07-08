@@ -85,6 +85,7 @@ defmodule Spawn.MixProject do
       {:libcluster, "~> 3.3"},
       {:horde, "~> 0.9"},
       {:highlander, "~> 0.2.1"},
+      {:process_hub, "~> 0.2"},
       {:phoenix_pubsub, "~> 2.1"},
       {:phoenix_pubsub_nats, "~> 0.2"},
       {:jason, "~> 1.3"},

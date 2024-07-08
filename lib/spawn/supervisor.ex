@@ -29,11 +29,40 @@ defmodule Spawn.Supervisor do
         {Spawn.Cache.LookupCache, []},
         Spawn.Cluster.StateHandoff.ManagerSupervisor.child_spec(opts),
         {Spawn.Cluster.ClusterSupervisor, []},
+        process_hub(),
         Spawn.Cluster.Node.Registry.child_spec()
       ]
       |> maybe_start_internal_nats(opts)
 
     Supervisor.init(children, strategy: :one_for_one)
+  end
+
+  defp process_hub() do
+    {ProcessHub,
+     %ProcessHub{
+       hub_id: Config.get(:actor_system_name),
+       # Configure the redundancy strategy.
+       redundancy_strategy: %ProcessHub.Strategy.Redundancy.Replication{
+         replication_factor: 2,
+         replication_model: :active_passive,
+         redundancy_signal: :none
+       },
+       # Configure the migration strategy.
+       migration_strategy: %ProcessHub.Strategy.Migration.HotSwap{
+         retention: 2000,
+         handover: true
+       },
+       # Configure the synchronization strategy.
+       synchronization_strategy: %ProcessHub.Strategy.Synchronization.PubSub{
+         sync_interval: 10000
+       },
+       # Configure the partition tolerance strategy.
+       partition_tolerance_strategy: %ProcessHub.Strategy.PartitionTolerance.DynamicQuorum{
+         quorum_size: 2
+       },
+       # Configure the distribution strategy.
+       distribution_strategy: %ProcessHub.Strategy.Distribution.ConsistentHashing{}
+     }}
   end
 
   defp maybe_start_internal_nats(children, opts) do
