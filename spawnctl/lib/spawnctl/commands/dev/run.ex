@@ -344,6 +344,7 @@ defmodule SpawnCtl.Commands.Dev.Run do
     |> Container.with_environment("SPAWN_STATESTORE_KEY", opts.statestore_key)
     |> Container.with_environment("USER_FUNCTION_PORT", "#{opts.actor_host_port}")
     |> Container.with_fixed_port(opts.proxy_bind_port)
+    |> maybe_use_host_network(opts)
     |> Container.with_label("spawn.actorsystem.name", opts.actor_system)
     |> Container.with_label("spawn.proxy.name", opts.name)
     |> Container.with_label("spawn.proxy.database.type", opts.database_type)
