@@ -1,0 +1,14 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - manifests/spire-namespace.yaml
+  - manifests/server-account.yaml
+  - manifests/spire-bundle-configmap.yaml
+  - manifests/server-cluster-role.yaml
+  - manifests/server-configmap.yaml
+  - manifests/server-statefulset.yaml
+  - manifests/server-service.yaml
+  - manifests/agent-account.yaml
+  - manifests/agent-cluster-role.yaml
+  - manifests/agent-configmap.yaml
+  - manifests/agent-daemonset.yaml
