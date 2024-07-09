@@ -7,7 +7,6 @@ defmodule Actors.Actor.Entity.Lifecycle do
 
   alias Actors.Actor.{Entity.EntityState, Entity.Invocation, StateManager}
   alias Actors.Actor.Pubsub
-  alias Actors.Exceptions.NetworkPartitionException
 
   alias Eigr.Functions.Protocol.Actors.{
     Actor,
@@ -39,8 +38,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
               %ActorSettings{
                 stateful: stateful?,
                 snapshot_strategy: snapshot_strategy,
-                deactivation_strategy: deactivation_strategy,
-                kind: kind
+                deactivation_strategy: deactivation_strategy
               } = _settings,
             timer_actions: timer_actions
           }
@@ -48,72 +46,31 @@ defmodule Actors.Actor.Entity.Lifecycle do
       ) do
     Process.flag(:trap_exit, true)
 
-    split_brain_detector_mod =
-      Application.get_env(:spawn, :split_brain_detector, Actors.Node.DefaultSplitBrainDetector)
-
     Logger.notice(
       "Activating Actor #{inspect(name)} with Parent #{inspect(parent)} in Node #{inspect(Node.self())}. Persistence #{inspect(stateful?)}."
     )
 
-    actor_name_key =
-      if kind == :POOLED do
-        parent
-      else
-        name
-      end
-
     :ok = handle_metadata(name, system, metadata)
     :ok = Invocation.handle_timers(timer_actions, system, state.actor)
-
-    :ok =
-      Spawn.Cluster.Node.Registry.update_entry_value(
-        Actors.Actor.Entity,
-        actor_name_key,
-        self(),
-        state.actor.id
-      )
 
     schedule_deactivate(deactivation_strategy, get_jitter())
 
     state =
       case maybe_schedule_snapshot_advance(snapshot_strategy) do
         {:ok, timer} ->
-          %EntityState{
-            state
-            | opts:
-                Keyword.merge(state.opts,
-                  timer: timer,
-                  split_brain_detector: split_brain_detector_mod
-                )
-          }
+          %EntityState{state | opts: Keyword.merge(state.opts, timer: timer)}
 
         _ ->
-          %EntityState{
-            state
-            | opts:
-                Keyword.merge(state.opts,
-                  split_brain_detector: split_brain_detector_mod
-                )
-          }
+          state
       end
 
     {:ok, state, {:continue, :load_state}}
   end
 
-  def load_state(%EntityState{actor: actor, revision: revision, opts: opts} = state) do
+  def load_state(%EntityState{actor: actor, revision: revision, opts: _opts} = state) do
     case get_state(actor.id, revision) do
-      {:ok, current_state, current_revision, status, node} ->
-        split_brain_detector =
-          Keyword.get(opts, :split_brain_detector, Actors.Node.DefaultSplitBrainDetector)
-
-        case check_partition(actor.id, status, node, split_brain_detector) do
-          :continue ->
-            {:noreply, updated_state(state, current_state, current_revision),
-             {:continue, :call_init_action}}
-
-          {:network_partition_detected, error} ->
-            handle_network_partition(actor.id, error)
-        end
+      {:ok, _current_state, _current_revision, _status, _node} ->
+        {:continue, :call_init_action}
 
       {:not_found, %{}, _current_revision} ->
         Logger.debug("Not found state on statestore for Actor #{inspect(actor.id)}.")
@@ -282,27 +239,6 @@ defmodule Actors.Actor.Entity.Lifecycle do
 
   defp updated_state(%EntityState{actor: actor} = state, actual_state, revision) do
     %EntityState{state | actor: %Actor{actor | state: actual_state}, revision: revision}
-  end
-
-  defp check_partition(id, status, node, split_brain_detector) do
-    case split_brain_detector.check_network_partition(id, status, node) do
-      {:ok, :continue} ->
-        :continue
-
-      {:error, :network_partition_detected} ->
-        {:network_partition_detected, :network_partition_detected}
-
-      error ->
-        {:network_partition_detected, error}
-    end
-  end
-
-  defp handle_network_partition(id, error) do
-    Logger.warning(
-      "We have detected a possible network partition issue for Actor #{inspect(id)}. This actor will not start. Details: #{inspect(error)}"
-    )
-
-    raise NetworkPartitionException
   end
 
   defp handle_load_state_error(id, state, error) do

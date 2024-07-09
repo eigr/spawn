@@ -83,7 +83,7 @@ defmodule Spawn.MixProject do
       {:retry, "~> 0.17"},
       {:flow, "~> 1.2"},
       {:libcluster, "~> 3.3"},
-      {:horde, "~> 0.9"},
+      #{:horde, "~> 0.9"},
       {:highlander, "~> 0.2.1"},
       {:process_hub, "~> 0.2"},
       {:phoenix_pubsub, "~> 2.1"},

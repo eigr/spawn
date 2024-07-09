@@ -494,6 +494,6 @@ defmodule Actors.Actor.Entity do
   defp reply_to_noreply({:noreply, _response, state, opts}), do: {:noreply, state, opts}
 
   defp via(name) do
-    {:via, Horde.Registry, {Spawn.Cluster.Node.Registry, {__MODULE__, name}}}
+    {:via, Horde.Registry, {Spawn.Cluster.Node.Distributor, {__MODULE__, name}}}
   end
 end

@@ -11,7 +11,6 @@ defmodule Actors.Actor.InvocationScheduler do
 
   require Logger
 
-  alias Spawn.Cluster.StateHandoff.InvocationSchedulerState
   alias Eigr.Functions.Protocol.InvocationRequest
 
   @hibernate_delay 20_000
@@ -28,8 +27,8 @@ defmodule Actors.Actor.InvocationScheduler do
   def handle_continue(:init_invocations, state) do
     schedule_hibernate()
 
-    InvocationSchedulerState.all()
-    |> Enum.each(&call_invoke/1)
+    # InvocationSchedulerState.all()
+    # |> Enum.each(&call_invoke/1)
 
     {:noreply, state}
   end
@@ -42,7 +41,8 @@ defmodule Actors.Actor.InvocationScheduler do
   @impl true
   def handle_info({:invoke, decoded_request, scheduled_to, repeat_in}, state) do
     if is_nil(repeat_in) do
-      InvocationSchedulerState.remove(InvocationRequest.encode(decoded_request))
+      # InvocationSchedulerState.remove(InvocationRequest.encode(decoded_request))
+      nil
     else
       scheduled_to = DateTime.add(scheduled_to, repeat_in, :millisecond)
 
@@ -62,10 +62,10 @@ defmodule Actors.Actor.InvocationScheduler do
 
   @impl true
   def handle_cast({:schedule, request, scheduled_to, repeat_in}, state) do
-    encoded_request =
+    _encoded_request =
       InvocationRequest.encode(%InvocationRequest{request | scheduled_to: 0, async: true})
 
-    InvocationSchedulerState.put(encoded_request, scheduled_to, repeat_in)
+    # InvocationSchedulerState.put(encoded_request, scheduled_to, repeat_in)
 
     call_invoke({request, {scheduled_to, repeat_in}})
 
@@ -73,21 +73,21 @@ defmodule Actors.Actor.InvocationScheduler do
   end
 
   @impl true
-  def handle_cast({:schedule_fixed, requests}, state) do
-    requests =
-      Enum.reduce(requests, [], fn {request, scheduled_to, repeat_in}, acc ->
-        encoded_request = InvocationRequest.encode(request)
+  def handle_cast({:schedule_fixed, _requests}, state) do
+    # requests =
+    #   Enum.reduce(requests, [], fn {request, scheduled_to, repeat_in}, acc ->
+    #     encoded_request = InvocationRequest.encode(request)
 
-        if is_nil(InvocationSchedulerState.get(encoded_request)) do
-          call_invoke({request, {scheduled_to, repeat_in}})
+    #     if is_nil(InvocationSchedulerState.get(encoded_request)) do
+    #       call_invoke({request, {scheduled_to, repeat_in}})
 
-          acc ++ [{encoded_request, scheduled_to, repeat_in}]
-        else
-          acc
-        end
-      end)
+    #       acc ++ [{encoded_request, scheduled_to, repeat_in}]
+    #     else
+    #       acc
+    #     end
+    #   end)
 
-    InvocationSchedulerState.put_many(requests)
+    # InvocationSchedulerState.put_many(requests)
 
     {:noreply, state}
   end

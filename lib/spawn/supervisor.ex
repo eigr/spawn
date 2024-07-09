@@ -27,10 +27,8 @@ defmodule Spawn.Supervisor do
       [
         supervisor_process_logger(__MODULE__),
         {Spawn.Cache.LookupCache, []},
-        Spawn.Cluster.StateHandoff.ManagerSupervisor.child_spec(opts),
         {Spawn.Cluster.ClusterSupervisor, []},
-        process_hub(),
-        Spawn.Cluster.Node.Registry.child_spec()
+        process_hub()
       ]
       |> maybe_start_internal_nats(opts)
 

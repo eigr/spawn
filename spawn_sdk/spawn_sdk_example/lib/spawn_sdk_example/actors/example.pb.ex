@@ -34,7 +34,7 @@ defmodule Io.Eigr.Spawn.Example.MyState do
     }
   end
 
-  field :value, 1, type: :int32
+  field(:value, 1, type: :int32)
 end
 
 defmodule Io.Eigr.Spawn.Example.MyBusinessMessage do
@@ -73,7 +73,7 @@ defmodule Io.Eigr.Spawn.Example.MyBusinessMessage do
     }
   end
 
-  field :value, 1, type: :int32
+  field(:value, 1, type: :int32)
 end
 
 defmodule Io.Eigr.Spawn.Example.Joe.Service do

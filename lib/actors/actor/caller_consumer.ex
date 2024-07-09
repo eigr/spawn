@@ -667,7 +667,7 @@ defmodule Actors.Actor.CallerConsumer do
     Tracer.with_span "actor-lookup" do
       Tracer.set_attributes([{:actor_fqdn, actor_fqdn}])
 
-      case Spawn.Cluster.Node.Registry.lookup(Actors.Actor.Entity, parent) do
+      case Spawn.Cluster.Node.Distributor.lookup(system_name, parent) do
         [{actor_ref, actor_ref_id}] ->
           Tracer.add_event("actor-status", [{"alive", true}])
           Tracer.set_attributes([{"actor-pid", "#{inspect(actor_ref)}"}])
