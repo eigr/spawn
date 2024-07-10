@@ -10,11 +10,16 @@ defmodule Actors.Security.Spiffe.Client do
   alias Spiffe.Workload.SpiffeWorkloadAPI.Stub, as: SpiffeStub
 
   def fetch_x509_svid() do
-    # Replace with your SPIRE server address
-    url =
-      "#{Config.get(:security_idp_spire_server_address)}:#{Config.get(:security_idp_spire_server_port)}"
-
-    with {:connect, {:ok, channel}} <- {:connect, GRPC.Stub.connect(url)},
+    with {:connect, {:ok, channel}} <-
+           {:connect,
+            GRPC.Stub.connect(build_url(),
+              headers: [{"workload.spiffe.io", "true"}],
+              adapter_opts: [
+                http2_opts: %{settings_timeout: 10_000},
+                retry: 5,
+                retry_fun: &retry_fun/2
+              ]
+            )},
          {:build_request, request} <- {:build_request, %X509SVIDRequest{}} do
       SpiffeStub.fetch_x509_svid(channel, request)
     else
@@ -27,16 +32,38 @@ defmodule Actors.Security.Spiffe.Client do
   end
 
   def fetch_jwt_svid(audience, spiffe_id \\ nil) do
-    # Replace with your SPIRE server address
-    {:ok, channel} = GRPC.Stub.connect("localhost:8081")
-    request = %JWTSVIDRequest{audience: audience, spiffe_id: spiffe_id}
-    SpiffeStub.fetch_jwtsvid(channel, request)
+    with {:connect, {:ok, channel}} <- {:connect, GRPC.Stub.connect(build_url())},
+         {:build_request, request} <-
+           {:build_request, %JWTSVIDRequest{audience: audience, spiffe_id: spiffe_id}} do
+      SpiffeStub.fetch_jwtsvid(channel, request)
+    else
+      {:connect, error} ->
+        {:error, error}
+
+      {:build_request, error} ->
+        {:error, error}
+    end
   end
 
   def validate_jwt_svid(audience, svid) do
-    # Replace with your SPIRE server address
-    {:ok, channel} = GRPC.Stub.connect("localhost:8081")
-    request = %ValidateJWTSVIDRequest{audience: audience, svid: svid}
-    SpiffeStub.validate_jwtsvid(channel, request)
+    with {:connect, {:ok, channel}} <- {:connect, GRPC.Stub.connect(build_url())},
+         {:build_request, request} <-
+           {:build_request, %ValidateJWTSVIDRequest{audience: audience, svid: svid}} do
+      SpiffeStub.validate_jwtsvid(channel, request)
+    else
+      {:connect, error} ->
+        {:error, error}
+
+      {:build_request, error} ->
+        {:error, error}
+    end
+  end
+
+  defp build_url(),
+    do:
+      "#{Config.get(:security_idp_spire_server_address)}:#{Config.get(:security_idp_spire_server_port)}"
+
+  defp retry_fun(_reason, _attempt) do
+    :ok
   end
 end

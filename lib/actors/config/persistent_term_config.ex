@@ -677,6 +677,33 @@ if Code.ensure_loaded?(:persistent_term) do
       value
     end
 
+    defp load_env({:security_idp_spire_enabled, default}) do
+      value =
+        env("SPAWN_IDP_SPIRE_ENABLED", default)
+        |> to_bool()
+
+      :persistent_term.put({__MODULE__, :security_idp_spire_enabled}, value)
+
+      value
+    end
+
+    defp load_env({:security_idp_spire_server_address, default}) do
+      value = env("SPAWN_IDP_SPIRE_ADDRESS", default)
+      :persistent_term.put({__MODULE__, :security_idp_spire_server_address}, value)
+
+      value
+    end
+
+    defp load_env({:security_idp_spire_server_port, default}) do
+      value =
+        env("SPAWN_IDP_SPIRE_PORT", default)
+        |> String.to_integer()
+
+      :persistent_term.put({__MODULE__, :security_idp_spire_server_port}, value)
+
+      value
+    end
+
     defp load_env({:ship_interval, default}) do
       value =
         env("SPAWN_CRDT_SHIP_INTERVAL", default)
