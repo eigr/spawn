@@ -34,7 +34,7 @@ data:
         plugin_data {
           clusters = {
             # NOTE: Change this to your cluster name
-            "demo-cluster" = {
+            "k3d-eigr-spawn" = {
               use_token_review_api_validation = true
               service_account_allow_list = ["spire:spire-agent"]
             }
