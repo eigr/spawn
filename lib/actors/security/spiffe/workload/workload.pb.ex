@@ -1,4 +1,4 @@
-defmodule Spiffe.Workload.X509SVIDRequest do
+defmodule X509SVIDRequest do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
 
@@ -19,7 +19,7 @@ defmodule Spiffe.Workload.X509SVIDRequest do
     }
   end
 end
-defmodule Spiffe.Workload.X509SVIDResponse.FederatedBundlesEntry do
+defmodule X509SVIDResponse.FederatedBundlesEntry do
   @moduledoc false
   use Protobuf, map: true, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
 
@@ -80,7 +80,7 @@ defmodule Spiffe.Workload.X509SVIDResponse.FederatedBundlesEntry do
   field :key, 1, type: :string
   field :value, 2, type: :bytes
 end
-defmodule Spiffe.Workload.X509SVIDResponse do
+defmodule X509SVIDResponse do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
 
@@ -104,7 +104,7 @@ defmodule Spiffe.Workload.X509SVIDResponse do
           options: nil,
           proto3_optional: nil,
           type: :TYPE_MESSAGE,
-          type_name: ".spiffe.workload.X509SVID"
+          type_name: ".X509SVID"
         },
         %Google.Protobuf.FieldDescriptorProto{
           __unknown_fields__: [],
@@ -132,7 +132,7 @@ defmodule Spiffe.Workload.X509SVIDResponse do
           options: nil,
           proto3_optional: nil,
           type: :TYPE_MESSAGE,
-          type_name: ".spiffe.workload.X509SVIDResponse.FederatedBundlesEntry"
+          type_name: ".X509SVIDResponse.FederatedBundlesEntry"
         }
       ],
       name: "X509SVIDResponse",
@@ -195,16 +195,15 @@ defmodule Spiffe.Workload.X509SVIDResponse do
     }
   end
 
-  field :svids, 1, repeated: true, type: Spiffe.Workload.X509SVID
+  field :svids, 1, repeated: true, type: X509SVID
   field :crl, 2, repeated: true, type: :bytes
 
   field :federated_bundles, 3,
     repeated: true,
-    type: Spiffe.Workload.X509SVIDResponse.FederatedBundlesEntry,
-    json_name: "federatedBundles",
-    map: true
+    type: X509SVIDResponse.FederatedBundlesEntry,
+    json_name: "federatedBundles"
 end
-defmodule Spiffe.Workload.X509SVID do
+defmodule X509SVID do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
 
@@ -302,7 +301,7 @@ defmodule Spiffe.Workload.X509SVID do
   field :bundle, 4, type: :bytes
   field :hint, 5, type: :string
 end
-defmodule Spiffe.Workload.X509BundlesRequest do
+defmodule X509BundlesRequest do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
 
@@ -323,7 +322,7 @@ defmodule Spiffe.Workload.X509BundlesRequest do
     }
   end
 end
-defmodule Spiffe.Workload.X509BundlesResponse.BundlesEntry do
+defmodule X509BundlesResponse.BundlesEntry do
   @moduledoc false
   use Protobuf, map: true, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
 
@@ -384,7 +383,7 @@ defmodule Spiffe.Workload.X509BundlesResponse.BundlesEntry do
   field :key, 1, type: :string
   field :value, 2, type: :bytes
 end
-defmodule Spiffe.Workload.X509BundlesResponse do
+defmodule X509BundlesResponse do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
 
@@ -422,7 +421,7 @@ defmodule Spiffe.Workload.X509BundlesResponse do
           options: nil,
           proto3_optional: nil,
           type: :TYPE_MESSAGE,
-          type_name: ".spiffe.workload.X509BundlesResponse.BundlesEntry"
+          type_name: ".X509BundlesResponse.BundlesEntry"
         }
       ],
       name: "X509BundlesResponse",
@@ -486,13 +485,9 @@ defmodule Spiffe.Workload.X509BundlesResponse do
   end
 
   field :crl, 1, repeated: true, type: :bytes
-
-  field :bundles, 2,
-    repeated: true,
-    type: Spiffe.Workload.X509BundlesResponse.BundlesEntry,
-    map: true
+  field :bundles, 2, repeated: true, type: X509BundlesResponse.BundlesEntry
 end
-defmodule Spiffe.Workload.JWTSVIDRequest do
+defmodule JWTSVIDRequest do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
 
@@ -545,7 +540,7 @@ defmodule Spiffe.Workload.JWTSVIDRequest do
   field :audience, 1, repeated: true, type: :string
   field :spiffe_id, 2, type: :string, json_name: "spiffeId"
 end
-defmodule Spiffe.Workload.JWTSVIDResponse do
+defmodule JWTSVIDResponse do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
 
@@ -569,7 +564,7 @@ defmodule Spiffe.Workload.JWTSVIDResponse do
           options: nil,
           proto3_optional: nil,
           type: :TYPE_MESSAGE,
-          type_name: ".spiffe.workload.JWTSVID"
+          type_name: ".JWTSVID"
         }
       ],
       name: "JWTSVIDResponse",
@@ -581,9 +576,9 @@ defmodule Spiffe.Workload.JWTSVIDResponse do
     }
   end
 
-  field :svids, 1, repeated: true, type: Spiffe.Workload.JWTSVID
+  field :svids, 1, repeated: true, type: JWTSVID
 end
-defmodule Spiffe.Workload.JWTSVID do
+defmodule JWTSVID do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
 
@@ -651,7 +646,7 @@ defmodule Spiffe.Workload.JWTSVID do
   field :svid, 2, type: :string
   field :hint, 3, type: :string
 end
-defmodule Spiffe.Workload.JWTBundlesRequest do
+defmodule JWTBundlesRequest do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
 
@@ -672,7 +667,7 @@ defmodule Spiffe.Workload.JWTBundlesRequest do
     }
   end
 end
-defmodule Spiffe.Workload.JWTBundlesResponse.BundlesEntry do
+defmodule JWTBundlesResponse.BundlesEntry do
   @moduledoc false
   use Protobuf, map: true, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
 
@@ -733,7 +728,7 @@ defmodule Spiffe.Workload.JWTBundlesResponse.BundlesEntry do
   field :key, 1, type: :string
   field :value, 2, type: :bytes
 end
-defmodule Spiffe.Workload.JWTBundlesResponse do
+defmodule JWTBundlesResponse do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
 
@@ -757,7 +752,7 @@ defmodule Spiffe.Workload.JWTBundlesResponse do
           options: nil,
           proto3_optional: nil,
           type: :TYPE_MESSAGE,
-          type_name: ".spiffe.workload.JWTBundlesResponse.BundlesEntry"
+          type_name: ".JWTBundlesResponse.BundlesEntry"
         }
       ],
       name: "JWTBundlesResponse",
@@ -820,12 +815,9 @@ defmodule Spiffe.Workload.JWTBundlesResponse do
     }
   end
 
-  field :bundles, 1,
-    repeated: true,
-    type: Spiffe.Workload.JWTBundlesResponse.BundlesEntry,
-    map: true
+  field :bundles, 1, repeated: true, type: JWTBundlesResponse.BundlesEntry
 end
-defmodule Spiffe.Workload.ValidateJWTSVIDRequest do
+defmodule ValidateJWTSVIDRequest do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
 
@@ -878,7 +870,7 @@ defmodule Spiffe.Workload.ValidateJWTSVIDRequest do
   field :audience, 1, type: :string
   field :svid, 2, type: :string
 end
-defmodule Spiffe.Workload.ValidateJWTSVIDResponse do
+defmodule ValidateJWTSVIDResponse do
   @moduledoc false
   use Protobuf, protoc_gen_elixir_version: "0.10.0", syntax: :proto3
 
@@ -931,9 +923,9 @@ defmodule Spiffe.Workload.ValidateJWTSVIDResponse do
   field :spiffe_id, 1, type: :string, json_name: "spiffeId"
   field :claims, 2, type: Google.Protobuf.Struct
 end
-defmodule Spiffe.Workload.SpiffeWorkloadAPI.Service do
+defmodule SpiffeWorkloadAPI.Service do
   @moduledoc false
-  use GRPC.Service, name: "spiffe.workload.SpiffeWorkloadAPI", protoc_gen_elixir_version: "0.10.0"
+  use GRPC.Service, name: "SpiffeWorkloadAPI", protoc_gen_elixir_version: "0.10.0"
 
   def descriptor do
     # credo:disable-for-next-line
@@ -943,46 +935,46 @@ defmodule Spiffe.Workload.SpiffeWorkloadAPI.Service do
         %Google.Protobuf.MethodDescriptorProto{
           __unknown_fields__: [],
           client_streaming: false,
-          input_type: ".spiffe.workload.X509SVIDRequest",
+          input_type: ".X509SVIDRequest",
           name: "FetchX509SVID",
           options: nil,
-          output_type: ".spiffe.workload.X509SVIDResponse",
+          output_type: ".X509SVIDResponse",
           server_streaming: true
         },
         %Google.Protobuf.MethodDescriptorProto{
           __unknown_fields__: [],
           client_streaming: false,
-          input_type: ".spiffe.workload.X509BundlesRequest",
+          input_type: ".X509BundlesRequest",
           name: "FetchX509Bundles",
           options: nil,
-          output_type: ".spiffe.workload.X509BundlesResponse",
+          output_type: ".X509BundlesResponse",
           server_streaming: true
         },
         %Google.Protobuf.MethodDescriptorProto{
           __unknown_fields__: [],
           client_streaming: false,
-          input_type: ".spiffe.workload.JWTSVIDRequest",
+          input_type: ".JWTSVIDRequest",
           name: "FetchJWTSVID",
           options: nil,
-          output_type: ".spiffe.workload.JWTSVIDResponse",
+          output_type: ".JWTSVIDResponse",
           server_streaming: false
         },
         %Google.Protobuf.MethodDescriptorProto{
           __unknown_fields__: [],
           client_streaming: false,
-          input_type: ".spiffe.workload.JWTBundlesRequest",
+          input_type: ".JWTBundlesRequest",
           name: "FetchJWTBundles",
           options: nil,
-          output_type: ".spiffe.workload.JWTBundlesResponse",
+          output_type: ".JWTBundlesResponse",
           server_streaming: true
         },
         %Google.Protobuf.MethodDescriptorProto{
           __unknown_fields__: [],
           client_streaming: false,
-          input_type: ".spiffe.workload.ValidateJWTSVIDRequest",
+          input_type: ".ValidateJWTSVIDRequest",
           name: "ValidateJWTSVID",
           options: nil,
-          output_type: ".spiffe.workload.ValidateJWTSVIDResponse",
+          output_type: ".ValidateJWTSVIDResponse",
           server_streaming: false
         }
       ],
@@ -991,24 +983,18 @@ defmodule Spiffe.Workload.SpiffeWorkloadAPI.Service do
     }
   end
 
-  rpc :FetchX509SVID, Spiffe.Workload.X509SVIDRequest, stream(Spiffe.Workload.X509SVIDResponse)
+  rpc :FetchX509SVID, X509SVIDRequest, stream(X509SVIDResponse)
 
-  rpc :FetchX509Bundles,
-      Spiffe.Workload.X509BundlesRequest,
-      stream(Spiffe.Workload.X509BundlesResponse)
+  rpc :FetchX509Bundles, X509BundlesRequest, stream(X509BundlesResponse)
 
-  rpc :FetchJWTSVID, Spiffe.Workload.JWTSVIDRequest, Spiffe.Workload.JWTSVIDResponse
+  rpc :FetchJWTSVID, JWTSVIDRequest, JWTSVIDResponse
 
-  rpc :FetchJWTBundles,
-      Spiffe.Workload.JWTBundlesRequest,
-      stream(Spiffe.Workload.JWTBundlesResponse)
+  rpc :FetchJWTBundles, JWTBundlesRequest, stream(JWTBundlesResponse)
 
-  rpc :ValidateJWTSVID,
-      Spiffe.Workload.ValidateJWTSVIDRequest,
-      Spiffe.Workload.ValidateJWTSVIDResponse
+  rpc :ValidateJWTSVID, ValidateJWTSVIDRequest, ValidateJWTSVIDResponse
 end
 
-defmodule Spiffe.Workload.SpiffeWorkloadAPI.Stub do
+defmodule SpiffeWorkloadAPI.Stub do
   @moduledoc false
-  use GRPC.Stub, service: Spiffe.Workload.SpiffeWorkloadAPI.Service
+  use GRPC.Stub, service: SpiffeWorkloadAPI.Service
 end

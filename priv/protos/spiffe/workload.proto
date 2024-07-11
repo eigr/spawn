@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package spiffe.workload;
+// package spiffe.workload;
 
 import "google/protobuf/struct.proto";
 
