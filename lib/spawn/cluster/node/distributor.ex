@@ -4,6 +4,8 @@ defmodule Spawn.Cluster.Node.Distributor do
   """
   require Logger
 
+  alias Actors.Config.PersistentTermConfig, as: Config
+
   alias ProcessHub.Service.ProcessRegistry
 
   alias Eigr.Functions.Protocol.Actors.Actor
@@ -19,20 +21,20 @@ defmodule Spawn.Cluster.Node.Distributor do
 
   def nodes(system), do: ProcessHub.nodes(system)
 
-  @doc """
-  Registers a `Actors` into the local ETS table.
-  """
-  def register_local(%ActorSystem{name: name, registry: %Registry{actors: actors} = _registry}) do
-    :ets.insert(@actor_table, {name, actors})
-    Logger.info("Registered actor system with name: #{name}")
-    :ok
+  def child_specs() do
+    [
+      registry_actors_distributor_process_hub(),
+      init_registry_process(),
+      normal_actors_distributor_process_hub(),
+      pooled_actors_distributor_process_hub()
+    ]
   end
 
   @doc """
-  Registers a `Actors` into the remote nodess.
+  Registers a `Actors` in a register.
   """
-  def register_remote(%ActorSystem{name: name, registry: %Registry{actors: actors} = system) do
-    nodes = nodes(name)
+  def register(%ActorSystem{name: name, registry: %Registry{actors: actors}} = system) do
+    nodes = nodes("registry_#{name}")
     {res, failed_nodes} = :rpc.multicall(nodes, __MODULE__, :register_local, [system])
     :ets.insert(@actor_table, {name, actors})
     Logger.info("Registered actor system with name: #{name}")
@@ -92,5 +94,105 @@ defmodule Spawn.Cluster.Node.Distributor do
   """
   @spec list_actor_pids(module()) :: list(pid())
   def list_actor_pids(_mod) do
+  end
+
+  defp init_registry_process() do
+    %{
+      id: :initializer_registry_process,
+      start:
+        {Task, :start,
+         [
+           fn ->
+             Process.flag(:trap_exit, true)
+
+             ProcessHub.start_children(
+               "registry_#{Config.get(:actor_system_name)}",
+               [
+                 %{
+                   id: Spawn.Cluster.Node.GlobalRegistry,
+                   start: {Spawn.Cluster.Node.GlobalRegistry, :start_link, [%{}]}
+                 }
+               ],
+               child_mapping: %{
+                 self: [Node.self()]
+               }
+             )
+
+             receive do
+               {:EXIT, _pid, reason} ->
+                 Logger.info(
+                   "[SUPERVISOR] Initializer Registry Process: #{inspect(self())} is successfully down with reason #{inspect(reason)}"
+                 )
+
+                 :ok
+             end
+           end
+         ]}
+    }
+  end
+
+  defp registry_actors_distributor_process_hub() do
+    {ProcessHub,
+     %ProcessHub{
+       hub_id: "registry_#{Config.get(:actor_system_name)}",
+       redundancy_strategy: %ProcessHub.Strategy.Redundancy.Replication{
+         # TODO get from config
+         replication_factor: 2,
+         replication_model: :active_active,
+         redundancy_signal: :none
+       },
+       synchronization_strategy: %ProcessHub.Strategy.Synchronization.PubSub{
+         # TODO get from config
+         sync_interval: 10000
+       },
+       distribution_strategy: %ProcessHub.Strategy.Distribution.Guided{}
+     }}
+  end
+
+  defp normal_actors_distributor_process_hub() do
+    {ProcessHub,
+     %ProcessHub{
+       hub_id: Config.get(:actor_system_name),
+       redundancy_strategy: %ProcessHub.Strategy.Redundancy.Replication{
+         # TODO get from config
+         replication_factor: 2,
+         replication_model: :active_passive,
+         redundancy_signal: :none
+       },
+       migration_strategy: %ProcessHub.Strategy.Migration.HotSwap{
+         # TODO get from config
+         retention: 2000,
+         handover: true
+       },
+       synchronization_strategy: %ProcessHub.Strategy.Synchronization.Gossip{
+         # TODO get from config
+         sync_interval: 10000,
+         # TODO get from config
+         recipients: 2
+       },
+       partition_tolerance_strategy: %ProcessHub.Strategy.PartitionTolerance.DynamicQuorum{
+         # TODO get from config
+         quorum_size: 2
+       },
+       distribution_strategy: %ProcessHub.Strategy.Distribution.Guided{}
+     }}
+  end
+
+  defp pooled_actors_distributor_process_hub() do
+    {ProcessHub,
+     %ProcessHub{
+       hub_id: "pooled_#{Config.get(:actor_system_name)}",
+       redundancy_strategy: %ProcessHub.Strategy.Redundancy.Replication{
+         replication_model: :active_active,
+         redundancy_signal: :none
+       },
+       synchronization_strategy: %ProcessHub.Strategy.Synchronization.PubSub{
+         sync_interval: 10000
+       },
+       partition_tolerance_strategy: %ProcessHub.Strategy.PartitionTolerance.DynamicQuorum{
+         quorum_size: 2
+       },
+       distribution_strategy: %ProcessHub.Strategy.Distribution.Guided{}
+     }}
   end
 end

@@ -36,11 +36,11 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
     }
   ]
 
-  @default_actor_host_function_replicas 1
+  @default_actor_host_function_replicas 2
 
   @default_actor_host_resources %{
     "requests" => %{
-      "cpu" => "100m",
+      "cpu" => "10m",
       "memory" => "80Mi",
       "ephemeral-storage" => "1M"
     }
@@ -48,7 +48,7 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
 
   @default_proxy_resources %{
     "requests" => %{
-      "cpu" => "50m",
+      "cpu" => "10m",
       "memory" => "80Mi",
       "ephemeral-storage" => "1M"
     }
@@ -249,7 +249,7 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
 
     proxy_container =
       %{
-        "name" => "sidecar",
+        "name" => "spawn",
         "image" => "#{annotations.proxy_image_tag}",
         "imagePullPolicy" => "Always",
         "env" => @default_actor_host_function_env,
