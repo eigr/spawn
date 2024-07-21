@@ -3,7 +3,7 @@ defmodule Spawnctl.Commands.Playground.K8s.Kind do
   A module to manage Kind (Kubernetes in Docker) clusters from Elixir.
   """
   alias SpawnCtl.Util.Emoji
-  import SpawnCtl.Util, only: [log: 3]
+  import SpawnCtl.Util, only: [log: 3, os_exec: 2]
 
   @kind_cmd System.find_executable("kind")
 
@@ -37,7 +37,7 @@ defmodule Spawnctl.Commands.Playground.K8s.Kind do
   Checks if a Kind cluster is already created.
   """
   def kind_cluster_created?(cluster_name \\ "kind") do
-    case System.cmd(@kind_cmd, ["get", "clusters"]) do
+    case os_exec(@kind_cmd, ["get", "clusters"]) do
       {output, 0} ->
         String.contains?(output, cluster_name)
 
@@ -63,7 +63,7 @@ defmodule Spawnctl.Commands.Playground.K8s.Kind do
 
         {:ok, nil}
       else
-        case System.cmd(@kind_cmd, ["create", "cluster", "--name", cluster_name]) do
+        case os_exec(@kind_cmd, ["create", "cluster", "--name", cluster_name]) do
           {output, 0} ->
             log(
               :info,
@@ -99,7 +99,7 @@ defmodule Spawnctl.Commands.Playground.K8s.Kind do
   """
   def delete_cluster(cluster_name \\ "kind") do
     if kind_installed?() do
-      case System.cmd(@kind_cmd, ["delete", "cluster", "--name", cluster_name]) do
+      case os_exec(@kind_cmd, ["delete", "cluster", "--name", cluster_name]) do
         {output, 0} ->
           log(
             :info,
@@ -133,7 +133,7 @@ defmodule Spawnctl.Commands.Playground.K8s.Kind do
   Checks if Kind is installed on the host system.
   """
   def kind_installed? do
-    case System.cmd(@kind_cmd, ["version"]) do
+    case os_exec(@kind_cmd, ["version"]) do
       {_, 0} ->
         true
 

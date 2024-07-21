@@ -3,6 +3,8 @@ defmodule SpawnCtl.Util do
 
   @extension_blacklist ~w(.swp .swx)
 
+  def os_exec(cmd, args) when is_list(args), do: System.cmd(cmd, args)
+
   def extract_tar_gz(file_path) do
     current_path = File.cwd!()
     tar_command = "tar -xzf #{file_path} -C #{current_path}"

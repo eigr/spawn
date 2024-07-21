@@ -3,15 +3,13 @@ defmodule Spawnctl.Commands.Playground.K8s.Minikube do
   A module to manage Minikube clusters from Elixir.
   """
   alias SpawnCtl.Util.Emoji
-  import SpawnCtl.Util, only: [log: 3]
+  import SpawnCtl.Util, only: [log: 3, os_exec: 2]
 
   @minikube_cmd System.find_executable("minikube")
 
   defmodule Install do
     alias Spawnctl.Commands.Playground.K8s.Minikube
     alias Spawnctl.Commands.Playground.K8s.Minikube.Install, as: InstallCommand
-
-    import SpawnCtl.Util, only: [log: 3]
 
     defstruct opts: %{}
 
@@ -39,7 +37,7 @@ defmodule Spawnctl.Commands.Playground.K8s.Minikube do
   Checks if Minikube is already started.
   """
   def minikube_started? do
-    case System.cmd(@minikube_cmd, ["status"]) do
+    case os_exec(@minikube_cmd, ["status"]) do
       {output, 0} ->
         String.contains?(output, "host: Running") and
           String.contains?(output, "kubelet: Running") and
@@ -67,7 +65,7 @@ defmodule Spawnctl.Commands.Playground.K8s.Minikube do
 
         {:ok, nil}
       else
-        case System.cmd(@minikube_cmd, ["start", "--driver", "docker"]) do
+        case os_exec(@minikube_cmd, ["start", "--driver", "docker"]) do
           {output, 0} ->
             log(
               :info,
@@ -103,7 +101,7 @@ defmodule Spawnctl.Commands.Playground.K8s.Minikube do
   """
   def stop_cluster do
     if minikube_installed?() do
-      case System.cmd(@minikube_cmd, ["stop"]) do
+      case os_exec(@minikube_cmd, ["stop"]) do
         {output, 0} ->
           log(
             :info,
@@ -138,7 +136,7 @@ defmodule Spawnctl.Commands.Playground.K8s.Minikube do
   """
   def delete_cluster do
     if minikube_installed?() do
-      case System.cmd(@minikube_cmd, ["delete"]) do
+      case os_exec(@minikube_cmd, ["delete"]) do
         {output, 0} ->
           log(
             :info,
@@ -172,7 +170,7 @@ defmodule Spawnctl.Commands.Playground.K8s.Minikube do
   Checks if Minikube is installed on the host system.
   """
   def minikube_installed? do
-    case System.cmd(@minikube_cmd, ["version"]) do
+    case os_exec(@minikube_cmd, ["version"]) do
       {_, 0} ->
         true
 

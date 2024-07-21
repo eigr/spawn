@@ -9,7 +9,7 @@ defmodule Spawnctl.Commands.Playground.K8s.K3d do
     - Delete a K3d cluster.
   """
   alias SpawnCtl.Util.Emoji
-  import SpawnCtl.Util, only: [log: 3]
+  import SpawnCtl.Util, only: [log: 3, os_exec: 2]
 
   @k3d_cmd System.find_executable("k3d")
 
@@ -48,7 +48,7 @@ defmodule Spawnctl.Commands.Playground.K8s.K3d do
   Checks if a K3d cluster is already created.
   """
   def k3d_cluster_created?(cluster_name \\ "k3s-default") do
-    case System.cmd(@k3d_cmd, ["cluster", "list"]) do
+    case os_exec(@k3d_cmd, ["cluster", "list"]) do
       {output, 0} ->
         String.contains?(output, cluster_name)
 
@@ -74,15 +74,15 @@ defmodule Spawnctl.Commands.Playground.K8s.K3d do
 
         {:ok, nil}
       else
-        case System.cmd(@k3d_cmd, [
-               "cluster",
-               "create",
-               cluster_name,
-               "--agents",
-               "3",
-               "--timeout",
-               opts.timeout
-             ]) do
+        case os_exec(@k3d_cmd, [
+          "cluster",
+          "create",
+          cluster_name,
+          "--agents",
+          "3",
+          "--timeout",
+          opts.timeout
+        ])  do
           {output, 0} ->
             log(
               :info,
@@ -118,7 +118,7 @@ defmodule Spawnctl.Commands.Playground.K8s.K3d do
   """
   def delete_cluster(cluster_name \\ "k3s-default") do
     if k3d_installed?() do
-      case System.cmd(@k3d_cmd, ["cluster", "delete", cluster_name]) do
+      case os_exec(@k3d_cmd, ["cluster", "delete", cluster_name]) do
         {output, 0} ->
           log(
             :info,
@@ -152,7 +152,7 @@ defmodule Spawnctl.Commands.Playground.K8s.K3d do
   Checks if K3d is installed on the host system.
   """
   def k3d_installed? do
-    case System.cmd(@k3d_cmd, ["version"]) do
+    case os_exec(@k3d_cmd, ["version"]) do
       {_, 0} ->
         true
 
