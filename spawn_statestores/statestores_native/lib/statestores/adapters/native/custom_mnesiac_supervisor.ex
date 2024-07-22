@@ -4,6 +4,8 @@ defmodule Statestores.Adapters.Native.CustomMnesiacSupervisor do
 
   use Supervisor
 
+  alias Actors.Config.PersistentTermConfig, as: Config
+
   def start_link(_) do
     Supervisor.start_link(__MODULE__, [],
       name: Statestores.Adapters.Native.CustomMnesiacSupervisor
@@ -13,6 +15,15 @@ defmodule Statestores.Adapters.Native.CustomMnesiacSupervisor do
   @impl true
   def init(_) do
     _ = Logger.info("[mnesiac:#{node()}] mnesiac starting, with #{inspect(Node.list())}")
+
+    # If we ever change to Statefulset instead of deployment
+    # we need to set the mnesia path to be dynamic based on pod name.
+    # For the time being we only support one storage per system.
+    if system = Config.get(:actor_system_name) do
+      # this is necessary to be called on runtime, this will set the
+      # mnesia path to be dynamic based on configured volume mount
+      Application.put_env(:mnesia, :dir, "/data/#{system}" |> to_charlist())
+    end
 
     Mnesiac.init_mnesia(Node.list())
     |> case do
