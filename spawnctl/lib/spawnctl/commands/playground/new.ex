@@ -55,6 +55,9 @@ defmodule SpawnCtl.Commands.Playground.New do
     opts
     |> install_k8s(args, context)
     |> install_operator(args, context)
+    |> then(fn opt ->
+      nil
+    end)
   end
 
   defp install_k8s(%{k8s_flavour: "k3d"} = opts, _args, _context) do
@@ -81,7 +84,7 @@ defmodule SpawnCtl.Commands.Playground.New do
     }
 
     %RuntimeInstallCommand{opts: install_opts, kubeconfig: @kubecfg_default_file}
-    |> Runtime.install(fn -> nil end)
+    |> Runtime.install(fn -> opts end)
   end
 
   defp install_operator(%{k8s_flavour: "k3d", name: name} = opts, _args, _context) do
@@ -93,7 +96,7 @@ defmodule SpawnCtl.Commands.Playground.New do
     }
 
     %RuntimeInstallCommand{opts: install_opts, kubeconfig: @kubecfg_default_file}
-    |> Runtime.install(fn -> nil end)
+    |> Runtime.install(fn -> opts end)
   end
 
   defp install_operator(%{k8s_flavour: _k8s_flavour, name: name} = opts, _args, _context) do
@@ -105,6 +108,6 @@ defmodule SpawnCtl.Commands.Playground.New do
     }
 
     %RuntimeInstallCommand{opts: install_opts, kubeconfig: @kubecfg_default_file}
-    |> Runtime.install(fn -> nil end)
+    |> Runtime.install(fn -> opts end)
   end
 end
