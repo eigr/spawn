@@ -65,6 +65,11 @@ services:
     networks:
       - mysql-compose-network
 
+  nats:
+    image: 'nats:latest'
+    ports:
+      - "4222:4222"
+
   spawn-proxy:
     image: eigr/spawn-proxy:1.4.1
     restart: always

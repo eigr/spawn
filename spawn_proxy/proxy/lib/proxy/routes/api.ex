@@ -58,13 +58,18 @@ defmodule Proxy.Routes.API do
   post "/system/:name/actors/:actor_name/invoke" do
     remote_ip = get_remote_ip(conn)
 
-    with %InvocationRequest{system: system, actor: actor} = request <-
-           get_body(conn.body_params, InvocationRequest),
-         {:ok, response} <- Actors.invoke(request, remote_ip: remote_ip) do
+    with {:get_body, %InvocationRequest{system: system, actor: actor} = request} <-
+           {:get_body, get_body(conn.body_params, InvocationRequest)},
+         {:invoke, {:ok, response}} <- {:invoke, Actors.invoke(request, remote_ip: remote_ip)} do
       resp = build_response(system, actor, response)
-
       send!(conn, 200, encode(InvocationResponse, resp), @content_type)
     else
+      {:get_body, error} ->
+        do_handle_error(conn, error)
+
+      {:invoke, error} ->
+        do_handle_error(conn, error)
+
       error ->
         do_handle_error(conn, error)
     end

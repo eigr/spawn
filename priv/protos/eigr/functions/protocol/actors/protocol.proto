@@ -275,6 +275,7 @@ message SideEffect {
 // https://www.enterpriseintegrationpatterns.com/patterns/messaging/BroadcastAggregate.html
 message Broadcast {
     // Target topic or channel
+    //Change this to channel
     string channel_group = 1;
 
     // Payload
