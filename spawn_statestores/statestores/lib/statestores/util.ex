@@ -17,7 +17,7 @@ defmodule Statestores.Util do
         Logger.debug("Directory already exists: #{path}")
 
       {:error, :enoent} ->
-        case File.mkdir(path) do
+        case File.mkdir_p(path) do
           :ok ->
             Logger.debug("Directory created: #{path}")
 
