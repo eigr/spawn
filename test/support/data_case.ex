@@ -5,7 +5,9 @@ defmodule Actors.DataCase do
 
   using do
     quote do
-      use Statestores.SandboxHelper, repos: [Statestores.Util.load_snapshot_adapter()]
+      if Statestores.Util.load_snapshot_adapter() != Statestores.Adapters.NativeSnapshotAdapter do
+        use Statestores.SandboxHelper, repos: [Statestores.Util.load_snapshot_adapter()]
+      end
 
       use Actors.MockTest
       import Actors.FactoryTest
