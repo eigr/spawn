@@ -26,7 +26,7 @@ defmodule Statestores.Adapters.Native.CustomMnesiacSupervisor do
       # mnesia path to be dynamic based on configured volume mount
       statestore_data_path =
         if System.get_env("MIX_ENV") != "prod" do
-          "#{File.cwd!()}/data/#{system}"
+          "#{System.tmp_dir!()}/data/#{system}"
         else
           "/data/#{system}"
         end
