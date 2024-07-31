@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    name: Build and Test OTP ${{matrix.otp}} / Elixir ${{matrix.elixir}}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        otp: [25. 26]
+        elixir: [1.15]
+
+    env:
+      MIX_ENV: test
+      ImageOS: ubuntu20 # equivalent to runs-on ubuntu-20.04
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Protoc
+        uses: arduino/setup-protoc@v3
+
+      - name: start minikube
+        id: minikube
+        uses: medyagh/setup-minikube@master
+
+      - name: Test cluster !
+        run: kubectl get pods -A
+
+      - name: Run tests operator
+        run: |
+          cd spawn_operator/spawn_operator
+          mix deps.get
+          MIX_ENV=test PROXY_DATABASE_TYPE=native PROXY_CLUSTER_STRATEGY=gossip PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
+          cd ../../

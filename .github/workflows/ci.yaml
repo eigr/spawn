@@ -14,15 +14,6 @@ jobs:
       matrix:
         otp: [25. 26]
         elixir: [1.15]
-    services:
-      db:
-        env:
-          MYSQL_USER: admin
-          MYSQL_PASSWORD: "admin"
-          MYSQL_ROOT_PASSWORD: "admin"
-          MYSQL_DATABASE: "eigr-functions-db"
-        image: mariadb
-        ports: ["3307:3306"]
 
     env:
       MIX_ENV: test
@@ -52,20 +43,10 @@ jobs:
           path: _build
           key: ${{ runner.os }}-build-${{ matrix.otp }}-${{ matrix.elixir }}-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
 
-      - name: start minikube
-        id: minikube
-        uses: medyagh/setup-minikube@master
-
-      - name: Test cluster !
-        run: kubectl get pods -A
-
       - name: Install dependencies
         run: |
           mix deps.clean --all
           mix deps.get
-
-      - name: Prepare filesystem
-        run: mkdir -p /data
 
       - name: Run tests spawn
         run: |
