@@ -11,6 +11,28 @@ defmodule Statestores.Util do
     Application.load(@otp_app)
   end
 
+  def create_directory(path) do
+    case File.stat(path) do
+      {:ok, %File.Stat{type: :directory}} ->
+        Logger.debug("Directory already exists: #{path}")
+
+      {:error, :enoent} ->
+        case File.mkdir(path) do
+          :ok ->
+            Logger.debug("Directory created: #{path}")
+
+          {:error, reason} ->
+            Logger.error("Failed to create directory: #{reason}")
+        end
+
+      {:ok, _} ->
+        Logger.warning("Path exists but is not a directory: #{path}")
+
+      {:error, reason} ->
+        Logger.error("Error checking path: #{reason}")
+    end
+  end
+
   def supervisor_process_logger(module) do
     %{
       id: Module.concat([module, Logger]),

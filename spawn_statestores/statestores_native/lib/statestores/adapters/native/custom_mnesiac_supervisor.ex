@@ -6,6 +6,8 @@ defmodule Statestores.Adapters.Native.CustomMnesiacSupervisor do
 
   alias Actors.Config.PersistentTermConfig, as: Config
 
+  import Statestores.Util, only: [create_directory: 1]
+
   def start_link(_) do
     Supervisor.start_link(__MODULE__, [],
       name: Statestores.Adapters.Native.CustomMnesiacSupervisor
@@ -22,7 +24,15 @@ defmodule Statestores.Adapters.Native.CustomMnesiacSupervisor do
     if system = Config.get(:actor_system_name) do
       # this is necessary to be called on runtime, this will set the
       # mnesia path to be dynamic based on configured volume mount
-      Application.put_env(:mnesia, :dir, "/data/#{system}" |> to_charlist())
+      statestore_data_path =
+        if System.get_env("MIX_ENV") != "prod" do
+          "#{File.cwd!()}/data/#{system}"
+        else
+          "/data/#{system}"
+        end
+
+      create_directory(statestore_data_path)
+      Application.put_env(:mnesia, :dir, statestore_data_path |> to_charlist())
     end
 
     Mnesiac.init_mnesia(Node.list())
