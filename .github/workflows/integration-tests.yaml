@@ -1,0 +1,42 @@
+name: Integration Tests
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - spawn_operator/**
+      - spawn_proxy/proxy/**
+  pull_request:
+    branches: [main]
+    paths:
+      - spawn_operator/**
+      - spawn_proxy/proxy/**
+
+jobs:
+  build:
+    name: Build and Test OTP ${{matrix.otp}} / Elixir ${{matrix.elixir}}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        otp: [25. 26]
+        elixir: [1.15]
+
+    env:
+      MIX_ENV: test
+      ImageOS: ubuntu20 # equivalent to runs-on ubuntu-20.04
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Protoc
+        uses: arduino/setup-protoc@v3
+
+      - name: start minikube
+        id: minikube
+        uses: medyagh/setup-minikube@master
+
+      - name: Test cluster !
+        run: kubectl get pods -A
+
+      - name: Run tests operator
+        run: echo "TODO"

@@ -11,6 +11,28 @@ defmodule Statestores.Util do
     Application.load(@otp_app)
   end
 
+  def create_directory(path) do
+    case File.stat(path) do
+      {:ok, %File.Stat{type: :directory}} ->
+        Logger.debug("Directory already exists: #{path}")
+
+      {:error, :enoent} ->
+        case File.mkdir_p(path) do
+          :ok ->
+            Logger.debug("Directory created: #{path}")
+
+          {:error, reason} ->
+            Logger.error("Failed to create directory: #{reason}")
+        end
+
+      {:ok, _} ->
+        Logger.warning("Path exists but is not a directory: #{path}")
+
+      {:error, reason} ->
+        Logger.error("Error checking path: #{reason}")
+    end
+  end
+
   def supervisor_process_logger(module) do
     %{
       id: Module.concat([module, Logger]),
@@ -70,11 +92,7 @@ defmodule Statestores.Util do
   def get_default_database_type do
     cond do
       Code.ensure_loaded?(Statestores.Adapters.PostgresSnapshotAdapter) -> "postgres"
-      Code.ensure_loaded?(Statestores.Adapters.MySQLSnapshotAdapter) -> "mysql"
       Code.ensure_loaded?(Statestores.Adapters.MariaDBSnapshotAdapter) -> "mariadb"
-      Code.ensure_loaded?(Statestores.Adapters.CockroachDBSnapshotAdapter) -> "cockroachdb"
-      Code.ensure_loaded?(Statestores.Adapters.SQLite3SnapshotAdapter) -> "sqlite"
-      Code.ensure_loaded?(Statestores.Adapters.MSSQLSnapshotAdapter) -> "mssql"
       Code.ensure_loaded?(Statestores.Adapters.NativeSnapshotAdapter) -> "native"
       true -> nil
     end
@@ -180,34 +198,16 @@ defmodule Statestores.Util do
   end
 
   # Lookup Adapters
-  defp load_lookup_adapter_by_type(:mysql), do: Statestores.Adapters.MySQLLookupAdapter
-
   defp load_lookup_adapter_by_type(:mariadb), do: Statestores.Adapters.MariaDBLookupAdapter
 
-  defp load_lookup_adapter_by_type(:cockroachdb),
-    do: Statestores.Adapters.CockroachDBLookupAdapter
-
   defp load_lookup_adapter_by_type(:postgres), do: Statestores.Adapters.PostgresLookupAdapter
-
-  defp load_lookup_adapter_by_type(:sqlite), do: Statestores.Adapters.SQLite3LookupAdapter
-
-  defp load_lookup_adapter_by_type(:mssql), do: Statestores.Adapters.MSSQLLookupAdapter
 
   defp load_lookup_adapter_by_type(:native), do: Statestores.Adapters.NativeLookupAdapter
 
   # Snapshot Adapters
-  defp load_snapshot_adapter_by_type(:mysql), do: Statestores.Adapters.MySQLSnapshotAdapter
-
   defp load_snapshot_adapter_by_type(:mariadb), do: Statestores.Adapters.MariaDBSnapshotAdapter
 
-  defp load_snapshot_adapter_by_type(:cockroachdb),
-    do: Statestores.Adapters.CockroachDBSnapshotAdapter
-
   defp load_snapshot_adapter_by_type(:postgres), do: Statestores.Adapters.PostgresSnapshotAdapter
-
-  defp load_snapshot_adapter_by_type(:sqlite), do: Statestores.Adapters.SQLite3SnapshotAdapter
-
-  defp load_snapshot_adapter_by_type(:mssql), do: Statestores.Adapters.MSSQLSnapshotAdapter
 
   defp load_snapshot_adapter_by_type(:native), do: Statestores.Adapters.NativeSnapshotAdapter
 end
