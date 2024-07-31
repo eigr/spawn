@@ -3,8 +3,14 @@ name: Integration Tests
 on:
   push:
     branches: [main]
+    paths:
+      - spawn_operator/**
+      - spawn_proxy/proxy/**
   pull_request:
     branches: [main]
+    paths:
+      - spawn_operator/**
+      - spawn_proxy/proxy/**
 
 jobs:
   build:
