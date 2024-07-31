@@ -4,17 +4,13 @@
   - [x] Erlang Distributed as transport.
     - [x] mTLS Support with Erlang Dist.
     - [x] Automatic renewal of certificates.
-  - [x] Cross ActorSystem invocation Nats distribution.
+  - [x] Cross ActorSystem invocation with Nats distribution.
 - [x] Configuration management via Kubernetes [CRDs](https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definitions/) and Envinronment Variables.
 - [x] State Management. 
-  - [x] Supported database adapters for persistent storage using multiple database providers.
-    - [x] Sqlite (Beta)
+  - [x] Supported database adapters for persistent storage using:
     - [x] MariaDB
-    - [x] MySql
     - [x] Native (Distributed Mnesia with disk persistence)
     - [x] Postgres
-    - [x] CockroachDB (Beta)
-    - [x] MSSQL (Beta)
   - [x] Write behind during execution and Write ahead during deactivation.
   - [x] Point in time Recovery. See Statestore for more information.
 - [x] Automatic activation and deactivation of Actors.
@@ -45,10 +41,11 @@
 - [x] Activators
   - [x] CronJob Scheduler.
   - [x] gRPC/HTTP.
-    - [x] Unary. Under development.
-    - [ ] Stream In.
+    - [x] Unary.
+    - [x] Bid Streamed.
+    - [x] Stream In.
     - [ ] Stream Out.
-    - [ ] Bid Streamed.
+    - [x] HTTP Transcoding.
   - [x] RabbitMQ.
   - [ ] Kafka.
   - [ ] Amazon SQS.
