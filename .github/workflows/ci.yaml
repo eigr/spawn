@@ -65,7 +65,7 @@ jobs:
           mix deps.get
 
       - name: Prepare filesystem
-        run: mkdir -p /data && chmod 777 /data
+        run: mkdir -p /data
 
       - name: Run tests spawn
         run: |
