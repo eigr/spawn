@@ -52,7 +52,7 @@ defmodule SpawnCtl.MixProject do
             linux: [os: :linux, cpu: :x86_64],
             linux_musl: [os: :linux, cpu: :x86_64, libc: :musl]
             # macos: [os: :darwin, cpu: :x86_64],
-            # windows: [os: :windows, cpu: :x86_64]
+            windows: [os: :windows, cpu: :x86_64]
           ]
         ]
       ]
