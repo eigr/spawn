@@ -107,18 +107,20 @@ defmodule Mix.Tasks.Bonny.Gen.Manifest.SpawnOperatorCustomizer do
 
   @spec override(Bonny.Resource.t()) :: Bonny.Resource.t()
   def override(%{kind: "Deployment"} = resource) do
-    %{resource | spec: %{resource.spec | template: update_template(resource)}}
+    %{resource | spec: %{resource.spec | template: update_template(resource), replicas: 2}}
   end
 
   # fallback
   def override(resource), do: resource
 
   defp update_template(resource) do
-    spec = resource.spec.template.spec
-    container = List.first(resource.spec.template.spec.containers)
+    template = resource.spec.template
+    spec = template.spec
+    container = List.first(spec.containers)
 
     security_context = Map.get(container, :securityContext, %{})
     updated_sc = Map.delete(security_context, :runAsUser)
+    updated_sc = %{ updated_sc | runAsNonRoot: false}
 
     updated_spec =
       Map.put(spec, :volumes, [
@@ -160,6 +162,18 @@ defmodule Mix.Tasks.Bonny.Gen.Manifest.SpawnOperatorCustomizer do
         "periodSeconds" => 5,
         "successThreshold" => 1,
         "timeoutSeconds" => 5
+      })
+
+    updated_container =
+      Map.put(updated_container, :resources, %{
+        "limits" => %{
+          "cpu" => "200m",
+          "memory" => "380Mi"
+        },
+        "requests" => %{
+          "cpu" => "200m",
+          "memory" => "380Mi"
+        }
       })
 
     updated_spec = %{
