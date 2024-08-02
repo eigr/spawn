@@ -5,8 +5,6 @@ defmodule Spawnctl.Commands.Playground.K8s.Kind do
   alias SpawnCtl.Util.Emoji
   import SpawnCtl.Util, only: [log: 3, os_exec: 2]
 
-  @kind_cmd System.find_executable("kind")
-
   defmodule Install do
     alias Spawnctl.Commands.Playground.K8s.Kind
     alias Spawnctl.Commands.Playground.K8s.Kind.Install, as: InstallCommand
@@ -37,7 +35,9 @@ defmodule Spawnctl.Commands.Playground.K8s.Kind do
   Checks if a Kind cluster is already created.
   """
   def kind_cluster_created?(cluster_name \\ "kind") do
-    case os_exec(@kind_cmd, ["get", "clusters"]) do
+    kind_cmd System.find_executable("kind")
+
+    case os_exec(kind_cmd, ["get", "clusters"]) do
       {output, 0} ->
         String.contains?(output, cluster_name)
 
@@ -53,6 +53,8 @@ defmodule Spawnctl.Commands.Playground.K8s.Kind do
   Creates a Kind cluster with the specified name.
   """
   def create_cluster(cluster_name) do
+    kind_cmd System.find_executable("kind")
+
     if kind_installed?() do
       if kind_cluster_created?(cluster_name) do
         log(
@@ -63,7 +65,7 @@ defmodule Spawnctl.Commands.Playground.K8s.Kind do
 
         {:ok, nil}
       else
-        case os_exec(@kind_cmd, ["create", "cluster", "--name", cluster_name]) do
+        case os_exec(kind_cmd, ["create", "cluster", "--name", cluster_name]) do
           {output, 0} ->
             log(
               :info,
@@ -98,8 +100,10 @@ defmodule Spawnctl.Commands.Playground.K8s.Kind do
   Deletes the Kind cluster with the specified name.
   """
   def delete_cluster(cluster_name \\ "kind") do
+    kind_cmd System.find_executable("kind")
+
     if kind_installed?() do
-      case os_exec(@kind_cmd, ["delete", "cluster", "--name", cluster_name]) do
+      case os_exec(kind_cmd, ["delete", "cluster", "--name", cluster_name]) do
         {output, 0} ->
           log(
             :info,
@@ -133,7 +137,9 @@ defmodule Spawnctl.Commands.Playground.K8s.Kind do
   Checks if Kind is installed on the host system.
   """
   def kind_installed? do
-    case os_exec(@kind_cmd, ["version"]) do
+    kind_cmd System.find_executable("kind")
+
+    case os_exec(kind_cmd, ["version"]) do
       {_, 0} ->
         true
 

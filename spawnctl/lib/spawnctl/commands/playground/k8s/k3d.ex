@@ -11,8 +11,6 @@ defmodule Spawnctl.Commands.Playground.K8s.K3d do
   alias SpawnCtl.Util.Emoji
   import SpawnCtl.Util, only: [log: 3, os_exec: 2]
 
-  @k3d_cmd System.find_executable("k3d")
-
   defmodule Install do
     @moduledoc """
     The Install module within K3d to handle installation and cluster management tasks.
@@ -48,7 +46,9 @@ defmodule Spawnctl.Commands.Playground.K8s.K3d do
   Checks if a K3d cluster is already created.
   """
   def k3d_cluster_created?(cluster_name \\ "k3s-default") do
-    case os_exec(@k3d_cmd, ["cluster", "list"]) do
+    k3d_cmd System.find_executable("k3d")
+
+    case os_exec(k3d_cmd, ["cluster", "list"]) do
       {output, 0} ->
         String.contains?(output, cluster_name)
 
@@ -64,6 +64,8 @@ defmodule Spawnctl.Commands.Playground.K8s.K3d do
   Creates a K3d cluster with 3 nodes and the specified name.
   """
   def create_cluster(cluster_name, opts \\ %{timeout: "5m"}) do
+    k3d_cmd System.find_executable("k3d")
+
     if k3d_installed?() do
       if k3d_cluster_created?(cluster_name) do
         log(
@@ -74,7 +76,7 @@ defmodule Spawnctl.Commands.Playground.K8s.K3d do
 
         {:ok, nil}
       else
-        case os_exec(@k3d_cmd, [
+        case os_exec(k3d_cmd, [
           "cluster",
           "create",
           cluster_name,
@@ -117,8 +119,10 @@ defmodule Spawnctl.Commands.Playground.K8s.K3d do
   Deletes the K3d cluster with the specified name.
   """
   def delete_cluster(cluster_name \\ "k3s-default") do
+    k3d_cmd System.find_executable("k3d")
+
     if k3d_installed?() do
-      case os_exec(@k3d_cmd, ["cluster", "delete", cluster_name]) do
+      case os_exec(k3d_cmd, ["cluster", "delete", cluster_name]) do
         {output, 0} ->
           log(
             :info,
@@ -152,7 +156,9 @@ defmodule Spawnctl.Commands.Playground.K8s.K3d do
   Checks if K3d is installed on the host system.
   """
   def k3d_installed? do
-    case os_exec(@k3d_cmd, ["version"]) do
+    k3d_cmd System.find_executable("k3d")
+
+    case os_exec(k3d_cmd, ["version"]) do
       {_, 0} ->
         true
 

@@ -21,9 +21,6 @@ defmodule SpawnCtl.Commands.Playground.New do
     timeout: "5m"
   }
 
-  @user_home System.user_home!()
-  @kubecfg_default_dir Path.join(@user_home, ".kube")
-  @kubecfg_default_file Path.join(@kubecfg_default_dir, "config")
   @vsn "v1.4.1"
 
   option(:name, :string, "Defines the name of the Playground.",
@@ -52,9 +49,13 @@ defmodule SpawnCtl.Commands.Playground.New do
       "Creating a new playground called #{opts.name}. This could be a real marathon..."
     )
 
+    user_home System.user_home!()
+    kubecfg_default_dir Path.join(user_home, ".kube")
+    kubecfg_default_file Path.join(kubecfg_default_dir, "config")
+
     opts
     |> install_k8s(args, context)
-    |> install_operator(args, context)
+    |> install_operator(kubecfg_default_file, args, context)
     |> then(fn opt ->
       nil
     end)
@@ -75,11 +76,11 @@ defmodule SpawnCtl.Commands.Playground.New do
     |> Installer.install(fn out_opts -> out_opts end)
   end
 
-  defp install_operator(%{k8s_flavour: "minikube", name: _name} = opts, _args, _context) do
+  defp install_operator(%{k8s_flavour: "minikube", name: _name} = opts, kubecfg_default_file, _args, _context) do
     install_opts = %{
       context: "minikube",
       env_config: "none",
-      kubeconfig: @kubecfg_default_file,
+      kubeconfig: kubecfg_default_file,
       version: @vsn
     }
 
@@ -87,11 +88,11 @@ defmodule SpawnCtl.Commands.Playground.New do
     |> Runtime.install(fn -> opts end)
   end
 
-  defp install_operator(%{k8s_flavour: "k3d", name: name} = opts, _args, _context) do
+  defp install_operator(%{k8s_flavour: "k3d", name: name} = opts, kubecfg_default_file, _args, _context) do
     install_opts = %{
       context: "k3d-#{name}",
       env_config: "none",
-      kubeconfig: @kubecfg_default_file,
+      kubeconfig: kubecfg_default_file,
       version: @vsn
     }
 
@@ -99,11 +100,11 @@ defmodule SpawnCtl.Commands.Playground.New do
     |> Runtime.install(fn -> opts end)
   end
 
-  defp install_operator(%{k8s_flavour: _k8s_flavour, name: name} = opts, _args, _context) do
+  defp install_operator(%{k8s_flavour: _k8s_flavour, name: name} = opts, kubecfg_default_file, _args, _context) do
     install_opts = %{
       context: name,
       env_config: "none",
-      kubeconfig: @kubecfg_default_file,
+      kubeconfig: kubecfg_default_file,
       version: @vsn
     }
 

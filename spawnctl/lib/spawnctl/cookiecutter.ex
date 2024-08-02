@@ -5,10 +5,10 @@ defmodule Spawnctl.Cookiecutter do
   alias SpawnCtl.Util.Emoji
   import SpawnCtl.Util, only: [log: 3]
 
-  @venv_dir "#{File.cwd!()}/.venv"
-  @cookiecutter_path "#{@venv_dir}/bin/cookiecutter"
-
   def generate_project(input_dir, output_dir, extra_context) do
+    venv_dir "#{File.cwd!()}/.venv"
+    cookiecutter_path "#{venv_dir}/bin/cookiecutter"
+
     case setup_venv() do
       {:ok, _message} ->
         # Convert the extra context to a JSON string
@@ -27,7 +27,7 @@ defmodule Spawnctl.Cookiecutter do
         log(:info, Emoji.runner(), "Generating project...")
 
         {output, exit_code} =
-          System.cmd(@cookiecutter_path, args, stderr_to_stdout: true)
+          System.cmd(cookiecutter_path, args, stderr_to_stdout: true)
 
         if exit_code == 0 do
           {:ok, output}
@@ -42,11 +42,12 @@ defmodule Spawnctl.Cookiecutter do
 
   def cleanup(template_path, lang, opts) do
     pwd = File.cwd!()
+    venv_dir "#{pwd}/.venv"
     tmp_file = Path.join(pwd, "#{lang}-v#{opts.sdk_version}.tar.gz")
 
     with {:drop_template_path, {:ok, _files}} <-
            {:drop_template_path, drop_template(template_path)},
-         {:drop_venv_path, {:ok, _files}} <- {:drop_venv_path, drop_virtualenv(@venv_dir)},
+         {:drop_venv_path, {:ok, _files}} <- {:drop_venv_path, drop_virtualenv(venv_dir)},
          {:drop_pkg, :ok} <- {:drop_pkg, drop_pkgs(tmp_file)} do
       :ok
     else
@@ -90,11 +91,13 @@ defmodule Spawnctl.Cookiecutter do
   end
 
   def setup_venv do
+    pwd = File.cwd!()
+    venv_dir "#{pwd}/.venv"
     case find_python_executable() do
       {:ok, python_executable} ->
         # Create virtual environment
         log(:info, Emoji.floppy_disk(), "Creating virtual environment to build template...")
-        {output, exit_code} = System.cmd(python_executable, ["-m", "venv", @venv_dir])
+        {output, exit_code} = System.cmd(python_executable, ["-m", "venv", venv_dir])
 
         if exit_code == 0 do
           log(:info, Emoji.check(), "Virtual environment created successfully!")
@@ -122,9 +125,11 @@ defmodule Spawnctl.Cookiecutter do
   end
 
   defp install_cookiecutter do
+    pwd = File.cwd!()
+    venv_dir "#{pwd}/.venv"
     # Install cookiecutter in virtual environment
     {output, exit_code} =
-      System.cmd("#{@venv_dir}/bin/pip", [
+      System.cmd("#{venv_dir}/bin/pip", [
         "install",
         "--disable-pip-version-check",
         "cookiecutter"

@@ -4,9 +4,6 @@ defmodule SpawnCtl.Commands.Install.Kubernetes do
     description: "Install k8s Orchestrator Runtime."
 
   @vsn "v1.4.1"
-  @user_home System.user_home!()
-  @kubecfg_default_dir Path.join(@user_home, ".kube")
-  @kubecfg_default_file Path.join(@kubecfg_default_dir, "config")
 
   alias SpawnCtl.Util.Emoji
   alias SpawnCtl.Commands.Install.Behavior.Runtime
@@ -16,7 +13,7 @@ defmodule SpawnCtl.Commands.Install.Kubernetes do
 
   option(:kubeconfig, :string, "Load a Kubernetes kube config file.",
     alias: :k,
-    default: @kubecfg_default_file
+    default: get_default_kubeconfig()
   )
 
   option(:env_config, :string, "Load a Kubernetes kube config from environment variable.",
@@ -59,5 +56,11 @@ defmodule SpawnCtl.Commands.Install.Kubernetes do
 
     %InstallCommand{opts: opts, kubeconfig: kubeconfig}
     |> Runtime.install(fn -> nil end)
+  end
+
+  defp get_default_kubeconfig() do
+    user_home = System.user_home!()
+    kubecfg_default_dir = Path.join(user_home, ".kube")
+    Path.join(kubecfg_default_dir, "config")
   end
 end
