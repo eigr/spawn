@@ -12,8 +12,7 @@ defmodule SpawnCtl.Commands.Install.Kubernetes do
   import SpawnCtl.Util, only: [log: 3]
 
   option(:kubeconfig, :string, "Load a Kubernetes kube config file.",
-    alias: :k,
-    default: get_default_kubeconfig()
+    alias: :k
   )
 
   option(:env_config, :string, "Load a Kubernetes kube config from environment variable.",
@@ -33,7 +32,7 @@ defmodule SpawnCtl.Commands.Install.Kubernetes do
     ]
   )
 
-  def run(_, %{kubeconfig: cfg, env_config: env} = opts, context) do
+  def run(_, %{kubeconfig: cfg, env_config: env} = opts, context) when not is_nil(cfg) do
     kubeconfig =
       if env == "none" && File.exists?(cfg) do
         cfg
@@ -53,6 +52,13 @@ defmodule SpawnCtl.Commands.Install.Kubernetes do
           System.stop(1)
         end
       end
+
+    %InstallCommand{opts: opts, kubeconfig: kubeconfig}
+    |> Runtime.install(fn -> nil end)
+  end
+
+  def run(_, %{env_config: env} = opts, context) do
+    kubeconfig = get_default_kubeconfig()
 
     %InstallCommand{opts: opts, kubeconfig: kubeconfig}
     |> Runtime.install(fn -> nil end)

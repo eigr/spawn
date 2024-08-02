@@ -6,8 +6,8 @@ defmodule Spawnctl.Cookiecutter do
   import SpawnCtl.Util, only: [log: 3]
 
   def generate_project(input_dir, output_dir, extra_context) do
-    venv_dir "#{File.cwd!()}/.venv"
-    cookiecutter_path "#{venv_dir}/bin/cookiecutter"
+    venv_dir = "#{File.cwd!()}/.venv"
+    cookiecutter_path = "#{venv_dir}/bin/cookiecutter"
 
     case setup_venv() do
       {:ok, _message} ->
@@ -42,7 +42,7 @@ defmodule Spawnctl.Cookiecutter do
 
   def cleanup(template_path, lang, opts) do
     pwd = File.cwd!()
-    venv_dir "#{pwd}/.venv"
+    venv_dir = "#{pwd}/.venv"
     tmp_file = Path.join(pwd, "#{lang}-v#{opts.sdk_version}.tar.gz")
 
     with {:drop_template_path, {:ok, _files}} <-
@@ -92,7 +92,7 @@ defmodule Spawnctl.Cookiecutter do
 
   def setup_venv do
     pwd = File.cwd!()
-    venv_dir "#{pwd}/.venv"
+    venv_dir = "#{pwd}/.venv"
     case find_python_executable() do
       {:ok, python_executable} ->
         # Create virtual environment
@@ -126,7 +126,7 @@ defmodule Spawnctl.Cookiecutter do
 
   defp install_cookiecutter do
     pwd = File.cwd!()
-    venv_dir "#{pwd}/.venv"
+    venv_dir = "#{pwd}/.venv"
     # Install cookiecutter in virtual environment
     {output, exit_code} =
       System.cmd("#{venv_dir}/bin/pip", [

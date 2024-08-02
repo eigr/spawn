@@ -49,9 +49,9 @@ defmodule SpawnCtl.Commands.Playground.New do
       "Creating a new playground called #{opts.name}. This could be a real marathon..."
     )
 
-    user_home System.user_home!()
-    kubecfg_default_dir Path.join(user_home, ".kube")
-    kubecfg_default_file Path.join(kubecfg_default_dir, "config")
+    user_home = System.user_home!()
+    kubecfg_default_dir = Path.join(user_home, ".kube")
+    kubecfg_default_file = Path.join(kubecfg_default_dir, "config")
 
     opts
     |> install_k8s(args, context)
@@ -84,7 +84,7 @@ defmodule SpawnCtl.Commands.Playground.New do
       version: @vsn
     }
 
-    %RuntimeInstallCommand{opts: install_opts, kubeconfig: @kubecfg_default_file}
+    %RuntimeInstallCommand{opts: install_opts, kubeconfig: kubecfg_default_file}
     |> Runtime.install(fn -> opts end)
   end
 
@@ -96,7 +96,7 @@ defmodule SpawnCtl.Commands.Playground.New do
       version: @vsn
     }
 
-    %RuntimeInstallCommand{opts: install_opts, kubeconfig: @kubecfg_default_file}
+    %RuntimeInstallCommand{opts: install_opts, kubeconfig: kubecfg_default_file}
     |> Runtime.install(fn -> opts end)
   end
 
@@ -108,7 +108,7 @@ defmodule SpawnCtl.Commands.Playground.New do
       version: @vsn
     }
 
-    %RuntimeInstallCommand{opts: install_opts, kubeconfig: @kubecfg_default_file}
+    %RuntimeInstallCommand{opts: install_opts, kubeconfig: kubecfg_default_file}
     |> Runtime.install(fn -> opts end)
   end
 end

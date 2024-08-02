@@ -35,7 +35,7 @@ defmodule Spawnctl.Commands.Playground.K8s.Minikube do
   Checks if Minikube is already started.
   """
   def minikube_started? do
-    minikube_cmd System.find_executable("minikube")
+    minikube_cmd = System.find_executable("minikube")
 
     case os_exec(minikube_cmd, ["status"]) do
       {output, 0} ->
@@ -55,7 +55,7 @@ defmodule Spawnctl.Commands.Playground.K8s.Minikube do
   Starts a Minikube cluster with the specified driver.
   """
   def start_cluster(_cluster_name) do
-    minikube_cmd System.find_executable("minikube")
+    minikube_cmd = System.find_executable("minikube")
 
     if minikube_installed?() do
       if minikube_started?() do
@@ -102,7 +102,7 @@ defmodule Spawnctl.Commands.Playground.K8s.Minikube do
   Stops the Minikube cluster.
   """
   def stop_cluster do
-    minikube_cmd System.find_executable("minikube")
+    minikube_cmd = System.find_executable("minikube")
 
     if minikube_installed?() do
       case os_exec(minikube_cmd, ["stop"]) do
@@ -139,7 +139,7 @@ defmodule Spawnctl.Commands.Playground.K8s.Minikube do
   Deletes the Minikube cluster.
   """
   def delete_cluster do
-    minikube_cmd System.find_executable("minikube")
+    minikube_cmd = System.find_executable("minikube")
 
     if minikube_installed?() do
       case os_exec(minikube_cmd, ["delete"]) do
@@ -176,7 +176,7 @@ defmodule Spawnctl.Commands.Playground.K8s.Minikube do
   Checks if Minikube is installed on the host system.
   """
   def minikube_installed? do
-    minikube_cmd System.find_executable("minikube")
+    minikube_cmd = System.find_executable("minikube")
 
     case os_exec(minikube_cmd, ["version"]) do
       {_, 0} ->
