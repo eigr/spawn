@@ -149,11 +149,15 @@ defmodule SpawnCtl.Commands.Playground.New do
            {:download, download_recipe_manifests(recipe_name, tmp_file)},
          {:manifests, {:ok, resources}} <-
            {:manifests, K8s.Resource.all_from_file(tmp_file, namespace: opts.namespace)} do
-      log(:info, Emoji.exclamation(), "Installing playground...")
+      log(:info, Emoji.hourglass(), "Installing playground...")
 
       case do_apply(conn, resources) do
         :ok ->
-          ReadmeFetcher.fetch_readme("eigr", "playground-recipes", "#{recipe_name}/README.md")
+          ReadmeFetcher.fetch_readme(
+            "eigr",
+            "playground-recipes",
+            "#{recipe_name}/README.md"
+          )
 
         error ->
           log(
