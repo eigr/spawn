@@ -29,7 +29,7 @@ defmodule SpawnCtl.Commands.Apply do
     default: "~/.kube/config"
   )
 
-  option(:namespace, :string, "Apply manifests no specified Kubernetes namespace.",
+  option(:namespace, :string, "Apply manifests on specified Kubernetes namespace.",
     alias: :n,
     default: "default"
   )

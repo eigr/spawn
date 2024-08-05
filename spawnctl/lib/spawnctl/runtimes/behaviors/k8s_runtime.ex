@@ -109,6 +109,8 @@ defmodule Spawnctl.Runtimes.Behaviors.K8sRuntime do
               "Failure occurring during install. Details #{inspect(error)}"
             )
         end
+
+        callback.(source_opts)
       end
     end
   end

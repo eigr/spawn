@@ -40,7 +40,7 @@ defmodule SpawnCtl.Util do
     end
   end
 
-  def log(:info, emoji, msg), do: IO.puts(IO.ANSI.blue() <> "#{emoji}  " <> msg)
+  def log(:info, emoji, msg), do: IO.puts(IO.ANSI.green() <> "#{emoji}  " <> msg)
   def log(:error, emoji, msg), do: IO.puts(:stderr, IO.ANSI.red() <> "#{emoji}  " <> msg)
 
   defmodule Emoji do

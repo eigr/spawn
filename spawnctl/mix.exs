@@ -32,6 +32,7 @@ defmodule SpawnCtl.MixProject do
     [
       {:burrito, "~> 1.1"},
       {:do_it, "~> 0.6"},
+      {:earmark, "~> 1.4"},
       {:exmoji, "~> 0.3"},
       {:file_system, "~> 1.0"},
       {:jason, "~> 1.4"},

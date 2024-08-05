@@ -77,14 +77,14 @@ defmodule Spawnctl.Commands.Playground.K8s.K3d do
         {:ok, nil}
       else
         case os_exec(k3d_cmd, [
-          "cluster",
-          "create",
-          cluster_name,
-          "--agents",
-          "3",
-          "--timeout",
-          opts.timeout
-        ])  do
+               "cluster",
+               "create",
+               cluster_name,
+               "--agents",
+               "3",
+               "--timeout",
+               opts.timeout
+             ]) do
           {output, 0} ->
             log(
               :info,

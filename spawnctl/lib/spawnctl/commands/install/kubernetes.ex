@@ -11,9 +11,7 @@ defmodule SpawnCtl.Commands.Install.Kubernetes do
 
   import SpawnCtl.Util, only: [log: 3]
 
-  option(:kubeconfig, :string, "Load a Kubernetes kube config file.",
-    alias: :k
-  )
+  option(:kubeconfig, :string, "Load a Kubernetes kube config file.", alias: :k)
 
   option(:env_config, :string, "Load a Kubernetes kube config from environment variable.",
     alias: :e,

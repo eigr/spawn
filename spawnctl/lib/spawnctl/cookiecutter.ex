@@ -93,6 +93,7 @@ defmodule Spawnctl.Cookiecutter do
   def setup_venv do
     pwd = File.cwd!()
     venv_dir = "#{pwd}/.venv"
+
     case find_python_executable() do
       {:ok, python_executable} ->
         # Create virtual environment

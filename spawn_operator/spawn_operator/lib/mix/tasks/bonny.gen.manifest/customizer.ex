@@ -120,7 +120,7 @@ defmodule Mix.Tasks.Bonny.Gen.Manifest.SpawnOperatorCustomizer do
 
     security_context = Map.get(container, :securityContext, %{})
     updated_sc = Map.delete(security_context, :runAsUser)
-    updated_sc = %{ updated_sc | runAsNonRoot: false}
+    updated_sc = %{updated_sc | runAsNonRoot: false}
 
     updated_spec =
       Map.put(spec, :volumes, [
