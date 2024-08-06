@@ -7,6 +7,7 @@ defmodule SpawnCtl do
     description: "Spawn CLI Tool",
     version: "1.1.2"
 
+  command(SpawnCtl.Commands.Playground)
   command(SpawnCtl.Commands.Install)
   command(SpawnCtl.Commands.New)
   command(SpawnCtl.Commands.Apply)

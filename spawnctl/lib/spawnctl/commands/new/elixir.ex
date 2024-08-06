@@ -97,12 +97,9 @@ defmodule SpawnCtl.Commands.New.Elixir do
   option(:statestore_type, :string, "Spawn statestore provider.",
     alias: :S,
     allowed_values: [
-      "cockroachdb",
       "mariadb",
-      "mssql",
-      "mysql",
       "postgres",
-      "sqlite"
+      "native"
     ]
   )
 

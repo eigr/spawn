@@ -17,7 +17,6 @@ defmodule Spawnctl.Runtimes.Behaviors.K8sRuntime do
 
     defimpl SpawnCtl.Commands.Install.Behavior.Runtime, for: __MODULE__ do
       @vsn "v1.4.1"
-      @workspace System.tmp_dir!()
       @manifest_filename "spawn-manifest.yaml"
       @default_namespace "eigr-functions"
 
@@ -30,7 +29,7 @@ defmodule Spawnctl.Runtimes.Behaviors.K8sRuntime do
             callback
           )
           when is_function(callback) do
-        tmp_file = Path.join(@workspace, @manifest_filename)
+        tmp_file = Path.join(System.tmp_dir!(), @manifest_filename)
         opts = [namespace: @default_namespace]
 
         log(
@@ -110,6 +109,8 @@ defmodule Spawnctl.Runtimes.Behaviors.K8sRuntime do
               "Failure occurring during install. Details #{inspect(error)}"
             )
         end
+
+        callback.(source_opts)
       end
     end
   end

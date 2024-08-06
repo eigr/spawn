@@ -43,37 +43,45 @@ defmodule SpawnOperator.K8s.System.Secret.ActorSystemSecret do
     statestore = String.downcase(Map.get(params, "type", "native")) |> Base.encode64()
     pool_params = Map.get(params, "pool", %{})
     pool_size = Map.get(pool_params, "size", "10") |> Base.encode64()
-    statestore_credentials_secret_ref = Map.fetch!(params, "credentialsSecretRef")
+    statestore_credentials_secret_ref = Map.get(params, "credentialsSecretRef", "none")
     statestore_ssl = "#{Map.get(params, "ssl", "false")}" |> Base.encode64()
     statestore_ssl_verify = "#{Map.get(params, "ssl_verify", "false")}" |> Base.encode64()
 
-    {:ok, secret} =
-      K8s.Client.get("v1", :secret,
-        namespace: "eigr-functions",
-        name: statestore_credentials_secret_ref
-      )
-      |> then(&K8s.Client.run(conn(), &1))
+    if statestore == "native" do
+      %{
+        "PROXY_DATABASE_TYPE" => statestore
+        # TODO check if encryption key is necessary
+        # "SPAWN_STATESTORE_KEY" => statestore_key,
+      }
+    else
+      {:ok, secret} =
+        K8s.Client.get("v1", :secret,
+          namespace: "eigr-functions",
+          name: statestore_credentials_secret_ref
+        )
+        |> then(&K8s.Client.run(conn(), &1))
 
-    secret_data = Map.fetch!(secret, "data")
-    statestore_db_user = Map.fetch!(secret_data, "username")
-    statestore_db_secret = Map.fetch!(secret_data, "password")
-    statestore_key = Map.fetch!(secret_data, "encryptionKey")
-    statestore_db_name = Map.get(secret_data, "database", "eigr-functions-db")
-    statestore_db_host = Map.get(secret_data, "host")
-    statestore_db_port = Map.get(secret_data, "port")
+      secret_data = Map.fetch!(secret, "data")
+      statestore_db_user = Map.fetch!(secret_data, "username")
+      statestore_db_secret = Map.fetch!(secret_data, "password")
+      statestore_key = Map.fetch!(secret_data, "encryptionKey")
+      statestore_db_name = Map.get(secret_data, "database", "eigr-functions-db")
+      statestore_db_host = Map.get(secret_data, "host")
+      statestore_db_port = Map.get(secret_data, "port")
 
-    %{
-      "PROXY_DATABASE_TYPE" => statestore,
-      "PROXY_DATABASE_NAME" => statestore_db_name,
-      "PROXY_DATABASE_HOST" => statestore_db_host,
-      "PROXY_DATABASE_PORT" => statestore_db_port,
-      "PROXY_DATABASE_USERNAME" => statestore_db_user,
-      "PROXY_DATABASE_SECRET" => statestore_db_secret,
-      "PROXY_DATABASE_POOL_SIZE" => pool_size,
-      "SPAWN_STATESTORE_KEY" => statestore_key,
-      "PROXY_DATABASE_SSL" => statestore_ssl,
-      "PROXY_DATABASE_SSL_VERIFY" => statestore_ssl_verify
-    }
+      %{
+        "PROXY_DATABASE_TYPE" => statestore,
+        "PROXY_DATABASE_NAME" => statestore_db_name,
+        "PROXY_DATABASE_HOST" => statestore_db_host,
+        "PROXY_DATABASE_PORT" => statestore_db_port,
+        "PROXY_DATABASE_USERNAME" => statestore_db_user,
+        "PROXY_DATABASE_SECRET" => statestore_db_secret,
+        "PROXY_DATABASE_POOL_SIZE" => pool_size,
+        "SPAWN_STATESTORE_KEY" => statestore_key,
+        "PROXY_DATABASE_SSL" => statestore_ssl,
+        "PROXY_DATABASE_SSL_VERIFY" => statestore_ssl_verify
+      }
+    end
   end
 
   defp get_dist_options(system, ns, params) do

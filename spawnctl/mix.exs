@@ -30,14 +30,15 @@ defmodule SpawnCtl.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:burrito, "~> 1.0"},
+      {:burrito, "~> 1.1"},
       {:do_it, "~> 0.6"},
+      {:earmark, "~> 1.4"},
       {:exmoji, "~> 0.3"},
       {:file_system, "~> 1.0"},
       {:jason, "~> 1.4"},
       {:k8s, "~> 2.6"},
       {:req, "~> 0.4"},
-      {:testcontainers, "~> 1.8"},
+      {:testcontainers, "~> 1.8.4"},
       # Non runtime deps
       {:credo, "~> 1.6", runtime: false}
     ]
@@ -49,10 +50,11 @@ defmodule SpawnCtl.MixProject do
         steps: [:assemble, &Burrito.wrap/1],
         burrito: [
           targets: [
-            linux: [os: :linux, cpu: :x86_64],
-            linux_musl: [os: :linux, cpu: :x86_64, libc: :musl]
-            # macos: [os: :darwin, cpu: :x86_64],
-            # windows: [os: :windows, cpu: :x86_64]
+            #linux: [os: :linux, cpu: :x86_64],
+            #linux_musl: [os: :linux, cpu: :x86_64, libc: :musl],
+            #macos: [os: :darwin, cpu: :x86_64],
+            macos_arm: [os: :darwin, cpu: :aarch64],
+            #windows: [os: :windows, cpu: :x86_64]
           ]
         ]
       ]
