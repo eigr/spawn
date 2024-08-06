@@ -62,10 +62,10 @@ jobs:
 
       - name: Install GitHub CLI
         run: |
-          sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0
-          sudo apt-add-repository https://cli.github.com/packages
-          sudo apt update
-          sudo apt install gh -y
+          GH_CLI_VERSION=2.33.0
+          curl -LO https://github.com/cli/cli/releases/download/v${GH_CLI_VERSION}/gh_${GH_CLI_VERSION}_linux_amd64.tar.gz
+          tar -xvf gh_${GH_CLI_VERSION}_linux_amd64.tar.gz
+          sudo mv gh_${GH_CLI_VERSION}_linux_amd64/bin/gh /usr/local/bin
 
       - name: Authenticate GitHub CLI
         run: echo ${{ secrets.GHCR_PAT }} | gh auth login --with-token
