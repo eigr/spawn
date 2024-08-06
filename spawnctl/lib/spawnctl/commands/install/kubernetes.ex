@@ -4,9 +4,6 @@ defmodule SpawnCtl.Commands.Install.Kubernetes do
     description: "Install k8s Orchestrator Runtime."
 
   @vsn "v1.4.1"
-  @user_home System.user_home!()
-  @kubecfg_default_dir Path.join(@user_home, ".kube")
-  @kubecfg_default_file Path.join(@kubecfg_default_dir, "config")
 
   alias SpawnCtl.Util.Emoji
   alias SpawnCtl.Commands.Install.Behavior.Runtime
@@ -14,10 +11,7 @@ defmodule SpawnCtl.Commands.Install.Kubernetes do
 
   import SpawnCtl.Util, only: [log: 3]
 
-  option(:kubeconfig, :string, "Load a Kubernetes kube config file.",
-    alias: :k,
-    default: @kubecfg_default_file
-  )
+  option(:kubeconfig, :string, "Load a Kubernetes kube config file.", alias: :k)
 
   option(:env_config, :string, "Load a Kubernetes kube config from environment variable.",
     alias: :e,
@@ -36,7 +30,7 @@ defmodule SpawnCtl.Commands.Install.Kubernetes do
     ]
   )
 
-  def run(_, %{kubeconfig: cfg, env_config: env} = opts, context) do
+  def run(_, %{kubeconfig: cfg, env_config: env} = opts, context) when not is_nil(cfg) do
     kubeconfig =
       if env == "none" && File.exists?(cfg) do
         cfg
@@ -59,5 +53,18 @@ defmodule SpawnCtl.Commands.Install.Kubernetes do
 
     %InstallCommand{opts: opts, kubeconfig: kubeconfig}
     |> Runtime.install(fn -> nil end)
+  end
+
+  def run(_, %{env_config: env} = opts, context) do
+    kubeconfig = get_default_kubeconfig()
+
+    %InstallCommand{opts: opts, kubeconfig: kubeconfig}
+    |> Runtime.install(fn -> nil end)
+  end
+
+  defp get_default_kubeconfig() do
+    user_home = System.user_home!()
+    kubecfg_default_dir = Path.join(user_home, ".kube")
+    Path.join(kubecfg_default_dir, "config")
   end
 end

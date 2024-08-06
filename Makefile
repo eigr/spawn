@@ -34,6 +34,12 @@ clean-all:
 build:
 	mix deps.get && mix compile
 
+clean-cli:
+	cd spawnctl/ && ./spawnctl maintenance uninstall
+
+build-cli:
+	cd spawnctl/ && MIX_ENV=prod mix local.rebar --force && MIX_ENV=prod mix local.hex --force && MIX_ENV=prod mix deps.get && MIX_ENV=prod mix release.init && MIX_ENV=prod mix release spawnctl && rm -rf spawnctl && cp burrito_out/spawnctl_linux spawnctl
+
 build-proxy-image:
 	# When we migrate to new version of buildx we can do: docker buildx build -f Dockerfile-proxy --tag ${proxy-image} --attest type=provenance,mode=max .
 	docker build --no-cache -f Dockerfile-proxy -t ${proxy-image} .
