@@ -63,9 +63,10 @@ jobs:
       - name: Build and push spawn proxy image
         uses: docker/build-push-action@v5
         with:
-          context: ./Dockerfile-proxy
+          context: .
+          file: ./Dockerfile-proxy
           push: true
-          tags: ghcr.io/eigr/spawn-proxy:1.4.2
+          tags: ghcr.io/eigr/spawn-initializer:latest,ghcr.io/eigr/spawn-proxy:1.4.2
 
       - name: Make spawn proxy image public
         run: |
@@ -81,9 +82,10 @@ jobs:
       - name: Build and push spawn operator image
         uses: docker/build-push-action@v5
         with:
-          context: ./Dockerfile-operator
+          context: .
+          file: ./Dockerfile-operator
           push: true
-          tags: ghcr.io/eigr/spawn-operator:1.4.2
+          tags: ghcr.io/eigr/spawn-initializer:latest,ghcr.io/eigr/spawn-operator:1.4.2
 
       - name: Make spawn operator image public
         run: |
@@ -99,9 +101,10 @@ jobs:
       - name: Build and push spawn initializer image
         uses: docker/build-push-action@v5
         with:
-          context: ./Dockerfile-initializer
+          context: .
+          file: ./Dockerfile-initializer
           push: true
-          tags: ghcr.io/eigr/spawn-initializer:1.4.2
+          tags: ghcr.io/eigr/spawn-initializer:latest,ghcr.io/eigr/spawn-initializer:1.4.2
 
       - name: Make spawn operator image public
         run: |
