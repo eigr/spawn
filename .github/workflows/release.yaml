@@ -111,6 +111,9 @@ jobs:
       - name: Verify Zig installation
         run: zig version
 
+      - name: Install 7zip
+        run: sudo apt-get update && sudo apt-get install -y p7zip-full
+
       - name: Generate CLI
         run: make build-cli
 
