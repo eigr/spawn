@@ -137,16 +137,16 @@ jobs:
             "/user/packages/container/ghcr.io/${IMAGE_NAME}/visibility" \
             -f visibility=public
 
-      - name: Install zig
+      - name: Install Zig
         run: |
-          curl https://raw.githubusercontent.com/tristanisham/zvm/master/install.sh | bash
-          echo "# ZVM" >> $HOME/.profile
-          echo 'export ZVM_INSTALL="$HOME/.zvm/self"' >> $HOME/.profile
-          echo 'export PATH="$PATH:$HOME/.zvm/bin"' >> $HOME/.profile
-          echo 'export PATH="$PATH:$ZVM_INSTALL/"' >> $HOME/.profile
-          Run 'source ~/.profile'
-          zvm install 0.13.0
-          zvm use 0.13.0
+          ZIG_VERSION=0.13.0
+          wget https://ziglang.org/download/${ZIG_VERSION}/zig-linux-x86_64-${ZIG_VERSION}.tar.xz
+          tar -xf zig-linux-x86_64-${ZIG_VERSION}.tar.xz
+          sudo mv zig-linux-x86_64-${ZIG_VERSION} /usr/local/zig
+          sudo ln -s /usr/local/zig/zig /usr/local/bin/zig
+
+      - name: Verify Zig installation
+        run: zig version
 
       - name: Generate CLI
         run: make build-cli
