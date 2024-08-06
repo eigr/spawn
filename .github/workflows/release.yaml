@@ -66,7 +66,7 @@ jobs:
           context: .
           file: ./Dockerfile-proxy
           push: true
-          tags: ghcr.io/eigr/spawn-initializer:latest,ghcr.io/eigr/spawn-proxy:1.4.2
+          tags: ghcr.io/eigr/spawn-proxy:latest,ghcr.io/eigr/spawn-proxy:1.4.2
 
       - name: Make spawn proxy image public
         run: |
@@ -75,7 +75,7 @@ jobs:
           curl \
             -X PATCH \
             -H "Accept: application/vnd.github.v3+json" \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Authorization: token ${{ secrets.GHCR_PAT }}" \
             "${PACKAGE_URL}" \
             -d '{"visibility":"public"}'
 
@@ -85,7 +85,7 @@ jobs:
           context: .
           file: ./Dockerfile-operator
           push: true
-          tags: ghcr.io/eigr/spawn-initializer:latest,ghcr.io/eigr/spawn-operator:1.4.2
+          tags: ghcr.io/eigr/spawn-operator:latest,ghcr.io/eigr/spawn-operator:1.4.2
 
       - name: Make spawn operator image public
         run: |
@@ -94,7 +94,7 @@ jobs:
           curl \
             -X PATCH \
             -H "Accept: application/vnd.github.v3+json" \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Authorization: token ${{ secrets.GHCR_PAT }}" \
             "${PACKAGE_URL}" \
             -d '{"visibility":"public"}'
 
@@ -113,7 +113,7 @@ jobs:
           curl \
             -X PATCH \
             -H "Accept: application/vnd.github.v3+json" \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Authorization: token ${{ secrets.GHCR_PAT }}" \
             "${PACKAGE_URL}" \
             -d '{"visibility":"public"}'
 
@@ -125,7 +125,7 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: spawnctl/burrito_out/spawnctl_*
+          file: spawnctl/burrito_out/spawnctl*
           tag: ${{ github.ref }}
           overwrite: true
           file_glob: true
