@@ -58,8 +58,8 @@ defmodule SpawnCtl.MixProject do
             windows: [os: :windows, cpu: :x86_64]
           ],
           extra_steps: [
-            fetch: [pre: [ExampleCliApp.CustomBuildStep]],
-            build: [post: [ExampleCliApp.CustomBuildStep]]
+            fetch: [pre: [SpawnCtl.CustomBuildStep]],
+            build: [post: [SpawnCtl.CustomBuildStep]]
           ],
           debug: Mix.env() != :prod
         ]
