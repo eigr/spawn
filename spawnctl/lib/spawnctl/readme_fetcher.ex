@@ -34,39 +34,12 @@ defmodule SpawnCtl.ReadmeFetcher do
   end
 
   defp render_and_print_readme(readme_content) do
-    case Earmark.as_html(readme_content) do
-      {:ok, html, _} ->
-        plain_text = html_to_plain_text(html)
+    log(
+      :info,
+      Emoji.ok(),
+      "Instructions:"
+    )
 
-        log(
-          :info,
-          Emoji.ok(),
-          "Instructions:"
-        )
-
-        IO.puts(plain_text)
-
-      {:error, _message, _context} ->
-        log(
-          :error,
-          Emoji.tired_face(),
-          "Failed to render markdown"
-        )
-
-        :error
-    end
-  end
-
-  defp html_to_plain_text(html) do
-    html
-    |> String.replace(~r/<\/?[^>]+>/, "")
-    |> String.replace(~r/\s+/, " ")
-    |> String.replace("&lt;", "<")
-    |> String.replace("&gt;", ">")
-    |> String.replace("&amp;", "&")
-    |> String.replace("&quot;", "\"")
-    |> String.replace("&apos;", "'")
-    |> String.replace("<br>", "\n")
-    |> String.replace("<br />", "\n")
+    IO.puts(readme_content)
   end
 end

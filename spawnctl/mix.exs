@@ -50,11 +50,11 @@ defmodule SpawnCtl.MixProject do
         steps: [:assemble, &Burrito.wrap/1],
         burrito: [
           targets: [
-            linux: [os: :linux, cpu: :x86_64],
-            linux_musl: [os: :linux, cpu: :x86_64, libc: :musl],
-            macos: [os: :darwin, cpu: :x86_64],
+            #linux: [os: :linux, cpu: :x86_64],
+            #linux_musl: [os: :linux, cpu: :x86_64, libc: :musl],
+            #macos: [os: :darwin, cpu: :x86_64],
             macos_arm: [os: :darwin, cpu: :aarch64],
-            windows: [os: :windows, cpu: :x86_64]
+            #windows: [os: :windows, cpu: :x86_64]
           ]
         ]
       ]
