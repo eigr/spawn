@@ -60,16 +60,6 @@ jobs:
           file_glob: true
           body: ${{ steps.changelog.outputs.changes }}
 
-      - name: Install GitHub CLI
-        run: |
-          GH_CLI_VERSION=2.33.0
-          curl -LO https://github.com/cli/cli/releases/download/v${GH_CLI_VERSION}/gh_${GH_CLI_VERSION}_linux_amd64.tar.gz
-          tar -xvf gh_${GH_CLI_VERSION}_linux_amd64.tar.gz
-          sudo mv gh_${GH_CLI_VERSION}_linux_amd64/bin/gh /usr/local/bin
-
-      - name: Authenticate GitHub CLI
-        run: echo ${{ secrets.GHCR_PAT }} | gh auth login --with-token
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
@@ -92,15 +82,6 @@ jobs:
           tags: ghcr.io/eigr/spawn-proxy:latest,ghcr.io/eigr/spawn-proxy:1.4.2
           github-token: ${{ secrets.GHCR_PAT }}
 
-      - name: Make spawn proxy image public
-        run: |
-          IMAGE_NAME="eigr/spawn-proxy"
-          gh api \
-            -X PATCH \
-            -H "Accept: application/vnd.github.v3+json" \
-            "/user/packages/container/ghcr.io/${IMAGE_NAME}/visibility" \
-            -f visibility=public
-
       - name: Build and push spawn operator image
         uses: docker/build-push-action@v5
         with:
@@ -110,15 +91,6 @@ jobs:
           tags: ghcr.io/eigr/spawn-operator:latest,ghcr.io/eigr/spawn-operator:1.4.2
           github-token: ${{ secrets.GHCR_PAT }}
 
-      - name: Make spawn operator image public
-        run: |
-          IMAGE_NAME="eigr/spawn-operator"
-          gh api \
-            -X PATCH \
-            -H "Accept: application/vnd.github.v3+json" \
-            "/user/packages/container/ghcr.io/${IMAGE_NAME}/visibility" \
-            -f visibility=public
-
       - name: Build and push spawn initializer image
         uses: docker/build-push-action@v5
         with:
@@ -127,15 +99,6 @@ jobs:
           push: true
           tags: ghcr.io/eigr/spawn-initializer:latest,ghcr.io/eigr/spawn-initializer:1.4.2
           github-token: ${{ secrets.GHCR_PAT }}
-
-      - name: Make spawn operator image public
-        run: |
-          IMAGE_NAME="eigr/spawn-initializer"
-          gh api \
-            -X PATCH \
-            -H "Accept: application/vnd.github.v3+json" \
-            "/user/packages/container/ghcr.io/${IMAGE_NAME}/visibility" \
-            -f visibility=public
 
       - name: Install Zig
         run: |
