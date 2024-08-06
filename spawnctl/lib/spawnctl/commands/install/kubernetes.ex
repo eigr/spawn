@@ -3,7 +3,7 @@ defmodule SpawnCtl.Commands.Install.Kubernetes do
     name: "kubernetes",
     description: "Install k8s Orchestrator Runtime."
 
-  @vsn "v1.4.1"
+  @vsn "v1.4.2"
 
   alias SpawnCtl.Util.Emoji
   alias SpawnCtl.Commands.Install.Behavior.Runtime

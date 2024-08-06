@@ -21,7 +21,7 @@ defmodule SpawnCtl.Commands.New.Elixir do
     - `-t`, `--app-image-tag`: Defines the OCI Container image tag. (Default: "spawn-elixir-example:#{@vsn}")
     - `-t`, `--app-namespace`: Defines the Kubernetes namespace to install app. (Default: "default")
     - `-e`, `--elixir-version`: Defines the Elixir version. (Allowed Values: "1.14", "1.15", "1.16", "1.17")
-    - `-v`, `--sdk-version`: Spawn Elixir SDK version. (Allowed Values: "1.4.1")
+    - `-v`, `--sdk-version`: Spawn Elixir SDK version. (Allowed Values: "1.4.2")
     - `-S`, `--statestore-type`: Spawn statestore provider. (Allowed Values: "cockroachdb", "mariadb", "mssql", "mysql", "postgres", "sqlite")
     - `-U`, `--statestore-user`: Spawn statestore username. (Default: "admin")
     - `-P`, `--statestore-pwd`: Spawn statestore password. (Default: "admin")
@@ -39,8 +39,8 @@ defmodule SpawnCtl.Commands.New.Elixir do
 
   import SpawnCtl.Util, only: [log: 3]
 
-  @vsn "1.4.1"
-  @main_sdk_version "1.4.1"
+  @vsn "1.4.2"
+  @main_sdk_version "1.4.2"
 
   @default_opts %{
     actor_system: "spawn-system",

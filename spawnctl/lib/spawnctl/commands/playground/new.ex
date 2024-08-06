@@ -24,7 +24,7 @@ defmodule SpawnCtl.Commands.Playground.New do
     timeout: "5m"
   }
 
-  @vsn "v1.4.1"
+  @vsn "v1.4.2"
 
   option(:name, :string, "Defines the name of the Playground.",
     alias: :n,
