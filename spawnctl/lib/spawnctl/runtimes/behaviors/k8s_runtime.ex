@@ -28,7 +28,7 @@ defmodule Spawnctl.Runtimes.Behaviors.K8sRuntime do
             } = _strategy,
             callback
           )
-          when is_function(callback) do
+          when is_function(callback, 1) do
         tmp_file = Path.join(System.tmp_dir!(), @manifest_filename)
         opts = [namespace: @default_namespace]
 

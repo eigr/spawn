@@ -11,22 +11,11 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        otp: [24, 25. 26]
+        otp: [25]
         elixir: [1.15]
-    services:
-      db:
-        env:
-          MYSQL_USER: admin
-          MYSQL_PASSWORD: "admin"
-          MYSQL_ROOT_PASSWORD: "admin"
-          MYSQL_DATABASE: "eigr-functions-db"
-        image: mysql:5.7
-        ports: ["3306:3306"]
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-
     env:
-      MIX_ENV: test
-      ImageOS: ubuntu20 # equivalent to runs-on ubuntu-20.04
+      MIX_ENV: prod
+      ImageOS: ubuntu20
 
     steps:
       - uses: actions/checkout@v3
@@ -34,8 +23,8 @@ jobs:
       - name: Set up Elixir
         uses: erlef/setup-beam@v1
         with:
-          elixir-version: ${{matrix.elixir}} # Define the elixir version [required]
-          otp-version: ${{matrix.otp}} # Define the OTP version [required]
+          elixir-version: ${{matrix.elixir}}
+          otp-version: ${{matrix.otp}}
 
       - uses: actions/cache@v1
         id: deps-cache
@@ -49,63 +38,92 @@ jobs:
           path: _build
           key: ${{ runner.os }}-build-${{ matrix.otp }}-${{ matrix.elixir }}-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
 
-      - name: start minikube
-        id: minikube
-        uses: medyagh/setup-minikube@master
+      - name: Generate operator manifest
+        run: make generate-k8s-manifests
 
-      - name: Test cluster !
-        run: kubectl get pods -A
-
-      - name: Install dependencies
-        run: |
-          mix deps.clean --all
-          mix deps.get
-
-      - name: Run tests spawn
-        run: |
-          MIX_ENV=test PROXY_DATABASE_TYPE=mysql PROXY_CLUSTER_STRATEGY=gossip PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
-
-      - name: Run tests spawn_sdk
-        run: |
-          cd spawn_sdk/spawn_sdk
-          mix deps.get
-          MIX_ENV=test PROXY_DATABASE_TYPE=mysql PROXY_CLUSTER_STRATEGY=gossip PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
-          cd ../../
-
-      - name: Run tests spawn_statestores
-        run: |
-          cd spawn_statestores/statestores_mysql
-          mix deps.get
-          MIX_ENV=test PROXY_CLUSTER_STRATEGY=gossip PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
-          cd ../../
-
-      - name: Run tests proxy
-        run: |
-          cd spawn_proxy/proxy
-          mix deps.get
-          MIX_ENV=test PROXY_DATABASE_TYPE=mysql PROXY_CLUSTER_STRATEGY=gossip PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
-          cd ../../
-
-      - name: Run tests operator
-        run: |
-          cd spawn_operator/spawn_operator
-          mix deps.get
-          MIX_ENV=test PROXY_DATABASE_TYPE=mysql PROXY_CLUSTER_STRATEGY=gossip PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
-          cd ../../
-
-  build-and-push-image:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Build and push container image
-        uses: docker/build-push-action@v2
+      - name: Update CHANGELOG
+        id: changelog
+        uses: requarks/changelog-action@v1
         with:
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-          registry: docker.pkg.github.com
-          repository: https://ghcr.io/eigr/spawn
-          tag_with_sha: true
-          tag_with_ref: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ github.ref_name }}
+          includeInvalidCommits: true
+
+      - name: Upload manifest to release
+        if: always()
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: spawn_operator/spawn_operator/manifest.yaml
+          tag: ${{ github.ref }}
+          overwrite: true
+          file_glob: true
+          body: ${{ steps.changelog.outputs.changes }}
+
+      - name: Build and push spawn proxy image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./Dockerfile-proxy
+          push: true
+          tags: ghcr.io/eigr/spawn-proxy:1.4.2
+
+      - name: Make spawn proxy image public
+        run: |
+          IMAGE_NAME="eigr/spawn-proxy"
+          PACKAGE_URL="https://api.github.com/user/packages/container/${IMAGE_NAME}/visibility"
+          curl \
+            -X PATCH \
+            -H "Accept: application/vnd.github.v3+json" \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "${PACKAGE_URL}" \
+            -d '{"visibility":"public"}'
+
+      - name: Build and push spawn operator image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./Dockerfile-operator
+          push: true
+          tags: ghcr.io/eigr/spawn-operator:1.4.2
+
+      - name: Make spawn operator image public
+        run: |
+          IMAGE_NAME="eigr/spawn-operator"
+          PACKAGE_URL="https://api.github.com/user/packages/container/${IMAGE_NAME}/visibility"
+          curl \
+            -X PATCH \
+            -H "Accept: application/vnd.github.v3+json" \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "${PACKAGE_URL}" \
+            -d '{"visibility":"public"}'
+
+      - name: Build and push spawn initializer image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./Dockerfile-initializer
+          push: true
+          tags: ghcr.io/eigr/spawn-initializer:1.4.2
+
+      - name: Make spawn operator image public
+        run: |
+          IMAGE_NAME="eigr/spawn-initializer"
+          PACKAGE_URL="https://api.github.com/user/packages/container/${IMAGE_NAME}/visibility"
+          curl \
+            -X PATCH \
+            -H "Accept: application/vnd.github.v3+json" \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "${PACKAGE_URL}" \
+            -d '{"visibility":"public"}'
+
+      - name: Generate CLI
+        run: make build-cli
+
+      - name: Upload CLI binaries to release
+        if: always()
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: spawnctl/burrito_out/spawnctl_*
+          tag: ${{ github.ref }}
+          overwrite: true
+          file_glob: true
+          body: ${{ steps.changelog.outputs.changes }}

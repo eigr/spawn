@@ -52,14 +52,14 @@ defmodule SpawnCtl.Commands.Install.Kubernetes do
       end
 
     %InstallCommand{opts: opts, kubeconfig: kubeconfig}
-    |> Runtime.install(fn -> nil end)
+    |> Runtime.install(fn opts -> opts end)
   end
 
   def run(_, %{env_config: env} = opts, context) do
     kubeconfig = get_default_kubeconfig()
 
     %InstallCommand{opts: opts, kubeconfig: kubeconfig}
-    |> Runtime.install(fn -> nil end)
+    |> Runtime.install(fn opts -> opts end)
   end
 
   defp get_default_kubeconfig() do
