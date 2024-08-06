@@ -15,7 +15,6 @@ jobs:
         elixir: [1.15]
     env:
       MIX_ENV: prod
-      ImageOS: ubuntu20
 
     steps:
       - uses: actions/checkout@v3
