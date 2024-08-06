@@ -67,6 +67,7 @@ jobs:
           file: ./Dockerfile-proxy
           push: true
           tags: ghcr.io/eigr/spawn-proxy:latest,ghcr.io/eigr/spawn-proxy:1.4.2
+          github-token: ${{ secrets.GHCR_PAT }}
 
       - name: Make spawn proxy image public
         run: |
@@ -86,6 +87,7 @@ jobs:
           file: ./Dockerfile-operator
           push: true
           tags: ghcr.io/eigr/spawn-operator:latest,ghcr.io/eigr/spawn-operator:1.4.2
+          github-token: ${{ secrets.GHCR_PAT }}
 
       - name: Make spawn operator image public
         run: |
@@ -105,6 +107,7 @@ jobs:
           file: ./Dockerfile-initializer
           push: true
           tags: ghcr.io/eigr/spawn-initializer:latest,ghcr.io/eigr/spawn-initializer:1.4.2
+          github-token: ${{ secrets.GHCR_PAT }}
 
       - name: Make spawn operator image public
         run: |
