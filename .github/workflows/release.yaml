@@ -133,6 +133,12 @@ jobs:
             "${PACKAGE_URL}" \
             -d '{"visibility":"public"}'
 
+      - name: Install zig
+        run: |
+          curl https://raw.githubusercontent.com/tristanisham/zvm/master/install.sh | bash
+          zvm install 0.13.0
+          zvm use 0.13.0
+
       - name: Generate CLI
         run: make build-cli
 
