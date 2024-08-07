@@ -51,7 +51,7 @@ defmodule SpawnCtl.MixProject do
           targets: [
             linux: [os: :linux, cpu: :x86_64],
             linux_aarch64: [os: :linux, cpu: :aarch64],
-            #linux_musl: [os: :linux, cpu: :x86_64, libc: :musl],
+            linux_musl: [os: :linux, cpu: :x86_64, libc: :musl],
             macos: [os: :darwin, cpu: :x86_64],
             macos_m1: [os: :darwin, cpu: :aarch64],
             windows: [os: :windows, cpu: :x86_64]
