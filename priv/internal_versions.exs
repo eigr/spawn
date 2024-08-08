@@ -3,12 +3,8 @@ defmodule InternalVersions do
   @versions [
     spawn_statestores: "1.4.2",
     spawn_statestores_mariadb: "1.4.2",
-    spawn_statestores_mysql: "1.4.2",
-    spawn_statestores_mssql: "1.4.2",
     spawn_statestores_native: "1.4.2",
     spawn_statestores_postgres: "1.4.2",
-    spawn_statestores_sqlite: "1.4.2",
-    spawn_statestores_cockroachdb: "1.4.2",
     spawn: "1.4.2",
     spawn_sdk: "1.4.2",
     activator: "1.4.2",
@@ -177,11 +173,7 @@ defmodule InternalVersions do
     match_spawn_with_path = ~r(\{:spawn,\s*path:.*\})
     match_spawn_statestores_with_path = ~r(\{:spawn_statestores,\s*path:.*\})
     match_spawn_mariadb_with_path = ~r(\{:spawn_statestores_mariadb,\s*path:.*\})
-    match_spawn_mysql_with_path = ~r(\{:spawn_statestores_mysql,\s*path:.*\})
-    match_spawn_mssql_with_path = ~r(\{:spawn_statestores_mssql,\s*path:.*\})
     match_spawn_postgres_with_path = ~r(\{:spawn_statestores_postgres,\s*path:.*\})
-    match_spawn_cockroachdb_with_path = ~r(\{:spawn_statestores_cockroachdb,\s*path:.*\})
-    match_spawn_sqlite_with_path = ~r(\{:spawn_statestores_sqlite,\s*path:.*\})
     match_spawn_native_with_path = ~r(\{:spawn_statestores_native,\s*path:.*\})
 
     mix_file
@@ -195,28 +187,8 @@ defmodule InternalVersions do
       global: false
     )
     |> String.replace(
-      match_spawn_mysql_with_path,
-      dep_for("spawn_statestores_mysql", optional?),
-      global: false
-    )
-    |> String.replace(
-      match_spawn_mssql_with_path,
-      dep_for("spawn_statestores_mssql", optional?),
-      global: false
-    )
-    |> String.replace(
       match_spawn_postgres_with_path,
       dep_for("spawn_statestores_postgres", optional?),
-      global: false
-    )
-    |> String.replace(
-      match_spawn_cockroachdb_with_path,
-      dep_for("spawn_statestores_cockroachdb", optional?),
-      global: false
-    )
-    |> String.replace(
-      match_spawn_sqlite_with_path,
-      dep_for("spawn_statestores_sqlite", optional?),
       global: false
     )
     |> String.replace(
