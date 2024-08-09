@@ -1,10 +1,12 @@
 defmodule SpawnOperator.Controller.ActivatorController do
+  @moduledoc """
+  `ActivatorHandler` handles Activator CRD events
+  """
+  use Bonny.ControllerV2
   require Bonny.API.CRD
 
-  use Bonny.ControllerV2
-
   step(Bonny.Pluggable.SkipObservedGenerations)
-  step(SpawnOperator.Handler.ActivatorHandler)
+  step :handle_event
 
   @impl true
   def rbac_rules() do
@@ -19,4 +21,11 @@ defmodule SpawnOperator.Controller.ActivatorController do
       to_rbac_rule({"networking.k8s.io", ["ingresses", "ingressclasses"], ["*"]})
     ]
   end
+
+  @impl Pluggable
+  @spec handle_event(Bonny.Axn.t(), Keyword.t()) :: Bonny.Axn.t()
+  def handle_event(%Bonny.Axn{action: action, resource: resource} = axn, nil)
+    do:
+      SpawnOperator.get_args(resource)
+      |> Activator.apply(axn, action)
 end
