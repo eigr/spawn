@@ -6,6 +6,7 @@ defmodule SpawnOperator.Operator do
   step(Bonny.Pluggable.ApplyStatus)
   step(Bonny.Pluggable.ApplyDescendants)
 
+  @impl true
   def crds() do
     [
       Bonny.API.CRD.new!(
@@ -44,6 +45,7 @@ defmodule SpawnOperator.Operator do
     ]
   end
 
+  @impl true
   def controllers(watch_namespace, _opts) do
     [
       %{
