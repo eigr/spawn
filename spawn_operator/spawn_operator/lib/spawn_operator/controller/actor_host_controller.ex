@@ -84,6 +84,7 @@ defmodule SpawnOperator.Controller.ActorHostController do
         host: # Mandatory
           image: docker.io/eigr/spawn-springboot-examples:latest # Mandatory
           embedded: false # Optional. Default false. True only when the SDK supports a native connection to the Spawn mesh network
+          hostSDK: java # valid [dart, elixir, java, python, rust, springboot, nodejs]
           ports:
           - containerPort: 80
 
