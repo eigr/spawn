@@ -40,6 +40,7 @@ defmodule SpawnOperator.Controller.ActorSystemController do
   step(Bonny.Pluggable.SkipObservedGenerations)
   step :handle_event
 
+  @impl true
   def rbac_rules() do
     [
       to_rbac_rule({"rbac.authorization.k8s.io", ["role", "roles", "rolebindings"], "*"}),

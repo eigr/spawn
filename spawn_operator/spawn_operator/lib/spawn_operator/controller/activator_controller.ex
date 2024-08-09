@@ -5,6 +5,8 @@ defmodule SpawnOperator.Controller.ActivatorController do
   use Bonny.ControllerV2
   require Bonny.API.CRD
 
+  alias SpawnOperator.K8s.Activators.Activator
+
   step(Bonny.Pluggable.SkipObservedGenerations)
   step :handle_event
 
@@ -22,10 +24,9 @@ defmodule SpawnOperator.Controller.ActivatorController do
     ]
   end
 
-  @impl Pluggable
   @spec handle_event(Bonny.Axn.t(), Keyword.t()) :: Bonny.Axn.t()
-  def handle_event(%Bonny.Axn{action: action, resource: resource} = axn, nil)
-    do:
-      SpawnOperator.get_args(resource)
-      |> Activator.apply(axn, action)
+  def handle_event(%Bonny.Axn{action: action, resource: resource} = axn, nil) do
+    SpawnOperator.get_args(resource)
+    |> Activator.apply(axn, action)
+  end
 end
