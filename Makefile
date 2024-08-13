@@ -1,5 +1,5 @@
 version=1.4.2
-registry=eigr
+registry=ghcr.io/eigr
 
 CLUSTER_NAME=spawn-k8s
 K3D_KUBECONFIG_PATH?=./integration.yaml
@@ -43,6 +43,9 @@ build-cli:
 build-proxy-image:
 	# When we migrate to new version of buildx we can do: docker buildx build -f Dockerfile-proxy --tag ${proxy-image} --attest type=provenance,mode=max .
 	docker build --no-cache -f Dockerfile-proxy -t ${proxy-image} .
+
+build-proxy-initializer:
+	docker build --no-cache -f Dockerfile-initializer -t ${proxy-initializer} .
 
 build-operator-image:
 	docker build --no-cache -f Dockerfile-operator -t ${operator-image} .
