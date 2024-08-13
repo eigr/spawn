@@ -46,7 +46,7 @@ defmodule SpawnOperator.Versions.Api.V1.ActorHost do
                     type: boolean
                   hostSDK:
                     type: string
-                    enum: ["dart", "elixir", "java", "python", "rust", "springboot", "nodejs"]
+                    enum: ["dart", "elixir", "go", "java", "python", "rust", "springboot", "nodejs"]
                   ports:
                     type: array
                     items:
@@ -74,16 +74,16 @@ defmodule SpawnOperator.Versions.Api.V1.ActorHost do
       """a,
       additionalPrinterColumns: [
         %{
-          name: "Image",
-          type: "string",
-          description: "Docker image used for the ActorHost",
-          jsonPath: ".spec.host.image"
-        },
-        %{
           name: "Host SDK",
           type: "string",
           description: "SDK used by the ActorHost",
           jsonPath: ".spec.host.hostSDK"
+        },
+        %{
+          name: "Image",
+          type: "string",
+          description: "Docker image used for the ActorHost",
+          jsonPath: ".spec.host.image"
         },
         %{
           name: "Min Replicas",
