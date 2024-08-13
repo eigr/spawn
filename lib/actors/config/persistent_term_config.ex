@@ -290,7 +290,7 @@ if Code.ensure_loaded?(:persistent_term) do
     end
 
     defp load_env({:grpc_compiled_modules_path, :runtime}) do
-      default_value = "#{File.cwd!()}/priv/protos/modules"
+      default_value = "#{File.cwd!()}/priv/generated_modules"
 
       value = env("PROXY_GRPC_COMPILED_MODULES_PATH", default_value)
       :persistent_term.put({__MODULE__, :grpc_compiled_modules_path}, value)
