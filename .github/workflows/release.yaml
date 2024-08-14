@@ -126,3 +126,14 @@ jobs:
           overwrite: true
           file_glob: true
           body: ${{ steps.changelog.outputs.changes }}
+
+      - name: Upload scripts to install binaries
+        if: always()
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: spawnctl/install.*
+          tag: ${{ github.ref }}
+          overwrite: true
+          file_glob: true
+          body: ${{ steps.changelog.outputs.changes }}
