@@ -2,41 +2,52 @@ defmodule Spawnctl.Cookiecutter do
   @moduledoc """
   A module to call the cookiecutter Python application from Elixir within a virtual environment.
   """
+
   alias SpawnCtl.Util.Emoji
   import SpawnCtl.Util, only: [log: 3]
 
   def generate_project(input_dir, output_dir, extra_context) do
-    venv_dir = "#{File.cwd!()}/.venv"
-    cookiecutter_path = "#{venv_dir}/bin/cookiecutter"
+    cookiecutter_executable = System.find_executable("cookiecutter")
 
-    case setup_venv() do
-      {:ok, _message} ->
-        # Convert the extra context to a JSON string
-        extra_context_args = convert_extra_context_to_args(extra_context)
+    if is_nil(cookiecutter_executable) do
+      case setup_venv() do
+        {:ok, _message} ->
+          venv_dir = "#{File.cwd!()}/.venv"
+          cookiecutter_path = "#{venv_dir}/bin/cookiecutter"
 
-        # Prepare the command arguments
-        args =
-          [
-            input_dir,
-            "-o",
-            output_dir,
-            "--no-input"
-          ] ++ extra_context_args
+          execute_cookiecutter(cookiecutter_path, input_dir, output_dir, extra_context)
 
-        # Run the cookiecutter command
-        log(:info, Emoji.runner(), "Generating project...")
+        {:error, reason} ->
+          {:error, reason}
+      end
+    else
+      execute_cookiecutter(cookiecutter_executable, input_dir, output_dir, extra_context)
+    end
+  end
 
-        {output, exit_code} =
-          System.cmd(cookiecutter_path, args, stderr_to_stdout: true)
+  defp execute_cookiecutter(cookiecutter_path, input_dir, output_dir, extra_context) do
+    # Convert the extra context to a JSON string
+    extra_context_args = convert_extra_context_to_args(extra_context)
 
-        if exit_code == 0 do
-          {:ok, output}
-        else
-          {:error, output}
-        end
+    # Prepare the command arguments
+    args =
+      [
+        input_dir,
+        "-o",
+        output_dir,
+        "--no-input"
+      ] ++ extra_context_args
 
-      {:error, reason} ->
-        {:error, reason}
+    # Run the cookiecutter command
+    log(:info, Emoji.runner(), "Generating project...")
+
+    {output, exit_code} =
+      System.cmd(cookiecutter_path, args, stderr_to_stdout: true)
+
+    if exit_code == 0 do
+      {:ok, output}
+    else
+      {:error, output}
     end
   end
 
