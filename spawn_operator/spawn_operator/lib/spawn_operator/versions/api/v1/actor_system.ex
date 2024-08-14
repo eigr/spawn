@@ -29,6 +29,7 @@ defmodule SpawnOperator.Versions.Api.V1.ActorSystem do
       schema: ~y"""
       :openAPIV3Schema:
         :type: object
+        :description: "Defines an Spawn ActorSystem to configure group of ActorHost applications."
         :required: ["spec"]
         :properties:
           :spec:

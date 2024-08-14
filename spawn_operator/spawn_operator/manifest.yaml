@@ -164,6 +164,21 @@ spec:
       name: v1
       schema:
         openAPIV3Schema:
+          description: |
+            Defines an ActorHost application. Example:
+
+
+            ---
+            apiVersion: spawn-eigr.io/v1
+            kind: ActorHost
+            metadata:
+              name: my-java-app
+            spec:
+              host:
+                image: ghcr.io/eigr/spawn-springboot-examples:latest
+                sdk: java
+                ports:
+                - containerPort: 80
           properties:
             spec:
               properties:
@@ -201,7 +216,16 @@ spec:
                   properties:
                     embedded:
                       type: boolean
-                    hostSDK:
+                    image:
+                      type: string
+                    ports:
+                      items:
+                        properties:
+                          containerPort:
+                            type: integer
+                        type: object
+                      type: array
+                    sdk:
                       enum:
                         - dart
                         - elixir
@@ -212,15 +236,6 @@ spec:
                         - springboot
                         - nodejs
                       type: string
-                    image:
-                      type: string
-                    ports:
-                      items:
-                        properties:
-                          containerPort:
-                            type: integer
-                        type: object
-                      type: array
                   required:
                     - image
                   type: object
@@ -294,6 +309,7 @@ spec:
       name: v1
       schema:
         openAPIV3Schema:
+          description: Defines an Spawn ActorSystem to configure group of ActorHost applications.
           properties:
             spec:
               properties:

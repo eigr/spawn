@@ -15,6 +15,22 @@ defmodule SpawnOperator.Versions.Api.V1.ActorHost do
       schema: ~y"""
       :openAPIV3Schema:
         :type: object
+        :description: |
+          Defines an ActorHost application. Example:
+
+
+          ---
+          apiVersion: spawn-eigr.io/v1
+          kind: ActorHost
+          metadata:
+            name: my-java-app
+          spec:
+            host:
+              image: ghcr.io/eigr/spawn-springboot-examples:latest
+              sdk: java
+              ports:
+              - containerPort: 80
+
         :required: ["spec"]
         :properties:
           :spec:
@@ -44,7 +60,7 @@ defmodule SpawnOperator.Versions.Api.V1.ActorHost do
                     type: string
                   embedded:
                     type: boolean
-                  hostSDK:
+                  sdk:
                     type: string
                     enum: ["dart", "elixir", "go", "java", "python", "rust", "springboot", "nodejs"]
                   ports:
