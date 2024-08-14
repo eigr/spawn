@@ -51,7 +51,7 @@ defmodule SpawnCtl.Commands.Dev.Run do
   ### Example 4: Running with All Custom Options
 
       > spawnctl dev run --actor-system "custom-system" \
-          --proto-files "/myprotos" \
+          --protos "./protos" \
           --proxy-bind-address "192.168.1.1" \
           --proxy-bind-port 8080 \
           --proxy-image "custom/proxy:latest" \
@@ -78,8 +78,8 @@ defmodule SpawnCtl.Commands.Dev.Run do
 
   @default_opts %{
     actor_system: "spawn-system",
-    manifest_files: ".k8s/",
-    proto_files: "/fakepath",
+    manifest_path: ".k8s/",
+    protos: "./protos",
     proto_changes_watcher: false,
     proxy_bind_address: "0.0.0.0",
     proxy_bind_port: 9001,
@@ -102,14 +102,14 @@ defmodule SpawnCtl.Commands.Dev.Run do
     default: @default_opts.actor_system
   )
 
-  option(:manifest_files, :string, "Local where your Actor k8s manifest files reside.",
+  option(:manifest_path, :string, "Path where your Actor k8s manifest files reside.",
     alias: :M,
-    default: @default_opts.manifest_files
+    default: @default_opts.manifest_path
   )
 
-  option(:proto_files, :string, "Local where your protobuf files reside.",
+  option(:protos, :string, "Path where your protobuf files reside.",
     alias: :p,
-    default: @default_opts.proto_files
+    default: @default_opts.protos
   )
 
   option(:proto_changes_watcher, :boolean, "Watches changes in protobuf files and reload proxy.",
@@ -197,9 +197,9 @@ defmodule SpawnCtl.Commands.Dev.Run do
 
     if opts.proto_changes_watcher do
       paths =
-        if File.exists?(opts.manifest_files),
-          do: [opts.proto_files, opts.manifest_files],
-          else: [opts.proto_files]
+        if File.exists?(opts.manifest_path),
+          do: [opts.protos, opts.manifest_path],
+          else: [opts.protos]
 
       {:ok, pid} = FileSystem.start_link(dirs: paths)
       FileSystem.subscribe(pid)
@@ -225,9 +225,16 @@ defmodule SpawnCtl.Commands.Dev.Run do
 
   defp start_container(opts, _ctx) do
     opts
+    |> parse_inputs()
     |> build_proxy_container()
     |> Testcontainers.start_container()
     |> handle_container_start_result(opts)
+  end
+
+  defp parse_inputs(opts) do
+    opts
+    |> Map.update!(:protos, &Path.absname/1)
+    |> Map.update!(:manifest_path, &Path.absname/1)
   end
 
   defp handle_container_start_result({:ok, container}, opts) do
@@ -332,7 +339,7 @@ defmodule SpawnCtl.Commands.Dev.Run do
 
   defp build_proxy_container(opts) do
     Container.new(opts.proxy_image)
-    |> maybe_mount_proto_files(opts.proto_files)
+    |> maybe_mount_proto_files(opts.protos)
     |> Container.with_environment("MIX_ENV", "prod")
     |> Container.with_environment("PROXY_CLUSTER_STRATEGY", "gossip")
     |> Container.with_environment("PROXY_DATABASE_TYPE", opts.database_type)
@@ -370,12 +377,8 @@ defmodule SpawnCtl.Commands.Dev.Run do
   end
 
   defp maybe_mount_proto_files(container, proto_files) do
-    if proto_files == @default_opts.proto_files do
-      container
-    else
-      container
-      |> Container.with_bind_mount(proto_files, "/app/priv/protos/", "rw")
-    end
+    container
+    |> Container.with_bind_mount(proto_files, "/app/priv/protos/", "rw")
   end
 
   defp maybe_use_database_volume(container, opts) do
