@@ -87,11 +87,11 @@ defmodule SpawnCtl.Commands.Dev.Run do
     proxy_image: "eigr/spawn-proxy:1.4.2",
     actor_host_port: 8090,
     database_self_provisioning: true,
-    database_host: "mariadb",
-    database_port: 3307,
-    database_type: "mariadb",
+    database_host: "",
+    database_port: 0,
+    database_type: "native",
     database_pool: 30,
-    statestore_key: "myfake-key-3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE=",
+    statestore_key: "3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE=",
     log_level: "info",
     name: "proxy",
     enable_nats: false
@@ -333,18 +333,22 @@ defmodule SpawnCtl.Commands.Dev.Run do
   defp build_proxy_container(opts) do
     Container.new(opts.proxy_image)
     |> maybe_mount_proto_files(opts.proto_files)
+    |> Container.with_environment("MIX_ENV", "prod")
     |> Container.with_environment("PROXY_CLUSTER_STRATEGY", "gossip")
     |> Container.with_environment("PROXY_DATABASE_TYPE", opts.database_type)
     |> Container.with_environment("PROXY_DATABASE_PORT", "#{opts.database_port}")
     |> Container.with_environment("PROXY_DATABASE_POOL_SIZE", "#{opts.database_pool}")
     |> Container.with_environment("PROXY_HTTP_PORT", "#{opts.proxy_bind_port}")
     |> Container.with_environment("PROXY_GRPC_PORT", "#{opts.proxy_bind_grpc_port}")
+    |> Container.with_environment("PROXY_ACTOR_SYSTEM_NAME", "#{opts.actor_system}")
     |> Container.with_environment("SPAWN_USE_INTERNAL_NATS", "#{opts.enable_nats}")
     |> Container.with_environment("SPAWN_PROXY_LOGGER_LEVEL", opts.log_level)
     |> Container.with_environment("SPAWN_STATESTORE_KEY", opts.statestore_key)
     |> Container.with_environment("USER_FUNCTION_PORT", "#{opts.actor_host_port}")
+    |> Container.with_environment("RELEASE_NAME", "#{opts.name}")
     |> Container.with_fixed_port(opts.proxy_bind_port)
     |> maybe_use_host_network(opts)
+    |> maybe_use_database_volume(opts)
     |> Container.with_label("spawn.actorsystem.name", opts.actor_system)
     |> Container.with_label("spawn.proxy.name", opts.name)
     |> Container.with_label("spawn.proxy.database.type", opts.database_type)
@@ -370,7 +374,16 @@ defmodule SpawnCtl.Commands.Dev.Run do
       container
     else
       container
-      |> Container.with_bind_mount(proto_files, "/app/priv/protos/actors", "rw")
+      |> Container.with_bind_mount(proto_files, "/app/priv/protos/", "rw")
+    end
+  end
+
+  defp maybe_use_database_volume(container, opts) do
+    if opts.database_type == "native" do
+      container
+      |> Container.with_bind_volume("spawn_#{opts.actor_system}_data", "/data/")
+    else
+      container
     end
   end
 

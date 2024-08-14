@@ -25,7 +25,6 @@ defmodule Statestores.Adapters.Native.CustomMnesiacSupervisor do
       statestore_data_path =
         if System.get_env("MIX_ENV") != "prod" do
           "#{System.tmp_dir!()}/data/#{system}"
-
         else
           "/data/#{system}"
         end

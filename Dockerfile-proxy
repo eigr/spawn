@@ -29,25 +29,26 @@ RUN mix local.rebar --force \
 # Application Stage
 FROM alpine:3.20
 
-# Install only necessary runtime dependencies
-RUN apk add --no-cache zstd ncurses-libs libstdc++ libgcc
+# Set runner environment
+ENV MIX_ENV=prod
+ENV HOME=/app
 
 # Create a user with ID 1000
 RUN adduser -D -u 1000 appuser
 
-WORKDIR /app
+RUN apk add --no-cache --update zstd ncurses-libs libstdc++ libgcc protobuf
 
-# Set runner environment
-ENV MIX_ENV=prod
-ENV HOME=/app
+WORKDIR /app
 
 # Copy the built release and configuration
 COPY rel/overlays/mtls.ssl.conf .
 COPY --from=builder --chown=1000:1000 /app/_build/${MIX_ENV}/rel/proxy ./
 
 # Create necessary directories and files with appropriate permissions
-RUN mkdir -p /app/.cache/bakeware/ /data/ && \
-    chown -R appuser /app/.cache/bakeware/ /data/ && \
+RUN mkdir -p /app/.cache/bakeware/ /data/ /app/priv/generated_modules/ && \
+    chown -R appuser /app/.cache/bakeware/ /data/ /app/priv/generated_modules/ && \
+    chmod 600 /app/priv/generated_modules/ && \
+    chmod 600 /data/ && \
     touch /.erlang.cookie /app/.erlang.cookie && \
     chown appuser /app/.erlang.cookie && \
     chmod 600 /.erlang.cookie /app/.erlang.cookie

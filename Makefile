@@ -227,3 +227,4 @@ run-operator-image:
 
 run-initializer-image:
 	docker run --rm --name=spawn-operator --net=host ${proxy-initializer}
+
