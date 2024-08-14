@@ -39,7 +39,7 @@ defmodule SpawnCtl.Commands.New.Node do
     allowed_values: [@main_sdk_version]
   )
 
-  argument(:actor_system, :string, "Actor system of the spawn app.")
+  argument(:name, :string, "Name of the app.")
 
   @doc """
   Executes the command to generate a new Spawn NodeJS project.
