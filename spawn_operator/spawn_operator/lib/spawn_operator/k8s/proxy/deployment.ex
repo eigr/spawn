@@ -36,21 +36,21 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
       "requests" => %{
         "cpu" => "150m",
         "memory" => "256Mi",
-        "ephemeral-storage" => "2M"
+        "ephemeral-storage" => "1M"
       }
     },
     "go" => %{
       "requests" => %{
         "cpu" => "50m",
         "memory" => "128Mi",
-        "ephemeral-storage" => "2M"
+        "ephemeral-storage" => "1M"
       }
     },
     "java" => %{
       "requests" => %{
         "cpu" => "200m",
         "memory" => "512Mi",
-        "ephemeral-storage" => "2M"
+        "ephemeral-storage" => "1M"
       }
     },
     "python" => %{
@@ -71,7 +71,7 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
       "requests" => %{
         "cpu" => "300m",
         "memory" => "512Mi",
-        "ephemeral-storage" => "2M"
+        "ephemeral-storage" => "1M"
       }
     },
     "nodejs" => %{
@@ -246,23 +246,42 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
       },
       "podAntiAffinity" => %{
         "preferredDuringSchedulingIgnoredDuringExecution" => [
-          affinity_term(app_name, "kubernetes.io/hostname", 100)
+          anti_affinity_term(app_name, "kubernetes.io/hostname", 100)
         ]
       }
     }
   end
 
   @doc false
-  defp affinity_term(key, topology, weight) do
+  defp affinity_term(value, topology, weight) do
     %{
       "weight" => weight,
       "podAffinityTerm" => %{
         "labelSelector" => %{
           "matchExpressions" => [
             %{
-              "key" => key,
+              "key" => "actor-system",
               "operator" => "In",
-              "values" => [key]
+              "values" => [value]
+            }
+          ]
+        },
+        "topologyKey" => topology
+      }
+    }
+  end
+
+  @doc false
+  defp anti_affinity_term(value, topology, weight) do
+    %{
+      "weight" => weight,
+      "podAffinityTerm" => %{
+        "labelSelector" => %{
+          "matchExpressions" => [
+            %{
+              "key" => "app",
+              "operator" => "In",
+              "values" => [value]
             }
           ]
         },
@@ -326,11 +345,11 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
 
   @doc false
   defp maybe_set_security_context(spec, %{"securityContext" => context}) when is_map(context) do
-    put_in(spec["template"]["spec"]["securityContext"], context)
+    put_in(spec["securityContext"], context)
   end
 
   defp maybe_set_security_context(spec, _),
-    do: put_in(spec["template"]["spec"]["securityContext"], @default_security_context)
+    do: put_in(spec["securityContext"], @default_security_context)
 
   @doc false
   defp maybe_warn_wrong_volumes(params, host_params) do
