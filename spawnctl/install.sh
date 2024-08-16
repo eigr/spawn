@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Detect OS and architecture
 OS=$(uname -s | tr '[:upper:]' '[:lower:]')
@@ -12,28 +12,46 @@ case "$ARCH" in
 esac
 
 # Determine the correct binary name
-if [[ "$OS" == "linux" ]]; then
-    if [[ "$ARCH" == "x86_64" ]]; then
-        FILENAME="spawnctl_linux"
-    elif [[ "$ARCH" == "aarch64" ]]; then
-        FILENAME="spawnctl_linux_aarch64"
-    fi
-elif [[ "$OS" == "darwin" ]]; then
-    if [[ "$ARCH" == "x86_64" ]]; then
-        FILENAME="spawnctl_macos"
-    elif [[ "$ARCH" == "m1" ]]; then
-        FILENAME="spawnctl_macos_m1"
-    fi
-elif [[ "$OS" == "windows_nt" ]]; then
-    FILENAME="spawnctl_windows.exe"
-else
-    echo "Unsupported OS: $OS"; exit 1
-fi
+case "$OS" in
+    "linux")
+        case "$ARCH" in
+            "x86_64")
+                FILENAME="spawnctl_linux"
+                ;;
+            "aarch64")
+                FILENAME="spawnctl_linux_aarch64"
+                ;;
+            *)
+                echo "Unsupported architecture: $ARCH"; exit 1
+                ;;
+        esac
+        ;;
+    "darwin")
+        case "$ARCH" in
+            "x86_64")
+                FILENAME="spawnctl_macos"
+                ;;
+            "m1")
+                FILENAME="spawnctl_macos_m1"
+                ;;
+            *)
+                echo "Unsupported architecture: $ARCH"; exit 1
+                ;;
+        esac
+        ;;
+    "windows_nt")
+        FILENAME="spawnctl_windows.exe"
+        ;;
+    *)
+        echo "Unsupported OS: $OS"; exit 1
+        ;;
+esac
+
 
 # Check if spawn is already installed and run maintenance uninstall
 if command -v spawn &> /dev/null; then
     echo "Previous version of Spawn CLI detected. Running 'spawn maintenance uninstall' to remove cached files."
-    spawn maintenance uninstall
+    yes | spawn maintenance uninstall
 fi
 
 # Download the binary
@@ -44,10 +62,10 @@ curl -LO "$URL"
 INSTALL_DIR="/usr/local/bin"
 if [ ! -w "$INSTALL_DIR" ]; then
     echo "No write access to $INSTALL_DIR. Installing to ~/bin instead."
-    INSTALL_DIR="$HOME/bin"
+    INSTALL_DIR="$HOME/.spawn/bin"
     mkdir -p "$INSTALL_DIR"
-    # Ensure ~/bin is in PATH
-    if ! grep -q "$INSTALL_DIR" <<< "$PATH"; then
+    # Ensure ~/.spawn/bin is in PATH
+    if ! echo "$PATH" | grep -q "$INSTALL_DIR"; then
         echo "export PATH=\$PATH:$INSTALL_DIR" >> ~/.bashrc
         echo "export PATH=\$PATH:$INSTALL_DIR" >> ~/.zshrc
         source ~/.bashrc
