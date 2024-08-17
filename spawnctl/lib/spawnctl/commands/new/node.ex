@@ -107,7 +107,7 @@ defmodule SpawnCtl.Commands.New.Node do
 
   defp render({:error, message}, _args, _opts), do: {:error, message}
 
-  defp render({:ok, template_path}, %{name: name, sdk_version: sdk_version} = _args, opts)
+  defp render({:ok, template_path}, %{name: name} = _args, %{sdk_version: sdk_version} = opts)
        when not is_nil(sdk_version) do
     extra_context = %{
       "app_name" => name,
