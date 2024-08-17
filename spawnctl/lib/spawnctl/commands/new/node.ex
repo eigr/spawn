@@ -105,10 +105,10 @@ defmodule SpawnCtl.Commands.New.Node do
     end
   end
 
-  def render({:error, message}, _args, _opts), do: {:error, message}
+  defp render({:error, message}, _args, _opts), do: {:error, message}
 
-  def render({:ok, template_path}, %{name: name, sdk_version: sdk_version} = _args, opts)
-      when not is_nil(sdk_version) do
+  defp render({:ok, template_path}, %{name: name, sdk_version: sdk_version} = _args, opts)
+       when not is_nil(sdk_version) do
     extra_context = %{
       "app_name" => name,
       "spawn_system" => opts.actor_system,
@@ -118,7 +118,7 @@ defmodule SpawnCtl.Commands.New.Node do
     do_render(template_path, extra_context)
   end
 
-  def render({:ok, template_path}, %{name: name} = _args, opts) do
+  defp render({:ok, template_path}, %{name: name} = _args, opts) do
     extra_context = %{
       "app_name" => name,
       "spawn_system" => opts.actor_system,
