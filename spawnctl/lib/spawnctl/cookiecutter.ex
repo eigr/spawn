@@ -101,7 +101,7 @@ defmodule Spawnctl.Cookiecutter do
     end)
   end
 
-  def setup_venv do
+  def setup_venv() do
     pwd = File.cwd!()
     venv_dir = "#{pwd}/.venv"
 

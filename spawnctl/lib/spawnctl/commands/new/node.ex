@@ -33,13 +33,13 @@ defmodule SpawnCtl.Commands.New.Node do
     default: "v#{@vsn}"
   )
 
-  option(:sdk_version, :string, "Spawn Elixir SDK version.",
+  option(:sdk_version, :string, "Spawn Node SDK version.",
     alias: :v,
     default: @main_sdk_version,
     allowed_values: [@main_sdk_version]
   )
 
-  argument(:name, :string, "Name of the app.")
+  argument(:name, :string, "Name of the project to be created.")
 
   @doc """
   Executes the command to generate a new Spawn NodeJS project.
@@ -107,13 +107,29 @@ defmodule SpawnCtl.Commands.New.Node do
 
   def render({:error, message}, _args, _opts), do: {:error, message}
 
-  def render({:ok, template_path}, %{name: name} = _args, opts) do
-    output_dir = File.cwd!()
-
+  def render({:ok, template_path}, %{name: name, sdk_version: sdk_version} = _args, opts)
+      when not is_nil(sdk_version) do
     extra_context = %{
       "app_name" => name,
-      "spawn_system" => opts.actor_system
+      "spawn_system" => opts.actor_system,
+      "sdk_version" => sdk_version
     }
+
+    do_render(template_path, extra_context)
+  end
+
+  def render({:ok, template_path}, %{name: name} = _args, opts) do
+    extra_context = %{
+      "app_name" => name,
+      "spawn_system" => opts.actor_system,
+      "sdk_version" => @main_sdk_version
+    }
+
+    do_render(template_path, extra_context)
+  end
+
+  defp do_render(template_path, extra_context) do
+    output_dir = File.cwd!()
 
     case Cookiecutter.generate_project(template_path, output_dir, extra_context) do
       {:ok, _output} ->
