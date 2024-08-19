@@ -17,7 +17,11 @@ defmodule SpawnCtl.Commands.New.Java do
   @default_opts %{
     actor_system: "spawn-system",
     namespace: "default",
-    app_image_tag: "ttl.sh/spawn-java-postalcode:1h"
+    app_description: "Spawn Java Standard App.",
+    app_image_tag: "ttl.sh/spawn-java-postalcode:1h",
+    statestore_user: "admin",
+    statestore_pwd: "admin",
+    statestore_key: "myfake-key-3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE="
   }
 
   @vsn "1.4.2"
@@ -44,15 +48,39 @@ defmodule SpawnCtl.Commands.New.Java do
     default: @default_opts.app_image_tag
   )
 
+  option(:sdk_version, :string, "Spawn Java SDK version.",
+    alias: :v,
+    default: @main_sdk_version,
+    allowed_values: [@main_sdk_version]
+  )
+
   option(:template_version, :string, "Spawn CLI Language templates version.",
     alias: :t,
     default: "v#{@vsn}"
   )
 
-  option(:sdk_version, :string, "Spawn Java SDK version.",
-    alias: :v,
-    default: @main_sdk_version,
-    allowed_values: [@main_sdk_version]
+  option(:statestore_type, :string, "Spawn statestore provider.",
+    alias: :S,
+    allowed_values: [
+      "mariadb",
+      "postgres",
+      "native"
+    ]
+  )
+
+  option(:statestore_user, :string, "Spawn statestore username.",
+    alias: :U,
+    default: @default_opts.statestore_user
+  )
+
+  option(:statestore_pwd, :string, "Spawn statestore password.",
+    alias: :P,
+    default: @default_opts.statestore_pwd
+  )
+
+  option(:statestore_key, :string, "Spawn statestore key.",
+    alias: :K,
+    default: @default_opts.statestore_key
   )
 
   option(:group_id, :string, "Java project groupId.",
@@ -159,7 +187,7 @@ defmodule SpawnCtl.Commands.New.Java do
       "app_name" => name,
       "spawn_app_spawn_system" => opts.actor_system,
       "spawn_app_namespace" => opts.namespace,
-      "spawn_sdk_version" => "v#{sdk_version}",
+      "spawn_sdk_version" => "v#{@main_sdk_version}",
       "group_id" => opts.group_id,
       "artifact_id" => opts.artifact_id,
       "version" => opts.version,

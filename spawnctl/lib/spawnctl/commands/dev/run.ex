@@ -66,7 +66,6 @@ defmodule SpawnCtl.Commands.Dev.Run do
           --enable-nats true \
           --name "custom-proxy"
   """
-
   use DoIt.Command,
     name: "run",
     description: "Run Spawn proxy in dev mode."
