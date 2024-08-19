@@ -45,7 +45,7 @@ defmodule SpawnCtl.Commands.New.Elixir do
   @default_opts %{
     actor_system: "spawn-system",
     app_description: "Spawn App.",
-    app_image_tag: "spawn-elixir-example:#{@vsn}",
+    app_image_tag: "ttl.sh/spawn-elixir-example:#{@vsn}",
     app_namespace: "default",
     statestore_user: "admin",
     statestore_pwd: "admin",
@@ -63,12 +63,12 @@ defmodule SpawnCtl.Commands.New.Elixir do
   )
 
   option(:app_image_tag, :string, "Defines the OCI Container image tag.",
-    alias: :t,
+    alias: :i,
     default: @default_opts.app_image_tag
   )
 
   option(:app_namespace, :string, "Defines the Kubernetes namespace to install app.",
-    alias: :t,
+    alias: :n,
     default: @default_opts.app_namespace
   )
 

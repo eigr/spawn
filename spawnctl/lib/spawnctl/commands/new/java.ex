@@ -15,7 +15,9 @@ defmodule SpawnCtl.Commands.New.Java do
   import SpawnCtl.Util, only: [log: 3]
 
   @default_opts %{
-    actor_system: "spawn-system"
+    actor_system: "spawn-system",
+    namespace: "default",
+    app_image_tag: "ttl.sh/spawn-java-postalcode:1h"
   }
 
   @vsn "1.4.2"
@@ -25,6 +27,21 @@ defmodule SpawnCtl.Commands.New.Java do
   option(:actor_system, :string, "Spawn actor system.",
     alias: :s,
     default: @default_opts.actor_system
+  )
+
+  option(:app_namespace, :string, "Spawn ActorSystem namespace.",
+    alias: :n,
+    default: @default_opts.namespace
+  )
+
+  option(:app_description, :string, "Defines the application description.",
+    alias: :d,
+    default: @default_opts.app_description
+  )
+
+  option(:app_image_tag, :string, "Defines the OCI Container image tag.",
+    alias: :i,
+    default: @default_opts.app_image_tag
   )
 
   option(:template_version, :string, "Spawn CLI Language templates version.",
@@ -51,11 +68,6 @@ defmodule SpawnCtl.Commands.New.Java do
   option(:version, :string, "Java project version.",
     alias: :V,
     default: "1.0.1"
-  )
-
-  option(:package, :string, "Java project package name.",
-    alias: :p,
-    default: "io.eigr.spawn.java.demo"
   )
 
   argument(:name, :string, "Name of the project to be created.")
@@ -130,12 +142,13 @@ defmodule SpawnCtl.Commands.New.Java do
        when not is_nil(sdk_version) do
     extra_context = %{
       "app_name" => name,
-      "spawn_system" => opts.actor_system,
-      "sdk_version" => sdk_version,
+      "spawn_app_spawn_system" => opts.actor_system,
+      "spawn_app_namespace" => opts.namespace,
+      "spawn_sdk_version" => "v#{sdk_version}",
       "group_id" => opts.group_id,
       "artifact_id" => opts.artifact_id,
       "version" => opts.version,
-      "package" => opts.package
+      "app_image_tag" => opts.app_image_tag
     }
 
     do_render(template_path, extra_context)
@@ -144,12 +157,13 @@ defmodule SpawnCtl.Commands.New.Java do
   defp render({:ok, template_path}, %{name: name} = _args, opts) do
     extra_context = %{
       "app_name" => name,
-      "spawn_system" => opts.actor_system,
-      "sdk_version" => @main_sdk_version,
+      "spawn_app_spawn_system" => opts.actor_system,
+      "spawn_app_namespace" => opts.namespace,
+      "spawn_sdk_version" => "v#{sdk_version}",
       "group_id" => opts.group_id,
       "artifact_id" => opts.artifact_id,
       "version" => opts.version,
-      "package" => opts.package
+      "app_image_tag" => opts.app_image_tag
     }
 
     do_render(template_path, extra_context)
