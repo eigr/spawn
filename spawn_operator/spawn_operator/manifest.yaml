@@ -38,7 +38,7 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: spec.serviceAccountName
-          image: eigr/spawn-operator:1.4.2
+          image: ghcr.io/eigr/spawn-operator:1.4.2
           livenessProbe:
             failureThreshold: 3
             httpGet:
@@ -72,10 +72,13 @@ spec:
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
-            runAsNonRoot: false
           volumeMounts:
             - mountPath: /app/.cache/bakeware/
               name: bakeware-cache
+      securityContext:
+        fsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
       serviceAccountName: spawn-operator
       volumes:
         - emptyDir: {}
@@ -139,20 +142,134 @@ spec:
     singular: actorhost
   scope: Namespaced
   versions:
-    - additionalPrinterColumns: []
+    - additionalPrinterColumns:
+        - description: SDK used by the ActorHost
+          jsonPath: .spec.host.hostSDK
+          name: Host SDK
+          type: string
+        - description: Docker image used for the ActorHost
+          jsonPath: .spec.host.image
+          name: Image
+          type: string
+        - description: Minimum number of replicas for the ActorHost
+          jsonPath: .spec.autoscaler.min
+          name: Min Replicas
+          type: integer
+        - description: Maximum number of replicas for the ActorHost
+          jsonPath: .spec.autoscaler.max
+          name: Max Replicas
+          type: integer
       deprecated: false
       deprecationWarning:
       name: v1
       schema:
         openAPIV3Schema:
+          description: |
+            Defines an ActorHost application. Example:
+
+
+            ---
+            apiVersion: spawn-eigr.io/v1
+            kind: ActorHost
+            metadata:
+              name: my-java-app
+            spec:
+              host:
+                image: ghcr.io/eigr/spawn-springboot-examples:latest
+                sdk: java
+                ports:
+                - containerPort: 80
           properties:
+            spec:
+              properties:
+                affinity:
+                  type: object
+                autoscaler:
+                  properties:
+                    averageCpuUtilizationPercentage:
+                      type: integer
+                    averageMemoryUtilizationValue:
+                      type: integer
+                    max:
+                      type: integer
+                    min:
+                      type: integer
+                  type: object
+                env:
+                  items:
+                    properties:
+                      name:
+                        type: string
+                      value:
+                        type: string
+                      valueFrom:
+                        properties:
+                          fieldRef:
+                            properties:
+                              fieldPath:
+                                type: string
+                            type: object
+                        type: object
+                    type: object
+                  type: array
+                host:
+                  properties:
+                    embedded:
+                      type: boolean
+                    image:
+                      type: string
+                    ports:
+                      items:
+                        properties:
+                          containerPort:
+                            type: integer
+                        type: object
+                      type: array
+                    sdk:
+                      enum:
+                        - dart
+                        - elixir
+                        - go
+                        - java
+                        - python
+                        - rust
+                        - springboot
+                        - nodejs
+                      type: string
+                  required:
+                    - image
+                  type: object
+                replicas:
+                  type: integer
+              type: object
             status:
               properties:
+                conditions:
+                  items:
+                    properties:
+                      lastHeartbeatTime:
+                        format: date-time
+                        type: string
+                      lastTransitionTime:
+                        format: date-time
+                        type: string
+                      message:
+                        type: string
+                      status:
+                        enum:
+                          - 'True'
+                          - 'False'
+                        type: string
+                      type:
+                        type: string
+                    type: object
+                  type: array
                 observedGeneration:
                   type: integer
               type: object
+          required:
+            - spec
           type: object
-          x-kubernetes-preserve-unknown-fields: true
       served: true
       storage: true
       subresources:
@@ -178,20 +295,97 @@ spec:
     singular: actorsystem
   scope: Namespaced
   versions:
-    - additionalPrinterColumns: []
+    - additionalPrinterColumns:
+        - description: The kind of cluster used for the ActorSystem
+          jsonPath: .spec.cluster.kind
+          name: Cluster Kind
+          type: string
+        - description: The type of state store used for the ActorSystem
+          jsonPath: .spec.statestore.type
+          name: State Store Type
+          type: string
       deprecated: false
       deprecationWarning:
       name: v1
       schema:
         openAPIV3Schema:
+          description: Defines an Spawn ActorSystem to configure group of ActorHost applications.
           properties:
+            spec:
+              properties:
+                cluster:
+                  properties:
+                    cookie:
+                      type: string
+                    kind:
+                      default: erlang
+                      enum:
+                        - erlang
+                        - quic
+                      type: string
+                    systemToSystem:
+                      properties:
+                        enabled:
+                          type: boolean
+                        natsClusterSecretRef:
+                          type: string
+                      type: object
+                    tls:
+                      properties:
+                        certManager:
+                          properties:
+                            enabled:
+                              type: boolean
+                            issuerName:
+                              type: string
+                          type: object
+                        secretName:
+                          type: string
+                      type: object
+                  type: object
+                statestore:
+                  properties:
+                    credentialsSecretRef:
+                      type: string
+                    pool:
+                      properties:
+                        size:
+                          type: integer
+                      type: object
+                    type:
+                      enum:
+                        - Postgres
+                      type: string
+                  type: object
+              type: object
             status:
               properties:
+                conditions:
+                  items:
+                    properties:
+                      lastHeartbeatTime:
+                        format: date-time
+                        type: string
+                      lastTransitionTime:
+                        format: date-time
+                        type: string
+                      message:
+                        type: string
+                      status:
+                        enum:
+                          - 'True'
+                          - 'False'
+                        type: string
+                      type:
+                        type: string
+                    type: object
+                  type: array
                 observedGeneration:
                   type: integer
               type: object
+          required:
+            - spec
           type: object
-          x-kubernetes-preserve-unknown-fields: true
       served: true
       storage: true
       subresources:

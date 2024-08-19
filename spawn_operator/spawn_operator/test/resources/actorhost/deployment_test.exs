@@ -37,7 +37,7 @@ defmodule DeploymentTest do
                  "namespace" => "default"
                },
                "spec" => %{
-                 "replicas" => 1,
+                 "replicas" => 2,
                  "selector" => %{
                    "matchLabels" => %{"actor-system" => "spawn-system", "app" => "spawn-test"}
                  },
@@ -139,6 +139,13 @@ defmodule DeploymentTest do
                        }
                      ],
                      "terminationGracePeriodSeconds" => 405,
+                     "securityContext" => %{
+                       "allowPrivilegeEscalation" => false,
+                       "fsGroup" => 1000,
+                       "readOnlyRootFilesystem" => true,
+                       "runAsNonRoot" => true,
+                       "runAsUser" => 1000
+                     },
                      "initContainers" => [
                        %{
                          "args" => [
@@ -153,7 +160,7 @@ defmodule DeploymentTest do
                            "--to",
                            "default"
                          ],
-                         "image" => "docker.io/eigr/spawn-initializer:1.4.2",
+                         "image" => "ghcr.io/eigr/spawn-initializer:1.4.2",
                          "name" => "init-certificates"
                        }
                      ],
@@ -184,7 +191,7 @@ defmodule DeploymentTest do
                  "namespace" => "default"
                },
                "spec" => %{
-                 "replicas" => 1,
+                 "replicas" => 2,
                  "selector" => %{
                    "matchLabels" => %{"actor-system" => "spawn-system", "app" => "spawn-test"}
                  },
@@ -289,6 +296,13 @@ defmodule DeploymentTest do
                        }
                      ],
                      "terminationGracePeriodSeconds" => 405,
+                     "securityContext" => %{
+                       "allowPrivilegeEscalation" => false,
+                       "fsGroup" => 1000,
+                       "readOnlyRootFilesystem" => true,
+                       "runAsNonRoot" => true,
+                       "runAsUser" => 1000
+                     },
                      "volumes" => [
                        %{"emptyDir" => "{}", "name" => "volume-name"},
                        %{
@@ -310,7 +324,7 @@ defmodule DeploymentTest do
                            "--to",
                            "default"
                          ],
-                         "image" => "docker.io/eigr/spawn-initializer:1.4.2",
+                         "image" => "ghcr.io/eigr/spawn-initializer:1.4.2",
                          "name" => "init-certificates"
                        }
                      ],
@@ -335,7 +349,7 @@ defmodule DeploymentTest do
                  "namespace" => "default"
                },
                "spec" => %{
-                 "replicas" => 1,
+                 "replicas" => 2,
                  "selector" => %{
                    "matchLabels" => %{"actor-system" => "spawn-system", "app" => "spawn-test"}
                  },
@@ -507,7 +521,7 @@ defmodule DeploymentTest do
                }
              } = build_host_deploy(simple_host_with_ports_resource)
 
-      assert List.last(containers) == %{
+      assert List.first(containers) == %{
                "env" => [
                  %{"name" => "RELEASE_NAME", "value" => "spawn"},
                  %{
@@ -587,6 +601,190 @@ defmodule DeploymentTest do
                  %{"mountPath" => "/app/certs", "name" => "certs"}
                ]
              } = List.last(containers)
+    end
+
+    for sdk <- ~w(dart elixir java python rust springboot nodejs unknown)a do
+      @global_sdk sdk
+      test "generate deployment for SDK #{sdk}", ctx do
+        %{
+          simple_host: simple_host
+        } = ctx
+
+        expected_resources =
+          case @global_sdk do
+            "dart" ->
+              %{"requests" => %{"cpu" => "10m", "memory" => "70Mi", "ephemeral-storage" => "1M"}}
+
+            "elixir" ->
+              %{
+                "requests" => %{"cpu" => "150m", "memory" => "256Mi", "ephemeral-storage" => "1M"}
+              }
+
+            "java" ->
+              %{
+                "requests" => %{"cpu" => "200m", "memory" => "512Mi", "ephemeral-storage" => "1M"}
+              }
+
+            "python" ->
+              %{"requests" => %{"cpu" => "10m", "memory" => "256Mi", "ephemeral-storage" => "1M"}}
+
+            "rust" ->
+              %{"requests" => %{"cpu" => "10m", "memory" => "70Mi", "ephemeral-storage" => "1M"}}
+
+            "springboot" ->
+              %{
+                "requests" => %{"cpu" => "300m", "memory" => "512Mi", "ephemeral-storage" => "1M"}
+              }
+
+            "nodejs" ->
+              %{
+                "requests" => %{"cpu" => "150m", "memory" => "256Mi", "ephemeral-storage" => "1M"}
+              }
+
+            _ ->
+              %{"requests" => %{"cpu" => "100m", "memory" => "80Mi", "ephemeral-storage" => "1M"}}
+          end
+
+        host = simple_host["spec"]["host"]
+        new_simple_actor_host = Map.put(host, "sdk", Atom.to_string(@global_sdk))
+        simple_host = Map.put(simple_host, "spec", %{"host" => new_simple_actor_host})
+
+        assert %{
+                 "apiVersion" => "apps/v1",
+                 "kind" => "Deployment",
+                 "metadata" => %{
+                   "labels" => %{"actor-system" => "spawn-system", "app" => "spawn-test"},
+                   "name" => "spawn-test",
+                   "namespace" => "default"
+                 },
+                 "spec" => %{
+                   "replicas" => 2,
+                   "selector" => %{
+                     "matchLabels" => %{"actor-system" => "spawn-system", "app" => "spawn-test"}
+                   },
+                   "strategy" => %{
+                     "rollingUpdate" => %{"maxSurge" => "50%", "maxUnavailable" => 0},
+                     "type" => "RollingUpdate"
+                   },
+                   "template" => %{
+                     "metadata" => %{
+                       "annotations" => %{
+                         "prometheus.io/path" => "/metrics",
+                         "prometheus.io/port" => "9001",
+                         "prometheus.io/scrape" => "true"
+                       },
+                       "labels" => %{"actor-system" => "spawn-system", "app" => "spawn-test"}
+                     },
+                     "spec" => %{
+                       "affinity" => %{
+                         "podAntiAffinity" => %{
+                           "preferredDuringSchedulingIgnoredDuringExecution" => [
+                             %{
+                               "podAffinityTerm" => %{
+                                 "labelSelector" => %{
+                                   "matchExpressions" => [
+                                     %{
+                                       "key" => "app",
+                                       "operator" => "In",
+                                       "values" => ["spawn-test"]
+                                     }
+                                   ]
+                                 },
+                                 "topologyKey" => "kubernetes.io/hostname"
+                               },
+                               "weight" => 100
+                             }
+                           ]
+                         },
+                         "podAffinity" => %{
+                           "preferredDuringSchedulingIgnoredDuringExecution" => [
+                             %{
+                               "podAffinityTerm" => %{
+                                 "labelSelector" => %{
+                                   "matchExpressions" => [
+                                     %{
+                                       "key" => "actor-system",
+                                       "operator" => "In",
+                                       "values" => ["spawn-system"]
+                                     }
+                                   ]
+                                 },
+                                 "topologyKey" => "kubernetes.io/hostname"
+                               },
+                               "weight" => 50
+                             }
+                           ]
+                         }
+                       },
+                       "containers" => [
+                         %{
+                           "env" => [
+                             %{"name" => "RELEASE_NAME", "value" => "spawn"},
+                             %{
+                               "name" => "NAMESPACE",
+                               "valueFrom" => %{
+                                 "fieldRef" => %{"fieldPath" => "metadata.namespace"}
+                               }
+                             },
+                             %{
+                               "name" => "POD_IP",
+                               "valueFrom" => %{"fieldRef" => %{"fieldPath" => "status.podIP"}}
+                             },
+                             %{"name" => "SPAWN_PROXY_PORT", "value" => "9001"},
+                             %{"name" => "SPAWN_PROXY_INTERFACE", "value" => "0.0.0.0"},
+                             %{"name" => "RELEASE_DISTRIBUTION", "value" => "name"},
+                             %{"name" => "RELEASE_NODE", "value" => "$(RELEASE_NAME)@$(POD_IP)"}
+                           ],
+                           "image" => "eigr/spawn-test:latest",
+                           "name" => "actorhost",
+                           "ports" => [%{"containerPort" => "9001", "name" => "http"}],
+                           "resources" => expected_resources
+                         },
+                         %{
+                           "image" => "ghcr.io/eigr/spawn-proxy:1.4.2",
+                           "name" => "proxy",
+                           "ports" => [%{"containerPort" => "9001", "name" => "http"}],
+                           "resources" => %{
+                             "requests" => %{
+                               "cpu" => "50m",
+                               "ephemeral-storage" => "1M",
+                               "memory" => "80Mi"
+                             }
+                           }
+                         }
+                       ],
+                       "terminationGracePeriodSeconds" => 405,
+                       "initContainers" => [
+                         %{
+                           "args" => [
+                             "--environment",
+                             "prod",
+                             "--secret",
+                             "tls-certs",
+                             "--namespace",
+                             "default",
+                             "--service",
+                             "spawn-system",
+                             "--to",
+                             "default"
+                           ],
+                           "image" => "ghcr.io/eigr/spawn-initializer:1.4.2",
+                           "name" => "init-certificates"
+                         }
+                       ],
+                       "securityContext" => %{
+                         "allowPrivilegeEscalation" => false,
+                         "fsGroup" => 1000,
+                         "readOnlyRootFilesystem" => true,
+                         "runAsNonRoot" => true,
+                         "runAsUser" => 1000
+                       },
+                       "serviceAccountName" => "spawn-system-sa"
+                     }
+                   }
+                 }
+               } == build_host_deploy(simple_host)
+      end
     end
   end
 

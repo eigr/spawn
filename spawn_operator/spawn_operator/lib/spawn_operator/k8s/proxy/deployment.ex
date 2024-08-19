@@ -1,15 +1,13 @@
 defmodule SpawnOperator.K8s.Proxy.Deployment do
-  @moduledoc false
-
+  @moduledoc """
+  Handles the generation of Kubernetes Deployment manifests for the Spawn system.
+  """
   require Logger
 
   @behaviour SpawnOperator.K8s.Manifest
 
   @default_actor_host_function_env [
-    %{
-      "name" => "RELEASE_NAME",
-      "value" => "spawn"
-    },
+    %{"name" => "RELEASE_NAME", "value" => "spawn"},
     %{
       "name" => "NAMESPACE",
       "valueFrom" => %{"fieldRef" => %{"fieldPath" => "metadata.namespace"}}
@@ -18,31 +16,77 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
       "name" => "POD_IP",
       "valueFrom" => %{"fieldRef" => %{"fieldPath" => "status.podIP"}}
     },
-    %{
-      "name" => "SPAWN_PROXY_PORT",
-      "value" => "9001"
-    },
-    %{
-      "name" => "SPAWN_PROXY_INTERFACE",
-      "value" => "0.0.0.0"
-    },
-    %{
-      "name" => "RELEASE_DISTRIBUTION",
-      "value" => "name"
-    },
-    %{
-      "name" => "RELEASE_NODE",
-      "value" => "$(RELEASE_NAME)@$(POD_IP)"
-    }
+    %{"name" => "SPAWN_PROXY_PORT", "value" => "9001"},
+    %{"name" => "SPAWN_PROXY_INTERFACE", "value" => "0.0.0.0"},
+    %{"name" => "RELEASE_DISTRIBUTION", "value" => "name"},
+    %{"name" => "RELEASE_NODE", "value" => "$(RELEASE_NAME)@$(POD_IP)"}
   ]
 
-  @default_actor_host_function_replicas 1
+  @default_actor_host_function_replicas 2
 
-  @default_actor_host_resources %{
-    "requests" => %{
-      "cpu" => "100m",
-      "memory" => "80Mi",
-      "ephemeral-storage" => "1M"
+  @actor_host_resources_by_sdk %{
+    "dart" => %{
+      "requests" => %{
+        "cpu" => "10m",
+        "memory" => "70Mi",
+        "ephemeral-storage" => "1M"
+      }
+    },
+    "elixir" => %{
+      "requests" => %{
+        "cpu" => "150m",
+        "memory" => "256Mi",
+        "ephemeral-storage" => "1M"
+      }
+    },
+    "go" => %{
+      "requests" => %{
+        "cpu" => "50m",
+        "memory" => "128Mi",
+        "ephemeral-storage" => "1M"
+      }
+    },
+    "java" => %{
+      "requests" => %{
+        "cpu" => "200m",
+        "memory" => "512Mi",
+        "ephemeral-storage" => "1M"
+      }
+    },
+    "python" => %{
+      "requests" => %{
+        "cpu" => "10m",
+        "memory" => "256Mi",
+        "ephemeral-storage" => "1M"
+      }
+    },
+    "rust" => %{
+      "requests" => %{
+        "cpu" => "10m",
+        "memory" => "70Mi",
+        "ephemeral-storage" => "1M"
+      }
+    },
+    "springboot" => %{
+      "requests" => %{
+        "cpu" => "300m",
+        "memory" => "512Mi",
+        "ephemeral-storage" => "1M"
+      }
+    },
+    "nodejs" => %{
+      "requests" => %{
+        "cpu" => "150m",
+        "memory" => "256Mi",
+        "ephemeral-storage" => "1M"
+      }
+    },
+    "unknown" => %{
+      "requests" => %{
+        "cpu" => "100m",
+        "memory" => "80Mi",
+        "ephemeral-storage" => "1M"
+      }
     }
   }
 
@@ -56,320 +100,271 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
 
   @default_termination_period_seconds 405
 
+  @default_security_context %{
+    "allowPrivilegeEscalation" => false,
+    "readOnlyRootFilesystem" => true,
+    "runAsNonRoot" => true,
+    "runAsUser" => 1000,
+    "fsGroup" => 1000
+  }
+
   @impl true
+  @doc """
+  Generates the Kubernetes Deployment manifest for the given resource.
+  """
   def manifest(resource, _opts \\ []), do: gen_deployment(resource)
 
-  defp gen_deployment(
-         %{
-           system: system,
-           namespace: ns,
-           name: name,
-           params: params,
-           labels: _labels,
-           annotations: annotations
-         } = _resource
-       ) do
-    host_params = Map.get(params, "host")
-    replicas = max(1, Map.get(params, "replicas", @default_actor_host_function_replicas))
+  @doc false
+  defp gen_deployment(%{
+         system: system,
+         namespace: ns,
+         name: name,
+         params: params,
+         annotations: annotations
+       }) do
+    host_params = Map.get(params, "host", %{})
+    replicas = max(2, Map.get(params, "replicas", @default_actor_host_function_replicas))
     embedded = Map.get(host_params, "embedded", false)
+    sdk = Map.get(params, "sdk", "unknown")
+
+    actor_host_resources =
+      Map.get(@actor_host_resources_by_sdk, sdk, @actor_host_resources_by_sdk["unknown"])
 
     maybe_warn_wrong_volumes(params, host_params)
 
     %{
       "apiVersion" => "apps/v1",
       "kind" => "Deployment",
-      "metadata" => %{
-        "name" => name,
-        "namespace" => ns,
-        "labels" => %{"app" => name, "actor-system" => system}
-      },
-      "spec" => %{
-        "replicas" => replicas,
-        "selector" => %{
-          "matchLabels" => %{"app" => name, "actor-system" => system}
-        },
-        "strategy" => %{
-          "type" => "RollingUpdate",
-          "rollingUpdate" => %{
-            "maxSurge" => "50%",
-            "maxUnavailable" => 0
-          }
-        },
-        "template" => %{
-          "metadata" => %{
-            "annotations" => %{
-              "prometheus.io/port" => "#{annotations.proxy_http_port}",
-              "prometheus.io/path" => "/metrics",
-              "prometheus.io/scrape" => "true"
-            },
-            "labels" => %{
-              "app" => name,
-              "actor-system" => system
-            }
-          },
-          "spec" =>
-            %{
-              "affinity" => Map.get(host_params, "affinity", build_affinity(system, name)),
-              "containers" => get_containers(embedded, system, name, host_params, annotations),
-              "initContainers" => [
-                %{
-                  "name" => "init-certificates",
-                  "image" => "docker.io/eigr/spawn-initializer:1.4.2",
-                  "args" => [
-                    "--environment",
-                    :prod,
-                    "--secret",
-                    "tls-certs",
-                    "--namespace",
-                    "#{ns}",
-                    "--service",
-                    "#{system}",
-                    "--to",
-                    "#{ns}"
-                  ]
-                }
-              ],
-              "serviceAccountName" => "#{system}-sa"
-            }
-            |> maybe_put_volumes(params)
-            |> maybe_set_termination_period(params)
-        }
+      "metadata" => metadata(name, ns, system),
+      "spec" =>
+        spec(system, name, ns, replicas, host_params, embedded, annotations, actor_host_resources)
+    }
+  end
+
+  @doc false
+  defp metadata(name, ns, system) do
+    %{
+      "name" => name,
+      "namespace" => ns,
+      "labels" => %{"app" => name, "actor-system" => system}
+    }
+  end
+
+  @doc false
+  defp spec(system, name, ns, replicas, host_params, embedded, annotations, actor_host_resources) do
+    %{
+      "replicas" => replicas,
+      "selector" => selector(system, name),
+      "strategy" => strategy(),
+      "template" =>
+        template(system, name, ns, host_params, embedded, annotations, actor_host_resources)
+    }
+  end
+
+  @doc false
+  defp selector(system, name),
+    do: %{"matchLabels" => %{"app" => name, "actor-system" => system}}
+
+  @doc false
+  defp strategy do
+    %{
+      "type" => "RollingUpdate",
+      "rollingUpdate" => %{
+        "maxSurge" => "50%",
+        "maxUnavailable" => 0
       }
     }
   end
 
+  @doc false
+  defp template(system, name, ns, host_params, embedded, annotations, actor_host_resources) do
+    %{
+      "metadata" => template_metadata(name, system, annotations.proxy_http_port),
+      "spec" =>
+        base_spec(system, name, ns, host_params, embedded, annotations, actor_host_resources)
+        |> maybe_put_volumes(host_params)
+        |> maybe_set_termination_period(host_params)
+        |> maybe_set_security_context(host_params)
+    }
+  end
+
+  @doc false
+  defp template_metadata(name, system, proxy_http_port) do
+    %{
+      "annotations" => %{
+        "prometheus.io/port" => "#{proxy_http_port}",
+        "prometheus.io/path" => "/metrics",
+        "prometheus.io/scrape" => "true"
+      },
+      "labels" => %{
+        "app" => name,
+        "actor-system" => system
+      }
+    }
+  end
+
+  @doc false
+  defp base_spec(system, name, ns, host_params, embedded, annotations, actor_host_resources) do
+    %{
+      "affinity" => Map.get(host_params, "affinity", build_affinity(system, name)),
+      "containers" =>
+        get_containers(embedded, system, name, host_params, annotations, actor_host_resources),
+      "initContainers" => init_containers(ns, system),
+      "serviceAccountName" => "#{system}-sa"
+    }
+  end
+
+  @doc false
+  defp init_containers(ns, system) do
+    [
+      %{
+        "name" => "init-certificates",
+        "image" => "ghcr.io/eigr/spawn-initializer:1.4.2",
+        "args" => [
+          "--environment",
+          "prod",
+          "--secret",
+          "tls-certs",
+          "--namespace",
+          ns,
+          "--service",
+          system,
+          "--to",
+          ns
+        ]
+      }
+    ]
+  end
+
+  @doc false
   defp build_affinity(system, app_name) do
     %{
       "podAffinity" => %{
         "preferredDuringSchedulingIgnoredDuringExecution" => [
-          %{
-            "weight" => 50,
-            "podAffinityTerm" => %{
-              "labelSelector" => %{
-                "matchExpressions" => [
-                  %{
-                    "key" => "actor-system",
-                    "operator" => "In",
-                    "values" => [
-                      system
-                    ]
-                  }
-                ]
-              },
-              "topologyKey" => "kubernetes.io/hostname"
-            }
-          }
+          affinity_term(system, "kubernetes.io/hostname", 50)
         ]
       },
       "podAntiAffinity" => %{
         "preferredDuringSchedulingIgnoredDuringExecution" => [
-          %{
-            "weight" => 100,
-            "podAffinityTerm" => %{
-              "labelSelector" => %{
-                "matchExpressions" => [
-                  %{
-                    "key" => "app",
-                    "operator" => "In",
-                    "values" => [
-                      app_name
-                    ]
-                  }
-                ]
-              },
-              "topologyKey" => "kubernetes.io/hostname"
-            }
-          }
+          anti_affinity_term(app_name, "kubernetes.io/hostname", 100)
         ]
       }
     }
   end
 
-  defp get_containers(true, system, name, host_params, annotations) do
-    actor_host_function_image = Map.get(host_params, "image")
-
-    actor_host_function_envs = Map.get(host_params, "env", []) ++ @default_actor_host_function_env
-
-    proxy_http_port = String.to_integer(annotations.proxy_http_port)
-
-    proxy_actor_host_function_ports = [
-      %{"containerPort" => 4369, "name" => "epmd"},
-      %{"containerPort" => proxy_http_port, "name" => "proxy-http"}
-    ]
-
-    actor_host_function_ports = Map.get(host_params, "ports", [])
-    actor_host_function_ports = actor_host_function_ports ++ proxy_actor_host_function_ports
-
-    actor_host_function_resources =
-      Map.get(host_params, "resources", @default_actor_host_resources)
-
-    host_and_proxy_container =
-      %{
-        "name" => "actorhost",
-        "image" => actor_host_function_image,
-        "env" => actor_host_function_envs,
-        "envFrom" => [
-          %{
-            "configMapRef" => %{
-              "name" => "#{name}-sidecar-cm"
+  @doc false
+  defp affinity_term(value, topology, weight) do
+    %{
+      "weight" => weight,
+      "podAffinityTerm" => %{
+        "labelSelector" => %{
+          "matchExpressions" => [
+            %{
+              "key" => "actor-system",
+              "operator" => "In",
+              "values" => [value]
             }
-          },
-          %{
-            "secretRef" => %{
-              "name" => "#{system}-secret"
-            }
-          }
-        ],
-        "ports" => actor_host_function_ports,
-        "resources" => actor_host_function_resources
-      }
-      |> maybe_put_volume_mounts_to_host_container(host_params)
-
-    [
-      host_and_proxy_container
-    ]
-  end
-
-  defp get_containers(false, system, name, host_params, annotations) do
-    actor_host_function_image = Map.get(host_params, "image")
-
-    actor_host_function_envs =
-      Map.get(host_params, "env", []) ++
-        @default_actor_host_function_env
-
-    actor_host_function_resources =
-      Map.get(host_params, "resources", @default_actor_host_resources)
-
-    proxy_http_port = String.to_integer(annotations.proxy_http_port)
-
-    proxy_actor_host_function_ports = [
-      %{"containerPort" => 4369, "name" => "epmd"},
-      %{"containerPort" => proxy_http_port, "name" => "proxy-http"}
-    ]
-
-    proxy_container =
-      %{
-        "name" => "sidecar",
-        "image" => "#{annotations.proxy_image_tag}",
-        "imagePullPolicy" => "Always",
-        "env" => @default_actor_host_function_env,
-        "ports" => proxy_actor_host_function_ports,
-        "livenessProbe" => %{
-          "httpGet" => %{
-            "path" => "/health/liveness",
-            "port" => proxy_http_port,
-            "scheme" => "HTTP"
-          },
-          "failureThreshold" => 3,
-          "initialDelaySeconds" => 10,
-          "periodSeconds" => 10,
-          "successThreshold" => 1,
-          "timeoutSeconds" => 30
+          ]
         },
-        "readinessProbe" => %{
-          "httpGet" => %{
-            "path" => "/health/readiness",
-            "port" => proxy_http_port,
-            "scheme" => "HTTP"
-          },
-          "failureThreshold" => 1,
-          "initialDelaySeconds" => 5,
-          "periodSeconds" => 5,
-          "successThreshold" => 1,
-          "timeoutSeconds" => 5
+        "topologyKey" => topology
+      }
+    }
+  end
+
+  @doc false
+  defp anti_affinity_term(value, topology, weight) do
+    %{
+      "weight" => weight,
+      "podAffinityTerm" => %{
+        "labelSelector" => %{
+          "matchExpressions" => [
+            %{
+              "key" => "app",
+              "operator" => "In",
+              "values" => [value]
+            }
+          ]
         },
-        "resources" => @default_proxy_resources,
-        "envFrom" => [
-          %{
-            "configMapRef" => %{
-              "name" => "#{name}-sidecar-cm"
-            }
-          },
-          %{
-            "secretRef" => %{
-              "name" => "#{system}-secret"
-            }
-          }
-        ]
+        "topologyKey" => topology
       }
-      |> maybe_put_volume_mounts_to_host_container(host_params)
+    }
+  end
 
-    host_container =
-      %{
-        "name" => "actorhost",
-        "image" => actor_host_function_image,
-        "env" => actor_host_function_envs,
-        "resources" => actor_host_function_resources
-      }
-      |> maybe_put_ports_to_host_container(host_params)
-      |> maybe_put_volume_mounts_to_host_container(host_params)
+  @doc false
+  defp get_containers(true, system, name, host_params, annotations, actor_host_resources) do
+    [create_actor_host_container(system, name, host_params, annotations, actor_host_resources)]
+  end
 
+  @doc false
+  defp get_containers(false, system, name, host_params, annotations, actor_host_resources) do
     [
-      proxy_container,
-      host_container
+      create_actor_host_container(system, name, host_params, annotations, actor_host_resources),
+      create_proxy_container(annotations)
     ]
   end
 
-  defp maybe_put_ports_to_host_container(spec, %{"ports" => ports}) do
-    Map.put(spec, "ports", ports)
+  @doc false
+  defp create_actor_host_container(_system, _name, host_params, annotations, actor_host_resources) do
+    %{
+      "name" => "actorhost",
+      "image" => Map.fetch!(host_params, "image"),
+      "env" => @default_actor_host_function_env ++ Map.get(host_params, "env", []),
+      "resources" => actor_host_resources,
+      "ports" => [
+        %{"name" => "http", "containerPort" => annotations.proxy_http_port}
+      ]
+    }
   end
 
-  defp maybe_put_ports_to_host_container(spec, _), do: spec
-
-  defp maybe_set_termination_period(spec, %{
-         "terminationGracePeriodSeconds" => terminationGracePeriodSeconds
-       }) do
-    Map.put(
-      spec,
-      "terminationGracePeriodSeconds",
-      terminationGracePeriodSeconds || @default_termination_period_seconds
-    )
+  @doc false
+  defp create_proxy_container(annotations) do
+    %{
+      "name" => "proxy",
+      "image" => "ghcr.io/eigr/spawn-proxy:1.4.2",
+      "resources" => @default_proxy_resources,
+      "ports" => [
+        %{"name" => "http", "containerPort" => annotations.proxy_http_port}
+      ]
+    }
   end
 
-  defp maybe_set_termination_period(spec, _) do
-    Map.put(spec, "terminationGracePeriodSeconds", @default_termination_period_seconds)
-  end
-
+  @doc false
   defp maybe_put_volumes(spec, %{"volumes" => volumes}) do
-    volumes =
-      volumes ++
-        [
-          %{
-            "name" => "certs",
-            "secret" => %{"secretName" => "tls-certs", "optional" => true}
-          }
-        ]
-
-    Map.merge(spec, %{"volumes" => volumes})
+    Map.put(spec, "volumes", volumes)
   end
 
-  defp maybe_put_volumes(spec, _) do
-    Map.put(spec, "volumes", [
-      %{
-        "name" => "certs",
-        "secret" => %{"secretName" => "tls-certs", "optional" => true}
-      }
-    ])
+  defp maybe_put_volumes(spec, _), do: spec
+
+  @doc false
+  defp maybe_set_termination_period(spec, %{"terminationGracePeriodSeconds" => period}) do
+    Map.put(spec, "terminationGracePeriodSeconds", period)
   end
 
-  defp maybe_put_volume_mounts_to_host_container(spec, %{"volumeMounts" => volumeMounts}) do
-    volumeMounts = volumeMounts ++ [%{"name" => "certs", "mountPath" => "/app/certs"}]
-    Map.merge(spec, %{"volumeMounts" => volumeMounts})
+  defp maybe_set_termination_period(spec, _),
+    do: Map.put(spec, "terminationGracePeriodSeconds", @default_termination_period_seconds)
+
+  @doc false
+  defp maybe_set_security_context(spec, %{"securityContext" => context}) when is_map(context) do
+    put_in(spec["securityContext"], context)
   end
 
-  defp maybe_put_volume_mounts_to_host_container(spec, _) do
-    Map.put(spec, "volumeMounts", [%{"name" => "certs", "mountPath" => "/app/certs"}])
-  end
+  defp maybe_set_security_context(spec, _),
+    do: put_in(spec["securityContext"], @default_security_context)
 
+  @doc false
   defp maybe_warn_wrong_volumes(params, host_params) do
     volumes = Map.get(params, "volumes", [])
+    volume_mounts = Map.get(host_params, "volumeMounts", [])
 
-    host_params
-    |> Map.get("volumeMounts", [])
-    |> Enum.each(fn mount ->
-      if !Enum.find(volumes, &(&1["name"] == mount["name"])) do
-        Logger.warning("Not found volume registered for #{mount["name"]}")
-      end
-    end)
+    cond do
+      length(volumes) > 0 and length(volume_mounts) == 0 ->
+        Logger.warning("Volumes are defined but no volumeMounts provided.")
+
+      length(volume_mounts) > 0 and length(volumes) == 0 ->
+        Logger.warning("VolumeMounts are defined but no volumes provided.")
+
+      true ->
+        :ok
+    end
   end
 end
