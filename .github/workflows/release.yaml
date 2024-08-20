@@ -140,7 +140,7 @@ jobs:
 
       - uses: BobAnkh/add-contributors@master
         with:
-          BRANCH: "main"
+          BRANCH: "feat/update-contributors"
           PULL_REQUEST: "feat/update-contributors"
           COLUMN_PER_ROW: "6"
           ACCESS_TOKEN: ${{secrets.GITHUB_TOKEN}}
