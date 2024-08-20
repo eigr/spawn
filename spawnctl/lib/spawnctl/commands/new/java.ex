@@ -14,19 +14,19 @@ defmodule SpawnCtl.Commands.New.Java do
 
   import SpawnCtl.Util, only: [log: 3]
 
+  @vsn "1.4.2"
+  @main_sdk_version "v1.3.1"
+  @template "java-std"
+
   @default_opts %{
     actor_system: "spawn-system",
-    namespace: "default",
+    app_namespace: "default",
     app_description: "Spawn Java Standard App.",
-    app_image_tag: "ttl.sh/spawn-java-postalcode:1h",
+    app_image_tag: "ttl.sh/spawn-java-example:1h",
     statestore_user: "admin",
     statestore_pwd: "admin",
     statestore_key: "myfake-key-3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE="
   }
-
-  @vsn "1.4.2"
-  @main_sdk_version "1.4.2"
-  @template "java-std"
 
   option(:actor_system, :string, "Spawn actor system.",
     alias: :s,
@@ -35,7 +35,7 @@ defmodule SpawnCtl.Commands.New.Java do
 
   option(:app_namespace, :string, "Spawn ActorSystem namespace.",
     alias: :n,
-    default: @default_opts.namespace
+    default: @default_opts.app_namespace
   )
 
   option(:app_description, :string, "Defines the application description.",
@@ -168,10 +168,21 @@ defmodule SpawnCtl.Commands.New.Java do
 
   defp render({:ok, template_path}, %{name: name} = _args, %{sdk_version: sdk_version} = opts)
        when not is_nil(sdk_version) do
+    app_hyphenized_name = String.replace(name, "_", "-")
+
+    statestore_type =
+      if is_nil(opts.statestore_type) || opts.statestore_type == "" do
+        "native"
+      else
+        opts.statestore_type
+      end
+
     extra_context = %{
       "app_name" => name,
+      "app_name_hyphenate" => app_hyphenized_name,
       "spawn_app_spawn_system" => opts.actor_system,
-      "spawn_app_namespace" => opts.namespace,
+      "spawn_app_namespace" => opts.app_namespace,
+      "spawn_app_statestore_type" => statestore_type,
       "spawn_sdk_version" => "v#{sdk_version}",
       "group_id" => opts.group_id,
       "artifact_id" => opts.artifact_id,
@@ -183,10 +194,21 @@ defmodule SpawnCtl.Commands.New.Java do
   end
 
   defp render({:ok, template_path}, %{name: name} = _args, opts) do
+    app_hyphenized_name = String.replace(name, "_", "-")
+
+    statestore_type =
+      if is_nil(opts.statestore_type) || opts.statestore_type == "" do
+        "native"
+      else
+        opts.statestore_type
+      end
+
     extra_context = %{
       "app_name" => name,
+      "app_name_hyphenate" => app_hyphenized_name,
       "spawn_app_spawn_system" => opts.actor_system,
-      "spawn_app_namespace" => opts.namespace,
+      "spawn_app_namespace" => opts.app_namespace,
+      "spawn_app_statestore_type" => statestore_type,
       "spawn_sdk_version" => "v#{@main_sdk_version}",
       "group_id" => opts.group_id,
       "artifact_id" => opts.artifact_id,

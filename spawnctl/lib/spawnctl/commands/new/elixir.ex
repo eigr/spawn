@@ -45,7 +45,7 @@ defmodule SpawnCtl.Commands.New.Elixir do
   @default_opts %{
     actor_system: "spawn-system",
     app_description: "Spawn App.",
-    app_image_tag: "ttl.sh/spawn-elixir-example:#{@vsn}",
+    app_image_tag: "ttl.sh/spawn-elixir-example:1h",
     app_namespace: "default",
     statestore_user: "admin",
     statestore_pwd: "admin",
@@ -196,7 +196,7 @@ defmodule SpawnCtl.Commands.New.Elixir do
 
     statestore_type =
       if is_nil(opts.statestore_type) || opts.statestore_type == "" do
-        "postgres"
+        "native"
       else
         opts.statestore_type
       end
