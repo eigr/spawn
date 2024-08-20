@@ -4,6 +4,6 @@ defmodule SpawnCtl.Commands.Config do
     name: "config",
     description: "Configure Spawn applications."
 
-  subcommand(SpawnCtl.Commands.Config.Host)
+  subcommand(Spawnctl.Commands.Config.Host)
   subcommand(SpawnCtl.Commands.Config.System)
 end
