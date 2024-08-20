@@ -137,3 +137,14 @@ jobs:
           overwrite: true
           file_glob: true
           body: ${{ steps.changelog.outputs.changes }}
+
+      - uses: BobAnkh/add-contributors@master
+        with:
+          CONTRIBUTOR: "### Contributors"
+          COLUMN_PER_ROW: "6"
+          ACCESS_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          IMG_WIDTH: "100"
+          FONT_SIZE: "14"
+          PATH: "/CONTRIBUTORS.md"
+          COMMIT_MESSAGE: "docs(README): update contributors"
+          AVATAR_SHAPE: "round"
