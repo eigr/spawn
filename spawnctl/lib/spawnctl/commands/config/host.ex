@@ -1,4 +1,4 @@
-defmodule Spawnctl.Commands.Config.Host do
+defmodule SpawnCtl.Commands.Config.Host do
   @moduledoc """
 
   """
