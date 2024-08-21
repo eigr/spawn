@@ -15,7 +15,7 @@ defmodule SpawnCtl.Commands.New.Java do
   import SpawnCtl.Util, only: [log: 3]
 
   @vsn "1.4.2"
-  @main_sdk_version "v1.3.1"
+  @main_sdk_version "1.4.2"
   @template "java-std"
 
   @default_opts %{
@@ -23,6 +23,8 @@ defmodule SpawnCtl.Commands.New.Java do
     app_namespace: "default",
     app_description: "Spawn Java Standard App.",
     app_image_tag: "ttl.sh/spawn-java-example:1h",
+    group_id: "io.eigr.spawn.java",
+    artifact_id: "demo",
     statestore_user: "admin",
     statestore_pwd: "admin",
     statestore_key: "myfake-key-3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE="
@@ -61,6 +63,7 @@ defmodule SpawnCtl.Commands.New.Java do
 
   option(:statestore_type, :string, "Spawn statestore provider.",
     alias: :S,
+    default: "native",
     allowed_values: [
       "mariadb",
       "postgres",
@@ -85,12 +88,12 @@ defmodule SpawnCtl.Commands.New.Java do
 
   option(:group_id, :string, "Java project groupId.",
     alias: :g,
-    default: "io.eigr.spawn.java"
+    default: @default_opts.group_id
   )
 
   option(:artifact_id, :string, "Java project artifactId.",
     alias: :a,
-    default: "demo"
+    default: @default_opts.artifact_id
   )
 
   option(:version, :string, "Java project version.",
