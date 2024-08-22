@@ -35,25 +35,42 @@ defmodule Sidecar.Grpc.Generators.ReflectionServerGenerator do
   end
 
   @impl true
-  def generate(ctx, %Google.Protobuf.FileDescriptorProto{service: svcs} = _desc) do
+  def generate(ctx, %Google.Protobuf.FileDescriptorProto{name: name, service: svcs} = _desc) do
     current_services = :persistent_term.get(:grpc_reflection_services, [])
 
-    services = do_generate(ctx, svcs, current_services)
+    {_name,
+     [
+       services: services
+     ]} = result = do_generate(ctx, name, svcs, current_services)
 
     :persistent_term.put(:grpc_reflection_services, services)
+
+    result
+  end
+
+  defp do_generate(_ctx, name, nil, current_services) do
+    {name,
+     [
+       services: current_services
+     ]}
+  end
+
+  defp do_generate(_ctx, name, [], current_services) do
+    {name,
+     [
+       services: current_services
+     ]}
+  end
+
+  defp do_generate(ctx, _name, svcs, current_services) do
+    services =
+      svcs
+      |> Enum.map(fn svc -> Util.mod_name(ctx, [Macro.camelize(svc.name)]) end)
+      |> Kernel.++(current_services)
 
     {List.first(services),
      [
        services: services
      ]}
-  end
-
-  defp do_generate(_ctx, nil, current_services), do: current_services
-  defp do_generate(_ctx, [], current_services), do: current_services
-
-  defp do_generate(ctx, svcs, current_services) do
-    svcs
-    |> Enum.map(fn svc -> Util.mod_name(ctx, [Macro.camelize(svc.name)]) end)
-    |> Kernel.++(current_services)
   end
 end
