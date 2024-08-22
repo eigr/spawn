@@ -83,7 +83,7 @@ defmodule SpawnCtl.Commands.Dev.Run do
     proxy_bind_address: "0.0.0.0",
     proxy_bind_port: 9001,
     proxy_bind_grpc_port: 9980,
-    proxy_image: "eigr/spawn-proxy:1.4.2",
+    proxy_image: "ghcr.io/eigr/spawn-proxy:1.4.2",
     actor_host_port: 8090,
     database_self_provisioning: true,
     database_host: "",
