@@ -41,6 +41,14 @@ defmodule Sidecar.GRPC.Generators.HandlerTranscodingGenerator do
 
   @impl true
   def generate(ctx, %Google.Protobuf.FileDescriptorProto{service: svcs} = _desc) do
+    do_generate(ctx, svcs)
+  end
+
+  defp do_generate(_ctx, nil), do: {"unknown", []}
+
+  defp do_generate(_ctx, []), do: {"unknown", []}
+
+  defp do_generate(ctx, svcs) do
     for svc <- svcs do
       mod_name = Util.mod_name(ctx, [Macro.camelize(svc.name)])
       actor_name = Macro.camelize(svc.name)
