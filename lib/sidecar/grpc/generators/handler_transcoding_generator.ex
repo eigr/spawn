@@ -50,7 +50,7 @@ defmodule Sidecar.GRPC.Generators.HandlerTranscodingGenerator do
       {"unknown",
        [
          render: false,
-         module: "unknown"
+         module: "Unknown"
        ]}
 
   defp do_generate(_ctx, []),
@@ -58,7 +58,7 @@ defmodule Sidecar.GRPC.Generators.HandlerTranscodingGenerator do
       {"unknown",
        [
          render: false,
-         module: "unknown"
+         module: "Unknown"
        ]}
 
   defp do_generate(ctx, svcs) do
