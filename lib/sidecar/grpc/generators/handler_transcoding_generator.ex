@@ -15,26 +15,27 @@ defmodule Sidecar.GRPC.Generators.HandlerTranscodingGenerator do
   def template do
     """
     defmodule <%= @module %>.ActorDispatcher do
-      use GRPC.Server, service: <%= @service_name %>.Service, http_transcode: true
+      <%= if @render do %>
+        use GRPC.Server, service: <%= @service_name %>.Service, http_transcode: true
 
-      alias Sidecar.GRPC.Dispatcher
+        alias Sidecar.GRPC.Dispatcher
 
-      <%= for {method_name, input, output, _options} <- @methods do %>
-        @spec <%= Macro.underscore(method_name) %>(<%= input %>.t(), GRPC.Server.Stream.t()) :: <%= output %>.t()
-        def <%= Macro.underscore(method_name) %>(message, stream) do
-          request = %{
-            system: <%= inspect(@actor_system) %>,
-            actor_name: <%= inspect(@actor_name) %>,
-            action_name: <%= inspect(method_name) %>,
-            input: message,
-            stream: stream,
-            descriptor: <%= @service_name %>.Service.descriptor()
-          }
+        <%= for {method_name, input, output, _options} <- @methods do %>
+          @spec <%= Macro.underscore(method_name) %>(<%= input %>.t(), GRPC.Server.Stream.t()) :: <%= output %>.t()
+          def <%= Macro.underscore(method_name) %>(message, stream) do
+            request = %{
+              system: <%= inspect(@actor_system) %>,
+              actor_name: <%= inspect(@actor_name) %>,
+              action_name: <%= inspect(method_name) %>,
+              input: message,
+              stream: stream,
+              descriptor: <%= @service_name %>.Service.descriptor()
+            }
 
-          Dispatcher.dispatch(request)
-        end
+            Dispatcher.dispatch(request)
+          end
+        <% end %>
       <% end %>
-
     end
     """
   end
@@ -44,9 +45,21 @@ defmodule Sidecar.GRPC.Generators.HandlerTranscodingGenerator do
     do_generate(ctx, svcs)
   end
 
-  defp do_generate(_ctx, nil), do: {"unknown", []}
+  defp do_generate(_ctx, nil),
+    do:
+      {"unknown",
+       [
+         render: false,
+         module: "unknown"
+       ]}
 
-  defp do_generate(_ctx, []), do: {"unknown", []}
+  defp do_generate(_ctx, []),
+    do:
+      {"unknown",
+       [
+         render: false,
+         module: "unknown"
+       ]}
 
   defp do_generate(ctx, svcs) do
     for svc <- svcs do
@@ -69,6 +82,7 @@ defmodule Sidecar.GRPC.Generators.HandlerTranscodingGenerator do
 
       {mod_name,
        [
+         render: true,
          module: mod_name,
          actor_system: actor_system,
          actor_name: actor_name,
