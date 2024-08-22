@@ -43,7 +43,7 @@ defmodule Sidecar.GRPC.CodeGenerator do
 
     {grpc_generator_plugin, handler_generator_plugin} =
       if transcoding_enabled? do
-        {ProtobufGenerate.Plugins.GRPCWithOptions,
+        {Sidecar.GRPC.Generators.GRPCWithCustomOptions,
          Sidecar.GRPC.Generators.HandlerTranscodingGenerator}
       else
         {ProtobufGenerate.Plugins.GRPC, Sidecar.GRPC.Generators.HandlerGenerator}
