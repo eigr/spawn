@@ -305,13 +305,16 @@ defmodule Sidecar.GRPC.Dispatcher do
   defp build_actor_id_from_settings(_, _, _, _), do: nil
 
   defp find_actor_name_and_ctype(message) do
-    Enum.find_value(message.descriptor().field, fn %Google.Protobuf.FieldDescriptorProto{
-                                                     name: name,
-                                                     options: %Google.Protobuf.FieldOptions{
-                                                       ctype: ctype,
-                                                       __pb_extensions__: ext
-                                                     }
-                                                   } ->
+    module = message.__struct__
+    descriptor_proto = apply(module, :descriptor, [])
+
+    Enum.find_value(descriptor_proto.field, fn %Google.Protobuf.FieldDescriptorProto{
+                                                 name: name,
+                                                 options: %Google.Protobuf.FieldOptions{
+                                                   ctype: ctype,
+                                                   __pb_extensions__: ext
+                                                 }
+                                               } ->
       Map.get(ext, {Eigr.Functions.Protocol.Actors.PbExtension, :actor_id}, false) &&
         {ctype, name}
     end)
