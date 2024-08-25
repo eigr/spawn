@@ -16,7 +16,7 @@ defmodule Statestores.Adapters.PostgresSnapshotAdapter do
     query = """
     SELECT *
       FROM historical_snapshots
-     WHERE id = #{id}
+     WHERE actor_id = #{id}
        AND revision = #{revision}
      ORDER BY inserted_at DESC, updated_at DESC
     """
