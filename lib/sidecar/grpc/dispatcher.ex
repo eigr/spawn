@@ -317,7 +317,7 @@ defmodule Sidecar.GRPC.Dispatcher do
                                                } ->
                                   
       Map.get(ext, {Eigr.Functions.Protocol.Actors.PbExtension, :actor_id}, false) &&
-        {ctype, name}
+        {ctype, String.to_atom(name)}
     end)
   end
 
@@ -337,6 +337,7 @@ defmodule Sidecar.GRPC.Dispatcher do
        system: %ActorSystem{name: actor_system},
        actor: %Actor{id: actor_id},
        action_name: action_name,
+       register_ref: actor_id.parent,
        payload: {:value, any_pack!(message)}
      }}
   end
