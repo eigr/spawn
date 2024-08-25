@@ -21,6 +21,12 @@ defmodule SpawnCtl.Commands.New.Node do
 
   @default_opts %{
     actor_system: "spawn-system",
+    app_namespace: "default",
+    app_description: "Spawn Node App.",
+    app_image_tag: "ttl.sh/spawn-node-example:1h",
+    statestore_user: "admin",
+    statestore_pwd: "admin",
+    statestore_key: "myfake-key-3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE="
     allowed_template_versions: [
       "v#{@vsn}",
       "v1.4.2"
