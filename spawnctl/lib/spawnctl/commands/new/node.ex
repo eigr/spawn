@@ -32,6 +32,21 @@ defmodule SpawnCtl.Commands.New.Node do
     default: @default_opts.actor_system
   )
 
+  option(:app_namespace, :string, "Spawn ActorSystem namespace.",
+    alias: :n,
+    default: @default_opts.app_namespace
+  )
+
+  option(:app_description, :string, "Defines the application description.",
+    alias: :d,
+    default: @default_opts.app_description
+  )
+
+  option(:app_image_tag, :string, "Defines the OCI Container image tag.",
+    alias: :i,
+    default: @default_opts.app_image_tag
+  )
+
   option(:template_version, :string, "Spawn CLI Language templates version.",
     alias: :t,
     default: "v#{@vsn}",
@@ -45,6 +60,31 @@ defmodule SpawnCtl.Commands.New.Node do
       @main_sdk_version,
       "1.4.2"
     ]
+  )
+
+  option(:statestore_type, :string, "Spawn statestore provider.",
+    alias: :S,
+    default: "native",
+    allowed_values: [
+      "mariadb",
+      "postgres",
+      "native"
+    ]
+  )
+
+  option(:statestore_user, :string, "Spawn statestore username.",
+    alias: :U,
+    default: @default_opts.statestore_user
+  )
+
+  option(:statestore_pwd, :string, "Spawn statestore password.",
+    alias: :P,
+    default: @default_opts.statestore_pwd
+  )
+
+  option(:statestore_key, :string, "Spawn statestore key.",
+    alias: :K,
+    default: @default_opts.statestore_key
   )
 
   argument(:name, :string, "Name of the project to be created.")
@@ -117,20 +157,32 @@ defmodule SpawnCtl.Commands.New.Node do
 
   defp render({:ok, template_path}, %{name: name} = _args, %{sdk_version: sdk_version} = opts)
        when not is_nil(sdk_version) do
+    app_hyphenized_name = String.replace(name, "_", "-")
+
     extra_context = %{
       "app_name" => name,
-      "spawn_system" => opts.actor_system,
-      "sdk_version" => sdk_version
+      "app_name_hyphenate" => app_hyphenized_name,
+      "spawn_app_spawn_system" => opts.actor_system,
+      "spawn_app_namespace" => opts.app_namespace,
+      "spawn_app_statestore_type" => statestore_type,
+      "spawn_sdk_version" => sdk_version,
+      "app_image_tag" => opts.app_image_tag
     }
 
     do_render(template_path, extra_context)
   end
 
   defp render({:ok, template_path}, %{name: name} = _args, opts) do
+    app_hyphenized_name = String.replace(name, "_", "-")
+
     extra_context = %{
       "app_name" => name,
-      "spawn_system" => opts.actor_system,
-      "sdk_version" => @main_sdk_version
+      "app_name_hyphenate" => app_hyphenized_name,
+      "spawn_app_spawn_system" => opts.actor_system,
+      "spawn_app_namespace" => opts.app_namespace,
+      "spawn_app_statestore_type" => statestore_type,
+      "spawn_sdk_version" => @main_sdk_version,
+      "app_image_tag" => opts.app_image_tag
     }
 
     do_render(template_path, extra_context)
