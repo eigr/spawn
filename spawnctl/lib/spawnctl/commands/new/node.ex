@@ -170,7 +170,7 @@ defmodule SpawnCtl.Commands.New.Node do
       "app_name_hyphenate" => app_hyphenized_name,
       "spawn_app_spawn_system" => opts.actor_system,
       "spawn_app_namespace" => opts.app_namespace,
-      "spawn_app_statestore_type" => statestore_type,
+      "spawn_app_statestore_type" => opts.statestore_type,
       "spawn_sdk_version" => sdk_version,
       "app_image_tag" => opts.app_image_tag
     }
@@ -186,7 +186,7 @@ defmodule SpawnCtl.Commands.New.Node do
       "app_name_hyphenate" => app_hyphenized_name,
       "spawn_app_spawn_system" => opts.actor_system,
       "spawn_app_namespace" => opts.app_namespace,
-      "spawn_app_statestore_type" => statestore_type,
+      "spawn_app_statestore_type" => opts.statestore_type,
       "spawn_sdk_version" => @main_sdk_version,
       "app_image_tag" => opts.app_image_tag
     }
