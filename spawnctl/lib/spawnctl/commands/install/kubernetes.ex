@@ -3,7 +3,7 @@ defmodule SpawnCtl.Commands.Install.Kubernetes do
     name: "kubernetes",
     description: "Install k8s Orchestrator Runtime."
 
-  @vsn "v1.4.2"
+  @vsn "v1.4.3"
 
   alias SpawnCtl.Util.Emoji
   alias SpawnCtl.Commands.Install.Behavior.Runtime
@@ -26,7 +26,8 @@ defmodule SpawnCtl.Commands.Install.Kubernetes do
   option(:version, :string, "Install Operator with a specific version.",
     alias: :V,
     allowed_values: [
-      @vsn
+      @vsn,
+      "1.4.2"
     ]
   )
 

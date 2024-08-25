@@ -48,7 +48,7 @@ To get started, you'll need to install the Spawn Actor Orchestrator runtime. The
 1. **Install the CLI:**
 
    ```sh
-   curl -sSL https://github.com/eigr/spawn/releases/download/v1.4.2/install.sh | sh
+   curl -sSL https://github.com/eigr/spawn/releases/download/v1.4.3/install.sh | sh
    ```
 
 2. **Install the Operator**   

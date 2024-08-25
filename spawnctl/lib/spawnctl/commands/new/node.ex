@@ -19,7 +19,7 @@ defmodule SpawnCtl.Commands.New.Node do
     actor_system: "spawn-system"
   }
 
-  @vsn "1.4.2"
+  @vsn "1.4.3"
   @main_sdk_version "1.4.2"
   @template "nodejs"
 
@@ -36,7 +36,10 @@ defmodule SpawnCtl.Commands.New.Node do
   option(:sdk_version, :string, "Spawn Node SDK version.",
     alias: :v,
     default: @main_sdk_version,
-    allowed_values: [@main_sdk_version]
+    allowed_values: [
+      @main_sdk_version,
+      "1.4.3"
+    ]
   )
 
   argument(:name, :string, "Name of the project to be created.")

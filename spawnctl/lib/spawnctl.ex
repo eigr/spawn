@@ -5,7 +5,7 @@ defmodule SpawnCtl do
   """
   use DoIt.MainCommand,
     description: "Spawn CLI Tool",
-    version: "1.1.2"
+    version: "1.4.3"
 
   command(SpawnCtl.Commands.Apply)
   command(SpawnCtl.Commands.Config)

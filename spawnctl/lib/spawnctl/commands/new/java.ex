@@ -14,8 +14,8 @@ defmodule SpawnCtl.Commands.New.Java do
 
   import SpawnCtl.Util, only: [log: 3]
 
-  @vsn "1.4.2"
-  @main_sdk_version "1.4.2"
+  @vsn "1.4.3"
+  @main_sdk_version "1.4.3"
   @template "java-std"
 
   @default_opts %{
@@ -53,7 +53,10 @@ defmodule SpawnCtl.Commands.New.Java do
   option(:sdk_version, :string, "Spawn Java SDK version.",
     alias: :v,
     default: @main_sdk_version,
-    allowed_values: [@main_sdk_version]
+    allowed_values: [
+      @main_sdk_version,
+      "1.4.2"
+    ]
   )
 
   option(:template_version, :string, "Spawn CLI Language templates version.",

@@ -55,7 +55,7 @@ if command -v spawn &> /dev/null; then
 fi
 
 # Download the binary
-URL="https://github.com/eigr/spawn/releases/download/v1.4.2/$FILENAME"
+URL="https://github.com/eigr/spawn/releases/download/v1.4.3/$FILENAME"
 curl -LO "$URL"
 
 # Determine installation directory
