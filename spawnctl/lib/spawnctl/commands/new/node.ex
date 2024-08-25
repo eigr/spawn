@@ -15,13 +15,17 @@ defmodule SpawnCtl.Commands.New.Node do
     name: "node",
     description: "Generate a Spawn NodeJS project."
 
-  @default_opts %{
-    actor_system: "spawn-system"
-  }
-
   @vsn "1.4.3"
-  @main_sdk_version "1.4.2"
+  @main_sdk_version "1.4.3"
   @template "nodejs"
+
+  @default_opts %{
+    actor_system: "spawn-system",
+    allowed_template_versions: [
+      "v#{@vsn}",
+      "v1.4.2"
+    ]
+  }
 
   option(:actor_system, :string, "Spawn actor system.",
     alias: :s,
@@ -30,7 +34,8 @@ defmodule SpawnCtl.Commands.New.Node do
 
   option(:template_version, :string, "Spawn CLI Language templates version.",
     alias: :t,
-    default: "v#{@vsn}"
+    default: "v#{@vsn}",
+    allowed_values: @default_opts.allowed_template_versions
   )
 
   option(:sdk_version, :string, "Spawn Node SDK version.",
@@ -38,7 +43,7 @@ defmodule SpawnCtl.Commands.New.Node do
     default: @main_sdk_version,
     allowed_values: [
       @main_sdk_version,
-      "1.4.3"
+      "1.4.2"
     ]
   )
 
