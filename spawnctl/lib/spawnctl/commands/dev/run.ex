@@ -73,7 +73,7 @@ defmodule SpawnCtl.Commands.Dev.Run do
   alias SpawnCtl.Util.Emoji
   alias Testcontainers.Container
 
-  import SpawnCtl.Util, only: [is_valid?: 1, log: 3]
+  import SpawnCtl.Util, only: [generate: 0, is_valid?: 1, log: 3]
 
   @default_opts %{
     actor_system: "spawn-system",
@@ -340,6 +340,7 @@ defmodule SpawnCtl.Commands.Dev.Run do
     Container.new(opts.proxy_image)
     |> maybe_mount_proto_files(opts.protos)
     |> Container.with_environment("MIX_ENV", "prod")
+    |> Container.with_environment("PROXY_APP_NAME", "proxy_#{generate()}")
     |> Container.with_environment("PROXY_CLUSTER_STRATEGY", "gossip")
     |> Container.with_environment("PROXY_DATABASE_TYPE", opts.database_type)
     |> Container.with_environment("PROXY_DATABASE_PORT", "#{opts.database_port}")

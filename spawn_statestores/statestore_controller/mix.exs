@@ -1,15 +1,15 @@
-defmodule StatestoresPostgres.MixProject do
+defmodule StatestoresMysql.MixProject do
   use Mix.Project
 
-  @app :spawn_statestores_postgres
+  @app :spawn_statestore_controller
   @version "0.0.0-local.dev"
-  @source_url "https://github.com/eigr/spawn/blob/main/spawn_statestores/statestores_postgres"
+  @source_url "https://github.com/eigr/spawn/blob/main/spawn_statestores/statestore_controller"
 
   def project do
     [
       app: @app,
       version: @version,
-      description: "Spawn Statestores Postgres is a storage lib for the Spawn Actors System",
+      description: "Spawn Statestores Controller",
       source_url: @source_url,
       homepage_url: "https://eigr.io/",
       build_path: "../../_build",
@@ -57,8 +57,9 @@ defmodule StatestoresPostgres.MixProject do
     [
       {:cloak_ecto, "~> 1.2"},
       {:ecto_sql, "~> 3.10"},
+      {:postgrex, "~> 0.19"},
+      {:postgrex_pgoutput, "~> 0.1"},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
-      {:postgrex, "~> 0.17"},
       {:spawn_statestores, path: "../statestores"}
     ]
   end
