@@ -23,14 +23,16 @@ defmodule Actors.Actor.Entity.Lifecycle.EventSourceProducer do
           stream_name: opts.actor_name,
           consumer_name: opts.actor_name
         },
-        concurrency: 10
+        # Projects are like long-lasting threads and therefore concurrency should be avoided
+        # if the intention is to have some notion of ordering.
+        concurrency: 1
       ],
       processors: [
-        default: [concurrency: 10]
+        default: [concurrency: 1]
       ],
       batchers: [
         default: [
-          concurrency: 10,
+          concurrency: 1,
           batch_size: 10_000,
           batch_timeout: 2_000
         ]
