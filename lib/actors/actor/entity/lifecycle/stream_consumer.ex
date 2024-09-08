@@ -1,4 +1,4 @@
-defmodule Actors.Actor.Entity.Lifecycle.EventSourceConsumer do
+defmodule Actors.Actor.Entity.Lifecycle.StreamConsumer do
   @moduledoc false
   use Broadway
 

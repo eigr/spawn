@@ -1,12 +1,13 @@
-defmodule Actors.Actor.Entity.Lifecycle.EventSource do
+defmodule Actors.Actor.Entity.Lifecycle.StreamInitiator do
   @moduledoc """
   Handles lifecycle functions for Actor Entity that interacts with Event Source mechanisms
   """
 
+  alias Actors.Actor.Entity.Lifecycle.StreamConsumer
+
   alias Eigr.Functions.Protocol.Actors.Actor
   alias Eigr.Functions.Protocol.Actors.EventSourceSettings
   alias Eigr.Functions.Protocol.Actors.ProjectionSubject
-  alias Actors.Actor.Entity.Lifecycle.EventSourceProducer
 
   alias Spawn.Utils.Nats
   alias Gnat.Jetstream.API.Stream, as: NatsStream
@@ -33,7 +34,7 @@ defmodule Actors.Actor.Entity.Lifecycle.EventSource do
       })
 
     {:ok, _pid} =
-      EventSourceConsumer.start_link(%{
+      StreamConsumer.start_link(%{
         actor_name: actor.id.name,
         projection_pid: self(),
         strict_ordering: actor.settings.event_source.strict_events_ordering
