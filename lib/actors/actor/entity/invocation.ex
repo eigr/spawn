@@ -53,6 +53,25 @@ defmodule Actors.Actor.Entity.Invocation do
 
   @http_host_interface Actors.Actor.Interface.Http
 
+  def process_projection_events(messages, state) do
+    %EntityState{
+      system: actor_system,
+      actor:
+        %Actor{
+          id: %ActorId{name: actor_name, parent: parent} = id,
+          state: actor_state,
+          actions: actions
+        } = _actor,
+      opts: actor_opts
+    } = state
+
+    messages
+    |> Enum.map(fn message ->
+      nil
+      # do something with message
+    end)
+  end
+
   def handle_timers([], _system, _actor), do: :ok
 
   def handle_timers(timers, system, actor) when is_list(timers) do

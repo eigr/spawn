@@ -52,3 +52,4 @@ for file in $PROTOS; do
     --one-file-per-module \
     $BASE_PATH/$file
 done
+

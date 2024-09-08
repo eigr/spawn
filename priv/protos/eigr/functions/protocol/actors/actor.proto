@@ -3,6 +3,7 @@ syntax = "proto3";
 package eigr.functions.protocol.actors;
 
 import "google/protobuf/any.proto";
+import "google/protobuf/timestamp.proto";
 
 option java_package = "io.eigr.functions.protocol.actors";
 option go_package = "github.com/eigr/go-support/eigr/actors;actors";
@@ -114,10 +115,40 @@ enum Kind {
     
     // Reserved for future use
     PROXY = 4;
+
+    // Projection actors are used to project data from different actor streams.
+    PROJECTION = 5;
+}
+
+message ProjectionSubject {
+    string actor = 1;
+    string action = 2;
+    google.protobuf.Timestamp start_time = 3;
+}
+
+message EventsRetentionTime {
+    int64 time = 1;
+}
+
+message EventsRetentionStrategy {
+    oneof strategy {
+        EventsRetentionTime time_in_ms = 1;
+        bool infinite = 2;
+    }
+}
+
+message EventSourceSettings {
+    // Define this for projections that need to listen to events
+    repeated ProjectionSubject subjects = 1;
+
+    // Define this for actors that can emit events
+    bool sourceable = 2;
+    
+    // The strategy for event store retention 
+    EventsRetentionStrategy events_retention_strategy = 3;
 }
 
 message ActorSettings {
-
     // Indicates the type of Actor to be configured.
     Kind kind = 1;
 
@@ -135,6 +166,9 @@ message ActorSettings {
 
     // When kind is POOLED this is used to define maximum actor instances
     int32 max_pool_size = 6;
+
+    // Event source settings
+    EventSourceSettings event_source = 7;
 }
 
 message ActorId {
@@ -168,3 +202,4 @@ message Actor {
     // The registered timer actions for an actor.
     repeated FixedTimerAction timer_actions = 5;
 }
+

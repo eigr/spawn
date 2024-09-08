@@ -6,6 +6,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
   require Logger
 
   alias Actors.Actor.{Entity.EntityState, Entity.Invocation, StateManager}
+  alias Actors.Actor.Entity.Lifecycle.EventSource
   alias Actors.Actor.Pubsub
   alias Actors.Exceptions.NetworkPartitionException
 
@@ -64,6 +65,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
 
     :ok = handle_metadata(name, system, metadata)
     :ok = Invocation.handle_timers(timer_actions, system, state.actor)
+    :ok = handle_event_source(state.actor)
 
     :ok =
       Spawn.Cluster.Node.Registry.update_entry_value(
@@ -279,6 +281,19 @@ defmodule Actors.Actor.Entity.Lifecycle do
   end
 
   # Private functions
+
+  defp handle_event_source(%Actor{settings: %ActorSettings{kind: :PROJECTION}} = actor) do
+    EventSource.init_projection_actor(actor)
+  end
+
+  defp handle_event_source(
+         %Actor{settings: %ActorSettings{kind: kind, event_source: %{sourceable: true}}} = actor
+       )
+       when kind in [:NAMED, :UNNAMED] do
+    EventSource.init_sourceable_actor(actor)
+  end
+
+  defp handle_event_source(_actor), do: :ok
 
   defp updated_state(%EntityState{actor: actor} = state, actual_state, revision) do
     %EntityState{state | actor: %Actor{actor | state: actual_state}, revision: revision}

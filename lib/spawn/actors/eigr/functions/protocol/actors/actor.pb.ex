@@ -1,5 +1,6 @@
 defmodule Eigr.Functions.Protocol.Actors.Kind do
   @moduledoc false
+
   use Protobuf, enum: true, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   def descriptor do
@@ -36,6 +37,12 @@ defmodule Eigr.Functions.Protocol.Actors.Kind do
           number: 4,
           options: nil,
           __unknown_fields__: []
+        },
+        %Google.Protobuf.EnumValueDescriptorProto{
+          name: "PROJECTION",
+          number: 5,
+          options: nil,
+          __unknown_fields__: []
         }
       ],
       options: nil,
@@ -50,10 +57,12 @@ defmodule Eigr.Functions.Protocol.Actors.Kind do
   field(:UNNAMED, 2)
   field(:POOLED, 3)
   field(:PROXY, 4)
+  field(:PROJECTION, 5)
 end
 
 defmodule Eigr.Functions.Protocol.Actors.Registry.ActorsEntry do
   @moduledoc false
+
   use Protobuf, map: true, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   def descriptor do
@@ -100,7 +109,6 @@ defmodule Eigr.Functions.Protocol.Actors.Registry.ActorsEntry do
         deprecated: false,
         map_entry: true,
         deprecated_legacy_json_field_conflicts: nil,
-        # features: nil,
         uninterpreted_option: [],
         __pb_extensions__: %{},
         __unknown_fields__: []
@@ -118,6 +126,7 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.Registry do
   @moduledoc false
+
   use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   def descriptor do
@@ -183,7 +192,6 @@ defmodule Eigr.Functions.Protocol.Actors.Registry do
             deprecated: false,
             map_entry: true,
             deprecated_legacy_json_field_conflicts: nil,
-            # features: nil,
             uninterpreted_option: [],
             __pb_extensions__: %{},
             __unknown_fields__: []
@@ -214,6 +222,7 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.ActorSystem do
   @moduledoc false
+
   use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   def descriptor do
@@ -268,6 +277,7 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.ActorSnapshotStrategy do
   @moduledoc false
+
   use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   def descriptor do
@@ -315,6 +325,7 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.ActorDeactivationStrategy do
   @moduledoc false
+
   use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   def descriptor do
@@ -362,6 +373,7 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.TimeoutStrategy do
   @moduledoc false
+
   use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   def descriptor do
@@ -401,6 +413,7 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.Action do
   @moduledoc false
+
   use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   def descriptor do
@@ -440,6 +453,7 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.FixedTimerAction do
   @moduledoc false
+
   use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   def descriptor do
@@ -494,6 +508,7 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.ActorState.TagsEntry do
   @moduledoc false
+
   use Protobuf, map: true, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   def descriptor do
@@ -540,7 +555,6 @@ defmodule Eigr.Functions.Protocol.Actors.ActorState.TagsEntry do
         deprecated: false,
         map_entry: true,
         deprecated_legacy_json_field_conflicts: nil,
-        # features: nil,
         uninterpreted_option: [],
         __pb_extensions__: %{},
         __unknown_fields__: []
@@ -558,6 +572,7 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.ActorState do
   @moduledoc false
+
   use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   def descriptor do
@@ -637,7 +652,6 @@ defmodule Eigr.Functions.Protocol.Actors.ActorState do
             deprecated: false,
             map_entry: true,
             deprecated_legacy_json_field_conflicts: nil,
-            # features: nil,
             uninterpreted_option: [],
             __pb_extensions__: %{},
             __unknown_fields__: []
@@ -670,6 +684,7 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.Metadata.TagsEntry do
   @moduledoc false
+
   use Protobuf, map: true, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   def descriptor do
@@ -716,7 +731,6 @@ defmodule Eigr.Functions.Protocol.Actors.Metadata.TagsEntry do
         deprecated: false,
         map_entry: true,
         deprecated_legacy_json_field_conflicts: nil,
-        # features: nil,
         uninterpreted_option: [],
         __pb_extensions__: %{},
         __unknown_fields__: []
@@ -734,6 +748,7 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.Metadata do
   @moduledoc false
+
   use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   def descriptor do
@@ -813,7 +828,6 @@ defmodule Eigr.Functions.Protocol.Actors.Metadata do
             deprecated: false,
             map_entry: true,
             deprecated_legacy_json_field_conflicts: nil,
-            # features: nil,
             uninterpreted_option: [],
             __pb_extensions__: %{},
             __unknown_fields__: []
@@ -850,6 +864,7 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.Channel do
   @moduledoc false
+
   use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   def descriptor do
@@ -902,8 +917,261 @@ defmodule Eigr.Functions.Protocol.Actors.Channel do
   field(:action, 2, type: :string)
 end
 
+defmodule Eigr.Functions.Protocol.Actors.ProjectionSubject do
+  @moduledoc false
+
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
+
+  def descriptor do
+    # credo:disable-for-next-line
+    %Google.Protobuf.DescriptorProto{
+      name: "ProjectionSubject",
+      field: [
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "actor",
+          extendee: nil,
+          number: 1,
+          label: :LABEL_OPTIONAL,
+          type: :TYPE_STRING,
+          type_name: nil,
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "actor",
+          proto3_optional: nil,
+          __unknown_fields__: []
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "action",
+          extendee: nil,
+          number: 2,
+          label: :LABEL_OPTIONAL,
+          type: :TYPE_STRING,
+          type_name: nil,
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "action",
+          proto3_optional: nil,
+          __unknown_fields__: []
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "start_time",
+          extendee: nil,
+          number: 3,
+          label: :LABEL_OPTIONAL,
+          type: :TYPE_MESSAGE,
+          type_name: ".google.protobuf.Timestamp",
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "startTime",
+          proto3_optional: nil,
+          __unknown_fields__: []
+        }
+      ],
+      nested_type: [],
+      enum_type: [],
+      extension_range: [],
+      extension: [],
+      options: nil,
+      oneof_decl: [],
+      reserved_range: [],
+      reserved_name: [],
+      __unknown_fields__: []
+    }
+  end
+
+  field(:actor, 1, type: :string)
+  field(:action, 2, type: :string)
+  field(:start_time, 3, type: Google.Protobuf.Timestamp, json_name: "startTime")
+end
+
+defmodule Eigr.Functions.Protocol.Actors.EventsRetentionTime do
+  @moduledoc false
+
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
+
+  def descriptor do
+    # credo:disable-for-next-line
+    %Google.Protobuf.DescriptorProto{
+      name: "EventsRetentionTime",
+      field: [
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "time",
+          extendee: nil,
+          number: 1,
+          label: :LABEL_OPTIONAL,
+          type: :TYPE_INT64,
+          type_name: nil,
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "time",
+          proto3_optional: nil,
+          __unknown_fields__: []
+        }
+      ],
+      nested_type: [],
+      enum_type: [],
+      extension_range: [],
+      extension: [],
+      options: nil,
+      oneof_decl: [],
+      reserved_range: [],
+      reserved_name: [],
+      __unknown_fields__: []
+    }
+  end
+
+  field(:time, 1, type: :int64)
+end
+
+defmodule Eigr.Functions.Protocol.Actors.EventsRetentionStrategy do
+  @moduledoc false
+
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
+
+  def descriptor do
+    # credo:disable-for-next-line
+    %Google.Protobuf.DescriptorProto{
+      name: "EventsRetentionStrategy",
+      field: [
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "time_in_ms",
+          extendee: nil,
+          number: 1,
+          label: :LABEL_OPTIONAL,
+          type: :TYPE_MESSAGE,
+          type_name: ".eigr.functions.protocol.actors.EventsRetentionTime",
+          default_value: nil,
+          options: nil,
+          oneof_index: 0,
+          json_name: "timeInMs",
+          proto3_optional: nil,
+          __unknown_fields__: []
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "infinite",
+          extendee: nil,
+          number: 2,
+          label: :LABEL_OPTIONAL,
+          type: :TYPE_BOOL,
+          type_name: nil,
+          default_value: nil,
+          options: nil,
+          oneof_index: 0,
+          json_name: "infinite",
+          proto3_optional: nil,
+          __unknown_fields__: []
+        }
+      ],
+      nested_type: [],
+      enum_type: [],
+      extension_range: [],
+      extension: [],
+      options: nil,
+      oneof_decl: [
+        %Google.Protobuf.OneofDescriptorProto{
+          name: "strategy",
+          options: nil,
+          __unknown_fields__: []
+        }
+      ],
+      reserved_range: [],
+      reserved_name: [],
+      __unknown_fields__: []
+    }
+  end
+
+  oneof(:strategy, 0)
+
+  field(:time_in_ms, 1,
+    type: Eigr.Functions.Protocol.Actors.EventsRetentionTime,
+    json_name: "timeInMs",
+    oneof: 0
+  )
+
+  field(:infinite, 2, type: :bool, oneof: 0)
+end
+
+defmodule Eigr.Functions.Protocol.Actors.EventSourceSettings do
+  @moduledoc false
+
+  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
+
+  def descriptor do
+    # credo:disable-for-next-line
+    %Google.Protobuf.DescriptorProto{
+      name: "EventSourceSettings",
+      field: [
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "subjects",
+          extendee: nil,
+          number: 1,
+          label: :LABEL_REPEATED,
+          type: :TYPE_MESSAGE,
+          type_name: ".eigr.functions.protocol.actors.ProjectionSubject",
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "subjects",
+          proto3_optional: nil,
+          __unknown_fields__: []
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "sourceable",
+          extendee: nil,
+          number: 2,
+          label: :LABEL_OPTIONAL,
+          type: :TYPE_BOOL,
+          type_name: nil,
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "sourceable",
+          proto3_optional: nil,
+          __unknown_fields__: []
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "events_retention_strategy",
+          extendee: nil,
+          number: 3,
+          label: :LABEL_OPTIONAL,
+          type: :TYPE_MESSAGE,
+          type_name: ".eigr.functions.protocol.actors.EventsRetentionStrategy",
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "eventsRetentionStrategy",
+          proto3_optional: nil,
+          __unknown_fields__: []
+        }
+      ],
+      nested_type: [],
+      enum_type: [],
+      extension_range: [],
+      extension: [],
+      options: nil,
+      oneof_decl: [],
+      reserved_range: [],
+      reserved_name: [],
+      __unknown_fields__: []
+    }
+  end
+
+  field(:subjects, 1, repeated: true, type: Eigr.Functions.Protocol.Actors.ProjectionSubject)
+  field(:sourceable, 2, type: :bool)
+
+  field(:events_retention_strategy, 3,
+    type: Eigr.Functions.Protocol.Actors.EventsRetentionStrategy,
+    json_name: "eventsRetentionStrategy"
+  )
+end
+
 defmodule Eigr.Functions.Protocol.Actors.ActorSettings do
   @moduledoc false
+
   use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   def descriptor do
@@ -994,6 +1262,20 @@ defmodule Eigr.Functions.Protocol.Actors.ActorSettings do
           json_name: "maxPoolSize",
           proto3_optional: nil,
           __unknown_fields__: []
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "event_source",
+          extendee: nil,
+          number: 7,
+          label: :LABEL_OPTIONAL,
+          type: :TYPE_MESSAGE,
+          type_name: ".eigr.functions.protocol.actors.EventSourceSettings",
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "eventSource",
+          proto3_optional: nil,
+          __unknown_fields__: []
         }
       ],
       nested_type: [],
@@ -1023,10 +1305,16 @@ defmodule Eigr.Functions.Protocol.Actors.ActorSettings do
 
   field(:min_pool_size, 5, type: :int32, json_name: "minPoolSize")
   field(:max_pool_size, 6, type: :int32, json_name: "maxPoolSize")
+
+  field(:event_source, 7,
+    type: Eigr.Functions.Protocol.Actors.EventSourceSettings,
+    json_name: "eventSource"
+  )
 end
 
 defmodule Eigr.Functions.Protocol.Actors.ActorId do
   @moduledoc false
+
   use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   def descriptor do
@@ -1096,6 +1384,7 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.Actor do
   @moduledoc false
+
   use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
 
   def descriptor do

@@ -89,8 +89,10 @@ defmodule Spawn.MixProject do
       {:phoenix_pubsub_nats, "~> 0.2"},
       {:jason, "~> 1.3"},
       {:gnat, "~> 1.7"},
+      {:jetstream, "~> 0.0.9"},
       {:k8s, "~> 2.2"},
       {:k8s_webhoox, "~> 0.2"},
+      {:broadway, "~> 1.1"},
       # temporary until bandit releases 1.5.4
       {:hpax, "~> 0.1.1"},
       # Metrics & Tracing deps
