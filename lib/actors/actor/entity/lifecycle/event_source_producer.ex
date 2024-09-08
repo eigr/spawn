@@ -33,7 +33,8 @@ defmodule Actors.Actor.Entity.Lifecycle.EventSourceProducer do
       batchers: [
         default: [
           concurrency: 1,
-          batch_size: 10_000,
+          # Avoi big batches, micro batches is better
+          batch_size: 10,
           batch_timeout: 2_000
         ]
       ]
