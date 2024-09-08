@@ -146,6 +146,9 @@ message EventSourceSettings {
     
     // The strategy for event store retention 
     EventsRetentionStrategy events_retention_strategy = 3;
+
+    // Define how we consume events from subjects
+    bool strict_events_ordering = 4;
 }
 
 message ActorSettings {

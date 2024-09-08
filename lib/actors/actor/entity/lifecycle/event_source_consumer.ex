@@ -1,4 +1,4 @@
-defmodule Actors.Actor.Entity.Lifecycle.EventSourceProducer do
+defmodule Actors.Actor.Entity.Lifecycle.EventSourceConsumer do
   @moduledoc false
   use Broadway
 
@@ -6,9 +6,10 @@ defmodule Actors.Actor.Entity.Lifecycle.EventSourceProducer do
   alias Spawn.Utils.Nats
 
   @type opts :: %{
-          projection_pid: pid(),
-          actor_name: String.t()
-        }
+    projection_pid: pid(),
+    actor_name: String.t(),
+    strict_ordering: boolean()
+  }
 
   @spec start_link(opts :: opts()) :: :ignore | {:error, any} | {:ok, pid}
   def start_link(opts) do
@@ -23,16 +24,14 @@ defmodule Actors.Actor.Entity.Lifecycle.EventSourceProducer do
           stream_name: opts.actor_name,
           consumer_name: opts.actor_name
         },
-        # Projects are like long-lasting threads and therefore concurrency should be avoided
-        # if the intention is to have some notion of ordering.
-        concurrency: 1
+        concurrency: build_concurrency(opts)
       ],
       processors: [
-        default: [concurrency: 1]
+        default: [concurrency: build_concurrency(opts)]
       ],
       batchers: [
         default: [
-          concurrency: 1,
+          concurrency: build_concurrency(opts),
           # Avoi big batches, micro batches is better
           batch_size: 10,
           batch_timeout: 2_000
@@ -53,4 +52,9 @@ defmodule Actors.Actor.Entity.Lifecycle.EventSourceProducer do
 
     messages
   end
+
+  # Projections are like long-lasting threads and therefore concurrency should be avoided
+  # if the intention is to have some notion of ordering.
+  defp build_concurrency(%{strict_ordering: true}), do: 1
+  defp build_concurrency(%{strict_ordering: false}), do: 15
 end

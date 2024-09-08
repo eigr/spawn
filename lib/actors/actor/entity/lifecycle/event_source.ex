@@ -14,6 +14,7 @@ defmodule Actors.Actor.Entity.Lifecycle.EventSource do
 
   @stream_not_found_code 10059
   @consumer_not_found_code 10014
+  @one_day_in_ms 24 * 60 * 60 * 1000
 
   def init_projection_actor(%Actor{} = actor) do
     :ok =
@@ -32,7 +33,11 @@ defmodule Actors.Actor.Entity.Lifecycle.EventSource do
       })
 
     {:ok, _pid} =
-      EventSourceProducer.start_link(%{actor_name: actor.id.name, projection_pid: self()})
+      EventSourceConsumer.start_link(%{
+        actor_name: actor.id.name,
+        projection_pid: self(),
+        strict_ordering: actor.settings.event_source.strict_events_ordering
+      })
 
     :ok
   end
@@ -91,10 +96,9 @@ defmodule Actors.Actor.Entity.Lifecycle.EventSource do
   end
 
   defp build_stream_max_age(%EventSourceSettings{} = settings) do
-    case settings.events_retention_strategy do
-      :infinite -> 0
-      # ms to ns
-      max_age -> max_age * 1_000_000
+    case Map.get(settings.events_retention_strategy, :strategy, {:time_in_ms, @one_day_in_ms}) do
+      {:infinite, true} -> 0
+      {:time_in_ms, max_age} -> max_age * 1_000_000 # ms to ns
     end
   end
 end

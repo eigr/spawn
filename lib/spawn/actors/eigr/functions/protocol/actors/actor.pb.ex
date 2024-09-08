@@ -52,12 +52,12 @@ defmodule Eigr.Functions.Protocol.Actors.Kind do
     }
   end
 
-  field(:UNKNOW_KIND, 0)
-  field(:NAMED, 1)
-  field(:UNNAMED, 2)
-  field(:POOLED, 3)
-  field(:PROXY, 4)
-  field(:PROJECTION, 5)
+  field :UNKNOW_KIND, 0
+  field :NAMED, 1
+  field :UNNAMED, 2
+  field :POOLED, 3
+  field :PROXY, 4
+  field :PROJECTION, 5
 end
 
 defmodule Eigr.Functions.Protocol.Actors.Registry.ActorsEntry do
@@ -120,8 +120,8 @@ defmodule Eigr.Functions.Protocol.Actors.Registry.ActorsEntry do
     }
   end
 
-  field(:key, 1, type: :string)
-  field(:value, 2, type: Eigr.Functions.Protocol.Actors.Actor)
+  field :key, 1, type: :string
+  field :value, 2, type: Eigr.Functions.Protocol.Actors.Actor
 end
 
 defmodule Eigr.Functions.Protocol.Actors.Registry do
@@ -213,11 +213,10 @@ defmodule Eigr.Functions.Protocol.Actors.Registry do
     }
   end
 
-  field(:actors, 1,
+  field :actors, 1,
     repeated: true,
     type: Eigr.Functions.Protocol.Actors.Registry.ActorsEntry,
     map: true
-  )
 end
 
 defmodule Eigr.Functions.Protocol.Actors.ActorSystem do
@@ -271,8 +270,8 @@ defmodule Eigr.Functions.Protocol.Actors.ActorSystem do
     }
   end
 
-  field(:name, 1, type: :string)
-  field(:registry, 2, type: Eigr.Functions.Protocol.Actors.Registry)
+  field :name, 1, type: :string
+  field :registry, 2, type: Eigr.Functions.Protocol.Actors.Registry
 end
 
 defmodule Eigr.Functions.Protocol.Actors.ActorSnapshotStrategy do
@@ -318,9 +317,9 @@ defmodule Eigr.Functions.Protocol.Actors.ActorSnapshotStrategy do
     }
   end
 
-  oneof(:strategy, 0)
+  oneof :strategy, 0
 
-  field(:timeout, 1, type: Eigr.Functions.Protocol.Actors.TimeoutStrategy, oneof: 0)
+  field :timeout, 1, type: Eigr.Functions.Protocol.Actors.TimeoutStrategy, oneof: 0
 end
 
 defmodule Eigr.Functions.Protocol.Actors.ActorDeactivationStrategy do
@@ -366,9 +365,9 @@ defmodule Eigr.Functions.Protocol.Actors.ActorDeactivationStrategy do
     }
   end
 
-  oneof(:strategy, 0)
+  oneof :strategy, 0
 
-  field(:timeout, 1, type: Eigr.Functions.Protocol.Actors.TimeoutStrategy, oneof: 0)
+  field :timeout, 1, type: Eigr.Functions.Protocol.Actors.TimeoutStrategy, oneof: 0
 end
 
 defmodule Eigr.Functions.Protocol.Actors.TimeoutStrategy do
@@ -408,7 +407,7 @@ defmodule Eigr.Functions.Protocol.Actors.TimeoutStrategy do
     }
   end
 
-  field(:timeout, 1, type: :int64)
+  field :timeout, 1, type: :int64
 end
 
 defmodule Eigr.Functions.Protocol.Actors.Action do
@@ -448,7 +447,7 @@ defmodule Eigr.Functions.Protocol.Actors.Action do
     }
   end
 
-  field(:name, 1, type: :string)
+  field :name, 1, type: :string
 end
 
 defmodule Eigr.Functions.Protocol.Actors.FixedTimerAction do
@@ -502,8 +501,8 @@ defmodule Eigr.Functions.Protocol.Actors.FixedTimerAction do
     }
   end
 
-  field(:seconds, 1, type: :int32)
-  field(:action, 2, type: Eigr.Functions.Protocol.Actors.Action)
+  field :seconds, 1, type: :int32
+  field :action, 2, type: Eigr.Functions.Protocol.Actors.Action
 end
 
 defmodule Eigr.Functions.Protocol.Actors.ActorState.TagsEntry do
@@ -566,8 +565,8 @@ defmodule Eigr.Functions.Protocol.Actors.ActorState.TagsEntry do
     }
   end
 
-  field(:key, 1, type: :string)
-  field(:value, 2, type: :string)
+  field :key, 1, type: :string
+  field :value, 2, type: :string
 end
 
 defmodule Eigr.Functions.Protocol.Actors.ActorState do
@@ -673,13 +672,12 @@ defmodule Eigr.Functions.Protocol.Actors.ActorState do
     }
   end
 
-  field(:tags, 1,
+  field :tags, 1,
     repeated: true,
     type: Eigr.Functions.Protocol.Actors.ActorState.TagsEntry,
     map: true
-  )
 
-  field(:state, 2, type: Google.Protobuf.Any)
+  field :state, 2, type: Google.Protobuf.Any
 end
 
 defmodule Eigr.Functions.Protocol.Actors.Metadata.TagsEntry do
@@ -742,8 +740,8 @@ defmodule Eigr.Functions.Protocol.Actors.Metadata.TagsEntry do
     }
   end
 
-  field(:key, 1, type: :string)
-  field(:value, 2, type: :string)
+  field :key, 1, type: :string
+  field :value, 2, type: :string
 end
 
 defmodule Eigr.Functions.Protocol.Actors.Metadata do
@@ -849,17 +847,15 @@ defmodule Eigr.Functions.Protocol.Actors.Metadata do
     }
   end
 
-  field(:channel_group, 1,
+  field :channel_group, 1,
     repeated: true,
     type: Eigr.Functions.Protocol.Actors.Channel,
     json_name: "channelGroup"
-  )
 
-  field(:tags, 2,
+  field :tags, 2,
     repeated: true,
     type: Eigr.Functions.Protocol.Actors.Metadata.TagsEntry,
     map: true
-  )
 end
 
 defmodule Eigr.Functions.Protocol.Actors.Channel do
@@ -913,8 +909,8 @@ defmodule Eigr.Functions.Protocol.Actors.Channel do
     }
   end
 
-  field(:topic, 1, type: :string)
-  field(:action, 2, type: :string)
+  field :topic, 1, type: :string
+  field :action, 2, type: :string
 end
 
 defmodule Eigr.Functions.Protocol.Actors.ProjectionSubject do
@@ -982,9 +978,9 @@ defmodule Eigr.Functions.Protocol.Actors.ProjectionSubject do
     }
   end
 
-  field(:actor, 1, type: :string)
-  field(:action, 2, type: :string)
-  field(:start_time, 3, type: Google.Protobuf.Timestamp, json_name: "startTime")
+  field :actor, 1, type: :string
+  field :action, 2, type: :string
+  field :start_time, 3, type: Google.Protobuf.Timestamp, json_name: "startTime"
 end
 
 defmodule Eigr.Functions.Protocol.Actors.EventsRetentionTime do
@@ -1024,7 +1020,7 @@ defmodule Eigr.Functions.Protocol.Actors.EventsRetentionTime do
     }
   end
 
-  field(:time, 1, type: :int64)
+  field :time, 1, type: :int64
 end
 
 defmodule Eigr.Functions.Protocol.Actors.EventsRetentionStrategy do
@@ -1084,15 +1080,14 @@ defmodule Eigr.Functions.Protocol.Actors.EventsRetentionStrategy do
     }
   end
 
-  oneof(:strategy, 0)
+  oneof :strategy, 0
 
-  field(:time_in_ms, 1,
+  field :time_in_ms, 1,
     type: Eigr.Functions.Protocol.Actors.EventsRetentionTime,
     json_name: "timeInMs",
     oneof: 0
-  )
 
-  field(:infinite, 2, type: :bool, oneof: 0)
+  field :infinite, 2, type: :bool, oneof: 0
 end
 
 defmodule Eigr.Functions.Protocol.Actors.EventSourceSettings do
@@ -1146,6 +1141,20 @@ defmodule Eigr.Functions.Protocol.Actors.EventSourceSettings do
           json_name: "eventsRetentionStrategy",
           proto3_optional: nil,
           __unknown_fields__: []
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "strict_events_ordering",
+          extendee: nil,
+          number: 4,
+          label: :LABEL_OPTIONAL,
+          type: :TYPE_BOOL,
+          type_name: nil,
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "strictEventsOrdering",
+          proto3_optional: nil,
+          __unknown_fields__: []
         }
       ],
       nested_type: [],
@@ -1160,13 +1169,14 @@ defmodule Eigr.Functions.Protocol.Actors.EventSourceSettings do
     }
   end
 
-  field(:subjects, 1, repeated: true, type: Eigr.Functions.Protocol.Actors.ProjectionSubject)
-  field(:sourceable, 2, type: :bool)
+  field :subjects, 1, repeated: true, type: Eigr.Functions.Protocol.Actors.ProjectionSubject
+  field :sourceable, 2, type: :bool
 
-  field(:events_retention_strategy, 3,
+  field :events_retention_strategy, 3,
     type: Eigr.Functions.Protocol.Actors.EventsRetentionStrategy,
     json_name: "eventsRetentionStrategy"
-  )
+
+  field :strict_events_ordering, 4, type: :bool, json_name: "strictEventsOrdering"
 end
 
 defmodule Eigr.Functions.Protocol.Actors.ActorSettings do
@@ -1290,26 +1300,23 @@ defmodule Eigr.Functions.Protocol.Actors.ActorSettings do
     }
   end
 
-  field(:kind, 1, type: Eigr.Functions.Protocol.Actors.Kind, enum: true)
-  field(:stateful, 2, type: :bool)
+  field :kind, 1, type: Eigr.Functions.Protocol.Actors.Kind, enum: true
+  field :stateful, 2, type: :bool
 
-  field(:snapshot_strategy, 3,
+  field :snapshot_strategy, 3,
     type: Eigr.Functions.Protocol.Actors.ActorSnapshotStrategy,
     json_name: "snapshotStrategy"
-  )
 
-  field(:deactivation_strategy, 4,
+  field :deactivation_strategy, 4,
     type: Eigr.Functions.Protocol.Actors.ActorDeactivationStrategy,
     json_name: "deactivationStrategy"
-  )
 
-  field(:min_pool_size, 5, type: :int32, json_name: "minPoolSize")
-  field(:max_pool_size, 6, type: :int32, json_name: "maxPoolSize")
+  field :min_pool_size, 5, type: :int32, json_name: "minPoolSize"
+  field :max_pool_size, 6, type: :int32, json_name: "maxPoolSize"
 
-  field(:event_source, 7,
+  field :event_source, 7,
     type: Eigr.Functions.Protocol.Actors.EventSourceSettings,
     json_name: "eventSource"
-  )
 end
 
 defmodule Eigr.Functions.Protocol.Actors.ActorId do
@@ -1377,9 +1384,9 @@ defmodule Eigr.Functions.Protocol.Actors.ActorId do
     }
   end
 
-  field(:name, 1, type: :string)
-  field(:system, 2, type: :string)
-  field(:parent, 3, type: :string)
+  field :name, 1, type: :string
+  field :system, 2, type: :string
+  field :parent, 3, type: :string
 end
 
 defmodule Eigr.Functions.Protocol.Actors.Actor do
@@ -1489,15 +1496,14 @@ defmodule Eigr.Functions.Protocol.Actors.Actor do
     }
   end
 
-  field(:id, 1, type: Eigr.Functions.Protocol.Actors.ActorId)
-  field(:state, 2, type: Eigr.Functions.Protocol.Actors.ActorState)
-  field(:metadata, 6, type: Eigr.Functions.Protocol.Actors.Metadata)
-  field(:settings, 3, type: Eigr.Functions.Protocol.Actors.ActorSettings)
-  field(:actions, 4, repeated: true, type: Eigr.Functions.Protocol.Actors.Action)
+  field :id, 1, type: Eigr.Functions.Protocol.Actors.ActorId
+  field :state, 2, type: Eigr.Functions.Protocol.Actors.ActorState
+  field :metadata, 6, type: Eigr.Functions.Protocol.Actors.Metadata
+  field :settings, 3, type: Eigr.Functions.Protocol.Actors.ActorSettings
+  field :actions, 4, repeated: true, type: Eigr.Functions.Protocol.Actors.Action
 
-  field(:timer_actions, 5,
+  field :timer_actions, 5,
     repeated: true,
     type: Eigr.Functions.Protocol.Actors.FixedTimerAction,
     json_name: "timerActions"
-  )
 end
