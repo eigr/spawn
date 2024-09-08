@@ -289,7 +289,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
   end
 
   defp handle_projection(
-         %Actor{settings: %ActorSettings{kind: kind, event_source: %{sourceable: true}}} = actor
+         %Actor{settings: %ActorSettings{kind: kind, projection_settings: %{sourceable: true}}} = actor
        )
        when kind in [:NAMED, :UNNAMED] do
     StreamInitiator.init_sourceable_actor(actor)

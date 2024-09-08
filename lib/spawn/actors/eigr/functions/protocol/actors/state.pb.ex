@@ -1,6 +1,6 @@
 defmodule Eigr.Functions.Protocol.State.Revision do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
+  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
 
   def descriptor do
     # credo:disable-for-next-line
@@ -34,12 +34,12 @@ defmodule Eigr.Functions.Protocol.State.Revision do
     }
   end
 
-  field(:value, 1, type: :int64)
+  field :value, 1, type: :int64
 end
 
 defmodule Eigr.Functions.Protocol.State.Checkpoint do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
+  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
 
   def descriptor do
     # credo:disable-for-next-line
@@ -87,6 +87,6 @@ defmodule Eigr.Functions.Protocol.State.Checkpoint do
     }
   end
 
-  field(:revision, 1, type: Eigr.Functions.Protocol.State.Revision)
-  field(:state, 2, type: Eigr.Functions.Protocol.Actors.ActorState)
+  field :revision, 1, type: Eigr.Functions.Protocol.State.Revision
+  field :state, 2, type: Eigr.Functions.Protocol.Actors.ActorState
 end

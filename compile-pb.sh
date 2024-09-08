@@ -4,7 +4,7 @@ set -o nounset
 set -o errexit
 set -o pipefail
 
-protoc --elixir_out=gen_descriptors=true,plugins=grpc:./lib/spawn/grpc --proto_path=priv/protos/grpc/ priv/protos/grpc/reflection/v1alpha/reflection.proto
+#protoc --elixir_out=gen_descriptors=true,plugins=grpc:./lib/spawn/grpc --proto_path=priv/protos/grpc/ priv/protos/grpc/reflection/v1alpha/reflection.proto
 
 # protoc --elixir_out=gen_descriptors=true:./lib/spawn/google/protobuf --proto_path=priv/protos/google/protobuf priv/protos/google/protobuf/any.proto
 # protoc --elixir_out=gen_descriptors=true:./lib/spawn/google/protobuf --proto_path=priv/protos/google/protobuf priv/protos/google/protobuf/empty.proto
@@ -48,7 +48,7 @@ for file in $PROTOS; do
     --include-path=$BASE_PATH/priv/protos/ \
     --include-path=./priv/protos/google/protobuf \
     --include-path=./priv/protos/google/api \
-    --plugins=ProtobufGenerate.Plugins.GRPCWithOptions \
+    --plugin=ProtobufGenerate.Plugins.GRPCWithOptions \
     --one-file-per-module \
     $BASE_PATH/$file
 done

@@ -1,7 +1,6 @@
 defmodule Eigr.Functions.Protocol.Actors.Kind do
   @moduledoc false
-
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
+  use Protobuf, enum: true, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
 
   def descriptor do
     # credo:disable-for-next-line
@@ -62,8 +61,7 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.Registry.ActorsEntry do
   @moduledoc false
-
-  use Protobuf, map: true, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
+  use Protobuf, map: true, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
 
   def descriptor do
     # credo:disable-for-next-line
@@ -126,8 +124,7 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.Registry do
   @moduledoc false
-
-  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
+  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
 
   def descriptor do
     # credo:disable-for-next-line
@@ -221,8 +218,7 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.ActorSystem do
   @moduledoc false
-
-  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
+  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
 
   def descriptor do
     # credo:disable-for-next-line
@@ -276,8 +272,7 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.ActorSnapshotStrategy do
   @moduledoc false
-
-  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
+  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
 
   def descriptor do
     # credo:disable-for-next-line
@@ -324,8 +319,7 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.ActorDeactivationStrategy do
   @moduledoc false
-
-  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
+  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
 
   def descriptor do
     # credo:disable-for-next-line
@@ -372,8 +366,7 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.TimeoutStrategy do
   @moduledoc false
-
-  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
+  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
 
   def descriptor do
     # credo:disable-for-next-line
@@ -412,8 +405,7 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.Action do
   @moduledoc false
-
-  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
+  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
 
   def descriptor do
     # credo:disable-for-next-line
@@ -452,8 +444,7 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.FixedTimerAction do
   @moduledoc false
-
-  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
+  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
 
   def descriptor do
     # credo:disable-for-next-line
@@ -507,8 +498,7 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.ActorState.TagsEntry do
   @moduledoc false
-
-  use Protobuf, map: true, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
+  use Protobuf, map: true, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
 
   def descriptor do
     # credo:disable-for-next-line
@@ -571,8 +561,7 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.ActorState do
   @moduledoc false
-
-  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
+  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
 
   def descriptor do
     # credo:disable-for-next-line
@@ -682,8 +671,7 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.Metadata.TagsEntry do
   @moduledoc false
-
-  use Protobuf, map: true, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
+  use Protobuf, map: true, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
 
   def descriptor do
     # credo:disable-for-next-line
@@ -746,8 +734,7 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.Metadata do
   @moduledoc false
-
-  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
+  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
 
   def descriptor do
     # credo:disable-for-next-line
@@ -860,8 +847,7 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.Channel do
   @moduledoc false
-
-  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
+  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
 
   def descriptor do
     # credo:disable-for-next-line
@@ -915,8 +901,7 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.ProjectionSubject do
   @moduledoc false
-
-  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
+  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
 
   def descriptor do
     # credo:disable-for-next-line
@@ -985,8 +970,7 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.EventsRetentionTime do
   @moduledoc false
-
-  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
+  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
 
   def descriptor do
     # credo:disable-for-next-line
@@ -1025,8 +1009,7 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.EventsRetentionStrategy do
   @moduledoc false
-
-  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
+  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
 
   def descriptor do
     # credo:disable-for-next-line
@@ -1090,15 +1073,14 @@ defmodule Eigr.Functions.Protocol.Actors.EventsRetentionStrategy do
   field :infinite, 2, type: :bool, oneof: 0
 end
 
-defmodule Eigr.Functions.Protocol.Actors.EventSourceSettings do
+defmodule Eigr.Functions.Protocol.Actors.ProjectionSettings do
   @moduledoc false
-
-  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
+  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
 
   def descriptor do
     # credo:disable-for-next-line
     %Google.Protobuf.DescriptorProto{
-      name: "EventSourceSettings",
+      name: "ProjectionSettings",
       field: [
         %Google.Protobuf.FieldDescriptorProto{
           name: "subjects",
@@ -1181,8 +1163,7 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.ActorSettings do
   @moduledoc false
-
-  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
+  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
 
   def descriptor do
     # credo:disable-for-next-line
@@ -1274,16 +1255,16 @@ defmodule Eigr.Functions.Protocol.Actors.ActorSettings do
           __unknown_fields__: []
         },
         %Google.Protobuf.FieldDescriptorProto{
-          name: "event_source",
+          name: "projection_settings",
           extendee: nil,
           number: 7,
           label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.EventSourceSettings",
+          type_name: ".eigr.functions.protocol.actors.ProjectionSettings",
           default_value: nil,
           options: nil,
           oneof_index: nil,
-          json_name: "eventSource",
+          json_name: "projectionSettings",
           proto3_optional: nil,
           __unknown_fields__: []
         }
@@ -1314,15 +1295,14 @@ defmodule Eigr.Functions.Protocol.Actors.ActorSettings do
   field :min_pool_size, 5, type: :int32, json_name: "minPoolSize"
   field :max_pool_size, 6, type: :int32, json_name: "maxPoolSize"
 
-  field :event_source, 7,
-    type: Eigr.Functions.Protocol.Actors.EventSourceSettings,
-    json_name: "eventSource"
+  field :projection_settings, 7,
+    type: Eigr.Functions.Protocol.Actors.ProjectionSettings,
+    json_name: "projectionSettings"
 end
 
 defmodule Eigr.Functions.Protocol.Actors.ActorId do
   @moduledoc false
-
-  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
+  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
 
   def descriptor do
     # credo:disable-for-next-line
@@ -1391,8 +1371,7 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.Actor do
   @moduledoc false
-
-  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
+  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
 
   def descriptor do
     # credo:disable-for-next-line

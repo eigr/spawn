@@ -6,7 +6,7 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamInitiator do
   alias Actors.Actor.Entity.Lifecycle.StreamConsumer
 
   alias Eigr.Functions.Protocol.Actors.Actor
-  alias Eigr.Functions.Protocol.Actors.EventSourceSettings
+  alias Eigr.Functions.Protocol.Actors.ProjectionSettings
   alias Eigr.Functions.Protocol.Actors.ProjectionSubject
 
   alias Spawn.Utils.Nats
@@ -85,7 +85,7 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamInitiator do
 
   defp conn, do: Nats.connection_name()
 
-  defp build_sources(%EventSourceSettings{} = settings) do
+  defp build_sources(%ProjectionSettings{} = settings) do
     settings.subjects
     |> Enum.map(fn %ProjectionSubject{} = subject ->
       %{
@@ -96,7 +96,7 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamInitiator do
     end)
   end
 
-  defp build_stream_max_age(%EventSourceSettings{} = settings) do
+  defp build_stream_max_age(%ProjectionSettings{} = settings) do
     case Map.get(settings.events_retention_strategy, :strategy, {:time_in_ms, @one_day_in_ms}) do
       {:infinite, true} -> 0
       {:time_in_ms, max_age} -> max_age * 1_000_000 # ms to ns

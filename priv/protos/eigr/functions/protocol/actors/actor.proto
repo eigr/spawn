@@ -137,7 +137,7 @@ message EventsRetentionStrategy {
     }
 }
 
-message EventSourceSettings {
+message ProjectionSettings {
     // Define this for projections that need to listen to events
     repeated ProjectionSubject subjects = 1;
 
@@ -171,7 +171,7 @@ message ActorSettings {
     int32 max_pool_size = 6;
 
     // Event source settings
-    EventSourceSettings event_source = 7;
+    ProjectionSettings projection_settings = 7;
 }
 
 message ActorId {
