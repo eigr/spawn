@@ -99,7 +99,8 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamInitiator do
   defp build_stream_max_age(%ProjectionSettings{} = settings) do
     case Map.get(settings.events_retention_strategy, :strategy, {:time_in_ms, @one_day_in_ms}) do
       {:infinite, true} -> 0
-      {:time_in_ms, max_age} -> max_age * 1_000_000 # ms to ns
+      # ms to ns
+      {:time_in_ms, max_age} -> max_age * 1_000_000
     end
   end
 end

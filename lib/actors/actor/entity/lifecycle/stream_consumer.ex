@@ -6,10 +6,10 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamConsumer do
   alias Spawn.Utils.Nats
 
   @type opts :: %{
-    projection_pid: pid(),
-    actor_name: String.t(),
-    strict_ordering: boolean()
-  }
+          projection_pid: pid(),
+          actor_name: String.t(),
+          strict_ordering: boolean()
+        }
 
   @spec start_link(opts :: opts()) :: :ignore | {:error, any} | {:ok, pid}
   def start_link(opts) do
