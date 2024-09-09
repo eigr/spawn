@@ -296,6 +296,10 @@ defmodule Actors.Actor.Entity do
         Invocation.process_projection_events(events, state)
         |> reply_to_noreply()
 
+      {:replay, opts} ->
+        Invocation.replay(opts, state)
+        |> reply_to_noreply()
+
       action ->
         do_handle_cast(action, state)
     end

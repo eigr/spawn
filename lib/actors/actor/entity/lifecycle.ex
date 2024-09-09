@@ -35,18 +35,19 @@ defmodule Actors.Actor.Entity.Lifecycle do
   def init(
         %EntityState{
           system: system,
-          actor: %Actor{
-            id: %ActorId{name: name, parent: parent} = _id,
-            metadata: metadata,
-            settings:
-              %ActorSettings{
-                stateful: stateful?,
-                snapshot_strategy: snapshot_strategy,
-                deactivation_strategy: deactivation_strategy,
-                kind: kind
-              } = _settings,
-            timer_actions: timer_actions
-          } = actor
+          actor:
+            %Actor{
+              id: %ActorId{name: name, parent: parent} = _id,
+              metadata: metadata,
+              settings:
+                %ActorSettings{
+                  stateful: stateful?,
+                  snapshot_strategy: snapshot_strategy,
+                  deactivation_strategy: deactivation_strategy,
+                  kind: kind
+                } = _settings,
+              timer_actions: timer_actions
+            } = actor
         } = state
       ) do
     Process.flag(:trap_exit, true)

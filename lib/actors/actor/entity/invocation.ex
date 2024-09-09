@@ -6,13 +6,17 @@ defmodule Actors.Actor.Entity.Invocation do
   require Logger
   require OpenTelemetry.Tracer, as: Tracer
 
-  alias Actors.Actor.Entity.{EntityState, Lifecycle}
-  alias Actors.Exceptions.NotAuthorizedException
+  alias Actors.Actor.Entity.EntityState
+  alias Actors.Actor.Entity.Lifecycle
+  alias Actors.Actor.Entity.Lifecycle.StreamInitiator
   alias Actors.Actor.InvocationScheduler
+  alias Actors.Exceptions.NotAuthorizedException
+  alias Actors.Actor.Pubsub
 
   alias Eigr.Functions.Protocol.Actors.{
     Actor,
     ActorId,
+    ActorSettings,
     ActorSystem,
     ActorState,
     Action,
@@ -31,8 +35,6 @@ defmodule Actors.Actor.Entity.Invocation do
     Workflow,
     Noop
   }
-
-  alias Actors.Actor.Pubsub
 
   import Spawn.Utils.Common, only: [return_and_maybe_hibernate: 1]
 
@@ -71,6 +73,25 @@ defmodule Actors.Actor.Entity.Invocation do
       # do something with message
     end)
   end
+
+  def replay(
+        call_opts,
+        %EntityState{
+          actor:
+            %Actor{
+              settings:
+                %ActorSettings{
+                  kind: :PROJECTION
+                } = _settings
+            } = actor,
+          projection_stream_pid: stream_pid
+        } = state
+      ) do
+    {:ok, newpid} = StreamInitiator.replay(stream_pid, actor, call_opts)
+    {:noreply, %{state | projection_stream_pid: newpid}}
+  end
+
+  def replay(_replaymsg, _call_opts, state), do: {:noreply, state}
 
   def handle_timers([], _system, _actor), do: :ok
 
