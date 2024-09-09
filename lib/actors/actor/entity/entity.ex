@@ -419,6 +419,18 @@ defmodule Actors.Actor.Entity do
   end
 
   @doc """
+  When the Actor is a Projection the messages sent to the projection can be reprocessed.
+  See this for more information about this programming model
+  """
+  def replay(ref, opts) when is_pid(ref) do
+    GenServer.cast(ref, {:replay, opts})
+  end
+
+  def replay(ref, opts) do
+    GenServer.cast(via(ref), {:replay, opts})
+  end
+
+  @doc """
   Retrieve the health check readiness status.
   """
   @spec readiness(any, any) :: {:error, term()} | {:ok, term()}
