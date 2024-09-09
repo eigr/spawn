@@ -11,6 +11,7 @@ defmodule Actors.Actor.Entity.EntityState do
           actor: Actor.t(),
           state_hash: binary(),
           revision: number(),
+          projection_stream_pid: pid(),
           opts: Keyword.t()
         }
 

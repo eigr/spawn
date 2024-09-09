@@ -19,6 +19,7 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamInitiator do
   @consumer_not_found_code 10014
   @one_day_in_ms :timer.hours(24)
 
+  @spec init_projection_actor(module()) :: :ignore | {:error, any()} | {:ok, pid()}
   def init_projection_actor(%Actor{} = actor) do
     :ok =
       create_stream(%NatsStream{
@@ -35,14 +36,11 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamInitiator do
         deliver_policy: :all
       })
 
-    {:ok, _pid} =
-      StreamConsumer.start_link(%{
-        actor_name: actor.id.name,
-        projection_pid: self(),
-        strict_ordering: actor.settings.projection_settings.strict_events_ordering
-      })
-
-    :ok
+    StreamConsumer.start_link(%{
+      actor_name: actor.id.name,
+      projection_pid: self(),
+      strict_ordering: actor.settings.projection_settings.strict_events_ordering
+    })
   end
 
   def init_sourceable_actor(%Actor{} = actor) do

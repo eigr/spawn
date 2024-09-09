@@ -67,7 +67,6 @@ defmodule Actors.Actor.Entity.Lifecycle do
 
     :ok = handle_metadata(name, system, metadata)
     :ok = Invocation.handle_timers(timer_actions, system, state.actor)
-    :ok = handle_projection(state.actor)
 
     :ok =
       Spawn.Cluster.Node.Registry.update_entry_value(
@@ -88,7 +87,8 @@ defmodule Actors.Actor.Entity.Lifecycle do
                 Keyword.merge(state.opts,
                   timer: timer,
                   split_brain_detector: split_brain_detector_mod
-                )
+                ),
+              projection_stream_pid: maybe_init_projection(state.actor)
           }
 
         _ ->
@@ -97,7 +97,8 @@ defmodule Actors.Actor.Entity.Lifecycle do
             | opts:
                 Keyword.merge(state.opts,
                   split_brain_detector: split_brain_detector_mod
-                )
+                ),
+              projection_stream_pid: maybe_init_projection(state.actor)
           }
       end
 
@@ -283,6 +284,16 @@ defmodule Actors.Actor.Entity.Lifecycle do
   end
 
   # Private functions
+
+  defp maybe_init_projection(actor) do
+    case handle_projection(actor) do
+      {:ok, pid} when is_pid(pid) and Process.alive?(pid) ->
+        pid
+
+      _otherwise ->
+        nil
+    end
+  end
 
   defp handle_projection(%Actor{settings: %ActorSettings{kind: :PROJECTION}} = actor) do
     StreamInitiator.init_projection_actor(actor)

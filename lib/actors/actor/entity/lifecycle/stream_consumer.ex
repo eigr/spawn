@@ -11,7 +11,7 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamConsumer do
           strict_ordering: boolean()
         }
 
-  @spec start_link(opts :: opts()) :: :ignore | {:error, any} | {:ok, pid}
+  @spec start_link(opts :: opts()) :: :ignore | {:error, any()} | {:ok, pid()}
   def start_link(opts) do
     Broadway.start_link(
       __MODULE__,
