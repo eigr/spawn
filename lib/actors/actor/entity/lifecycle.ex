@@ -46,7 +46,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
                 kind: kind
               } = _settings,
             timer_actions: timer_actions
-          }
+          } = actor
         } = state
       ) do
     Process.flag(:trap_exit, true)
@@ -73,7 +73,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
         Actors.Actor.Entity,
         actor_name_key,
         self(),
-        state.actor.id
+        actor.id
       )
 
     schedule_deactivate(deactivation_strategy, get_jitter())
@@ -88,7 +88,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
                   timer: timer,
                   split_brain_detector: split_brain_detector_mod
                 ),
-              projection_stream_pid: maybe_init_projection(state.actor)
+              projection_stream_pid: maybe_init_projection(actor)
           }
 
         _ ->
@@ -98,7 +98,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
                 Keyword.merge(state.opts,
                   split_brain_detector: split_brain_detector_mod
                 ),
-              projection_stream_pid: maybe_init_projection(state.actor)
+              projection_stream_pid: maybe_init_projection(actor)
           }
       end
 
