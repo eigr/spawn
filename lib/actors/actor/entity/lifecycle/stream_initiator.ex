@@ -9,21 +9,23 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamInitiator do
   alias Eigr.Functions.Protocol.Actors.ProjectionSettings
   alias Eigr.Functions.Protocol.Actors.ProjectionSubject
 
+  alias Google.Protobuf.Timestamp
+
   alias Spawn.Utils.Nats
   alias Gnat.Jetstream.API.Stream, as: NatsStream
   alias Gnat.Jetstream.API.Consumer
 
   @stream_not_found_code 10059
   @consumer_not_found_code 10014
-  @one_day_in_ms 24 * 60 * 60 * 1000
+  @one_day_in_ms :timer.hours(24)
 
   def init_projection_actor(%Actor{} = actor) do
     :ok =
       create_stream(%NatsStream{
         name: actor.id.name,
         subjects: [],
-        sources: build_sources(actor.settings.event_source),
-        max_age: build_stream_max_age(actor.settings.event_source)
+        sources: build_sources(actor.settings.projection_settings),
+        max_age: build_stream_max_age(actor.settings.projection_settings)
       })
 
     :ok =
@@ -37,7 +39,7 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamInitiator do
       StreamConsumer.start_link(%{
         actor_name: actor.id.name,
         projection_pid: self(),
-        strict_ordering: actor.settings.event_source.strict_events_ordering
+        strict_ordering: actor.settings.projection_settings.strict_events_ordering
       })
 
     :ok
@@ -48,7 +50,7 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamInitiator do
       create_stream(%NatsStream{
         name: actor.id.name,
         subjects: ["actors.#{actor.id.name}.>"],
-        max_age: build_stream_max_age(actor.settings.event_source)
+        max_age: build_stream_max_age(actor.settings.projection_settings)
       })
 
     :ok
@@ -87,11 +89,11 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamInitiator do
 
   defp build_sources(%ProjectionSettings{} = settings) do
     settings.subjects
-    |> Enum.map(fn %ProjectionSubject{} = subject ->
+    |> Enum.map(fn %ProjectionSubject{start_time: %Timestamp{seconds: start_at}} = subject ->
       %{
         name: subject.actor,
         filter_subject: "actors.#{subject.actor}.*.#{subject.action}",
-        opt_start_time: subject.start_time
+        opt_start_time: start_at
       }
     end)
   end
