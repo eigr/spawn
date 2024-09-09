@@ -287,7 +287,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
 
   defp maybe_init_projection(actor) do
     case handle_projection(actor) do
-      {:ok, pid} when is_pid(pid) and Process.alive?(pid) ->
+      {:ok, pid} when is_pid(pid) && Process.alive?(pid) ->
         pid
 
       _otherwise ->
