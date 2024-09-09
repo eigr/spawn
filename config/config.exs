@@ -41,11 +41,6 @@ config :protobuf, extensions: :enabled
 
 config :opentelemetry, :resource, service: %{name: "spawn"}
 
-# config :opentelemetry,
-#   span_processor: :batch,
-#   traces_exporter: {:otel_exporter_stdout, []}
-#   #traces_exporter: {:otel_exporter_stdout, []}
-
 config :opentelemetry,
        :processors,
        otel_batch_processor: %{
