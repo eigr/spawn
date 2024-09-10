@@ -297,7 +297,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
   end
 
   defp handle_projection(%Actor{settings: %ActorSettings{kind: :PROJECTION}} = actor) do
-    StreamInitiator.init_projection_actor(actor)
+    StreamInitiator.init_projection_stream(actor)
   end
 
   defp handle_projection(
@@ -305,7 +305,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
            actor
        )
        when kind in [:NAMED, :UNNAMED] do
-    StreamInitiator.init_sourceable_actor(actor)
+    StreamInitiator.init_sourceable_stream(actor)
   end
 
   defp handle_projection(_actor), do: :ok

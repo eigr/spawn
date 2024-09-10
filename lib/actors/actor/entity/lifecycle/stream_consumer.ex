@@ -42,24 +42,29 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamConsumer do
     )
   end
 
-  @spec handle_message(any(), Broadway.Message.t(), any()) :: Broadway.Message.t()
+  @spec handle_message(any(), Message.t(), any()) :: Message.t()
   def handle_message(_processor_name, message, _context) do
     message
     |> build_fact()
     |> Message.configure_ack(on_success: :term)
   end
 
-  @spec handle_batch(any(), Broadway.Message.t(), any(), opts()) :: Broadway.Message.t()
+  @spec handle_batch(any(), Message.t(), any(), opts()) :: list(Message.t())
   def handle_batch(_, messages, _, context) do
     GenServer.cast(context.projection_pid, {:process_projection_events, messages})
 
     messages
   end
 
-  @spec build_fact(Broadway.Message.t()) :: Broadway.Message.t()
+  @spec build_fact(Message.t()) :: Message.t()
   defp build_fact(message) do
     # %Broadway.Message{data: "{\"ACTION\":\"KEY_ADDED\",\"KEY\":\"MYKEY\",\"VALUE\":\"MYVALUE\"}", metadata: %{headers: [], topic: "actors.mike"}, acknowledger: {OffBroadway.Jetstream.Acknowledger, #Reference<0.743380651.807927811.227242>, %{on_success: :term, reply_to: "$JS.ACK.newtest.projectionviewertest.1.11.11.1725657673932595345.21"}}, batcher: :default, batch_key: :default, batch_mode: :bulk, status: :ok}
 
+    message
+    |> Message.update_data(&process_data/1)
+  end
+
+  defp process_data(message) do
     payload = message.data
     _headers = message.metadata.headers
     topic = message.metadata.topic
@@ -77,5 +82,5 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamConsumer do
   # Projections are like long-lasting threads and therefore concurrency should be avoided
   # if the intention is to have some notion of ordering.
   defp build_concurrency(%{strict_ordering: true}), do: 1
-  defp build_concurrency(%{strict_ordering: false}), do: 15
+  defp build_concurrency(%{strict_ordering: false}), do: System.schedulers_online()
 end

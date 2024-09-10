@@ -92,6 +92,7 @@ defmodule Spawn.MixProject do
       {:jetstream, "~> 0.0.9"},
       {:k8s, "~> 2.2"},
       {:k8s_webhoox, "~> 0.2"},
+      {:uuid, "~> 1.1"},
       {:broadway, "~> 1.1"},
       # temporary until bandit releases 1.5.4
       {:hpax, "~> 0.1.1"},

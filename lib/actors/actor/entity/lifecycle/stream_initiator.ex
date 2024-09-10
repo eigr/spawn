@@ -20,8 +20,8 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamInitiator do
   @one_day_in_ms :timer.hours(24)
   @stream_not_found_code 10059
 
-  @spec init_projection_actor(module()) :: :ignore | {:error, any()} | {:ok, pid()}
-  def init_projection_actor(%Actor{} = actor) do
+  @spec init_projection_stream(module()) :: :ignore | {:error, any()} | {:ok, pid()}
+  def init_projection_stream(%Actor{} = actor) do
     name = "#{actor.id.system}:#{actor.id.name}"
 
     with {:create_stream, :ok} <- {:create_stream, create_stream(actor, true)},
@@ -52,7 +52,7 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamInitiator do
     end
   end
 
-  def init_sourceable_actor(%Actor{} = actor), do: create_stream(actor, false)
+  def init_sourceable_stream(%Actor{} = actor), do: create_stream(actor, false)
 
   def replay(stream_pid, actor, call_opts) do
     # TODO: Necessary avoid naming conflicts using actor system and actor name to build name of stream
