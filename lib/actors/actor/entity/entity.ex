@@ -420,8 +420,9 @@ defmodule Actors.Actor.Entity do
 
   @doc """
   When the Actor is a Projection the messages sent to the projection can be reprocessed.
-  See this for more information about this programming model
+  See this for more information about this programming model.
   """
+  @spec replay(pid() | module(), Keyword.t()) :: {:error, term()} | :ok
   def replay(ref, opts) when is_pid(ref) do
     GenServer.cast(ref, {:replay, opts})
   end

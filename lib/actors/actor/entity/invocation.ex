@@ -36,6 +36,8 @@ defmodule Actors.Actor.Entity.Invocation do
     Noop
   }
 
+  alias Spawn.Utils.Nats
+
   import Spawn.Utils.Common, only: [return_and_maybe_hibernate: 1]
 
   @default_actions [
@@ -410,12 +412,31 @@ defmodule Actors.Actor.Entity.Invocation do
          request,
          %ActorInvocationResponse{checkpoint: checkpoint} = response,
          %EntityState{
+           actor:
+             %Actor{
+               id: id,
+               settings:
+                 %ActorSettings{
+                   kind: kind,
+                   projection_settings: projection_settings
+                 } = _settings
+             } = _actor,
            revision: revision
          } = state,
          opts
        ) do
+    response_params = %{
+      actor_id: id,
+      kind: kind,
+      projection_settings: projection_settings,
+      request: request,
+      response: response,
+      state: state,
+      opts: opts
+    }
+
     response =
-      case do_response(request, response, state, opts) do
+      case do_response(response_params) do
         :noreply ->
           {:noreply, state}
           |> return_and_maybe_hibernate()
@@ -437,18 +458,46 @@ defmodule Actors.Actor.Entity.Invocation do
   end
 
   defp do_response(
-         _request,
-         %ActorInvocationResponse{workflow: workflow} = response,
-         _state,
-         _opts
+         %{
+           actor_id: id,
+           kind: kind,
+           projection_settings: settings,
+           request: request,
+           response: %ActorInvocationResponse{workflow: workflow} = response,
+           state: state,
+           opts: _opts
+         } = _params
        )
        when is_nil(workflow) or workflow == %{} do
+    :ok = do_handle_projection(id, request.action, settings, state)
+
     response
   end
 
-  defp do_response(request, response, state, opts) do
+  defp do_response(
+         %{
+           actor_id: id,
+           kind: kind,
+           projection_settings: settings,
+           request: request,
+           response: response,
+           state: state,
+           opts: opts
+         } = _params
+       ) do
+    :ok = do_handle_projection(id, request.action, settings, state)
+
     do_run_workflow(request, response, state, opts)
   end
+
+  defp do_handle_projection(id, action, %{sourceable: true} = _settings, state) do
+    key = "#{id.system}:#{id.parent}:#{id.name}"
+    subject = "actors.#{id.name}.#{action}"
+    payload = state.actor.state.state
+    Gnat.pub(Nats.connection_name(), subject, payload, headers: [{"Nats-Msg-Id", key}])
+  end
+
+  defp do_handle_projection(_id, _settings, _state), do: :ok
 
   defp do_run_workflow(
          _request,

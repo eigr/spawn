@@ -16,9 +16,9 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamInitiator do
   alias Gnat.Jetstream.API.Stream, as: NatsStream
   alias Gnat.Jetstream.API.Consumer
 
-  @stream_not_found_code 10059
   @consumer_not_found_code 10014
   @one_day_in_ms :timer.hours(24)
+  @stream_not_found_code 10059
 
   @spec init_projection_actor(module()) :: :ignore | {:error, any()} | {:ok, pid()}
   def init_projection_actor(%Actor{} = actor) do
@@ -31,21 +31,21 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamInitiator do
     else
       {:create_stream, error} ->
         Logger.error(
-          "Error on start Projection #{name}. During phase [create_stream] Details: #{inspect(error)}"
+          "Error on start Projection #{name}. During phase [create_stream]. Details: #{inspect(error)}"
         )
 
         {:error, error}
 
       {:create_consumer, error} ->
         Logger.error(
-          "Error on start Projection #{name}. During phase [create_consumer] Details: #{inspect(error)}"
+          "Error on start Projection #{name}. During phase [create_consumer]. Details: #{inspect(error)}"
         )
 
         {:error, error}
 
       error ->
         Logger.error(
-          "Error on start Projection #{name}. During phase [start_pipeline] Details: #{inspect(error)}"
+          "Error on start Projection #{name}. During phase [start_pipeline]. Details: #{inspect(error)}"
         )
 
         {:error, error}
@@ -58,7 +58,7 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamInitiator do
     # TODO: Necessary avoid naming conflicts using actor system and actor name to build name of stream
     name = "#{actor.id.system}:#{actor.id.name}"
 
-    with {:stop_pipeline, :ok} <- {:stop_pipeline, Broadway.stop(stream_pid)},
+    with {:stop_pipeline, :ok} <- {:stop_pipeline, stop_pipeline(stream_pid)},
          {:destroy_consumer, :ok} <- {:destroy_consumer, destroy_consumer(actor)},
          {:recreate_consumer, :ok} <- {:recreate_consumer, create_consumer(actor, call_opts)},
          {:start_pipeline, {:ok, newpid}} <- {:start_pipeline, start_pipeline(actor)} do
@@ -66,28 +66,28 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamInitiator do
     else
       {:stop_pipeline, error} ->
         Logger.error(
-          "Error on start Projection #{name}. During phase [stop_pipeline] Details: #{inspect(error)}"
+          "Error on start Projection #{name}. During phase [stop_pipeline]. Details: #{inspect(error)}"
         )
 
         {:error, error}
 
       {:destroy_consumer, error} ->
         Logger.error(
-          "Error on start Projection #{name}. During phase [destroy_consumer] Details: #{inspect(error)}"
+          "Error on start Projection #{name}. During phase [destroy_consumer]. Details: #{inspect(error)}"
         )
 
         {:error, error}
 
       {:recreate_consumer, error} ->
         Logger.error(
-          "Error on start Projection #{name}. During phase [recreate_consumer] Details: #{inspect(error)}"
+          "Error on start Projection #{name}. During phase [recreate_consumer]. Details: #{inspect(error)}"
         )
 
         {:error, error}
 
       {:start_pipeline, error} ->
         Logger.error(
-          "Error on start Projection #{name}. During phase [start_pipeline] Details: #{inspect(error)}"
+          "Error on start Projection #{name}. During phase [start_pipeline]. Details: #{inspect(error)}"
         )
 
         {:error, error}
@@ -219,7 +219,12 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamInitiator do
       {:ok, _info} ->
         Consumer.delete(conn(), stream_name, consumer_name)
 
-      {:error, %{"code" => 404, "description" => "consumer not found", "err_code" => 10014}} ->
+      {:error,
+       %{
+         "code" => 404,
+         "description" => "consumer not found",
+         "err_code" => @consumer_not_found_code
+       }} ->
         :ok
 
       error ->
