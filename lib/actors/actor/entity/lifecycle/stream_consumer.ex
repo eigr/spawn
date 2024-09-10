@@ -66,10 +66,14 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamConsumer do
 
   defp process_data(message) do
     payload = message.data
-    _headers = message.metadata.headers
-    topic = message.metadata.topic
+
+    metadata =
+      Enum.reduce(message.metadata.headers, %{}, fn {key, value}, acc ->
+        Map.put(acc, key, value)
+      end)
+      |> Map.put("topic", message.metadata.topic)
+
     time = DateTime.utc_now() |> DateTime.to_unix(:seconds)
-    metadata = %{} |> Map.put("topic", topic)
 
     %Fact{
       uuid: UUID.uuid4(:hex),
