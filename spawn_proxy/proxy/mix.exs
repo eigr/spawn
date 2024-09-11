@@ -21,7 +21,11 @@ defmodule Proxy.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger, :runtime_tools, :os_mon],
+      extra_applications: [
+        :logger,
+        :runtime_tools,
+        :os_mon
+      ],
       mod: {Proxy.Application, []}
     ]
   end
@@ -47,7 +51,11 @@ defmodule Proxy.MixProject do
     [
       proxy: [
         include_executables_for: [:unix],
-        applications: [proxy: :permanent],
+        applications: [
+          opentelemetry_exporter: :permanent,
+          opentelemetry: :temporary,
+          proxy: :permanent
+        ],
         steps: [
           :assemble,
           &Bakeware.assemble/1
