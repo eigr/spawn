@@ -391,7 +391,7 @@ defmodule SpawnCtl.Commands.Dev.Run do
     |> maybe_use_host_network(opts)
     |> Container.with_waiting_strategy(
       CommandWaitStrategy.new(
-        ["--jetstream"],
+        ["--jetstream", "--http_port=8222"],
         60_000,
         1000
       )
@@ -472,3 +472,4 @@ defmodule SpawnCtl.Commands.Dev.Run do
     end)
   end
 end
+
