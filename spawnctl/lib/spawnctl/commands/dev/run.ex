@@ -25,6 +25,8 @@ defmodule SpawnCtl.Commands.Dev.Run do
   - Logger level: "info"
   - Proxy instance name: "proxy"
   - Nats image: "nats" 
+  - Nats http port: 8222 
+  - Nats port: 4222
 
   ### Example 2: Running with Custom Actor System and Database Host
 
@@ -64,6 +66,8 @@ defmodule SpawnCtl.Commands.Dev.Run do
           --statestore-key "custom-key" \
           --log-level "debug" \
           --nats-image "nats" \
+          --nats-http-port 8222 \
+          --nats-port 4222 \
           --name "custom-proxy"
   """
   use DoIt.Command,
@@ -94,7 +98,9 @@ defmodule SpawnCtl.Commands.Dev.Run do
     statestore_key: "3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE=",
     log_level: "info",
     name: "proxy",
-    nats_image: "nats"
+    nats_image: "nats",
+    nats_http_port: 8222,
+    nats_port: 4222
   }
 
   option(:actor_system, :string, "Defines the name of the ActorSystem.",
@@ -187,10 +193,14 @@ defmodule SpawnCtl.Commands.Dev.Run do
     default: @default_opts.nats_image
   )
 
+  option(:nats_http_port, :integer, "Nats http port", default: @default_opts.nats_http_port)
+
+  option(:nats_port, :integer, "Nats port", default: @default_opts.nats_port)
+
   # Only supports one restartable atm
   @containers [
-    %{image: :proxy_image, restartable: true},
-    %{image: :nats_image, restartable: false}
+    %{image: :nats_image, restartable: false},
+    %{image: :proxy_image, restartable: true}
   ]
 
   @doc """
@@ -202,6 +212,7 @@ defmodule SpawnCtl.Commands.Dev.Run do
     log(:info, Emoji.runner(), "Starting Spawn Proxy in dev mode...")
 
     {:ok, _pid} = SpawnCtl.GroupExecAfter.start_link()
+    {:ok, _pid} = Testcontainers.start_link()
 
     if opts.proto_changes_watcher do
       @containers
@@ -218,8 +229,6 @@ defmodule SpawnCtl.Commands.Dev.Run do
 
       Process.sleep(:infinity)
     else
-      {:ok, _pid} = Testcontainers.start_link()
-
       for container <- @containers do
         {:ok, _} = start_container(container, opts, ctx)
       end
@@ -253,23 +262,21 @@ defmodule SpawnCtl.Commands.Dev.Run do
     |> Map.update!(:manifest_path, &Path.absname/1)
   end
 
-  defp handle_container_start_result(container, %{image: :proxy_image} = params, opts) do
-    log_success(container, params, opts)
+  defp handle_container_start_result({:ok, container}, container_params, opts) do
+    log_success(container, container_params, opts)
     setup_exit_handler(container)
 
     {:ok, container}
   end
 
+  defp handle_container_start_result({:error, error}, _container_params, _opts) do
+    log_failure(error)
+
+    {:error, error}
+  end
+
   defp watch(%{image: :proxy_image} = params, nil = _container, opts, ctx) do
-    if opts[:docker_pid] == nil do
-      {:ok, docker_pid} = Testcontainers.start_link()
-
-      opts = Map.put(opts, :docker_pid, docker_pid)
-
-      start_and_watch_container(params, opts, ctx)
-    else
-      start_and_watch_container(params, opts, ctx)
-    end
+    start_and_watch_container(params, opts, ctx)
   end
 
   defp watch(%{image: :proxy_image} = params, container, opts, ctx),
@@ -389,10 +396,12 @@ defmodule SpawnCtl.Commands.Dev.Run do
   defp build_nats_container(opts) do
     Container.new(opts.nats_image)
     |> maybe_use_host_network(opts)
+    |> Container.with_fixed_port(opts.nats_port)
+    |> Container.with_fixed_port(opts.nats_http_port)
     |> Container.with_waiting_strategy(
       CommandWaitStrategy.new(
-        ["--jetstream", "--http_port=8222"],
-        60_000,
+        ["--jetstream", "--http_port=#{opts.nats_http_port}", " "],
+        15_000,
         1000
       )
     )
@@ -428,8 +437,8 @@ defmodule SpawnCtl.Commands.Dev.Run do
 
   defp log_success(container, %{image: :proxy_image}, opts) do
     log(:info, Emoji.exclamation(), "Spawn Proxy uses the following mapped ports: [
-      Proxy HTTP: #{inspect(Container.mapped_port(container, opts.proxy_bind_port))}:#{opts.proxy_bind_port},
-      Proxy gRPC: #{inspect(Container.mapped_port(container, opts.proxy_bind_grpc_port))}:#{opts.proxy_bind_grpc_port}
+      Proxy HTTP: #{inspect(Container.mapped_port(container, opts.proxy_bind_port) || opts.proxy_bind_port)}:#{opts.proxy_bind_port},
+      Proxy gRPC: #{inspect(Container.mapped_port(container, opts.proxy_bind_grpc_port) || opts.proxy_bind_grpc_port)}:#{opts.proxy_bind_grpc_port}
     ]")
 
     log(
@@ -439,10 +448,10 @@ defmodule SpawnCtl.Commands.Dev.Run do
     )
   end
 
-  defp log_success(container, %{image: :nats_image}, _opts) do
+  defp log_success(container, %{image: :nats_image}, opts) do
     log(:info, Emoji.exclamation(), "Nats uses the following mapped ports: [
-      > #{inspect(Container.mapped_port(container, 4222))}:4222
-      > #{inspect(Container.mapped_port(container, 8222))}:8222
+      Nats: #{inspect(Container.mapped_port(container, opts.nats_port) || opts.nats_port)}:#{opts.nats_port},
+      Nats HTTP: #{inspect(Container.mapped_port(container, opts.nats_port) || opts.nats_http_port)}:#{opts.nats_http_port}
     ]")
 
     log(
@@ -472,4 +481,3 @@ defmodule SpawnCtl.Commands.Dev.Run do
     end)
   end
 end
-

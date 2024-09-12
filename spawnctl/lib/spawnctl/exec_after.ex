@@ -1,4 +1,6 @@
 defmodule SpawnCtl.GroupExecAfter do
+  @moduledoc false
+
   use GenServer
 
   @impl true
@@ -19,9 +21,7 @@ defmodule SpawnCtl.GroupExecAfter do
 
   @impl true
   def handle_info({:callback, callback}, state) do
-    spawn(fn ->
-      callback.()
-    end)
+    spawn(fn -> callback.() end)
 
     {:noreply, %{state | timer_ref: nil}}
   end
@@ -33,4 +33,3 @@ defmodule SpawnCtl.GroupExecAfter do
   @doc false
   def start_link, do: GenServer.start_link(__MODULE__, [], name: __MODULE__)
 end
-
