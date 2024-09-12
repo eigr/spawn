@@ -33,12 +33,6 @@ config :logger, :console,
 
 config :protobuf, extensions: :enabled
 
-# config :prometheus, MetricsEndpoint.Exporter,
-#  path: "/metrics",
-#  format: :auto,
-#  registry: :default,
-#  auth: false
-
 config :opentelemetry, :resource, service: %{name: "spawn"}
 
 config :opentelemetry,

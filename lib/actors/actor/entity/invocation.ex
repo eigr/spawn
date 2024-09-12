@@ -28,6 +28,7 @@ defmodule Actors.Actor.Entity.Invocation do
     ActorInvocationResponse,
     Broadcast,
     Context,
+    Fact,
     Forward,
     InvocationRequest,
     Pipe,
@@ -70,7 +71,7 @@ defmodule Actors.Actor.Entity.Invocation do
     } = state
 
     messages
-    |> Enum.map(fn message ->
+    |> Enum.map(fn %Fact{} = message ->
       nil
       # do something with message
     end)

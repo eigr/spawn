@@ -19,57 +19,57 @@ services:
     ports:
       - 9411:9411
     privileged: true
-  # postgres:
-  #   image: postgres
-  #   restart: always
-  #   environment:
-  #     - POSTGRES_USER=postgres
-  #     - POSTGRES_PASSWORD=postgres
-  #     - POSTGRES_DATABASE=eigr-functions-db
-  #     - PGDATA=/var/lib/postgresql/data/pgdata
-  #   ports:
-  #     - "5432:5432"
-  #   volumes:
-  #     - postgres:/var/lib/postgresql/data
 
-  # mysql:
-  #   image: mysql:5.7
-  #   environment:
-  #     MYSQL_USER: admin
-  #     MYSQL_PASSWORD: "admin"
-  #     MYSQL_ROOT_PASSWORD: "admin"
-  #     MYSQL_DATABASE: "eigr-functions-db"
-  #   ports:
-  #     - "3306:3306"
-  #   volumes:
-  #     - mysql:/var/lib/mysql
-  #   networks:
-  #     - mysql-compose-network
+  postgres:
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DATABASE=eigr-functions-db
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres:/var/lib/postgresql/data
 
-  # mariadb:
-  #   image: mariadb
-  #   environment:
-  #     MYSQL_ROOT_PASSWORD: admin
-  #     MYSQL_DATABASE: eigr-functions-db
-  #     MYSQL_USER: admin
-  #     MYSQL_PASSWORD: admin
-  #   volumes:
-  #     - mariadb:/var/lib/mysql
-  #   ports:
-  #     - "3307:3306"
+  mysql:
+    image: mysql:5.7
+    environment:
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: "admin"
+      MYSQL_ROOT_PASSWORD: "admin"
+      MYSQL_DATABASE: "eigr-functions-db"
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql:/var/lib/mysql
+    networks:
+      - mysql-compose-network
 
-  # adminer:
-  #   image: adminer
-  #   ports:
-  #     - 8080:8080
-  #   networks:
-  #     - mysql-compose-network
+  mariadb:
+    image: mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: eigr-functions-db
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+    volumes:
+      - mariadb:/var/lib/mysql
+    ports:
+      - "3307:3306"
 
-  # nats:
-  #   image: 'nats:latest'
-  #   ports:
-  #     - "4222:4222"
+  adminer:
+    image: adminer
+    ports:
+      - 8080:8080
+    networks:
+      - mysql-compose-network
 
+  nats:
+    image: 'nats:latest'
+    ports:
+      - "4222:4222"
   # spawn-proxy:
   #   image: eigr/spawn-proxy:1.4.3
   #   restart: always
@@ -89,11 +89,11 @@ services:
   #   ports:
   #     - "9001:9001"
 
-  # networks:
-  #   mysql-compose-network:
-  #     driver: bridge
+networks:
+  mysql-compose-network:
+    driver: bridge
 
-  # volumes:
-  #   mysql:
-  #   postgres:
-  #   mariadb:
+volumes:
+  mysql:
+  postgres:
+  mariadb:

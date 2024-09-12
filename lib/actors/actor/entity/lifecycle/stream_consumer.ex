@@ -7,6 +7,8 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamConsumer do
   alias Eigr.Functions.Protocol.Fact
   alias Google.Protobuf.Timestamp
 
+  @type fact :: %Fact{}
+
   @type opts :: %{
           projection_pid: pid(),
           actor_name: String.t(),
@@ -64,6 +66,7 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamConsumer do
     |> Message.put_data(process_data(message))
   end
 
+  @spec process_data(Message.t()) :: fact()
   defp process_data(message) do
     payload = message.data
 
