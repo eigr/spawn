@@ -24,8 +24,8 @@ defmodule SpawnCtl.Commands.Dev.Run do
   - Statestore Key: "myfake-key-3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE="
   - Logger level: "info"
   - Proxy instance name: "proxy"
-  - Nats image: "nats" 
-  - Nats http port: 8222 
+  - Nats image: "nats"
+  - Nats http port: 8222
   - Nats port: 4222
 
   ### Example 2: Running with Custom Actor System and Database Host
@@ -398,13 +398,8 @@ defmodule SpawnCtl.Commands.Dev.Run do
     |> maybe_use_host_network(opts)
     |> Container.with_fixed_port(opts.nats_port)
     |> Container.with_fixed_port(opts.nats_http_port)
-    |> Container.with_waiting_strategy(
-      CommandWaitStrategy.new(
-        ["--jetstream", "--http_port=#{opts.nats_http_port}", " "],
-        15_000,
-        1000
-      )
-    )
+    |> Container.with_cmd("--jetstream")
+    |> Container.with_cmd("--http_port=#{opts.nats_http_port}")
   end
 
   defp maybe_use_host_network(container, _opts) do
