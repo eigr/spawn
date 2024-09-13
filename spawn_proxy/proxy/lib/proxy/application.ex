@@ -15,6 +15,7 @@ defmodule Proxy.Application do
           apply(:proc_lib, :set_label, ["Spawn.Proxy.Application"])
         end
 
+        OpentelemetryEcto.setup([:spawn_statestores, :repo])
         Config.load()
         Logger.configure(level: Config.get(:logger_level))
 
