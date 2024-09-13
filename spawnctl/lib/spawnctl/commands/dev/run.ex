@@ -398,8 +398,7 @@ defmodule SpawnCtl.Commands.Dev.Run do
     |> maybe_use_host_network(opts)
     |> Container.with_fixed_port(opts.nats_port)
     |> Container.with_fixed_port(opts.nats_http_port)
-    |> Container.with_cmd("--jetstream")
-    |> Container.with_cmd("--http_port=#{opts.nats_http_port}")
+    |> Container.with_cmd(["--jetstream", "--http_port=#{opts.nats_http_port}"])
   end
 
   defp maybe_use_host_network(container, _opts) do
