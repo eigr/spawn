@@ -47,7 +47,11 @@ defmodule Proxy.MixProject do
     [
       proxy: [
         include_executables_for: [:unix],
-        applications: [proxy: :permanent],
+        applications: [
+          opentelemetry_exporter: :permanent,
+          opentelemetry: :temporary,
+          proxy: :permanent
+        ],
         steps: [
           :assemble,
           &Bakeware.assemble/1

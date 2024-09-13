@@ -99,6 +99,7 @@ defmodule Spawn.MixProject do
       {:telemetry_metrics_prometheus_core, "~> 1.2"},
       {:opentelemetry_api, "~> 1.0"},
       {:opentelemetry, "~> 1.0"},
+      {:opentelemetry_ecto, "~> 1.2"},
       {:opentelemetry_exporter, "~> 1.0"},
       # Statestores deps
       {:spawn_statestores_mariadb,
