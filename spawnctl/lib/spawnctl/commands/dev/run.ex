@@ -76,7 +76,6 @@ defmodule SpawnCtl.Commands.Dev.Run do
 
   alias SpawnCtl.Util.Emoji
   alias Testcontainers.Container
-  alias Testcontainers.CommandWaitStrategy
 
   import SpawnCtl.Util, only: [is_valid?: 1, log: 3]
 
@@ -212,7 +211,16 @@ defmodule SpawnCtl.Commands.Dev.Run do
     log(:info, Emoji.runner(), "Starting Spawn Proxy in dev mode...")
 
     {:ok, _pid} = SpawnCtl.GroupExecAfter.start_link()
-    {:ok, _pid} = Testcontainers.start_link()
+
+    {:ok, _pid} =
+      case Testcontainers.start_link() do
+        {:ok, pid} ->
+          {:ok, pid}
+
+        {:error, {:error, {:failed_to_register_ryuk_filter, :closed}}} ->
+          Process.sleep(500)
+          Testcontainers.start_link()
+      end
 
     if opts.proto_changes_watcher do
       @containers
@@ -315,7 +323,7 @@ defmodule SpawnCtl.Commands.Dev.Run do
          opts,
          ctx
        ) do
-    SpawnCli.GroupExecAfter.exec(
+    SpawnCtl.GroupExecAfter.exec(
       fn ->
         log(
           :info,
@@ -341,7 +349,7 @@ defmodule SpawnCtl.Commands.Dev.Run do
         stop_existing_docker_process(pid)
         watch(params, nil, opts, ctx)
 
-      {:error, {:error, :failed_to_register_ryuk_filter, :closed}} ->
+      {:error, {:error, {:failed_to_register_ryuk_filter, :closed}}} ->
         log_transient_fault()
         watch(params, nil, opts, ctx)
 
