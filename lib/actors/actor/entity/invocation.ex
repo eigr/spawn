@@ -20,7 +20,8 @@ defmodule Actors.Actor.Entity.Invocation do
     ActorSystem,
     ActorState,
     Action,
-    FixedTimerAction
+    FixedTimerAction,
+    Metadata
   }
 
   alias Eigr.Functions.Protocol.{
@@ -39,6 +40,7 @@ defmodule Actors.Actor.Entity.Invocation do
 
   alias Spawn.Utils.Nats
 
+  import Spawn.Utils.AnySerializer, only: [any_pack!: 1]
   import Spawn.Utils.Common, only: [return_and_maybe_hibernate: 1]
 
   @default_actions [
@@ -63,18 +65,39 @@ defmodule Actors.Actor.Entity.Invocation do
       system: actor_system,
       actor:
         %Actor{
-          id: %ActorId{name: actor_name, parent: parent} = id,
+          id: %ActorId{name: _actor_name, parent: _parent} = id,
           state: actor_state,
-          actions: actions
         } = _actor,
       opts: actor_opts
     } = state
 
-    messages
-    |> Enum.map(fn %Fact{} = message ->
-      nil
-      # do something with message
-    end)
+    invocations =
+      messages
+      |> Enum.map(fn %Fact{} = message ->
+        actor_key_parts =
+          Map.get(message.metadata, "Nats-Msg-Id")
+          |> String.split(":")
+
+        {name, _rest} = List.pop_at(actor_key_parts, 2)
+        {parent, _rest} = List.pop_at(actor_key_parts, 1)
+        {system_name, _rest} = List.pop_at(actor_key_parts, 0)
+
+        {action, _rest} =
+          message.metadata.topic
+          |> String.split(".")
+          |> List.pop_at(3)
+
+        %InvocationRequest{
+          async: true,
+          actor: %Actor{
+            id: %ActorId{name: name, system: system_name, parent: parent}
+          },
+          metadata: %Metadata{tags: message.metadata},
+          action_name: action,
+          payload: {:value, any_pack!(message.state)},
+          caller: nil
+        }
+      end)
   end
 
   def replay(
@@ -493,9 +516,12 @@ defmodule Actors.Actor.Entity.Invocation do
 
   defp do_handle_projection(id, action, %{sourceable: true} = _settings, state) do
     key = "#{id.system}:#{id.parent}:#{id.name}"
-    subject = "actors.#{id.name}.#{action}"
+    subject = "actors.#{id.parent}.#{id.name}.#{action}"
     payload = state.actor.state.state
-    Gnat.pub(Nats.connection_name(), subject, payload, headers: [{"Nats-Msg-Id", key}])
+
+    Gnat.pub(Nats.connection_name(), subject, payload,
+      headers: [{"Nats-Msg-Id", key}, {"Spawn-System", "#{id.system}"}]
+    )
   end
 
   defp do_handle_projection(_id, _action, _settings, _state), do: :ok
