@@ -1,6 +1,6 @@
-defmodule Statestores.Adapters.MariaDBProjectionAdapterTest do
+defmodule Statestores.Adapters.PostgresProjectionAdapterTest do
   use Statestores.DataCase
-  alias Statestores.Adapters.MariaDBProjectionAdapter, as: Adapter
+  alias Statestores.Adapters.PostgresProjectionAdapter, as: Adapter
   alias Statestores.Schemas.Projection
 
   import Statestores.Util, only: [load_projection_adapter: 0]

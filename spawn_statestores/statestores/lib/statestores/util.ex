@@ -75,7 +75,7 @@ defmodule Statestores.Util do
 
   @spec load_snapshot_adapter :: adapter()
   def load_snapshot_adapter() do
-    case Application.fetch_env(@otp_app, :_adapter) do
+    case Application.fetch_env(@otp_app, :database_adapter) do
       {:ok, value} ->
         value
 
@@ -213,6 +213,13 @@ defmodule Statestores.Util do
     key
   end
 
+  def normalize_table_name(nil), do: {:error, "Table name cannot be nil"}
+  def normalize_table_name(name) when is_binary(name) do
+    name
+    |> Macro.underscore() # Converts "CamelCase" to "snake_case"
+    |> String.downcase() # Ensures the name is all lowercase
+  end
+
   # Lookup Adapters
   defp load_lookup_adapter_by_type(:mariadb), do: Statestores.Adapters.MariaDBLookupAdapter
 
@@ -230,4 +237,7 @@ defmodule Statestores.Util do
   # Projections Adapters
   defp load_projection_adapter_by_type(:mariadb),
     do: Statestores.Adapters.MariaDBProjectionAdapter
+
+  defp load_projection_adapter_by_type(:postgres),
+    do: Statestores.Adapters.PostgresProjectionAdapter
 end

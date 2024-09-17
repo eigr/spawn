@@ -1,9 +1,11 @@
-defmodule Statestores.Adapters.MariaDBProjectionAdapter do
+defmodule Statestores.Adapters.PostgresProjectionAdapter do
   @moduledoc """
-  Implements the ProjectionBehaviour for MariaDB, with dynamic table name support.
+  Implements the ProjectionBehaviour for Postgres, with dynamic table name support.
   """
   use Statestores.Adapters.ProjectionBehaviour
-  use Ecto.Repo, otp_app: :spawn_statestores, adapter: Ecto.Adapters.MyXQL
+  use Ecto.Repo,
+    otp_app: :spawn_statestores,
+    adapter: Ecto.Adapters.Postgres
   use Scrivener, page_size: 50
 
   alias Statestores.Schemas.{Projection, ValueObjectSchema}
@@ -276,7 +278,7 @@ defmodule Statestores.Adapters.MariaDBProjectionAdapter do
   end
 
   @impl true
-  def default_port, do: "3306"
+  def default_port, do: "5432"
 
   defp to_json(nil), do: Jason.encode!(%{})
   defp to_json(map), do: Jason.encode!(map)
