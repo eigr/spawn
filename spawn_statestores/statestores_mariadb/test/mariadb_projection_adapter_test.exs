@@ -6,7 +6,7 @@ defmodule Statestores.Adapters.MariaDBProjectionAdapterTest do
   import Statestores.Util, only: [load_projection_adapter: 0]
 
   # Import helper functions if needed for insertions
-  import Ecto.Query
+  # import Ecto.Query
 
   describe "create_table/1" do
     test "creates a table if it does not exist", _ctx do
@@ -26,12 +26,13 @@ defmodule Statestores.Adapters.MariaDBProjectionAdapterTest do
       # Insert mock data into the projection table
       {:ok, _} =
         repo.save(%Projection{
+          id: "123",
           projection_id: "proj_1",
           projection_name: projection_name,
           system: "test_system",
           metadata: %{"key" => "value"},
           data_type: "type.googleapis.com/io.eigr.spawn.example.MyState",
-          data: "Hello Joe",
+          data: <<1, 2, 3>>,
           inserted_at: DateTime.utc_now(),
           updated_at: DateTime.utc_now()
         })
@@ -41,53 +42,57 @@ defmodule Statestores.Adapters.MariaDBProjectionAdapterTest do
     end
   end
 
-  # describe "get_last_by_projection_id/2" do
-  #   test "returns the last inserted projection for a specific projection_id", ctx do
-  #     repo = load_projection_adapter()
-  #     projection_name = "test_projections"
-  #     projection_id = "proj_1"
+  describe "get_last_by_projection_id/2" do
+    test "returns the last inserted projection for a specific projection_id", ctx do
+      repo = load_projection_adapter()
+      projection_name = "test_projections"
+      projection_id = "proj_1"
 
-  #     {:ok, _} =
-  #       repo.save(%Projection{
-  #         projection_id: projection_id,
-  #         projection_name: projection_name,
-  #         system: "test_system",
-  #         metadata: %{"key" => "value"},
-  #         data_type: "type.googleapis.com/io.eigr.spawn.example.MyState",
-  #         data: "Hello Joe",
-  #         inserted_at: DateTime.utc_now(),
-  #         updated_at: DateTime.utc_now()
-  #       })
+      {:ok, _} =
+        repo.save(%Projection{
+          id: "123",
+          projection_id: projection_id,
+          projection_name: projection_name,
+          system: "test_system",
+          metadata: %{"key" => "value"},
+          data_type: "type.googleapis.com/io.eigr.spawn.example.MyState",
+          data: <<1, 2, 3>>,
+          inserted_at: DateTime.utc_now(),
+          updated_at: DateTime.utc_now()
+        })
 
-  #     assert {:ok, projection} =
-  #              MariaDBProjectionAdapter.get_last_by_projection_id(projection_name, projection_id)
+      assert {:ok, projection} =
+               MariaDBProjectionAdapter.get_last_by_projection_id(projection_name, projection_id)
 
-  #     assert projection.projection_id == projection_id
-  #   end
-  # end
+      assert projection.projection_id == projection_id
+    end
+  end
 
-  # describe "get_all/3" do
-  #   test "returns paginated projections", ctx do
-  #     repo = load_projection_adapter()
-  #     projection_name = "test_projections"
+  describe "get_all/3" do
+    test "returns paginated projections", ctx do
+      repo = load_projection_adapter()
+      projection_name = "test_projections"
 
-  #     # Insert multiple records for pagination
-  #     Enum.each(1..20, fn n ->
-  #       repo.save(%Projection{
-  #         projection_id: "proj_#{n}",
-  #         projection_name: projection_name,
-  #         system: "test_system",
-  #         metadata: %{"key" => "value#{n}"},
-  #         inserted_at: DateTime.utc_now(),
-  #         updated_at: DateTime.utc_now()
-  #       })
-  #     end)
+      # Insert multiple records for pagination
+      Enum.each(1..20, fn n ->
+        repo.save(%Projection{
+          id: "#{n}",
+          projection_id: "proj_#{n}",
+          projection_name: projection_name,
+          system: "test_system",
+          metadata: %{"key" => "value#{n}"},
+          data_type: "type.googleapis.com/io.eigr.spawn.example.MyState",
+          data: <<1, 2, 3>>,
+          inserted_at: DateTime.utc_now(),
+          updated_at: DateTime.utc_now()
+        })
+      end)
 
-  #     {:ok, result} = MariaDBProjectionAdapter.get_all(projection_name, 1, 10)
-  #     assert length(result.entries) == 10
-  #     assert result.page_number == 1
-  #   end
-  # end
+      {:ok, result} = MariaDBProjectionAdapter.get_all(projection_name, 1, 10)
+      assert length(result.entries) == 10
+      assert result.page_number == 1
+    end
+  end
 
   # describe "search_by_metadata/5" do
   #   test "returns projections matching metadata key and value", ctx do

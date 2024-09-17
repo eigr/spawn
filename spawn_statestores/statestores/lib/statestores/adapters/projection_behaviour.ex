@@ -31,7 +31,7 @@ defmodule Statestores.Adapters.ProjectionBehaviour do
 
   @callback create_table(projection_name()) :: {:ok, String.t()}
 
-  @callback get_last(projection_name(), projection_id()) :: {:error, any} | {:ok, projection()}
+  @callback get_last(projection_name()) :: {:error, any} | {:ok, projection()}
 
   @callback get_last_by_projection_id(projection_name(), projection_id()) ::
               {:error, any} | {:ok, projection()}
@@ -43,7 +43,6 @@ defmodule Statestores.Adapters.ProjectionBehaviour do
 
   @callback get_by_interval(
               projection_name(),
-              projection_id(),
               time_start(),
               time_end(),
               page(),

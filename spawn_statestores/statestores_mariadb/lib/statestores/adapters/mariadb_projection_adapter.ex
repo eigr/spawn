@@ -10,8 +10,6 @@ defmodule Statestores.Adapters.MariaDBProjectionAdapter do
 
   use Scrivener, page_size: 50
 
-  alias Ecto.Repo
-
   import Ecto.Query
 
   alias Statestores.Schemas.Projection
@@ -45,7 +43,7 @@ defmodule Statestores.Adapters.MariaDBProjectionAdapter do
         limit: 1
       )
 
-    case Repo.one(query) do
+    case __MODULE__.one(query) do
       nil -> {:error, "No record found"}
       projection -> {:ok, projection}
     end
@@ -60,7 +58,7 @@ defmodule Statestores.Adapters.MariaDBProjectionAdapter do
         limit: 1
       )
 
-    case Repo.one(query) do
+    case __MODULE__.one(query) do
       nil -> {:error, "No record found"}
       projection -> {:ok, projection}
     end
@@ -73,7 +71,7 @@ defmodule Statestores.Adapters.MariaDBProjectionAdapter do
         order_by: [asc: p.inserted_at]
       )
 
-    case __MODULE__.Repo.paginate(query, page: page, page_size: page_size) do
+    case __MODULE__.paginate(query, page: page, page_size: page_size) do
       %Scrivener.Page{} = page_data -> {:ok, page_data}
       _ -> {:error, "No records found"}
     end
@@ -87,7 +85,7 @@ defmodule Statestores.Adapters.MariaDBProjectionAdapter do
         order_by: [asc: p.inserted_at]
       )
 
-    case __MODULE__.Repo.paginate(query, page: page, page_size: page_size) do
+    case __MODULE__.paginate(query, page: page, page_size: page_size) do
       %Scrivener.Page{} = page_data -> {:ok, page_data}
       _ -> {:error, "No records found"}
     end
@@ -101,7 +99,7 @@ defmodule Statestores.Adapters.MariaDBProjectionAdapter do
         order_by: [asc: p.inserted_at]
       )
 
-    case __MODULE__.Repo.paginate(query, page: page, page_size: page_size) do
+    case __MODULE__.paginate(query, page: page, page_size: page_size) do
       %Scrivener.Page{} = page_data -> {:ok, page_data}
       _ -> {:error, "No records found in the given time interval"}
     end
@@ -124,7 +122,7 @@ defmodule Statestores.Adapters.MariaDBProjectionAdapter do
         order_by: [asc: p.inserted_at]
       )
 
-    case __MODULE__.Repo.paginate(query, page: page, page_size: page_size) do
+    case __MODULE__.paginate(query, page: page, page_size: page_size) do
       %Scrivener.Page{} = page_data -> {:ok, page_data}
       _ -> {:error, "No records found in the given time interval"}
     end
@@ -136,7 +134,7 @@ defmodule Statestores.Adapters.MariaDBProjectionAdapter do
         metadata_key,
         metadata_value,
         page \\ 1,
-        page_size \\ 10
+        page_size \\ 50
       ) do
     query =
       from(p in {projection_name, Projection},
@@ -144,7 +142,7 @@ defmodule Statestores.Adapters.MariaDBProjectionAdapter do
         order_by: [asc: p.inserted_at]
       )
 
-    case __MODULE__.Repo.paginate(query, page: page, page_size: page_size) do
+    case __MODULE__.paginate(query, page: page, page_size: page_size) do
       %Scrivener.Page{} = page_data -> {:ok, page_data}
       _ -> {:error, "No projections found with the given json attribute and projection_id"}
     end
@@ -157,7 +155,7 @@ defmodule Statestores.Adapters.MariaDBProjectionAdapter do
         metadata_key,
         metadata_value,
         page \\ 1,
-        page_size \\ 10
+        page_size \\ 50
       ) do
     query =
       from(p in {projection_name, Projection},
@@ -166,7 +164,7 @@ defmodule Statestores.Adapters.MariaDBProjectionAdapter do
         order_by: [asc: p.inserted_at]
       )
 
-    case __MODULE__.Repo.paginate(query, page: page, page_size: page_size) do
+    case __MODULE__.paginate(query, page: page, page_size: page_size) do
       %Scrivener.Page{} = page_data -> {:ok, page_data}
       _ -> {:error, "No projections found with the given json attribute and projection_id"}
     end
@@ -174,12 +172,40 @@ defmodule Statestores.Adapters.MariaDBProjectionAdapter do
 
   @impl true
   def save(%Projection{} = projection) do
-    changeset = Projection.changeset(%Projection{}, ValueObjectSchema.to_map(projection))
+    record = ValueObjectSchema.to_map(projection)
+    {:ok, data} = Statestores.Vault.encrypt(record.data)
 
-    query = from(p in {projection.projection_name, Projection})
+    # TODO check if this query is correct for all use cases
+    query = """
+    INSERT INTO #{projection.projection_name}
+    (id, projection_id, projection_name, system, metadata, data_type, data, inserted_at, updated_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ON DUPLICATE KEY UPDATE
+      projection_id = VALUES(projection_id),
+      projection_name = VALUES(projection_name),
+      system = VALUES(system),
+      metadata = VALUES(metadata),
+      data_type = VALUES(data_type),
+      data = VALUES(data),
+      inserted_at = VALUES(inserted_at),
+      updated_at = VALUES(updated_at)
+    """
 
-    case Repo.insert_or_update(query, changeset) do
-      {:ok, projection} -> {:ok, projection}
+    bindings = [
+      record.id,
+      record.projection_id,
+      record.projection_name,
+      record.system,
+      record.metadata,
+      record.data_type,
+      data,
+      record.inserted_at,
+      record.updated_at
+    ]
+
+    # Execute the query using Ecto.Adapters.SQL.query/4
+    case Ecto.Adapters.SQL.query(__MODULE__, query, bindings) do
+      {:ok, _result} -> {:ok, projection}
       {:error, reason} -> {:error, reason}
     end
   end

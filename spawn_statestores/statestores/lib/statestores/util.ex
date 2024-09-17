@@ -228,5 +228,6 @@ defmodule Statestores.Util do
   defp load_snapshot_adapter_by_type(:native), do: Statestores.Adapters.NativeSnapshotAdapter
 
   # Projections Adapters
-  defp load_projection_adapter_by_type(:mariadb), do: Statestores.Adapters.MariaDBProjectionAdapter
+  defp load_projection_adapter_by_type(:mariadb),
+    do: Statestores.Adapters.MariaDBProjectionAdapter
 end
