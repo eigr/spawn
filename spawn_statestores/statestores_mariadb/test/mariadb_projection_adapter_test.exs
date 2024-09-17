@@ -24,7 +24,6 @@ defmodule Statestores.Adapters.MariaDBProjectionAdapterTest do
       IO.inspect(repo)
       projection_name = "test_projections"
 
-      # Insert mock data into the projection table
       {:ok, _} =
         repo.save(%Projection{
           id: "123",
@@ -74,7 +73,6 @@ defmodule Statestores.Adapters.MariaDBProjectionAdapterTest do
       repo = ctx.repo
       projection_name = "test_projections"
 
-      # Insert multiple records for pagination
       Enum.each(1..20, fn n ->
         repo.save(%Projection{
           id: "#{n}",
@@ -90,6 +88,7 @@ defmodule Statestores.Adapters.MariaDBProjectionAdapterTest do
       end)
 
       {:ok, result} = MariaDBProjectionAdapter.get_all(projection_name, 1, 10)
+      IO.inspect(result, label: "Pagination Result -----------")
       assert length(result.entries) == 10
       assert result.page_number == 1
     end

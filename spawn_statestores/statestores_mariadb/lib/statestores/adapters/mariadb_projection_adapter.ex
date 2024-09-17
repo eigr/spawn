@@ -3,21 +3,15 @@ defmodule Statestores.Adapters.MariaDBProjectionAdapter do
   Implements the ProjectionBehaviour for MariaDB, with dynamic table name support.
   """
   use Statestores.Adapters.ProjectionBehaviour
-
-  use Ecto.Repo,
-    otp_app: :spawn_statestores,
-    adapter: Ecto.Adapters.MyXQL
-
+  use Ecto.Repo, otp_app: :spawn_statestores, adapter: Ecto.Adapters.MyXQL
   use Scrivener, page_size: 50
 
   import Ecto.Query
 
-  alias Statestores.Schemas.Projection
-  alias Statestores.Schemas.ValueObjectSchema
+  alias Statestores.Schemas.{Projection, ValueObjectSchema}
 
   @impl true
-  def create_table(projection_name) when is_nil(projection_name),
-    do: {:error, "Projection name cannot be nil."}
+  def create_table(nil), do: {:error, "Projection name cannot be nil."}
 
   def create_table(projection_name) do
     query = """
@@ -34,12 +28,12 @@ defmodule Statestores.Adapters.MariaDBProjectionAdapter do
     );
     """
 
-    Ecto.Adapters.SQL.query(Statestores.Adapters.MariaDBProjectionAdapter, query)
+    Ecto.Adapters.SQL.query!(__MODULE__, query)
     {:ok, "Table #{projection_name} created or already exists."}
   end
 
   @impl true
-  def get_last(projection_name) when is_nil(projection_name), do: {:error, "No record found"}
+  def get_last(nil), do: {:error, "No record found"}
 
   def get_last(projection_name) do
     query =
@@ -48,17 +42,12 @@ defmodule Statestores.Adapters.MariaDBProjectionAdapter do
         limit: 1
       )
 
-    case __MODULE__.one(query) do
-      nil -> {:error, "No record found"}
-      projection -> {:ok, projection}
-    end
+    fetch_single_record(query)
   end
 
   @impl true
-  def get_last_by_projection_id(projection_name, projection_id)
-      when is_nil(projection_name) or is_nil(projection_id) do
-    {:error, "No record found"}
-  end
+  def get_last_by_projection_id(nil, _projection_id), do: {:error, "No record found"}
+  def get_last_by_projection_id(_projection_name, nil), do: {:error, "No record found"}
 
   def get_last_by_projection_id(projection_name, projection_id) do
     query =
@@ -68,15 +57,11 @@ defmodule Statestores.Adapters.MariaDBProjectionAdapter do
         limit: 1
       )
 
-    case __MODULE__.one(query) do
-      nil -> {:error, "No record found"}
-      projection -> {:ok, projection}
-    end
+    fetch_single_record(query)
   end
 
   @impl true
-  def get_all(projection_name, _page, _page_size) when is_nil(projection_name),
-    do: {:error, "No records found"}
+  def get_all(nil, _page, _page_size), do: {:error, "No records found"}
 
   def get_all(projection_name, page \\ 1, page_size \\ 50) do
     query =
@@ -84,19 +69,15 @@ defmodule Statestores.Adapters.MariaDBProjectionAdapter do
         order_by: [asc: p.inserted_at]
       )
 
-    case __MODULE__.paginate(query, page: page, page_size: page_size) do
-      %Scrivener.Page{} = page_data ->
-        {:ok, page_data}
-
-      _ ->
-        {:error, "No records found"}
-    end
+    paginate_query(query, page, page_size)
   end
 
   @impl true
-  def get_all_by_projection_id(projection_name, projection_id, _page, _page_size)
-      when is_nil(projection_name) or is_nil(projection_id),
-      do: {:error, "No records found"}
+  def get_all_by_projection_id(nil, _projection_id, _page, _page_size),
+    do: {:error, "No records found"}
+
+  def get_all_by_projection_id(_projection_name, nil, _page, _page_size),
+    do: {:error, "No records found"}
 
   def get_all_by_projection_id(projection_name, projection_id, page \\ 1, page_size \\ 50) do
     query =
@@ -105,20 +86,18 @@ defmodule Statestores.Adapters.MariaDBProjectionAdapter do
         order_by: [asc: p.inserted_at]
       )
 
-    case __MODULE__.paginate(query, page: page, page_size: page_size) do
-      %Scrivener.Page{} = page_data ->
-        {:ok, page_data}
-
-      _ ->
-        {:error, "No records found"}
-    end
+    paginate_query(query, page, page_size)
   end
 
   @impl true
-  def get_by_interval(projection_name, time_start, time_end, _page, _page_size)
-      when is_nil(projection_name) or is_nil(time_start) or is_nil(time_end) do
-    {:error, "No records found in the given time interval"}
-  end
+  def get_by_interval(nil, _time_start, _time_end, _page, _page_size),
+    do: {:error, "No records found"}
+
+  def get_by_interval(_projection_name, nil, _time_end, _page, _page_size),
+    do: {:error, "No records found"}
+
+  def get_by_interval(_projection_name, _time_start, nil, _page, _page_size),
+    do: {:error, "No records found"}
 
   def get_by_interval(projection_name, time_start, time_end, page \\ 1, page_size \\ 50) do
     query =
@@ -127,28 +106,49 @@ defmodule Statestores.Adapters.MariaDBProjectionAdapter do
         order_by: [asc: p.inserted_at]
       )
 
-    case __MODULE__.paginate(query, page: page, page_size: page_size) do
-      %Scrivener.Page{} = page_data ->
-        {:ok, page_data}
-
-      _ ->
-        {:error, "No records found in the given time interval"}
-    end
+    paginate_query(query, page, page_size)
   end
 
   @impl true
   def get_by_projection_id_and_interval(
-        projection_name,
-        projection_id,
-        time_start,
-        time_end,
+        nil,
+        _projection_id,
+        _time_start,
+        _time_end,
         _page,
         _page_size
-      )
-      when is_nil(projection_name) or is_nil(projection_id) or is_nil(time_start) or
-             is_nil(time_end) do
-    {:error, "No records found in the given time interval"}
-  end
+      ),
+      do: {:error, "No records found"}
+
+  def get_by_projection_id_and_interval(
+        _projection_name,
+        nil,
+        _time_start,
+        _time_end,
+        _page,
+        _page_size
+      ),
+      do: {:error, "No records found"}
+
+  def get_by_projection_id_and_interval(
+        _projection_name,
+        _projection_id,
+        nil,
+        _time_end,
+        _page,
+        _page_size
+      ),
+      do: {:error, "No records found"}
+
+  def get_by_projection_id_and_interval(
+        _projection_name,
+        _projection_id,
+        _time_start,
+        nil,
+        _page,
+        _page_size
+      ),
+      do: {:error, "No records found"}
 
   def get_by_projection_id_and_interval(
         projection_name,
@@ -166,13 +166,7 @@ defmodule Statestores.Adapters.MariaDBProjectionAdapter do
         order_by: [asc: p.inserted_at]
       )
 
-    case __MODULE__.paginate(query, page: page, page_size: page_size) do
-      %Scrivener.Page{} = page_data ->
-        {:ok, page_data}
-
-      _ ->
-        {:error, "No records found in the given time interval"}
-    end
+    paginate_query(query, page, page_size)
   end
 
   @impl true
@@ -183,13 +177,6 @@ defmodule Statestores.Adapters.MariaDBProjectionAdapter do
         page \\ 1,
         page_size \\ 50
       ) do
-    # Postgres way to find inside json
-    # query =
-    #   from(p in {projection_name, Projection},
-    #     where: fragment("?->>? = ?", p.metadata, ^metadata_key, ^metadata_value),
-    #     order_by: [asc: p.inserted_at]
-    #   )
-
     key = "$.#{metadata_key}"
 
     query =
@@ -199,13 +186,7 @@ defmodule Statestores.Adapters.MariaDBProjectionAdapter do
         order_by: [asc: p.inserted_at]
       )
 
-    case __MODULE__.paginate(query, page: page, page_size: page_size) do
-      %Scrivener.Page{} = page_data ->
-        {:ok, page_data}
-
-      _ ->
-        {:error, "No projections found with the given json attribute and projection_id"}
-    end
+    paginate_query(query, page, page_size)
   end
 
   @impl true
@@ -221,19 +202,13 @@ defmodule Statestores.Adapters.MariaDBProjectionAdapter do
 
     query =
       from(p in {projection_name, Projection},
-        where: p.projection_id == ^projection_id,
         where:
-          fragment("JSON_UNQUOTE(JSON_EXTRACT(?, ?)) = ?", p.metadata, ^key, ^metadata_value),
+          p.projection_id == ^projection_id and
+            fragment("JSON_UNQUOTE(JSON_EXTRACT(?, ?)) = ?", p.metadata, ^key, ^metadata_value),
         order_by: [asc: p.inserted_at]
       )
 
-    case __MODULE__.paginate(query, page: page, page_size: page_size) do
-      %Scrivener.Page{} = page_data ->
-        {:ok, page_data}
-
-      _ ->
-        {:error, "No projections found with the given json attribute and projection_id"}
-    end
+    paginate_query(query, page, page_size)
   end
 
   @impl true
@@ -241,7 +216,6 @@ defmodule Statestores.Adapters.MariaDBProjectionAdapter do
     record = ValueObjectSchema.to_map(projection)
     {:ok, data} = Statestores.Vault.encrypt(record.data)
 
-    # TODO check if this query is correct for all use cases
     query = """
     INSERT INTO #{projection.projection_name}
     (id, projection_id, projection_name, system, metadata, data_type, data, inserted_at, updated_at)
@@ -269,7 +243,6 @@ defmodule Statestores.Adapters.MariaDBProjectionAdapter do
       record.updated_at
     ]
 
-    # Execute the query using Ecto.Adapters.SQL.query/4
     case Ecto.Adapters.SQL.query(__MODULE__, query, bindings) do
       {:ok, _result} ->
         {:ok, projection}
@@ -282,6 +255,28 @@ defmodule Statestores.Adapters.MariaDBProjectionAdapter do
   @impl true
   def default_port, do: "3306"
 
-  defp to_json(map) when is_nil(map), do: Jason.encode!(%{})
+  defp to_json(nil), do: Jason.encode!(%{})
   defp to_json(map), do: Jason.encode!(map)
+
+  # Private helper to fetch a single record from the database
+  defp fetch_single_record(query) do
+    case __MODULE__.one(query) do
+      nil ->
+        {:error, "No record found"}
+
+      projection ->
+        {:ok, projection}
+    end
+  end
+
+  # Private helper to handle pagination
+  defp paginate_query(query, page, page_size) do
+    case __MODULE__.paginate(query, page: page, page_size: page_size) do
+      %Scrivener.Page{} = page_data ->
+        {:ok, page_data}
+
+      _ ->
+        {:error, "No records found"}
+    end
+  end
 end
