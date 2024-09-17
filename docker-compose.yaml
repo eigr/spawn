@@ -58,6 +58,8 @@ services:
       - mariadb:/var/lib/mysql
     ports:
       - "3307:3306"
+    networks:
+      - mysql-compose-network
 
   adminer:
     image: adminer

@@ -75,7 +75,7 @@ defmodule Statestores.Util do
 
   @spec load_snapshot_adapter :: adapter()
   def load_snapshot_adapter() do
-    case Application.fetch_env(@otp_app, :database_adapter) do
+    case Application.fetch_env(@otp_app, :_adapter) do
       {:ok, value} ->
         value
 
@@ -86,6 +86,22 @@ defmodule Statestores.Util do
           )
 
         load_snapshot_adapter_by_type(type)
+    end
+  end
+
+  @spec load_projection_adapter :: adapter()
+  def load_projection_adapter() do
+    case Application.fetch_env(@otp_app, :projection_adapter) do
+      {:ok, value} ->
+        value
+
+      :error ->
+        type =
+          String.to_existing_atom(
+            System.get_env("PROXY_DATABASE_TYPE", get_default_database_type())
+          )
+
+        load_projection_adapter_by_type(type)
     end
   end
 
@@ -210,4 +226,7 @@ defmodule Statestores.Util do
   defp load_snapshot_adapter_by_type(:postgres), do: Statestores.Adapters.PostgresSnapshotAdapter
 
   defp load_snapshot_adapter_by_type(:native), do: Statestores.Adapters.NativeSnapshotAdapter
+
+  # Projections Adapters
+  defp load_projection_adapter_by_type(:mariadb), do: Statestores.Adapters.MariaDBProjectionAdapter
 end
