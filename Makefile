@@ -1,5 +1,5 @@
 version=1.4.3
-registry=eigr
+registry=ghcr.io/eigr
 
 CLUSTER_NAME=spawn-k8s
 K3D_KUBECONFIG_PATH?=./integration.yaml
