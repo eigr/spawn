@@ -27,9 +27,9 @@ defmodule Statestores.Adapters.PostgresProjectionAdapter do
       system VARCHAR(255),
       metadata JSON,
       data_type VARCHAR(255),
-      data BLOB,
-      inserted_at DATETIME,
-      updated_at DATETIME
+      data BYTEA,
+      inserted_at TIMESTAMP,
+      updated_at TIMESTAMP
     );
     """
 
