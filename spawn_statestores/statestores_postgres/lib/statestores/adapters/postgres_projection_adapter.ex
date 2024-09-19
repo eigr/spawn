@@ -3,9 +3,11 @@ defmodule Statestores.Adapters.PostgresProjectionAdapter do
   Implements the ProjectionBehaviour for Postgres, with dynamic table name support.
   """
   use Statestores.Adapters.ProjectionBehaviour
+
   use Ecto.Repo,
     otp_app: :spawn_statestores,
     adapter: Ecto.Adapters.Postgres
+
   use Scrivener, page_size: 50
 
   alias Statestores.Schemas.{Projection, ValueObjectSchema}
@@ -200,12 +202,10 @@ defmodule Statestores.Adapters.PostgresProjectionAdapter do
         page_size \\ 50
       ) do
     table_name = normalize_table_name(projection_name)
-    key = "$.#{metadata_key}"
 
     query =
       from(p in {table_name, Projection},
-        where:
-          fragment("JSON_UNQUOTE(JSON_EXTRACT(?, ?)) = ?", p.metadata, ^key, ^metadata_value),
+        where: fragment("?->>? = ?", p.metadata, ^metadata_key, ^metadata_value),
         order_by: [asc: p.inserted_at]
       )
 
@@ -222,13 +222,12 @@ defmodule Statestores.Adapters.PostgresProjectionAdapter do
         page_size \\ 50
       ) do
     table_name = normalize_table_name(projection_name)
-    key = "$.#{metadata_key}"
 
     query =
       from(p in {table_name, Projection},
         where:
           p.projection_id == ^projection_id and
-            fragment("JSON_UNQUOTE(JSON_EXTRACT(?, ?)) = ?", p.metadata, ^key, ^metadata_value),
+            fragment("?->>? = ?", p.metadata, ^metadata_key, ^metadata_value),
         order_by: [asc: p.inserted_at]
       )
 
@@ -237,23 +236,24 @@ defmodule Statestores.Adapters.PostgresProjectionAdapter do
 
   @impl true
   def save(%Projection{} = projection) do
-    table_name = normalize_table_name(projection.projection_name)
     record = ValueObjectSchema.to_map(projection)
     {:ok, data} = Statestores.Vault.encrypt(record.data)
 
+    # Prepare the SQL query using `ON CONFLICT`
     query = """
-    INSERT INTO #{table_name}
+    INSERT INTO #{projection.projection_name}
     (id, projection_id, projection_name, system, metadata, data_type, data, inserted_at, updated_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ON DUPLICATE KEY UPDATE
-      projection_id = VALUES(projection_id),
-      projection_name = VALUES(projection_name),
-      system = VALUES(system),
-      metadata = VALUES(metadata),
-      data_type = VALUES(data_type),
-      data = VALUES(data),
-      inserted_at = VALUES(inserted_at),
-      updated_at = VALUES(updated_at)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+    ON CONFLICT (id) DO UPDATE
+    SET
+      projection_id = EXCLUDED.projection_id,
+      projection_name = EXCLUDED.projection_name,
+      system = EXCLUDED.system,
+      metadata = EXCLUDED.metadata,
+      data_type = EXCLUDED.data_type,
+      data = EXCLUDED.data,
+      inserted_at = EXCLUDED.inserted_at,
+      updated_at = EXCLUDED.updated_at
     """
 
     bindings = [
@@ -261,13 +261,14 @@ defmodule Statestores.Adapters.PostgresProjectionAdapter do
       record.projection_id,
       record.projection_name,
       record.system,
-      to_json(record.metadata),
+      record.metadata,
       record.data_type,
       data,
       record.inserted_at,
       record.updated_at
     ]
 
+    # Execute the query using Ecto.Adapters.SQL.query/4
     case Ecto.Adapters.SQL.query(__MODULE__, query, bindings) do
       {:ok, _result} ->
         {:ok, projection}

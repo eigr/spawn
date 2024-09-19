@@ -6,10 +6,10 @@ defmodule Statestores.Schemas.Projection do
   schema "projection_placeholder" do
     field :projection_id, :string
     field :projection_name, :string
-    field(:system, :string)
+    field :system, :string
     field :metadata, :map
     field :data_type, :string
-    field(:data, Statestores.Types.Binary)
+    field :data, Statestores.Types.Binary
     field :inserted_at, :naive_datetime
     field :updated_at, :naive_datetime
   end
