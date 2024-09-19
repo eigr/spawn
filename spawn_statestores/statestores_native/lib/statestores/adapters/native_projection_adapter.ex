@@ -12,6 +12,7 @@ defmodule Statestores.Adapters.NativeProjectionAdapter do
   def create_table(nil), do: {:error, "Projection name cannot be nil."}
 
   def create_table(projection_name) do
+    table_name = normalize_table_name(projection_name)
     {:ok, "Table #{table_name} created or already exists."}
   end
 
@@ -144,5 +145,4 @@ defmodule Statestores.Adapters.NativeProjectionAdapter do
 
   @impl true
   def default_port, do: "0000"
-
 end
