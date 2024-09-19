@@ -242,5 +242,5 @@ defmodule Statestores.Util do
     do: Statestores.Adapters.PostgresProjectionAdapter
 
   defp load_projection_adapter_by_type(:native),
-    do: nil
+    do: Statestores.Adapters.NativeProjectionAdapter
 end
