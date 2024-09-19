@@ -324,6 +324,23 @@ defmodule SpawnSdk.Actor do
 
       @behaviour SpawnSdk.Actor
       @before_compile SpawnSdk.Actor
+
+      service_mod = opts[:service]
+      service_name = service_mod.__meta__(:name)
+
+      Enum.each(service_mod.__rpc_calls__(), fn {name, {_, req_stream}, {_, res_stream}, _options} =
+                                                  rpc ->
+        func_name = name |> to_string |> Macro.underscore()
+
+        def unquote(String.to_atom(func_name))(
+              %SpawnSdk.ActorRef{} = receiver,
+              request,
+              opts \\ []
+            ) do
+          receiver
+          |> SpawnSdk.Actor.invoke(action: name, data: request)
+        end
+      end)
     end
   end
 
