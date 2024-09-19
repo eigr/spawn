@@ -240,4 +240,7 @@ defmodule Statestores.Util do
 
   defp load_projection_adapter_by_type(:postgres),
     do: Statestores.Adapters.PostgresProjectionAdapter
+
+  defp load_projection_adapter_by_type(:native),
+    do: nil
 end
