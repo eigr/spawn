@@ -40,6 +40,14 @@ defmodule Statestores.Adapters.Native.CustomMnesiacSupervisor do
 
       {:error, {:failed_to_connect_node, node}} ->
         Logger.warning("Failed to connect node: #{node}")
+
+      {:error, :enoent} ->
+        Logger.error(
+          "Failed to initialize Native Statestore. ENOENT The current working directory has been unlinked."
+        )
+
+      error ->
+        Logger.error("Failed to initialize Native Statestore. Details: #{inspect(error)}")
     end
 
     _ = Logger.info("[mnesiac:#{node()}] mnesiac started")

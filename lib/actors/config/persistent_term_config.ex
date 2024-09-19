@@ -80,6 +80,9 @@ if Code.ensure_loaded?(:persistent_term) do
       {:ship_interval, "2"},
       {:ship_debounce, "2"},
       {:sync_interval, "2"},
+      {:security_idp_spire_enabled, "true"},
+      {:security_idp_spire_server_address, "spire-server.spire.svc.cluster.local"},
+      {:security_idp_spire_server_port, "8081"},
       {:state_handoff_controller_adapter, "crdt"},
       {:state_handoff_manager_pool_size, "20"},
       {:state_handoff_manager_call_timeout, "60000"},
@@ -670,6 +673,33 @@ if Code.ensure_loaded?(:persistent_term) do
         |> String.to_integer()
 
       :persistent_term.put({__MODULE__, :proxy_db_pool_size}, value)
+
+      value
+    end
+
+    defp load_env({:security_idp_spire_enabled, default}) do
+      value =
+        env("SPAWN_IDP_SPIRE_ENABLED", default)
+        |> to_bool()
+
+      :persistent_term.put({__MODULE__, :security_idp_spire_enabled}, value)
+
+      value
+    end
+
+    defp load_env({:security_idp_spire_server_address, default}) do
+      value = env("SPAWN_IDP_SPIRE_ADDRESS", default)
+      :persistent_term.put({__MODULE__, :security_idp_spire_server_address}, value)
+
+      value
+    end
+
+    defp load_env({:security_idp_spire_server_port, default}) do
+      value =
+        env("SPAWN_IDP_SPIRE_PORT", default)
+        |> String.to_integer()
+
+      :persistent_term.put({__MODULE__, :security_idp_spire_server_port}, value)
 
       value
     end
