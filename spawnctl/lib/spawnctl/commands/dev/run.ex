@@ -237,7 +237,9 @@ defmodule SpawnCtl.Commands.Dev.Run do
   end
 
   defp handle_container_start_result({:ok, container}, opts) do
-    log_success(container, opts)
+    :os.type()
+    |> log_success(container, opts)
+
     setup_exit_handler(container)
     {:ok, container}
   end
@@ -391,7 +393,40 @@ defmodule SpawnCtl.Commands.Dev.Run do
     end
   end
 
-  defp log_success(container, opts) do
+  case :os.type() do
+    {:win32, _} ->
+      container
+
+    {:unix, :darwin} ->
+      container
+
+    {:unix, _} ->
+      container
+      |> Container.with_network_mode("host")
+  end
+
+  defp log_success({:win32, _}, container, opts), do: log_sucess_with_ports(container, opts)
+
+  defp log_success({:unix, :darwin}, container, opts), do: log_sucess_with_ports(container, opts)
+
+  defp log_success({:unix, _}, container, opts) do
+    start_time = DateTime.utc_now() |> DateTime.to_string()
+
+    log(:info, Emoji.exclamation(), "Spawn Proxy using host network. Exposed ports: [
+      Proxy HTTP: #{opts.proxy_bind_port},
+      Proxy gRPC: #{opts.proxy_bind_grpc_port}
+    ]")
+
+    log(
+      :info,
+      Emoji.rocket(),
+      "[#{start_time}] Spawn Proxy started successfully. Container Id: #{container.container_id}"
+    )
+  end
+
+  defp log_sucess_with_ports(container, opts) do
+    tart_time = DateTime.utc_now() |> DateTime.to_string()
+
     log(:info, Emoji.exclamation(), "Spawn Proxy uses the following mapped ports: [
       Proxy HTTP: #{inspect(Container.mapped_port(container, opts.proxy_bind_port))}:#{opts.proxy_bind_port},
       Proxy gRPC: #{inspect(Container.mapped_port(container, opts.proxy_bind_grpc_port))}:#{opts.proxy_bind_grpc_port}
@@ -400,7 +435,7 @@ defmodule SpawnCtl.Commands.Dev.Run do
     log(
       :info,
       Emoji.rocket(),
-      "Spawn Proxy started successfully in dev mode. Container Id: #{container.container_id}"
+      "[#{start_time}] Spawn Proxy started successfully. Container Id: #{container.container_id}"
     )
   end
 
