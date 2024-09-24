@@ -393,6 +393,7 @@ defmodule SpawnCtl.Commands.Dev.Run do
     |> Container.with_environment("USER_FUNCTION_PORT", "#{opts.actor_host_port}")
     |> Container.with_environment("RELEASE_NAME", "#{opts.name}")
     |> Container.with_fixed_port(opts.proxy_bind_port)
+    |> Container.with_exposed_port(opts.proxy_bind_grpc_port)
     |> maybe_use_host_network(opts)
     |> maybe_use_database_volume(opts)
     |> Container.with_label("spawn.actorsystem.name", opts.actor_system)
@@ -404,8 +405,7 @@ defmodule SpawnCtl.Commands.Dev.Run do
   defp build_nats_container(opts) do
     Container.new(opts.nats_image)
     |> maybe_use_host_network(opts)
-    |> Container.with_fixed_port(opts.nats_port)
-    |> Container.with_fixed_port(opts.nats_http_port)
+    |> Container.with_exposed_ports([opts.nats_port, opts.nats_http_port])
     |> Container.with_cmd(["--jetstream", "--http_port=#{opts.nats_http_port}"])
   end
 
