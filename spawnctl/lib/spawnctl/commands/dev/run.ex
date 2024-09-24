@@ -354,6 +354,7 @@ defmodule SpawnCtl.Commands.Dev.Run do
     |> Container.with_environment("USER_FUNCTION_PORT", "#{opts.actor_host_port}")
     |> Container.with_environment("RELEASE_NAME", "#{opts.name}")
     |> Container.with_fixed_port(opts.proxy_bind_port)
+    |> Container.with_exposed_port(opts.proxy_bind_grpc_port)
     |> maybe_use_host_network(opts)
     |> maybe_use_database_volume(opts)
     |> Container.with_label("spawn.actorsystem.name", opts.actor_system)
