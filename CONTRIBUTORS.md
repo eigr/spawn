@@ -17,17 +17,17 @@
         </a>
     </td>
     <td align="center" style="word-wrap: break-word; width: 150.0; height: 150.0">
-        <a href=https://github.com/adolfont>
-            <img src=https://avatars.githubusercontent.com/u/79562?v=4 width="100;"  alt=Adolfo Neto/>
-            <br />
-            <sub style="font-size:14px"><b>Adolfo Neto</b></sub>
-        </a>
-    </td>
-    <td align="center" style="word-wrap: break-word; width: 150.0; height: 150.0">
         <a href=https://github.com/h3nrique>
             <img src=https://avatars.githubusercontent.com/u/813562?v=4 width="100;"  alt=Paulo Henrique Alves/>
             <br />
             <sub style="font-size:14px"><b>Paulo Henrique Alves</b></sub>
+        </a>
+    </td>
+    <td align="center" style="word-wrap: break-word; width: 150.0; height: 150.0">
+        <a href=https://github.com/adolfont>
+            <img src=https://avatars.githubusercontent.com/u/79562?v=4 width="100;"  alt=Adolfo Neto/>
+            <br />
+            <sub style="font-size:14px"><b>Adolfo Neto</b></sub>
         </a>
     </td>
     <td align="center" style="word-wrap: break-word; width: 150.0; height: 150.0">
