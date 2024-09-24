@@ -30,6 +30,9 @@ erl_crash.dump
 
 .elixir_ls/**
 
+**/**/_build/
+**/**/deps/
+
 # Temporary Sqlite3 database
 eigr-functions-db.db
 

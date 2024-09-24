@@ -10,6 +10,12 @@ Application.put_env(
   Statestores.Adapters.PostgresLookupAdapter
 )
 
+Application.put_env(
+  :spawn_statestores,
+  :database_projection_adapter,
+  Statestores.Adapters.PostgresProjectionAdapter
+)
+
 ExUnit.start()
 
 Statestores.Supervisor.start_link(%{})
