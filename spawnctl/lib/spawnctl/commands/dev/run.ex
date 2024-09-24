@@ -191,7 +191,23 @@ defmodule SpawnCtl.Commands.Dev.Run do
 
   This function starts the Spawn proxy container with the provided options.
   """
-  def run(_, opts, ctx) do
+  def run(args, opts, ctx) do
+    parent = self()
+
+    {:ok, :quit} =
+      System.trap_signal(:sigquit, :quit, fn ->
+        send(parent, :exit)
+        :ok
+      end)
+
+    spawn(fn -> do_run(args, opts, ctx) end)
+
+    receive do
+      :exit -> System.stop()
+    end
+  end
+
+  defp do_run(_, opts, ctx) do
     log(:info, Emoji.runner(), "Starting Spawn Proxy in dev mode...")
 
     if opts.proto_changes_watcher do
@@ -393,18 +409,6 @@ defmodule SpawnCtl.Commands.Dev.Run do
     end
   end
 
-  case :os.type() do
-    {:win32, _} ->
-      container
-
-    {:unix, :darwin} ->
-      container
-
-    {:unix, _} ->
-      container
-      |> Container.with_network_mode("host")
-  end
-
   defp log_success({:win32, _}, container, opts), do: log_sucess_with_ports(container, opts)
 
   defp log_success({:unix, :darwin}, container, opts), do: log_sucess_with_ports(container, opts)
@@ -425,7 +429,7 @@ defmodule SpawnCtl.Commands.Dev.Run do
   end
 
   defp log_sucess_with_ports(container, opts) do
-    tart_time = DateTime.utc_now() |> DateTime.to_string()
+    start_time = DateTime.utc_now() |> DateTime.to_string()
 
     log(:info, Emoji.exclamation(), "Spawn Proxy uses the following mapped ports: [
       Proxy HTTP: #{inspect(Container.mapped_port(container, opts.proxy_bind_port))}:#{opts.proxy_bind_port},
