@@ -12,16 +12,16 @@
 [![join discord](https://badgen.net/badge/discord/Join%20Eigr%20on%20Discord/discord?icon=discord&label&color=blue)](https://discord.gg/2PcshvfS93)
 [![twitter](https://badgen.net/badge/twitter/@eigr_io/blue?label&icon=twitter)](https://twitter.com/eigr_io)
 
-### **[Website](https://eigr.io)** • **[Getting Started](docs/getting_started.md)** • **[SDKs](docs/sdks.md)** • **[Documentation](https://eigr.io/docs/projects-spawn/spawn-introduction/)** • **[Blog](https://eigr.io/blog/)**
+### **[Website](https://eigr.io)** • **[Documentation](https://eigr.io/docs/projects-spawn/spawn-introduction/)** • **[Blog](https://eigr.io/blog/)**
 
 
-## Overview 
+## Overview
 
 Spawn is a groundbreaking open-source runtime designed to address the needs of modern businesses. Originating from contributors to [Cloudstate](https://github.com/cloudstateio/cloudstate), Spawn offers a flexible and scalable solution for both cloud and on-premises environments.
 
 With its polyglot capabilities, Spawn supports multiple programming languages, empowering your team to utilize the best tools for each task. This flexibility not only enhances developer productivity but also accelerates the achievement of your business goals.
 
-Explore how Spawn can help you meet your business objectives efficiently. Check out our [documentation](docs/index.md) to [get started](docs/getting_started.md).
+Explore how Spawn can help you meet your business objectives efficiently. Check out our [documentation](docs/index.md) and [installation guide](docs/install.md) to [get started](docs/getting_started.md).
 
 ## Why Choose Spawn?
 

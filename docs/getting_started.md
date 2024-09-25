@@ -7,119 +7,15 @@ First we must develop our HostFunction. Look for the documentation for each [SDK
 - [Using NodeJS SDK](https://github.com/eigr/spawn-node-sdk#installation)
 - [Using Python SDK](https://github.com/eigr/spawn-python-sdk#getting-started)
 
-Having our container created and containing our Actor Host Function (following above SDK recommendations), we must deploy
-it in a Kubernetes cluster with the Spawn Controller installed (See more about this
-process in the section on installation).
-
-In this tutorial we are going to use a MySql database. In this case, in order for Spawn to know how to connect to the database instance, it is first necessary to create a kubernetes secret in same namespace you installed the Spawn Operator with the connection data and other parameters. Example:
+But basically you can create your Spawn applications through the CLI. But basically you can create your Spawn applications through the CLI. For example, to create an application based on the NodeJS template, just type the following command in your terminal:
 
 ```shell
-kubectl create secret generic mysql-connection-secret -n eigr-functions \
-  --from-literal=database=eigr-functions-db \
-  --from-literal=host='mysql' \
-  --from-literal=port='3306' \
-  --from-literal=username='admin' \
-  --from-literal=password='admin' \
-  --from-literal=encryptionKey=$(openssl rand -base64 32)
+spawn new node hello_world
 ```
 
-Sapwn securely encrypts the Actors' State, so the **_encryptionKey_** item must be informed and must be a key of reasonable size and complexity to ensure the security of your data.
+See the following gif for another example:
 
-> **_NOTE:_** To learn more about Statestores settings, see the [statestore section](statestores.md).
-
-If you are going to use the Activators resource in your project or if you want your Actors to be able to communicate between different ActorSystems then you will need to create a secret with the connection information with the Nats server. See an example of how to do this below:
-
-> **_NOTICE:_** It is not within the scope of this tutorial to install Nats but a simple way to do it in kubernetes is in to run these commands: **helm repo add nats https://nats-io.github.io/k8s/helm/charts/ && helm install spawn-nats nats/nats**.
-
-Now create the config file with the Nats credentials:
-
-```
-kubectl -n default create secret generic nats-invocation-conn-secret \
-  --from-literal=url="nats://spawn-nats:4222" \
-  --from-literal=authEnabled="false" \
-  --from-literal=tlsEnabled="false" \
-  --from-literal=username="" \
-  --from-literal=password=""
-```
-
-Now in a directory of your choice, create a file called **_system.yaml_** with the following content:
-
-```yaml
----
-apiVersion: spawn-eigr.io/v1
-kind: ActorSystem
-metadata:
-  name: spawn-system # Mandatory. Name of the ActorSystem
-  namespace: default # Optional. Default namespace is "default"
-spec:
-  # This externalInvocation section is necessary only if Nats broker is used in your project.
-  externalInvocation:
-    enabled: "true"
-    externalConnectorRef: nats-invocation-conn-secret
-  statestore:
-    type: MySql # Valid are [MySql, Postgres, Sqlite, MSSQL, CockroachDB]
-    credentialsSecretRef: mysql-connection-secret # The secret containing connection params created in the previous step.
-    pool: # Optional
-      size: "10"
-```
-
-This file will be responsible for creating a system of actors in the cluster.
-
-Now create a new file called **_host.yaml_** with the following content:
-
-```yaml
----
-apiVersion: spawn-eigr.io/v1
-kind: ActorHost
-metadata:
-  name: spawn-springboot-example # Mandatory. Name of the Node containing Actor Host Functions
-  namespace: default # Optional. Default namespace is "default"
-  annotations:
-    # Mandatory. Name of the ActorSystem declared in ActorSystem CRD
-    spawn-eigr.io/actor-system: spawn-system
-spec:
-  host:
-    image: eigr/spawn-springboot-examples:latest # Mandatory
-    ports:
-      - name: "http"
-        containerPort: 8091
-```
-
-This file will be responsible for deploying your host function and actors in the cluster.
-But if you are using the SDK for Elixir then your Yaml should look like this:
-
-```yaml
----
-apiVersion: spawn-eigr.io/v1
-kind: ActorHost
-metadata:
-  name: spawn-dice-game
-  namespace: default
-  annotations:
-    spawn-eigr.io/actor-system: game-system
-spec:
-  host:
-    embedded: true # This indicates that it is a native BEAM application and therefore does not need a sidecar proxy attached.
-    image: eigr/dice-game-example:1.4.3
-    ports:
-      - name: "http"
-        containerPort: 8800
-```
-
-Now that the files have been defined, we can apply them to the cluster:
-
-```shell
-kubectl apply -f system.yaml
-kubectl apply -f host.yaml
-```
-
-After that, just check your actors with:
-
-```shell
-kubectl get actorhosts
-```
-
-### Examples
+![Create Your First Project](docs/gifs/new-project.gif)
 
 Once you have done the initial setup you can start developing your actors in several available languages. See below how easy it is to do this:
 
@@ -160,6 +56,7 @@ Once you have done the initial setup you can start developing your actors in sev
       state_type: Io.Eigr.Spawn.Example.MyState, # or :json if you don't care about protobuf types
     
     require Logger
+    
     alias Io.Eigr.Spawn.Example.{MyState, MyBusinessMessage}
 
     action "Sum", fn %Context{state: state} = ctx, %MyBusinessMessage{value: value} = data ->
@@ -178,38 +75,48 @@ Once you have done the initial setup you can start developing your actors in sev
   ```java
   package io.eigr.spawn.java.demo;
 
-  import io.eigr.spawn.api.actors.Value;
   import io.eigr.spawn.api.actors.ActorContext;
-  import io.eigr.spawn.api.actors.annotations.Action;
-  import io.eigr.spawn.api.actors.annotations.stateful.StatefulNamedActor;
-  import io.eigr.spawn.java.demo.domain.Domain;
-  import org.slf4j.Logger;
-  import org.slf4j.LoggerFactory;
+  import io.eigr.spawn.api.actors.StatefulActor;
+  import io.eigr.spawn.api.actors.Value;
+  import io.eigr.spawn.api.actors.behaviors.ActorBehavior;
+  import io.eigr.spawn.api.actors.behaviors.BehaviorCtx;
+  import io.eigr.spawn.api.actors.behaviors.NamedActorBehavior;
+  import io.eigr.spawn.api.actors.ActionBindings;
+  import domain.Reply;
+  import domain.Request;
+  import domain.State;
 
-  @StatefulNamedActor(name = "joe", stateType = Domain.JoeState.class)
-  public class Joe {
-    private static final Logger log = LoggerFactory.getLogger(Joe.class);
+  import static io.eigr.spawn.api.actors.behaviors.ActorBehavior.*;
 
-    @Action
-    public Value setLanguage(Domain.Request msg, ActorContext<Domain.JoeState> context) {
-        log.info("Received invocation. Message: {}. Context: {}", msg, context);
-        if (context.getState().isPresent()) {
-          log.info("State is present and value is {}", context.getState().get());
-        }
+  public final class JoeActor implements StatefulActor<State> {
 
-        return Value.at()
-                .response(Domain.Reply.newBuilder()
-                        .setResponse("Hello From Java")
-                        .build())
-                .state(updateState("erlang"))
-                .reply();
-    }
+      @Override
+      public ActorBehavior configure(BehaviorCtx context) {
+          return new NamedActorBehavior(
+                  name("JoeActor"),
+                  channel("test.channel"),
+                  action("SetLanguage", ActionBindings.of(Request.class, this::setLanguage))
+          );
+      }
 
-    private Domain.JoeState updateState(String language) {
-        return Domain.JoeState.newBuilder()
-                .addLanguages(language)
-                .build();
-    }
+      private Value setLanguage(ActorContext<State> context, Request msg) {
+          if (context.getState().isPresent()) {
+              //Do something with previous state
+          }
+
+          return Value.at()
+                  .response(Reply.newBuilder()
+                          .setResponse(String.format("Hi %s. Hello From Java", msg.getLanguage()))
+                          .build())
+                  .state(updateState(msg.getLanguage()))
+                  .reply();
+      }
+
+      private State updateState(String language) {
+          return State.newBuilder()
+                  .addLanguages(language)
+                  .build();
+      }
   }
   ```
 </details>
@@ -278,6 +185,122 @@ Once you have done the initial setup you can start developing your actors in sev
   }
   ```
 </details>
+
+### Deploy
+
+Having our container created and containing our Actor Host Function (following above SDK recommendations), we must deploy
+it in a Kubernetes cluster with the Spawn Operator installed (See more about this
+process in the section on installation).
+
+In this tutorial we are going to use a MariaDB database. In this case, in order for Spawn to know how to connect to the database instance, it is first necessary to create a kubernetes secret in same namespace you installed the Spawn Operator with the connection data and other parameters. Example:
+
+```shell
+kubectl create secret generic mariadb-connection-secret -n eigr-functions \
+  --from-literal=database=eigr-functions-db \
+  --from-literal=host='mariadb' \
+  --from-literal=port='3306' \
+  --from-literal=username='admin' \
+  --from-literal=password='admin' \
+  --from-literal=encryptionKey=$(openssl rand -base64 32)
+```
+
+Spawn securely encrypts the Actors' State, so the **_encryptionKey_** item must be informed and must be a key of reasonable size and complexity to ensure the security of your data.
+
+> **_NOTE:_** To learn more about Statestores settings, see the [statestore section](statestores.md).
+
+If you are going to use the Activators resource in your project or if you want your Actors to be able to communicate between different ActorSystems then you will need to create a secret with the connection information with the Nats server. See an example of how to do this below:
+
+> **_NOTICE:_** It is not within the scope of this tutorial to install Nats but a simple way to do it in kubernetes is in to run these commands: **helm repo add nats https://nats-io.github.io/k8s/helm/charts/ && helm install spawn-nats nats/nats**.
+
+Now create the config file with the Nats credentials:
+
+```
+kubectl -n default create secret generic nats-invocation-conn-secret \
+  --from-literal=url="nats://spawn-nats:4222" \
+  --from-literal=authEnabled="false" \
+  --from-literal=tlsEnabled="false" \
+  --from-literal=username="" \
+  --from-literal=password=""
+```
+
+Now in a directory of your choice, create a file called **_system.yaml_** with the following content:
+
+```yaml
+---
+apiVersion: spawn-eigr.io/v1
+kind: ActorSystem
+metadata:
+  name: spawn-system # 1. Mandatory. Name of the ActorSystem
+  namespace: default # 2. Optional. Default namespace is "default"
+spec:
+  # This externalInvocation section is necessary only if Nats broker is used in your project.
+  externalInvocation:
+    enabled: "true"
+    externalConnectorRef: nats-invocation-conn-secret # 3. Credentials to connect on Nats broker.
+  statestore:
+    type: MariaDB # 4. Set database provider. Valid are [MariaDB, Postgres, Native]
+    credentialsSecretRef: mariadb-connection-secret # 5. The secret containing the database connection params created in the previous step.
+    pool: # Optional
+      size: "10"
+```
+
+This file will be responsible for creating a system of actors in the cluster.
+
+Now create a new file called **_host.yaml_** with the following content:
+
+```yaml
+---
+apiVersion: spawn-eigr.io/v1
+kind: ActorHost
+metadata:
+  name: spawn-springboot-example # 1. Mandatory. Name of the Node containing Actor Host Functions
+  namespace: default # 2. Optional. Default namespace is "default"
+  annotations:
+    # 3. Mandatory. Name of the ActorSystem declared in ActorSystem CRD
+    spawn-eigr.io/actor-system: spawn-system
+spec:
+  host:
+    image: eigr/spawn-springboot-examples:latest # 4. Mandatory. Container image
+    ports:
+      - name: "http"
+        containerPort: 8091
+```
+
+This file will be responsible for deploying your host function and actors in the cluster.
+But if you are using the SDK for Elixir then your Yaml should look like this:
+
+```yaml
+---
+apiVersion: spawn-eigr.io/v1
+kind: ActorHost
+metadata:
+  name: spawn-dice-game
+  namespace: default
+  annotations:
+    spawn-eigr.io/actor-system: game-system
+spec:
+  host:
+    embedded: true # This indicates that it is a native BEAM application and therefore does not need a sidecar proxy attached.
+    image: eigr/dice-game-example:1.4.3
+    ports:
+      - name: "http"
+        containerPort: 8800
+```
+
+Now that the files have been defined, we can apply them to the cluster:
+
+```shell
+kubectl apply -f system.yaml
+kubectl apply -f host.yaml
+```
+
+After that, just check your actors with:
+
+```shell
+kubectl get actorhosts
+```
+
+### Examples
 
 You can find some project examples of using Spawn in the links below:
 

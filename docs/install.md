@@ -23,9 +23,9 @@ At this point you will be ready to also install our Kubernetes Operator. Assumin
 spawn install k8s --context=minikube
 ```
 
-For the full list of options use spawn install kubernetes: `spawn install k8s --help`.
+For the full list of options use: `spawn install k8s --help`.
 
-Alternatively you can also install the Operator directly via manifest file.. The following command shows how this could be done directly via the command line:
+Alternatively you can also install the Operator directly via manifest file. The following command shows how this could be done directly via the command line:
 
 ```shell
 kubectl create ns eigr-functions && curl -L https://github.com/eigr/spawn/releases/download/{release-version}/manifest.yaml | kubectl apply -f -
