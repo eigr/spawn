@@ -17,7 +17,9 @@ Installing is very simple. First download and install our CLI in one command lin
 curl -sSL https://github.com/eigr/spawn/releases/download/v1.4.3/install.sh | sh
 ```
 
-At this point you will be ready to also install our Kubernetes Operator. Assuming the Kubernetes context you want to install to is called `minikube` the command would be as follows:
+At this point you will be ready to also install our Kubernetes Operator.
+
+Assuming the Kubernetes context you want to install to is called `minikube` the command would be as follows:
 
 ```sh
 spawn install k8s --context=minikube
