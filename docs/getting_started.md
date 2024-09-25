@@ -53,11 +53,22 @@ You can also check out the following gif for another example:
 
 Once you have done the initial setup you can start developing your actors in several available languages. See below how easy it is to do this:
 
-<details open>
-  <summary>NodeJS/Bun</summary>
+<table class="styled-table">
+  <thead>
+    <tr>
+      <th>Language</th>
+      <th>Example</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr>
+  <td>Typescript</td>
+  <td>
+  <details open>
+    <summary>Show Code</summary>
 
-  ```js 
-  import spawn, { ActorContext, Value } from '@eigr/spawn-sdk'
+```js
+import spawn, { ActorContext, Value } from '@eigr/spawn-sdk'
   import { UserState, ChangeUserNamePayload, ChangeUserNameStatus } from 'src/protos/examples/user_example'
 
   const system = spawn.createSystem('SpawnSystemName')
@@ -75,150 +86,169 @@ Once you have done the initial setup you can start developing your actors in sev
   }
 
   actor.addAction({ name: 'setName', payloadType: ChangeUserNamePayload }, setNameHandler)
-  ```
-</details>
+```
+  </details>
+  </td>
+</tr>
+    <tr>
+      <td>Elixir</td>
+      <td>
+      <details>
+        <summary>Show Code</summary>
 
-<details>
-  <summary>Elixir</summary>
+```elixir
+defmodule SpawnSdkExample.Actors.MyActor do
+  use SpawnSdk.Actor,
+    name: "joe",
+    kind: :named,
+    stateful: true, 
+    state_type: Io.Eigr.Spawn.Example.MyState, # or :json if you don't care about protobuf types
   
-  ```elixir
-  defmodule SpawnSdkExample.Actors.MyActor do
-    use SpawnSdk.Actor,
-      name: "joe",
-      kind: :named,
-      stateful: true, 
-      state_type: Io.Eigr.Spawn.Example.MyState, # or :json if you don't care about protobuf types
-    
-    require Logger
-    
-    alias Io.Eigr.Spawn.Example.{MyState, MyBusinessMessage}
+  require Logger
+  
+  alias Io.Eigr.Spawn.Example.{MyState, MyBusinessMessage}
 
-    action "Sum", fn %Context{state: state} = ctx, %MyBusinessMessage{value: value} = data ->
-      Logger.info("Received Request: #{inspect(data)}. Context: #{inspect(ctx)}")
-      new_value = if is_nil(state), do: value, else: (state.value || 0) + value
+  action "Sum", fn %Context{state: state} = ctx, %MyBusinessMessage{value: value} = data ->
+    Logger.info("Received Request: #{inspect(data)}. Context: #{inspect(ctx)}")
+    new_value = if is_nil(state), do: value, else: (state.value || 0) + value
 
-      Value.of(%MyBusinessMessage{value: new_value}, %MyState{value: new_value})
-    end
+    Value.of(%MyBusinessMessage{value: new_value}, %MyState{value: new_value})
   end
-  ```
-</details>
+end
+```
+  </details>
+  </td>
+</tr>
+<tr>
+  <td>Java</td>
+  <td>
+  <details>
+    <summary>Show Code</summary>
 
-<details>
-  <summary>Java</summary>
-  
-  ```java
-  package io.eigr.spawn.java.demo;
+```java
+package io.eigr.spawn.java.demo;
 
-  import io.eigr.spawn.api.actors.ActorContext;
-  import io.eigr.spawn.api.actors.StatefulActor;
-  import io.eigr.spawn.api.actors.Value;
-  import io.eigr.spawn.api.actors.behaviors.ActorBehavior;
-  import io.eigr.spawn.api.actors.behaviors.BehaviorCtx;
-  import io.eigr.spawn.api.actors.behaviors.NamedActorBehavior;
-  import io.eigr.spawn.api.actors.ActionBindings;
-  import domain.Reply;
-  import domain.Request;
-  import domain.State;
+import io.eigr.spawn.api.actors.ActorContext;
+import io.eigr.spawn.api.actors.StatefulActor;
+import io.eigr.spawn.api.actors.Value;
+import io.eigr.spawn.api.actors.behaviors.ActorBehavior;
+import io.eigr.spawn.api.actors.behaviors.BehaviorCtx;
+import io.eigr.spawn.api.actors.behaviors.NamedActorBehavior;
+import io.eigr.spawn.api.actors.ActionBindings;
+import domain.Reply;
+import domain.Request;
+import domain.State;
 
-  import static io.eigr.spawn.api.actors.behaviors.ActorBehavior.*;
+import static io.eigr.spawn.api.actors.behaviors.ActorBehavior.*;
 
-  public final class JoeActor implements StatefulActor<State> {
+public final class JoeActor implements StatefulActor<State> {
 
-      @Override
-      public ActorBehavior configure(BehaviorCtx context) {
-          return new NamedActorBehavior(
-                  name("JoeActor"),
-                  channel("test.channel"),
-                  action("SetLanguage", ActionBindings.of(Request.class, this::setLanguage))
-          );
-      }
+    @Override
+    public ActorBehavior configure(BehaviorCtx context) {
+        return new NamedActorBehavior(
+                name("JoeActor"),
+                channel("test.channel"),
+                action("SetLanguage", ActionBindings.of(Request.class, this::setLanguage))
+        );
+    }
 
-      private Value setLanguage(ActorContext<State> context, Request msg) {
-          if (context.getState().isPresent()) {
-              //Do something with previous state
-          }
+    private Value setLanguage(ActorContext<State> context, Request msg) {
+        if (context.getState().isPresent()) {
+            //Do something with previous state
+        }
 
-          return Value.at()
-                  .response(Reply.newBuilder()
-                          .setResponse(String.format("Hi %s. Hello From Java", msg.getLanguage()))
-                          .build())
-                  .state(updateState(msg.getLanguage()))
-                  .reply();
-      }
+        return Value.at()
+                .response(Reply.newBuilder()
+                        .setResponse(String.format("Hi %s. Hello From Java", msg.getLanguage()))
+                        .build())
+                .state(updateState(msg.getLanguage()))
+                .reply();
+    }
 
-      private State updateState(String language) {
-          return State.newBuilder()
-                  .addLanguages(language)
-                  .build();
-      }
-  }
-  ```
-</details>
+    private State updateState(String language) {
+        return State.newBuilder()
+                .addLanguages(language)
+                .build();
+    }
+}
+```
+  </details>
+  </td>
+</tr>
+<tr>
+  <td>Python</td>
+  <td>
+  <details>
+    <summary>Show Code</summary>
 
-<details>
-  <summary>Python</summary>
-  
-  ```python
-  from domain.domain_pb2 import JoeState, Request
-  from spawn.eigr.functions.actors.api.actor import Actor
-  from spawn.eigr.functions.actors.api.settings import ActorSettings
-  from spawn.eigr.functions.actors.api.context import Context
-  from spawn.eigr.functions.actors.api.value import Value
+```python
+from domain.domain_pb2 import JoeState, Request
+from spawn.eigr.functions.actors.api.actor import Actor
+from spawn.eigr.functions.actors.api.settings import ActorSettings
+from spawn.eigr.functions.actors.api.context import Context
+from spawn.eigr.functions.actors.api.value import Value
 
-  actor = Actor(settings=ActorSettings(
-      name="joe", stateful=True, channel="test"))
+actor = Actor(settings=ActorSettings(
+    name="joe", stateful=True, channel="test"))
 
 
-  @actor.action("setLanguage")
-  def set_language(request: Request, ctx: Context) -> Value:
-      new_state = None
+@actor.action("setLanguage")
+def set_language(request: Request, ctx: Context) -> Value:
+    new_state = None
 
-      if not ctx.state:
-          new_state = JoeState()
-          new_state.languages.append("python")
-      else:
-          new_state = ctx.state
+    if not ctx.state:
+        new_state = JoeState()
+        new_state.languages.append("python")
+    else:
+        new_state = ctx.state
 
-      return Value().state(new_state).noreply()
-  ```
-</details>
+    return Value().state(new_state).noreply()
+```
+  </details>
+  </td>
+</tr>
+<tr>
+  <td>Rust</td>
+  <td>
+  <details>
+    <summary>Show Code</summary>
 
-<details>
-  <summary>Rust</summary>
-  
-  ```rust
-  use spawn_examples::domain::domain::{Reply, Request, State};
-  use spawn_rs::{value::Value, Context, Message};
+```rust
+use spawn_examples::domain::domain::{Reply, Request, State};
+use spawn_rs::{value::Value, Context, Message};
 
-  use log::info;
+use log::info;
 
-  pub fn set_language(msg: Message, ctx: Context) -> Value {
-      info!("Actor msg: {:?}", msg);
-      return match msg.body::<Request>() {
-          Ok(request) => {
-              let lang = request.language;
-              info!("Setlanguage To: {:?}", lang);
-              let mut reply = Reply::default();
-              reply.response = lang;
+pub fn set_language(msg: Message, ctx: Context) -> Value {
+    info!("Actor msg: {:?}", msg);
+    return match msg.body::<Request>() {
+        Ok(request) => {
+            let lang = request.language;
+            info!("Setlanguage To: {:?}", lang);
+            let mut reply = Reply::default();
+            reply.response = lang;
 
-              match &ctx.state::<State>() {
-                  Some(state) => Value::new()
-                      .state::<State>(&state.as_ref().unwrap(), "domain.State".to_string())
-                      .response(&reply, "domain.Reply".to_string())
-                      .to_owned(),
-                  _ => Value::new()
-                      .state::<State>(&State::default(), "domain.State".to_string())
-                      .response(&reply, "domain.Reply".to_string())
-                      .to_owned(),
-              }
-          }
-          Err(_e) => Value::new()
-              .state::<State>(&State::default(), "domain.State".to_string())
-              .to_owned(),
-      };
-  }
-  ```
-</details>
+            match &ctx.state::<State>() {
+                Some(state) => Value::new()
+                    .state::<State>(&state.as_ref().unwrap(), "domain.State".to_string())
+                    .response(&reply, "domain.Reply".to_string())
+                    .to_owned(),
+                _ => Value::new()
+                    .state::<State>(&State::default(), "domain.State".to_string())
+                    .response(&reply, "domain.Reply".to_string())
+                    .to_owned(),
+            }
+        }
+        Err(_e) => Value::new()
+            .state::<State>(&State::default(), "domain.State".to_string())
+            .to_owned(),
+    };
+}
+```
+  </details>
+  </td>
+</tr>
+</tbody> </table>
 
 ### Deploy
 
