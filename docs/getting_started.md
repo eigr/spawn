@@ -52,7 +52,7 @@ You can also check out the following gif for another example:
 ![Create Your First Project](gifs/new-project.gif)
 
 Once you have done the initial setup you can start developing your actors in several available languages. See below how easy it is to do this:
-
+<!-- 
 <table class="styled-table">
   <thead>
     <tr>
@@ -248,7 +248,7 @@ pub fn set_language(msg: Message, ctx: Context) -> Value {
   </details>
   </td>
 </tr>
-</tbody></table>
+</tbody></table> -->
 
 ### Deploy
 
