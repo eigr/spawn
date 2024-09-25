@@ -23,7 +23,11 @@ At this point you will be ready to also install our Kubernetes Operator. Assumin
 spawn install k8s --context=minikube
 ```
 
-For the full list of options use: `spawn install k8s --help`.
+See the demonstration below for a better understanding of the installation process:
+
+![Setting Up Operator](docs/gifs/install.gif)
+
+> **_NOTE:_** For the full list of options use: `spawn install k8s --help`.
 
 Alternatively you can also install the Operator directly via manifest file. The following command shows how this could be done directly via the command line:
 

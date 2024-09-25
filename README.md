@@ -37,30 +37,6 @@ Spawn's stateful computing model abstracts complex infrastructure tasks, enablin
 
 For CEOs and CTOs, Spawn provides confidence that your company's objectives can be achieved more swiftly and efficiently, enhancing competitiveness without compromising on technical quality or scalability.
 
-## Getting Started with Spawn
-
-Starting with Spawn is straightforward and efficient. Here are two quick demonstrations to help you begin:
-
-### Step 1: Installing the Actor Orchestrator Runtime
-
-To get started, you'll need to install the Spawn Actor Orchestrator runtime. The current runtime is available as an operator for Kubernetes. We also provide a CLI to simplify this process.
-
-1. **Install the CLI:**
-
-   ```sh
-   curl -sSL https://github.com/eigr/spawn/releases/download/v1.4.3/install.sh | sh
-   ```
-
-2. **Install the Operator**   
-
-![Setting Up Operator](docs/gifs/install.gif)
-
-### Step 2: Create Your First Project
-
-![Create Your First Project](docs/gifs/new-project.gif)
-
-Check out our [documentation](docs/index.md) for detailed guides and tutorials.
-
 ## Latest Blogs
 
 * https://eigr.io/blog/spawn-the-actor-mesh/
