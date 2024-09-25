@@ -21,7 +21,3 @@ defaults:
 # Add links to your custom CSS
 include:
   - assets/css/style.css
-
-# Plugins (if any)
-plugins:
-  - jekyll-feed
