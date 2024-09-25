@@ -56,7 +56,7 @@ Once you have done the initial setup you can start developing your actors in sev
 <details open>
   <summary>NodeJS/Bun</summary>
 
-  ```js
+  ```js 
   import spawn, { ActorContext, Value } from '@eigr/spawn-sdk'
   import { UserState, ChangeUserNamePayload, ChangeUserNameStatus } from 'src/protos/examples/user_example'
 
