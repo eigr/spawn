@@ -7,7 +7,7 @@ To begin, you'll need to develop your HostFunction application. Refer to the doc
 - [Using NodeJS SDK](https://github.com/eigr/spawn-node-sdk#installation)
 - [Using Python SDK](https://github.com/eigr/spawn-python-sdk#getting-started)
 
-Alternatively, you can quickly scaffold a Spawn application using the CLI.
+Alternatively, you can quickly scaffold a Spawn application [using the CLI](install.md).
 
 For example, to create a NodeJS application template, run the following command:
 
