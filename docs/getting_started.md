@@ -51,50 +51,32 @@ You can also check out the following gif for another example:
 
 ![Create Your First Project](gifs/new-project.gif)
 
-Once you have done the initial setup you can start developing your actors in several available languages. See below how easy it is to do this:
-<!-- 
-<table class="styled-table">
-  <thead>
-    <tr>
-      <th>Language</th>
-      <th>Example</th>
-    </tr>
-  </thead>
-  <tbody>
-<tr>
-  <td>Typescript</td>
-  <td>
-  <details open>
-    <summary>Show Code</summary>
+Once you have done the initial setup you can start developing your actors in several available languages. See below how easy it is to do this in some languages:
+
+NodeJS 
 
 ```js
 import spawn, { ActorContext, Value } from '@eigr/spawn-sdk'
-  import { UserState, ChangeUserNamePayload, ChangeUserNameStatus } from 'src/protos/examples/user_example'
+import { UserState, ChangeUserNamePayload, ChangeUserNameStatus } from 'src/protos/examples/user_example'
 
-  const system = spawn.createSystem('SpawnSystemName')
+const system = spawn.createSystem('SpawnSystemName')
 
-  const actor = system.buildActor({
-    name: 'joe',
-    stateType: UserState, // or 'json' if you don't want to use protobufs
-    stateful: true,
-  })
+const actor = system.buildActor({
+  name: 'joe',
+  stateType: UserState, // or 'json' if you don't want to use protobufs
+  stateful: true,
+})
 
-  const setNameHandler = async (context: ActorContext<UserState>, payload: ChangeUserNamePayload) => {
-    return Value.of<UserState, ChangeUserNameResponse>()
-      .state({ name: payload.newName })
-      .response(ChangeUserNameResponse, { status: ChangeUserNameStatus.OK })
-  }
+const setNameHandler = async (context: ActorContext<UserState>, payload: ChangeUserNamePayload) => {
+  return Value.of<UserState, ChangeUserNameResponse>()
+    .state({ name: payload.newName })
+    .response(ChangeUserNameResponse, { status: ChangeUserNameStatus.OK })
+}
 
-  actor.addAction({ name: 'setName', payloadType: ChangeUserNamePayload }, setNameHandler)
+actor.addAction({ name: 'setName', payloadType: ChangeUserNamePayload }, setNameHandler)
 ```
-  </details>
-  </td>
-</tr>
-    <tr>
-      <td>Elixir</td>
-      <td>
-      <details>
-        <summary>Show Code</summary>
+
+Elixir
 
 ```elixir
 defmodule SpawnSdkExample.Actors.MyActor do
@@ -116,15 +98,8 @@ defmodule SpawnSdkExample.Actors.MyActor do
   end
 end
 ```
-  </details>
-  </td>
-</tr>
-<tr>
-  <td>Java</td>
-  <td>
-  <details>
-    <summary>Show Code</summary>
 
+Java
 ```java
 package io.eigr.spawn.java.demo;
 
@@ -142,44 +117,37 @@ import domain.State;
 import static io.eigr.spawn.api.actors.behaviors.ActorBehavior.*;
 
 public final class JoeActor implements StatefulActor<State> {
+  @Override
+  public ActorBehavior configure(BehaviorCtx context) {
+      return new NamedActorBehavior(
+              name("JoeActor"),
+              channel("test.channel"),
+              action("SetLanguage", ActionBindings.of(Request.class, this::setLanguage))
+      );
+  }
 
-    @Override
-    public ActorBehavior configure(BehaviorCtx context) {
-        return new NamedActorBehavior(
-                name("JoeActor"),
-                channel("test.channel"),
-                action("SetLanguage", ActionBindings.of(Request.class, this::setLanguage))
-        );
-    }
+  private Value setLanguage(ActorContext<State> context, Request msg) {
+      if (context.getState().isPresent()) {
+          //Do something with previous state
+      }
 
-    private Value setLanguage(ActorContext<State> context, Request msg) {
-        if (context.getState().isPresent()) {
-            //Do something with previous state
-        }
+      return Value.at()
+              .response(Reply.newBuilder()
+                      .setResponse(String.format("Hi %s. Hello From Java", msg.getLanguage()))
+                      .build())
+              .state(updateState(msg.getLanguage()))
+              .reply();
+  }
 
-        return Value.at()
-                .response(Reply.newBuilder()
-                        .setResponse(String.format("Hi %s. Hello From Java", msg.getLanguage()))
-                        .build())
-                .state(updateState(msg.getLanguage()))
-                .reply();
-    }
-
-    private State updateState(String language) {
-        return State.newBuilder()
-                .addLanguages(language)
-                .build();
-    }
+  private State updateState(String language) {
+      return State.newBuilder()
+              .addLanguages(language)
+              .build();
+  }
 }
 ```
-  </details>
-  </td>
-</tr>
-<tr>
-  <td>Python</td>
-  <td>
-  <details>
-    <summary>Show Code</summary>
+
+Python
 
 ```python
 from domain.domain_pb2 import JoeState, Request
@@ -190,7 +158,6 @@ from spawn.eigr.functions.actors.api.value import Value
 
 actor = Actor(settings=ActorSettings(
     name="joe", stateful=True, channel="test"))
-
 
 @actor.action("setLanguage")
 def set_language(request: Request, ctx: Context) -> Value:
@@ -203,16 +170,10 @@ def set_language(request: Request, ctx: Context) -> Value:
         new_state = ctx.state
 
     return Value().state(new_state).noreply()
-```
-  </details>
-  </td>
-</tr>
-<tr>
-  <td>Rust</td>
-  <td>
-  <details>
-    <summary>Show Code</summary>
 
+```
+
+Rust
 ```rust
 use spawn_examples::domain::domain::{Reply, Request, State};
 use spawn_rs::{value::Value, Context, Message};
@@ -245,10 +206,6 @@ pub fn set_language(msg: Message, ctx: Context) -> Value {
     };
 }
 ```
-  </details>
-  </td>
-</tr>
-</tbody></table> -->
 
 ### Deploy
 
