@@ -248,7 +248,7 @@ pub fn set_language(msg: Message, ctx: Context) -> Value {
   </details>
   </td>
 </tr>
-</tbody> </table>
+</tbody></table>
 
 ### Deploy
 
