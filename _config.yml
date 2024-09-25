@@ -4,20 +4,12 @@ description: >- # Markdown support is enabled
 
 # Build settings
 markdown: kramdown
-theme: minima # Default theme, or you can specify another one
+theme: slate # Default theme, or you can specify another one
 
 # Custom CSS
 sass:
   style: compressed
 
-# Include your custom CSS file
-defaults:
-  - scope:
-      path: ""
-      type: "page"
-    values:
-      layout: "default"
-
 # Add links to your custom CSS
 include:
-  - assets/css/style.css
+  - /assets/css/style.css
