@@ -4,7 +4,7 @@ description: >- # Markdown support is enabled
 
 # Build settings
 markdown: kramdown
-theme: slate # Default theme, or you can specify another one
+remote_theme: pages-themes/slate@v0.2.0
 
 # Custom CSS
 sass:
@@ -13,3 +13,6 @@ sass:
 # Add links to your custom CSS
 include:
   - /assets/css/style.css
+
+plugins:
+  - jekyll-remote-theme # add this line to the plugins list if you already have one
