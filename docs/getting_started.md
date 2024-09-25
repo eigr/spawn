@@ -15,7 +15,7 @@ spawn new node hello_world
 
 See the following gif for another example:
 
-![Create Your First Project](docs/gifs/new-project.gif)
+![Create Your First Project](gifs/new-project.gif)
 
 Once you have done the initial setup you can start developing your actors in several available languages. See below how easy it is to do this:
 

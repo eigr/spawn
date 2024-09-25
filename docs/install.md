@@ -27,7 +27,7 @@ spawn install k8s --context=minikube
 
 See the demonstration below for a better understanding of the installation process:
 
-![Setting Up Operator](docs/gifs/install.gif)
+![Setting Up Operator](gifs/install.gif)
 
 > **_NOTE:_** For the full list of options use: `spawn install k8s --help`.
 
