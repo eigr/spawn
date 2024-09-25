@@ -4,6 +4,7 @@ description: >- # Markdown support is enabled
 
 # Build settings
 markdown: kramdown
+theme: minima # Default theme, or you can specify another one
 
 # Custom CSS
 sass:
