@@ -203,12 +203,14 @@ defmodule SpawnCtl.Commands.Dev.Run do
     spawn(fn -> do_run(args, opts, ctx) end)
 
     receive do
-      :exit -> System.stop()
+      :exit ->
+        log(:info, Emoji.runner(), "[#{get_time()}] Stopping Spawn Proxy...")
+        System.stop()
     end
   end
 
   defp do_run(_, opts, ctx) do
-    log(:info, Emoji.runner(), "Starting Spawn Proxy in dev mode...")
+    log(:info, Emoji.runner(), "[#{get_time()}] Starting Spawn Proxy in dev mode...")
 
     if opts.proto_changes_watcher do
       paths =
@@ -414,8 +416,6 @@ defmodule SpawnCtl.Commands.Dev.Run do
   defp log_success({:unix, :darwin}, container, opts), do: log_sucess_with_ports(container, opts)
 
   defp log_success({:unix, _}, container, opts) do
-    start_time = DateTime.utc_now() |> DateTime.to_string()
-
     log(:info, Emoji.exclamation(), "Spawn Proxy using host network. Exposed ports: [
       Proxy HTTP: #{opts.proxy_bind_port},
       Proxy gRPC: #{opts.proxy_bind_grpc_port}
@@ -424,13 +424,11 @@ defmodule SpawnCtl.Commands.Dev.Run do
     log(
       :info,
       Emoji.rocket(),
-      "[#{start_time}] Spawn Proxy started successfully. Container Id: #{container.container_id}"
+      "[#{get_time()}] Spawn Proxy started successfully. Container Id: #{container.container_id}"
     )
   end
 
   defp log_sucess_with_ports(container, opts) do
-    start_time = DateTime.utc_now() |> DateTime.to_string()
-
     log(:info, Emoji.exclamation(), "Spawn Proxy uses the following mapped ports: [
       Proxy HTTP: #{inspect(Container.mapped_port(container, opts.proxy_bind_port))}:#{opts.proxy_bind_port},
       Proxy gRPC: #{inspect(Container.mapped_port(container, opts.proxy_bind_grpc_port))}:#{opts.proxy_bind_grpc_port}
@@ -439,7 +437,7 @@ defmodule SpawnCtl.Commands.Dev.Run do
     log(
       :info,
       Emoji.rocket(),
-      "[#{start_time}] Spawn Proxy started successfully. Container Id: #{container.container_id}"
+      "[#{get_time()}] Spawn Proxy started successfully. Container Id: #{container.container_id}"
     )
   end
 
@@ -449,6 +447,10 @@ defmodule SpawnCtl.Commands.Dev.Run do
       Emoji.tired_face(),
       "Failure occurring during Spawn Proxy start phase. Details: #{inspect(error)}"
     )
+  end
+
+  defp get_time() do
+    DateTime.utc_now() |> DateTime.to_string()
   end
 
   defp setup_exit_handler(container) do

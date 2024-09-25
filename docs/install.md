@@ -11,7 +11,21 @@ The recommended way to install Spawn is via our Kubernetes Operator.
 
 ### Instructions
 
-To install you need to download the Operator manifest file. The following command shows how this could be done directly via the command line:
+Installing is very simple. First download and install our CLI in one command line:
+
+```sh
+curl -sSL https://github.com/eigr/spawn/releases/download/v1.4.3/install.sh | sh
+```
+
+At this point you will be ready to also install our Kubernetes Operator. Assuming the Kubernetes context you want to install to is called `minikube` the command would be as follows:
+
+```sh
+spawn install k8s --context=minikube
+```
+
+For the full list of options use spawn install kubernetes: `spawn install k8s --help`.
+
+Alternatively you can also install the Operator directly via manifest file.. The following command shows how this could be done directly via the command line:
 
 ```shell
 kubectl create ns eigr-functions && curl -L https://github.com/eigr/spawn/releases/download/{release-version}/manifest.yaml | kubectl apply -f -
