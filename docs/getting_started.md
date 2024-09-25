@@ -53,7 +53,7 @@ You can also check out the following gif for another example:
 
 Once you have done the initial setup you can start developing your actors in several available languages. See below how easy it is to do this in some languages:
 
-NodeJS 
+**NodeJS**
 
 ```js
 import spawn, { ActorContext, Value } from '@eigr/spawn-sdk'
@@ -76,7 +76,7 @@ const setNameHandler = async (context: ActorContext<UserState>, payload: ChangeU
 actor.addAction({ name: 'setName', payloadType: ChangeUserNamePayload }, setNameHandler)
 ```
 
-Elixir
+**Elixir**
 
 ```elixir
 defmodule SpawnSdkExample.Actors.MyActor do
@@ -99,7 +99,7 @@ defmodule SpawnSdkExample.Actors.MyActor do
 end
 ```
 
-Java
+**Java**
 ```java
 package io.eigr.spawn.java.demo;
 
@@ -147,7 +147,7 @@ public final class JoeActor implements StatefulActor<State> {
 }
 ```
 
-Python
+**Python**
 
 ```python
 from domain.domain_pb2 import JoeState, Request
@@ -173,7 +173,7 @@ def set_language(request: Request, ctx: Context) -> Value:
 
 ```
 
-Rust
+**Rust**
 ```rust
 use spawn_examples::domain::domain::{Reply, Request, State};
 use spawn_rs::{value::Value, Context, Message};
