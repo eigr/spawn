@@ -16,7 +16,11 @@ Spawn currently has or develops SDK for the following languages:
 | Rust            | 🚧      | https://github.com/eigr/spawn-rust-sdk                      |
 | Spring Boot     | ✅      | https://github.com/eigr/spawn-springboot-sdk                |
 
+Full documentation for each language can be found in each of their repositories, but [here](sdks/index.md) we provide a quick introduction to each.
+
 [Back to Index](index.md)
+
+[Jump to language support index](sdks/index.md)
 
 [Next: Custom Resources](crds.md)
 
