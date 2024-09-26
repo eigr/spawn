@@ -57,6 +57,8 @@ Watch some insightful talks on Eigr Community and Spawn:
 - **Adriano Santos ElugSP 2023**: https://www.youtube.com/watch?v=MKTqiAtpK1E _(Portuguese)_
 - **Elias Arruda on Elixir CWB (Curitiba)**: https://www.youtube.com/live/yE_uWbPEWnI?si=5L3SORG3PERZpQ4V&t=463 _(Portuguese)_
 
+- **Adriano Santos NodeBR on Microsoft Reactor - API's Like a Boss**: https://www.youtube.com/live/ZXJJ3BdgVBk?si=Ai0kfBrVTl6V7toT&t=373 _(Portuguese)_
+
 
 ## Meet Sepp: Our Cyberpunk Mascot
 

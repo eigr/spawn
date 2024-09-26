@@ -1,6 +1,6 @@
 # Install
 
-The recommended way to install Spawn is via our Kubernetes Operator.
+The recommended way to install Spawn is via our CLI tool.
 
 ### Prerequisites
 
