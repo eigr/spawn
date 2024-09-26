@@ -108,6 +108,8 @@ Sent," "Verified," and "Active." Each state defines how the actor responds to me
 
 The Actor Model offers a robust paradigm for building scalable, resilient, and maintainable software systems. By embracing message-passing and encapsulating state within actors, developers can address the complexities of concurrency and distribution effectively. In business applications, this model can streamline processes such as order handling, customer interactions, financial transactions, and game interactions. The granularity of actors significantly impacts system performance and maintainability, requiring careful management through profiling, dynamic actor creation, state partitioning, and batch processing. Additionally, actors can be modeled as business entities, aligning system design with real-world processes. By implementing architectural patterns like Sagas, Event Sourcing, CQRS, and State Machines, the Actor Model can enhance the robustness and scalability of a wide range of applications.
 
+[Back to Index](index.md)
+
 [Next: Index](index.md)
 
 [Previous: History](history.md)
