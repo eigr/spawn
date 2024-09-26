@@ -1,6 +1,6 @@
 # Spawn Language Support
 
-# Table of Contents
+### Table of Contents
 
 01. [Dart](dart/getting_started.md)
     - 1.2. [Actors](dart/actors.md) 
