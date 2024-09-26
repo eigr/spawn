@@ -13,7 +13,7 @@
 [![join discord](https://badgen.net/badge/discord/Join%20Eigr%20on%20Discord/discord?icon=discord&label&color=blue)](https://discord.gg/2PcshvfS93)
 [![twitter](https://badgen.net/badge/twitter/@eigr_io/blue?label&icon=twitter)](https://twitter.com/eigr_io)
 
-### **[Getting Started ](https://eigr.io/spawn/docs/getting_started.html)** • **[Website](https://eigr.io)** • **[Documentation](https://eigr.io/spawn/docs/)** • **[Blog](https://eigr.io/blog/)**
+### **[Getting Started ](https://eigr.io/spawn/docs/getting_started.html)** • **[Website](https://eigr.io/spawn)** • **[Documentation](https://eigr.io/spawn/docs/)** • **[Blog](https://eigr.io/blog/)**
 
 
 ## Overview
