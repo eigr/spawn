@@ -28,7 +28,7 @@ Explore how Spawn can help you meet your business objectives efficiently. Check 
 
 - **Simplified Infrastructure:** Spawn abstracts the complex backend architecture so developers can focus on writing business logic, not managing infrastructure.
 - **Stateful Computing Made Easy:** Spawn handles state management natively, allowing your applications to be both scalable and resilient across distributed systems.
-- **Polyglot Flexibility:** Build in the language of your choice, from Elixir to Java to TypeScript, all within the same ecosystem.
+- **Polyglot Flexibility:** Build in the language of your choice, from Elixir to Java to TypeScript and others, all within the same ecosystem.
 - **Seamless Scalability:** Whether you’re deploying in the cloud or on-premises, Spawn grows with your business, ensuring high availability and performance.
 - **Designed for Business Needs:** Optimize productivity by streamlining your development process with a runtime that enables rapid time-to-market for critical features.
 
