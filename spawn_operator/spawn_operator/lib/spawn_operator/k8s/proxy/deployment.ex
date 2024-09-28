@@ -70,7 +70,7 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
          } = _resource
        ) do
     host_params = Map.get(params, "host")
-    task_actors_config = Map.get(host_params, "taskActors", %{})
+    task_actors_config = %{"taskActors" => Map.get(host_params, "taskActors", %{})}
     topology = Map.get(params, "topology", %{})
 
     replicas = max(1, Map.get(params, "replicas", @default_actor_host_function_replicas))
@@ -213,7 +213,7 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
     actor_host_function_image = Map.get(host_params, "image")
 
     actor_host_function_envs =
-      if length(Map.values(task_actors_config)) == 0 do
+      if is_nil(task_actors_config) || List.first(Map.values(task_actors_config)) == %{} do
         Map.get(host_params, "env", []) ++ @default_actor_host_function_env
       else
         Map.get(host_params, "env", []) ++
@@ -279,7 +279,7 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
     ]
 
     envs =
-      if length(Map.values(task_actors_config)) == 0 do
+      if is_nil(task_actors_config) || List.first(Map.values(task_actors_config)) == %{} do
         @default_actor_host_function_env
       else
         @default_actor_host_function_env ++ build_task_env(task_actors_config)
