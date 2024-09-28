@@ -20,6 +20,30 @@ defmodule SpawnOperator.FactoryTest do
     }
   end
 
+  def build_embedded_actor_host_with_node_selector(attrs \\ []) do
+    %{
+      "apiVersion" => "spawn-eigr.io/v1",
+      "kind" => "ActorHost",
+      "metadata" => %{
+        "name" => attrs[:name] || "spawn-test",
+        "system" => "spawn-system",
+        "namespace" => "default",
+        "generation" => 1
+      },
+      "spec" => %{
+        "topology" => %{
+          "nodeSelector" => %{
+            "gpu" => "false"
+          }
+        },
+        "host" => %{
+          "embedded" => true,
+          "image" => attrs[:host_image] || "eigr/spawn-test:latest"
+        }
+      }
+    }
+  end
+
   def build_embedded_actor_host_with_volume_mounts(attrs \\ []) do
     %{
       "apiVersion" => "spawn-eigr.io/v1",
