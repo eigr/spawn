@@ -417,7 +417,11 @@ defmodule DeploymentTest do
                            %{"name" => "SPAWN_PROXY_INTERFACE", "value" => "0.0.0.0"},
                            %{"name" => "RELEASE_DISTRIBUTION", "value" => "name"},
                            %{"name" => "RELEASE_NODE", "value" => "$(RELEASE_NAME)@$(POD_IP)"},
-                           %{"name" => "SPAWN_PROXY_TASK_CONFIG", "value" => "PMRHIYLTNNAWG5DPOJZSEOS3PMRHAYLSMVXHITTBNVSSEORCJJXXGZJCFQRHI33QN5WG6Z3ZEI5HWITON5SGKU3FNRSWG5DPOIRDU6ZCM5YHKIR2EJTGC3DTMURH27L5LV6Q===="}
+                           %{
+                             "name" => "SPAWN_PROXY_TASK_CONFIG",
+                             "value" =>
+                               "PMRHIYLTNNAWG5DPOJZSEOS3PMRHAYLSMVXHITTBNVSSEORCJJXXGZJCFQRHI33QN5WG6Z3ZEI5HWITON5SGKU3FNRSWG5DPOIRDU6ZCM5YHKIR2EJTGC3DTMURH27L5LV6Q===="
+                           }
                          ],
                          "envFrom" => [
                            %{"configMapRef" => %{"name" => "spawn-test-sidecar-cm"}},

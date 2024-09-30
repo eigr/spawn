@@ -71,6 +71,7 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
        ) do
     host_params = Map.get(params, "host")
     task_actors_config = %{"taskActors" => Map.get(host_params, "taskActors", %{})}
+    IO.inspect(task_actors_config, label: "Config ------------------------")
     topology = Map.get(params, "topology", %{})
 
     replicas = max(1, Map.get(params, "replicas", @default_actor_host_function_replicas))
@@ -196,17 +197,6 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
         ]
       }
     }
-  end
-
-  defp build_task_env(task_actors_config) do
-    value =
-      task_actors_config
-      |> Jason.encode!()
-      |> Base.encode32()
-
-    [
-      %{"name" => "SPAWN_PROXY_TASK_CONFIG", "value" => value}
-    ]
   end
 
   defp get_containers(true, system, name, host_params, annotations, task_actors_config) do
@@ -345,6 +335,17 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
     [
       proxy_container,
       host_container
+    ]
+  end
+
+  defp build_task_env(task_actors_config) do
+    value =
+      task_actors_config
+      |> Jason.encode!()
+      |> Base.encode32()
+
+    [
+      %{"name" => "SPAWN_PROXY_TASK_CONFIG", "value" => value}
     ]
   end
 

@@ -44,6 +44,14 @@ spec:
     # this configure podTemplate for Task Actors
     taskActors:
       - parentName: Jose
+        workerPool:
+          min: 0
+          max: 10
+          maxConcurrency: 100
+          bootTimeout: 30000
+          callTimeout: 30000
+          oneShoot: "false"
+          idleShutdownAfter: 30000
         topology:
           nodeSelector:
             gpu: "true"
@@ -51,6 +59,7 @@ spec:
             - key: "gpu-machines"
               operator: "Exists"
               effect: "NoExecute"
+        resources:
       - parentName: Franchesco
         topology:
           nodeSelector:

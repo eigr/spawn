@@ -72,12 +72,17 @@ defmodule Actors.Actor.Entity do
 
   alias Eigr.Functions.Protocol.Actors.Actor
   alias Eigr.Functions.Protocol.Actors.ActorId
+  alias Eigr.Functions.Protocol.Actors.ActorSettings
   alias Eigr.Functions.Protocol.Actors.ActorState
   alias Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckReply
   alias Eigr.Functions.Protocol.Actors.Healthcheck.Status, as: HealthcheckStatus
 
+  alias Eigr.Functions.Protocol.InvocationRequest
+
   alias Eigr.Functions.Protocol.State.Checkpoint
   alias Eigr.Functions.Protocol.State.Revision
+
+  alias Spawn.Cluster.Provisioner.Scheduler
 
   import Spawn.Utils.Common, only: [return_and_maybe_hibernate: 1]
 
@@ -128,9 +133,28 @@ defmodule Actors.Actor.Entity do
     state = EntityState.unpack(state)
 
     case action do
-      {:invocation_request, invocation, opts} ->
+      {:invocation_request,
+       %InvocationRequest{
+         actor:
+           %Actor{id: %ActorId{name: actor_name} = _id, settings: %ActorSettings{kind: kind}} =
+               _actor
+       } = invocation, opts} ->
         opts = Keyword.merge(opts, from_pid: from)
-        Invocation.invoke({invocation, opts}, state)
+        # Check if actor is Task and call Invocation.invoke in remote POD.
+        IO.inspect(kind, label: "Kind ------------------")
+        case kind do
+          :TASK ->
+            Scheduler.schedule_and_invoke(
+              actor_name,
+              invocation,
+              opts,
+              state,
+              &Invocation.invoke/2
+            )
+
+          _ ->
+            Invocation.invoke({invocation, opts}, state)
+        end
 
       action ->
         do_handle_defaults(action, from, state)

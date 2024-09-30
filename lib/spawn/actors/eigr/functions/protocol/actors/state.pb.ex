@@ -34,7 +34,7 @@ defmodule Eigr.Functions.Protocol.State.Revision do
     }
   end
 
-  field :value, 1, type: :int64
+  field(:value, 1, type: :int64)
 end
 
 defmodule Eigr.Functions.Protocol.State.Checkpoint do
@@ -87,6 +87,6 @@ defmodule Eigr.Functions.Protocol.State.Checkpoint do
     }
   end
 
-  field :revision, 1, type: Eigr.Functions.Protocol.State.Revision
-  field :state, 2, type: Eigr.Functions.Protocol.Actors.ActorState
+  field(:revision, 1, type: Eigr.Functions.Protocol.State.Revision)
+  field(:state, 2, type: Eigr.Functions.Protocol.Actors.ActorState)
 end

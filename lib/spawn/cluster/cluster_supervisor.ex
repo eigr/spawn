@@ -15,12 +15,19 @@ defmodule Spawn.Cluster.ClusterSupervisor do
 
   @impl true
   def init(opts) do
-    children = [
-      supervisor_process_logger(__MODULE__),
-      cluster_supervisor(opts)
-    ]
+    children =
+      [
+        supervisor_process_logger(__MODULE__),
+        cluster_supervisor(opts)
+      ]
+      |> maybe_add_provisioner(opts)
 
     Supervisor.init(children, strategy: :one_for_one)
+  end
+
+  defp maybe_add_provisioner(children, opts) do
+    # TODO check if is production env
+    children ++ [{Spawn.Cluster.ProvisionerPoolSupervisor, opts}]
   end
 
   defp cluster_supervisor(opts) do

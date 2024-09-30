@@ -62,9 +62,9 @@ defmodule Eigr.Functions.Protocol.Actors.Healthcheck.Status do
     }
   end
 
-  field :status, 1, type: :string
-  field :details, 2, type: :string
-  field :updated_at, 3, type: Google.Protobuf.Timestamp, json_name: "updatedAt"
+  field(:status, 1, type: :string)
+  field(:details, 2, type: :string)
+  field(:updated_at, 3, type: Google.Protobuf.Timestamp, json_name: "updatedAt")
 end
 
 defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckReply do
@@ -103,7 +103,7 @@ defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckReply do
     }
   end
 
-  field :status, 1, type: Eigr.Functions.Protocol.Actors.Healthcheck.Status
+  field(:status, 1, type: Eigr.Functions.Protocol.Actors.Healthcheck.Status)
 end
 
 defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service do

@@ -38,7 +38,6 @@ defmodule Proxy.MixProject do
        path: "../../spawn_statestores/statestores_native", optional: false},
       {:bakeware, "~> 0.2"},
       {:bandit, "~> 1.5"},
-      {:flame_k8s_backend, "~> 0.5.4"},
       {:observer_cli, "~> 1.7"},
       {:sobelow, "~> 0.13", only: [:dev, :test], runtime: false}
     ]
