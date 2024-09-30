@@ -65,7 +65,7 @@ defmodule SpawnOperator.FactoryTest do
           "image" => attrs[:host_image] || "eigr/spawn-test:latest",
           "taskActors" => [
             %{
-              "parentName" => "Jose",
+              "actorName" => "Jose",
               "topology" => %{
                 "nodeSelector" => %{
                   "gpu" => "false"

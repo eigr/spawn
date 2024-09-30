@@ -72,12 +72,9 @@ defmodule Actors.Actor.Entity do
 
   alias Eigr.Functions.Protocol.Actors.Actor
   alias Eigr.Functions.Protocol.Actors.ActorId
-  alias Eigr.Functions.Protocol.Actors.ActorSettings
   alias Eigr.Functions.Protocol.Actors.ActorState
   alias Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckReply
   alias Eigr.Functions.Protocol.Actors.Healthcheck.Status, as: HealthcheckStatus
-
-  alias Eigr.Functions.Protocol.InvocationRequest
 
   alias Eigr.Functions.Protocol.State.Checkpoint
   alias Eigr.Functions.Protocol.State.Revision
@@ -134,12 +131,7 @@ defmodule Actors.Actor.Entity do
     state = EntityState.unpack(state)
 
     case action do
-      {:invocation_request,
-       %InvocationRequest{
-         actor:
-           %Actor{id: %ActorId{name: actor_name} = _id, settings: %ActorSettings{kind: kind}} =
-               _actor
-       } = invocation, opts} ->
+      {:invocation_request, invocation, opts} ->
         opts = Keyword.merge(opts, from_pid: from)
         # Check if actor is Task and call Invocation.invoke in remote POD.
         # This code is executed here to ensure that a real instance of the target actor is present locally.
@@ -151,10 +143,10 @@ defmodule Actors.Actor.Entity do
         # If this process fails, it is likely that Scheduler via Flame will terminate the remote process.
         # We still need to perform more tests to understand how this will affect the system.
         # The same applies to asynchronous calls.
-        case kind do
+        case state.actor.settings.kind do
           :TASK ->
             task = %SpawnTask{
-              parent: actor_name,
+              actor_name: state.actor.id.name,
               invocation: invocation,
               opts: opts,
               state: state
