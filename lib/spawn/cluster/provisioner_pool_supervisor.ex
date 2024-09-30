@@ -124,7 +124,7 @@ defmodule Spawn.Cluster.ProvisionerPoolSupervisor do
       max_concurrency: Map.get(worker_pool_config, "maxConcurrency", 100),
       boot_timeout: Map.get(worker_pool_config, "bootTimeout", 30000),
       timeout: Map.get(worker_pool_config, "callTimeout", 30000),
-      single_use: Map.get(worker_pool_config, "oneShoot", "false"),
+      single_use: Map.get(worker_pool_config, "singleUse", "false"),
       idle_shutdown_after: Map.get(worker_pool_config, "idleShutdownAfter", 30000)
     ]
   end

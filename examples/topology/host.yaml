@@ -50,7 +50,7 @@ spec:
           maxConcurrency: 100
           bootTimeout: 30000
           callTimeout: 30000
-          oneShoot: "false"
+          singleUse: "false"
           idleShutdownAfter: 30000
         topology:
           nodeSelector:
