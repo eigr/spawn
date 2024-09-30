@@ -141,7 +141,15 @@ defmodule Actors.Actor.Entity do
        } = invocation, opts} ->
         opts = Keyword.merge(opts, from_pid: from)
         # Check if actor is Task and call Invocation.invoke in remote POD.
-        IO.inspect(kind, label: "Kind ------------------")
+        # This code is executed here to ensure that a real instance of the target actor is present locally.
+        # On the remote node, the code will run with communication to the ActorHost happening locally via the
+        # sidecar. However, the return of the call will be directed to this process,
+        # allowing the local state to be updated, even though the execution occurred remotely.
+
+        # In synchronous calls, this also ensures that the deactivate timeout will not be impacted.
+        # If this process fails, it is likely that Scheduler via Flame will terminate the remote process.
+        # We still need to perform more tests to understand how this will affect the system.
+        # The same applies to asynchronous calls.
         case kind do
           :TASK ->
             Scheduler.schedule_and_invoke(
