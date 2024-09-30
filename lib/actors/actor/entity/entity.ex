@@ -83,6 +83,7 @@ defmodule Actors.Actor.Entity do
   alias Eigr.Functions.Protocol.State.Revision
 
   alias Spawn.Cluster.Provisioner.Scheduler
+  alias Spawn.Cluster.Provisioner.SpawnTask
 
   import Spawn.Utils.Common, only: [return_and_maybe_hibernate: 1]
 
@@ -152,13 +153,14 @@ defmodule Actors.Actor.Entity do
         # The same applies to asynchronous calls.
         case kind do
           :TASK ->
-            Scheduler.schedule_and_invoke(
-              actor_name,
-              invocation,
-              opts,
-              state,
-              &Invocation.invoke/2
-            )
+            task = %SpawnTask{
+              parent: actor_name,
+              invocation: invocation,
+              opts: opts,
+              state: state
+            }
+
+            Scheduler.schedule_and_invoke(task, &Invocation.invoke/2)
 
           _ ->
             Invocation.invoke({invocation, opts}, state)
