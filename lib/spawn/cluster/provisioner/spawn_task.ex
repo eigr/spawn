@@ -1,3 +1,3 @@
 defmodule Spawn.Cluster.Provisioner.SpawnTask do
-  defstruct [:parent, :invocation, :opts, :state]
+  defstruct [:actor_name, :invocation, :opts, :state]
 end

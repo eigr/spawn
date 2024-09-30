@@ -43,7 +43,7 @@ spec:
     image: eigr/spawn-springboot-examples:0.5.5 # Mandatory
     # this configure podTemplate for Task Actors
     taskActors:
-      - parentName: Jose
+      - actorName: Jose
         workerPool:
           min: 0
           max: 10
@@ -60,7 +60,7 @@ spec:
               operator: "Exists"
               effect: "NoExecute"
         resources:
-      - parentName: Franchesco
+      - actorName: Franchesco
         topology:
           nodeSelector:
             beam: "true"

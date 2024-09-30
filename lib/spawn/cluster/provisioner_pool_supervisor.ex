@@ -73,9 +73,9 @@ defmodule Spawn.Cluster.ProvisionerPoolSupervisor do
 
   defp maybe_put_toleration(template, _topology), do: template
 
-  defp build_flame_pool(pod_template, %{"parentName" => name} = cfg, :prod) do
+  defp build_flame_pool(pod_template, %{"actorName" => name} = cfg, :prod) do
     pool_name = build_worker_pool_name(__MODULE__, name)
-    Logger.info("Create pool for parent Actor #{name}. Pool Name #{inspect(pool_name)}")
+    Logger.info("Create pool for Actor #{name}. Pool Name #{inspect(pool_name)}")
 
     opts =
       [
@@ -87,7 +87,7 @@ defmodule Spawn.Cluster.ProvisionerPoolSupervisor do
     {FLAME.Pool, opts}
   end
 
-  defp build_flame_pool(_pod_template, %{"parentName" => name} = cfg, _env) do
+  defp build_flame_pool(_pod_template, %{"actorName" => name} = cfg, _env) do
     pool_name = build_worker_pool_name(__MODULE__, name)
     Logger.info("Creating default pool with name #{inspect(pool_name)}")
 
