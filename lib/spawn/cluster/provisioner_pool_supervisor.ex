@@ -21,9 +21,7 @@ defmodule Spawn.Cluster.ProvisionerPoolSupervisor do
       Enum.map(actor_configs, fn cfg ->
         Logger.info("Setup Task Actor with config: #{inspect(cfg)}")
 
-        cfg
-        |> build_pod_template()
-        |> build_flame_pool(cfg, env)
+        build_flame_pool(cfg, env)
       end)
 
     Supervisor.init(children, strategy: :one_for_one)
@@ -45,51 +43,57 @@ defmodule Spawn.Cluster.ProvisionerPoolSupervisor do
     end
   end
 
-  defp build_pod_template(%{"topology" => topology} = _cfg) do
-    %{}
+  defp build_pod_template(%{"topology" => topology} = _cfg, template) do
+    template
     |> maybe_put_node_selector(topology)
     |> maybe_put_toleration(topology)
   end
 
-  defp build_pod_template(_cfg), do: %{}
+  defp build_pod_template(_cfg, template), do: %{}
 
   defp maybe_put_node_selector(template, %{"nodeSelector" => selector}) do
-    Map.merge(template, %{
-      "metadata" => %{
-        "labels" => %{"io.eigr.spawn/worker" => "true"}
-      },
-      "spec" => %{"nodeSelector" => selector}
-    })
+    new_label_map =
+      get_in(template, ["metadata", "labels"])
+      |> Kernel.||(%{})
+      |> Map.merge(%{"io.eigr.spawn/worker" => "true"})
+
+    template
+    |> put_in(["metadata", "labels"], new_label_map)
+    |> put_in(["spec", "nodeSelector"], selector)
   end
 
   defp maybe_put_node_selector(template, _topology), do: template
 
   defp maybe_put_toleration(template, %{"tolerations" => toleration}) do
-    Map.merge(template, %{
-      "metadata" => %{
-        "labels" => %{"io.eigr.spawn/worker" => "true"}
-      },
-      "spec" => %{"tolerations" => toleration}
-    })
+    new_label_map =
+      get_in(template, ["metadata", "labels"])
+      |> Kernel.||(%{})
+      |> Map.merge(%{"io.eigr.spawn/worker" => "true"})
+
+    template
+    |> put_in(["metadata", "labels"], new_label_map)
+    |> put_in(["spec", "tolerations"], toleration)
   end
 
   defp maybe_put_toleration(template, _topology), do: template
 
-  defp build_flame_pool(pod_template, %{"actorName" => name} = cfg, :prod) do
+  defp build_flame_pool(%{"actorName" => name} = cfg, :prod) do
     pool_name = build_worker_pool_name(__MODULE__, name)
     Logger.info("Create pool for Actor #{name}. Pool Name #{inspect(pool_name)}")
 
     opts =
       [
         name: pool_name,
-        backend: {FLAMEK8sBackend, runner_pod_tpl: pod_template},
+        backend:
+          {FLAMEK8sBackend,
+           runner_pod_tpl: fn current_manifest -> build_pod_template(cfg, current_manifest) end},
         log: :debug
       ] ++ get_worker_pool_config(cfg)
 
     {FLAME.Pool, opts}
   end
 
-  defp build_flame_pool(_pod_template, %{"actorName" => name} = cfg, _env) do
+  defp build_flame_pool(%{"actorName" => name} = cfg, _env) do
     pool_name = build_worker_pool_name(__MODULE__, name)
     Logger.info("Creating default pool with name #{inspect(pool_name)}")
 
@@ -103,7 +107,7 @@ defmodule Spawn.Cluster.ProvisionerPoolSupervisor do
     {FLAME.Pool, opts}
   end
 
-  defp build_flame_pool(_pod_template, cfg, _env) do
+  defp build_flame_pool(cfg, _env) do
     pool_name = Module.concat(__MODULE__, "Default")
     Logger.info("Creating default pool with name #{inspect(pool_name)}")
 
