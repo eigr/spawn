@@ -420,7 +420,7 @@ defmodule DeploymentTest do
                            %{
                              "name" => "SPAWN_PROXY_TASK_CONFIG",
                              "value" =>
-                               "PMRHIYLTNNAWG5DPOJZSEOS3PMRHAYLSMVXHITTBNVSSEORCJJXXGZJCFQRHI33QN5WG6Z3ZEI5HWITON5SGKU3FNRSWG5DPOIRDU6ZCM5YHKIR2EJTGC3DTMURH27L5LV6Q===="
+                               "PMRHIYLTNNAWG5DPOJZSEOS3PMRGCY3UN5ZE4YLNMURDUISKN5ZWKIRMEJ2G64DPNRXWO6JCHJ5SE3TPMRSVGZLMMVRXI33SEI5HWITHOB2SEORCMZQWY43FEJ6X27K5PU======"
                            }
                          ],
                          "envFrom" => [

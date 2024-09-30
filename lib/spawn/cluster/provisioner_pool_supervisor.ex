@@ -45,13 +45,13 @@ defmodule Spawn.Cluster.ProvisionerPoolSupervisor do
     end
   end
 
-  defp build_pod_template(%{"topology" => topology} = cfg) do
+  defp build_pod_template(%{"topology" => topology} = _cfg) do
     %{}
     |> maybe_put_node_selector(topology)
     |> maybe_put_toleration(topology)
   end
 
-  defp build_pod_template(cfg), do: %{}
+  defp build_pod_template(_cfg), do: %{}
 
   defp maybe_put_node_selector(template, %{"nodeSelector" => selector}) do
     Map.merge(template, %{
