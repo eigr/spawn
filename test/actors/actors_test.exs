@@ -132,7 +132,7 @@ defmodule ActorsTest do
       mock_invoke_host_actor_with_ok_response(host_invoke_response)
 
       assert {:ok, %ActorInvocationResponse{actor_name: ^actor_name}} =
-               Actors.invoke(invoke_request) |> IO.inspect(label: "Remote response")
+               Actors.invoke(invoke_request)
     end
 
     @tag :skip
