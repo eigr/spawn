@@ -15,6 +15,14 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
       "valueFrom" => %{"fieldRef" => %{"fieldPath" => "metadata.namespace"}}
     },
     %{
+      "name" => "POD_NAME",
+      "valueFrom" => %{"fieldRef" => %{"fieldPath" => "metadata.name"}}
+    },
+    %{
+      "name" => "POD_NAMESPACE",
+      "valueFrom" => %{"fieldRef" => %{"fieldPath" => "metadata.namespace"}}
+    },
+    %{
       "name" => "POD_IP",
       "valueFrom" => %{"fieldRef" => %{"fieldPath" => "status.podIP"}}
     },
