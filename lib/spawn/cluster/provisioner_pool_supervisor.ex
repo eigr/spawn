@@ -36,6 +36,7 @@ defmodule Spawn.Cluster.ProvisionerPoolSupervisor do
         name: pool_name,
         backend:
           {FLAMEK8sBackend,
+           app_container_name: "sidecar",
            runner_pod_tpl: fn current_manifest -> build_pod_template(cfg, current_manifest) end},
         log: :debug
       ] ++ get_worker_pool_config(cfg)
