@@ -49,7 +49,7 @@ defmodule Spawn.Cluster.ProvisionerPoolSupervisor do
     |> maybe_put_toleration(topology)
   end
 
-  defp build_pod_template(_cfg, template), do: %{}
+  defp build_pod_template(_cfg, template), do: template
 
   defp maybe_put_node_selector(template, %{"nodeSelector" => selector}) do
     new_label_map =
