@@ -27,56 +27,6 @@ defmodule Spawn.Cluster.ProvisionerPoolSupervisor do
     Supervisor.init(children, strategy: :one_for_one)
   end
 
-  defp parse_config(""), do: []
-
-  defp parse_config(encoded_cfg) do
-    encoded_cfg
-    |> Base.decode32!()
-    |> Jason.decode!()
-    |> Map.get("taskActors", [])
-  end
-
-  defp get_environment do
-    case System.get_env("MIX_ENV", "dev") do
-      "prod" -> :prod
-      env -> String.to_atom(env)
-    end
-  end
-
-  defp build_pod_template(%{"topology" => topology} = _cfg, template) do
-    template
-    |> maybe_put_node_selector(topology)
-    |> maybe_put_toleration(topology)
-  end
-
-  defp build_pod_template(_cfg, template), do: template
-
-  defp maybe_put_node_selector(template, %{"nodeSelector" => selector}) do
-    new_label_map =
-      get_in(template, ["metadata", "labels"])
-      |> Kernel.||(%{})
-      |> Map.merge(%{"io.eigr.spawn/worker" => "true"})
-
-    template
-    |> put_in(["metadata", "labels"], new_label_map)
-    |> put_in(["spec", "nodeSelector"], selector)
-  end
-
-  defp maybe_put_node_selector(template, _topology), do: template
-
-  defp maybe_put_toleration(template, %{"tolerations" => toleration}) do
-    new_label_map =
-      get_in(template, ["metadata", "labels"])
-      |> Kernel.||(%{})
-      |> Map.merge(%{"io.eigr.spawn/worker" => "true"})
-
-    template
-    |> put_in(["metadata", "labels"], new_label_map)
-    |> put_in(["spec", "tolerations"], toleration)
-  end
-
-  defp maybe_put_toleration(template, _topology), do: template
-
   defp build_flame_pool(%{"actorName" => name} = cfg, :prod) do
     pool_name = build_worker_pool_name(__MODULE__, name)
     Logger.info("Create pool for Actor #{name}. Pool Name #{inspect(pool_name)}")
@@ -133,5 +83,55 @@ defmodule Spawn.Cluster.ProvisionerPoolSupervisor do
       single_use: Map.get(worker_pool_config, "oneOff", "false"),
       idle_shutdown_after: Map.get(worker_pool_config, "idleShutdownAfter", 30000)
     ]
+  end
+
+  defp build_pod_template(%{"topology" => topology} = _cfg, template) do
+    Map.delete(template, "resourceVersion")
+    |> maybe_put_node_selector(topology)
+    |> maybe_put_toleration(topology)
+  end
+
+  defp build_pod_template(_cfg, template), do: Map.delete(template, "resourceVersion")
+
+  defp maybe_put_node_selector(template, %{"nodeSelector" => selector}) do
+    new_label_map =
+      get_in(template, ["metadata", "labels"])
+      |> Kernel.||(%{})
+      |> Map.merge(%{"io.eigr.spawn/worker" => "true"})
+
+    template
+    |> put_in(["metadata", "labels"], new_label_map)
+    |> put_in(["spec", "nodeSelector"], selector)
+  end
+
+  defp maybe_put_node_selector(template, _topology), do: template
+
+  defp maybe_put_toleration(template, %{"tolerations" => toleration}) do
+    new_label_map =
+      get_in(template, ["metadata", "labels"])
+      |> Kernel.||(%{})
+      |> Map.merge(%{"io.eigr.spawn/worker" => "true"})
+
+    template
+    |> put_in(["metadata", "labels"], new_label_map)
+    |> put_in(["spec", "tolerations"], toleration)
+  end
+
+  defp maybe_put_toleration(template, _topology), do: template
+
+  defp parse_config(""), do: []
+
+  defp parse_config(encoded_cfg) do
+    encoded_cfg
+    |> Base.decode32!()
+    |> Jason.decode!()
+    |> Map.get("taskActors", [])
+  end
+
+  defp get_environment do
+    case System.get_env("MIX_ENV", "dev") do
+      "prod" -> :prod
+      env -> String.to_atom(env)
+    end
   end
 end
