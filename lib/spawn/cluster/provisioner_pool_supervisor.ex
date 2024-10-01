@@ -86,12 +86,13 @@ defmodule Spawn.Cluster.ProvisionerPoolSupervisor do
   end
 
   defp build_pod_template(%{"topology" => topology} = _cfg, template) do
-    Map.delete(template, "resourceVersion")
+    update_in(template["metadata"], &Map.drop(&1, ["resourceVersion"]))
     |> maybe_put_node_selector(topology)
     |> maybe_put_toleration(topology)
   end
 
-  defp build_pod_template(_cfg, template), do: Map.delete(template, "resourceVersion")
+  defp build_pod_template(_cfg, template),
+    do: update_in(template["metadata"], &Map.drop(&1, ["resourceVersion"]))
 
   defp maybe_put_node_selector(template, %{"nodeSelector" => selector}) do
     new_label_map =
