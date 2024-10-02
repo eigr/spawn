@@ -146,7 +146,11 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
                     "#{system}",
                     "--to",
                     "#{ns}"
-                  ]
+                  ],
+                  "env" => %{
+                    "name" => "RELEASE_DISTRIBUTION",
+                    "value" => "none"
+                  }
                 }
               ],
               "serviceAccountName" => "#{system}-sa"

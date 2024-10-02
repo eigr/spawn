@@ -35,8 +35,10 @@ defmodule Spawn.Cluster.Provisioner.Scheduler do
           func
         )
         when is_function(func) do
+      opts = Keyword.merge(opts, link: false)
+
       build_worker_pool_name(ProvisionerPoolSupervisor, actor_name)
-      |> FLAME.call(fn -> func.({invocation, opts}, state) end)
+      |> FLAME.call(fn -> func.({invocation, opts}, state) end, opts)
     end
   end
 
