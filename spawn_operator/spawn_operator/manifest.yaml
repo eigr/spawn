@@ -38,7 +38,7 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: spec.serviceAccountName
-          image: ghcr.io/eigr/spawn-operator:1.4.3
+          image: docker.io/eigr/spawn-operator:1.4.4-rc13
           livenessProbe:
             failureThreshold: 3
             httpGet:
@@ -64,10 +64,10 @@ spec:
             timeoutSeconds: 5
           resources:
             limits:
-              cpu: 200m
-              memory: 380Mi
+              cpu: 1
+              memory: 1024Mi
             requests:
-              cpu: 200m
+              cpu: 10m
               memory: 380Mi
           securityContext:
             allowPrivilegeEscalation: false
