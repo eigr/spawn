@@ -5,6 +5,10 @@ defmodule Spawn.Utils.Common do
   alias Actors.Config.PersistentTermConfig, as: Config
   alias Eigr.Functions.Protocol.Actors.ActorId
 
+  def build_worker_pool_name(module, parent) do
+    Module.concat(module, String.upcase(parent))
+  end
+
   @spec actor_host_hash() :: integer()
   def actor_host_hash() do
     system = Config.get(:actor_system_name)

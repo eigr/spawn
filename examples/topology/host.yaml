@@ -1,0 +1,66 @@
+---
+apiVersion: spawn-eigr.io/v1
+kind: ActorHost
+metadata:
+  name: topology-example # Mandatory. Name of the Node containing Actor Host Functions
+  namespace: default # Optional. Default namespace is "default"
+  annotations:
+    # Mandatory. Name of the ActorSystem declared in ActorSystem CRD
+    spawn-eigr.io/actor-system: spawn-system
+spec:
+  topology:
+    # affinity:
+    #   podAffinity:
+    #     preferredDuringSchedulingIgnoredDuringExecution:
+    #       - weight: 50
+    #         podAffinityTerm:
+    #           labelSelector:
+    #             matchExpressions:
+    #               - key: actor-system
+    #                 operator: In
+    #                 values:
+    #                   - system
+    #           topologyKey: kubernetes.io/hostname
+
+    #   podAntiAffinity:
+    #     preferredDuringSchedulingIgnoredDuringExecution:
+    #       - weight: 100
+    #         podAffinityTerm:
+    #           labelSelector:
+    #             matchExpressions:
+    #               - key: app
+    #                 operator: In
+    #                 values:
+    #                   - app_name
+    #           topologyKey: kubernetes.io/hostname
+    nodeSelector:
+      gpu: "false"
+    tolerations:
+      - key: "cpu-machines"
+        operator: "Exists"
+        effect: "NoExecute"
+  host:
+    image: eigr/spawn-springboot-examples:0.5.5 # Mandatory
+    # this configure podTemplate for Task Actors
+    taskActors:
+      - actorName: Jose
+        workerPool:
+          min: 0
+          max: 10
+          maxConcurrency: 100
+          bootTimeout: 30000
+          callTimeout: 30000
+          oneOff: "false"
+          idleShutdownAfter: 30000
+        topology:
+          nodeSelector:
+            gpu: "true"
+          tolerations:
+            - key: "gpu-machines"
+              operator: "Exists"
+              effect: "NoExecute"
+        resources:
+      - actorName: Franchesco
+        topology:
+          nodeSelector:
+            beam: "true"

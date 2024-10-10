@@ -79,6 +79,9 @@ defmodule Actors.Actor.Entity do
   alias Eigr.Functions.Protocol.State.Checkpoint
   alias Eigr.Functions.Protocol.State.Revision
 
+  alias Spawn.Cluster.Provisioner.Scheduler, as: FlameScheduler
+  alias Spawn.Cluster.Provisioner.SpawnTask
+
   import Spawn.Utils.Common, only: [return_and_maybe_hibernate: 1]
 
   @default_call_timeout :infinity
@@ -130,7 +133,41 @@ defmodule Actors.Actor.Entity do
     case action do
       {:invocation_request, invocation, opts} ->
         opts = Keyword.merge(opts, from_pid: from)
-        Invocation.invoke({invocation, opts}, state)
+        # Check if actor is Task and call Invocation.invoke in remote POD.
+        # This code is executed here to ensure that a real instance of the target actor is present locally.
+        # On the remote node, the code will run with communication to the ActorHost happening locally via the
+        # sidecar. However, the return of the call will be directed to this process,
+        # allowing the local state to be updated, even though the execution occurred remotely.
+
+        # In synchronous calls, this also ensures that the deactivate timeout will not be impacted.
+        # If this process fails, it is likely that Scheduler via Flame will terminate the remote process.
+        # We still need to perform more tests to understand how this will affect the system.
+        # The same applies to asynchronous calls.
+        case state.actor.settings.kind do
+          :TASK ->
+            opts = Keyword.merge(opts, timeout: :infinity)
+
+            task = %SpawnTask{
+              actor_name: state.actor.id.name,
+              invocation: invocation,
+              opts: opts,
+              state: state
+            }
+
+            try do
+              resp = FlameScheduler.schedule_and_invoke(task, &Invocation.invoke/2)
+
+              IO.inspect(resp,
+                label: "FlameScheduler invoke response ---------------------------"
+              )
+            catch
+              error ->
+                IO.inspect(error, label: "Error during Flame Scheduler invocation ---------")
+            end
+
+          _ ->
+            Invocation.invoke({invocation, opts}, state)
+        end
 
       action ->
         do_handle_defaults(action, from, state)

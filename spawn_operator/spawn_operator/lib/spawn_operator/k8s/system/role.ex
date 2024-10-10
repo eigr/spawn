@@ -31,6 +31,11 @@ defmodule SpawnOperator.K8s.System.Role do
           "apiGroups" => [""],
           "resources" => ["configmaps", "secrets"],
           "verbs" => ["*"]
+        },
+        %{
+          "apiGroups" => [""],
+          "resources" => ["pods"],
+          "verbs" => ["create", "delete", "get", "list", "patch"]
         }
       ]
     }

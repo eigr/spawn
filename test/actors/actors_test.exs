@@ -111,6 +111,30 @@ defmodule ActorsTest do
                Actors.invoke(invoke_request)
     end
 
+    test "invoke task actor function for a newly registered actor" do
+      actor_name = "Jose"
+
+      actor = build_actor(name: actor_name, kind: :TASK)
+      actor_entry = build_actor_entry(name: actor_name, actor: actor)
+      registry = build_registry_with_actors(actors: actor_entry)
+      system = build_system(registry: registry)
+
+      request = build_registration_request(actor_system: system)
+
+      {:ok, %RegistrationResponse{}} = Actors.register(request)
+
+      # invoke
+      invoke_request = build_invocation_request(system: system, actor: actor)
+
+      host_invoke_response =
+        build_host_invoke_response(actor_name: actor_name, system_name: system.name)
+
+      mock_invoke_host_actor_with_ok_response(host_invoke_response)
+
+      assert {:ok, %ActorInvocationResponse{actor_name: ^actor_name}} =
+               Actors.invoke(invoke_request)
+    end
+
     @tag :skip
     test "invoke actor function for a already registered actor in another node", ctx do
       %{system: system, actor: actor} = ctx

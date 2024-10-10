@@ -45,6 +45,8 @@ defmodule Operator.MixProject do
       {:bakeware, ">= 0.0.0", runtime: false},
       {:bonny, "~> 1.1"},
       {:castore, "~> 1.0"},
+      {:flame, "~> 0.5", runtime: false},
+      {:flame_k8s_backend, "~> 0.5", runtime: false},
       {:spawn, path: "../../"}
     ]
   end

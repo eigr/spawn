@@ -315,7 +315,6 @@ defmodule Sidecar.GRPC.Dispatcher do
                                                    __pb_extensions__: ext
                                                  }
                                                } ->
-                                  
       Map.get(ext, {Eigr.Functions.Protocol.Actors.PbExtension, :actor_id}, false) &&
         {ctype, String.to_atom(name)}
     end)
