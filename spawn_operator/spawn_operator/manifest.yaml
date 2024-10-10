@@ -38,7 +38,7 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: spec.serviceAccountName
-          image: docker.io/eigr/spawn-operator:1.4.4-rc13
+          image: docker.io/eigr/spawn-operator:1.4.4-rc.22
           livenessProbe:
             failureThreshold: 3
             httpGet:

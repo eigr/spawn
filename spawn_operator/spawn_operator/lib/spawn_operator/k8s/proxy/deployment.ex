@@ -8,7 +8,7 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
   @default_actor_host_function_env [
     %{
       "name" => "RELEASE_NAME",
-      "value" => "spawn"
+      "value" => "proxy"
     },
     %{
       "name" => "NAMESPACE",
@@ -98,7 +98,7 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
       "spec" => %{
         "replicas" => replicas,
         "selector" => %{
-          "matchLabels" => %{"app" => name, "actor-system" => system}
+          "matchLabels" => %{"actor-system" => system}
         },
         "strategy" => %{
           "type" => "RollingUpdate",
@@ -135,6 +135,9 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
                 %{
                   "name" => "init-certificates",
                   "image" => "#{annotations.proxy_init_container_image_tag}",
+                  "env" => [
+                    %{"containerPort" => 4369, "name" => "epmd"}
+                  ],
                   "args" => [
                     "--environment",
                     :prod,
@@ -216,12 +219,23 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
   defp get_containers(true, system, name, host_params, annotations, task_actors_config) do
     actor_host_function_image = Map.get(host_params, "image")
 
+    updated_default_envs =
+      @default_actor_host_function_env ++
+        [
+          %{
+            "name" => "RELEASE_COOKIE",
+            "valueFrom" => %{
+              "secretKeyRef" => %{"name" => "#{system}-secret", "key" => "RELEASE_COOKIE"}
+            }
+          }
+        ]
+
     actor_host_function_envs =
       if is_nil(task_actors_config) || List.first(Map.values(task_actors_config)) == %{} do
-        Map.get(host_params, "env", []) ++ @default_actor_host_function_env
+        Map.get(host_params, "env", []) ++ updated_default_envs
       else
         Map.get(host_params, "env", []) ++
-          @default_actor_host_function_env ++
+          updated_default_envs ++
           build_task_env(task_actors_config)
       end
 
@@ -268,9 +282,20 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
   defp get_containers(false, system, name, host_params, annotations, task_actors_config) do
     actor_host_function_image = Map.get(host_params, "image")
 
+    updated_default_envs =
+      @default_actor_host_function_env ++
+        [
+          %{
+            "name" => "RELEASE_COOKIE",
+            "valueFrom" => %{
+              "secretKeyRef" => %{"name" => "#{system}-secret", "key" => "RELEASE_COOKIE"}
+            }
+          }
+        ]
+
     actor_host_function_envs =
       Map.get(host_params, "env", []) ++
-        @default_actor_host_function_env
+      updated_default_envs
 
     actor_host_function_resources =
       Map.get(host_params, "resources", @default_actor_host_resources)
@@ -284,9 +309,9 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
 
     envs =
       if is_nil(task_actors_config) || List.first(Map.values(task_actors_config)) == %{} do
-        @default_actor_host_function_env
+        updated_default_envs
       else
-        @default_actor_host_function_env ++ build_task_env(task_actors_config)
+        updated_default_envs ++ build_task_env(task_actors_config)
       end
 
     proxy_container =

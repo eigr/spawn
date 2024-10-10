@@ -21,7 +21,7 @@ RUN mix local.rebar --force \
     && mix release.init
 
 RUN echo "-name spawn_sdk_elixir@${HOSTNAME}" >> ./rel/vm.args.eex \
-    && echo "-setcookie ${NODE_COOKIE}" >> ./rel/vm.args.eex
+    && echo "-setcookie ${RELEASE_COOKIE}" >> ./rel/vm.args.eex
 
 RUN cd spawn_sdk/spawn_sdk_example \
     && mix deps.get \

@@ -79,7 +79,7 @@ defmodule Actors.Actor.Entity do
   alias Eigr.Functions.Protocol.State.Checkpoint
   alias Eigr.Functions.Protocol.State.Revision
 
-  alias Spawn.Cluster.Provisioner.Scheduler
+  alias Spawn.Cluster.Provisioner.Scheduler, as: FlameScheduler
   alias Spawn.Cluster.Provisioner.SpawnTask
 
   import Spawn.Utils.Common, only: [return_and_maybe_hibernate: 1]
@@ -145,6 +145,8 @@ defmodule Actors.Actor.Entity do
         # The same applies to asynchronous calls.
         case state.actor.settings.kind do
           :TASK ->
+            opts = Keyword.merge(opts, timeout: :infinity)
+
             task = %SpawnTask{
               actor_name: state.actor.id.name,
               invocation: invocation,
@@ -152,7 +154,16 @@ defmodule Actors.Actor.Entity do
               state: state
             }
 
-            Scheduler.schedule_and_invoke(task, &Invocation.invoke/2)
+            try do
+              resp = FlameScheduler.schedule_and_invoke(task, &Invocation.invoke/2)
+
+              IO.inspect(resp,
+                label: "FlameScheduler invoke response ---------------------------"
+              )
+            catch
+              error ->
+                IO.inspect(error, label: "Error during Flame Scheduler invocation ---------")
+            end
 
           _ ->
             Invocation.invoke({invocation, opts}, state)

@@ -31,7 +31,7 @@ ENV RELEASE_NAME="activator_sqs"
 # This will be the full nodename
 ENV RELEASE_NODE="${RELEASE_NAME}@${POD_IP}"
 
-RUN echo "-setcookie ${NODE_COOKIE}" >> ./rel/vm.args.eex
+RUN echo "-setcookie ${RELEASE_COOKIE}" >> ./rel/vm.args.eex
 
 RUN cd spawn_activators/activator_sqs \
     && mix deps.get \

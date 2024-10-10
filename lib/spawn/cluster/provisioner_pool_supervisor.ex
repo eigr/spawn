@@ -79,10 +79,11 @@ defmodule Spawn.Cluster.ProvisionerPoolSupervisor do
       min: Map.get(worker_pool_config, "min", 0),
       max: Map.get(worker_pool_config, "max", 10),
       max_concurrency: Map.get(worker_pool_config, "maxConcurrency", 100),
-      boot_timeout: Map.get(worker_pool_config, "bootTimeout", 30000),
-      timeout: Map.get(worker_pool_config, "callTimeout", 30000),
       single_use: Map.get(worker_pool_config, "oneOff", "false"),
-      idle_shutdown_after: Map.get(worker_pool_config, "idleShutdownAfter", 30000)
+      timeout: Map.get(worker_pool_config, "callTimeout", :infinity),
+      boot_timeout: Map.get(worker_pool_config, "bootTimeout", :timer.minutes(3)),
+      idle_shutdown_after: Map.get(worker_pool_config, "idleShutdownAfter", :timer.minutes(1)),
+      track_resources: true
     ]
   end
 
@@ -90,6 +91,41 @@ defmodule Spawn.Cluster.ProvisionerPoolSupervisor do
     update_in(template["metadata"], &Map.drop(&1, ["resourceVersion"]))
     |> maybe_put_node_selector(topology)
     |> maybe_put_toleration(topology)
+
+    # |> update_in(["containers", Access.at(0)], fn container ->
+    #   container
+    #   |> Map.put_new("env", [])
+    #   |> Map.update!("env", fn env ->
+    #     [
+    #       %{
+    #         "name" => "POD_NAME",
+    #         "valueFrom" => %{"fieldRef" => %{"fieldPath" => "metadata.name"}}
+    #       },
+    #       %{
+    #         "name" => "POD_IP",
+    #         "valueFrom" => %{"fieldRef" => %{"fieldPath" => "status.podIP"}}
+    #       },
+    #       %{
+    #         "name" => "POD_NAMESPACE",
+    #         "valueFrom" => %{"fieldRef" => %{"fieldPath" => "metadata.namespace"}}
+    #       },
+    #       %{"name" => "FLAME_PARENT", "value" => encoded_parent}
+    #       | Enum.reject(
+    #           env,
+    #           &(&1["name"] in ["FLAME_PARENT", "POD_NAME", "POD_NAMESPACE", "POD_IP"])
+    #         )
+    #     ]
+    #     |> put_new_env("NODE_COOKIE", Node.get_cookie())
+    # end)
+  end
+
+  defp put_new_env(env, _name, :nocookie), do: env
+
+  defp put_new_env(env, name, value) do
+    case get_in(env, [Access.filter(&(&1["name"] == name))]) do
+      [] -> [%{"name" => name, "value" => value} | env]
+      _ -> env
+    end
   end
 
   defp build_pod_template(_cfg, template),
