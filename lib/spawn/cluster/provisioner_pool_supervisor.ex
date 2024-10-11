@@ -20,57 +20,33 @@ defmodule Spawn.Cluster.ProvisionerPoolSupervisor do
     children =
       Enum.map(actor_configs, fn cfg ->
         Logger.info("Setup Task Actor with config: #{inspect(cfg)}")
-
         build_flame_pool(cfg, env)
       end)
 
     Supervisor.init(children, strategy: :one_for_one)
   end
 
-  defp build_flame_pool(%{"actorName" => name} = cfg, :prod) do
+  defp build_flame_pool(%{"actorName" => name} = cfg, env) do
     pool_name = build_worker_pool_name(__MODULE__, name)
-    Logger.info("Create pool for Actor #{name}. Pool Name #{inspect(pool_name)}")
+    Logger.info("Creating pool for Actor #{name}. Pool Name: #{inspect(pool_name)}")
 
     opts =
       [
         name: pool_name,
-        backend:
-          {FLAMEK8sBackend,
-           app_container_name: "sidecar",
-           runner_pod_tpl: fn current_manifest -> build_pod_template(cfg, current_manifest) end},
+        backend: pool_backend(cfg, env),
         log: :debug
       ] ++ get_worker_pool_config(cfg)
 
     {FLAME.Pool, opts}
   end
 
-  defp build_flame_pool(%{"actorName" => name} = cfg, _env) do
-    pool_name = build_worker_pool_name(__MODULE__, name)
-    Logger.info("Creating default pool with name #{inspect(pool_name)}")
-
-    opts =
-      [
-        name: pool_name,
-        backend: FLAME.LocalBackend,
-        log: :debug
-      ] ++ get_worker_pool_config(cfg)
-
-    {FLAME.Pool, opts}
+  defp pool_backend(cfg, :prod) do
+    {FLAMEK8sBackend,
+     app_container_name: "sidecar",
+     runner_pod_tpl: fn current_manifest -> build_pod_template(cfg, current_manifest) end}
   end
 
-  defp build_flame_pool(cfg, _env) do
-    pool_name = Module.concat(__MODULE__, "Default")
-    Logger.info("Creating default pool with name #{inspect(pool_name)}")
-
-    opts =
-      [
-        name: pool_name,
-        backend: FLAME.LocalBackend,
-        log: :debug
-      ] ++ get_worker_pool_config(cfg)
-
-    {FLAME.Pool, opts}
-  end
+  defp pool_backend(_, _env), do: FLAME.LocalBackend
 
   defp get_worker_pool_config(cfg) do
     worker_pool_config = Map.get(cfg, "workerPool", %{})
@@ -87,75 +63,78 @@ defmodule Spawn.Cluster.ProvisionerPoolSupervisor do
     ]
   end
 
-  defp build_pod_template(%{"topology" => topology} = _cfg, template) do
-    update_in(template["metadata"], &Map.drop(&1, ["resourceVersion"]))
-    |> maybe_put_node_selector(topology)
-    |> maybe_put_toleration(topology)
+  defp build_pod_template(cfg, template) do
+    Logger.debug("Building pod template...")
 
-    # |> update_in(["containers", Access.at(0)], fn container ->
-    #   container
-    #   |> Map.put_new("env", [])
-    #   |> Map.update!("env", fn env ->
-    #     [
-    #       %{
-    #         "name" => "POD_NAME",
-    #         "valueFrom" => %{"fieldRef" => %{"fieldPath" => "metadata.name"}}
-    #       },
-    #       %{
-    #         "name" => "POD_IP",
-    #         "valueFrom" => %{"fieldRef" => %{"fieldPath" => "status.podIP"}}
-    #       },
-    #       %{
-    #         "name" => "POD_NAMESPACE",
-    #         "valueFrom" => %{"fieldRef" => %{"fieldPath" => "metadata.namespace"}}
-    #       },
-    #       %{"name" => "FLAME_PARENT", "value" => encoded_parent}
-    #       | Enum.reject(
-    #           env,
-    #           &(&1["name"] in ["FLAME_PARENT", "POD_NAME", "POD_NAMESPACE", "POD_IP"])
-    #         )
-    #     ]
-    #     |> put_new_env("NODE_COOKIE", Node.get_cookie())
-    # end)
+    template
+    |> update_pod_metadata()
+    |> update_pod_spec()
+    |> remove_probes_from_containers()
+    |> maybe_put_node_selector(cfg)
+    |> maybe_put_toleration(cfg)
   end
 
-  defp put_new_env(env, _name, :nocookie), do: env
+  defp update_pod_metadata(template) do
+    target_metadata = %{
+      "name" => "target-pod",
+      "namespace" => Access.get(template, "metadata")["namespace"],
+      "annotations" => %{
+        "prometheus.io/path" => "/metrics",
+        "prometheus.io/port" => "9001",
+        "prometheus.io/scrape" => "true"
+      }
+    }
 
-  defp put_new_env(env, name, value) do
-    case get_in(env, [Access.filter(&(&1["name"] == name))]) do
-      [] -> [%{"name" => name, "value" => value} | env]
-      _ -> env
-    end
+    put_in(template["metadata"], target_metadata)
   end
 
-  defp build_pod_template(_cfg, template),
-    do: update_in(template["metadata"], &Map.drop(&1, ["resourceVersion"]))
+  defp update_pod_spec(template) do
+    spec = template["spec"]
 
-  defp maybe_put_node_selector(template, %{"nodeSelector" => selector}) do
+    target_spec = %{
+      "initContainers" => spec["initContainers"],
+      "containers" => spec["containers"],
+      "volumes" => spec["volumes"],
+      "serviceAccount" => spec["serviceAccount"],
+      "serviceAccountName" => spec["serviceAccountName"],
+      "terminationGracePeriodSeconds" => spec["terminationGracePeriodSeconds"],
+      "restartPolicy" => "Never"
+    }
+
+    put_in(template["spec"], target_spec)
+  end
+
+  defp remove_probes_from_containers(template) do
+    updated_containers =
+      template["spec"]["containers"]
+      |> Enum.map(&Map.drop(&1, ["readinessProbe", "livenessProbe"]))
+
+    put_in(template["spec"]["containers"], updated_containers)
+  end
+
+  defp maybe_put_node_selector(template, %{"topology" => topology}) do
+    update_metadata_with_labels(template)
+    |> put_in(["spec", "nodeSelector"], topology["nodeSelector"])
+  end
+
+  defp maybe_put_node_selector(template, _cfg), do: template
+
+  defp maybe_put_toleration(template, %{"topology" => topology}) do
+    update_metadata_with_labels(template)
+    |> put_in(["spec", "tolerations"], topology["tolerations"])
+  end
+
+  defp maybe_put_toleration(template, _cfg), do: template
+
+  defp update_metadata_with_labels(template) do
     new_label_map =
-      get_in(template, ["metadata", "labels"])
+      template
+      |> get_in(["metadata", "labels"])
       |> Kernel.||(%{})
       |> Map.merge(%{"io.eigr.spawn/worker" => "true"})
 
-    template
-    |> put_in(["metadata", "labels"], new_label_map)
-    |> put_in(["spec", "nodeSelector"], selector)
+    put_in(template["metadata"]["labels"], new_label_map)
   end
-
-  defp maybe_put_node_selector(template, _topology), do: template
-
-  defp maybe_put_toleration(template, %{"tolerations" => toleration}) do
-    new_label_map =
-      get_in(template, ["metadata", "labels"])
-      |> Kernel.||(%{})
-      |> Map.merge(%{"io.eigr.spawn/worker" => "true"})
-
-    template
-    |> put_in(["metadata", "labels"], new_label_map)
-    |> put_in(["spec", "tolerations"], toleration)
-  end
-
-  defp maybe_put_toleration(template, _topology), do: template
 
   defp parse_config(""), do: []
 

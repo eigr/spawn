@@ -76,6 +76,8 @@ defmodule Actors.Actor.Entity do
   alias Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckReply
   alias Eigr.Functions.Protocol.Actors.Healthcheck.Status, as: HealthcheckStatus
 
+  alias Eigr.Functions.Protocol.ActorInvocationResponse
+
   alias Eigr.Functions.Protocol.State.Checkpoint
   alias Eigr.Functions.Protocol.State.Revision
 
@@ -154,15 +156,21 @@ defmodule Actors.Actor.Entity do
               state: state
             }
 
-            try do
-              resp = FlameScheduler.schedule_and_invoke(task, &Invocation.invoke/2)
+            FlameScheduler.schedule_and_invoke(task, &Invocation.invoke/2)
+            |> IO.inspect(label: "Remoting Scheduler raw response")
+            |> case do
+              {:reply, {:ok, %ActorInvocationResponse{}} = resp, %EntityState{} = _state, _signal} =
+                  payload ->
+                Logger.debug("Remoting Scheduler response for invocation: #{inspect(resp)}")
 
-              IO.inspect(resp,
-                label: "FlameScheduler invoke response ---------------------------"
-              )
-            catch
-              error ->
-                IO.inspect(error, label: "Error during Flame Scheduler invocation ---------")
+                payload
+
+              unexpect ->
+                Logger.error(
+                  "Error during Remoting Scheduler invocation. Details: #{inspect(unexpect)}"
+                )
+
+                unexpect
             end
 
           _ ->

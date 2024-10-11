@@ -5,8 +5,9 @@ config :do_it, DoIt.Commfig,
   filename: "spawn_cli.json"
 
 config :flame, :terminator,
-  shutdown_timeout: :timer.minutes(2)
-  failsafe_timeout: :timer.minutes(1)
+  shutdown_timeout: :timer.minutes(3),
+  failsafe_timeout: :timer.minutes(1),
+  log: :debug
 
 # config :spawn_statestores, Statestores.Vault,
 # json_library: Jason,

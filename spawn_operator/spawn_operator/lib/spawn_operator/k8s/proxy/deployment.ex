@@ -295,7 +295,7 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
 
     actor_host_function_envs =
       Map.get(host_params, "env", []) ++
-      updated_default_envs
+        updated_default_envs
 
     actor_host_function_resources =
       Map.get(host_params, "resources", @default_actor_host_resources)

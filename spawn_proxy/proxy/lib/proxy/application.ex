@@ -17,8 +17,6 @@ defmodule Proxy.Application do
 
         OpentelemetryEcto.setup([:spawn_statestores, :repo])
         Config.load()
-        System.get_env("RELEASE_COOKIE")
-        |> IO.inspect(label: "Application Cookie ------------------------------")
 
         Logger.configure(level: Config.get(:logger_level))
 
