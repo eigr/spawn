@@ -128,59 +128,129 @@ defmodule Actors.Actor.Entity do
     |> return_and_maybe_hibernate()
   end
 
+  @doc """
+  Handles different types of incoming `call` actions for an actor process.
+
+  This function is responsible for processing actions sent to the actor. It distinguishes between invocation requests
+  and other default actions. The main action handled is the `:invocation_request`, which includes logic for task-based
+  actors and synchronous execution.
+
+  ### Parameters:
+    - `action`: Represents the action to be handled by the actor. It can be a tuple of `{:invocation_request, invocation, opts}`
+      or other actions.
+    - `from`: The caller process that made the request, usually a tuple containing the PID and a reference.
+    - `state`: The current state of the actor, typically passed in a packed format and unpacked at the start of the function.
+
+  ### Action Handling:
+    - `{:invocation_request, invocation, opts}`:
+      - If the actor is of kind `:TASK`, the function schedules the task execution remotely using `FlameScheduler.schedule_and_invoke/2`.
+      - For non-task actors, the function directly invokes the action using `Invocation.invoke/2`.
+    - Default actions are delegated to `do_handle_defaults/3`.
+
+  ### Return Value:
+  The function returns a packed response, which is either the result of an invocation or the default action handling.
+  The response is further processed by `parse_packed_response/1`.
+
+  ### Workflow:
+  1. The actor's state is unpacked via `EntityState.unpack/1`.
+  2. Based on the `action`:
+      - For `{:invocation_request, invocation, opts}`, the function checks if the actor is of kind `:TASK`:
+        - If true, the invocation is handled remotely with the remote task scheduler (`FlameScheduler`), ensuring proper remote invocation while maintaining local state consistency.
+        - Otherwise, the action is invoked locally.
+      - For other actions, `do_handle_defaults/3` is called to manage additional behaviors.
+  3. The final response is returned as a packed structure after being processed by `parse_packed_response/1`.
+
+  ### See Also:
+    - `handle_invocation_request/4`
+    - `schedule_task_invocation/3`
+    - `FlameScheduler.schedule_and_invoke/2`
+    - `Invocation.invoke/2`
+  """
   @impl true
   def handle_call(action, from, state) do
     state = EntityState.unpack(state)
 
     case action do
       {:invocation_request, invocation, opts} ->
-        opts = Keyword.merge(opts, from_pid: from)
-        # Check if actor is Task and call Invocation.invoke in remote POD.
-        # This code is executed here to ensure that a real instance of the target actor is present locally.
-        # On the remote node, the code will run with communication to the ActorHost happening locally via the
-        # sidecar. However, the return of the call will be directed to this process,
-        # allowing the local state to be updated, even though the execution occurred remotely.
+        handle_invocation_request(invocation, opts, from, state)
 
-        # In synchronous calls, this also ensures that the deactivate timeout will not be impacted.
-        # If this process fails, it is likely that Scheduler via Flame will terminate the remote process.
-        # We still need to perform more tests to understand how this will affect the system.
-        # The same applies to asynchronous calls.
-        case state.actor.settings.kind do
-          :TASK ->
-            opts = Keyword.merge(opts, timeout: :infinity)
-
-            task = %SpawnTask{
-              actor_name: state.actor.id.name,
-              invocation: invocation,
-              opts: opts,
-              state: state
-            }
-
-            FlameScheduler.schedule_and_invoke(task, &Invocation.invoke/2)
-            |> IO.inspect(label: "Remoting Scheduler raw response")
-            |> case do
-              {:reply, {:ok, %ActorInvocationResponse{}} = resp, %EntityState{} = _state, _signal} =
-                  payload ->
-                Logger.debug("Remoting Scheduler response for invocation: #{inspect(resp)}")
-
-                payload
-
-              unexpect ->
-                Logger.error(
-                  "Error during Remoting Scheduler invocation. Details: #{inspect(unexpect)}"
-                )
-
-                unexpect
-            end
-
-          _ ->
-            Invocation.invoke({invocation, opts}, state)
-        end
-
-      action ->
+      _ ->
         do_handle_defaults(action, from, state)
     end
     |> parse_packed_response()
+  end
+
+  defp handle_invocation_request(invocation, opts, from, state) do
+    opts = Keyword.merge(opts, from_pid: from)
+
+    case state.actor.settings.kind do
+      :TASK ->
+        schedule_task_invocation(invocation, opts, state)
+
+      _ ->
+        Invocation.invoke({invocation, opts}, state)
+    end
+  end
+
+  defp schedule_task_invocation(invocation, opts, state) do
+    task_opts = Keyword.merge(opts, timeout: :infinity)
+
+    %SpawnTask{
+      actor_name: state.actor.id.name,
+      invocation: invocation,
+      opts: task_opts,
+      state: state
+    }
+    |> FlameScheduler.schedule_and_invoke(&Invocation.invoke/2)
+    |> then(fn
+      {:ok, source_request, dest_response, updated_state, source_opts} ->
+        # Handle response here ensures that the full response behavior will be given by the Actor
+        # that initiated the remote call and not the target POD,
+        # which could cause unwanted side effects.
+        # For this works we need to disable track_resources: false
+        Invocation.handle_response(source_request, dest_response, updated_state, source_opts)
+
+      res ->
+        res
+    end)
+    |> handle_scheduler_response()
+  end
+
+  defp handle_scheduler_response(
+         {:reply, {:ok, %ActorInvocationResponse{} = resp}, %EntityState{} = _state} =
+           payload
+       ) do
+    Logger.debug("Remoting Scheduler response for invocation: #{inspect(resp)}")
+    payload
+  end
+
+  defp handle_scheduler_response(
+         {:reply, {:ok, %ActorInvocationResponse{} = resp}, %EntityState{} = _state, _signal} =
+           payload
+       ) do
+    Logger.debug("Remoting Scheduler response for invocation: #{inspect(resp)}")
+    payload
+  end
+
+  defp handle_scheduler_response(
+         {:noreply, %EntityState{} = _state} =
+           payload
+       ) do
+    Logger.debug("Remoting Scheduler response for invocation ok")
+    payload
+  end
+
+  defp handle_scheduler_response(
+         {:noreply, %EntityState{} = _state, _signal} =
+           payload
+       ) do
+    Logger.debug("Remoting Scheduler response for invocation ok")
+    payload
+  end
+
+  defp handle_scheduler_response(another) do
+    Logger.error("Error during Remoting Scheduler invocation. Details: #{inspect(another)}")
+    another
   end
 
   defp do_handle_defaults(action, from, state) do

@@ -79,7 +79,6 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
        ) do
     host_params = Map.get(params, "host")
     task_actors_config = %{"taskActors" => Map.get(host_params, "taskActors", %{})}
-    IO.inspect(task_actors_config, label: "Config ------------------------")
     topology = Map.get(params, "topology", %{})
 
     replicas = max(1, Map.get(params, "replicas", @default_actor_host_function_replicas))

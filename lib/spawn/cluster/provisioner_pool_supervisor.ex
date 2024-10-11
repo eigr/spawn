@@ -59,7 +59,7 @@ defmodule Spawn.Cluster.ProvisionerPoolSupervisor do
       timeout: Map.get(worker_pool_config, "callTimeout", :infinity),
       boot_timeout: Map.get(worker_pool_config, "bootTimeout", :timer.minutes(3)),
       idle_shutdown_after: Map.get(worker_pool_config, "idleShutdownAfter", :timer.minutes(1)),
-      track_resources: true
+      track_resources: false
     ]
   end
 

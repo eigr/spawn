@@ -1,5 +1,5 @@
 #version=1.4.3
-version=1.4.4-rc.35
+version=1.4.4-rc.38
 registry=eigr
 
 CLUSTER_NAME=spawn-k8s
@@ -96,7 +96,7 @@ test-operator:
 	cd spawn_operator/spawn_operator && MIX_ENV=test mix deps.get && MIX_ENV=test PROXY_DATABASE_TYPE=mysql PROXY_CLUSTER_STRATEGY=gossip PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
 
 test-proxy:
-	cd spawn_proxy/proxy && MIX_ENV=test mix deps.get && MIX_ENV=test SPAWN_PROXY_LOGGER_LEVEL=debug PROXY_DATABASE_TYPE=mariadb PROXY_DATABASE_PORT=3307 PROXY_CLUSTER_STRATEGY=gossip PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
+	cd spawn_proxy/proxy && MIX_ENV=test mix deps.get && MIX_ENV=test SPAWN_PROXY_LOGGER_LEVEL=debug PROXY_DATABASE_TYPE=native PROXY_DATABASE_PORT=3307 PROXY_CLUSTER_STRATEGY=gossip PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
 
 run-benchmark:
 	cd spawn_sdk/spawn_sdk_example &&  mix deps.get && SPAWN_PROXY_LOGGER_LEVEL=info PROXY_CLUSTER_STRATEGY=gossip PROXY_DATABASE_TYPE=mariadb PROXY_DATABASE_PORT=3307 PROXY_DATABASE_POOL_SIZE=50 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= iex --name spawn@127.0.0.1 -S mix run benchmark.exs
