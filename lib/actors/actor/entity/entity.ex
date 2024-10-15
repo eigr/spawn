@@ -404,8 +404,11 @@ defmodule Actors.Actor.Entity do
 
     case action do
       {:invocation_request, invocation, opts} ->
-        Invocation.invoke({invocation, opts}, state)
+        handle_invocation_request(invocation, opts, from, state)
         |> reply_to_noreply()
+
+        #Invocation.invoke({invocation, opts}, state)
+        #|> reply_to_noreply()
 
       action ->
         do_handle_cast(action, state)
