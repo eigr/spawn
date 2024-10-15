@@ -6,7 +6,16 @@ defmodule Spawn.Utils.Common do
   alias Eigr.Functions.Protocol.Actors.ActorId
 
   def build_worker_pool_name(module, parent) do
+    System.get_env("SPAWN_PROXY_USE_DEFAULT_FLAME_POOL", "false")
+    |> do_build_worker_pool_name(module, parent)
+  end
+
+  defp do_build_worker_pool_name("false", module, parent) do
     Module.concat(module, String.upcase(parent))
+  end
+
+  defp do_build_worker_pool_name("true", module, _parent) do
+    Module.concat(module, "default")
   end
 
   @spec actor_host_hash() :: integer()
