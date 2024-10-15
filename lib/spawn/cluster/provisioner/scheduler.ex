@@ -31,7 +31,7 @@ defmodule Spawn.Cluster.Provisioner.Scheduler do
     The result of executing the provided function within the context of the actor provisioning system.
     """
     def execute(
-          %SpawnTask{actor_name: actor_name, invocation: invocation, opts: opts, state: state},
+          %SpawnTask{actor_name: actor_name, invocation: invocation, opts: opts, state: state, async: false},
           func
         )
         when is_function(func) do
@@ -39,6 +39,17 @@ defmodule Spawn.Cluster.Provisioner.Scheduler do
 
       build_worker_pool_name(ProvisionerPoolSupervisor, actor_name)
       |> FLAME.call(fn -> func.({invocation, opts}, state) end, opts)
+    end
+
+    def execute(
+          %SpawnTask{actor_name: actor_name, invocation: invocation, opts: opts, state: state, async: true},
+          func
+        )
+        when is_function(func) do
+      opts = Keyword.merge(opts, link: false)
+
+      build_worker_pool_name(ProvisionerPoolSupervisor, actor_name)
+      |> FLAME.cast(fn -> func.({invocation, opts}, state) end, opts)
     end
   end
 

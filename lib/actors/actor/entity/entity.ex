@@ -189,17 +189,26 @@ defmodule Actors.Actor.Entity do
 
       _ ->
         Invocation.invoke({invocation, opts}, state)
+        |> then(fn
+          {:ok, source_request, dest_response, updated_state, source_opts} ->
+            Invocation.handle_response(source_request, dest_response, updated_state, source_opts)
+
+          res ->
+            res
+        end)
     end
   end
 
   defp schedule_task_invocation(invocation, opts, state) do
     task_opts = Keyword.merge(opts, timeout: :infinity)
+    request_type = Keyword.get(opts, :async, false)
 
     %SpawnTask{
       actor_name: state.actor.id.name,
       invocation: invocation,
       opts: task_opts,
-      state: state
+      state: state,
+      async: request_type
     }
     |> FlameScheduler.schedule_and_invoke(&Invocation.invoke/2)
     |> then(fn
@@ -404,11 +413,9 @@ defmodule Actors.Actor.Entity do
 
     case action do
       {:invocation_request, invocation, opts} ->
-        handle_invocation_request(invocation, opts, from, state)
+        opts = Keyword.merge(opts, async: true)
+        handle_invocation_request(invocation, opts, nil, state)
         |> reply_to_noreply()
-
-        #Invocation.invoke({invocation, opts}, state)
-        #|> reply_to_noreply()
 
       action ->
         do_handle_cast(action, state)
