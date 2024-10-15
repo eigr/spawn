@@ -566,6 +566,8 @@ defmodule SpawnSdk.System.SpawnSystem do
   def decode_kind(:singleton), do: :NAMED
   def decode_kind(:named), do: :NAMED
   def decode_kind(:NAMED), do: :NAMED
+  def decode_kind(:TASK), do: :TASK
+  def decode_kind(:task), do: :TASK
   def decode_kind(:pooled), do: :POOLED
   def decode_kind(:POOLED), do: :POOLED
   def decode_kind(_), do: :UNKNOW_KIND

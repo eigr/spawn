@@ -19,7 +19,7 @@ defmodule SpawnOperator.Handler.ActorHostHandler do
           spawn-eigr.io.sidecar.deploymentMode: "sidecar"
 
           # Optional
-          spawn-eigr.io.sidecar.containerImage: "docker.io/eigr/spawn-proxy"
+          spawn-eigr.io.sidecar.containerImage: "ghcr.io/eigr/spawn-proxy"
 
           # Optional
           spawn-eigr.io.sidecar.containerVersion: "1.4.3"
@@ -82,7 +82,7 @@ defmodule SpawnOperator.Handler.ActorHostHandler do
         replicas: 1 # Optional. If negative number than autoscaling is enable
 
         host: # Mandatory
-          image: docker.io/eigr/spawn-springboot-examples:latest # Mandatory
+          image: ghcr.io/eigr/spawn-springboot-examples:latest # Mandatory
           embedded: false # Optional. Default false. True only when the SDK supports a native connection to the Spawn mesh network
           ports:
           - containerPort: 80

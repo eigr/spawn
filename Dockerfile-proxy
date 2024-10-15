@@ -31,7 +31,7 @@ ENV RELEASE_NAME="proxy"
 # This will be the full nodename
 ENV RELEASE_NODE="${RELEASE_NAME}@${POD_IP}"
 
-#RUN echo "-setcookie ${NODE_COOKIE}" >> ./priv/rel/vm.args.eex
+#RUN echo "-setcookie ${RELEASE_COOKIE}" >> ./priv/rel/vm.args.eex
 
 RUN cd spawn_proxy/proxy \
     && mix deps.get \
