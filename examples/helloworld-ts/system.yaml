@@ -1,0 +1,10 @@
+---
+apiVersion: spawn-eigr.io/v1
+kind: ActorSystem
+metadata:
+  name: spawn-system
+  namespace: default
+spec:
+  statestore:
+    type: Native
+    credentialsSecretRef: mariadb-connection-secret

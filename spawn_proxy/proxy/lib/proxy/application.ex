@@ -17,6 +17,7 @@ defmodule Proxy.Application do
 
         OpentelemetryEcto.setup([:spawn_statestores, :repo])
         Config.load()
+
         Logger.configure(level: Config.get(:logger_level))
 
         children = [

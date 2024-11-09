@@ -515,7 +515,7 @@ defmodule Actors.Actor.CallerConsumer do
           # Instead of using Map.get/3, which performs a lookup twice, we use pattern matching
           timeout =
             case metadata["request-timeout"] do
-              nil -> 10_000
+              nil -> 60_000
               value -> value
             end
 

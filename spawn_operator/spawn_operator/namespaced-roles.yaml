@@ -11,6 +11,16 @@ rules:
       - secrets
     verbs:
       - "*"
+  - apiGroups:
+      - ""
+    resources:
+      - "pods"
+    verbs:
+      - "create"
+      - "get"
+      - "list"
+      - "delete"
+      - "patch"
 
 ---
 apiVersion: v1
