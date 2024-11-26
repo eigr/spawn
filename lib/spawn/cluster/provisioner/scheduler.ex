@@ -31,7 +31,13 @@ defmodule Spawn.Cluster.Provisioner.Scheduler do
     The result of executing the provided function within the context of the actor provisioning system.
     """
     def execute(
-          %SpawnTask{actor_name: actor_name, invocation: invocation, opts: opts, state: state, async: false},
+          %SpawnTask{
+            actor_name: actor_name,
+            invocation: invocation,
+            opts: opts,
+            state: state,
+            async: false
+          },
           func
         )
         when is_function(func) do
@@ -42,7 +48,13 @@ defmodule Spawn.Cluster.Provisioner.Scheduler do
     end
 
     def execute(
-          %SpawnTask{actor_name: actor_name, invocation: invocation, opts: opts, state: state, async: true},
+          %SpawnTask{
+            actor_name: actor_name,
+            invocation: invocation,
+            opts: opts,
+            state: state,
+            async: true
+          },
           func
         )
         when is_function(func) do

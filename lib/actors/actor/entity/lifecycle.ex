@@ -100,7 +100,13 @@ defmodule Actors.Actor.Entity.Lifecycle do
     {:ok, state, {:continue, :load_state}}
   end
 
-  def load_state(%EntityState{actor: actor, revision: revision, opts: opts} = state) do
+  def load_state(
+        %EntityState{
+          actor: %Actor{settings: %ActorSettings{stateful: true}} = actor,
+          revision: revision,
+          opts: opts
+        } = state
+      ) do
     case get_state(actor.id, revision) do
       {:ok, current_state, current_revision, status, node} ->
         split_brain_detector =
@@ -122,7 +128,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
          {:continue, :call_init_action}}
 
       error ->
-        handle_load_state_error(actor.name, state, error)
+        handle_load_state_error(actor.id, state, error)
     end
   end
 

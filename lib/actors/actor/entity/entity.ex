@@ -414,6 +414,7 @@ defmodule Actors.Actor.Entity do
     case action do
       {:invocation_request, invocation, opts} ->
         opts = Keyword.merge(opts, async: true)
+
         handle_invocation_request(invocation, opts, nil, state)
         |> reply_to_noreply()
 
