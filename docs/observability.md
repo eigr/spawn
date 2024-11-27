@@ -7,6 +7,8 @@ Spawn exports metrics in Prometheus format and also pushes traces in OTLP format
 ![spawn trace details](images/observability-spawn-2.jpeg)
 
 
+[Back to Index](index.md)
+
 [Next: Local Development](local_development.md)
 
 [Previous: Activators](activators.md)

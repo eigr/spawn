@@ -1,0 +1,22 @@
+---
+apiVersion: spawn-eigr.io/v1
+kind: ActorHost
+metadata:
+  name: flame
+  namespace: default
+  annotations:
+    spawn-eigr.io/actor-system: spawn-system
+    spawn-eigr.io/sidecar-logger-level: debug
+    spawn-eigr.io/sidecar-image-tag: "docker.io/eigr/spawn-proxy:1.4.4-rc.38"
+    spawn-eigr.io/sidecar-init-container-image-tag: "docker.io/eigr/spawn-initializer:1.4.4-rc.38"
+spec:
+  replicas: 2
+  host:
+    image: eigr/helloworld:2
+    taskActors:
+      - actorName: TaskActor
+        workerPool:
+          min: 0
+    ports:
+      - name: http
+        containerPort: 8091

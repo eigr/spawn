@@ -59,6 +59,8 @@
   - [ ] Actor invocation with Authentication/Authorization Basic Auth flow. Under development.
   - [ ] Actor invocation with Authentication/Authorization JWT Auth flow. Under development.
 
+[Back to Index](index.md)
+
 [Next: Install](install.md)
 
 [Previous: Architecture](architecture.md)

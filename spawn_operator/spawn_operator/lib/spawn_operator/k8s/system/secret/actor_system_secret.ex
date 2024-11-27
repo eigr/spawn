@@ -96,7 +96,7 @@ defmodule SpawnOperator.K8s.System.Secret.ActorSystemSecret do
         cluster_heartbeat = "240000" |> Base.encode64()
 
         %{
-          "NODE_COOKIE" => cookie,
+          "RELEASE_COOKIE" => cookie,
           "PROXY_ACTOR_SYSTEM_NAME" => Base.encode64(system),
           "PROXY_CLUSTER_POLLING" => cluster_poolling,
           "PROXY_CLUSTER_STRATEGY" => cluster_strategy,

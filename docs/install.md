@@ -1,17 +1,35 @@
 # Install
 
-The recommended way to install Spawn is via our Kubernetes Operator.
+The recommended way to install Spawn is via our CLI tool.
 
 ### Prerequisites
 
 - Kubernetes Cluster
-- Nats broker accessible within the cluster (See the note below).
-
-> **_Important:_** Nats broker is only necessary if you want to use the Activators feature or if you need your actors to communicate between different ActorSystems.
+- Nats broker accessible within the cluster.
 
 ### Instructions
 
-To install you need to download the Operator manifest file. The following command shows how this could be done directly via the command line:
+Installing is very simple. First download and install our CLI in one command line:
+
+```sh
+curl -sSL https://github.com/eigr/spawn/releases/download/v1.4.3/install.sh | sh
+```
+
+At this point you will be ready to also install our Kubernetes Operator.
+
+Assuming the Kubernetes context you want to install to is called `minikube` the command would be as follows:
+
+```sh
+spawn install k8s --context=minikube
+```
+
+See the demonstration below for a better understanding of the installation process:
+
+![Setting Up Operator](gifs/install.gif)
+
+> **_NOTE:_** For the full list of options use: `spawn install k8s --help`.
+
+Alternatively, you can also install the Operator directly via the manifest file. The following command shows how this could be done directly via the command line:
 
 ```shell
 kubectl create ns eigr-functions && curl -L https://github.com/eigr/spawn/releases/download/{release-version}/manifest.yaml | kubectl apply -f -
@@ -22,6 +40,8 @@ kubectl create ns eigr-functions && curl -L https://github.com/eigr/spawn/releas
 ```shell
 kubectl create ns eigr-functions && curl -L https://github.com/eigr/spawn/releases/download/v1.4.3/manifest.yaml | kubectl apply -f -
 ```
+
+[Back to Index](index.md)
 
 [Next: Getting Started](getting_started.md)
 

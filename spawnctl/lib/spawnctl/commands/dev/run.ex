@@ -77,7 +77,7 @@ defmodule SpawnCtl.Commands.Dev.Run do
   alias SpawnCtl.Util.Emoji
   alias Testcontainers.Container
 
-  import SpawnCtl.Util, only: [is_valid?: 1, log: 3]
+  import SpawnCtl.Util, only: [generate: 0, is_valid?: 1, log: 3]
 
   @default_opts %{
     actor_system: "spawn-system",
@@ -207,8 +207,26 @@ defmodule SpawnCtl.Commands.Dev.Run do
 
   This function starts the Spawn proxy container with the provided options.
   """
-  def run(_, opts, ctx) do
-    log(:info, Emoji.runner(), "Starting Spawn Proxy in dev mode...")
+  def run(args, opts, ctx) do
+    parent = self()
+
+    {:ok, :quit} =
+      System.trap_signal(:sigquit, :quit, fn ->
+        send(parent, :exit)
+        :ok
+      end)
+
+    spawn(fn -> do_run(args, opts, ctx) end)
+
+    receive do
+      :exit ->
+        log(:info, Emoji.runner(), "[#{get_time()}] Stopping Spawn Proxy...")
+        System.stop()
+    end
+  end
+
+  defp do_run(_, opts, ctx) do
+    log(:info, Emoji.runner(), "[#{get_time()}] Starting Spawn Proxy in dev mode...")
 
     {:ok, _pid} = SpawnCtl.GroupExecAfter.start_link()
 
@@ -270,8 +288,10 @@ defmodule SpawnCtl.Commands.Dev.Run do
     |> Map.update!(:manifest_path, &Path.absname/1)
   end
 
-  defp handle_container_start_result({:ok, container}, container_params, opts) do
-    log_success(container, container_params, opts)
+  defp handle_container_start_result({:ok, container}, opts) do
+    :os.type()
+    |> log_success(container, opts)
+
     setup_exit_handler(container)
 
     {:ok, container}
@@ -380,6 +400,7 @@ defmodule SpawnCtl.Commands.Dev.Run do
     Container.new(opts.proxy_image)
     |> maybe_mount_proto_files(opts.protos)
     |> Container.with_environment("MIX_ENV", "prod")
+    |> Container.with_environment("PROXY_APP_NAME", "proxy_#{generate()}")
     |> Container.with_environment("PROXY_CLUSTER_STRATEGY", "gossip")
     |> Container.with_environment("PROXY_DATABASE_TYPE", opts.database_type)
     |> Container.with_environment("PROXY_DATABASE_PORT", "#{opts.database_port}")
@@ -446,7 +467,7 @@ defmodule SpawnCtl.Commands.Dev.Run do
     log(
       :info,
       Emoji.rocket(),
-      "Spawn Proxy started successfully in dev mode. Container Id: #{container.container_id}"
+      "[#{get_time()}] Spawn Proxy started successfully. Container Id: #{container.container_id}"
     )
   end
 
@@ -469,6 +490,10 @@ defmodule SpawnCtl.Commands.Dev.Run do
       Emoji.tired_face(),
       "Failure occurring during Spawn Proxy start phase. Details: #{inspect(error)}"
     )
+  end
+
+  defp get_time() do
+    DateTime.utc_now() |> DateTime.to_string()
   end
 
   defp setup_exit_handler(container) do

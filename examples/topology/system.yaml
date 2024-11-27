@@ -1,0 +1,15 @@
+---
+apiVersion: spawn-eigr.io/v1
+kind: ActorSystem
+metadata:
+  name: spawn-system # Mandatory. Name of the state store
+  namespace: default # Optional. Default namespace is "default"
+spec:
+  externalInvocation:
+    enabled: "true"
+    externalConnectorRef: invocation-connection-ref-secret
+  statestore:
+    type: MySql
+    credentialsSecretRef: mysql-connection-secret # The secret containing connection params
+    pool: # Optional
+      size: "10"

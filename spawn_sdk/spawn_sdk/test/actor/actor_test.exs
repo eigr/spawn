@@ -3,6 +3,32 @@ defmodule Actor.ActorTest do
 
   require Logger
 
+  alias Eigr.Spawn.Actor.{MyMessageRequest, MyMessageResponse}
+
+  defmodule Actor.TaskActor do
+    use SpawnSdk.Actor,
+      name: "task_actor_ref",
+      kind: :task,
+      stateful: true,
+      state_type: Eigr.Spawn.Actor.MyState,
+      tags: [{"foo", "none"}, {"bar", "unchanged"}]
+
+    defact init(_) do
+      Value.noreply_state!(%{value: 0})
+    end
+
+    action("sum", fn %Context{} = ctx, %MyMessageRequest{id: id, data: data} ->
+      current_state = ctx.state
+      new_state = current_state + 1
+
+      response = %MyMessageResponse{id: id, data: data}
+      result = %Value{state: new_state, value: response}
+
+      result
+      |> Value.noreply!()
+    end)
+  end
+
   defmodule Actor.MyActor do
     use SpawnSdk.Actor,
       name: "my_actor_ref",
@@ -225,6 +251,7 @@ defmodule Actor.ActorTest do
             Actor.PooledActor,
             Actor.JsonActor,
             Actor.BroadcastActor,
+            Actor.TaskActor,
             Actor.TimerActor
           ]
         }
@@ -268,6 +295,24 @@ defmodule Actor.ActorTest do
                state: %Eigr.Spawn.Actor.MyState{id: "1", value: 1},
                value: %Eigr.Spawn.Actor.MyMessageResponse{}
              } = Actor.MyActor.handle_action({"sum", request}, ctx)
+    end
+  end
+
+  describe "invoke task actors" do
+    test "simple invoke task actor", ctx do
+      system = ctx.system
+      actor_name = "task_actor_ref"
+
+      SpawnSdk.invoke(actor_name,
+        action: "sum",
+        system: system,
+        payload: %{value: 999}
+      )
+
+      assert SpawnSdk.invoke(actor_name,
+               action: "getState",
+               system: system
+             ) == {:ok, %{value: 999}}
     end
   end
 

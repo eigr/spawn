@@ -44,6 +44,7 @@ It is also worth mentioning that this feature depends on the implementation of e
 | Snapshot Data Partition                   | :white_check_mark:   | :x:                | :x:                  |
 | State AES Encryption                      | :white_check_mark:   | :white_check_mark: | :white_check_mark:   |
 
+[Back to Index](index.md)
 
 [Next: Activators](activators.md)
 

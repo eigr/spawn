@@ -351,6 +351,70 @@ defmodule Actors.Actor.Entity.Invocation do
     end
   end
 
+  def handle_response(
+        request,
+        %ActorInvocationResponse{checkpoint: checkpoint} = response,
+        %EntityState{
+          revision: revision
+        } = state,
+        opts
+      ) do
+    response =
+      case do_response(request, response, state, opts) do
+        :noreply ->
+          {:noreply, state}
+          |> return_and_maybe_hibernate()
+
+        response ->
+          {:reply, {:ok, response}, state}
+          |> return_and_maybe_hibernate()
+      end
+
+    response_checkpoint(response, checkpoint, revision, state)
+  end
+
+
+  defp handle_response(
+         request,
+         %ActorInvocationResponse{checkpoint: checkpoint} = response,
+         %EntityState{
+           actor:
+             %Actor{
+               id: id,
+               settings:
+                 %ActorSettings{
+                   kind: kind,
+                   projection_settings: projection_settings
+                 } = _settings
+             } = _actor,
+           revision: revision
+         } = state,
+         opts
+       ) do
+    response_params = %{
+      actor_id: id,
+      kind: kind,
+      projection_settings: projection_settings,
+      request: request,
+      response: response,
+      state: state,
+      opts: opts
+    }
+
+    response =
+      case do_response(response_params) do
+        :noreply ->
+          {:noreply, state}
+          |> return_and_maybe_hibernate()
+
+        response ->
+          {:reply, {:ok, response}, state}
+          |> return_and_maybe_hibernate()
+      end
+
+    response_checkpoint(response, checkpoint, revision, state)
+  end
+
   defp is_authorized?(invocation, actions, timers) do
     acl_manager = get_acl_manager()
 
@@ -381,10 +445,13 @@ defmodule Actors.Actor.Entity.Invocation do
     Tracer.with_span "invoke-host" do
       case interface.invoke_host(request, state, @default_actions) do
         {:ok, response, new_state} ->
-          handle_response(request, response, new_state, opts)
+          {:ok, request, response, new_state, opts}
+
+        # handle_response(request, response, new_state, opts)
 
         {:error, reason, new_state} ->
-          {:reply, {:error, reason}, new_state} |> return_and_maybe_hibernate()
+          {:reply, {:error, reason}, new_state}
+          |> return_and_maybe_hibernate()
       end
     end
   end
@@ -432,46 +499,6 @@ defmodule Actors.Actor.Entity.Invocation do
     }
   end
 
-  defp handle_response(
-         request,
-         %ActorInvocationResponse{checkpoint: checkpoint} = response,
-         %EntityState{
-           actor:
-             %Actor{
-               id: id,
-               settings:
-                 %ActorSettings{
-                   kind: kind,
-                   projection_settings: projection_settings
-                 } = _settings
-             } = _actor,
-           revision: revision
-         } = state,
-         opts
-       ) do
-    response_params = %{
-      actor_id: id,
-      kind: kind,
-      projection_settings: projection_settings,
-      request: request,
-      response: response,
-      state: state,
-      opts: opts
-    }
-
-    response =
-      case do_response(response_params) do
-        :noreply ->
-          {:noreply, state}
-          |> return_and_maybe_hibernate()
-
-        response ->
-          {:reply, {:ok, response}, state}
-          |> return_and_maybe_hibernate()
-      end
-
-    response_checkpoint(response, checkpoint, revision, state)
-  end
 
   defp response_checkpoint(response, checkpoint, revision, state) do
     if checkpoint do

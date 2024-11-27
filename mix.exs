@@ -80,6 +80,7 @@ defmodule Spawn.MixProject do
       {:grpc, "~> 0.8"},
       {:grpc_reflection, "~> 0.1"},
       {:finch, "~> 0.18"},
+      {:flame_k8s_backend, "~> 0.5"},
       {:retry, "~> 0.17"},
       {:flow, "~> 1.2"},
       {:libcluster, "~> 3.3"},

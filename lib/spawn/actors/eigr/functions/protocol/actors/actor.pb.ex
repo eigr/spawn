@@ -1,6 +1,10 @@
 defmodule Eigr.Functions.Protocol.Actors.Kind do
   @moduledoc false
+<<<<<<< HEAD
   use Protobuf, enum: true, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
+=======
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.13.0", syntax: :proto3
+>>>>>>> main
 
   def descriptor do
     # credo:disable-for-next-line
@@ -38,7 +42,11 @@ defmodule Eigr.Functions.Protocol.Actors.Kind do
           __unknown_fields__: []
         },
         %Google.Protobuf.EnumValueDescriptorProto{
+<<<<<<< HEAD
           name: "PROJECTION",
+=======
+          name: "TASK",
+>>>>>>> main
           number: 5,
           options: nil,
           __unknown_fields__: []
@@ -56,12 +64,20 @@ defmodule Eigr.Functions.Protocol.Actors.Kind do
   field(:UNNAMED, 2)
   field(:POOLED, 3)
   field(:PROXY, 4)
+<<<<<<< HEAD
   field(:PROJECTION, 5)
+=======
+  field(:TASK, 5)
+>>>>>>> main
 end
 
 defmodule Eigr.Functions.Protocol.Actors.Registry.ActorsEntry do
   @moduledoc false
+<<<<<<< HEAD
   use Protobuf, map: true, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
+=======
+  use Protobuf, map: true, protoc_gen_elixir_version: "0.13.0", syntax: :proto3
+>>>>>>> main
 
   def descriptor do
     # credo:disable-for-next-line
@@ -124,7 +140,11 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.Registry do
   @moduledoc false
+<<<<<<< HEAD
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
+=======
+  use Protobuf, protoc_gen_elixir_version: "0.13.0", syntax: :proto3
+>>>>>>> main
 
   def descriptor do
     # credo:disable-for-next-line
@@ -219,7 +239,11 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.ActorSystem do
   @moduledoc false
+<<<<<<< HEAD
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
+=======
+  use Protobuf, protoc_gen_elixir_version: "0.13.0", syntax: :proto3
+>>>>>>> main
 
   def descriptor do
     # credo:disable-for-next-line
@@ -273,7 +297,11 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.ActorSnapshotStrategy do
   @moduledoc false
+<<<<<<< HEAD
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
+=======
+  use Protobuf, protoc_gen_elixir_version: "0.13.0", syntax: :proto3
+>>>>>>> main
 
   def descriptor do
     # credo:disable-for-next-line
@@ -320,7 +348,11 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.ActorDeactivationStrategy do
   @moduledoc false
+<<<<<<< HEAD
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
+=======
+  use Protobuf, protoc_gen_elixir_version: "0.13.0", syntax: :proto3
+>>>>>>> main
 
   def descriptor do
     # credo:disable-for-next-line
@@ -367,7 +399,11 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.TimeoutStrategy do
   @moduledoc false
+<<<<<<< HEAD
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
+=======
+  use Protobuf, protoc_gen_elixir_version: "0.13.0", syntax: :proto3
+>>>>>>> main
 
   def descriptor do
     # credo:disable-for-next-line
@@ -406,7 +442,11 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.Action do
   @moduledoc false
+<<<<<<< HEAD
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
+=======
+  use Protobuf, protoc_gen_elixir_version: "0.13.0", syntax: :proto3
+>>>>>>> main
 
   def descriptor do
     # credo:disable-for-next-line
@@ -445,7 +485,11 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.FixedTimerAction do
   @moduledoc false
+<<<<<<< HEAD
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
+=======
+  use Protobuf, protoc_gen_elixir_version: "0.13.0", syntax: :proto3
+>>>>>>> main
 
   def descriptor do
     # credo:disable-for-next-line
@@ -499,7 +543,11 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.ActorState.TagsEntry do
   @moduledoc false
+<<<<<<< HEAD
   use Protobuf, map: true, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
+=======
+  use Protobuf, map: true, protoc_gen_elixir_version: "0.13.0", syntax: :proto3
+>>>>>>> main
 
   def descriptor do
     # credo:disable-for-next-line
@@ -562,7 +610,11 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.ActorState do
   @moduledoc false
+<<<<<<< HEAD
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
+=======
+  use Protobuf, protoc_gen_elixir_version: "0.13.0", syntax: :proto3
+>>>>>>> main
 
   def descriptor do
     # credo:disable-for-next-line
@@ -673,7 +725,11 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.Metadata.TagsEntry do
   @moduledoc false
+<<<<<<< HEAD
   use Protobuf, map: true, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
+=======
+  use Protobuf, map: true, protoc_gen_elixir_version: "0.13.0", syntax: :proto3
+>>>>>>> main
 
   def descriptor do
     # credo:disable-for-next-line
@@ -736,7 +792,11 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.Metadata do
   @moduledoc false
+<<<<<<< HEAD
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
+=======
+  use Protobuf, protoc_gen_elixir_version: "0.13.0", syntax: :proto3
+>>>>>>> main
 
   def descriptor do
     # credo:disable-for-next-line
@@ -851,7 +911,11 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.Channel do
   @moduledoc false
+<<<<<<< HEAD
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
+=======
+  use Protobuf, protoc_gen_elixir_version: "0.13.0", syntax: :proto3
+>>>>>>> main
 
   def descriptor do
     # credo:disable-for-next-line
@@ -1169,7 +1233,11 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.ActorSettings do
   @moduledoc false
+<<<<<<< HEAD
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
+=======
+  use Protobuf, protoc_gen_elixir_version: "0.13.0", syntax: :proto3
+>>>>>>> main
 
   def descriptor do
     # credo:disable-for-next-line
@@ -1311,7 +1379,11 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.ActorId do
   @moduledoc false
+<<<<<<< HEAD
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
+=======
+  use Protobuf, protoc_gen_elixir_version: "0.13.0", syntax: :proto3
+>>>>>>> main
 
   def descriptor do
     # credo:disable-for-next-line
@@ -1380,7 +1452,11 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.Actor do
   @moduledoc false
+<<<<<<< HEAD
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
+=======
+  use Protobuf, protoc_gen_elixir_version: "0.13.0", syntax: :proto3
+>>>>>>> main
 
   def descriptor do
     # credo:disable-for-next-line

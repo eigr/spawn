@@ -1,6 +1,10 @@
 defmodule Eigr.Functions.Protocol.Actors.Healthcheck.Status do
   @moduledoc false
+<<<<<<< HEAD
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
+=======
+  use Protobuf, protoc_gen_elixir_version: "0.13.0", syntax: :proto3
+>>>>>>> main
 
   def descriptor do
     # credo:disable-for-next-line
@@ -69,7 +73,11 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckReply do
   @moduledoc false
+<<<<<<< HEAD
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
+=======
+  use Protobuf, protoc_gen_elixir_version: "0.13.0", syntax: :proto3
+>>>>>>> main
 
   def descriptor do
     # credo:disable-for-next-line
@@ -111,7 +119,7 @@ defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service do
 
   use GRPC.Service,
     name: "eigr.functions.protocol.actors.healthcheck.HealthCheckActor",
-    protoc_gen_elixir_version: "0.12.0"
+    protoc_gen_elixir_version: "0.13.0"
 
   def descriptor do
     # credo:disable-for-next-line
