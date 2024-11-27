@@ -66,7 +66,7 @@ defmodule Actors.Actor.Entity.Invocation do
       actor:
         %Actor{
           id: %ActorId{name: _actor_name, parent: _parent} = id,
-          state: actor_state,
+          state: actor_state
         } = _actor,
       opts: actor_opts
     } = state
@@ -355,42 +355,19 @@ defmodule Actors.Actor.Entity.Invocation do
         request,
         %ActorInvocationResponse{checkpoint: checkpoint} = response,
         %EntityState{
+          actor:
+            %Actor{
+              id: id,
+              settings:
+                %ActorSettings{
+                  kind: kind,
+                  projection_settings: projection_settings
+                } = _settings
+            } = _actor,
           revision: revision
         } = state,
         opts
       ) do
-    response =
-      case do_response(request, response, state, opts) do
-        :noreply ->
-          {:noreply, state}
-          |> return_and_maybe_hibernate()
-
-        response ->
-          {:reply, {:ok, response}, state}
-          |> return_and_maybe_hibernate()
-      end
-
-    response_checkpoint(response, checkpoint, revision, state)
-  end
-
-
-  defp handle_response(
-         request,
-         %ActorInvocationResponse{checkpoint: checkpoint} = response,
-         %EntityState{
-           actor:
-             %Actor{
-               id: id,
-               settings:
-                 %ActorSettings{
-                   kind: kind,
-                   projection_settings: projection_settings
-                 } = _settings
-             } = _actor,
-           revision: revision
-         } = state,
-         opts
-       ) do
     response_params = %{
       actor_id: id,
       kind: kind,
@@ -498,7 +475,6 @@ defmodule Actors.Actor.Entity.Invocation do
       caller: caller
     }
   end
-
 
   defp response_checkpoint(response, checkpoint, revision, state) do
     if checkpoint do

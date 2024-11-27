@@ -1,10 +1,6 @@
 defmodule Eigr.Functions.Protocol.State.Revision do
   @moduledoc false
-<<<<<<< HEAD
-  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
-=======
-  use Protobuf, protoc_gen_elixir_version: "0.13.0", syntax: :proto3
->>>>>>> main
+  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
   def descriptor do
     # credo:disable-for-next-line
@@ -43,11 +39,7 @@ end
 
 defmodule Eigr.Functions.Protocol.State.Checkpoint do
   @moduledoc false
-<<<<<<< HEAD
-  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.12.0"
-=======
-  use Protobuf, protoc_gen_elixir_version: "0.13.0", syntax: :proto3
->>>>>>> main
+  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
   def descriptor do
     # credo:disable-for-next-line

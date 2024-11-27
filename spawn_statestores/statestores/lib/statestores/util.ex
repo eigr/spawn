@@ -214,10 +214,13 @@ defmodule Statestores.Util do
   end
 
   def normalize_table_name(nil), do: {:error, "Table name cannot be nil"}
+
   def normalize_table_name(name) when is_binary(name) do
     name
-    |> Macro.underscore() # Converts "CamelCase" to "snake_case"
-    |> String.downcase() # Ensures the name is all lowercase
+    # Converts "CamelCase" to "snake_case"
+    |> Macro.underscore()
+    # Ensures the name is all lowercase
+    |> String.downcase()
   end
 
   # Lookup Adapters

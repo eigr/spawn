@@ -249,10 +249,14 @@ defmodule Statestores.Adapters.MariaDBProjectionAdapterTest do
       projection_name = "test_projections"
 
       {:ok, result} = Adapter.get_all(projection_name, 5, 10)
-      IO.inspect(result, label: "fail get_all/3 ----------------------------------------------------------------")
+
+      IO.inspect(result,
+        label: "fail get_all/3 ----------------------------------------------------------------"
+      )
 
       assert length(result.entries) == 0
-      assert result.page_number == 1 # this totall create on test
+      # this totall create on test
+      assert result.page_number == 1
     end
   end
 end
