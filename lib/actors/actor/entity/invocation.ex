@@ -496,7 +496,7 @@ defmodule Actors.Actor.Entity.Invocation do
          } = _params
        )
        when is_nil(workflow) or workflow == %{} do
-    :ok = do_handle_projection(id, request.action, settings, state)
+    :ok = do_handle_projection(id, request.action_name, settings, state)
 
     response
   end
@@ -512,7 +512,7 @@ defmodule Actors.Actor.Entity.Invocation do
            opts: opts
          } = _params
        ) do
-    :ok = do_handle_projection(id, request.action, settings, state)
+    :ok = do_handle_projection(id, request.action_name, settings, state)
 
     do_run_workflow(request, response, state, opts)
   end
