@@ -150,7 +150,7 @@ test-spawn:
 	elixir --name spawn@127.0.0.1 -S mix test
 
 test-sdk:
-	cd spawn_sdk/spawn_sdk_example && \
+	cd spawn_sdk/spawn_sdk && \
 	mix deps.get && \
 	MIX_ENV=test \
 	SPAWN_PROXY_LOGGER_LEVEL=info \
@@ -158,6 +158,7 @@ test-sdk:
 	PROXY_DATABASE_TYPE=mariadb \
 	PROXY_DATABASE_PORT=3307 \
 	PROXY_DATABASE_POOL_SIZE=50 \
+	SPAWN_USE_INTERNAL_NATS=true \
 	SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= \
 	elixir --name spawn@127.0.0.1 -S mix test
 

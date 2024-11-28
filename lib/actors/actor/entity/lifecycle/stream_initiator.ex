@@ -124,7 +124,7 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamInitiator do
       %{
         name: subject.actor,
         filter_subject: "actors.#{subject.actor}.*.#{subject.action}",
-        opt_start_time: start_at
+        opt_start_time: DateTime.from_unix!(start_at, :second)
       }
     end)
   end
@@ -133,6 +133,7 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamInitiator do
     case Map.get(settings.events_retention_strategy, :strategy, {:time_in_ms, @one_day_in_ms}) do
       {:infinite, true} -> 0
       # ms to ns
+      {:time_in_ms, %{time: max_age}} -> max_age * 1_000_000
       {:time_in_ms, max_age} -> max_age * 1_000_000
     end
   end
@@ -142,16 +143,20 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamInitiator do
   defp create_stream(actor, true) do
     # TODO: Necessary avoid naming conflicts using actor system and actor name to build name of stream
     stream_name = actor.id.name
+    max_age = build_stream_max_age(actor.settings.projection_settings)
 
-    stream = %NatsStream{
-      name: stream_name,
-      subjects: [],
-      sources: build_sources(actor.settings.projection_settings),
-      max_age: build_stream_max_age(actor.settings.projection_settings)
-    }
+    stream =
+      %NatsStream{
+        name: stream_name,
+        subjects: [],
+        sources: build_sources(actor.settings.projection_settings),
+        duplicate_window: max_age,
+        max_age: max_age
+      }
 
     case NatsStream.info(conn(), stream_name) do
       {:ok, _info} ->
+        # TODO: Make sure to update the stream if it already exists and sources is changed
         :ok
 
       {:error, %{"code" => 404, "err_code" => @stream_not_found_code}} ->
@@ -167,10 +172,13 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamInitiator do
     # TODO: Necessary avoid naming conflicts using actor system and actor name to build name of stream
     stream_name = actor.id.name
 
+    max_age = build_stream_max_age(actor.settings.projection_settings)
+
     stream = %NatsStream{
       name: stream_name,
       subjects: ["actors.#{stream_name}.>"],
-      max_age: build_stream_max_age(actor.settings.projection_settings)
+      max_age: max_age,
+      duplicate_window: max_age
     }
 
     case NatsStream.info(conn(), stream_name) do

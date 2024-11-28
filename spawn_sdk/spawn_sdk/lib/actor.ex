@@ -340,6 +340,10 @@ defmodule SpawnSdk.Actor do
 
     state_type = Keyword.get(opts, :state_type, :json)
     stateful = Keyword.get(opts, :stateful, true)
+    sourceable = Keyword.get(opts, :sourceable, false)
+    subjects = Keyword.get(opts, :subjects, [])
+    events_retention = Keyword.get(opts, :events_retention, 24 * 60 * 60)
+    strict_ordering = Keyword.get(opts, :strict_ordering, false)
 
     tags = Keyword.get(opts, :tags, nil)
 
@@ -421,6 +425,10 @@ defmodule SpawnSdk.Actor do
       def __meta__(:max_pool_size), do: unquote(max_pool_size)
       def __meta__(:snapshot_timeout), do: unquote(snapshot_timeout)
       def __meta__(:deactivate_timeout), do: unquote(deactivate_timeout)
+      def __meta__(:sourceable), do: unquote(sourceable)
+      def __meta__(:subjects), do: unquote(subjects)
+      def __meta__(:events_retention), do: unquote(events_retention)
+      def __meta__(:strict_ordering), do: unquote(strict_ordering)
       def __meta__(:tags), do: Map.new(unquote(tags) || %{})
     end
   end

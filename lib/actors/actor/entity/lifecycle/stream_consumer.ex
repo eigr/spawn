@@ -19,7 +19,8 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamConsumer do
   def start_link(opts) do
     Broadway.start_link(
       __MODULE__,
-      name: opts.actor_name,
+      # there will be not a lot so probably fine to convert to atom
+      name: String.to_atom(opts.actor_name),
       context: opts,
       producer: [
         module: {

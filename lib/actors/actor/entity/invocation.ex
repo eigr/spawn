@@ -40,7 +40,7 @@ defmodule Actors.Actor.Entity.Invocation do
 
   alias Spawn.Utils.Nats
 
-  import Spawn.Utils.AnySerializer, only: [any_pack!: 1]
+  import Spawn.Utils.AnySerializer, only: [any_pack!: 1, unpack_any_bin: 1]
   import Spawn.Utils.Common, only: [return_and_maybe_hibernate: 1]
 
   @default_actions [
@@ -61,43 +61,57 @@ defmodule Actors.Actor.Entity.Invocation do
   @http_host_interface Actors.Actor.Interface.Http
 
   def process_projection_events(messages, state) do
-    %EntityState{
-      system: actor_system,
-      actor:
-        %Actor{
-          id: %ActorId{name: _actor_name, parent: _parent} = id,
-          state: actor_state
-        } = _actor,
-      opts: actor_opts
-    } = state
+    %EntityState{actor: %Actor{} = actor} = state
 
     invocations =
       messages
-      |> Enum.map(fn %Fact{} = message ->
-        actor_key_parts =
-          Map.get(message.metadata, "Nats-Msg-Id")
-          |> String.split(":")
-
-        {name, _rest} = List.pop_at(actor_key_parts, 2)
-        {parent, _rest} = List.pop_at(actor_key_parts, 1)
-        {system_name, _rest} = List.pop_at(actor_key_parts, 0)
-
-        {action, _rest} =
-          message.metadata.topic
-          |> String.split(".")
-          |> List.pop_at(3)
+      |> Enum.map(fn %Broadway.Message{data: %Fact{} = message} ->
+        system_name = Map.get(message.metadata, "spawn-system")
+        parent = Map.get(message.metadata, "actor-parent")
+        name = Map.get(message.metadata, "actor-name")
+        action = Map.get(message.metadata, "actor-action")
 
         %InvocationRequest{
           async: true,
-          actor: %Actor{
-            id: %ActorId{name: name, system: system_name, parent: parent}
-          },
-          metadata: %Metadata{tags: message.metadata},
+          system: %ActorSystem{name: system_name},
+          actor: %Actor{id: actor.id},
+          metadata: message.metadata,
           action_name: action,
-          payload: {:value, any_pack!(message.state)},
-          caller: nil
+          payload: parse_payload(unpack_any_bin(message.state)),
+          caller: %ActorId{name: name, system: system_name, parent: parent}
         }
       end)
+
+    spawn(fn ->
+      invocations
+      |> Flow.from_enumerable(min_demand: 1, max_demand: System.schedulers_online())
+      |> Flow.map(fn invocation ->
+        try do
+          Actors.invoke(invocation, span_ctx: Tracer.current_span_ctx())
+        catch
+          error ->
+            Logger.warning(
+              "Error during processing events on projection. Invocation: #{inspect(invocation)} Error: #{inspect(error)}"
+            )
+
+            :ok
+        end
+      end)
+      |> Flow.run()
+    end)
+
+    {:noreply, state}
+  end
+
+  defp parse_payload(response) do
+    case response do
+      nil -> {:noop, %Noop{}}
+      %Noop{} = noop -> {:noop, noop}
+      {:noop, %Noop{} = noop} -> {:noop, noop}
+      {_, nil} -> {:noop, %Noop{}}
+      {:value, response} -> {:value, any_pack!(response)}
+      response -> {:value, any_pack!(response)}
+    end
   end
 
   def replay(
@@ -518,12 +532,21 @@ defmodule Actors.Actor.Entity.Invocation do
   end
 
   defp do_handle_projection(id, action, %{sourceable: true} = _settings, state) do
-    key = "#{id.system}:#{id.parent}:#{id.name}"
-    subject = "actors.#{id.parent}.#{id.name}.#{action}"
-    payload = state.actor.state.state
+    actor_name_or_parent = if id.parent == "", do: id.name, else: id.parent
+
+    subject = "actors.#{actor_name_or_parent}.#{id.name}"
+    payload = Google.Protobuf.Any.encode(state.actor.state.state)
+
+    uuid = UUID.uuid4(:hex)
 
     Gnat.pub(Nats.connection_name(), subject, payload,
-      headers: [{"Nats-Msg-Id", key}, {"Spawn-System", "#{id.system}"}]
+      headers: [
+        {"Nats-Msg-Id", uuid},
+        {"Spawn-System", "#{id.system}"},
+        {"Actor-Parent", "#{id.parent}"},
+        {"Actor-Name", "#{id.name}"},
+        {"Actor-Action", "#{action}"}
+      ]
     )
   end
 
