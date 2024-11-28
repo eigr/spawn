@@ -534,7 +534,7 @@ defmodule Actors.Actor.Entity.Invocation do
   defp do_handle_projection(id, action, %{sourceable: true} = _settings, state) do
     actor_name_or_parent = if id.parent == "", do: id.name, else: id.parent
 
-    subject = "actors.#{actor_name_or_parent}.#{id.name}"
+    subject = "actors.#{actor_name_or_parent}.#{id.name}.#{action}"
     payload = Google.Protobuf.Any.encode(state.actor.state.state)
 
     uuid = UUID.uuid4(:hex)
