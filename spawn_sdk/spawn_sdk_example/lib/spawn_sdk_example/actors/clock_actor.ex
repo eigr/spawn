@@ -2,13 +2,14 @@ defmodule SpawnSdkExample.Actors.ClockActor do
   use SpawnSdk.Actor,
     name: "ClockActor",
     state_type: Io.Eigr.Spawn.Example.MyState,
-    deactivate_timeout: 15_000
+    deactivate_timeout: 15_000,
+    sourceable: true
 
   require Logger
 
   alias Io.Eigr.Spawn.Example.MyState
 
-  action("Clock", [timer: 10_000], fn %Context{state: state} = ctx ->
+  action("Clock", [timer: 2_000], fn %Context{state: state} = ctx ->
     Logger.info("[clock] Clock Actor Received Request. Context: #{inspect(ctx)}")
 
     new_value = if is_nil(state), do: 0, else: state.value + 1

@@ -89,6 +89,22 @@ defmodule Statestores.Util do
     end
   end
 
+  @spec load_projection_adapter :: adapter()
+  def load_projection_adapter() do
+    case Application.fetch_env(@otp_app, :projection_adapter) do
+      {:ok, value} ->
+        value
+
+      :error ->
+        type =
+          String.to_existing_atom(
+            System.get_env("PROXY_DATABASE_TYPE", get_default_database_type())
+          )
+
+        load_projection_adapter_by_type(type)
+    end
+  end
+
   def get_default_database_type do
     cond do
       Code.ensure_loaded?(Statestores.Adapters.PostgresSnapshotAdapter) -> "postgres"
@@ -197,6 +213,16 @@ defmodule Statestores.Util do
     key
   end
 
+  def normalize_table_name(nil), do: {:error, "Table name cannot be nil"}
+
+  def normalize_table_name(name) when is_binary(name) do
+    name
+    # Converts "CamelCase" to "snake_case"
+    |> Macro.underscore()
+    # Ensures the name is all lowercase
+    |> String.downcase()
+  end
+
   # Lookup Adapters
   defp load_lookup_adapter_by_type(:mariadb), do: Statestores.Adapters.MariaDBLookupAdapter
 
@@ -210,4 +236,14 @@ defmodule Statestores.Util do
   defp load_snapshot_adapter_by_type(:postgres), do: Statestores.Adapters.PostgresSnapshotAdapter
 
   defp load_snapshot_adapter_by_type(:native), do: Statestores.Adapters.NativeSnapshotAdapter
+
+  # Projections Adapters
+  defp load_projection_adapter_by_type(:mariadb),
+    do: Statestores.Adapters.MariaDBProjectionAdapter
+
+  defp load_projection_adapter_by_type(:postgres),
+    do: Statestores.Adapters.PostgresProjectionAdapter
+
+  defp load_projection_adapter_by_type(:native),
+    do: Statestores.Adapters.NativeProjectionAdapter
 end

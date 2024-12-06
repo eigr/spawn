@@ -21,7 +21,11 @@ defmodule Proxy.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger, :runtime_tools, :os_mon],
+      extra_applications: [
+        :logger,
+        :runtime_tools,
+        :os_mon
+      ],
       mod: {Proxy.Application, []}
     ]
   end

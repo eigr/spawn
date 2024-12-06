@@ -5,7 +5,12 @@ defmodule Statestores.Supervisor do
   @shutdown_timeout_ms 330_000
 
   import Statestores.Util,
-    only: [load_lookup_adapter: 0, load_snapshot_adapter: 0, supervisor_process_logger: 1]
+    only: [
+      load_lookup_adapter: 0,
+      load_snapshot_adapter: 0,
+      load_projection_adapter: 0,
+      supervisor_process_logger: 1
+    ]
 
   def start_link(args) do
     Supervisor.start_link(__MODULE__, args, name: __MODULE__, shutdown: @shutdown_timeout_ms)
@@ -22,6 +27,7 @@ defmodule Statestores.Supervisor do
   def init(_args) do
     lookup_adapter = load_lookup_adapter()
     snapshot_adapter = load_snapshot_adapter()
+    projection_adapter = load_projection_adapter()
     Statestores.Migrator.migrate(snapshot_adapter)
     Statestores.Migrator.migrate(lookup_adapter)
 
@@ -30,6 +36,7 @@ defmodule Statestores.Supervisor do
         supervisor_process_logger(__MODULE__),
         Statestores.Vault,
         snapshot_adapter,
+        projection_adapter,
         lookup_adapter
       ]
       |> maybe_add_native_children(snapshot_adapter)

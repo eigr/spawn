@@ -1,6 +1,6 @@
 defmodule Eigr.Functions.Protocol.Actors.Healthcheck.Status do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.13.0", syntax: :proto3
+  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
   def descriptor do
     # credo:disable-for-next-line
@@ -69,7 +69,7 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckReply do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.13.0", syntax: :proto3
+  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
   def descriptor do
     # credo:disable-for-next-line

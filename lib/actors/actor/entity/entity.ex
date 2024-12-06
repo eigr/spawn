@@ -418,6 +418,14 @@ defmodule Actors.Actor.Entity do
         handle_invocation_request(invocation, opts, nil, state)
         |> reply_to_noreply()
 
+      {:process_projection_events, events} ->
+        Invocation.process_projection_events(events, state)
+        |> reply_to_noreply()
+
+      {:replay, opts} ->
+        Invocation.replay(opts, state)
+        |> reply_to_noreply()
+
       action ->
         do_handle_cast(action, state)
     end
@@ -534,6 +542,19 @@ defmodule Actors.Actor.Entity do
   def get_state(ref, opts) do
     timeout = Keyword.get(opts, :timeout, @default_call_timeout)
     GenServer.call(via(ref), :get_state, timeout)
+  end
+
+  @doc """
+  When the Actor is a Projection the messages sent to the projection can be reprocessed.
+  See this for more information about this programming model.
+  """
+  @spec replay(pid() | module(), Keyword.t()) :: {:error, term()} | :ok
+  def replay(ref, opts) when is_pid(ref) do
+    GenServer.cast(ref, {:replay, opts})
+  end
+
+  def replay(ref, opts) do
+    GenServer.cast(via(ref), {:replay, opts})
   end
 
   @doc """

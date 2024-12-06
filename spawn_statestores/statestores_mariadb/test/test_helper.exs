@@ -10,6 +10,12 @@ Application.put_env(
   Statestores.Adapters.MariaDBLookupAdapter
 )
 
+Application.put_env(
+  :spawn_statestores,
+  :database_projection_adapter,
+  Statestores.Adapters.MariaDBProjectionAdapter
+)
+
 ExUnit.start()
 
 Statestores.Supervisor.start_link(%{})

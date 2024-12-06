@@ -6,17 +6,22 @@ defmodule Actors.Actor.Entity.Invocation do
   require Logger
   require OpenTelemetry.Tracer, as: Tracer
 
-  alias Actors.Actor.Entity.{EntityState, Lifecycle}
-  alias Actors.Exceptions.NotAuthorizedException
+  alias Actors.Actor.Entity.EntityState
+  alias Actors.Actor.Entity.Lifecycle
+  alias Actors.Actor.Entity.Lifecycle.StreamInitiator
   alias Actors.Actor.InvocationScheduler
+  alias Actors.Exceptions.NotAuthorizedException
+  alias Actors.Actor.Pubsub
 
   alias Eigr.Functions.Protocol.Actors.{
     Actor,
     ActorId,
+    ActorSettings,
     ActorSystem,
     ActorState,
     Action,
-    FixedTimerAction
+    FixedTimerAction,
+    Metadata
   }
 
   alias Eigr.Functions.Protocol.{
@@ -24,6 +29,7 @@ defmodule Actors.Actor.Entity.Invocation do
     ActorInvocationResponse,
     Broadcast,
     Context,
+    Fact,
     Forward,
     InvocationRequest,
     Pipe,
@@ -32,8 +38,9 @@ defmodule Actors.Actor.Entity.Invocation do
     Noop
   }
 
-  alias Actors.Actor.Pubsub
+  alias Spawn.Utils.Nats
 
+  import Spawn.Utils.AnySerializer, only: [any_pack!: 1, unpack_any_bin: 1]
   import Spawn.Utils.Common, only: [return_and_maybe_hibernate: 1]
 
   @default_actions [
@@ -52,6 +59,79 @@ defmodule Actors.Actor.Entity.Invocation do
   ]
 
   @http_host_interface Actors.Actor.Interface.Http
+
+  def process_projection_events(messages, state) do
+    %EntityState{actor: %Actor{} = actor} = state
+
+    invocations =
+      messages
+      |> Enum.map(fn %Broadway.Message{data: %Fact{} = message} ->
+        system_name = Map.get(message.metadata, "spawn-system")
+        parent = Map.get(message.metadata, "actor-parent")
+        name = Map.get(message.metadata, "actor-name")
+        action = Map.get(message.metadata, "actor-action")
+
+        %InvocationRequest{
+          async: true,
+          system: %ActorSystem{name: system_name},
+          actor: %Actor{id: actor.id},
+          metadata: message.metadata,
+          action_name: action,
+          payload: parse_payload(unpack_any_bin(message.state)),
+          caller: %ActorId{name: name, system: system_name, parent: parent}
+        }
+      end)
+
+    spawn(fn ->
+      invocations
+      |> Flow.from_enumerable(min_demand: 1, max_demand: System.schedulers_online())
+      |> Flow.map(fn invocation ->
+        try do
+          Actors.invoke(invocation, span_ctx: Tracer.current_span_ctx())
+        catch
+          error ->
+            Logger.warning(
+              "Error during processing events on projection. Invocation: #{inspect(invocation)} Error: #{inspect(error)}"
+            )
+
+            :ok
+        end
+      end)
+      |> Flow.run()
+    end)
+
+    {:noreply, state}
+  end
+
+  defp parse_payload(response) do
+    case response do
+      nil -> {:noop, %Noop{}}
+      %Noop{} = noop -> {:noop, noop}
+      {:noop, %Noop{} = noop} -> {:noop, noop}
+      {_, nil} -> {:noop, %Noop{}}
+      {:value, response} -> {:value, any_pack!(response)}
+      response -> {:value, any_pack!(response)}
+    end
+  end
+
+  def replay(
+        call_opts,
+        %EntityState{
+          actor:
+            %Actor{
+              settings:
+                %ActorSettings{
+                  kind: :PROJECTION
+                } = _settings
+            } = actor,
+          projection_stream_pid: stream_pid
+        } = state
+      ) do
+    {:ok, newpid} = StreamInitiator.replay(stream_pid, actor, call_opts)
+    {:noreply, %{state | projection_stream_pid: newpid}}
+  end
+
+  def replay(_replaymsg, _call_opts, state), do: {:noreply, state}
 
   def handle_timers([], _system, _actor), do: :ok
 
@@ -289,12 +369,31 @@ defmodule Actors.Actor.Entity.Invocation do
         request,
         %ActorInvocationResponse{checkpoint: checkpoint} = response,
         %EntityState{
+          actor:
+            %Actor{
+              id: id,
+              settings:
+                %ActorSettings{
+                  kind: kind,
+                  projection_settings: projection_settings
+                } = _settings
+            } = _actor,
           revision: revision
         } = state,
         opts
       ) do
+    response_params = %{
+      actor_id: id,
+      kind: kind,
+      projection_settings: projection_settings,
+      request: request,
+      response: response,
+      state: state,
+      opts: opts
+    }
+
     response =
-      case do_response(request, response, state, opts) do
+      case do_response(response_params) do
         :noreply ->
           {:noreply, state}
           |> return_and_maybe_hibernate()
@@ -400,18 +499,58 @@ defmodule Actors.Actor.Entity.Invocation do
   end
 
   defp do_response(
-         _request,
-         %ActorInvocationResponse{workflow: workflow} = response,
-         _state,
-         _opts
+         %{
+           actor_id: id,
+           kind: kind,
+           projection_settings: settings,
+           request: request,
+           response: %ActorInvocationResponse{workflow: workflow} = response,
+           state: state,
+           opts: _opts
+         } = _params
        )
        when is_nil(workflow) or workflow == %{} do
+    :ok = do_handle_projection(id, request.action_name, settings, state)
+
     response
   end
 
-  defp do_response(request, response, state, opts) do
+  defp do_response(
+         %{
+           actor_id: id,
+           kind: kind,
+           projection_settings: settings,
+           request: request,
+           response: response,
+           state: state,
+           opts: opts
+         } = _params
+       ) do
+    :ok = do_handle_projection(id, request.action_name, settings, state)
+
     do_run_workflow(request, response, state, opts)
   end
+
+  defp do_handle_projection(id, action, %{sourceable: true} = _settings, state) do
+    actor_name_or_parent = if id.parent == "", do: id.name, else: id.parent
+
+    subject = "actors.#{actor_name_or_parent}.#{id.name}.#{action}"
+    payload = Google.Protobuf.Any.encode(state.actor.state.state)
+
+    uuid = UUID.uuid4(:hex)
+
+    Gnat.pub(Nats.connection_name(), subject, payload,
+      headers: [
+        {"Nats-Msg-Id", uuid},
+        {"Spawn-System", "#{id.system}"},
+        {"Actor-Parent", "#{id.parent}"},
+        {"Actor-Name", "#{id.name}"},
+        {"Actor-Action", "#{action}"}
+      ]
+    )
+  end
+
+  defp do_handle_projection(_id, _action, _settings, _state), do: :ok
 
   defp do_run_workflow(
          _request,

@@ -24,7 +24,9 @@ defmodule SpawnCtl.Commands.Dev.Run do
   - Statestore Key: "myfake-key-3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE="
   - Logger level: "info"
   - Proxy instance name: "proxy"
-  - Use Nats for cross ActorSystem communication: false
+  - Nats image: "nats"
+  - Nats http port: 8222
+  - Nats port: 4222
 
   ### Example 2: Running with Custom Actor System and Database Host
 
@@ -63,7 +65,9 @@ defmodule SpawnCtl.Commands.Dev.Run do
           --database-pool 50  \
           --statestore-key "custom-key" \
           --log-level "debug" \
-          --enable-nats true \
+          --nats-image "nats" \
+          --nats-http-port 8222 \
+          --nats-port 4222 \
           --name "custom-proxy"
   """
   use DoIt.Command,
@@ -93,7 +97,9 @@ defmodule SpawnCtl.Commands.Dev.Run do
     statestore_key: "3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE=",
     log_level: "info",
     name: "proxy",
-    enable_nats: false
+    nats_image: "nats",
+    nats_http_port: 8222,
+    nats_port: 4222
   }
 
   option(:actor_system, :string, "Defines the name of the ActorSystem.",
@@ -181,10 +187,20 @@ defmodule SpawnCtl.Commands.Dev.Run do
     default: @default_opts.name
   )
 
-  option(:enable_nats, :boolean, "Use or not Nats for cross ActorSystem communication",
+  option(:nats_image, :string, "Nats test image",
     alias: :N,
-    default: @default_opts.enable_nats
+    default: @default_opts.nats_image
   )
+
+  option(:nats_http_port, :integer, "Nats http port", default: @default_opts.nats_http_port)
+
+  option(:nats_port, :integer, "Nats port", default: @default_opts.nats_port)
+
+  # Only supports one restartable atm
+  @containers [
+    %{image: :nats_image, restartable: false},
+    %{image: :proxy_image, restartable: true}
+  ]
 
   @doc """
   Runs the Spawn proxy in development mode.
@@ -212,40 +228,58 @@ defmodule SpawnCtl.Commands.Dev.Run do
   defp do_run(_, opts, ctx) do
     log(:info, Emoji.runner(), "[#{get_time()}] Starting Spawn Proxy in dev mode...")
 
-    if opts.proto_changes_watcher do
-      paths =
-        if File.exists?(opts.manifest_path),
-          do: [opts.protos, opts.manifest_path],
-          else: [opts.protos]
+    {:ok, _pid} = SpawnCtl.GroupExecAfter.start_link()
 
-      {:ok, pid} = FileSystem.start_link(dirs: paths)
-      FileSystem.subscribe(pid)
-      watch(nil, opts, ctx)
-    else
+    {:ok, _pid} =
       case Testcontainers.start_link() do
-        {:ok, _docker_pid} ->
-          case start_container(opts, ctx) do
-            {:ok, _container} ->
-              Process.sleep(:infinity)
+        {:ok, pid} ->
+          {:ok, pid}
 
-            {:error, error} ->
-              log_failure(error)
-              System.stop(1)
-          end
-
-        error ->
-          log_failure(error)
-          System.stop(1)
+        {:error, {:error, {:failed_to_register_ryuk_filter, :closed}}} ->
+          Process.sleep(500)
+          Testcontainers.start_link()
       end
+
+    if opts.proto_changes_watcher do
+      @containers
+      |> Enum.reject(& &1.restartable)
+      |> Enum.each(fn container_params ->
+        {:ok, _} = start_container(container_params, opts, ctx)
+      end)
+
+      container_params = Enum.find(@containers, & &1.restartable)
+
+      spawn(fn ->
+        watch(container_params, nil, opts, ctx)
+      end)
+
+      Process.sleep(:infinity)
+    else
+      for container <- @containers do
+        {:ok, _} = start_container(container, opts, ctx)
+      end
+
+      Process.sleep(:infinity)
     end
+  rescue
+    error ->
+      log_failure(error)
+      System.stop(1)
   end
 
-  defp start_container(opts, _ctx) do
+  defp start_container(%{image: :proxy_image} = params, opts, _ctx) do
     opts
     |> parse_inputs()
     |> build_proxy_container()
     |> Testcontainers.start_container()
-    |> handle_container_start_result(opts)
+    |> handle_container_start_result(params, opts)
+  end
+
+  defp start_container(%{image: :nats_image} = params, opts, _ctx) do
+    opts
+    |> build_nats_container()
+    |> Testcontainers.start_container()
+    |> handle_container_start_result(params, opts)
   end
 
   defp parse_inputs(opts) do
@@ -259,79 +293,85 @@ defmodule SpawnCtl.Commands.Dev.Run do
     |> log_success(container, opts)
 
     setup_exit_handler(container)
+
     {:ok, container}
   end
 
-  defp handle_container_start_result(error, _opts) do
+  defp handle_container_start_result({:error, error}, _container_params, _opts) do
     log_failure(error)
+
     {:error, error}
   end
 
-  defp watch(nil, opts, ctx) do
-    if opts[:docker_pid] == nil do
-      with {:ok, docker_pid} <- Testcontainers.start_link(),
-           {:ok, container} <- start_container(Map.put(opts, :docker_pid, docker_pid), ctx) do
-        await_file_events(container, opts, ctx)
-      else
-        {:error, {:already_started, pid}} ->
-          log(:info, Emoji.winking(), "Stopping docker setup...")
-          stop_existing_docker_process(pid)
-          watch(nil, opts, ctx)
-
-        {:error, {:error, {:failed_to_register_ryuk_filter, :closed}}} ->
-          log_transient_fault()
-          watch(nil, opts, ctx)
-
-        error ->
-          log_failure(error)
-      end
-    else
-      start_and_watch_container(opts, ctx)
-    end
+  defp watch(%{image: :proxy_image} = params, nil = _container, opts, ctx) do
+    start_and_watch_container(params, opts, ctx)
   end
 
-  defp watch(container, opts, ctx), do: await_file_events(container, opts, ctx)
+  defp watch(%{image: :proxy_image} = params, container, opts, ctx),
+    do: await_file_events(params, container, opts, ctx)
 
-  defp await_file_events(container, opts, ctx) do
+  defp await_file_events(%{image: :proxy_image} = params, container, opts, ctx) do
+    paths =
+      if File.exists?(opts.manifest_path),
+        do: [opts.protos, opts.manifest_path],
+        else: [opts.protos]
+
+    {:ok, pid} = FileSystem.start_link(dirs: paths)
+
+    FileSystem.subscribe(pid)
+
     receive do
-      {:file_event, _worker_pid, {path, events}} = _evt ->
+      {:file_event, _worker_pid, {path, events} = event} = _evt ->
         main_evt = List.first(events)
 
         if is_valid?(path) && Enum.member?([:created, :modified, :deleted], main_evt) do
-          log(
-            :info,
-            Emoji.floppy_disk(),
-            "Detected #{inspect(List.first(events))} change in file [#{inspect(path)}]. Restarting Spawn proxy now..."
-          )
-
-          restart_container(container, opts, ctx)
+          # this will create a process in background and kill this listener
+          restart_container(params, container, event, opts, ctx)
         else
-          watch(container, opts, ctx)
+          watch(params, container, opts, ctx)
         end
 
       _other ->
-        watch(container, opts, ctx)
+        watch(params, container, opts, ctx)
     end
   end
 
-  defp restart_container(container, opts, ctx) do
-    Testcontainers.stop_container(container.container_id)
-    Process.sleep(500)
-    watch(nil, opts, ctx)
+  defp restart_container(
+         %{image: :proxy_image, restartable: true} = params,
+         container,
+         {path, events},
+         opts,
+         ctx
+       ) do
+    SpawnCtl.GroupExecAfter.exec(
+      fn ->
+        log(
+          :info,
+          Emoji.floppy_disk(),
+          "Detected #{inspect(List.first(events))} change in file [#{inspect(path)}]. Restarting Spawn proxy now..."
+        )
+
+        Testcontainers.stop_container(container.container_id)
+
+        watch(params, nil, opts, ctx)
+      end,
+      500
+    )
   end
 
-  defp start_and_watch_container(opts, ctx) do
-    with {:ok, container} <- start_container(opts, ctx) do
-      await_file_events(container, opts, ctx)
-    else
+  defp start_and_watch_container(%{image: :proxy_image} = params, opts, ctx) do
+    case start_container(params, opts, ctx) do
+      {:ok, container} ->
+        await_file_events(params, container, opts, ctx)
+
       {:error, {:already_started, pid}} ->
         log(:info, Emoji.winking(), "Stopping docker setup...")
         stop_existing_docker_process(pid)
-        watch(nil, opts, ctx)
+        watch(params, nil, opts, ctx)
 
-      {:error, {:error, :failed_to_register_ryuk_filter, :closed}} ->
+      {:error, {:error, {:failed_to_register_ryuk_filter, :closed}}} ->
         log_transient_fault()
-        watch(nil, opts, ctx)
+        watch(params, nil, opts, ctx)
 
       {:error, error} ->
         log_failure(error)
@@ -368,7 +408,7 @@ defmodule SpawnCtl.Commands.Dev.Run do
     |> Container.with_environment("PROXY_HTTP_PORT", "#{opts.proxy_bind_port}")
     |> Container.with_environment("PROXY_GRPC_PORT", "#{opts.proxy_bind_grpc_port}")
     |> Container.with_environment("PROXY_ACTOR_SYSTEM_NAME", "#{opts.actor_system}")
-    |> Container.with_environment("SPAWN_USE_INTERNAL_NATS", "#{opts.enable_nats}")
+    |> Container.with_environment("SPAWN_USE_INTERNAL_NATS", "true")
     |> Container.with_environment("SPAWN_PROXY_LOGGER_LEVEL", opts.log_level)
     |> Container.with_environment("SPAWN_STATESTORE_KEY", opts.statestore_key)
     |> Container.with_environment("USER_FUNCTION_PORT", "#{opts.actor_host_port}")
@@ -381,6 +421,13 @@ defmodule SpawnCtl.Commands.Dev.Run do
     |> Container.with_label("spawn.proxy.name", opts.name)
     |> Container.with_label("spawn.proxy.database.type", opts.database_type)
     |> Container.with_label("spawn.proxy.logger.level", opts.log_level)
+  end
+
+  defp build_nats_container(opts) do
+    Container.new(opts.nats_image)
+    |> maybe_use_host_network(opts)
+    |> Container.with_exposed_ports([opts.nats_port, opts.nats_http_port])
+    |> Container.with_cmd(["--jetstream", "--http_port=#{opts.nats_http_port}"])
   end
 
   defp maybe_use_host_network(container, _opts) do
@@ -411,14 +458,10 @@ defmodule SpawnCtl.Commands.Dev.Run do
     end
   end
 
-  defp log_success({:win32, _}, container, opts), do: log_sucess_with_ports(container, opts)
-
-  defp log_success({:unix, :darwin}, container, opts), do: log_sucess_with_ports(container, opts)
-
-  defp log_success({:unix, _}, container, opts) do
-    log(:info, Emoji.exclamation(), "Spawn Proxy using host network. Exposed ports: [
-      Proxy HTTP: #{opts.proxy_bind_port},
-      Proxy gRPC: #{opts.proxy_bind_grpc_port}
+  defp log_success(container, %{image: :proxy_image}, opts) do
+    log(:info, Emoji.exclamation(), "Spawn Proxy uses the following mapped ports: [
+      Proxy HTTP: #{inspect(Container.mapped_port(container, opts.proxy_bind_port) || opts.proxy_bind_port)}:#{opts.proxy_bind_port},
+      Proxy gRPC: #{inspect(Container.mapped_port(container, opts.proxy_bind_grpc_port) || opts.proxy_bind_grpc_port)}:#{opts.proxy_bind_grpc_port}
     ]")
 
     log(
@@ -428,16 +471,16 @@ defmodule SpawnCtl.Commands.Dev.Run do
     )
   end
 
-  defp log_sucess_with_ports(container, opts) do
-    log(:info, Emoji.exclamation(), "Spawn Proxy uses the following mapped ports: [
-      Proxy HTTP: #{inspect(Container.mapped_port(container, opts.proxy_bind_port))}:#{opts.proxy_bind_port},
-      Proxy gRPC: #{inspect(Container.mapped_port(container, opts.proxy_bind_grpc_port))}:#{opts.proxy_bind_grpc_port}
+  defp log_success(container, %{image: :nats_image}, opts) do
+    log(:info, Emoji.exclamation(), "Nats uses the following mapped ports: [
+      Nats: #{inspect(Container.mapped_port(container, opts.nats_port) || opts.nats_port)}:#{opts.nats_port},
+      Nats HTTP: #{inspect(Container.mapped_port(container, opts.nats_port) || opts.nats_http_port)}:#{opts.nats_http_port}
     ]")
 
     log(
       :info,
       Emoji.rocket(),
-      "[#{get_time()}] Spawn Proxy started successfully. Container Id: #{container.container_id}"
+      "Nats started successfully. Container Id: #{container.container_id}"
     )
   end
 
@@ -460,7 +503,7 @@ defmodule SpawnCtl.Commands.Dev.Run do
       log(
         :info,
         Emoji.winking(),
-        "Stopping Spawn Proxy in dev mode with status: #{inspect(status)}. Container Id: #{container.container_id}"
+        "Stopping Spawn Proxy in dev mode with status: #{inspect(status)}. ContainerId: #{inspect(container.container_id)}"
       )
     end)
   end
