@@ -13,15 +13,11 @@ RUN mix local.rebar --force \
     && mix deps.get \
     && mix release.init
 
-# Overriden at runtime
-ENV POD_IP="127.0.0.1"
-
 # This will be the basename of node
 ENV RELEASE_NAME="spawn_initializer"
 
-# This will be the full nodename
-ENV RELEASE_NODE="${RELEASE_NAME}@${POD_IP}"
-
+# Disable Erlang Dist
+ENV RELEASE_DISTRIBUTION=none
 
 RUN mix deps.get \
     && mix release spawn_initializer

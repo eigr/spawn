@@ -4,13 +4,19 @@ defmodule Actors.Actor.Entity.EntityState do
   """
   alias Eigr.Functions.Protocol.Actors.Actor
 
-  defstruct system: nil, actor: nil, state_hash: nil, revision: 0, opts: []
+  defstruct system: nil,
+            actor: nil,
+            state_hash: nil,
+            revision: 0,
+            projection_stream_pid: nil,
+            opts: []
 
   @type t :: %__MODULE__{
           system: String.t(),
           actor: Actor.t(),
           state_hash: binary(),
           revision: number(),
+          projection_stream_pid: pid(),
           opts: Keyword.t()
         }
 

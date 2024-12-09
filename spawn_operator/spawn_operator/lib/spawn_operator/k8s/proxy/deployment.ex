@@ -8,10 +8,18 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
   @default_actor_host_function_env [
     %{
       "name" => "RELEASE_NAME",
-      "value" => "spawn"
+      "value" => "proxy"
     },
     %{
       "name" => "NAMESPACE",
+      "valueFrom" => %{"fieldRef" => %{"fieldPath" => "metadata.namespace"}}
+    },
+    %{
+      "name" => "POD_NAME",
+      "valueFrom" => %{"fieldRef" => %{"fieldPath" => "metadata.name"}}
+    },
+    %{
+      "name" => "POD_NAMESPACE",
       "valueFrom" => %{"fieldRef" => %{"fieldPath" => "metadata.namespace"}}
     },
     %{
@@ -70,6 +78,9 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
          } = _resource
        ) do
     host_params = Map.get(params, "host")
+    task_actors_config = %{"taskActors" => Map.get(host_params, "taskActors", %{})}
+    topology = Map.get(params, "topology", %{})
+
     replicas = max(1, Map.get(params, "replicas", @default_actor_host_function_replicas))
     embedded = Map.get(host_params, "embedded", false)
 
@@ -86,7 +97,7 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
       "spec" => %{
         "replicas" => replicas,
         "selector" => %{
-          "matchLabels" => %{"app" => name, "actor-system" => system}
+          "matchLabels" => %{"actor-system" => system}
         },
         "strategy" => %{
           "type" => "RollingUpdate",
@@ -109,12 +120,23 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
           },
           "spec" =>
             %{
-              "affinity" => Map.get(host_params, "affinity", build_affinity(system, name)),
-              "containers" => get_containers(embedded, system, name, host_params, annotations),
+              "affinity" => Map.get(topology, "affinity", build_affinity(system, name)),
+              "containers" =>
+                get_containers(
+                  embedded,
+                  system,
+                  name,
+                  host_params,
+                  annotations,
+                  task_actors_config
+                ),
               "initContainers" => [
                 %{
                   "name" => "init-certificates",
-                  "image" => "ghcr.io/eigr/spawn-initializer:1.4.3",
+                  "image" => "#{annotations.proxy_init_container_image_tag}",
+                  "env" => [
+                    %{"containerPort" => 4369, "name" => "epmd"}
+                  ],
                   "args" => [
                     "--environment",
                     :prod,
@@ -126,11 +148,19 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
                     "#{system}",
                     "--to",
                     "#{ns}"
+                  ],
+                  "env" => [
+                    %{
+                      "name" => "RELEASE_DISTRIBUTION",
+                      "value" => "none"
+                    }
                   ]
                 }
               ],
               "serviceAccountName" => "#{system}-sa"
             }
+            |> maybe_put_node_selector(topology)
+            |> maybe_put_node_tolerations(topology)
             |> maybe_put_volumes(params)
             |> maybe_set_termination_period(params)
         }
@@ -185,10 +215,28 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
     }
   end
 
-  defp get_containers(true, system, name, host_params, annotations) do
+  defp get_containers(true, system, name, host_params, annotations, task_actors_config) do
     actor_host_function_image = Map.get(host_params, "image")
 
-    actor_host_function_envs = Map.get(host_params, "env", []) ++ @default_actor_host_function_env
+    updated_default_envs =
+      @default_actor_host_function_env ++
+        [
+          %{
+            "name" => "RELEASE_COOKIE",
+            "valueFrom" => %{
+              "secretKeyRef" => %{"name" => "#{system}-secret", "key" => "RELEASE_COOKIE"}
+            }
+          }
+        ]
+
+    actor_host_function_envs =
+      if is_nil(task_actors_config) || List.first(Map.values(task_actors_config)) == %{} do
+        Map.get(host_params, "env", []) ++ updated_default_envs
+      else
+        Map.get(host_params, "env", []) ++
+          updated_default_envs ++
+          build_task_env(task_actors_config)
+      end
 
     proxy_http_port = String.to_integer(annotations.proxy_http_port)
 
@@ -230,12 +278,23 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
     ]
   end
 
-  defp get_containers(false, system, name, host_params, annotations) do
+  defp get_containers(false, system, name, host_params, annotations, task_actors_config) do
     actor_host_function_image = Map.get(host_params, "image")
+
+    updated_default_envs =
+      @default_actor_host_function_env ++
+        [
+          %{
+            "name" => "RELEASE_COOKIE",
+            "valueFrom" => %{
+              "secretKeyRef" => %{"name" => "#{system}-secret", "key" => "RELEASE_COOKIE"}
+            }
+          }
+        ]
 
     actor_host_function_envs =
       Map.get(host_params, "env", []) ++
-        @default_actor_host_function_env
+        updated_default_envs
 
     actor_host_function_resources =
       Map.get(host_params, "resources", @default_actor_host_resources)
@@ -247,12 +306,19 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
       %{"containerPort" => proxy_http_port, "name" => "proxy-http"}
     ]
 
+    envs =
+      if is_nil(task_actors_config) || List.first(Map.values(task_actors_config)) == %{} do
+        updated_default_envs
+      else
+        updated_default_envs ++ build_task_env(task_actors_config)
+      end
+
     proxy_container =
       %{
         "name" => "sidecar",
         "image" => "#{annotations.proxy_image_tag}",
         "imagePullPolicy" => "Always",
-        "env" => @default_actor_host_function_env,
+        "env" => envs,
         "ports" => proxy_actor_host_function_ports,
         "livenessProbe" => %{
           "httpGet" => %{
@@ -309,6 +375,29 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
       host_container
     ]
   end
+
+  defp build_task_env(task_actors_config) do
+    value =
+      task_actors_config
+      |> Jason.encode!()
+      |> Base.encode32()
+
+    [
+      %{"name" => "SPAWN_PROXY_TASK_CONFIG", "value" => value}
+    ]
+  end
+
+  defp maybe_put_node_selector(spec, %{"nodeSelector" => selectors} = _topology) do
+    Map.merge(spec, %{"nodeSelector" => selectors})
+  end
+
+  defp maybe_put_node_selector(spec, _), do: spec
+
+  defp maybe_put_node_tolerations(spec, %{"tolerations" => tolerations} = _topology) do
+    Map.merge(spec, %{"tolerations" => tolerations})
+  end
+
+  defp maybe_put_node_tolerations(spec, _), do: spec
 
   defp maybe_put_ports_to_host_container(spec, %{"ports" => ports}) do
     Map.put(spec, "ports", ports)

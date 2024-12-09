@@ -1,6 +1,6 @@
 defmodule Eigr.Functions.Protocol.Actors.Healthcheck.Status do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
+  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
   def descriptor do
     # credo:disable-for-next-line
@@ -69,7 +69,7 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckReply do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.12.0", syntax: :proto3
+  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
   def descriptor do
     # credo:disable-for-next-line
@@ -108,9 +108,10 @@ end
 
 defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service do
   @moduledoc false
+
   use GRPC.Service,
     name: "eigr.functions.protocol.actors.healthcheck.HealthCheckActor",
-    protoc_gen_elixir_version: "0.12.0"
+    protoc_gen_elixir_version: "0.13.0"
 
   def descriptor do
     # credo:disable-for-next-line
@@ -221,7 +222,6 @@ defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service do
               options: %Google.Protobuf.MethodOptions{
                 deprecated: false,
                 idempotency_level: :IDEMPOTENCY_UNKNOWN,
-                # features: nil,
                 uninterpreted_option: [],
                 __pb_extensions__: %{
                   {Google.Api.PbExtension, :http} => %Google.Api.HttpRule{
@@ -246,7 +246,6 @@ defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service do
               options: %Google.Protobuf.MethodOptions{
                 deprecated: false,
                 idempotency_level: :IDEMPOTENCY_UNKNOWN,
-                # features: nil,
                 uninterpreted_option: [],
                 __pb_extensions__: %{
                   {Google.Api.PbExtension, :http} => %Google.Api.HttpRule{
@@ -288,9 +287,9 @@ defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service do
         swift_prefix: nil,
         php_class_prefix: nil,
         php_namespace: nil,
+        php_generic_services: false,
         php_metadata_namespace: nil,
         ruby_package: nil,
-        # features: nil,
         uninterpreted_option: [],
         __pb_extensions__: %{},
         __unknown_fields__: []
@@ -689,4 +688,10 @@ defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service do
       }
     }
   )
+end
+
+defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Stub do
+  @moduledoc false
+
+  use GRPC.Stub, service: Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service
 end

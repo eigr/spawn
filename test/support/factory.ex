@@ -99,6 +99,7 @@ defmodule Actors.FactoryTest do
       id: %ActorId{name: actor_name, system: attrs[:system]},
       actions: attrs[:actions] || [build_actor_action()],
       settings: %ActorSettings{
+        kind: Keyword.get(attrs, :kind, :NAMED),
         stateful: Keyword.get(attrs, :stateful, true),
         snapshot_strategy: attrs[:snapshot_strategy] || build_actor_snapshot_strategy(),
         deactivation_strategy:

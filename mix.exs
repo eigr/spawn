@@ -80,6 +80,7 @@ defmodule Spawn.MixProject do
       {:grpc, "~> 0.8"},
       {:grpc_reflection, "~> 0.1"},
       {:finch, "~> 0.18"},
+      {:flame_k8s_backend, "~> 0.5"},
       {:retry, "~> 0.17"},
       {:flow, "~> 1.2"},
       {:libcluster, "~> 3.3"},
@@ -88,9 +89,12 @@ defmodule Spawn.MixProject do
       {:phoenix_pubsub, "~> 2.1"},
       {:phoenix_pubsub_nats, "~> 0.2"},
       {:jason, "~> 1.3"},
-      {:gnat, "~> 1.7"},
+      {:gnat, "~> 1.9"},
+      {:jetstream, "~> 0.0.9"},
       {:k8s, "~> 2.2"},
       {:k8s_webhoox, "~> 0.2"},
+      {:uuid, "~> 1.1"},
+      {:broadway, "~> 1.1"},
       # temporary until bandit releases 1.5.4
       {:hpax, "~> 0.1.1"},
       # Metrics & Tracing deps
@@ -99,6 +103,7 @@ defmodule Spawn.MixProject do
       {:telemetry_metrics_prometheus_core, "~> 1.2"},
       {:opentelemetry_api, "~> 1.0"},
       {:opentelemetry, "~> 1.0"},
+      {:opentelemetry_ecto, "~> 1.2"},
       {:opentelemetry_exporter, "~> 1.0"},
       # Statestores deps
       {:spawn_statestores_mariadb,

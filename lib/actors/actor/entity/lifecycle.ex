@@ -5,9 +5,12 @@ defmodule Actors.Actor.Entity.Lifecycle do
   """
   require Logger
 
-  alias Actors.Actor.{Entity.EntityState, Entity.Invocation, StateManager}
-  alias Actors.Actor.Pubsub
+  alias Actors.Actor.Entity.EntityState
+  alias Actors.Actor.Entity.Invocation
+  alias Actors.Actor.Entity.Lifecycle.StreamInitiator
   alias Actors.Exceptions.NetworkPartitionException
+  alias Actors.Actor.Pubsub
+  alias Actors.Actor.StateManager
 
   alias Eigr.Functions.Protocol.Actors.{
     Actor,
@@ -32,18 +35,19 @@ defmodule Actors.Actor.Entity.Lifecycle do
   def init(
         %EntityState{
           system: system,
-          actor: %Actor{
-            id: %ActorId{name: name, parent: parent} = _id,
-            metadata: metadata,
-            settings:
-              %ActorSettings{
-                stateful: stateful?,
-                snapshot_strategy: snapshot_strategy,
-                deactivation_strategy: deactivation_strategy,
-                kind: kind
-              } = _settings,
-            timer_actions: timer_actions
-          }
+          actor:
+            %Actor{
+              id: %ActorId{name: name, parent: parent} = _id,
+              metadata: metadata,
+              settings:
+                %ActorSettings{
+                  stateful: stateful?,
+                  snapshot_strategy: snapshot_strategy,
+                  deactivation_strategy: deactivation_strategy,
+                  kind: kind
+                } = _settings,
+              timer_actions: timer_actions
+            } = actor
         } = state
       ) do
     Process.flag(:trap_exit, true)
@@ -70,7 +74,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
         Actors.Actor.Entity,
         actor_name_key,
         self(),
-        state.actor.id
+        actor.id
       )
 
     schedule_deactivate(deactivation_strategy, get_jitter())
@@ -84,7 +88,8 @@ defmodule Actors.Actor.Entity.Lifecycle do
                 Keyword.merge(state.opts,
                   timer: timer,
                   split_brain_detector: split_brain_detector_mod
-                )
+                ),
+              projection_stream_pid: maybe_init_projection(actor)
           }
 
         _ ->
@@ -93,14 +98,21 @@ defmodule Actors.Actor.Entity.Lifecycle do
             | opts:
                 Keyword.merge(state.opts,
                   split_brain_detector: split_brain_detector_mod
-                )
+                ),
+              projection_stream_pid: maybe_init_projection(actor)
           }
       end
 
     {:ok, state, {:continue, :load_state}}
   end
 
-  def load_state(%EntityState{actor: actor, revision: revision, opts: opts} = state) do
+  def load_state(
+        %EntityState{
+          actor: %Actor{settings: %ActorSettings{stateful: true}} = actor,
+          revision: revision,
+          opts: opts
+        } = state
+      ) do
     case get_state(actor.id, revision) do
       {:ok, current_state, current_revision, status, node} ->
         split_brain_detector =
@@ -122,7 +134,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
          {:continue, :call_init_action}}
 
       error ->
-        handle_load_state_error(actor.name, state, error)
+        handle_load_state_error(actor.id, state, error)
     end
   end
 
@@ -279,6 +291,30 @@ defmodule Actors.Actor.Entity.Lifecycle do
   end
 
   # Private functions
+
+  defp maybe_init_projection(actor) do
+    case handle_projection(actor) do
+      {:ok, pid} when is_pid(pid) ->
+        pid
+
+      _otherwise ->
+        nil
+    end
+  end
+
+  defp handle_projection(%Actor{settings: %ActorSettings{kind: :PROJECTION}} = actor) do
+    StreamInitiator.init_projection_stream(actor)
+  end
+
+  defp handle_projection(
+         %Actor{settings: %ActorSettings{kind: kind, projection_settings: %{sourceable: true}}} =
+           actor
+       )
+       when kind in [:NAMED, :UNNAMED] do
+    StreamInitiator.init_sourceable_stream(actor)
+  end
+
+  defp handle_projection(_actor), do: :ok
 
   defp updated_state(%EntityState{actor: actor} = state, actual_state, revision) do
     %EntityState{state | actor: %Actor{actor | state: actual_state}, revision: revision}

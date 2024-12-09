@@ -23,7 +23,11 @@ defmodule SpawnSdk.System.SpawnSystem do
     Registry,
     TimeoutStrategy,
     ActorDeactivationStrategy,
-    Channel
+    Channel,
+    ProjectionSettings,
+    ProjectionSubject,
+    EventsRetentionStrategy,
+    EventsRetentionTime
   }
 
   alias Eigr.Functions.Protocol.{
@@ -39,6 +43,7 @@ defmodule SpawnSdk.System.SpawnSystem do
     Noop
   }
 
+  alias Google.Protobuf.Timestamp
   import Spawn.Utils.AnySerializer
 
   @app :spawn_sdk
@@ -515,6 +520,10 @@ defmodule SpawnSdk.System.SpawnSystem do
       stateful = actor.__meta__(:stateful)
       snapshot_timeout = actor.__meta__(:snapshot_timeout)
       deactivate_timeout = actor.__meta__(:deactivate_timeout)
+      subjects = actor.__meta__(:subjects)
+      sourceable? = actor.__meta__(:sourceable)
+      events_retention = actor.__meta__(:events_retention)
+      strict_ordering? = actor.__meta__(:strict_ordering)
       timer_actions = actor.__meta__(:timers)
 
       min_pool_size = actor.__meta__(:min_pool_size)
@@ -536,6 +545,41 @@ defmodule SpawnSdk.System.SpawnSystem do
           topic when is_binary(topic) -> %Channel{topic: topic, action: "receive"}
         end)
 
+      subjects =
+        Enum.map(subjects, fn subject ->
+          case subject do
+            {actor, action} ->
+              %ProjectionSubject{
+                actor: actor,
+                action: action,
+                start_time: %Timestamp{seconds: 0}
+              }
+
+            {actor, action, start_time} ->
+              %ProjectionSubject{
+                actor: actor,
+                action: action,
+                start_time: %Timestamp{seconds: start_time}
+              }
+          end
+        end)
+
+      events_retention_strategy =
+        case events_retention do
+          :infinite ->
+            %EventsRetentionStrategy{strategy: {:infinite, true}}
+
+          value when is_number(value) ->
+            %EventsRetentionStrategy{strategy: {:time_in_ms, %EventsRetentionTime{time: value}}}
+        end
+
+      projection_settings = %ProjectionSettings{
+        subjects: subjects,
+        sourceable: sourceable?,
+        events_retention_strategy: events_retention_strategy,
+        strict_events_ordering: strict_ordering?
+      }
+
       {name,
        %Actor{
          id: %ActorId{system: system, name: name},
@@ -546,7 +590,8 @@ defmodule SpawnSdk.System.SpawnSystem do
            min_pool_size: min_pool_size,
            max_pool_size: max_pool_size,
            snapshot_strategy: snapshot_strategy,
-           deactivation_strategy: deactivation_strategy
+           deactivation_strategy: deactivation_strategy,
+           projection_settings: projection_settings
          },
          actions: Enum.map(actions, fn action -> get_action(action) end),
          timer_actions:
@@ -566,8 +611,12 @@ defmodule SpawnSdk.System.SpawnSystem do
   def decode_kind(:singleton), do: :NAMED
   def decode_kind(:named), do: :NAMED
   def decode_kind(:NAMED), do: :NAMED
+  def decode_kind(:TASK), do: :TASK
+  def decode_kind(:task), do: :TASK
   def decode_kind(:pooled), do: :POOLED
   def decode_kind(:POOLED), do: :POOLED
+  def decode_kind(:projection), do: :PROJECTION
+  def decode_kind(:PROJECTION), do: :PROJECTION
   def decode_kind(_), do: :UNKNOW_KIND
 
   defp get_action(action_atom) do

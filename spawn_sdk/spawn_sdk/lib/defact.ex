@@ -28,14 +28,10 @@ defmodule SpawnSdk.Defact do
   end
 
   defmacro action(action_name, opts, block_fn) do
-    action_name = parse_action_name(action_name)
-
     define_action(action_name, block_fn, opts)
   end
 
   defmacro action(action_name, block_fn) do
-    action_name = parse_action_name(action_name)
-
     define_action(action_name, block_fn)
   end
 
