@@ -73,7 +73,7 @@ defmodule Spawn.Utils.AnySerializer do
 
   def any_pack!(record) when is_struct(record) do
     %Any{
-      type_url: get_type_url(record.__struct__),
+      type_url: get_type_url(record),
       value: apply(record.__struct__, :encode, [record])
     }
   end
@@ -84,7 +84,9 @@ defmodule Spawn.Utils.AnySerializer do
     builder.decode(any_record.value)
   end
 
-  defp get_type_url(type) do
+  def get_type_url(%{__struct__: type}), do: get_type_url(type)
+
+  def get_type_url(type) do
     parts =
       type
       |> to_string

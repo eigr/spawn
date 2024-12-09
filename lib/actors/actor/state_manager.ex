@@ -11,6 +11,39 @@ if Code.ensure_loaded?(Statestores.Supervisor) do
     alias Statestores.Schemas.Snapshot
     alias Statestores.Manager.StateManager, as: StateStoreManager
 
+    defmodule Projection do
+      @moduledoc false
+
+      import Spawn.Utils.AnySerializer, only: [get_type_url: 1]
+
+      alias Eigr.Functions.Protocol.Actors.Actor
+      alias Eigr.Functions.Protocol.Actors.ActorSettings
+      alias Statestores.Manager.ProjectionStateManager
+      alias Spawn.Utils.AnySerializer
+
+      def maybe_create_projection_table(
+            %Actor{settings: %ActorSettings{kind: :PROJECTION}} = actor,
+            opts \\ []
+          ) do
+        Logger.debug("Creating projection table for actor #{inspect(actor.id.name)}")
+
+        {:ok, _} = ProjectionStateManager.create_table(actor.id.name)
+      end
+
+      def push(
+            %Actor{settings: %ActorSettings{kind: :PROJECTION}} = actor,
+            projection_id,
+            payload,
+            opts \\ []
+          ) do
+        if get_type_url(actor.settings.state_type) == get_type_url(payload) do
+
+        else
+          {:error, :invalid_payload}
+        end
+      end
+    end
+
     def is_new?(_old_hash, new_state) when is_nil(new_state), do: false
 
     def is_new?(old_hash, new_state) do
