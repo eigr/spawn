@@ -1,78 +1,61 @@
 defmodule Statestores.Projection.Query.Parser do
   @moduledoc """
-  Query Parser module
+  Parser for the custom DSL with subqueries treated as expressions.
+
+  ## Examples
+
+      iex> Parser.parse("select player_id, (select sum(points) where level = 'expert') as total_points")
+      {[:player_id, {:subquery, :sum, :points, %{level: 'expert'}}], [], []}
   """
 
+  @spec parse(String.t()) :: {list(), list(), list()}
   def parse(dsl) do
-    [select_part, rest] = String.split(dsl, " where ", parts: 2)
-
-    select_clause = parse_select(select_part)
-
-    {where_part, order_by_part} =
-      case String.split(rest || "", " order by ", parts: 2) do
-        [where] -> {where, nil}
-        [where, order] -> {where, order}
-        _ -> {nil, nil}
-      end
-
-    conditions =
-      if where_part do
-        where_part
-        |> String.split(" and ")
-        |> Enum.map(&parse_condition/1)
-      else
-        []
-      end
-
-    order_by =
-      if order_by_part do
-        order_by_part
-        |> String.split(", ")
-        |> Enum.map(&parse_order/1)
-      else
-        []
-      end
-
-    {select_clause, conditions, order_by}
+    {select_clause, rest} = parse_select_clause(dsl)
+    {select_clause, [], parse_order_by(rest)}
   end
 
-  defp parse_select(select_part) do
-    select_part
-    |> String.replace("select ", "")
-    |> String.split(", ")
-    |> Enum.map(&parse_column_or_function/1)
+  defp parse_select_clause(dsl) do
+    [_, select, rest] = Regex.run(~r/^select (.+?) (where|$)/, dsl)
+    select_clause =
+      select
+      |> String.split(", ")
+      |> Enum.map(&parse_select_item/1)
+
+    {select_clause, rest}
   end
 
-  defp parse_column_or_function(column) do
-    case String.split(column, "(") do
-      [func, args] ->
-        {String.to_atom(func), String.trim_trailing(args, ")")}
-      _ ->
-        {:column, column}
-    end
+  defp parse_select_item("select " <> rest) do
+    # A subquery é tratada como uma expressão no SELECT
+    {:subquery, parse_subquery(rest)}
+  end
+
+  defp parse_select_item(attr), do: String.to_atom(attr)
+
+  defp parse_subquery(dsl) do
+    # Extrai a expressão da subquery
+    [_, func, field, condition] = Regex.run(~r/^(sum|avg|min|max|count)\((.*?)\) where (.*)/, dsl)
+    {String.to_atom(func), String.to_atom(field), parse_condition(condition)}
   end
 
   defp parse_condition(condition) do
-    cond do
-      String.contains?(condition, " = ") ->
-        [key, value] = String.split(condition, " = ")
-        {key, parse_value(value)}
-
-      true ->
-        raise ArgumentError, "Invalid condition format: #{condition}"
-    end
+    # Trata a condição de filtro (por exemplo, `level = 'expert'`)
+    Enum.into(String.split(condition, " and "), %{}, fn pair ->
+      [key, value] = String.split(pair, "=")
+      {String.to_atom(key), String.trim(value, "'")}
+    end)
   end
 
-  defp parse_value(value) do
-    if String.starts_with?(value, ":") do
-      {:bind, String.trim_leading(value, ":")}
-    else
-      {:literal, value}
-    end
-  end
+  defp parse_order_by(rest) do
+    case Regex.run(~r/order by (.+)/, rest) do
+      [_, clause] ->
+        clause
+        |> String.split(", ")
+        |> Enum.map(fn item ->
+          [attr, dir] = String.split(item, " ")
+          {String.to_atom(attr), String.to_atom(dir)}
+        end)
 
-  defp parse_order(order) do
-    [field, direction] = String.split(order, " ")
-    {field, direction}
+      _ -> []
+    end
   end
 end

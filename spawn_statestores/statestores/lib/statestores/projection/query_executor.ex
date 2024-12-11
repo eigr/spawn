@@ -74,6 +74,31 @@ defmodule Statestores.Projection.QueryExecutor do
   **Parameters Substituted:**
 
   No parameters, as all values are literals.
+
+  --- 
+
+  ### Example 4: Query with Window Functions
+
+  ```elixir
+  iex> dsl = "select player_id, points, rank() over(order by points desc)"
+      iex> Statestores.Projection.QueryExecutor.execute(MyApp.Repo, dsl)
+      :ok
+  ```
+
+  **Generated SQL Query:**
+  
+  ```sql
+    SELECT
+        tags->>'player_id' AS player_id,
+        (tags->>'points')::numeric AS points,
+        RANK() OVER (ORDER BY (tags->>'points')::numeric DESC) AS rank
+    FROM
+        projections;
+  ``` 
+
+  **Parameters Substituted:**
+
+  No parameters, as all values are literals.
   """
 
   import Ecto.Query
