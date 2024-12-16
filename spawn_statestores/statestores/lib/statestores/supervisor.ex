@@ -42,7 +42,7 @@ defmodule Statestores.Supervisor do
         supervisor_process_logger(__MODULE__),
         Statestores.Vault,
         snapshot_adapter,
-        projection_adapter,
+        #projection_adapter,
         lookup_adapter
       ]
       |> maybe_add_native_children(snapshot_adapter)
