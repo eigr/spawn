@@ -14,18 +14,13 @@ defmodule Actor.ActorTest do
       tags: [{"foo", "none"}, {"bar", "unchanged"}]
 
     defact init(_) do
-      Value.noreply_state!(%{value: 0})
+      Value.noreply_state!(%Eigr.Spawn.Actor.MyState{value: 0})
     end
 
-    action("sum", fn %Context{} = ctx, %MyMessageRequest{id: id, data: data} ->
-      current_state = ctx.state
-      new_state = current_state + 1
-
-      response = %MyMessageResponse{id: id, data: data}
-      result = %Value{state: new_state, value: response}
-
-      result
-      |> Value.noreply!()
+    action("Sum", fn %Context{} = ctx, %MyMessageRequest{} = payload ->
+      Value.of()
+      |> Value.response(payload)
+      |> Value.state(%Eigr.Spawn.Actor.MyState{ctx.state | value: 999})
     end)
   end
 
@@ -304,15 +299,16 @@ defmodule Actor.ActorTest do
       actor_name = "task_actor_ref"
 
       SpawnSdk.invoke(actor_name,
-        action: "sum",
+        action: "Sum",
         system: system,
-        payload: %{value: 999}
+        payload: %MyMessageRequest{id: "abc", data: "999"}
       )
 
-      assert SpawnSdk.invoke(actor_name,
-               action: "getState",
-               system: system
-             ) == {:ok, %{value: 999}}
+      assert {:ok, %Eigr.Spawn.Actor.MyState{value: 999}} =
+               SpawnSdk.invoke(actor_name,
+                 action: "GetState",
+                 system: system
+               )
     end
   end
 

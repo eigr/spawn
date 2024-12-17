@@ -18,10 +18,27 @@ defmodule Spawn.Cluster.ProvisionerPoolSupervisor do
     env = get_environment()
 
     children =
-      Enum.map(actor_configs, fn cfg ->
-        Logger.info("Setup Task Actor with config: #{inspect(cfg)}")
-        build_flame_pool(cfg, env)
-      end)
+      case env do
+        :prod ->
+          Enum.map(actor_configs, fn cfg ->
+            Logger.info("Setup Task Actor with config: #{inspect(cfg)}")
+
+            build_flame_pool(cfg, env)
+          end)
+
+        _dev_and_test_mode ->
+          [
+            {FLAME.Pool,
+             [
+               name: build_worker_pool_name(__MODULE__, "default"),
+               backend: FLAME.LocalBackend,
+               min: 0,
+               max: 10,
+               max_concurrency: 5,
+               log: :debug
+             ]}
+          ]
+      end
 
     Supervisor.init(children, strategy: :one_for_one)
   end
