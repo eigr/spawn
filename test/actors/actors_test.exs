@@ -112,7 +112,7 @@ defmodule ActorsTest do
     end
 
     test "invoke task actor function for a newly registered actor" do
-      actor_name = "Jose"
+      actor_name = "task_actor_test_" <> Ecto.UUID.generate()
 
       actor = build_actor(name: actor_name, kind: :TASK)
       actor_entry = build_actor_entry(name: actor_name, actor: actor)
