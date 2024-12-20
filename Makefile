@@ -330,7 +330,30 @@ run-sdk-local3:
 	PROXY_DATABASE_TYPE=mariadb \
 	PROXY_DATABASE_PORT=3307 \
 	SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= \
+	SPAWN_SUPERVISORS_STATE_HANDOFF_CONTROLLER=nats \
 	iex --name spawn_a3@127.0.0.1 -S mix
+
+run-sdk-local4:
+	cd spawn_sdk/spawn_sdk_example && mix deps.get && \
+	PROXY_CLUSTER_STRATEGY=epmd \
+	SPAWN_USE_INTERNAL_NATS=true \
+	SPAWN_PUBSUB_ADAPTER=nats \
+	PROXY_DATABASE_TYPE=mariadb \
+	PROXY_DATABASE_PORT=3307 \
+	SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= \
+	SPAWN_SUPERVISORS_STATE_HANDOFF_CONTROLLER=nats \
+	iex --name spawn_a4@127.0.0.1 -S mix
+
+run-sdk-local5:
+	cd spawn_sdk/spawn_sdk_example && mix deps.get && \
+	PROXY_CLUSTER_STRATEGY=epmd \
+	SPAWN_USE_INTERNAL_NATS=true \
+	SPAWN_PUBSUB_ADAPTER=nats \
+	PROXY_DATABASE_TYPE=mariadb \
+	PROXY_DATABASE_PORT=3307 \
+	SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= \
+	SPAWN_SUPERVISORS_STATE_HANDOFF_CONTROLLER=nats \
+	iex --name spawn_a2@127.0.0.1 -S mix
 
 run-sdk-local-with-mariadb:
 	cd spawn_sdk/spawn_sdk_example && mix deps.get && \

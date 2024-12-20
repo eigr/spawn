@@ -100,7 +100,7 @@ defmodule Spawn.MixProject do
       # Metrics & Tracing deps
       {:telemetry_poller, "~> 1.0"},
       {:telemetry_metrics, "~> 1.0"},
-      {:telemetry_metrics_prometheus_core, "~> 1.2"},
+      {:telemetry_metrics_prometheus_core, "~> 1.2.1"},
       {:opentelemetry_api, "~> 1.0"},
       {:opentelemetry, "~> 1.0"},
       {:opentelemetry_ecto, "~> 1.2"},
