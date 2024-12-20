@@ -441,7 +441,12 @@ defmodule Actors.Actor.CallerConsumer do
       end)
       |> List.flatten()
 
-    # |> Enum.filter(&(&1.node == Node.self()))
+    hosts =
+      if Config.get(:state_handoff_controller_adapter) == "crdt" do
+        Enum.filter(hosts, &(&1.node == Node.self()))
+      else
+        hosts
+      end
 
     ActorRegistry.register(hosts)
 

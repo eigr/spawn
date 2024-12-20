@@ -67,7 +67,7 @@ defmodule Spawn.Cluster.StateHandoff.Controllers.NatsKvController do
             # Later on the create_or_lookup_actor, it will try to find the active process
             # or create it in this new node.
             #
-            # If somehow 2 actors are up at the same time, we have the 
+            # If somehow 2 actors are up at the same time, we have the
             # network partition mechanism to prevent it to cause inconsistent states
             if host.node not in (Node.list() ++ [Node.self()]) and
                  host.actor.id in :persistent_term.get(:local_requested_actors, []) do
@@ -83,13 +83,13 @@ defmodule Spawn.Cluster.StateHandoff.Controllers.NatsKvController do
           []
       end
 
-    {data, hosts} |> dbg()
+    {data, hosts}
   end
 
   @impl true
   @spec handle_init(opts()) :: new_data() | {new_data(), timer()}
   def handle_init(opts) do
-    Jetstream.API.KV.create_bucket(conn(), bucket_name(), storage: :memory)
+    Jetstream.API.KV.create_bucket(conn(), bucket_name(), storage: :file)
 
     %{opts: opts}
   end
@@ -107,7 +107,7 @@ defmodule Spawn.Cluster.StateHandoff.Controllers.NatsKvController do
   end
 
   def handle_terminate(node, data) do
-    Logger.warning("Invalid terminate state for Node #{inspect(node)}. State: #{inspect(data)}")
+    Logger.warning("Terminating #{inspect(__MODULE__)} #{inspect(node)}. State: #{inspect(data)}")
   end
 
   @impl true
