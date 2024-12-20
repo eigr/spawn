@@ -25,6 +25,13 @@ jobs:
       - name: Install Protoc
         uses: arduino/setup-protoc@v3
 
+      - name: Install NATS with JetStream
+        run: |
+          wget https://github.com/nats-io/nats-server/releases/download/v2.10.0/nats-server-v2.10.0-linux-amd64.tar.gz
+          tar -xvzf nats-server-v2.10.0-linux-amd64.tar.gz
+          sudo mv nats-server-v2.10.0-linux-amd64/nats-server /usr/local/bin/
+          nats-server --jetstream &
+
       - name: Set up Elixir
         uses: erlef/setup-beam@v1
         with:
@@ -50,13 +57,13 @@ jobs:
 
       - name: Run tests spawn
         run: |
-          MIX_ENV=test PROXY_DATABASE_TYPE=native PROXY_CLUSTER_STRATEGY=gossip PROXY_DATABASE_POOL_SIZE=15 PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
+          MIX_ENV=test PROXY_DATABASE_TYPE=native SPAWN_SUPERVISORS_STATE_HANDOFF_CONTROLLER=nats SPAWN_USE_INTERNAL_NATS=true SPAWN_PUBSUB_ADAPTER=nats PROXY_CLUSTER_STRATEGY=gossip PROXY_DATABASE_POOL_SIZE=15 PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
 
       - name: Run tests spawn_sdk
         run: |
           cd spawn_sdk/spawn_sdk
           mix deps.get
-          MIX_ENV=test PROXY_DATABASE_TYPE=native PROXY_CLUSTER_STRATEGY=gossip PROXY_DATABASE_POOL_SIZE=15 PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
+          MIX_ENV=test PROXY_DATABASE_TYPE=native SPAWN_SUPERVISORS_STATE_HANDOFF_CONTROLLER=nats SPAWN_USE_INTERNAL_NATS=true SPAWN_PUBSUB_ADAPTER=nats PROXY_CLUSTER_STRATEGY=gossip PROXY_DATABASE_POOL_SIZE=15 PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
           cd ../../
 
       - name: Run tests spawn_statestores

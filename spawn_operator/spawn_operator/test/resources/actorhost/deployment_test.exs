@@ -43,9 +43,7 @@ defmodule DeploymentTest do
                },
                "spec" => %{
                  "replicas" => 1,
-                 "selector" => %{
-                   "matchLabels" => %{"actor-system" => "spawn-system", "app" => "spawn-test"}
-                 },
+                 "selector" => %{"matchLabels" => %{"actor-system" => "spawn-system"}},
                  "strategy" => %{
                    "rollingUpdate" => %{"maxSurge" => "50%", "maxUnavailable" => 0},
                    "type" => "RollingUpdate"
@@ -64,42 +62,38 @@ defmodule DeploymentTest do
                        "podAffinity" => %{
                          "preferredDuringSchedulingIgnoredDuringExecution" => [
                            %{
-                             "weight" => 50,
                              "podAffinityTerm" => %{
                                "labelSelector" => %{
                                  "matchExpressions" => [
                                    %{
                                      "key" => "actor-system",
                                      "operator" => "In",
-                                     "values" => [
-                                       "spawn-system"
-                                     ]
+                                     "values" => ["spawn-system"]
                                    }
                                  ]
                                },
                                "topologyKey" => "kubernetes.io/hostname"
-                             }
+                             },
+                             "weight" => 50
                            }
                          ]
                        },
                        "podAntiAffinity" => %{
                          "preferredDuringSchedulingIgnoredDuringExecution" => [
                            %{
-                             "weight" => 100,
                              "podAffinityTerm" => %{
                                "labelSelector" => %{
                                  "matchExpressions" => [
                                    %{
                                      "key" => "app",
                                      "operator" => "In",
-                                     "values" => [
-                                       "spawn-test"
-                                     ]
+                                     "values" => ["spawn-test"]
                                    }
                                  ]
                                },
                                "topologyKey" => "kubernetes.io/hostname"
-                             }
+                             },
+                             "weight" => 100
                            }
                          ]
                        }
@@ -107,9 +101,19 @@ defmodule DeploymentTest do
                      "containers" => [
                        %{
                          "env" => [
-                           %{"name" => "RELEASE_NAME", "value" => "spawn"},
+                           %{"name" => "RELEASE_NAME", "value" => "proxy"},
                            %{
                              "name" => "NAMESPACE",
+                             "valueFrom" => %{
+                               "fieldRef" => %{"fieldPath" => "metadata.namespace"}
+                             }
+                           },
+                           %{
+                             "name" => "POD_NAME",
+                             "valueFrom" => %{"fieldRef" => %{"fieldPath" => "metadata.name"}}
+                           },
+                           %{
+                             "name" => "POD_NAMESPACE",
                              "valueFrom" => %{
                                "fieldRef" => %{"fieldPath" => "metadata.namespace"}
                              }
@@ -121,7 +125,16 @@ defmodule DeploymentTest do
                            %{"name" => "SPAWN_PROXY_PORT", "value" => "9001"},
                            %{"name" => "SPAWN_PROXY_INTERFACE", "value" => "0.0.0.0"},
                            %{"name" => "RELEASE_DISTRIBUTION", "value" => "name"},
-                           %{"name" => "RELEASE_NODE", "value" => "$(RELEASE_NAME)@$(POD_IP)"}
+                           %{"name" => "RELEASE_NODE", "value" => "$(RELEASE_NAME)@$(POD_IP)"},
+                           %{
+                             "name" => "RELEASE_COOKIE",
+                             "valueFrom" => %{
+                               "secretKeyRef" => %{
+                                 "key" => "RELEASE_COOKIE",
+                                 "name" => "spawn-system-secret"
+                               }
+                             }
+                           }
                          ],
                          "envFrom" => [
                            %{"configMapRef" => %{"name" => "spawn-test-sidecar-cm"}},
@@ -143,7 +156,6 @@ defmodule DeploymentTest do
                          "volumeMounts" => [%{"mountPath" => "/app/certs", "name" => "certs"}]
                        }
                      ],
-                     "terminationGracePeriodSeconds" => 405,
                      "initContainers" => [
                        %{
                          "args" => [
@@ -159,10 +171,12 @@ defmodule DeploymentTest do
                            "default"
                          ],
                          "image" => "ghcr.io/eigr/spawn-initializer:1.4.3",
-                         "name" => "init-certificates"
+                         "name" => "init-certificates",
+                         "env" => [%{"name" => "RELEASE_DISTRIBUTION", "value" => "none"}]
                        }
                      ],
                      "serviceAccountName" => "spawn-system-sa",
+                     "terminationGracePeriodSeconds" => 405,
                      "volumes" => [
                        %{
                          "name" => "certs",
@@ -172,7 +186,7 @@ defmodule DeploymentTest do
                    }
                  }
                }
-             } == build_host_deploy(embedded_actor_host)
+             } = build_host_deploy(embedded_actor_host)
     end
 
     test "generate embedded deployment with defaults and node selector", ctx do
@@ -190,9 +204,7 @@ defmodule DeploymentTest do
                },
                "spec" => %{
                  "replicas" => 1,
-                 "selector" => %{
-                   "matchLabels" => %{"actor-system" => "spawn-system", "app" => "spawn-test"}
-                 },
+                 "selector" => %{"matchLabels" => %{"actor-system" => "spawn-system"}},
                  "strategy" => %{
                    "rollingUpdate" => %{"maxSurge" => "50%", "maxUnavailable" => 0},
                    "type" => "RollingUpdate"
@@ -211,42 +223,38 @@ defmodule DeploymentTest do
                        "podAffinity" => %{
                          "preferredDuringSchedulingIgnoredDuringExecution" => [
                            %{
-                             "weight" => 50,
                              "podAffinityTerm" => %{
                                "labelSelector" => %{
                                  "matchExpressions" => [
                                    %{
                                      "key" => "actor-system",
                                      "operator" => "In",
-                                     "values" => [
-                                       "spawn-system"
-                                     ]
+                                     "values" => ["spawn-system"]
                                    }
                                  ]
                                },
                                "topologyKey" => "kubernetes.io/hostname"
-                             }
+                             },
+                             "weight" => 50
                            }
                          ]
                        },
                        "podAntiAffinity" => %{
                          "preferredDuringSchedulingIgnoredDuringExecution" => [
                            %{
-                             "weight" => 100,
                              "podAffinityTerm" => %{
                                "labelSelector" => %{
                                  "matchExpressions" => [
                                    %{
                                      "key" => "app",
                                      "operator" => "In",
-                                     "values" => [
-                                       "spawn-test"
-                                     ]
+                                     "values" => ["spawn-test"]
                                    }
                                  ]
                                },
                                "topologyKey" => "kubernetes.io/hostname"
-                             }
+                             },
+                             "weight" => 100
                            }
                          ]
                        }
@@ -254,9 +262,19 @@ defmodule DeploymentTest do
                      "containers" => [
                        %{
                          "env" => [
-                           %{"name" => "RELEASE_NAME", "value" => "spawn"},
+                           %{"name" => "RELEASE_NAME", "value" => "proxy"},
                            %{
                              "name" => "NAMESPACE",
+                             "valueFrom" => %{
+                               "fieldRef" => %{"fieldPath" => "metadata.namespace"}
+                             }
+                           },
+                           %{
+                             "name" => "POD_NAME",
+                             "valueFrom" => %{"fieldRef" => %{"fieldPath" => "metadata.name"}}
+                           },
+                           %{
+                             "name" => "POD_NAMESPACE",
                              "valueFrom" => %{
                                "fieldRef" => %{"fieldPath" => "metadata.namespace"}
                              }
@@ -268,7 +286,16 @@ defmodule DeploymentTest do
                            %{"name" => "SPAWN_PROXY_PORT", "value" => "9001"},
                            %{"name" => "SPAWN_PROXY_INTERFACE", "value" => "0.0.0.0"},
                            %{"name" => "RELEASE_DISTRIBUTION", "value" => "name"},
-                           %{"name" => "RELEASE_NODE", "value" => "$(RELEASE_NAME)@$(POD_IP)"}
+                           %{"name" => "RELEASE_NODE", "value" => "$(RELEASE_NAME)@$(POD_IP)"},
+                           %{
+                             "name" => "RELEASE_COOKIE",
+                             "valueFrom" => %{
+                               "secretKeyRef" => %{
+                                 "key" => "RELEASE_COOKIE",
+                                 "name" => "spawn-system-secret"
+                               }
+                             }
+                           }
                          ],
                          "envFrom" => [
                            %{"configMapRef" => %{"name" => "spawn-test-sidecar-cm"}},
@@ -290,7 +317,6 @@ defmodule DeploymentTest do
                          "volumeMounts" => [%{"mountPath" => "/app/certs", "name" => "certs"}]
                        }
                      ],
-                     "terminationGracePeriodSeconds" => 405,
                      "initContainers" => [
                        %{
                          "args" => [
@@ -306,21 +332,23 @@ defmodule DeploymentTest do
                            "default"
                          ],
                          "image" => "ghcr.io/eigr/spawn-initializer:1.4.3",
-                         "name" => "init-certificates"
+                         "name" => "init-certificates",
+                         "env" => [%{"name" => "RELEASE_DISTRIBUTION", "value" => "none"}]
                        }
                      ],
+                     "nodeSelector" => %{"gpu" => "false"},
                      "serviceAccountName" => "spawn-system-sa",
+                     "terminationGracePeriodSeconds" => 405,
                      "volumes" => [
                        %{
                          "name" => "certs",
                          "secret" => %{"optional" => true, "secretName" => "tls-certs"}
                        }
-                     ],
-                     "nodeSelector" => %{"gpu" => "false"}
+                     ]
                    }
                  }
                }
-             } == build_host_deploy(embedded_actor_host_with_node_selector)
+             } = build_host_deploy(embedded_actor_host_with_node_selector)
     end
 
     test "generate embedded deployment with defaults and node selector and task actors", ctx do
@@ -338,9 +366,7 @@ defmodule DeploymentTest do
                },
                "spec" => %{
                  "replicas" => 1,
-                 "selector" => %{
-                   "matchLabels" => %{"actor-system" => "spawn-system", "app" => "spawn-test"}
-                 },
+                 "selector" => %{"matchLabels" => %{"actor-system" => "spawn-system"}},
                  "strategy" => %{
                    "rollingUpdate" => %{"maxSurge" => "50%", "maxUnavailable" => 0},
                    "type" => "RollingUpdate"
@@ -359,42 +385,38 @@ defmodule DeploymentTest do
                        "podAffinity" => %{
                          "preferredDuringSchedulingIgnoredDuringExecution" => [
                            %{
-                             "weight" => 50,
                              "podAffinityTerm" => %{
                                "labelSelector" => %{
                                  "matchExpressions" => [
                                    %{
                                      "key" => "actor-system",
                                      "operator" => "In",
-                                     "values" => [
-                                       "spawn-system"
-                                     ]
+                                     "values" => ["spawn-system"]
                                    }
                                  ]
                                },
                                "topologyKey" => "kubernetes.io/hostname"
-                             }
+                             },
+                             "weight" => 50
                            }
                          ]
                        },
                        "podAntiAffinity" => %{
                          "preferredDuringSchedulingIgnoredDuringExecution" => [
                            %{
-                             "weight" => 100,
                              "podAffinityTerm" => %{
                                "labelSelector" => %{
                                  "matchExpressions" => [
                                    %{
                                      "key" => "app",
                                      "operator" => "In",
-                                     "values" => [
-                                       "spawn-test"
-                                     ]
+                                     "values" => ["spawn-test"]
                                    }
                                  ]
                                },
                                "topologyKey" => "kubernetes.io/hostname"
-                             }
+                             },
+                             "weight" => 100
                            }
                          ]
                        }
@@ -402,9 +424,19 @@ defmodule DeploymentTest do
                      "containers" => [
                        %{
                          "env" => [
-                           %{"name" => "RELEASE_NAME", "value" => "spawn"},
+                           %{"name" => "RELEASE_NAME", "value" => "proxy"},
                            %{
                              "name" => "NAMESPACE",
+                             "valueFrom" => %{
+                               "fieldRef" => %{"fieldPath" => "metadata.namespace"}
+                             }
+                           },
+                           %{
+                             "name" => "POD_NAME",
+                             "valueFrom" => %{"fieldRef" => %{"fieldPath" => "metadata.name"}}
+                           },
+                           %{
+                             "name" => "POD_NAMESPACE",
                              "valueFrom" => %{
                                "fieldRef" => %{"fieldPath" => "metadata.namespace"}
                              }
@@ -417,6 +449,15 @@ defmodule DeploymentTest do
                            %{"name" => "SPAWN_PROXY_INTERFACE", "value" => "0.0.0.0"},
                            %{"name" => "RELEASE_DISTRIBUTION", "value" => "name"},
                            %{"name" => "RELEASE_NODE", "value" => "$(RELEASE_NAME)@$(POD_IP)"},
+                           %{
+                             "name" => "RELEASE_COOKIE",
+                             "valueFrom" => %{
+                               "secretKeyRef" => %{
+                                 "key" => "RELEASE_COOKIE",
+                                 "name" => "spawn-system-secret"
+                               }
+                             }
+                           },
                            %{
                              "name" => "SPAWN_PROXY_TASK_CONFIG",
                              "value" =>
@@ -443,7 +484,6 @@ defmodule DeploymentTest do
                          "volumeMounts" => [%{"mountPath" => "/app/certs", "name" => "certs"}]
                        }
                      ],
-                     "terminationGracePeriodSeconds" => 405,
                      "initContainers" => [
                        %{
                          "args" => [
@@ -459,21 +499,23 @@ defmodule DeploymentTest do
                            "default"
                          ],
                          "image" => "ghcr.io/eigr/spawn-initializer:1.4.3",
-                         "name" => "init-certificates"
+                         "name" => "init-certificates",
+                         "env" => [%{"name" => "RELEASE_DISTRIBUTION", "value" => "none"}]
                        }
                      ],
+                     "nodeSelector" => %{"gpu" => "false"},
                      "serviceAccountName" => "spawn-system-sa",
+                     "terminationGracePeriodSeconds" => 405,
                      "volumes" => [
                        %{
                          "name" => "certs",
                          "secret" => %{"optional" => true, "secretName" => "tls-certs"}
                        }
-                     ],
-                     "nodeSelector" => %{"gpu" => "false"}
+                     ]
                    }
                  }
                }
-             } == build_host_deploy(embedded_actor_host_with_task_actors)
+             } = build_host_deploy(embedded_actor_host_with_task_actors)
     end
 
     test "generate embedded deployment with volumeMount", ctx do
@@ -491,9 +533,7 @@ defmodule DeploymentTest do
                },
                "spec" => %{
                  "replicas" => 1,
-                 "selector" => %{
-                   "matchLabels" => %{"actor-system" => "spawn-system", "app" => "spawn-test"}
-                 },
+                 "selector" => %{"matchLabels" => %{"actor-system" => "spawn-system"}},
                  "strategy" => %{
                    "rollingUpdate" => %{"maxSurge" => "50%", "maxUnavailable" => 0},
                    "type" => "RollingUpdate"
@@ -512,42 +552,38 @@ defmodule DeploymentTest do
                        "podAffinity" => %{
                          "preferredDuringSchedulingIgnoredDuringExecution" => [
                            %{
-                             "weight" => 50,
                              "podAffinityTerm" => %{
                                "labelSelector" => %{
                                  "matchExpressions" => [
                                    %{
                                      "key" => "actor-system",
                                      "operator" => "In",
-                                     "values" => [
-                                       "spawn-system"
-                                     ]
+                                     "values" => ["spawn-system"]
                                    }
                                  ]
                                },
                                "topologyKey" => "kubernetes.io/hostname"
-                             }
+                             },
+                             "weight" => 50
                            }
                          ]
                        },
                        "podAntiAffinity" => %{
                          "preferredDuringSchedulingIgnoredDuringExecution" => [
                            %{
-                             "weight" => 100,
                              "podAffinityTerm" => %{
                                "labelSelector" => %{
                                  "matchExpressions" => [
                                    %{
                                      "key" => "app",
                                      "operator" => "In",
-                                     "values" => [
-                                       "spawn-test"
-                                     ]
+                                     "values" => ["spawn-test"]
                                    }
                                  ]
                                },
                                "topologyKey" => "kubernetes.io/hostname"
-                             }
+                             },
+                             "weight" => 100
                            }
                          ]
                        }
@@ -555,9 +591,19 @@ defmodule DeploymentTest do
                      "containers" => [
                        %{
                          "env" => [
-                           %{"name" => "RELEASE_NAME", "value" => "spawn"},
+                           %{"name" => "RELEASE_NAME", "value" => "proxy"},
                            %{
                              "name" => "NAMESPACE",
+                             "valueFrom" => %{
+                               "fieldRef" => %{"fieldPath" => "metadata.namespace"}
+                             }
+                           },
+                           %{
+                             "name" => "POD_NAME",
+                             "valueFrom" => %{"fieldRef" => %{"fieldPath" => "metadata.name"}}
+                           },
+                           %{
+                             "name" => "POD_NAMESPACE",
                              "valueFrom" => %{
                                "fieldRef" => %{"fieldPath" => "metadata.namespace"}
                              }
@@ -569,7 +615,16 @@ defmodule DeploymentTest do
                            %{"name" => "SPAWN_PROXY_PORT", "value" => "9001"},
                            %{"name" => "SPAWN_PROXY_INTERFACE", "value" => "0.0.0.0"},
                            %{"name" => "RELEASE_DISTRIBUTION", "value" => "name"},
-                           %{"name" => "RELEASE_NODE", "value" => "$(RELEASE_NAME)@$(POD_IP)"}
+                           %{"name" => "RELEASE_NODE", "value" => "$(RELEASE_NAME)@$(POD_IP)"},
+                           %{
+                             "name" => "RELEASE_COOKIE",
+                             "valueFrom" => %{
+                               "secretKeyRef" => %{
+                                 "key" => "RELEASE_COOKIE",
+                                 "name" => "spawn-system-secret"
+                               }
+                             }
+                           }
                          ],
                          "envFrom" => [
                            %{"configMapRef" => %{"name" => "spawn-test-sidecar-cm"}},
@@ -594,14 +649,6 @@ defmodule DeploymentTest do
                          ]
                        }
                      ],
-                     "terminationGracePeriodSeconds" => 405,
-                     "volumes" => [
-                       %{"emptyDir" => "{}", "name" => "volume-name"},
-                       %{
-                         "name" => "certs",
-                         "secret" => %{"optional" => true, "secretName" => "tls-certs"}
-                       }
-                     ],
                      "initContainers" => [
                        %{
                          "args" => [
@@ -617,14 +664,23 @@ defmodule DeploymentTest do
                            "default"
                          ],
                          "image" => "ghcr.io/eigr/spawn-initializer:1.4.3",
-                         "name" => "init-certificates"
+                         "name" => "init-certificates",
+                         "env" => [%{"name" => "RELEASE_DISTRIBUTION", "value" => "none"}]
                        }
                      ],
-                     "serviceAccountName" => "spawn-system-sa"
+                     "serviceAccountName" => "spawn-system-sa",
+                     "terminationGracePeriodSeconds" => 405,
+                     "volumes" => [
+                       %{"emptyDir" => "{}", "name" => "volume-name"},
+                       %{
+                         "name" => "certs",
+                         "secret" => %{"optional" => true, "secretName" => "tls-certs"}
+                       }
+                     ]
                    }
                  }
                }
-             } == build_host_deploy(embedded_actor_host_with_volume_mounts)
+             } = build_host_deploy(embedded_actor_host_with_volume_mounts)
     end
 
     test "generate deployment with defaults", ctx do
@@ -642,9 +698,7 @@ defmodule DeploymentTest do
                },
                "spec" => %{
                  "replicas" => 1,
-                 "selector" => %{
-                   "matchLabels" => %{"actor-system" => "spawn-system", "app" => "spawn-test"}
-                 },
+                 "selector" => %{"matchLabels" => %{"actor-system" => "spawn-system"}},
                  "strategy" => %{
                    "rollingUpdate" => %{"maxSurge" => "50%", "maxUnavailable" => 0},
                    "type" => "RollingUpdate"
@@ -678,14 +732,43 @@ defmodule DeploymentTest do
                              "weight" => 100
                            }
                          ]
+                       },
+                       "podAffinity" => %{
+                         "preferredDuringSchedulingIgnoredDuringExecution" => [
+                           %{
+                             "podAffinityTerm" => %{
+                               "labelSelector" => %{
+                                 "matchExpressions" => [
+                                   %{
+                                     "key" => "actor-system",
+                                     "operator" => "In",
+                                     "values" => ["spawn-system"]
+                                   }
+                                 ]
+                               },
+                               "topologyKey" => "kubernetes.io/hostname"
+                             },
+                             "weight" => 50
+                           }
+                         ]
                        }
                      },
                      "containers" => [
                        %{
                          "env" => [
-                           %{"name" => "RELEASE_NAME", "value" => "spawn"},
+                           %{"name" => "RELEASE_NAME", "value" => "proxy"},
                            %{
                              "name" => "NAMESPACE",
+                             "valueFrom" => %{
+                               "fieldRef" => %{"fieldPath" => "metadata.namespace"}
+                             }
+                           },
+                           %{
+                             "name" => "POD_NAME",
+                             "valueFrom" => %{"fieldRef" => %{"fieldPath" => "metadata.name"}}
+                           },
+                           %{
+                             "name" => "POD_NAMESPACE",
                              "valueFrom" => %{
                                "fieldRef" => %{"fieldPath" => "metadata.namespace"}
                              }
@@ -697,20 +780,29 @@ defmodule DeploymentTest do
                            %{"name" => "SPAWN_PROXY_PORT", "value" => "9001"},
                            %{"name" => "SPAWN_PROXY_INTERFACE", "value" => "0.0.0.0"},
                            %{"name" => "RELEASE_DISTRIBUTION", "value" => "name"},
-                           %{"name" => "RELEASE_NODE", "value" => "$(RELEASE_NAME)@$(POD_IP)"}
+                           %{"name" => "RELEASE_NODE", "value" => "$(RELEASE_NAME)@$(POD_IP)"},
+                           %{
+                             "name" => "RELEASE_COOKIE",
+                             "valueFrom" => %{
+                               "secretKeyRef" => %{
+                                 "key" => "RELEASE_COOKIE",
+                                 "name" => "spawn-system-secret"
+                               }
+                             }
+                           }
                          ],
                          "envFrom" => [
                            %{"configMapRef" => %{"name" => "spawn-test-sidecar-cm"}},
                            %{"secretRef" => %{"name" => "spawn-system-secret"}}
                          ],
-                         "image" => _image_version,
+                         "image" => "ghcr.io/eigr/spawn-proxy:1.4.3",
                          "livenessProbe" => %{
+                           "failureThreshold" => 3,
                            "httpGet" => %{
                              "path" => "/health/liveness",
                              "port" => 9001,
                              "scheme" => "HTTP"
                            },
-                           "failureThreshold" => 3,
                            "initialDelaySeconds" => 10,
                            "periodSeconds" => 10,
                            "successThreshold" => 1,
@@ -722,12 +814,12 @@ defmodule DeploymentTest do
                            %{"containerPort" => 9001, "name" => "proxy-http"}
                          ],
                          "readinessProbe" => %{
+                           "failureThreshold" => 1,
                            "httpGet" => %{
                              "path" => "/health/readiness",
                              "port" => 9001,
                              "scheme" => "HTTP"
                            },
-                           "failureThreshold" => 1,
                            "initialDelaySeconds" => 5,
                            "periodSeconds" => 5,
                            "successThreshold" => 1,
@@ -739,13 +831,25 @@ defmodule DeploymentTest do
                              "ephemeral-storage" => "1M",
                              "memory" => "80Mi"
                            }
-                         }
+                         },
+                         "imagePullPolicy" => "Always",
+                         "volumeMounts" => [%{"mountPath" => "/app/certs", "name" => "certs"}]
                        },
                        %{
                          "env" => [
-                           %{"name" => "RELEASE_NAME", "value" => "spawn"},
+                           %{"name" => "RELEASE_NAME", "value" => "proxy"},
                            %{
                              "name" => "NAMESPACE",
+                             "valueFrom" => %{
+                               "fieldRef" => %{"fieldPath" => "metadata.namespace"}
+                             }
+                           },
+                           %{
+                             "name" => "POD_NAME",
+                             "valueFrom" => %{"fieldRef" => %{"fieldPath" => "metadata.name"}}
+                           },
+                           %{
+                             "name" => "POD_NAMESPACE",
                              "valueFrom" => %{
                                "fieldRef" => %{"fieldPath" => "metadata.namespace"}
                              }
@@ -757,7 +861,16 @@ defmodule DeploymentTest do
                            %{"name" => "SPAWN_PROXY_PORT", "value" => "9001"},
                            %{"name" => "SPAWN_PROXY_INTERFACE", "value" => "0.0.0.0"},
                            %{"name" => "RELEASE_DISTRIBUTION", "value" => "name"},
-                           %{"name" => "RELEASE_NODE", "value" => "$(RELEASE_NAME)@$(POD_IP)"}
+                           %{"name" => "RELEASE_NODE", "value" => "$(RELEASE_NAME)@$(POD_IP)"},
+                           %{
+                             "name" => "RELEASE_COOKIE",
+                             "valueFrom" => %{
+                               "secretKeyRef" => %{
+                                 "key" => "RELEASE_COOKIE",
+                                 "name" => "spawn-system-secret"
+                               }
+                             }
+                           }
                          ],
                          "image" => "eigr/spawn-test:latest",
                          "name" => "actorhost",
@@ -767,10 +880,37 @@ defmodule DeploymentTest do
                              "ephemeral-storage" => "1M",
                              "memory" => "80Mi"
                            }
-                         }
+                         },
+                         "volumeMounts" => [%{"mountPath" => "/app/certs", "name" => "certs"}]
                        }
                      ],
-                     "terminationGracePeriodSeconds" => 405
+                     "terminationGracePeriodSeconds" => 405,
+                     "initContainers" => [
+                       %{
+                         "args" => [
+                           "--environment",
+                           :prod,
+                           "--secret",
+                           "tls-certs",
+                           "--namespace",
+                           "default",
+                           "--service",
+                           "spawn-system",
+                           "--to",
+                           "default"
+                         ],
+                         "env" => [%{"name" => "RELEASE_DISTRIBUTION", "value" => "none"}],
+                         "image" => "ghcr.io/eigr/spawn-initializer:1.4.3",
+                         "name" => "init-certificates"
+                       }
+                     ],
+                     "serviceAccountName" => "spawn-system-sa",
+                     "volumes" => [
+                       %{
+                         "name" => "certs",
+                         "secret" => %{"optional" => true, "secretName" => "tls-certs"}
+                       }
+                     ]
                    }
                  }
                }
@@ -813,14 +953,20 @@ defmodule DeploymentTest do
                }
              } = build_host_deploy(simple_host_with_ports_resource)
 
-      assert List.last(containers) == %{
+      assert %{
                "env" => [
-                 %{"name" => "RELEASE_NAME", "value" => "spawn"},
+                 %{"name" => "RELEASE_NAME", "value" => "proxy"},
                  %{
                    "name" => "NAMESPACE",
-                   "valueFrom" => %{
-                     "fieldRef" => %{"fieldPath" => "metadata.namespace"}
-                   }
+                   "valueFrom" => %{"fieldRef" => %{"fieldPath" => "metadata.namespace"}}
+                 },
+                 %{
+                   "name" => "POD_NAME",
+                   "valueFrom" => %{"fieldRef" => %{"fieldPath" => "metadata.name"}}
+                 },
+                 %{
+                   "name" => "POD_NAMESPACE",
+                   "valueFrom" => %{"fieldRef" => %{"fieldPath" => "metadata.namespace"}}
                  },
                  %{
                    "name" => "POD_IP",
@@ -829,19 +975,28 @@ defmodule DeploymentTest do
                  %{"name" => "SPAWN_PROXY_PORT", "value" => "9001"},
                  %{"name" => "SPAWN_PROXY_INTERFACE", "value" => "0.0.0.0"},
                  %{"name" => "RELEASE_DISTRIBUTION", "value" => "name"},
-                 %{"name" => "RELEASE_NODE", "value" => "$(RELEASE_NAME)@$(POD_IP)"}
+                 %{"name" => "RELEASE_NODE", "value" => "$(RELEASE_NAME)@$(POD_IP)"},
+                 %{
+                   "name" => "RELEASE_COOKIE",
+                   "valueFrom" => %{
+                     "secretKeyRef" => %{
+                       "key" => "RELEASE_COOKIE",
+                       "name" => "spawn-system-secret"
+                     }
+                   }
+                 }
                ],
                "image" => "eigr/spawn-test:latest",
                "name" => "actorhost",
-               "resources" => %{
-                 "requests" => %{"memory" => "80Mi", "ephemeral-storage" => "1M", "cpu" => "100m"}
-               },
-               "volumeMounts" => [%{"mountPath" => "/app/certs", "name" => "certs"}],
                "ports" => [
                  %{"containerPort" => 8090, "name" => "http"},
                  %{"containerPort" => 8091, "name" => "https"}
-               ]
-             }
+               ],
+               "resources" => %{
+                 "requests" => %{"cpu" => "100m", "ephemeral-storage" => "1M", "memory" => "80Mi"}
+               },
+               "volumeMounts" => [%{"mountPath" => "/app/certs", "name" => "certs"}]
+             } == List.last(containers)
     end
 
     test "generate deployment with host volumeMount", ctx do

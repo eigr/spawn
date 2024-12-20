@@ -8,7 +8,7 @@ defmodule Actors.Registry.HostActor do
   defstruct actor: nil, node: nil, opts: nil
 
   @type t :: %__MODULE__{
-          node: pid(),
+          node: node(),
           actor: Actor.t(),
           opts: Keyword.t()
         }

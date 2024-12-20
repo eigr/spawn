@@ -60,6 +60,7 @@ services:
       - "3307:3306"
     networks:
       - mysql-compose-network
+    command: ["--max_connections=1000"]
 
   adminer:
     image: adminer

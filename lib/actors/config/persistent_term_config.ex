@@ -716,6 +716,14 @@ if Code.ensure_loaded?(:persistent_term) do
             persistent: true
           )
 
+        "nats" ->
+          Application.put_env(
+            :spawn,
+            :state_handoff_controller_adapter,
+            Spawn.Cluster.StateHandoff.Controllers.NatsKvController,
+            persistent: true
+          )
+
         _ ->
           if Code.ensure_loaded?(Statestores.Supervisor) do
             Application.put_env(

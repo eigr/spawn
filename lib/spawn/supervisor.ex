@@ -25,13 +25,15 @@ defmodule Spawn.Supervisor do
   def init(opts) do
     children =
       [
-        supervisor_process_logger(__MODULE__),
+        supervisor_process_logger(__MODULE__)
+      ]
+      |> maybe_start_internal_nats(opts)
+      |> Kernel.++([
         {Spawn.Cache.LookupCache, []},
         Spawn.Cluster.StateHandoff.ManagerSupervisor.child_spec(opts),
         {Spawn.Cluster.ClusterSupervisor, []},
         Spawn.Cluster.Node.Registry.child_spec()
-      ]
-      |> maybe_start_internal_nats(opts)
+      ])
 
     Supervisor.init(children, strategy: :one_for_one)
   end
@@ -44,12 +46,11 @@ defmodule Spawn.Supervisor do
       _ ->
         Logger.debug("Starting Spawn using Nats control protocol")
 
-        (children ++
-           [
-             Spawn.Cluster.Node.ConnectionSupervisor.child_spec(opts),
-             Spawn.Cluster.Node.ServerSupervisor.child_spec(opts)
-           ])
-        |> List.flatten()
+        children ++
+          [
+            Spawn.Cluster.Node.ConnectionSupervisor.child_spec(opts),
+            Spawn.Cluster.Node.ServerSupervisor.child_spec(opts)
+          ]
     end
   end
 end

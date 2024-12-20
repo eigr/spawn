@@ -27,7 +27,7 @@ defmodule SpawnSdkExample.Actors.UnnamedActor do
     |> Value.state(new_state)
     |> Value.effects(
       SideEffect.of()
-      |> SideEffect.effect("joe", :sum, result)
+      |> SideEffect.effect("Joe", "Sum", result)
     )
     |> Value.reply!()
   end

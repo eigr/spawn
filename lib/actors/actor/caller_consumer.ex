@@ -156,6 +156,9 @@ defmodule Actors.Actor.CallerConsumer do
       |> Map.values()
       |> Enum.map(fn actor -> ActorPool.create_actor_host_pool(actor, opts) end)
       |> List.flatten()
+      |> tap(fn hosts ->
+        :persistent_term.put(:local_requested_actors, hosts |> Enum.map(& &1.actor.id))
+      end)
       |> Enum.filter(&(&1.node == Node.self()))
       |> ActorRegistry.register()
       |> tap(fn _sts -> warmup_actors(actor_system, actors, opts) end)
@@ -437,7 +440,13 @@ defmodule Actors.Actor.CallerConsumer do
         end
       end)
       |> List.flatten()
-      |> Enum.filter(&(&1.node == Node.self()))
+
+    hosts =
+      if Config.get(:state_handoff_controller_adapter) == "crdt" do
+        Enum.filter(hosts, &(&1.node == Node.self()))
+      else
+        hosts
+      end
 
     ActorRegistry.register(hosts)
 
