@@ -48,40 +48,7 @@ defmodule Spawn.Cluster.StateHandoff.Controllers.NatsKvController do
   @impl true
   @spec get_by_id(id(), data()) :: {new_data(), hosts()}
   def get_by_id(id, %{} = data) do
-    key = generate_key(id)
-    bucket_name = Jetstream.API.KV.stream_name(bucket_name())
-    system = Config.get(:actor_system_name)
-
-    hosts =
-      case Jetstream.API.Stream.get_message(conn(), bucket_name, %{
-             last_by_subj: "$KV.#{bucket_name()}.#{system}.#{actor_host_hash()}.#{key}"
-           }) do
-        {:ok, message} ->
-          if is_nil(message.data) do
-            []
-          else
-            host = :erlang.binary_to_term(message.data)
-
-            # We claim the host if referenced node is down or unreachable
-            # this will change the register reference but not persist it.
-            # Later on the create_or_lookup_actor, it will try to find the active process
-            # or create it in this new node.
-            #
-            # If somehow 2 actors are up at the same time, we have the
-            # network partition mechanism to prevent it to cause inconsistent states
-            if host.node not in (Node.list() ++ [Node.self()]) and
-                 host.actor.id in :persistent_term.get(:local_requested_actors, []) do
-              claimed_host = %{host | node: Node.self()}
-
-              [claimed_host]
-            else
-              [host]
-            end
-          end
-
-        _error ->
-          []
-      end
+    hosts = get_hosts(id)
 
     {data, hosts}
   end
@@ -128,17 +95,40 @@ defmodule Spawn.Cluster.StateHandoff.Controllers.NatsKvController do
     system = Config.get(:actor_system_name)
     key = generate_key(id)
 
+    hosts = get_hosts(id)
+    new_hosts = (hosts ++ [host]) |> Enum.uniq() |> :erlang.term_to_binary()
+
     :ok =
       Jetstream.API.KV.put_value(
         conn(),
         bucket_name(),
         "#{system}.#{actor_host_hash()}.#{key}",
-        :erlang.term_to_binary(host)
+        new_hosts
       )
 
-    %{data | opts: host.opts}
+    data
   end
 
   defp conn, do: Spawn.Utils.Nats.connection_name()
   defp bucket_name, do: "spawn_hosts"
+
+  defp get_hosts(id) do
+    key = generate_key(id)
+    bucket_name = Jetstream.API.KV.stream_name(bucket_name())
+    system = Config.get(:actor_system_name)
+
+    case Jetstream.API.Stream.get_message(conn(), bucket_name, %{
+           last_by_subj: "$KV.#{bucket_name()}.#{system}.#{actor_host_hash()}.#{key}"
+         }) do
+      {:ok, message} ->
+        if is_nil(message.data) do
+          []
+        else
+          [:erlang.binary_to_term(message.data)] |> List.flatten()
+        end
+
+      {:error, _} ->
+        []
+    end
+  end
 end
