@@ -33,6 +33,10 @@ defmodule Statestores.Adapters.PostgresProjectionAdapter do
       inserted_at TIMESTAMP,
       updated_at TIMESTAMP
     );
+
+    CREATE INDEX IF NOT EXISTS idx_#{table_name}_projection_id ON #{table_name} (projection_id);
+    CREATE INDEX IF NOT EXISTS idx_#{table_name}_inserted_at ON #{table_name} (inserted_at);
+    CREATE INDEX IF NOT EXISTS idx_#{table_name}_updated_at ON #{table_name} (updated_at);
     """
 
     case Ecto.Adapters.SQL.query(__MODULE__, query) do
