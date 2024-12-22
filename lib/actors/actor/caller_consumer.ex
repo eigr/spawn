@@ -768,19 +768,28 @@ defmodule Actors.Actor.CallerConsumer do
          opts
        ) do
     try do
-      {:ok, actor_ref} =
-        :erpc.call(node, __MODULE__, :try_reactivate_actor, [system, actor, opts], @erpc_timeout)
+      case :erpc.call(
+             node,
+             __MODULE__,
+             :try_reactivate_actor,
+             [system, actor, opts],
+             @erpc_timeout
+           ) do
+        {:ok, actor_ref} ->
+          Tracer.set_attributes([{"actor-pid", "#{inspect(actor_ref)}"}])
 
-      Tracer.set_attributes([{"actor-pid", "#{inspect(actor_ref)}"}])
+          Tracer.add_event("try-reactivate-actor", [
+            {"reactivation-on-node", "#{inspect(node)}"}
+          ])
 
-      Tracer.add_event("try-reactivate-actor", [
-        {"reactivation-on-node", "#{inspect(node)}"}
-      ])
+          if pooled,
+            # Ensures that the name change will not affect the host function call
+            do: action_fun.(actor_ref, %ActorId{actor.id | name: actor_name.name}),
+            else: action_fun.(actor_ref, actor.id)
 
-      if pooled,
-        # Ensures that the name change will not affect the host function call
-        do: action_fun.(actor_ref, %ActorId{actor.id | name: actor_name.name}),
-        else: action_fun.(actor_ref, actor.id)
+        _ ->
+          raise ErlangError
+      end
     catch
       :exit, reason ->
         Logger.error(
