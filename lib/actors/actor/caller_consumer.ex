@@ -93,7 +93,20 @@ defmodule Actors.Actor.CallerConsumer do
     if length(events) > 1,
       do: Logger.debug("Flushing the Event buffer. Buffer Size: #{inspect(length(events))}")
 
-    Enum.each(events, &dispatch_to_actor/1)
+    Enum.each(events, fn event ->
+      {from, _} = event
+
+      try do
+        dispatch_to_actor(event)
+      catch
+        :exit, error ->
+          Logger.error(
+            "Some exit signal was not handled properly #{inspect(event)}: #{inspect(inspect(error))}, #{inspect(__STACKTRACE__)}"
+          )
+
+          GenStage.reply(from, {:error, :unhandled})
+      end
+    end)
 
     {:noreply, [], state}
   end
@@ -151,14 +164,10 @@ defmodule Actors.Actor.CallerConsumer do
         opts
       ) do
     if Sidecar.GracefulShutdown.running?() do
-      # actors ++ [%Actor{id: %ActorId{} = id, settings: %ActorSettings{} = settings}]
       actors
       |> Map.values()
       |> Enum.map(fn actor -> ActorPool.create_actor_host_pool(actor, opts) end)
       |> List.flatten()
-      |> tap(fn hosts ->
-        :persistent_term.put(:local_requested_actors, hosts |> Enum.map(& &1.actor.id))
-      end)
       |> Enum.filter(&(&1.node == Node.self()))
       |> ActorRegistry.register()
       |> tap(fn _sts -> warmup_actors(actor_system, actors, opts) end)
@@ -758,27 +767,34 @@ defmodule Actors.Actor.CallerConsumer do
          action_fun,
          opts
        ) do
-    case :erpc.call(
-           node,
-           __MODULE__,
-           :try_reactivate_actor,
-           [system, actor, opts],
-           @erpc_timeout
-         ) do
-      {:ok, actor_ref} ->
-        Tracer.set_attributes([{"actor-pid", "#{inspect(actor_ref)}"}])
+    try do
+      {:ok, actor_ref} =
+        :erpc.call(node, __MODULE__, :try_reactivate_actor, [system, actor, opts], @erpc_timeout)
 
-        Tracer.add_event("try-reactivate-actor", [
-          {"reactivation-on-node", "#{inspect(node)}"}
-        ])
+      Tracer.set_attributes([{"actor-pid", "#{inspect(actor_ref)}"}])
 
-        if pooled,
-          # Ensures that the name change will not affect the host function call
-          do: action_fun.(actor_ref, %ActorId{actor.id | name: actor_name.name}),
-          else: action_fun.(actor_ref, actor.id)
+      Tracer.add_event("try-reactivate-actor", [
+        {"reactivation-on-node", "#{inspect(node)}"}
+      ])
 
-      _ ->
-        raise ErlangError
+      if pooled,
+        # Ensures that the name change will not affect the host function call
+        do: action_fun.(actor_ref, %ActorId{actor.id | name: actor_name.name}),
+        else: action_fun.(actor_ref, actor.id)
+    catch
+      :exit, reason ->
+        Logger.error(
+          "Failed to call Actor #{inspect(actor.id)} on Node #{inspect(node)}: #{inspect(reason)}"
+        )
+
+        :error
+
+      :error, error ->
+        Logger.error(
+          "Failed to call Actor #{inspect(actor.id)} on Node #{inspect(node)}: #{inspect(error)}"
+        )
+
+        :error
     end
   end
 
