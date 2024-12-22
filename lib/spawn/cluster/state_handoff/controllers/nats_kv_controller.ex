@@ -48,9 +48,23 @@ defmodule Spawn.Cluster.StateHandoff.Controllers.NatsKvController do
   @impl true
   @spec get_by_id(id(), data()) :: {new_data(), hosts()}
   def get_by_id(id, %{} = data) do
-    hosts = get_hosts(id)
+    key = generate_key(id)
+    system = Config.get(:actor_system_name)
 
-    {data, hosts}
+    hosts = get_hosts(id, key, system)
+
+    all_nodes = Node.list() ++ [Node.self()]
+
+    hosts_to_keep =
+      Enum.filter(hosts, fn host ->
+        Enum.member?(all_nodes, host.node)
+      end)
+
+    if Enum.count(hosts_to_keep) != Enum.count(hosts) do
+      Process.send_after(self(), {:timer, {:keep_hosts, hosts_to_keep, key, system}}, 0)
+    end
+
+    {data, hosts_to_keep}
   end
 
   @impl true
@@ -69,16 +83,30 @@ defmodule Spawn.Cluster.StateHandoff.Controllers.NatsKvController do
 
   @impl true
   @spec handle_terminate(node(), data()) :: new_data()
-  def handle_terminate(_node, %{} = data) do
-    data
-  end
-
   def handle_terminate(node, data) do
-    Logger.warning("Terminating #{inspect(__MODULE__)} #{inspect(node)}. State: #{inspect(data)}")
+    Logger.debug("Terminating #{inspect(__MODULE__)} #{inspect(node)}. State: #{inspect(data)}")
   end
 
   @impl true
   @spec handle_timer(any(), data()) :: new_data() | {new_data(), timer()}
+  def handle_timer({:keep_hosts, hosts, key, system}, data) do
+    Logger.debug(
+      "Found a host that is likely registered to a dead node. Flushing node from hosts list for key #{inspect(key)}"
+    )
+
+    new_hosts = hosts |> :erlang.term_to_binary()
+
+    :ok =
+      Jetstream.API.KV.put_value(
+        conn(),
+        bucket_name(),
+        "#{system}.#{actor_host_hash()}.#{key}",
+        new_hosts
+      )
+
+    data
+  end
+
   def handle_timer(_event, data), do: data
 
   @impl true
@@ -112,23 +140,27 @@ defmodule Spawn.Cluster.StateHandoff.Controllers.NatsKvController do
   defp conn, do: Spawn.Utils.Nats.connection_name()
   defp bucket_name, do: "spawn_hosts"
 
-  defp get_hosts(id) do
-    key = generate_key(id)
+  defp get_hosts(id, key \\ nil, system \\ nil) do
+    key = key || generate_key(id)
+    system = system || Config.get(:actor_system_name)
+
     bucket_name = Jetstream.API.KV.stream_name(bucket_name())
-    system = Config.get(:actor_system_name)
 
-    case Jetstream.API.Stream.get_message(conn(), bucket_name, %{
-           last_by_subj: "$KV.#{bucket_name()}.#{system}.#{actor_host_hash()}.#{key}"
-         }) do
-      {:ok, message} ->
-        if is_nil(message.data) do
+    hosts =
+      case Jetstream.API.Stream.get_message(conn(), bucket_name, %{
+             last_by_subj: "$KV.#{bucket_name()}.#{system}.#{actor_host_hash()}.#{key}"
+           }) do
+        {:ok, message} ->
+          if is_nil(message.data) do
+            []
+          else
+            [:erlang.binary_to_term(message.data)] |> List.flatten()
+          end
+
+        {:error, _} ->
           []
-        else
-          [:erlang.binary_to_term(message.data)] |> List.flatten()
-        end
+      end
 
-      {:error, _} ->
-        []
-    end
+    hosts
   end
 end
