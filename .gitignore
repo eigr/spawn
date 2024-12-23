@@ -42,3 +42,4 @@ eigr-functions-db.db-wal
 
 spawn_cli/burrito_out/
 
+.elixir-tools/
