@@ -558,7 +558,7 @@ iex> SpawnSdk.invoke("robert", system: "spawn-system", action: "sum", payload: %
 Invoke Actors in a lazy way without having to spawn them before:
 
 ```elixir
-iex> SpawnSdk.invoke("robert_lazy", ref: SpawnSdkExample.Actors.UnnamedActor, system: "spawn-system", action: "sum", payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1})
+iex> SpawnSdk.invoke("robert_lazy", ref: "unnamed_actor", system: "spawn-system", action: "sum", payload: %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1})
 {:ok, %Io.Eigr.Spawn.Example.MyBusinessMessage{value: 1}}
 ```
 

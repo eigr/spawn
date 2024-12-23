@@ -3,7 +3,7 @@ defmodule SpawnSdkExample.Actors.ProjectionActor do
     name: "projection_actor",
     kind: :projection,
     state_type: Io.Eigr.Spawn.Example.MyState,
-    deactivate_timeout: 60_000,
+    deactivate_timeout: 99_999_999_999,
     snapshot_timeout: 10_000,
     subjects: [
       {"ClockActor", "SecondClock"},

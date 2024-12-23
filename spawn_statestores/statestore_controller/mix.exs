@@ -56,7 +56,7 @@ defmodule StatestoresMysql.MixProject do
   defp deps do
     [
       {:cloak_ecto, "~> 1.2"},
-      {:ecto_sql, "~> 3.10"},
+      {:ecto_sql, "~> 3.12"},
       {:postgrex, "~> 0.19"},
       {:postgrex_pgoutput, "~> 0.1"},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},

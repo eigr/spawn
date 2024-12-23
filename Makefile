@@ -147,6 +147,8 @@ test-spawn:
 	PROXY_CLUSTER_STRATEGY=gossip \
 	PROXY_HTTP_PORT=9005 \
 	SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= \
+	SPAWN_USE_INTERNAL_NATS=true \
+	SPAWN_SUPERVISORS_STATE_HANDOFF_CONTROLLER=nats \
 	elixir --name spawn@127.0.0.1 -S mix test
 
 test-sdk:
@@ -159,6 +161,7 @@ test-sdk:
 	PROXY_DATABASE_PORT=3307 \
 	PROXY_DATABASE_POOL_SIZE=50 \
 	SPAWN_USE_INTERNAL_NATS=true \
+	SPAWN_SUPERVISORS_STATE_HANDOFF_CONTROLLER=nats \
 	SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= \
 	elixir --name spawn@127.0.0.1 -S mix test
 
@@ -290,7 +293,10 @@ run-proxy-local-nodejs-test:
 	PROXY_HTTP_PORT=9001 \
 	SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= \
 	PROXY_ACTOR_SYSTEM_NAME=SpawnSysTest \
-	SPAWN_SUPERVISORS_STATE_HANDOFF_CONTROLLER=crdt \
+	SPAWN_USE_INTERNAL_NATS=true \
+	PROXY_DATABASE_PORT=3307 \
+	SPAWN_PUBSUB_ADAPTER=nats \
+	SPAWN_SUPERVISORS_STATE_HANDOFF_CONTROLLER=nats \
 	iex --name spawn_a1@test.default.svc -S mix
 
 run-proxy-local-dicegame:
@@ -330,7 +336,30 @@ run-sdk-local3:
 	PROXY_DATABASE_TYPE=mariadb \
 	PROXY_DATABASE_PORT=3307 \
 	SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= \
+	SPAWN_SUPERVISORS_STATE_HANDOFF_CONTROLLER=nats \
 	iex --name spawn_a3@127.0.0.1 -S mix
+
+run-sdk-local4:
+	cd spawn_sdk/spawn_sdk_example && mix deps.get && \
+	PROXY_CLUSTER_STRATEGY=epmd \
+	SPAWN_USE_INTERNAL_NATS=true \
+	SPAWN_PUBSUB_ADAPTER=nats \
+	PROXY_DATABASE_TYPE=mariadb \
+	PROXY_DATABASE_PORT=3307 \
+	SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= \
+	SPAWN_SUPERVISORS_STATE_HANDOFF_CONTROLLER=nats \
+	iex --name spawn_a4@127.0.0.1 -S mix
+
+run-sdk-local5:
+	cd spawn_sdk/spawn_sdk_example && mix deps.get && \
+	PROXY_CLUSTER_STRATEGY=epmd \
+	SPAWN_USE_INTERNAL_NATS=true \
+	SPAWN_PUBSUB_ADAPTER=nats \
+	PROXY_DATABASE_TYPE=mariadb \
+	PROXY_DATABASE_PORT=3307 \
+	SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= \
+	SPAWN_SUPERVISORS_STATE_HANDOFF_CONTROLLER=nats \
+	iex --name spawn_a2@127.0.0.1 -S mix
 
 run-sdk-local-with-mariadb:
 	cd spawn_sdk/spawn_sdk_example && mix deps.get && \
