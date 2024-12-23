@@ -9,12 +9,13 @@ defmodule Statestores.Projection.Query.QueryBuilder do
     select_sql =
       Enum.map(select_clause, fn
         :count_star -> "COUNT(*)"
-        {:avg, attr} -> "AVG(tags->>'#{attr}')::numeric"
+        {:avg, attr, _opts} -> "AVG(tags->>'#{attr}')::numeric"
         {:min, attr} -> "MIN(tags->>'#{attr}')::numeric"
         {:max, attr} -> "MAX(tags->>'#{attr}')::numeric"
         {:sum, attr} -> "SUM(tags->>'#{attr}')::numeric"
         {:rank_over, attr, dir} -> "RANK() OVER (ORDER BY (tags->>'#{attr}')::numeric #{String.upcase(to_string(dir))})"
-        attr -> "tags->>'#{attr}' AS #{attr}"
+        attr when is_atom(attr) -> "tags->>'#{attr}' AS #{attr}"
+        _ -> raise ArgumentError, "Unsupported select clause format"
       end)
       |> Enum.join(", ")
 
