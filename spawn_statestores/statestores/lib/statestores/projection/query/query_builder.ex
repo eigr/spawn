@@ -2,7 +2,6 @@ defmodule Statestores.Projection.Query.QueryBuilder do
   @moduledoc """
   Translates parsed DSL components into SQL, including support for aggregation functions,
   subqueries, and complex WHERE conditions.
-  Subqueries are supported in the `WHERE` clause and `SELECT`, and JOINs are used where necessary to combine data.
   """
 
   @spec build_query(list(), list(), list(), map()) :: {String.t(), list()}
@@ -10,11 +9,12 @@ defmodule Statestores.Projection.Query.QueryBuilder do
     select_sql =
       Enum.map(select_clause, fn
         :count_star -> "COUNT(*)"
-        {:avg, attr} -> "AVG(tags->>'#{inspect(attr)}')::numeric"
-        {:min, attr} -> "MIN(tags->>'#{inspect(attr)}')::numeric"
-        {:max, attr} -> "MAX(tags->>'#{inspect(attr)}')::numeric"
-        {:rank_over, attr, dir} -> "RANK() OVER (ORDER BY (tags->>'#{inspect(attr)}')::numeric #{String.upcase(to_string(dir))})"
-        attr -> "tags->>'#{inspect(attr)}' AS #{inspect(attr)}"
+        {:avg, attr} -> "AVG(tags->>'#{attr}')::numeric"
+        {:min, attr} -> "MIN(tags->>'#{attr}')::numeric"
+        {:max, attr} -> "MAX(tags->>'#{attr}')::numeric"
+        {:sum, attr} -> "SUM(tags->>'#{attr}')::numeric"
+        {:rank_over, attr, dir} -> "RANK() OVER (ORDER BY (tags->>'#{attr}')::numeric #{String.upcase(to_string(dir))})"
+        attr -> "tags->>'#{attr}' AS #{attr}"
       end)
       |> Enum.join(", ")
 
@@ -22,7 +22,7 @@ defmodule Statestores.Projection.Query.QueryBuilder do
     order_by_sql = build_order_by_clause(order_by)
 
     query = "SELECT #{select_sql} FROM projections #{where_sql} #{order_by_sql}"
-    {query, []}
+    {String.trim(query), []}
   end
 
   defp build_where_clause([]), do: ""
@@ -34,18 +34,18 @@ defmodule Statestores.Projection.Query.QueryBuilder do
 
       _ -> ""
     end)
+    |> Enum.reject(&(&1 == ""))
     |> Enum.join(" AND ")
-    |> (fn clause -> "WHERE #{clause}" end).()
+    |> (&("WHERE " <> &1)).()
   end
 
   defp build_condition(field, operator, value) when is_tuple(value) do
-    # For values ​​that are subqueries, we will treat this as a subquery in the WHERE
     subquery = build_subquery(value)
     "#{field} #{operator} (#{subquery})"
   end
 
   defp build_condition(field, operator, value) do
-    "#{field} #{operator} #{value}"
+    "#{field} #{operator} '#{value}'"
   end
 
   defp build_subquery({:select, select_clause, where_clause, order_by_clause}) do
@@ -63,7 +63,6 @@ defmodule Statestores.Projection.Query.QueryBuilder do
     where_sql = build_where_clause(where_clause)
     order_by_sql = build_order_by_clause(order_by_clause)
 
-    # Generating the subquery with `FROM` and considering the join with the main table (projections)
     "SELECT #{select_sql} FROM projections #{where_sql} #{order_by_sql}"
   end
 
@@ -74,6 +73,6 @@ defmodule Statestores.Projection.Query.QueryBuilder do
       "#{field} #{String.upcase(to_string(direction))}"
     end)
     |> Enum.join(", ")
-    |> (fn clause -> "ORDER BY #{clause}" end).()
+    |> (&("ORDER BY " <> &1)).()
   end
 end
