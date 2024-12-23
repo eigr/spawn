@@ -13,8 +13,8 @@ defmodule Statestores.Projection.Query.QueryBuilder do
         {:avg, field} -> "AVG(tags->>'#{field}')::numeric"
         {:min, field} -> "MIN(tags->>'#{field}')::numeric"
         {:max, field} -> "MAX(tags->>'#{field}')::numeric"
-        {:rank_over, attr, dir} -> "RANK() OVER (ORDER BY (tags->>'#{attr}')::numeric #{String.upcase(to_string(dir))})"
-        attr -> "tags->>'#{attr}' AS #{attr}"
+        {:rank_over, attr, dir} -> "RANK() OVER (ORDER BY (tags->>'#{inspect(attr)}')::numeric #{String.upcase(to_string(dir))})"
+        attr -> "tags->>'#{inspect(attr)}' AS #{inspect(attr)}"
       end)
       |> Enum.join(", ")
 
