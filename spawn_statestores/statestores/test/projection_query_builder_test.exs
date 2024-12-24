@@ -39,7 +39,7 @@ defmodule Projection.Query.BuilderTest do
 
   describe "build_query/4 with rank and aggregate functions" do
     test "builds query with rank over clause" do
-      select_clause = [:rank_over, :field1, :asc]
+      select_clause = [{:rank_over, :field1, :asc}]
       conditions = []
       order_by = []
       {query, _params} = QueryBuilder.build_query(select_clause, conditions, order_by, %{})
@@ -49,7 +49,7 @@ defmodule Projection.Query.BuilderTest do
     end
 
     test "builds query with sum aggregate function" do
-      select_clause = [:subquery, {:sum, :field1, %{}}]
+      select_clause = [{:sum, :field1, %{}}]
       conditions = []
       order_by = []
       {query, _params} = QueryBuilder.build_query(select_clause, conditions, order_by, %{})
@@ -59,7 +59,7 @@ defmodule Projection.Query.BuilderTest do
     end
 
     test "builds query with avg aggregate function" do
-      select_clause = [:subquery, {:avg, :field1, %{}}]
+      select_clause = [{:avg, :field1, %{}}]
       conditions = []
       order_by = []
       {query, _params} = QueryBuilder.build_query(select_clause, conditions, order_by, %{})
@@ -69,7 +69,7 @@ defmodule Projection.Query.BuilderTest do
     end
 
     test "builds query with min aggregate function" do
-      select_clause = [:subquery, {:min, :field1, %{}}]
+      select_clause = [{:min, :field1, %{}}]
       conditions = []
       order_by = []
       {query, _params} = QueryBuilder.build_query(select_clause, conditions, order_by, %{})
@@ -79,7 +79,7 @@ defmodule Projection.Query.BuilderTest do
     end
 
     test "builds query with max aggregate function" do
-      select_clause = [:subquery, {:max, :field1, %{}}]
+      select_clause = [{:max, :field1, %{}}]
       conditions = []
       order_by = []
       {query, _params} = QueryBuilder.build_query(select_clause, conditions, order_by, %{})
