@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "example/example.proto";
+
+package example.actors;
+
+service ExampleActor {
+  rpc Sum (.example.ValuePayload) returns (.example.SumResponse) {
+    option (google.api.http) = {
+      post: "/v1/sum"
+      body: "*"
+    };
+  }
+}
