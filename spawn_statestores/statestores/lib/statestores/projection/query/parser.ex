@@ -26,20 +26,20 @@ defmodule Statestores.Projection.Query.Parser do
   end
 
   defp parse_select_item("select " <> rest) do
-    # A subquery é tratada como uma expressão no SELECT
+    # The subquery is treated as an expression in the SELECT
     {:subquery, parse_subquery(rest)}
   end
 
   defp parse_select_item(attr), do: String.to_atom(attr)
 
   defp parse_subquery(dsl) do
-    # Extrai a expressão da subquery
+    # Extract the expression from the subquery
     [_, func, field, condition] = Regex.run(~r/^(sum|avg|min|max|count)\((.*?)\) where (.*)/, dsl)
     {String.to_atom(func), String.to_atom(field), parse_condition(condition)}
   end
 
   defp parse_condition(condition) do
-    # Trata a condição de filtro (por exemplo, `level = 'expert'`)
+    # Handles the filter condition (e.g. `level = 'expert'`)
     Enum.into(String.split(condition, " and "), %{}, fn pair ->
       [key, value] = String.split(pair, "=")
       {String.to_atom(key), String.trim(value, "'")}
