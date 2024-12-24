@@ -2,7 +2,7 @@
 
 To begin, you'll need to develop your HostFunction application. Refer to the documentation for each [SDK](sdks.md) to learn how to proceed with your preferred programming language.
 
-- [Using Elixir SDK](./spawn_sdk/spawn_sdk#installation)
+- [Using Elixir SDK](https://github.com/eigr/spawn/tree/main/spawn_sdk/spawn_sdk#spawn-elixir-sdk)
 - [Using Java SDK](https://github.com/eigr/spawn-java-std-sdk#getting-started)
 - [Using NodeJS SDK](https://github.com/eigr/spawn-node-sdk#installation)
 - [Using Python SDK](https://github.com/eigr/spawn-python-sdk#getting-started)
