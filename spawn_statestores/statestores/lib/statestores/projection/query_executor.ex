@@ -86,7 +86,7 @@ defmodule Statestores.Projection.QueryExecutor do
   ```
 
   **Generated SQL Query:**
-  
+
   ```sql
     SELECT
         tags->>'player_id' AS player_id,

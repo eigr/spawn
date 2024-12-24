@@ -8,40 +8,39 @@ defmodule Statestores.Projection.Query.QueryBuilder do
   def build_query(select_clause, conditions, order_by, _binds) do
     select_sql =
       select_clause
-      |> IO.inspect(label: "select_clause")
       |> Enum.filter(&valid_select?/1)
       |> Enum.map(fn
-        :count_star -> 
+        :count_star ->
           "COUNT(*)"
 
-        {:avg, attr, _opts} -> 
+        {:avg, attr, _opts} ->
           "AVG(tags->>'#{attr}')::numeric"
 
-        {:min, attr} -> 
-          "MIN(tags->>'#{attr}')::numeric"
-        
-        {:min, attr, _opts} -> 
+        {:min, attr} ->
           "MIN(tags->>'#{attr}')::numeric"
 
-        {:max, attr} -> 
+        {:min, attr, _opts} ->
+          "MIN(tags->>'#{attr}')::numeric"
+
+        {:max, attr} ->
           "MAX(tags->>'#{attr}')::numeric"
 
-        {:max, attr, _opts} -> 
+        {:max, attr, _opts} ->
           "MAX(tags->>'#{attr}')::numeric"
 
-        {:sum, attr} -> 
+        {:sum, attr} ->
           "SUM(tags->>'#{attr}')::numeric"
 
-        {:sum, attr, _opts} -> 
+        {:sum, attr, _opts} ->
           "SUM(tags->>'#{attr}')::numeric"
 
         {:rank_over, attr, dir} ->
           "RANK() OVER (ORDER BY (tags->>'#{attr}')::numeric #{String.upcase(to_string(dir))})"
 
-        attr when is_atom(attr) -> 
+        attr when is_atom(attr) ->
           "tags->>'#{attr}' AS #{attr}"
 
-        _ -> 
+        _ ->
           raise ArgumentError, "Unsupported select clause format"
       end)
       |> Enum.join(", ")
@@ -58,13 +57,15 @@ defmodule Statestores.Projection.Query.QueryBuilder do
   end
 
   defp build_where_clause([]), do: ""
+
   defp build_where_clause(conditions) do
     conditions
     |> Enum.map(fn
       {:where, field, operator, value} ->
         build_condition(field, operator, value)
 
-      _ -> ""
+      _ ->
+        ""
     end)
     |> Enum.reject(&(&1 == ""))
     |> Enum.join(" AND ")
@@ -77,38 +78,49 @@ defmodule Statestores.Projection.Query.QueryBuilder do
   end
 
   defp build_condition(field, operator, value) do
-    formatted_value = 
+    formatted_value =
       case value do
         ^value when is_binary(value) -> "'#{String.trim(value, "'")}'"
         _ -> value
       end
-  
+
     "#{field} #{operator} #{formatted_value}"
   end
 
   defp build_subquery({:select, select_clause, where_clause, order_by_clause}) do
     select_sql =
       Enum.map(select_clause, fn
-        :count_star -> "COUNT(*)"
-        {:avg, field} -> "AVG(tags->>'#{field}')::numeric"
-        {:min, field} -> "MIN(tags->>'#{field}')::numeric"
-        {:max, field} -> "MAX(tags->>'#{field}')::numeric"
-        {:rank_over, attr, dir} -> "RANK() OVER (ORDER BY (tags->>'#{attr}')::numeric #{String.upcase(to_string(dir))})"
-        attr -> "tags->>'#{attr}' AS #{attr}"
+        :count_star ->
+          "COUNT(*)"
+
+        {:avg, field} ->
+          "AVG(tags->>'#{field}')::numeric"
+
+        {:min, field} ->
+          "MIN(tags->>'#{field}')::numeric"
+
+        {:max, field} ->
+          "MAX(tags->>'#{field}')::numeric"
+
+        {:rank_over, attr, dir} ->
+          "RANK() OVER (ORDER BY (tags->>'#{attr}')::numeric #{String.upcase(to_string(dir))})"
+
+        attr ->
+          "tags->>'#{attr}' AS #{attr}"
       end)
       |> Enum.join(", ")
-  
+
     where_sql = build_where_clause(where_clause)
     order_by_sql = build_order_by_clause(order_by_clause)
-  
+
     ["SELECT", select_sql, "FROM projections", where_sql, order_by_sql]
     |> Enum.reject(&(&1 == ""))
     |> Enum.join(" ")
     |> String.trim()
   end
-  
 
   defp build_order_by_clause([]), do: ""
+
   defp build_order_by_clause(order_by) do
     order_by
     |> Enum.map(fn {field, direction} ->
@@ -129,5 +141,4 @@ defmodule Statestores.Projection.Query.QueryBuilder do
   defp valid_select?({:rank_over, _attr, _dir}), do: true
   defp valid_select?(attr) when is_atom(attr), do: true
   defp valid_select?(_), do: false
-
 end

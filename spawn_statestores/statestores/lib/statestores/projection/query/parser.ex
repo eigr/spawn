@@ -16,6 +16,7 @@ defmodule Statestores.Projection.Query.Parser do
 
   defp parse_select_clause(dsl) do
     [_, select, rest] = Regex.run(~r/^select (.+?) (where|$)/, dsl)
+
     select_clause =
       select
       |> String.split(", ")
@@ -55,7 +56,8 @@ defmodule Statestores.Projection.Query.Parser do
           {String.to_atom(attr), String.to_atom(dir)}
         end)
 
-      _ -> []
+      _ ->
+        []
     end
   end
 end
