@@ -3,6 +3,7 @@ defmodule Statestores.Adapters.NativeProjectionAdapter do
   Implements the ProjectionBehaviour for Mnesia, with dynamic table name support.
   """
   use Statestores.Adapters.ProjectionBehaviour
+  use GenServer
 
   alias Statestores.Schemas.Projection
 
@@ -145,4 +146,15 @@ defmodule Statestores.Adapters.NativeProjectionAdapter do
 
   @impl true
   def default_port, do: "0000"
+
+  def child_spec(_),
+    do: %{
+      id: __MODULE__,
+      start: {__MODULE__, :start_link, []}
+    }
+
+  def start_link, do: GenServer.start_link(__MODULE__, [], name: __MODULE__)
+
+  @impl GenServer
+  def init(_), do: {:ok, nil}
 end
