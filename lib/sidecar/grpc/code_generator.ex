@@ -55,6 +55,13 @@ defmodule Sidecar.GRPC.CodeGenerator do
       "Found #{length(user_defined_proto_files_list)} ActorHost Protocol Buffers to compile... (#{inspect(user_defined_proto_files_list)})"
     )
 
+    invoker_helper =
+      if Code.ensure_loaded?(SpawnSdk) do
+        ["--plugin=Sidecar.GRPC.Generators.ActorInvoker"]
+      else
+        []
+      end
+
     if length(user_defined_proto_files_list) > 0 do
       protoc_options =
         [
@@ -68,7 +75,7 @@ defmodule Sidecar.GRPC.CodeGenerator do
           "--plugin=Sidecar.GRPC.Generators.ServiceGenerator",
           "--plugin=Sidecar.Grpc.Generators.ReflectionServerGenerator"
         ] ++
-          user_defined_proto_files_list
+          user_defined_proto_files_list ++ invoker_helper
 
       _ = Generate.run(protoc_options)
 
