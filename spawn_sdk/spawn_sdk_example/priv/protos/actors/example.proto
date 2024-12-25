@@ -2,14 +2,18 @@ syntax = "proto3";
 
 import "google/api/annotations.proto";
 import "example/example.proto";
+import "eigr/functions/protocol/actors/extensions.proto";
 
 package example.actors;
 
 service ExampleActor {
-  rpc Sum (.example.ValuePayload) returns (.example.SumResponse) {
+  rpc ExampleView (.example.ValuePayload) returns (.example.SomeQueryResponse) {
+    option (eigr.functions.protocol.actors.view) = {
+      query: "SELECT id, name, age WHERE name = :customer_name" 
+      map_to: "results"
+    };
     option (google.api.http) = {
-      post: "/v1/sum"
-      body: "*"
+      get: "/v1/messages/{message_id}"
     };
   }
 }

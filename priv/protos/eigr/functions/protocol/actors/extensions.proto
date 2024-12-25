@@ -5,5 +5,15 @@ package eigr.functions.protocol.actors;
 import "google/protobuf/descriptor.proto";
 
 extend google.protobuf.FieldOptions {
-    bool actor_id = 9999;
+  bool actor_id = 9999;
 }
+
+message ActorViewOption {
+  string query = 1;
+  string map_to = 2;
+}
+
+extend google.protobuf.MethodOptions {
+  ActorViewOption view = 4890127;
+}
+
