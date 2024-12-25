@@ -13,7 +13,8 @@ defmodule Sidecar.GRPC.Supervisor do
       with {:compiling_protos, :ok} <-
              {:compiling_protos, Generator.compile_protos()},
            {:load_modules, {:ok, modules}} <- {:load_modules, Generator.load_modules(opts)},
-           {:compiling_modules, :ok} <- {:compiling_modules, Generator.compile_modules(modules)} do
+           {:compiling_modules, :ok} <- {:compiling_modules, Generator.compile_modules(modules)},
+           {:after_compile_hook, :ok} <- {:after_compile_hook, Generator.after_compile_hook()} do
         []
         |> maybe_start_reflection(Config.get(:grpc_reflection_enabled))
         |> maybe_start_grpc_server(Config.get(:grpc_server_enabled))

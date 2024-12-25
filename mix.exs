@@ -75,7 +75,7 @@ defmodule Spawn.MixProject do
       {:shards, "~> 1.1"},
       {:telemetry, "~> 1.0"},
       {:castore, "~> 1.0"},
-      {:protobuf, "~> 0.12"},
+      {:protobuf, "~> 0.13"},
       {:protobuf_generate, "~> 0.1"},
       {:grpc, "~> 0.8"},
       {:grpc_reflection, "~> 0.1"},

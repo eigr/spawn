@@ -20,8 +20,7 @@ defmodule Actors.Actor.Entity.Invocation do
     ActorSystem,
     ActorState,
     Action,
-    FixedTimerAction,
-    Metadata
+    FixedTimerAction
   }
 
   alias Eigr.Functions.Protocol.{
@@ -351,12 +350,14 @@ defmodule Actors.Actor.Entity.Invocation do
                timers,
                all_opts
              ) do
-          {true, interface, request} ->
-            Tracer.with_span "invoke-host" do
+          {:ok, {interface, request, action_type}} ->
+            if action_type == :view_action do
+              handle_view_invocation(request, state, all_opts)
+            else
               handle_invocation(interface, request, state, all_opts)
             end
 
-          {false, _} ->
+          {:error, :not_found} ->
             handle_not_found_action(action_name, actor_name, state)
         end
       end
@@ -410,26 +411,39 @@ defmodule Actors.Actor.Entity.Invocation do
     acl_manager = get_acl_manager()
 
     acl_manager.get_policies!()
-    |> acl_manager.is_authorized?(invocation) and
-      length(actions ++ timers) > 0
+    # and length(actions ++ timers) > 0
+    |> acl_manager.is_authorized?(invocation)
   end
 
   defp find_request_by_action(invocation, actor_state, action, actions, timers, actor_opts) do
     all_actions = actions ++ Enum.map(timers, & &1.action)
 
-    case member_action?(action, all_actions) do
-      true ->
+    case get_action_type(invocation, action, all_actions) do
+      :not_found ->
+        {:error, :not_found}
+
+      action_type ->
         interface = get_interface(actor_opts)
         request = build_request(invocation, actor_state, actor_opts)
-        {true, interface, request}
 
-      false ->
-        {false, nil}
+        {:ok, {interface, request, action_type}}
     end
   end
 
-  defp member_action?(action, actions) do
-    Enum.member?(@default_actions, action) or Enum.any?(actions, &(&1.name == action))
+  defp get_action_type(invocation, action, actions) do
+    cond do
+      Enum.member?(@default_actions, action) ->
+        :default_action
+
+      Enum.any?(actions, &(&1.name == action)) ->
+        :registered_action
+
+      !!:persistent_term.get("view-#{invocation.actor.id.name}-#{action}", false) ->
+        :view_action
+
+      true ->
+        :not_found
+    end
   end
 
   defp handle_invocation(interface, request, state, opts) do
@@ -444,6 +458,39 @@ defmodule Actors.Actor.Entity.Invocation do
           {:reply, {:error, reason}, new_state}
           |> return_and_maybe_hibernate()
       end
+    end
+  end
+
+  defp handle_view_invocation(request, state, opts) do
+    Tracer.with_span "invoke-host" do
+      # do query
+      # get query response
+
+      %ActorInvocation{
+        actor: %ActorId{name: name, system: system},
+        caller: caller
+      } = request
+
+      current_state = Map.get(state.actor.state || %{}, :state, %Google.Protobuf.Any{})
+      current_tags = Map.get(state.actor.state || %{}, :tags, %{})
+
+      context =
+        %Context{
+          caller: caller,
+          self: state.actor.id,
+          state: current_state,
+          tags: current_tags
+        }
+
+      response = %ActorInvocationResponse{
+        actor_name: name,
+        actor_system: system,
+        updated_context: context,
+        # payload should result in what was queried and parsed from the query definition
+        payload: {:noop, %Noop{}}
+      }
+
+      {:ok, request, response, state, opts}
     end
   end
 

@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package example;
+
+message ValuePayload {
+  int32 value = 1;
+}
+
+message ExampleState {
+  int32 value = 1;
+}
+
+message SumResponse {
+  int32 value = 1;
+}
+
+message SomeQueryResponse {
+  repeated SumResponse results = 1;
+}

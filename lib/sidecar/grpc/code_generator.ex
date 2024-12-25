@@ -14,6 +14,8 @@ defmodule Sidecar.GRPC.CodeGenerator do
   require Logger
 
   alias Actors.Config.PersistentTermConfig, as: Config
+  alias Eigr.Functions.Protocol.Actors.ActorViewOption
+  alias Protobuf.Protoc.Generator.Util
   alias Mix.Tasks.Protobuf.Generate
 
   @doc """
@@ -50,32 +52,107 @@ defmodule Sidecar.GRPC.CodeGenerator do
       end
 
     user_defined_proto_files_list = list_files_with_full_path_by_extensions(actors_path, ".proto")
+    include_files_path = list_files_with_full_path_by_extensions(include_path, ".proto")
 
     Logger.info(
       "Found #{length(user_defined_proto_files_list)} ActorHost Protocol Buffers to compile... (#{inspect(user_defined_proto_files_list)})"
     )
 
+    invoker_helper =
+      if Code.ensure_loaded?(SpawnSdk) do
+        ["--plugin=Sidecar.GRPC.Generators.ActorInvoker"]
+      else
+        []
+      end
+
+    spawn_protos_dir = Application.app_dir(:spawn, "priv/protos")
+
     if length(user_defined_proto_files_list) > 0 do
       protoc_options =
         [
           "--include-path=#{include_path}",
-          "--include-path=#{File.cwd!()}/priv/protos/google/protobuf",
-          "--include-path=#{File.cwd!()}/priv/protos/google/api",
+          "--include-path=#{spawn_protos_dir}",
           "--generate-descriptors=true",
+          "--one-file-per-module",
           "--output-path=#{output_path}",
           "--plugin=#{grpc_generator_plugin}",
           "--plugin=#{handler_generator_plugin}",
           "--plugin=Sidecar.GRPC.Generators.ServiceGenerator",
           "--plugin=Sidecar.Grpc.Generators.ReflectionServerGenerator"
         ] ++
+          invoker_helper ++
           user_defined_proto_files_list
 
+      include_files_options =
+        [
+          "--include-path=#{include_path}",
+          "--include-path=#{spawn_protos_dir}",
+          "--generate-descriptors=true",
+          "--one-file-per-module",
+          "--output-path=#{output_path}"
+        ] ++ include_files_path
+
+      _ = Generate.run(include_files_options)
       _ = Generate.run(protoc_options)
 
       :ok
     else
       {:ok, :nothing_to_compile}
     end
+  end
+
+  def after_compile_hook do
+    svcs = :persistent_term.get(:proto_file_descriptors, [])
+    ctx = :persistent_term.get(:proto_file_ctx, nil)
+
+    # do something after generating the code
+    Enum.each(svcs, fn svc ->
+      Enum.each(svc.method, fn method ->
+        case method.options.__pb_extensions__
+             |> Map.get({Eigr.Functions.Protocol.Actors.PbExtension, :view}) do
+          %ActorViewOption{} = option ->
+            output_type =
+              "Elixir.#{Util.type_from_type_name(ctx, method.output_type)}"
+              |> String.to_existing_atom()
+
+            input_type =
+              "Elixir.#{Util.type_from_type_name(ctx, method.input_type)}"
+              |> String.to_existing_atom()
+
+            descriptor = apply(output_type, :descriptor, [])
+
+            field =
+              descriptor.field
+              |> Enum.find(fn field ->
+                field.name == option.map_to
+              end)
+
+            type_name =
+              "Elixir.#{Util.type_from_type_name(ctx, field.type_name)}"
+              |> String.to_existing_atom()
+
+            # let the proxy know that there is a 
+            :persistent_term.put("view-#{svc.name}-#{method.name}", %{
+              query: option.query,
+              view_name: method.name,
+              query_result_type: type_name,
+              map_to: option.map_to,
+              output_type: output_type,
+              input_type: input_type
+            })
+
+            :ok
+
+          _ ->
+            nil
+        end
+      end)
+    end)
+
+    :persistent_term.erase(:proto_file_descriptors)
+    :persistent_term.erase(:proto_file_ctx)
+
+    :ok
   end
 
   @doc """

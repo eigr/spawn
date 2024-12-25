@@ -290,7 +290,12 @@ if Code.ensure_loaded?(:persistent_term) do
     end
 
     defp load_env({:grpc_compiled_modules_path, :runtime}) do
-      default_value = "#{File.cwd!()}/priv/generated_modules"
+      default_value =
+        if System.get_env("MIX_ENV") == "prod" do
+          "#{File.cwd!()}/priv/generated_modules"
+        else
+          "#{File.cwd!()}/lib/_generated"
+        end
 
       value = env("PROXY_GRPC_COMPILED_MODULES_PATH", default_value)
       :persistent_term.put({__MODULE__, :grpc_compiled_modules_path}, value)
