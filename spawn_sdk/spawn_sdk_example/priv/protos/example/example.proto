@@ -13,3 +13,7 @@ message ExampleState {
 message SumResponse {
   int32 value = 1;
 }
+
+message SomeQueryResponse {
+  repeated SumResponse results = 1;
+}
