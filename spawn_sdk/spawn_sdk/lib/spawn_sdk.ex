@@ -5,7 +5,7 @@ defmodule SpawnSdk do
              |> Enum.fetch!(1)
 
   defmodule ActorRef do
-    @enforce_keys [:system, :name]
+    @enforce_keys [:name]
     defstruct system: nil, name: nil, opts: []
 
     @type t() :: %__MODULE__{

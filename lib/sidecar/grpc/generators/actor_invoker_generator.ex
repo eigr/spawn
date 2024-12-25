@@ -18,26 +18,46 @@ defmodule Sidecar.GRPC.Generators.ActorInvoker do
         Invokes the <%= method_name %> method registered on <%= @actor_name %>.
 
         ## Parameters
+        - `ref` - The actor ref to send the action to.
         - `payload` - The payload to send to the action.
         - `opts` - The options to pass to the action.
 
         ## Examples
         ```elixir
-        iex> <%= @module %>.<%= Macro.underscore(method_name) %>(%<%= input %>{}, async: false, metadata: %{"example" => "metadata"})
+        iex> <%= @module %>.<%= Macro.underscore(method_name) %>(%SpawnSdk.ActorRef{name: "actor_id_01", system: "spawn-system"}, %<%= input %>{}, async: false, metadata: %{"example" => "metadata"})
         {:ok, %<%= output %>{}}
         ```
         \"\"\"
-        @spec <%= Macro.underscore(method_name) %>(<%= input %>.t(), Keyword.t()) :: {:ok, <%= output %>.t()} | {:error, term()} | {:ok, :async}
-        def <%= Macro.underscore(method_name) %>(%<%= input %>{} = payload \\\\ nil, opts \\\\ []) do
+        def <%= Macro.underscore(method_name) %>() do
+          %SpawnSdk.ActorRef{system: "<%= @actor_system %>", name: "<%= @actor_name %>"}
+          |> <%= Macro.underscore(method_name) %>(%<%= input %>{}, []) 
+        end
+
+        def <%= Macro.underscore(method_name) %>(%<%= input %>{} = payload) do
+          %SpawnSdk.ActorRef{system: "<%= @actor_system %>", name: "<%= @actor_name %>"}
+          |> <%= Macro.underscore(method_name) %>(payload, []) 
+        end
+
+        def <%= Macro.underscore(method_name) %>(%<%= input %>{} = payload, opts) when is_list(opts) do
+          %SpawnSdk.ActorRef{system: "<%= @actor_system %>", name: "<%= @actor_name %>"}
+          |> <%= Macro.underscore(method_name) %>(payload, opts) 
+        end
+
+        def <%= Macro.underscore(method_name) %>(%SpawnSdk.ActorRef{} = ref, %<%= input %>{} = payload) do
+          ref
+          |> <%= Macro.underscore(method_name) %>(payload, []) 
+        end
+
+        def <%= Macro.underscore(method_name) %>(%SpawnSdk.ActorRef{} = ref, %<%= input %>{} = payload, opts) when is_list(opts) do
           opts = [
-            system: opts[:system] || "<%= @actor_system %>",
+            system: ref.system || "<%= @actor_system %>",
             action: "<%= method_name %>",
             payload: payload,
             async: opts[:async] || false,
             metadata: opts[:metadata] || %{}
           ]
 
-          actor_to_invoke = opts[:actor] || "<%= @actor_name %>"
+          actor_to_invoke = ref.name || "<%= @actor_name %>"
 
           opts = if actor_to_invoke == "<%= @actor_name %>" do
             opts
@@ -45,7 +65,7 @@ defmodule Sidecar.GRPC.Generators.ActorInvoker do
             Keyword.put(opts, :ref, "<%= @actor_name %>")
           end
 
-          SpawnSdk.invoke(opts[:id] || "<%= @actor_name %>", opts)
+          SpawnSdk.invoke(actor_to_invoke, opts)
         end
       <% end %>
     end
