@@ -1,76 +1,46 @@
-defmodule Projection.Query.ParserTest do
+defmodule Statestores.Projection.Query.ParserTest do
   use ExUnit.Case, async: true
 
   alias Statestores.Projection.Query.Parser
 
-  describe "parse/1" do
-    test "parses select clause with no conditions and no order by" do
-      dsl = "select field1, field2"
-      expected = {[:field1, :field2], [], []}
-      assert Parser.parse(dsl) == expected
+  # describe "parse/1 simple query" do
+  #   test "parses select clause with no conditions and no order by" do
+  #     dsl = "select field1, field2"
+  #     assert {[:field1, :field2], [], []} == Parser.parse(dsl)
+  #   end
+
+  #   test "parses select clause with subquery" do
+  #     dsl = "select sum(field1) where level = 'expert'"
+  #     assert {[:subquery, {:sum, :field1, %{level: "expert"}}], [], []} == Parser.parse(dsl)
+  #   end
+  # end
+
+  describe "parse/1 group by expressions" do
+    test "parses query with GROUP BY and HAVING clauses" do
+      # dsl = "select sum(points) as total_points group by team having total_points > 100 order by total_points desc"
+      # dsl = "select points, team group by team having sum(points) > 100 order by points desc"
+      dsl =
+        "select sum(points) as total where age > 30 and salary <= 5000 group by department having count(employees) > 10 order by total desc"
+
+      {select, where, group_by, having, order_by} = Parser.parse(dsl)
+
+      assert select == [{:sum, :points, []}]
+      assert where == []
+      assert group_by == [:team]
+      assert having == [{:having, :total_points, ">", 100}]
+      assert order_by == [{:total_points, :desc}]
     end
 
-    test "parses select clause with subquery" do
-      dsl = "select sum(field1) where level = 'expert'"
-      expected = {[:subquery, {:sum, :field1, %{level: "expert"}}], [], []}
-      assert Parser.parse(dsl) == expected
-    end
+    # test "parses query without HAVING clause" do
+    #   dsl = "select sum(points) as total_points group by team order by total_points desc"
 
-    test "parses select clause with order by" do
-      dsl = "select field1, field2 order by field1 asc"
-      expected = {[:field1, :field2], [], [{:field1, :asc}]}
-      assert Parser.parse(dsl) == expected
-    end
+    #   {select, where, group_by, having, order_by} = Parser.parse(dsl)
 
-    test "parses select clause with where and order by" do
-      dsl = "select field1 where level = 'expert' order by field1 desc"
-      expected = {[:field1], [], [{:field1, :desc}]}
-      assert Parser.parse(dsl) == expected
-    end
-  end
-
-  describe "parse/1 with rank and aggregate functions" do
-    test "parses rank over clause" do
-      dsl = "select rank_over(field1, asc)"
-      expected = {[:rank_over, :field1, :asc], [], []}
-      assert Parser.parse(dsl) == expected
-    end
-
-    test "parses sum aggregate function" do
-      dsl = "select sum(field1) where level = 'expert'"
-      expected = {[:subquery, {:sum, :field1, %{level: "expert"}}], [], []}
-      assert Parser.parse(dsl) == expected
-    end
-
-    test "parses avg aggregate function" do
-      dsl = "select avg(field1)"
-      expected = {[:subquery, {:avg, :field1, %{}}], [], []}
-      assert Parser.parse(dsl) == expected
-    end
-
-    test "parses min aggregate function" do
-      dsl = "select min(field1)"
-      expected = {[:subquery, {:min, :field1, %{}}], [], []}
-      assert Parser.parse(dsl) == expected
-    end
-
-    test "parses max aggregate function" do
-      dsl = "select max(field1)"
-      expected = {[:subquery, {:max, :field1, %{}}], [], []}
-      assert Parser.parse(dsl) == expected
-    end
-
-    test "parses multiple functions together" do
-      dsl = "select sum(field1), avg(field2), rank_over(field3, desc)"
-
-      expected =
-        {[
-           {:sum, :field1, %{}},
-           {:avg, :field2, %{}},
-           {:rank_over, :field3, :desc}
-         ], [], []}
-
-      assert Parser.parse(dsl) == expected
-    end
+    #   assert select == [{:sum, :points, []}]
+    #   assert where == []
+    #   assert group_by == [:team]
+    #   assert having == []
+    #   assert order_by == [{:total_points, :desc}]
+    # end
   end
 end

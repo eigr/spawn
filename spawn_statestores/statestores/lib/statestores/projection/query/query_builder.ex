@@ -43,7 +43,15 @@ defmodule Statestores.Projection.Query.QueryBuilder do
       if group_by_sql == "" do
         ["SELECT", select_sql, "FROM projections", where_sql, order_by_sql]
       else
-        ["SELECT", select_sql, "FROM projections", where_sql, group_by_sql, having_sql, order_by_sql]
+        [
+          "SELECT",
+          select_sql,
+          "FROM projections",
+          where_sql,
+          group_by_sql,
+          having_sql,
+          order_by_sql
+        ]
       end
       |> Enum.reject(&(&1 == ""))
       |> Enum.join(" ")
