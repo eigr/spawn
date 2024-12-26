@@ -162,7 +162,7 @@ defmodule Statestores.Projection.Query.QueryBuilder do
   defp valid_select?(attr) when is_atom(attr), do: true
   defp valid_select?(_), do: false
 
-  defp valid_group_by?(group_by, select_clause) do
+  defp valid_group_by?(_group_by, select_clause) do
     Enum.any?(select_clause, &aggregation_function?/1)
   end
 
