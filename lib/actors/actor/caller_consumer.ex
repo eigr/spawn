@@ -18,7 +18,7 @@ defmodule Actors.Actor.CallerConsumer do
 
   alias Actors.Registry.{ActorRegistry, HostActor}
 
-  alias Eigr.Functions.Protocol.Actors.{
+  alias Spawn.Actors.{
     Actor,
     ActorId,
     Metadata,
@@ -27,7 +27,7 @@ defmodule Actors.Actor.CallerConsumer do
     Registry
   }
 
-  alias Eigr.Functions.Protocol.{
+  alias Spawn.{
     InvocationRequest,
     ProxyInfo,
     RegistrationRequest,

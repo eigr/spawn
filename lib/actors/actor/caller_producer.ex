@@ -41,9 +41,9 @@ defmodule Actors.Actor.CallerProducer do
 
   alias Actors.Actor.CallerConsumer
   alias Actors.Config.PersistentTermConfig, as: Config
-  alias Eigr.Functions.Protocol.Actors.ActorId
+  alias Spawn.Actors.ActorId
 
-  alias Eigr.Functions.Protocol.{
+  alias Spawn.{
     InvocationRequest,
     RegistrationRequest,
     RegistrationResponse,

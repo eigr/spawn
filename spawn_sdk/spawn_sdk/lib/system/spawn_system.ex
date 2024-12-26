@@ -9,7 +9,7 @@ defmodule SpawnSdk.System.SpawnSystem do
   alias Actors
   alias Actors.Actor.Entity.EntityState
 
-  alias Eigr.Functions.Protocol.Actors.{
+  alias Spawn.Actors.{
     Actor,
     ActorId,
     ActorState,
@@ -26,11 +26,10 @@ defmodule SpawnSdk.System.SpawnSystem do
     Channel,
     ProjectionSettings,
     ProjectionSubject,
-    EventsRetentionStrategy,
-    EventsRetentionTime
+    EventsRetentionStrategy
   }
 
-  alias Eigr.Functions.Protocol.{
+  alias Spawn.{
     ActorInvocation,
     ActorInvocationResponse,
     InvocationRequest,
@@ -114,8 +113,8 @@ defmodule SpawnSdk.System.SpawnSystem do
     payload = parse_payload(payload)
 
     req = %InvocationRequest{
-      system: %Eigr.Functions.Protocol.Actors.ActorSystem{name: system},
-      actor: %Eigr.Functions.Protocol.Actors.Actor{
+      system: %Spawn.Actors.ActorSystem{name: system},
+      actor: %Spawn.Actors.Actor{
         id: %ActorId{name: actor_name, system: system}
       },
       metadata: metadata,
@@ -163,7 +162,7 @@ defmodule SpawnSdk.System.SpawnSystem do
     %ActorInvocation{
       actor: %ActorId{name: name, system: system, parent: parent},
       action_name: action,
-      current_context: %Eigr.Functions.Protocol.Context{metadata: metadata},
+      current_context: %Spawn.Context{metadata: metadata},
       caller: caller
     } = invocation
 
@@ -178,7 +177,7 @@ defmodule SpawnSdk.System.SpawnSystem do
 
     if Enum.member?(default_actions, action) and
          not Enum.any?(default_actions, fn action -> contains_action?(actions, action) end) do
-      context = %Eigr.Functions.Protocol.Context{
+      context = %Spawn.Context{
         caller: caller,
         metadata: metadata,
         self: self_actor_id,
@@ -230,7 +229,7 @@ defmodule SpawnSdk.System.SpawnSystem do
            actor: %ActorId{name: name, system: system, parent: _parent},
            action_name: _action,
            payload: _payload,
-           current_context: %Eigr.Functions.Protocol.Context{metadata: _metadata},
+           current_context: %Spawn.Context{metadata: _metadata},
            caller: _caller
          } = _invocation,
          ctx
@@ -273,7 +272,7 @@ defmodule SpawnSdk.System.SpawnSystem do
 
     %ActorInvocation{
       actor: %ActorId{name: name, system: system, parent: _parent},
-      current_context: %Eigr.Functions.Protocol.Context{metadata: _metadata},
+      current_context: %Spawn.Context{metadata: _metadata},
       caller: caller
     } = invocation
 
@@ -297,7 +296,7 @@ defmodule SpawnSdk.System.SpawnSystem do
     new_tags = tags || current_tags
 
     resp = %ActorInvocationResponse{
-      updated_context: %Eigr.Functions.Protocol.Context{
+      updated_context: %Spawn.Context{
         caller: caller,
         self: self_actor_id,
         state: new_state,
@@ -347,7 +346,7 @@ defmodule SpawnSdk.System.SpawnSystem do
        ) do
     payload = parse_payload(payload)
 
-    %Eigr.Functions.Protocol.Broadcast{
+    %Spawn.Broadcast{
       channel_group: channel,
       payload: payload
     }
@@ -368,7 +367,7 @@ defmodule SpawnSdk.System.SpawnSystem do
        ) do
     cmd = if is_atom(action), do: Atom.to_string(action), else: action
 
-    pipe = %Eigr.Functions.Protocol.Pipe{
+    pipe = %Spawn.Pipe{
       actor: actor_name,
       action_name: cmd
     }
@@ -391,7 +390,7 @@ defmodule SpawnSdk.System.SpawnSystem do
        ) do
     cmd = if is_atom(action), do: Atom.to_string(action), else: action
 
-    forward = %Eigr.Functions.Protocol.Forward{
+    forward = %Spawn.Forward{
       actor: actor_name,
       action_name: cmd
     }
@@ -420,10 +419,10 @@ defmodule SpawnSdk.System.SpawnSystem do
     Enum.map(effects, fn %SpawnSdk.Flow.SideEffect{} = effect ->
       payload = parse_payload(effect.payload)
 
-      %Eigr.Functions.Protocol.SideEffect{
+      %Spawn.SideEffect{
         request: %InvocationRequest{
-          system: %Eigr.Functions.Protocol.Actors.ActorSystem{name: system},
-          actor: %Eigr.Functions.Protocol.Actors.Actor{
+          system: %Spawn.Actors.ActorSystem{name: system},
+          actor: %Spawn.Actors.Actor{
             id: %ActorId{name: effect.actor_name, system: system}
           },
           payload: payload,
@@ -570,7 +569,7 @@ defmodule SpawnSdk.System.SpawnSystem do
             %EventsRetentionStrategy{strategy: {:infinite, true}}
 
           value when is_number(value) ->
-            %EventsRetentionStrategy{strategy: {:time_in_ms, %EventsRetentionTime{time: value}}}
+            %EventsRetentionStrategy{strategy: {:duration_ms, value}}
         end
 
       projection_settings = %ProjectionSettings{

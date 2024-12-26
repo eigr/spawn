@@ -5,9 +5,9 @@ option objc_class_prefix = "HLW";
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
-import "eigr/functions/protocol/actors/extensions.proto";
+import "spawn/actors/extensions.proto";
 
-package eigr.functions.protocol.actors.healthcheck;
+package spawn.actors.healthcheck;
 
 message Status {
   string status = 1;

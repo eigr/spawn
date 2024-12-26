@@ -6,7 +6,7 @@ if Code.ensure_loaded?(Statestores.Supervisor) do
     """
     require Logger
 
-    alias Eigr.Functions.Protocol.Actors.{ActorId, ActorState}
+    alias Spawn.Actors.{ActorId, ActorState}
     alias Google.Protobuf.Any
     alias Statestores.Schemas.Snapshot
     alias Statestores.Manager.StateManager, as: StateStoreManager
@@ -141,9 +141,9 @@ if Code.ensure_loaded?(Statestores.Supervisor) do
         {:error, error}
     end
 
-    @spec save(ActorId.t(), Eigr.Functions.Protocol.Actors.ActorState.t(), Keyword.t()) ::
-            {:ok, Eigr.Functions.Protocol.Actors.ActorState.t()}
-            | {:error, any(), Eigr.Functions.Protocol.Actors.ActorState.t()}
+    @spec save(ActorId.t(), Spawn.Actors.ActorState.t(), Keyword.t()) ::
+            {:ok, Spawn.Actors.ActorState.t()}
+            | {:error, any(), Spawn.Actors.ActorState.t()}
     def save(_actor_id, nil, _opts), do: {:ok, nil}
 
     def save(_actor_id, %ActorState{state: actor_state} = _state, _opts)
@@ -193,11 +193,11 @@ if Code.ensure_loaded?(Statestores.Supervisor) do
 
     @spec save_async(
             ActorId.t(),
-            Eigr.Functions.Protocol.Actors.ActorState.t(),
+            Spawn.Actors.ActorState.t(),
             Keyword.t()
           ) ::
-            {:ok, Eigr.Functions.Protocol.Actors.ActorState.t()}
-            | {:error, any(), Eigr.Functions.Protocol.Actors.ActorState.t()}
+            {:ok, Spawn.Actors.ActorState.t()}
+            | {:error, any(), Spawn.Actors.ActorState.t()}
     def save_async(actor_id, state, opts \\ [])
 
     def save_async(_actor_id, nil, _opts), do: {:ok, %{}}

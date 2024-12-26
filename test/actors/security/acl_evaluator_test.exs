@@ -5,9 +5,9 @@ defmodule Actors.AclEvaluatorTest do
   alias Actors.Security.Acl.Rules.AclEvaluator
   alias Actors.Security.Acl.Policy
 
-  alias Eigr.Functions.Protocol.InvocationRequest
+  alias Spawn.InvocationRequest
 
-  alias Eigr.Functions.Protocol.Actors.{
+  alias Spawn.Actors.{
     Actor,
     ActorId
   }

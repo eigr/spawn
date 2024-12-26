@@ -12,7 +12,7 @@ defmodule Actors.Actor.InvocationScheduler do
   require Logger
 
   alias Spawn.Cluster.StateHandoff.InvocationSchedulerState
-  alias Eigr.Functions.Protocol.InvocationRequest
+  alias Spawn.InvocationRequest
 
   @hibernate_delay 20_000
   @hibernate_jitter 30_000

@@ -1,4 +1,4 @@
-defmodule Eigr.Functions.Protocol.Actors.PbExtension do
+defmodule Spawn.Actors.PbExtension do
   @moduledoc false
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
@@ -10,11 +10,16 @@ defmodule Eigr.Functions.Protocol.Actors.PbExtension do
 
   extend(Google.Protobuf.MethodOptions, :view, 4_890_127,
     optional: true,
-    type: Eigr.Functions.Protocol.Actors.ActorViewOption
+    type: Spawn.Actors.ActorViewOption
+  )
+
+  extend(Google.Protobuf.ServiceOptions, :settings, 4_890_128,
+    optional: true,
+    type: Spawn.Actors.ActorSettings
   )
 end
 
-defmodule Eigr.Functions.Protocol.Actors.ActorViewOption do
+defmodule Spawn.Actors.ActorViewOption do
   @moduledoc false
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 

@@ -2,7 +2,7 @@ defmodule NodeClientMock do
   @moduledoc """
   This module is used to mock the node http client.
   """
-  alias Eigr.Functions.Protocol.ActorInvocationResponse
+  alias Spawn.ActorInvocationResponse
 
   def invoke_host_actor(_payload, _opts \\ []) do
     response = Agent.get(Actors.MockTest, fn state -> state end)

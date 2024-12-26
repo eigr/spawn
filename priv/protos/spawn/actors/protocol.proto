@@ -141,13 +141,13 @@
 //
 syntax = "proto3";
 
-package eigr.functions.protocol;
+package spawn;
 
-import "eigr/functions/protocol/actors/actor.proto";
+import "spawn/actors/actor.proto";
 import "google/protobuf/any.proto";
 import "google/protobuf/timestamp.proto";
 
-option java_package = "io.eigr.functions.protocol";
+option java_package = "io.spawn";
 option go_package = "github.com/eigr/go-support/eigr/protocol;protocol";
 
 // Context is where current and/or updated state is stored
@@ -168,10 +168,10 @@ message Context {
   map<string, string> tags = 5;
 
   // Who is calling target actor
-  eigr.functions.protocol.actors.ActorId caller = 2;
+  spawn.actors.ActorId caller = 2;
 
   // The target actor itself
-  eigr.functions.protocol.actors.ActorId self = 3;
+  spawn.actors.ActorId self = 3;
 }
 
 // Noop is used when the input or output value of a function or method
@@ -188,7 +188,7 @@ message RegistrationRequest {
 
   ServiceInfo service_info = 1;
 
-  eigr.functions.protocol.actors.ActorSystem actor_system = 2;
+  spawn.actors.ActorSystem actor_system = 2;
 }
 
 message RegistrationResponse {
@@ -226,7 +226,7 @@ message ServiceInfo {
 }
 
 message SpawnRequest {
-  repeated eigr.functions.protocol.actors.ActorId actors = 1;
+  repeated spawn.actors.ActorId actors = 1;
 }
 
 message SpawnResponse { RequestStatus status = 1; }
@@ -338,9 +338,9 @@ message Workflow {
 //   the given name without having to call register before
 message InvocationRequest {
 
-  eigr.functions.protocol.actors.ActorSystem system = 1;
+  spawn.actors.ActorSystem system = 1;
 
-  eigr.functions.protocol.actors.Actor actor = 2;
+  spawn.actors.Actor actor = 2;
 
   string action_name = 3;
 
@@ -351,7 +351,7 @@ message InvocationRequest {
 
   bool async = 5;
 
-  eigr.functions.protocol.actors.ActorId caller = 6;
+  spawn.actors.ActorId caller = 6;
 
   map<string, string> metadata = 8;
 
@@ -383,7 +383,7 @@ message InvocationRequest {
 //   to action_name.
 message ActorInvocation {
 
-  eigr.functions.protocol.actors.ActorId actor = 1;
+  spawn.actors.ActorId actor = 1;
 
   string action_name = 2;
 
@@ -394,7 +394,7 @@ message ActorInvocation {
     Noop noop = 5;
   }
 
-  eigr.functions.protocol.actors.ActorId caller = 6;
+  spawn.actors.ActorId caller = 6;
 }
 
 // The user function's response after executing the action originated by the
@@ -443,9 +443,9 @@ message InvocationResponse {
 
   RequestStatus status = 1;
 
-  eigr.functions.protocol.actors.ActorSystem system = 2;
+  spawn.actors.ActorSystem system = 2;
 
-  eigr.functions.protocol.actors.Actor actor = 3;
+  spawn.actors.Actor actor = 3;
 
   oneof payload {
     google.protobuf.Any value = 4;

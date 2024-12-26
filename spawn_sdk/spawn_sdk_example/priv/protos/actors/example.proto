@@ -2,18 +2,38 @@ syntax = "proto3";
 
 import "google/api/annotations.proto";
 import "example/example.proto";
-import "eigr/functions/protocol/actors/extensions.proto";
+import "spawn/actors/extensions.proto";
 
 package example.actors;
 
 service ExampleActor {
+  option (spawn.actors.settings) = {
+    kind: PROJECTION
+    stateful: true
+    state_type: ".example.ExampleState"
+    snapshot_strategy: {
+      duration_ms: 60000
+    }
+    deactivation_strategy: {
+      duration_ms: 30000
+    }
+    projection_settings: {
+      subjects: [
+        { actor: "ActorA", action: "ActionA", start_time: { seconds: 1672531200 } }
+      ]
+      events_retention_strategy: {
+        duration_ms: 86400000
+      }
+      strict_events_ordering: false
+    }
+  };
+
   rpc ExampleView (.example.ValuePayload) returns (.example.SomeQueryResponse) {
-    option (eigr.functions.protocol.actors.view) = {
-      query: "SELECT id, name, age WHERE name = :customer_name" 
+    option (spawn.actors.view) = {
+      query: "SELECT id, name, age WHERE name = :customer_name"
       map_to: "results"
     };
-    option (google.api.http) = {
-      get: "/v1/messages/{message_id}"
-    };
   }
+
+  rpc ActionA (.example.ValuePayload) returns (.example.SomeQueryResponse) { }
 }

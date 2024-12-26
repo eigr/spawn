@@ -9,7 +9,7 @@ super simple [HTTP stack](https://github.com/eigr/spawn/blob/main/docs/protocol.
 to allow a heterogeneous layer of communication between different services which can, in
 turn, be implemented in any language that supports the gRPC protocol.
 
-The Spawn protocol itself is described [here](https://github.com/eigr/spawn/blob/main/priv/protos/eigr/functions/protocol/actors/protocol.proto).
+The Spawn protocol itself is described [here](https://github.com/eigr/spawn/blob/main/priv/protos/spawn/actors/protocol.proto).
 
 ### The Actor Model
 

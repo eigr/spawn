@@ -7,7 +7,7 @@ defmodule Spawn.Cluster.Node.Server do
   require Logger
   require OpenTelemetry.Tracer, as: Tracer
 
-  alias Eigr.Functions.Protocol.{InvocationRequest, ActorInvocationResponse}
+  alias Spawn.{InvocationRequest, ActorInvocationResponse}
 
   def request(%{topic: topic, body: body, reply_to: reply_to} = req)
       when is_binary(body) do

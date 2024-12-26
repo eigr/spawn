@@ -13,7 +13,7 @@ defmodule Actors.Actor.Entity.Invocation do
   alias Actors.Exceptions.NotAuthorizedException
   alias Actors.Actor.Pubsub
 
-  alias Eigr.Functions.Protocol.Actors.{
+  alias Spawn.Actors.{
     Actor,
     ActorId,
     ActorSettings,
@@ -23,7 +23,7 @@ defmodule Actors.Actor.Entity.Invocation do
     FixedTimerAction
   }
 
-  alias Eigr.Functions.Protocol.{
+  alias Spawn.{
     ActorInvocation,
     ActorInvocationResponse,
     Broadcast,

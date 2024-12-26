@@ -11,12 +11,12 @@ defmodule Sidecar.GRPC.Dispatcher do
   alias Actors.Registry.ActorRegistry
   alias Actors.Registry.HostActor
 
-  alias Eigr.Functions.Protocol.ActorInvocationResponse
-  alias Eigr.Functions.Protocol.Actors.Actor
-  alias Eigr.Functions.Protocol.Actors.ActorId
-  alias Eigr.Functions.Protocol.Actors.ActorSettings
-  alias Eigr.Functions.Protocol.Actors.ActorSystem
-  alias Eigr.Functions.Protocol.InvocationRequest
+  alias Spawn.ActorInvocationResponse
+  alias Spawn.Actors.Actor
+  alias Spawn.Actors.ActorId
+  alias Spawn.Actors.ActorSettings
+  alias Spawn.Actors.ActorSystem
+  alias Spawn.InvocationRequest
 
   alias GRPC.Server
   alias GRPC.Server.Stream, as: GRPCStream
@@ -315,7 +315,7 @@ defmodule Sidecar.GRPC.Dispatcher do
                                                    __pb_extensions__: ext
                                                  }
                                                } ->
-      Map.get(ext, {Eigr.Functions.Protocol.Actors.PbExtension, :actor_id}, false) &&
+      Map.get(ext, {Spawn.Actors.PbExtension, :actor_id}, false) &&
         {ctype, String.to_atom(name)}
     end)
   end
@@ -359,7 +359,7 @@ defmodule Sidecar.GRPC.Dispatcher do
       {:ok, %ActorInvocationResponse{payload: %Google.Protobuf.Any{} = response}} ->
         {:ok, unpack_unknown(response)}
 
-      {:ok, %ActorInvocationResponse{payload: {:noop, %Eigr.Functions.Protocol.Noop{}}}} ->
+      {:ok, %ActorInvocationResponse{payload: {:noop, %Spawn.Noop{}}}} ->
         {:ok, %Google.Protobuf.Empty{}}
 
       :async ->

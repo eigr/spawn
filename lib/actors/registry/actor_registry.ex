@@ -11,7 +11,7 @@ defmodule Actors.Registry.ActorRegistry do
   require Logger
 
   alias Actors.Registry.{HostActor, LoadBalancer}
-  alias Eigr.Functions.Protocol.Actors.{Actor, ActorId}
+  alias Spawn.Actors.{Actor, ActorId}
   alias Spawn.Cluster.StateHandoff.Manager, as: StateHandoff
 
   @doc """

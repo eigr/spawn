@@ -1,4 +1,4 @@
-defmodule Eigr.Functions.Protocol.Actors.Healthcheck.Status do
+defmodule Spawn.Actors.Healthcheck.Status do
   @moduledoc false
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
@@ -67,7 +67,7 @@ defmodule Eigr.Functions.Protocol.Actors.Healthcheck.Status do
   field(:updated_at, 3, type: Google.Protobuf.Timestamp, json_name: "updatedAt")
 end
 
-defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckReply do
+defmodule Spawn.Actors.Healthcheck.HealthCheckReply do
   @moduledoc false
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
@@ -82,7 +82,7 @@ defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckReply do
           number: 1,
           label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.healthcheck.Status",
+          type_name: ".spawn.actors.healthcheck.Status",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -103,26 +103,26 @@ defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckReply do
     }
   end
 
-  field(:status, 1, type: Eigr.Functions.Protocol.Actors.Healthcheck.Status)
+  field(:status, 1, type: Spawn.Actors.Healthcheck.Status)
 end
 
-defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service do
+defmodule Spawn.Actors.Healthcheck.HealthCheckActor.Service do
   @moduledoc false
 
   use GRPC.Service,
-    name: "eigr.functions.protocol.actors.healthcheck.HealthCheckActor",
+    name: "spawn.actors.healthcheck.HealthCheckActor",
     protoc_gen_elixir_version: "0.13.0"
 
   def descriptor do
     # credo:disable-for-next-line
     %Google.Protobuf.FileDescriptorProto{
-      name: "eigr/functions/protocol/actors/healthcheck.proto",
-      package: "eigr.functions.protocol.actors.healthcheck",
+      name: "spawn/actors/healthcheck.proto",
+      package: "spawn.actors.healthcheck",
       dependency: [
         "google/api/annotations.proto",
         "google/protobuf/empty.proto",
         "google/protobuf/timestamp.proto",
-        "eigr/functions/protocol/actors/extensions.proto"
+        "spawn/actors/extensions.proto"
       ],
       message_type: [
         %Google.Protobuf.DescriptorProto{
@@ -190,7 +190,7 @@ defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service do
               number: 1,
               label: :LABEL_OPTIONAL,
               type: :TYPE_MESSAGE,
-              type_name: ".eigr.functions.protocol.actors.healthcheck.Status",
+              type_name: ".spawn.actors.healthcheck.Status",
               default_value: nil,
               options: nil,
               oneof_index: nil,
@@ -218,7 +218,7 @@ defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service do
             %Google.Protobuf.MethodDescriptorProto{
               name: "Liveness",
               input_type: ".google.protobuf.Empty",
-              output_type: ".eigr.functions.protocol.actors.healthcheck.HealthCheckReply",
+              output_type: ".spawn.actors.healthcheck.HealthCheckReply",
               options: %Google.Protobuf.MethodOptions{
                 deprecated: false,
                 idempotency_level: :IDEMPOTENCY_UNKNOWN,
@@ -242,7 +242,7 @@ defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service do
             %Google.Protobuf.MethodDescriptorProto{
               name: "Readiness",
               input_type: ".google.protobuf.Empty",
-              output_type: ".eigr.functions.protocol.actors.healthcheck.HealthCheckReply",
+              output_type: ".spawn.actors.healthcheck.HealthCheckReply",
               options: %Google.Protobuf.MethodOptions{
                 deprecated: false,
                 idempotency_level: :IDEMPOTENCY_UNKNOWN,
@@ -354,7 +354,7 @@ defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [3, 3],
-            span: [7, 0, 57],
+            span: [7, 0, 39],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -362,7 +362,7 @@ defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [2],
-            span: [9, 0, 51],
+            span: [9, 0, 33],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -651,47 +651,37 @@ defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service do
     }
   end
 
-  rpc(
-    :Liveness,
-    Google.Protobuf.Empty,
-    Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckReply,
-    %{
-      http: %{
-        type: Google.Api.PbExtension,
-        value: %Google.Api.HttpRule{
-          selector: "",
-          body: "",
-          additional_bindings: [],
-          response_body: "",
-          pattern: {:get, "/health/liveness"},
-          __unknown_fields__: []
-        }
+  rpc(:Liveness, Google.Protobuf.Empty, Spawn.Actors.Healthcheck.HealthCheckReply, %{
+    http: %{
+      type: Google.Api.PbExtension,
+      value: %Google.Api.HttpRule{
+        selector: "",
+        body: "",
+        additional_bindings: [],
+        response_body: "",
+        pattern: {:get, "/health/liveness"},
+        __unknown_fields__: []
       }
     }
-  )
+  })
 
-  rpc(
-    :Readiness,
-    Google.Protobuf.Empty,
-    Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckReply,
-    %{
-      http: %{
-        type: Google.Api.PbExtension,
-        value: %Google.Api.HttpRule{
-          selector: "",
-          body: "",
-          additional_bindings: [],
-          response_body: "",
-          pattern: {:get, "/health/readiness"},
-          __unknown_fields__: []
-        }
+  rpc(:Readiness, Google.Protobuf.Empty, Spawn.Actors.Healthcheck.HealthCheckReply, %{
+    http: %{
+      type: Google.Api.PbExtension,
+      value: %Google.Api.HttpRule{
+        selector: "",
+        body: "",
+        additional_bindings: [],
+        response_body: "",
+        pattern: {:get, "/health/readiness"},
+        __unknown_fields__: []
       }
     }
-  )
+  })
 end
 
-defmodule Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Stub do
+defmodule Spawn.Actors.Healthcheck.HealthCheckActor.Stub do
   @moduledoc false
 
-  use GRPC.Stub, service: Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.Service
+  use GRPC.Stub, service: Spawn.Actors.Healthcheck.HealthCheckActor.Service
 end

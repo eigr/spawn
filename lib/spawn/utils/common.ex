@@ -3,7 +3,7 @@ defmodule Spawn.Utils.Common do
   require Logger
 
   alias Actors.Config.PersistentTermConfig, as: Config
-  alias Eigr.Functions.Protocol.Actors.ActorId
+  alias Spawn.Actors.ActorId
 
   def build_worker_pool_name(module, parent) do
     case get_environment() do

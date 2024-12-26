@@ -1,13 +1,13 @@
 defmodule ActorsTest do
   use Actors.DataCase, async: false
 
-  alias Eigr.Functions.Protocol.ActorInvocationResponse
-  alias Eigr.Functions.Protocol.Actors.ActorState
-  alias Eigr.Functions.Protocol.Actors.ActorId
-  alias Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckReply
-  alias Eigr.Functions.Protocol.Actors.Healthcheck.Status, as: HealthcheckStatus
+  alias Spawn.ActorInvocationResponse
+  alias Spawn.Actors.ActorState
+  alias Spawn.Actors.ActorId
+  alias Spawn.Actors.Healthcheck.HealthCheckReply
+  alias Spawn.Actors.Healthcheck.Status, as: HealthcheckStatus
 
-  alias Eigr.Functions.Protocol.RegistrationResponse
+  alias Spawn.RegistrationResponse
 
   setup do
     actor_name = "global_actor_test"

@@ -3,9 +3,9 @@ defmodule Activator.Dispatcher.DefaultDispatcher do
 
   require Logger
 
-  alias Eigr.Functions.Protocol.Actors.{Actor, ActorId, ActorSystem}
+  alias Spawn.Actors.{Actor, ActorId, ActorSystem}
 
-  alias Eigr.Functions.Protocol.{
+  alias Spawn.{
     InvocationRequest,
     Noop
   }
