@@ -4,8 +4,8 @@ defmodule Statestores.Projection.Query.QueryBuilder do
   subqueries, and complex WHERE conditions.
   """
 
-  @spec build_query(list(), list(), list(), map()) :: {String.t(), list()}
-  def build_query(select_clause, conditions, order_by, group_by) do
+  @spec build_query(list(), list(), list(), map(), list()) :: {String.t(), list()}
+  def build_query(select_clause, conditions, order_by, group_by, having_clause \\ []) do
     select_sql =
       select_clause
       |> Enum.filter(&valid_select?/1)
@@ -37,11 +37,13 @@ defmodule Statestores.Projection.Query.QueryBuilder do
           end
       end
 
+    having_sql = build_having_clause(having_clause)
+
     query =
       if group_by_sql == "" do
         ["SELECT", select_sql, "FROM projections", where_sql, order_by_sql]
       else
-        ["SELECT", select_sql, "FROM projections", where_sql, group_by_sql, order_by_sql]
+        ["SELECT", select_sql, "FROM projections", where_sql, group_by_sql, having_sql, order_by_sql]
       end
       |> Enum.reject(&(&1 == ""))
       |> Enum.join(" ")
@@ -81,12 +83,34 @@ defmodule Statestores.Projection.Query.QueryBuilder do
     |> (&("WHERE " <> &1)).()
   end
 
+  defp build_having_clause([]), do: ""
+
+  defp build_having_clause(conditions) do
+    conditions
+    |> Enum.map(&build_condition/1)
+    |> Enum.reject(&(&1 == ""))
+    |> Enum.join(" AND ")
+    |> (&("HAVING " <> &1)).()
+  end
+
   defp build_condition({:where, field, operator, value}) when is_tuple(value) do
     subquery = build_subquery(value)
     "#{field} #{operator} (#{subquery})"
   end
 
   defp build_condition({:where, field, operator, value}) do
+    formatted_value =
+      if is_binary(value), do: "'#{String.trim(value, "'")}'", else: value
+
+    "#{field} #{operator} #{formatted_value}"
+  end
+
+  defp build_condition({:having, field, operator, value}) when is_tuple(value) do
+    subquery = build_subquery(value)
+    "#{field} #{operator} (#{subquery})"
+  end
+
+  defp build_condition({:having, field, operator, value}) do
     formatted_value =
       if is_binary(value), do: "'#{String.trim(value, "'")}'", else: value
 

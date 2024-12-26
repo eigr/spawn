@@ -185,4 +185,32 @@ defmodule Projection.Query.BuilderTest do
                    end
     end
   end
+
+  describe "build_query/5 with HAVING clause" do
+    test "generates SQL with valid HAVING clause" do
+      select_clause = [{:sum, :price, []}]
+      conditions = []
+      order_by = []
+      group_by = [:category]
+      having_clause = [{:having, "SUM(price)", ">", 100}]
+
+      {query, _params} =
+        QueryBuilder.build_query(select_clause, conditions, order_by, group_by, having_clause)
+
+      assert query ==
+               "SELECT SUM(tags->>'price')::numeric FROM projections GROUP BY category HAVING SUM(price) > 100"
+    end
+
+    test "returns empty HAVING when no conditions are provided" do
+      select_clause = [{:sum, :price, []}]
+      conditions = []
+      order_by = []
+      group_by = [:price]
+
+      {query, _params} =
+        QueryBuilder.build_query(select_clause, conditions, order_by, group_by, [])
+
+      refute query =~ "HAVING"
+    end
+  end
 end
