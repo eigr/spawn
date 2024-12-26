@@ -5,7 +5,7 @@ defmodule Spawn.Utils.AnySerializer do
   """
 
   alias Google.Protobuf.Any
-  alias Eigr.Functions.Protocol.JSONType
+  alias Spawn.JSONType
 
   import Spawn.Utils.Common, only: [to_existing_atom_or_new: 1]
 

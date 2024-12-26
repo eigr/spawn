@@ -6,13 +6,13 @@ defmodule ActivatorAPI.Api.Dispatcher.UnaryDispatcher do
 
   require Logger
 
-  alias Eigr.Functions.Protocol.Actors.{
+  alias Spawn.Actors.{
     Actor,
     ActorId,
     ActorSystem
   }
 
-  alias Eigr.Functions.Protocol.{
+  alias Spawn.{
     ActorInvocationResponse,
     InvocationRequest,
     Noop

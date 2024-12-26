@@ -13,7 +13,7 @@ defmodule Spawn.Cluster.StateHandoff.Controllers.CrdtController do
   require Logger
 
   alias Actors.Config.PersistentTermConfig, as: Config
-  alias Eigr.Functions.Protocol.Actors.Actor
+  alias Spawn.Actors.Actor
 
   import Spawn.Utils.Common, only: [generate_key: 1, actor_host_hash: 0]
 
@@ -27,7 +27,7 @@ defmodule Spawn.Cluster.StateHandoff.Controllers.CrdtController do
 
   @type new_data :: data()
 
-  @type id :: Eigr.Functions.Protocol.Actors.ActorId.t()
+  @type id :: Spawn.Actors.ActorId.t()
 
   @type host :: Actors.Registry.HostActor.t()
 

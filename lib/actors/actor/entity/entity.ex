@@ -70,16 +70,16 @@ defmodule Actors.Actor.Entity do
   alias Actors.Actor.Entity.Lifecycle
   alias Actors.Actor.Entity.Invocation
 
-  alias Eigr.Functions.Protocol.Actors.Actor
-  alias Eigr.Functions.Protocol.Actors.ActorId
-  alias Eigr.Functions.Protocol.Actors.ActorState
-  alias Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckReply
-  alias Eigr.Functions.Protocol.Actors.Healthcheck.Status, as: HealthcheckStatus
+  alias Spawn.Actors.Actor
+  alias Spawn.Actors.ActorId
+  alias Spawn.Actors.ActorState
+  alias Spawn.Actors.Healthcheck.HealthCheckReply
+  alias Spawn.Actors.Healthcheck.Status, as: HealthcheckStatus
 
-  alias Eigr.Functions.Protocol.ActorInvocationResponse
+  alias Spawn.ActorInvocationResponse
 
-  alias Eigr.Functions.Protocol.State.Checkpoint
-  alias Eigr.Functions.Protocol.State.Revision
+  alias Spawn.State.Checkpoint
+  alias Spawn.State.Revision
 
   alias Spawn.Cluster.Provisioner.Scheduler, as: FlameScheduler
   alias Spawn.Cluster.Provisioner.SpawnTask

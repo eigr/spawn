@@ -2,7 +2,7 @@ defmodule Actors.ActorRegistryTest do
   use Actors.DataCase, async: false
 
   alias Actors.Registry.ActorRegistry
-  alias Eigr.Functions.Protocol.RegistrationResponse
+  alias Spawn.RegistrationResponse
 
   setup do
     actor_name = "actor_registry_test_two_nodes"

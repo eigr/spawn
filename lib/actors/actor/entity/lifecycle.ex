@@ -12,7 +12,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
   alias Actors.Actor.Pubsub
   alias Actors.Actor.StateManager
 
-  alias Eigr.Functions.Protocol.Actors.{
+  alias Spawn.Actors.{
     Actor,
     ActorId,
     ActorDeactivationStrategy,

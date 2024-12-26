@@ -4,7 +4,7 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamConsumer do
 
   alias Broadway.Message
   alias Spawn.Utils.Nats
-  alias Eigr.Functions.Protocol.Fact
+  alias Spawn.Fact
   alias Google.Protobuf.Timestamp
 
   @type fact :: %Fact{}

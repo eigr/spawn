@@ -5,17 +5,17 @@ defmodule Sidecar.ProcessSupervisor do
 
   alias Actors.Config.PersistentTermConfig, as: Config
 
-  alias Eigr.Functions.Protocol.Actors.Actor
-  alias Eigr.Functions.Protocol.Actors.ActorId
-  alias Eigr.Functions.Protocol.Actors.ActorDeactivationStrategy
-  alias Eigr.Functions.Protocol.Actors.ActorSettings
-  alias Eigr.Functions.Protocol.Actors.ActorSystem
-  alias Eigr.Functions.Protocol.Actors.Metadata
-  alias Eigr.Functions.Protocol.Actors.Registry
-  alias Eigr.Functions.Protocol.Actors.TimeoutStrategy
+  alias Spawn.Actors.Actor
+  alias Spawn.Actors.ActorId
+  alias Spawn.Actors.ActorDeactivationStrategy
+  alias Spawn.Actors.ActorSettings
+  alias Spawn.Actors.ActorSystem
+  alias Spawn.Actors.Metadata
+  alias Spawn.Actors.Registry
+  alias Spawn.Actors.TimeoutStrategy
 
-  alias Eigr.Functions.Protocol.RegistrationRequest
-  alias Eigr.Functions.Protocol.ServiceInfo
+  alias Spawn.RegistrationRequest
+  alias Spawn.ServiceInfo
 
   import Spawn.Utils.Common, only: [supervisor_process_logger: 1]
 

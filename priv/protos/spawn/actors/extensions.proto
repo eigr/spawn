@@ -1,8 +1,9 @@
 syntax = "proto3";
 
-package eigr.functions.protocol.actors;
+package spawn.actors;
 
 import "google/protobuf/descriptor.proto";
+import "spawn/actors/actor.proto";
 
 extend google.protobuf.FieldOptions {
   bool actor_id = 9999;
@@ -17,3 +18,6 @@ extend google.protobuf.MethodOptions {
   ActorViewOption view = 4890127;
 }
 
+extend google.protobuf.ServiceOptions {
+  spawn.actors.ActorSettings settings = 4890128;
+}

@@ -3,11 +3,11 @@
 //
 syntax = "proto3";
 
-package eigr.functions.protocol.state;
+package spawn.state;
 
-import "eigr/functions/protocol/actors/actor.proto";
+import "spawn/actors/actor.proto";
 
-option java_package = "io.eigr.functions.protocol.state";
+option java_package = "io.spawn.state";
 option go_package = "github.com/eigr/go-support/eigr/protocol/state;state";
 
 // A revision is just a version number for a record in the snapshot table that stores the actors' state.
@@ -24,5 +24,5 @@ message Checkpoint {
     
     Revision revision = 1;
 
-    eigr.functions.protocol.actors.ActorState state = 2;
+    spawn.actors.ActorState state = 2;
 }

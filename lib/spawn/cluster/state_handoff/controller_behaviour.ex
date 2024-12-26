@@ -10,7 +10,7 @@ defmodule Spawn.Cluster.StateHandoff.ControllerBehaviour do
 
   @type new_data :: data()
 
-  @type id :: Eigr.Functions.Protocol.Actors.ActorId.t()
+  @type id :: Spawn.Actors.ActorId.t()
 
   @type host :: Actors.Registry.HostActor.t()
 

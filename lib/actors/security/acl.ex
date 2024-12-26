@@ -2,7 +2,7 @@ defmodule Actors.Security.Acl do
   @moduledoc """
   `Acl` is a acces control list helper module
   """
-  alias Eigr.Functions.Protocol.InvocationRequest
+  alias Spawn.InvocationRequest
 
   @type base_policies_path :: String.t()
   @type invocation :: InvocationRequest.t()

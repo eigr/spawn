@@ -11,7 +11,7 @@ defmodule Actors.Actor.Entity.Supervisor do
 
   alias Actors.Actor.Entity.EntityState
   alias Actors.Config.PersistentTermConfig, as: Config
-  alias Eigr.Functions.Protocol.Actors.{Actor, ActorSystem}
+  alias Spawn.Actors.{Actor, ActorSystem}
 
   @default_number_of_partitions 8
   @shutdown_timeout_ms 330_000

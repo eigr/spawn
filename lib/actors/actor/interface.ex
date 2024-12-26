@@ -4,7 +4,7 @@ defmodule Actors.Actor.Interface do
   """
 
   alias Actors.Actor.Entity.EntityState
-  alias Eigr.Functions.Protocol.ActorInvocation
+  alias Spawn.ActorInvocation
 
   @type state :: EntityState.t()
   @type payload :: ActorInvocation.t()

@@ -10,12 +10,12 @@ defmodule Actors do
   alias Actors.Actor.CallerProducer
   alias Actors.Config.PersistentTermConfig, as: Config
 
-  alias Eigr.Functions.Protocol.Actors.{
+  alias Spawn.Actors.{
     ActorId,
     ActorSystem
   }
 
-  alias Eigr.Functions.Protocol.{
+  alias Spawn.{
     ActorInvocationResponse,
     InvocationRequest,
     RegistrationRequest,
