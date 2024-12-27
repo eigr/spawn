@@ -131,7 +131,10 @@ defmodule Actors.Actor.Entity.Lifecycle do
       {:not_found, %{}, _current_revision} ->
         Logger.debug("Not found state on statestore for Actor #{inspect(actor.id)}.")
 
-        initial_state = %{state.actor.state | state: maybe_parse_empty_struct(state_type)}
+        initial_state = %{
+          state.actor.state
+          | state: state.actor.state.state || maybe_parse_empty_struct(state_type)
+        }
 
         {:noreply, updated_state(state, initial_state, revision), {:continue, :call_init_action}}
 

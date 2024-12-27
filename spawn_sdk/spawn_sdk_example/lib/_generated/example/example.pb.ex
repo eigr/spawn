@@ -60,8 +60,8 @@ defmodule Example.ValuePayload do
     }
   end
 
-  field :value, 1, type: :int32
-  field :id, 2, type: :string, deprecated: false
+  field(:value, 1, type: :int32)
+  field(:id, 2, type: :string, deprecated: false)
 end
 
 defmodule Example.ExampleState do
@@ -100,7 +100,7 @@ defmodule Example.ExampleState do
     }
   end
 
-  field :value, 1, type: :int32
+  field(:value, 1, type: :int32)
 end
 
 defmodule Example.SumResponse do
@@ -139,7 +139,7 @@ defmodule Example.SumResponse do
     }
   end
 
-  field :value, 1, type: :int32
+  field(:value, 1, type: :int32)
 end
 
 defmodule Example.SomeQueryResponse do
@@ -178,5 +178,5 @@ defmodule Example.SomeQueryResponse do
     }
   end
 
-  field :results, 1, repeated: true, type: Example.SumResponse
+  field(:results, 1, repeated: true, type: Example.SumResponse)
 end
