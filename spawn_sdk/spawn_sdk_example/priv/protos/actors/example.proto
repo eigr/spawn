@@ -7,25 +7,12 @@ import "spawn/actors/extensions.proto";
 package example.actors;
 
 service ExampleActor {
-  option (spawn.actors.settings) = {
-    kind: PROJECTION
+  option (spawn.actors.actor) = {
+    kind: NAMED
     stateful: true
     state_type: ".example.ExampleState"
-    snapshot_strategy: {
-      duration_ms: 60000
-    }
-    deactivation_strategy: {
-      duration_ms: 30000
-    }
-    projection_settings: {
-      subjects: [
-        { actor: "ActorA", action: "ActionA", start_time: { seconds: 1672531200 } }
-      ]
-      events_retention_strategy: {
-        duration_ms: 86400000
-      }
-      strict_events_ordering: false
-    }
+    snapshot_interval: 60000
+    deactivate_timeout: 3000
   };
 
   rpc ExampleView (.example.ValuePayload) returns (.example.SomeQueryResponse) {
@@ -35,5 +22,10 @@ service ExampleActor {
     };
   }
 
-  rpc ActionA (.example.ValuePayload) returns (.example.SomeQueryResponse) { }
+  rpc Sum (.example.ValuePayload) returns (.example.SumResponse) {
+    option (google.api.http) = {
+      post: "/v1/example/sum"
+      body: "*"
+    };
+  }
 }

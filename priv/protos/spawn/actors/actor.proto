@@ -21,10 +21,7 @@ message ActorSystem {
 message ActorSnapshotStrategy {
   oneof strategy {
     // the timeout strategy.
-    TimeoutStrategy timeout = 1 [deprecated = true];
-
-    // simplified strategy based on duration in milliseconds
-    int64 duration_ms = 2;
+    TimeoutStrategy timeout = 1;
   }
 }
 
@@ -32,10 +29,7 @@ message ActorSnapshotStrategy {
 message ActorDeactivationStrategy {
   oneof strategy {
     // the timeout strategy.
-    TimeoutStrategy timeout = 1 [deprecated = true];
-  
-    // simplified strategy based on duration in milliseconds
-    int64 duration_ms = 2;
+    TimeoutStrategy timeout = 1;
   }
 }
 

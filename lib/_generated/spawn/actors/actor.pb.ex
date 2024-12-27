@@ -291,35 +291,9 @@ defmodule Spawn.Actors.ActorSnapshotStrategy do
           type: :TYPE_MESSAGE,
           type_name: ".spawn.actors.TimeoutStrategy",
           default_value: nil,
-          options: %Google.Protobuf.FieldOptions{
-            ctype: :STRING,
-            packed: nil,
-            deprecated: true,
-            lazy: false,
-            jstype: :JS_NORMAL,
-            weak: false,
-            unverified_lazy: false,
-            debug_redact: false,
-            uninterpreted_option: [],
-            __pb_extensions__: %{},
-            __unknown_fields__: []
-          },
-          oneof_index: 0,
-          json_name: "timeout",
-          proto3_optional: nil,
-          __unknown_fields__: []
-        },
-        %Google.Protobuf.FieldDescriptorProto{
-          name: "duration_ms",
-          extendee: nil,
-          number: 2,
-          label: :LABEL_OPTIONAL,
-          type: :TYPE_INT64,
-          type_name: nil,
-          default_value: nil,
           options: nil,
           oneof_index: 0,
-          json_name: "durationMs",
+          json_name: "timeout",
           proto3_optional: nil,
           __unknown_fields__: []
         }
@@ -344,8 +318,7 @@ defmodule Spawn.Actors.ActorSnapshotStrategy do
 
   oneof(:strategy, 0)
 
-  field(:timeout, 1, type: Spawn.Actors.TimeoutStrategy, oneof: 0, deprecated: true)
-  field(:duration_ms, 2, type: :int64, json_name: "durationMs", oneof: 0)
+  field(:timeout, 1, type: Spawn.Actors.TimeoutStrategy, oneof: 0)
 end
 
 defmodule Spawn.Actors.ActorDeactivationStrategy do
@@ -365,35 +338,9 @@ defmodule Spawn.Actors.ActorDeactivationStrategy do
           type: :TYPE_MESSAGE,
           type_name: ".spawn.actors.TimeoutStrategy",
           default_value: nil,
-          options: %Google.Protobuf.FieldOptions{
-            ctype: :STRING,
-            packed: nil,
-            deprecated: true,
-            lazy: false,
-            jstype: :JS_NORMAL,
-            weak: false,
-            unverified_lazy: false,
-            debug_redact: false,
-            uninterpreted_option: [],
-            __pb_extensions__: %{},
-            __unknown_fields__: []
-          },
-          oneof_index: 0,
-          json_name: "timeout",
-          proto3_optional: nil,
-          __unknown_fields__: []
-        },
-        %Google.Protobuf.FieldDescriptorProto{
-          name: "duration_ms",
-          extendee: nil,
-          number: 2,
-          label: :LABEL_OPTIONAL,
-          type: :TYPE_INT64,
-          type_name: nil,
-          default_value: nil,
           options: nil,
           oneof_index: 0,
-          json_name: "durationMs",
+          json_name: "timeout",
           proto3_optional: nil,
           __unknown_fields__: []
         }
@@ -418,8 +365,7 @@ defmodule Spawn.Actors.ActorDeactivationStrategy do
 
   oneof(:strategy, 0)
 
-  field(:timeout, 1, type: Spawn.Actors.TimeoutStrategy, oneof: 0, deprecated: true)
-  field(:duration_ms, 2, type: :int64, json_name: "durationMs", oneof: 0)
+  field(:timeout, 1, type: Spawn.Actors.TimeoutStrategy, oneof: 0)
 end
 
 defmodule Spawn.Actors.TimeoutStrategy do

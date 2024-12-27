@@ -20,22 +20,23 @@ defmodule Spawn.Utils.AnySerializer do
   def unpack_unknown(%{type_url: type_url} = any) do
     package_name = normalize_package_name(type_url)
 
-    any_unpack!(any, to_existing_atom_or_new(package_name))
+    any_unpack!(any, package_name)
     |> maybe_unpack_json!
   end
 
   def unpack_unknown(_), do: nil
 
-  defp normalize_package_name(type_url) do
+  def normalize_package_name(type_url) do
     type_url
     |> String.replace("type.googleapis.com/", "")
     |> normalize_no_package()
     |> normalize_and_capitalize()
     |> then(fn package -> Enum.join(["Elixir", package], ".") end)
+    |> to_existing_atom_or_new()
   end
 
-  defp normalize_no_package("." <> rest), do: rest
-  defp normalize_no_package(rest), do: rest
+  def normalize_no_package("." <> rest), do: rest
+  def normalize_no_package(rest), do: rest
 
   defp normalize_and_capitalize(str) do
     str

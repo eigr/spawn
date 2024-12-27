@@ -1,10 +1,5 @@
 defmodule SpawnSdkExample.Actors.ExampleActor do
-  use SpawnSdk.Actor,
-    name: "ExampleActor",
-    kind: :unnamed,
-    state_type: Example.ExampleState,
-    deactivate_timeout: 60_000,
-    snapshot_timeout: 2_000
+  use SpawnSdk.Actor, name: "ExampleActor"
 
   require Logger
 

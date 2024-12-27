@@ -267,7 +267,12 @@ defmodule SpawnSdk.System.SpawnSystem do
     %SpawnSdk.Value{state: host_state, value: response, tags: tags} = decoded_value
 
     %EntityState{
-      actor: %Actor{state: actor_state, id: self_actor_id} = actor
+      actor:
+        %Actor{
+          state: actor_state,
+          id: self_actor_id,
+          settings: %ActorSettings{} = actor_settings
+        } = actor
     } = entity_state
 
     %ActorInvocation{
@@ -285,7 +290,10 @@ defmodule SpawnSdk.System.SpawnSystem do
     side_effects = handle_side_effects(name, system, decoded_value)
 
     payload_response = parse_payload(response)
-    state_type = actor_instance.__meta__(:state_type)
+
+    state_type =
+      maybe_get_state_type_from_settings(actor_settings) ||
+        actor_instance.__meta__(:state_type)
 
     new_state =
       case pack_all_to_any(host_state || current_state, state_type) do
@@ -667,5 +675,15 @@ defmodule SpawnSdk.System.SpawnSystem do
   rescue
     # when returned type is a struct but not a protobuf
     UndefinedFunctionError -> json_any_pack!(response)
+  end
+
+  defp maybe_get_state_type_from_settings(actor_settings) do
+    case actor_settings do
+      %ActorSettings{state_type: state_type} when state_type != "" and not is_nil(state_type) ->
+        Spawn.Utils.AnySerializer.normalize_package_name(state_type)
+
+      _ ->
+        nil
+    end
   end
 end
