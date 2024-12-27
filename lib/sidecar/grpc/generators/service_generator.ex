@@ -29,7 +29,7 @@ defmodule Sidecar.GRPC.Generators.ServiceGenerator do
         [
           Sidecar.GRPC.Reflection.Server.V1,
           Sidecar.GRPC.Reflection.Server.V1Alpha,
-          Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.ActorDispatcher
+          Spawn.Actors.Healthcheck.HealthCheckActor.ActorDispatcher
         ] ++ services
 
       run(services)

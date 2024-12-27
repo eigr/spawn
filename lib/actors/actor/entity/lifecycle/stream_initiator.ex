@@ -6,9 +6,9 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamInitiator do
 
   alias Actors.Actor.Entity.Lifecycle.StreamConsumer
 
-  alias Eigr.Functions.Protocol.Actors.Actor
-  alias Eigr.Functions.Protocol.Actors.ProjectionSettings
-  alias Eigr.Functions.Protocol.Actors.ProjectionSubject
+  alias Spawn.Actors.Actor
+  alias Spawn.Actors.ProjectionSettings
+  alias Spawn.Actors.ProjectionSubject
 
   alias Google.Protobuf.Timestamp
 
@@ -130,11 +130,10 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamInitiator do
   end
 
   defp build_stream_max_age(%ProjectionSettings{} = settings) do
-    case Map.get(settings.events_retention_strategy, :strategy, {:time_in_ms, @one_day_in_ms}) do
+    case Map.get(settings.events_retention_strategy, :strategy, {:duration_ms, @one_day_in_ms}) do
       {:infinite, true} -> 0
       # ms to ns
-      {:time_in_ms, %{time: max_age}} -> max_age * 1_000_000
-      {:time_in_ms, max_age} -> max_age * 1_000_000
+      {:duration_ms, max_age} -> max_age * 1_000_000
     end
   end
 

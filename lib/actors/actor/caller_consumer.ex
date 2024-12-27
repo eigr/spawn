@@ -18,16 +18,21 @@ defmodule Actors.Actor.CallerConsumer do
 
   alias Actors.Registry.{ActorRegistry, HostActor}
 
-  alias Eigr.Functions.Protocol.Actors.{
+  alias Spawn.Actors.{
     Actor,
     ActorId,
     Metadata,
     ActorSettings,
     ActorSystem,
-    Registry
+    Registry,
+    ActorOpts,
+    TimeoutStrategy,
+    ProjectionSettings,
+    ActorDeactivationStrategy,
+    ActorSnapshotStrategy
   }
 
-  alias Eigr.Functions.Protocol.{
+  alias Spawn.{
     InvocationRequest,
     ProxyInfo,
     RegistrationRequest,
@@ -163,6 +168,8 @@ defmodule Actors.Actor.CallerConsumer do
         } = _registration,
         opts
       ) do
+    actors = actors |> Enum.map(&maybe_replace_actor_settings_with_proto/1) |> Map.new()
+
     if Sidecar.GracefulShutdown.running?() do
       actors
       |> Map.values()
@@ -191,6 +198,36 @@ defmodule Actors.Actor.CallerConsumer do
       }
 
       {:error, %RegistrationResponse{proxy_info: get_proxy_info(), status: status}}
+    end
+  end
+
+  defp maybe_replace_actor_settings_with_proto({actor_name, actor}) do
+    actor_opts = :persistent_term.get("actor-#{actor_name}", nil)
+
+    if is_nil(actor_opts) do
+      {actor_name, actor}
+    else
+      settings = %ActorSettings{
+        actor.settings
+        | kind: actor_opts.kind,
+          stateful: actor_opts.stateful,
+          state_type: actor_opts.state_type,
+          snapshot_strategy: %ActorSnapshotStrategy{
+            strategy: {:timeout, %TimeoutStrategy{timeout: actor_opts.snapshot_interval}}
+          },
+          deactivation_strategy: %ActorDeactivationStrategy{
+            strategy: {:timeout, %TimeoutStrategy{timeout: actor_opts.deactivate_timeout}}
+          },
+          projection_settings: %ProjectionSettings{
+            actor.settings.projection_settings
+            | sourceable: actor_opts.sourceable,
+              strict_events_ordering: actor_opts.strict_events_ordering,
+              events_retention_strategy: actor_opts.events_retention_strategy,
+              subjects: actor_opts.subjects
+          }
+      }
+
+      {actor_name, %Actor{actor | settings: settings}}
     end
   end
 

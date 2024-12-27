@@ -5,12 +5,12 @@ defmodule Actors.Security.Acl.Rules.AclEvaluator do
   """
   alias Actors.Security.Acl.Policy
 
-  alias Eigr.Functions.Protocol.Actors.{
+  alias Spawn.Actors.{
     Actor,
     ActorId
   }
 
-  alias Eigr.Functions.Protocol.InvocationRequest
+  alias Spawn.InvocationRequest
 
   @doc """
   Applies a policy on a request by evaluating whether the request should pass or not.
@@ -25,10 +25,10 @@ defmodule Actors.Security.Acl.Rules.AclEvaluator do
       ...>   actions: ["get"],
       ...>   actor_systems: ["*"]
       ...> },
-      ...> %Eigr.Functions.Protocol.InvocationRequest{
-      ...>    actor: %Eigr.Functions.Protocol.Actors.Actor{id: %Eigr.Functions.Protocol.Actors.ActorId{name: "joe"}},
+      ...> %Spawn.InvocationRequest{
+      ...>    actor: %Spawn.Actors.Actor{id: %Spawn.Actors.ActorId{name: "joe"}},
       ...>    action_name: "get",
-      ...>    caller: %Eigr.Functions.Protocol.Actors.ActorId{name: "robert", system: "actor-system"}
+      ...>    caller: %Spawn.Actors.ActorId{name: "robert", system: "actor-system"}
       ...> }
       ...> )
       true

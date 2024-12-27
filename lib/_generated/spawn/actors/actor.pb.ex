@@ -1,4 +1,4 @@
-defmodule Eigr.Functions.Protocol.Actors.Kind do
+defmodule Spawn.Actors.Kind do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
@@ -66,7 +66,7 @@ defmodule Eigr.Functions.Protocol.Actors.Kind do
   field(:PROJECTION, 6)
 end
 
-defmodule Eigr.Functions.Protocol.Actors.Registry.ActorsEntry do
+defmodule Spawn.Actors.Registry.ActorsEntry do
   @moduledoc false
   use Protobuf, map: true, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
@@ -95,7 +95,7 @@ defmodule Eigr.Functions.Protocol.Actors.Registry.ActorsEntry do
           number: 2,
           label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.Actor",
+          type_name: ".spawn.actors.Actor",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -126,10 +126,10 @@ defmodule Eigr.Functions.Protocol.Actors.Registry.ActorsEntry do
   end
 
   field(:key, 1, type: :string)
-  field(:value, 2, type: Eigr.Functions.Protocol.Actors.Actor)
+  field(:value, 2, type: Spawn.Actors.Actor)
 end
 
-defmodule Eigr.Functions.Protocol.Actors.Registry do
+defmodule Spawn.Actors.Registry do
   @moduledoc false
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
@@ -144,7 +144,7 @@ defmodule Eigr.Functions.Protocol.Actors.Registry do
           number: 1,
           label: :LABEL_REPEATED,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.Registry.ActorsEntry",
+          type_name: ".spawn.actors.Registry.ActorsEntry",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -177,7 +177,7 @@ defmodule Eigr.Functions.Protocol.Actors.Registry do
               number: 2,
               label: :LABEL_OPTIONAL,
               type: :TYPE_MESSAGE,
-              type_name: ".eigr.functions.protocol.actors.Actor",
+              type_name: ".spawn.actors.Actor",
               default_value: nil,
               options: nil,
               oneof_index: nil,
@@ -217,14 +217,10 @@ defmodule Eigr.Functions.Protocol.Actors.Registry do
     }
   end
 
-  field(:actors, 1,
-    repeated: true,
-    type: Eigr.Functions.Protocol.Actors.Registry.ActorsEntry,
-    map: true
-  )
+  field(:actors, 1, repeated: true, type: Spawn.Actors.Registry.ActorsEntry, map: true)
 end
 
-defmodule Eigr.Functions.Protocol.Actors.ActorSystem do
+defmodule Spawn.Actors.ActorSystem do
   @moduledoc false
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
@@ -253,7 +249,7 @@ defmodule Eigr.Functions.Protocol.Actors.ActorSystem do
           number: 2,
           label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.Registry",
+          type_name: ".spawn.actors.Registry",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -275,10 +271,10 @@ defmodule Eigr.Functions.Protocol.Actors.ActorSystem do
   end
 
   field(:name, 1, type: :string)
-  field(:registry, 2, type: Eigr.Functions.Protocol.Actors.Registry)
+  field(:registry, 2, type: Spawn.Actors.Registry)
 end
 
-defmodule Eigr.Functions.Protocol.Actors.ActorSnapshotStrategy do
+defmodule Spawn.Actors.ActorSnapshotStrategy do
   @moduledoc false
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
@@ -293,7 +289,7 @@ defmodule Eigr.Functions.Protocol.Actors.ActorSnapshotStrategy do
           number: 1,
           label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.TimeoutStrategy",
+          type_name: ".spawn.actors.TimeoutStrategy",
           default_value: nil,
           options: nil,
           oneof_index: 0,
@@ -322,10 +318,10 @@ defmodule Eigr.Functions.Protocol.Actors.ActorSnapshotStrategy do
 
   oneof(:strategy, 0)
 
-  field(:timeout, 1, type: Eigr.Functions.Protocol.Actors.TimeoutStrategy, oneof: 0)
+  field(:timeout, 1, type: Spawn.Actors.TimeoutStrategy, oneof: 0)
 end
 
-defmodule Eigr.Functions.Protocol.Actors.ActorDeactivationStrategy do
+defmodule Spawn.Actors.ActorDeactivationStrategy do
   @moduledoc false
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
@@ -340,7 +336,7 @@ defmodule Eigr.Functions.Protocol.Actors.ActorDeactivationStrategy do
           number: 1,
           label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.TimeoutStrategy",
+          type_name: ".spawn.actors.TimeoutStrategy",
           default_value: nil,
           options: nil,
           oneof_index: 0,
@@ -369,10 +365,10 @@ defmodule Eigr.Functions.Protocol.Actors.ActorDeactivationStrategy do
 
   oneof(:strategy, 0)
 
-  field(:timeout, 1, type: Eigr.Functions.Protocol.Actors.TimeoutStrategy, oneof: 0)
+  field(:timeout, 1, type: Spawn.Actors.TimeoutStrategy, oneof: 0)
 end
 
-defmodule Eigr.Functions.Protocol.Actors.TimeoutStrategy do
+defmodule Spawn.Actors.TimeoutStrategy do
   @moduledoc false
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
@@ -411,7 +407,7 @@ defmodule Eigr.Functions.Protocol.Actors.TimeoutStrategy do
   field(:timeout, 1, type: :int64)
 end
 
-defmodule Eigr.Functions.Protocol.Actors.Action do
+defmodule Spawn.Actors.Action do
   @moduledoc false
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
@@ -450,7 +446,7 @@ defmodule Eigr.Functions.Protocol.Actors.Action do
   field(:name, 1, type: :string)
 end
 
-defmodule Eigr.Functions.Protocol.Actors.FixedTimerAction do
+defmodule Spawn.Actors.FixedTimerAction do
   @moduledoc false
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
@@ -479,7 +475,7 @@ defmodule Eigr.Functions.Protocol.Actors.FixedTimerAction do
           number: 2,
           label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.Action",
+          type_name: ".spawn.actors.Action",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -501,10 +497,10 @@ defmodule Eigr.Functions.Protocol.Actors.FixedTimerAction do
   end
 
   field(:seconds, 1, type: :int32)
-  field(:action, 2, type: Eigr.Functions.Protocol.Actors.Action)
+  field(:action, 2, type: Spawn.Actors.Action)
 end
 
-defmodule Eigr.Functions.Protocol.Actors.ActorState.TagsEntry do
+defmodule Spawn.Actors.ActorState.TagsEntry do
   @moduledoc false
   use Protobuf, map: true, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
@@ -567,7 +563,7 @@ defmodule Eigr.Functions.Protocol.Actors.ActorState.TagsEntry do
   field(:value, 2, type: :string)
 end
 
-defmodule Eigr.Functions.Protocol.Actors.ActorState do
+defmodule Spawn.Actors.ActorState do
   @moduledoc false
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
@@ -582,7 +578,7 @@ defmodule Eigr.Functions.Protocol.Actors.ActorState do
           number: 1,
           label: :LABEL_REPEATED,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.ActorState.TagsEntry",
+          type_name: ".spawn.actors.ActorState.TagsEntry",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -669,16 +665,11 @@ defmodule Eigr.Functions.Protocol.Actors.ActorState do
     }
   end
 
-  field(:tags, 1,
-    repeated: true,
-    type: Eigr.Functions.Protocol.Actors.ActorState.TagsEntry,
-    map: true
-  )
-
+  field(:tags, 1, repeated: true, type: Spawn.Actors.ActorState.TagsEntry, map: true)
   field(:state, 2, type: Google.Protobuf.Any)
 end
 
-defmodule Eigr.Functions.Protocol.Actors.Metadata.TagsEntry do
+defmodule Spawn.Actors.Metadata.TagsEntry do
   @moduledoc false
   use Protobuf, map: true, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
@@ -741,7 +732,7 @@ defmodule Eigr.Functions.Protocol.Actors.Metadata.TagsEntry do
   field(:value, 2, type: :string)
 end
 
-defmodule Eigr.Functions.Protocol.Actors.Metadata do
+defmodule Spawn.Actors.Metadata do
   @moduledoc false
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
@@ -756,7 +747,7 @@ defmodule Eigr.Functions.Protocol.Actors.Metadata do
           number: 1,
           label: :LABEL_REPEATED,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.Channel",
+          type_name: ".spawn.actors.Channel",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -770,7 +761,7 @@ defmodule Eigr.Functions.Protocol.Actors.Metadata do
           number: 2,
           label: :LABEL_REPEATED,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.Metadata.TagsEntry",
+          type_name: ".spawn.actors.Metadata.TagsEntry",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -843,20 +834,11 @@ defmodule Eigr.Functions.Protocol.Actors.Metadata do
     }
   end
 
-  field(:channel_group, 1,
-    repeated: true,
-    type: Eigr.Functions.Protocol.Actors.Channel,
-    json_name: "channelGroup"
-  )
-
-  field(:tags, 2,
-    repeated: true,
-    type: Eigr.Functions.Protocol.Actors.Metadata.TagsEntry,
-    map: true
-  )
+  field(:channel_group, 1, repeated: true, type: Spawn.Actors.Channel, json_name: "channelGroup")
+  field(:tags, 2, repeated: true, type: Spawn.Actors.Metadata.TagsEntry, map: true)
 end
 
-defmodule Eigr.Functions.Protocol.Actors.Channel do
+defmodule Spawn.Actors.Channel do
   @moduledoc false
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
@@ -910,7 +892,7 @@ defmodule Eigr.Functions.Protocol.Actors.Channel do
   field(:action, 2, type: :string)
 end
 
-defmodule Eigr.Functions.Protocol.Actors.ProjectionSubject do
+defmodule Spawn.Actors.ProjectionSubject do
   @moduledoc false
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
@@ -979,46 +961,7 @@ defmodule Eigr.Functions.Protocol.Actors.ProjectionSubject do
   field(:start_time, 3, type: Google.Protobuf.Timestamp, json_name: "startTime")
 end
 
-defmodule Eigr.Functions.Protocol.Actors.EventsRetentionTime do
-  @moduledoc false
-  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
-
-  def descriptor do
-    # credo:disable-for-next-line
-    %Google.Protobuf.DescriptorProto{
-      name: "EventsRetentionTime",
-      field: [
-        %Google.Protobuf.FieldDescriptorProto{
-          name: "time",
-          extendee: nil,
-          number: 1,
-          label: :LABEL_OPTIONAL,
-          type: :TYPE_INT64,
-          type_name: nil,
-          default_value: nil,
-          options: nil,
-          oneof_index: nil,
-          json_name: "time",
-          proto3_optional: nil,
-          __unknown_fields__: []
-        }
-      ],
-      nested_type: [],
-      enum_type: [],
-      extension_range: [],
-      extension: [],
-      options: nil,
-      oneof_decl: [],
-      reserved_range: [],
-      reserved_name: [],
-      __unknown_fields__: []
-    }
-  end
-
-  field(:time, 1, type: :int64)
-end
-
-defmodule Eigr.Functions.Protocol.Actors.EventsRetentionStrategy do
+defmodule Spawn.Actors.EventsRetentionStrategy do
   @moduledoc false
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
@@ -1028,16 +971,16 @@ defmodule Eigr.Functions.Protocol.Actors.EventsRetentionStrategy do
       name: "EventsRetentionStrategy",
       field: [
         %Google.Protobuf.FieldDescriptorProto{
-          name: "time_in_ms",
+          name: "duration_ms",
           extendee: nil,
           number: 1,
           label: :LABEL_OPTIONAL,
-          type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.EventsRetentionTime",
+          type: :TYPE_INT64,
+          type_name: nil,
           default_value: nil,
           options: nil,
           oneof_index: 0,
-          json_name: "timeInMs",
+          json_name: "durationMs",
           proto3_optional: nil,
           __unknown_fields__: []
         },
@@ -1076,16 +1019,11 @@ defmodule Eigr.Functions.Protocol.Actors.EventsRetentionStrategy do
 
   oneof(:strategy, 0)
 
-  field(:time_in_ms, 1,
-    type: Eigr.Functions.Protocol.Actors.EventsRetentionTime,
-    json_name: "timeInMs",
-    oneof: 0
-  )
-
+  field(:duration_ms, 1, type: :int64, json_name: "durationMs", oneof: 0)
   field(:infinite, 2, type: :bool, oneof: 0)
 end
 
-defmodule Eigr.Functions.Protocol.Actors.ProjectionSettings do
+defmodule Spawn.Actors.ProjectionSettings do
   @moduledoc false
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
@@ -1100,7 +1038,7 @@ defmodule Eigr.Functions.Protocol.Actors.ProjectionSettings do
           number: 1,
           label: :LABEL_REPEATED,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.ProjectionSubject",
+          type_name: ".spawn.actors.ProjectionSubject",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -1128,7 +1066,7 @@ defmodule Eigr.Functions.Protocol.Actors.ProjectionSettings do
           number: 3,
           label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.EventsRetentionStrategy",
+          type_name: ".spawn.actors.EventsRetentionStrategy",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -1163,18 +1101,18 @@ defmodule Eigr.Functions.Protocol.Actors.ProjectionSettings do
     }
   end
 
-  field(:subjects, 1, repeated: true, type: Eigr.Functions.Protocol.Actors.ProjectionSubject)
+  field(:subjects, 1, repeated: true, type: Spawn.Actors.ProjectionSubject)
   field(:sourceable, 2, type: :bool)
 
   field(:events_retention_strategy, 3,
-    type: Eigr.Functions.Protocol.Actors.EventsRetentionStrategy,
+    type: Spawn.Actors.EventsRetentionStrategy,
     json_name: "eventsRetentionStrategy"
   )
 
   field(:strict_events_ordering, 4, type: :bool, json_name: "strictEventsOrdering")
 end
 
-defmodule Eigr.Functions.Protocol.Actors.ActorSettings do
+defmodule Spawn.Actors.ActorSettings do
   @moduledoc false
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
@@ -1189,7 +1127,7 @@ defmodule Eigr.Functions.Protocol.Actors.ActorSettings do
           number: 1,
           label: :LABEL_OPTIONAL,
           type: :TYPE_ENUM,
-          type_name: ".eigr.functions.protocol.actors.Kind",
+          type_name: ".spawn.actors.Kind",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -1217,7 +1155,7 @@ defmodule Eigr.Functions.Protocol.Actors.ActorSettings do
           number: 3,
           label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.ActorSnapshotStrategy",
+          type_name: ".spawn.actors.ActorSnapshotStrategy",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -1231,7 +1169,7 @@ defmodule Eigr.Functions.Protocol.Actors.ActorSettings do
           number: 4,
           label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.ActorDeactivationStrategy",
+          type_name: ".spawn.actors.ActorDeactivationStrategy",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -1273,11 +1211,25 @@ defmodule Eigr.Functions.Protocol.Actors.ActorSettings do
           number: 7,
           label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.ProjectionSettings",
+          type_name: ".spawn.actors.ProjectionSettings",
           default_value: nil,
           options: nil,
           oneof_index: nil,
           json_name: "projectionSettings",
+          proto3_optional: nil,
+          __unknown_fields__: []
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "state_type",
+          extendee: nil,
+          number: 8,
+          label: :LABEL_OPTIONAL,
+          type: :TYPE_STRING,
+          type_name: nil,
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "stateType",
           proto3_optional: nil,
           __unknown_fields__: []
         }
@@ -1294,16 +1246,16 @@ defmodule Eigr.Functions.Protocol.Actors.ActorSettings do
     }
   end
 
-  field(:kind, 1, type: Eigr.Functions.Protocol.Actors.Kind, enum: true)
+  field(:kind, 1, type: Spawn.Actors.Kind, enum: true)
   field(:stateful, 2, type: :bool)
 
   field(:snapshot_strategy, 3,
-    type: Eigr.Functions.Protocol.Actors.ActorSnapshotStrategy,
+    type: Spawn.Actors.ActorSnapshotStrategy,
     json_name: "snapshotStrategy"
   )
 
   field(:deactivation_strategy, 4,
-    type: Eigr.Functions.Protocol.Actors.ActorDeactivationStrategy,
+    type: Spawn.Actors.ActorDeactivationStrategy,
     json_name: "deactivationStrategy"
   )
 
@@ -1311,12 +1263,14 @@ defmodule Eigr.Functions.Protocol.Actors.ActorSettings do
   field(:max_pool_size, 6, type: :int32, json_name: "maxPoolSize")
 
   field(:projection_settings, 7,
-    type: Eigr.Functions.Protocol.Actors.ProjectionSettings,
+    type: Spawn.Actors.ProjectionSettings,
     json_name: "projectionSettings"
   )
+
+  field(:state_type, 8, type: :string, json_name: "stateType")
 end
 
-defmodule Eigr.Functions.Protocol.Actors.ActorId do
+defmodule Spawn.Actors.ActorId do
   @moduledoc false
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
@@ -1385,7 +1339,7 @@ defmodule Eigr.Functions.Protocol.Actors.ActorId do
   field(:parent, 3, type: :string)
 end
 
-defmodule Eigr.Functions.Protocol.Actors.Actor do
+defmodule Spawn.Actors.Actor do
   @moduledoc false
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
@@ -1400,7 +1354,7 @@ defmodule Eigr.Functions.Protocol.Actors.Actor do
           number: 1,
           label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.ActorId",
+          type_name: ".spawn.actors.ActorId",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -1414,7 +1368,7 @@ defmodule Eigr.Functions.Protocol.Actors.Actor do
           number: 2,
           label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.ActorState",
+          type_name: ".spawn.actors.ActorState",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -1428,7 +1382,7 @@ defmodule Eigr.Functions.Protocol.Actors.Actor do
           number: 6,
           label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.Metadata",
+          type_name: ".spawn.actors.Metadata",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -1442,7 +1396,7 @@ defmodule Eigr.Functions.Protocol.Actors.Actor do
           number: 3,
           label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.ActorSettings",
+          type_name: ".spawn.actors.ActorSettings",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -1456,7 +1410,7 @@ defmodule Eigr.Functions.Protocol.Actors.Actor do
           number: 4,
           label: :LABEL_REPEATED,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.Action",
+          type_name: ".spawn.actors.Action",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -1470,7 +1424,7 @@ defmodule Eigr.Functions.Protocol.Actors.Actor do
           number: 5,
           label: :LABEL_REPEATED,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.FixedTimerAction",
+          type_name: ".spawn.actors.FixedTimerAction",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -1491,15 +1445,15 @@ defmodule Eigr.Functions.Protocol.Actors.Actor do
     }
   end
 
-  field(:id, 1, type: Eigr.Functions.Protocol.Actors.ActorId)
-  field(:state, 2, type: Eigr.Functions.Protocol.Actors.ActorState)
-  field(:metadata, 6, type: Eigr.Functions.Protocol.Actors.Metadata)
-  field(:settings, 3, type: Eigr.Functions.Protocol.Actors.ActorSettings)
-  field(:actions, 4, repeated: true, type: Eigr.Functions.Protocol.Actors.Action)
+  field(:id, 1, type: Spawn.Actors.ActorId)
+  field(:state, 2, type: Spawn.Actors.ActorState)
+  field(:metadata, 6, type: Spawn.Actors.Metadata)
+  field(:settings, 3, type: Spawn.Actors.ActorSettings)
+  field(:actions, 4, repeated: true, type: Spawn.Actors.Action)
 
   field(:timer_actions, 5,
     repeated: true,
-    type: Eigr.Functions.Protocol.Actors.FixedTimerAction,
+    type: Spawn.Actors.FixedTimerAction,
     json_name: "timerActions"
   )
 end

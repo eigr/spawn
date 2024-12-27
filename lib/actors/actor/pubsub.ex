@@ -3,10 +3,10 @@ defmodule Actors.Actor.Pubsub do
 
   require Logger
 
-  alias Eigr.Functions.Protocol.InvocationRequest
-  alias Eigr.Functions.Protocol.Actors.ActorSystem
-  alias Eigr.Functions.Protocol.Actors.Actor
-  alias Eigr.Functions.Protocol.Actors.ActorId
+  alias Spawn.InvocationRequest
+  alias Spawn.Actors.ActorSystem
+  alias Spawn.Actors.Actor
+  alias Spawn.Actors.ActorId
 
   @default_pubsub_group :actor_channel
   @pubsub Application.compile_env(:spawn, :pubsub_group, @default_pubsub_group)

@@ -5,7 +5,7 @@ defmodule Proxy.Routes.API do
   use Proxy.Routes.Base
   require Logger
 
-  alias Eigr.Functions.Protocol.{
+  alias Spawn.{
     ActorInvocationResponse,
     InvocationRequest,
     InvocationResponse,
@@ -16,7 +16,7 @@ defmodule Proxy.Routes.API do
     SpawnResponse
   }
 
-  alias Eigr.Functions.Protocol.Actors.ActorId
+  alias Spawn.Actors.ActorId
 
   @content_type "application/octet-stream"
 

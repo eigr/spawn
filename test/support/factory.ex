@@ -1,14 +1,14 @@
 defmodule Actors.FactoryTest do
   @moduledoc false
 
-  alias Eigr.Functions.Protocol.{
+  alias Spawn.{
     RegistrationRequest,
     InvocationRequest,
     ActorInvocationResponse,
     ServiceInfo
   }
 
-  alias Eigr.Functions.Protocol.Actors.{
+  alias Spawn.Actors.{
     Registry,
     ActorSystem,
     Actor,
@@ -150,7 +150,7 @@ defmodule Actors.FactoryTest do
   def build_host_invoke_response(attrs \\ []) do
     state = %Actors.Protos.ChangeNameResponseTest{status: :OK, new_name: "new_name"} |> any_pack!
 
-    context = %Eigr.Functions.Protocol.Context{
+    context = %Spawn.Context{
       self: %ActorId{name: attrs[:actor_name], system: attrs[:system_name]},
       caller: attrs[:state] || nil,
       state: attrs[:state] || state,

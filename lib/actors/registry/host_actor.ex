@@ -3,7 +3,7 @@ defmodule Actors.Registry.HostActor do
   `HostActor` Defines the type of Actor that will be registered in `ActorRegistry`.
   """
 
-  alias Eigr.Functions.Protocol.Actors.Actor
+  alias Spawn.Actors.Actor
 
   defstruct actor: nil, node: nil, opts: nil
 

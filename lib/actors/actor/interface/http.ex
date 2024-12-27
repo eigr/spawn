@@ -8,12 +8,12 @@ defmodule Actors.Actor.Interface.Http do
 
   alias Actors.Actor.Entity.EntityState
 
-  alias Eigr.Functions.Protocol.Actors.{
+  alias Spawn.Actors.{
     Actor,
     ActorId
   }
 
-  alias Eigr.Functions.Protocol.{
+  alias Spawn.{
     Context,
     ActorInvocation,
     ActorInvocationResponse

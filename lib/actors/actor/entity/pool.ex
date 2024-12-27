@@ -7,7 +7,7 @@ defmodule Actors.Actor.Pool do
 
   alias Actors.Registry.HostActor
 
-  alias Eigr.Functions.Protocol.Actors.{
+  alias Spawn.Actors.{
     Actor,
     ActorId,
     ActorSettings

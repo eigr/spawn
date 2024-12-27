@@ -9,7 +9,7 @@ defmodule Example.Actors.ExampleActor.Service do
       dependency: [
         "google/api/annotations.proto",
         "example/example.proto",
-        "eigr/functions/protocol/actors/extensions.proto"
+        "spawn/actors/extensions.proto"
       ],
       message_type: [],
       enum_type: [],
@@ -26,18 +26,33 @@ defmodule Example.Actors.ExampleActor.Service do
                 idempotency_level: :IDEMPOTENCY_UNKNOWN,
                 uninterpreted_option: [],
                 __pb_extensions__: %{
-                  {Eigr.Functions.Protocol.Actors.PbExtension, :view} =>
-                    %Eigr.Functions.Protocol.Actors.ActorViewOption{
-                      query: "SELECT id, name, age WHERE name = :customer_name",
-                      map_to: "results",
-                      __unknown_fields__: []
-                    },
+                  {Spawn.Actors.PbExtension, :view} => %Spawn.Actors.ActorViewOption{
+                    query: "SELECT id, name, age WHERE name = :customer_name",
+                    map_to: "results",
+                    __unknown_fields__: []
+                  }
+                },
+                __unknown_fields__: []
+              },
+              client_streaming: false,
+              server_streaming: false,
+              __unknown_fields__: []
+            },
+            %Google.Protobuf.MethodDescriptorProto{
+              name: "Sum",
+              input_type: ".example.ValuePayload",
+              output_type: ".example.SumResponse",
+              options: %Google.Protobuf.MethodOptions{
+                deprecated: false,
+                idempotency_level: :IDEMPOTENCY_UNKNOWN,
+                uninterpreted_option: [],
+                __pb_extensions__: %{
                   {Google.Api.PbExtension, :http} => %Google.Api.HttpRule{
                     selector: "",
-                    body: "",
+                    body: "*",
                     additional_bindings: [],
                     response_body: "",
-                    pattern: {:get, "/v1/messages/{message_id}"},
+                    pattern: {:post, "/v1/example/sum"},
                     __unknown_fields__: []
                   }
                 },
@@ -48,7 +63,25 @@ defmodule Example.Actors.ExampleActor.Service do
               __unknown_fields__: []
             }
           ],
-          options: nil,
+          options: %Google.Protobuf.ServiceOptions{
+            deprecated: false,
+            uninterpreted_option: [],
+            __pb_extensions__: %{
+              {Spawn.Actors.PbExtension, :actor} => %Spawn.Actors.ActorOpts{
+                state_type: ".example.ExampleState",
+                stateful: true,
+                deactivate_timeout: 3000,
+                snapshot_interval: 60000,
+                sourceable: false,
+                strict_events_ordering: false,
+                events_retention_strategy: nil,
+                subjects: [],
+                kind: :NAMED,
+                __unknown_fields__: []
+              }
+            },
+            __unknown_fields__: []
+          },
           __unknown_fields__: []
         }
       ],
@@ -58,7 +91,7 @@ defmodule Example.Actors.ExampleActor.Service do
         location: [
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [],
-            span: [0, 0, 18, 1],
+            span: [0, 0, 30, 1],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -90,7 +123,7 @@ defmodule Example.Actors.ExampleActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [3, 2],
-            span: [4, 0, 57],
+            span: [4, 0, 39],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -106,7 +139,7 @@ defmodule Example.Actors.ExampleActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0],
-            span: [8, 0, 18, 1],
+            span: [8, 0, 30, 1],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -121,8 +154,24 @@ defmodule Example.Actors.ExampleActor.Service do
             __unknown_fields__: []
           },
           %Google.Protobuf.SourceCodeInfo.Location{
+            path: [6, 0, 3],
+            span: [9, 2, 15, 4],
+            leading_comments: nil,
+            trailing_comments: nil,
+            leading_detached_comments: [],
+            __unknown_fields__: []
+          },
+          %Google.Protobuf.SourceCodeInfo.Location{
+            path: [6, 0, 3, 4_890_128],
+            span: [9, 2, 15, 4],
+            leading_comments: nil,
+            trailing_comments: nil,
+            leading_detached_comments: [],
+            __unknown_fields__: []
+          },
+          %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 0],
-            span: [9, 2, 17, 3],
+            span: [17, 2, 22, 3],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -130,7 +179,7 @@ defmodule Example.Actors.ExampleActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 0, 1],
-            span: [9, 6, 17],
+            span: [17, 6, 17],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -138,7 +187,7 @@ defmodule Example.Actors.ExampleActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 0, 2],
-            span: [9, 19, 40],
+            span: [17, 19, 40],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -146,7 +195,7 @@ defmodule Example.Actors.ExampleActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 0, 3],
-            span: ~c"\t3M",
+            span: [17, 51, 77],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -154,7 +203,7 @@ defmodule Example.Actors.ExampleActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 0, 4],
-            span: [10, 4, 13, 6],
+            span: [18, 4, 21, 6],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -162,23 +211,55 @@ defmodule Example.Actors.ExampleActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 0, 4, 4_890_127],
-            span: [10, 4, 13, 6],
+            span: [18, 4, 21, 6],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
             __unknown_fields__: []
           },
           %Google.Protobuf.SourceCodeInfo.Location{
-            path: [6, 0, 2, 0, 4],
-            span: [14, 4, 16, 6],
+            path: [6, 0, 2, 1],
+            span: [24, 2, 29, 3],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
             __unknown_fields__: []
           },
           %Google.Protobuf.SourceCodeInfo.Location{
-            path: [6, 0, 2, 0, 4, 72_295_728],
-            span: [14, 4, 16, 6],
+            path: [6, 0, 2, 1, 1],
+            span: [24, 6, 9],
+            leading_comments: nil,
+            trailing_comments: nil,
+            leading_detached_comments: [],
+            __unknown_fields__: []
+          },
+          %Google.Protobuf.SourceCodeInfo.Location{
+            path: [6, 0, 2, 1, 2],
+            span: [24, 11, 32],
+            leading_comments: nil,
+            trailing_comments: nil,
+            leading_detached_comments: [],
+            __unknown_fields__: []
+          },
+          %Google.Protobuf.SourceCodeInfo.Location{
+            path: [6, 0, 2, 1, 3],
+            span: [24, 43, 63],
+            leading_comments: nil,
+            trailing_comments: nil,
+            leading_detached_comments: [],
+            __unknown_fields__: []
+          },
+          %Google.Protobuf.SourceCodeInfo.Location{
+            path: [6, 0, 2, 1, 4],
+            span: [25, 4, 28, 6],
+            leading_comments: nil,
+            trailing_comments: nil,
+            leading_detached_comments: [],
+            __unknown_fields__: []
+          },
+          %Google.Protobuf.SourceCodeInfo.Location{
+            path: [6, 0, 2, 1, 4, 72_295_728],
+            span: [25, 4, 28, 6],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -196,22 +277,25 @@ defmodule Example.Actors.ExampleActor.Service do
   end
 
   rpc(:ExampleView, Example.ValuePayload, Example.SomeQueryResponse, %{
+    view: %{
+      type: Spawn.Actors.PbExtension,
+      value: %Spawn.Actors.ActorViewOption{
+        query: "SELECT id, name, age WHERE name = :customer_name",
+        map_to: "results",
+        __unknown_fields__: []
+      }
+    }
+  })
+
+  rpc(:Sum, Example.ValuePayload, Example.SumResponse, %{
     http: %{
       type: Google.Api.PbExtension,
       value: %Google.Api.HttpRule{
         selector: "",
-        body: "",
+        body: "*",
         additional_bindings: [],
         response_body: "",
-        pattern: {:get, "/v1/messages/{message_id}"},
-        __unknown_fields__: []
-      }
-    },
-    view: %{
-      type: Eigr.Functions.Protocol.Actors.PbExtension,
-      value: %Eigr.Functions.Protocol.Actors.ActorViewOption{
-        query: "SELECT id, name, age WHERE name = :customer_name",
-        map_to: "results",
+        pattern: {:post, "/v1/example/sum"},
         __unknown_fields__: []
       }
     }
@@ -241,6 +325,20 @@ defmodule Example.Actors.ExampleActor.ActorDispatcher do
 
     Dispatcher.dispatch(request)
   end
+
+  @spec sum(Example.ValuePayload.t(), GRPC.Server.Stream.t()) :: Example.SumResponse.t()
+  def sum(message, stream) do
+    request = %{
+      system: "spawn-system",
+      actor_name: "ExampleActor",
+      action_name: "Sum",
+      input: message,
+      stream: stream,
+      descriptor: Example.Actors.ExampleActor.Service.descriptor()
+    }
+
+    Dispatcher.dispatch(request)
+  end
 end
 
 defmodule Sidecar.GRPC.ProxyEndpoint do
@@ -256,7 +354,7 @@ defmodule Sidecar.GRPC.ProxyEndpoint do
     [
       Sidecar.GRPC.Reflection.Server.V1,
       Sidecar.GRPC.Reflection.Server.V1Alpha,
-      Eigr.Functions.Protocol.Actors.Healthcheck.HealthCheckActor.ActorDispatcher
+      Spawn.Actors.Healthcheck.HealthCheckActor.ActorDispatcher
     ] ++ services
 
   run(services)
@@ -282,6 +380,51 @@ end
 
 defmodule Example.Actors.ExampleActor do
   @moduledoc "This module provides helper functions for invoking the methods on the Example.Actors.ExampleActor actor."
+
+  @doc """
+  Invokes the get_state implicit action for this actor.
+
+  ## Examples
+  ```elixir
+  iex> Example.Actors.ExampleActor.get_state()
+  {:ok, actor_state}
+  ```
+  """
+  def get_state do
+    %SpawnSdk.ActorRef{system: "spawn-system", name: "ExampleActor"}
+    |> get_state()
+  end
+
+  @doc """
+  Invokes the get_state implicit action.
+
+  ## Parameters
+  - `ref` - The actor ref to send the action to.
+
+  ## Examples
+  ```elixir
+  iex> Example.Actors.ExampleActor.get_state(%SpawnSdk.ActorRef{name: "actor_id_01", system: "spawn-system"})
+  {:ok, actor_state}
+  ```
+  """
+  def get_state(%SpawnSdk.ActorRef{} = ref) do
+    opts = [
+      system: ref.system || "spawn-system",
+      action: "get_state",
+      async: false
+    ]
+
+    actor_to_invoke = ref.name || "ExampleActor"
+
+    opts =
+      if actor_to_invoke == "ExampleActor" do
+        opts
+      else
+        Keyword.put(opts, :ref, "ExampleActor")
+      end
+
+    SpawnSdk.invoke(actor_to_invoke, opts)
+  end
 
   @doc """
   Invokes the ExampleView method registered on ExampleActor.
@@ -322,6 +465,62 @@ defmodule Example.Actors.ExampleActor do
     opts = [
       system: ref.system || "spawn-system",
       action: "ExampleView",
+      payload: payload,
+      async: opts[:async] || false,
+      metadata: opts[:metadata] || %{}
+    ]
+
+    actor_to_invoke = ref.name || "ExampleActor"
+
+    opts =
+      if actor_to_invoke == "ExampleActor" do
+        opts
+      else
+        Keyword.put(opts, :ref, "ExampleActor")
+      end
+
+    SpawnSdk.invoke(actor_to_invoke, opts)
+  end
+
+  @doc """
+  Invokes the Sum method registered on ExampleActor.
+
+  ## Parameters
+  - `ref` - The actor ref to send the action to.
+  - `payload` - The payload to send to the action.
+  - `opts` - The options to pass to the action.
+
+  ## Examples
+  ```elixir
+  iex> Example.Actors.ExampleActor.sum(%SpawnSdk.ActorRef{name: "actor_id_01", system: "spawn-system"}, %Example.ValuePayload{}, async: false, metadata: %{"example" => "metadata"})
+  {:ok, %Example.SumResponse{}}
+  ```
+  """
+  def sum() do
+    %SpawnSdk.ActorRef{system: "spawn-system", name: "ExampleActor"}
+    |> sum(%Example.ValuePayload{}, [])
+  end
+
+  def sum(%Example.ValuePayload{} = payload) do
+    %SpawnSdk.ActorRef{system: "spawn-system", name: "ExampleActor"}
+    |> sum(payload, [])
+  end
+
+  def sum(%Example.ValuePayload{} = payload, opts) when is_list(opts) do
+    %SpawnSdk.ActorRef{system: "spawn-system", name: "ExampleActor"}
+    |> sum(payload, opts)
+  end
+
+  def sum(%SpawnSdk.ActorRef{} = ref, %Example.ValuePayload{} = payload) do
+    ref
+    |> sum(payload, [])
+  end
+
+  def sum(%SpawnSdk.ActorRef{} = ref, %Example.ValuePayload{} = payload, opts)
+      when is_list(opts) do
+    opts = [
+      system: ref.system || "spawn-system",
+      action: "Sum",
       payload: payload,
       async: opts[:async] || false,
       metadata: opts[:metadata] || %{}

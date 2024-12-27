@@ -13,6 +13,50 @@ defmodule Sidecar.GRPC.Generators.ActorInvoker do
     defmodule <%= @module %> do
       @moduledoc "This module provides helper functions for invoking the methods on the <%= @service_name %> actor."
 
+      @doc \"\"\"
+      Invokes the get_state implicit action for this actor.
+
+      ## Examples
+      ```elixir
+      iex> <%= @module %>.get_state()
+      {:ok, actor_state}
+      ```
+      \"\"\"
+      def get_state do
+        %SpawnSdk.ActorRef{system: "<%= @actor_system %>", name: "<%= @actor_name %>"}
+        |> get_state()
+      end
+
+      @doc \"\"\"
+      Invokes the get_state implicit action.
+
+      ## Parameters
+      - `ref` - The actor ref to send the action to.
+
+      ## Examples
+      ```elixir
+      iex> <%= @module %>.get_state(%SpawnSdk.ActorRef{name: "actor_id_01", system: "spawn-system"})
+      {:ok, actor_state}
+      ```
+      \"\"\"
+      def get_state(%SpawnSdk.ActorRef{} = ref) do
+        opts = [
+          system: ref.system || "<%= @actor_system %>",
+          action: "get_state",
+          async: false
+        ]
+
+        actor_to_invoke = ref.name || "<%= @actor_name %>"
+
+        opts = if actor_to_invoke == "<%= @actor_name %>" do
+          opts
+        else
+          Keyword.put(opts, :ref, "<%= @actor_name %>")
+        end
+
+        SpawnSdk.invoke(actor_to_invoke, opts)
+      end
+
       <%= for {method_name, input, output, _options} <- @methods do %>
         @doc \"\"\"
         Invokes the <%= method_name %> method registered on <%= @actor_name %>.

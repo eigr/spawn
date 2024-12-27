@@ -1,4 +1,4 @@
-defmodule Eigr.Functions.Protocol.Status do
+defmodule Spawn.Status do
   @moduledoc false
   use Protobuf, enum: true, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
@@ -45,7 +45,7 @@ defmodule Eigr.Functions.Protocol.Status do
   field(:ERROR, 3)
 end
 
-defmodule Eigr.Functions.Protocol.Context.MetadataEntry do
+defmodule Spawn.Context.MetadataEntry do
   @moduledoc false
   use Protobuf, map: true, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
@@ -108,7 +108,7 @@ defmodule Eigr.Functions.Protocol.Context.MetadataEntry do
   field(:value, 2, type: :string)
 end
 
-defmodule Eigr.Functions.Protocol.Context.TagsEntry do
+defmodule Spawn.Context.TagsEntry do
   @moduledoc false
   use Protobuf, map: true, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
@@ -171,7 +171,7 @@ defmodule Eigr.Functions.Protocol.Context.TagsEntry do
   field(:value, 2, type: :string)
 end
 
-defmodule Eigr.Functions.Protocol.Context do
+defmodule Spawn.Context do
   @moduledoc false
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
@@ -200,7 +200,7 @@ defmodule Eigr.Functions.Protocol.Context do
           number: 4,
           label: :LABEL_REPEATED,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.Context.MetadataEntry",
+          type_name: ".spawn.Context.MetadataEntry",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -214,7 +214,7 @@ defmodule Eigr.Functions.Protocol.Context do
           number: 5,
           label: :LABEL_REPEATED,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.Context.TagsEntry",
+          type_name: ".spawn.Context.TagsEntry",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -228,7 +228,7 @@ defmodule Eigr.Functions.Protocol.Context do
           number: 2,
           label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.ActorId",
+          type_name: ".spawn.actors.ActorId",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -242,7 +242,7 @@ defmodule Eigr.Functions.Protocol.Context do
           number: 3,
           label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.ActorId",
+          type_name: ".spawn.actors.ActorId",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -367,19 +367,13 @@ defmodule Eigr.Functions.Protocol.Context do
   end
 
   field(:state, 1, type: Google.Protobuf.Any)
-
-  field(:metadata, 4,
-    repeated: true,
-    type: Eigr.Functions.Protocol.Context.MetadataEntry,
-    map: true
-  )
-
-  field(:tags, 5, repeated: true, type: Eigr.Functions.Protocol.Context.TagsEntry, map: true)
-  field(:caller, 2, type: Eigr.Functions.Protocol.Actors.ActorId)
-  field(:self, 3, type: Eigr.Functions.Protocol.Actors.ActorId)
+  field(:metadata, 4, repeated: true, type: Spawn.Context.MetadataEntry, map: true)
+  field(:tags, 5, repeated: true, type: Spawn.Context.TagsEntry, map: true)
+  field(:caller, 2, type: Spawn.Actors.ActorId)
+  field(:self, 3, type: Spawn.Actors.ActorId)
 end
 
-defmodule Eigr.Functions.Protocol.Noop do
+defmodule Spawn.Noop do
   @moduledoc false
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
@@ -401,7 +395,7 @@ defmodule Eigr.Functions.Protocol.Noop do
   end
 end
 
-defmodule Eigr.Functions.Protocol.JSONType do
+defmodule Spawn.JSONType do
   @moduledoc false
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
@@ -440,7 +434,7 @@ defmodule Eigr.Functions.Protocol.JSONType do
   field(:content, 1, type: :string)
 end
 
-defmodule Eigr.Functions.Protocol.RegistrationRequest do
+defmodule Spawn.RegistrationRequest do
   @moduledoc false
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
@@ -455,7 +449,7 @@ defmodule Eigr.Functions.Protocol.RegistrationRequest do
           number: 1,
           label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.ServiceInfo",
+          type_name: ".spawn.ServiceInfo",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -469,7 +463,7 @@ defmodule Eigr.Functions.Protocol.RegistrationRequest do
           number: 2,
           label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.ActorSystem",
+          type_name: ".spawn.actors.ActorSystem",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -490,15 +484,11 @@ defmodule Eigr.Functions.Protocol.RegistrationRequest do
     }
   end
 
-  field(:service_info, 1, type: Eigr.Functions.Protocol.ServiceInfo, json_name: "serviceInfo")
-
-  field(:actor_system, 2,
-    type: Eigr.Functions.Protocol.Actors.ActorSystem,
-    json_name: "actorSystem"
-  )
+  field(:service_info, 1, type: Spawn.ServiceInfo, json_name: "serviceInfo")
+  field(:actor_system, 2, type: Spawn.Actors.ActorSystem, json_name: "actorSystem")
 end
 
-defmodule Eigr.Functions.Protocol.RegistrationResponse do
+defmodule Spawn.RegistrationResponse do
   @moduledoc false
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
@@ -513,7 +503,7 @@ defmodule Eigr.Functions.Protocol.RegistrationResponse do
           number: 1,
           label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.RequestStatus",
+          type_name: ".spawn.RequestStatus",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -527,7 +517,7 @@ defmodule Eigr.Functions.Protocol.RegistrationResponse do
           number: 2,
           label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.ProxyInfo",
+          type_name: ".spawn.ProxyInfo",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -548,11 +538,11 @@ defmodule Eigr.Functions.Protocol.RegistrationResponse do
     }
   end
 
-  field(:status, 1, type: Eigr.Functions.Protocol.RequestStatus)
-  field(:proxy_info, 2, type: Eigr.Functions.Protocol.ProxyInfo, json_name: "proxyInfo")
+  field(:status, 1, type: Spawn.RequestStatus)
+  field(:proxy_info, 2, type: Spawn.ProxyInfo, json_name: "proxyInfo")
 end
 
-defmodule Eigr.Functions.Protocol.ServiceInfo do
+defmodule Spawn.ServiceInfo do
   @moduledoc false
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
@@ -681,7 +671,7 @@ defmodule Eigr.Functions.Protocol.ServiceInfo do
   field(:protocol_minor_version, 7, type: :int32, json_name: "protocolMinorVersion")
 end
 
-defmodule Eigr.Functions.Protocol.SpawnRequest do
+defmodule Spawn.SpawnRequest do
   @moduledoc false
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
@@ -696,7 +686,7 @@ defmodule Eigr.Functions.Protocol.SpawnRequest do
           number: 1,
           label: :LABEL_REPEATED,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.ActorId",
+          type_name: ".spawn.actors.ActorId",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -717,10 +707,10 @@ defmodule Eigr.Functions.Protocol.SpawnRequest do
     }
   end
 
-  field(:actors, 1, repeated: true, type: Eigr.Functions.Protocol.Actors.ActorId)
+  field(:actors, 1, repeated: true, type: Spawn.Actors.ActorId)
 end
 
-defmodule Eigr.Functions.Protocol.SpawnResponse do
+defmodule Spawn.SpawnResponse do
   @moduledoc false
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
@@ -735,7 +725,7 @@ defmodule Eigr.Functions.Protocol.SpawnResponse do
           number: 1,
           label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.RequestStatus",
+          type_name: ".spawn.RequestStatus",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -756,10 +746,10 @@ defmodule Eigr.Functions.Protocol.SpawnResponse do
     }
   end
 
-  field(:status, 1, type: Eigr.Functions.Protocol.RequestStatus)
+  field(:status, 1, type: Spawn.RequestStatus)
 end
 
-defmodule Eigr.Functions.Protocol.ProxyInfo do
+defmodule Spawn.ProxyInfo do
   @moduledoc false
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
@@ -843,7 +833,7 @@ defmodule Eigr.Functions.Protocol.ProxyInfo do
   field(:proxy_version, 4, type: :string, json_name: "proxyVersion")
 end
 
-defmodule Eigr.Functions.Protocol.SideEffect do
+defmodule Spawn.SideEffect do
   @moduledoc false
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
@@ -858,7 +848,7 @@ defmodule Eigr.Functions.Protocol.SideEffect do
           number: 1,
           label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.InvocationRequest",
+          type_name: ".spawn.InvocationRequest",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -879,10 +869,10 @@ defmodule Eigr.Functions.Protocol.SideEffect do
     }
   end
 
-  field(:request, 1, type: Eigr.Functions.Protocol.InvocationRequest)
+  field(:request, 1, type: Spawn.InvocationRequest)
 end
 
-defmodule Eigr.Functions.Protocol.Broadcast do
+defmodule Spawn.Broadcast do
   @moduledoc false
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
@@ -925,7 +915,7 @@ defmodule Eigr.Functions.Protocol.Broadcast do
           number: 4,
           label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.Noop",
+          type_name: ".spawn.Noop",
           default_value: nil,
           options: nil,
           oneof_index: 0,
@@ -956,10 +946,10 @@ defmodule Eigr.Functions.Protocol.Broadcast do
 
   field(:channel_group, 1, type: :string, json_name: "channelGroup")
   field(:value, 3, type: Google.Protobuf.Any, oneof: 0)
-  field(:noop, 4, type: Eigr.Functions.Protocol.Noop, oneof: 0)
+  field(:noop, 4, type: Spawn.Noop, oneof: 0)
 end
 
-defmodule Eigr.Functions.Protocol.Pipe do
+defmodule Spawn.Pipe do
   @moduledoc false
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
@@ -1013,7 +1003,7 @@ defmodule Eigr.Functions.Protocol.Pipe do
   field(:action_name, 2, type: :string, json_name: "actionName")
 end
 
-defmodule Eigr.Functions.Protocol.Forward do
+defmodule Spawn.Forward do
   @moduledoc false
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
@@ -1067,7 +1057,7 @@ defmodule Eigr.Functions.Protocol.Forward do
   field(:action_name, 2, type: :string, json_name: "actionName")
 end
 
-defmodule Eigr.Functions.Protocol.Fact.MetadataEntry do
+defmodule Spawn.Fact.MetadataEntry do
   @moduledoc false
   use Protobuf, map: true, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
@@ -1130,7 +1120,7 @@ defmodule Eigr.Functions.Protocol.Fact.MetadataEntry do
   field(:value, 2, type: :string)
 end
 
-defmodule Eigr.Functions.Protocol.Fact do
+defmodule Spawn.Fact do
   @moduledoc false
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
@@ -1173,7 +1163,7 @@ defmodule Eigr.Functions.Protocol.Fact do
           number: 3,
           label: :LABEL_REPEATED,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.Fact.MetadataEntry",
+          type_name: ".spawn.Fact.MetadataEntry",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -1262,11 +1252,11 @@ defmodule Eigr.Functions.Protocol.Fact do
 
   field(:uuid, 1, type: :string)
   field(:state, 2, type: Google.Protobuf.Any)
-  field(:metadata, 3, repeated: true, type: Eigr.Functions.Protocol.Fact.MetadataEntry, map: true)
+  field(:metadata, 3, repeated: true, type: Spawn.Fact.MetadataEntry, map: true)
   field(:timestamp, 4, type: Google.Protobuf.Timestamp)
 end
 
-defmodule Eigr.Functions.Protocol.Workflow do
+defmodule Spawn.Workflow do
   @moduledoc false
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
@@ -1281,7 +1271,7 @@ defmodule Eigr.Functions.Protocol.Workflow do
           number: 2,
           label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.Broadcast",
+          type_name: ".spawn.Broadcast",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -1295,7 +1285,7 @@ defmodule Eigr.Functions.Protocol.Workflow do
           number: 1,
           label: :LABEL_REPEATED,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.SideEffect",
+          type_name: ".spawn.SideEffect",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -1309,7 +1299,7 @@ defmodule Eigr.Functions.Protocol.Workflow do
           number: 3,
           label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.Pipe",
+          type_name: ".spawn.Pipe",
           default_value: nil,
           options: nil,
           oneof_index: 0,
@@ -1323,7 +1313,7 @@ defmodule Eigr.Functions.Protocol.Workflow do
           number: 4,
           label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.Forward",
+          type_name: ".spawn.Forward",
           default_value: nil,
           options: nil,
           oneof_index: 0,
@@ -1352,13 +1342,13 @@ defmodule Eigr.Functions.Protocol.Workflow do
 
   oneof(:routing, 0)
 
-  field(:broadcast, 2, type: Eigr.Functions.Protocol.Broadcast)
-  field(:effects, 1, repeated: true, type: Eigr.Functions.Protocol.SideEffect)
-  field(:pipe, 3, type: Eigr.Functions.Protocol.Pipe, oneof: 0)
-  field(:forward, 4, type: Eigr.Functions.Protocol.Forward, oneof: 0)
+  field(:broadcast, 2, type: Spawn.Broadcast)
+  field(:effects, 1, repeated: true, type: Spawn.SideEffect)
+  field(:pipe, 3, type: Spawn.Pipe, oneof: 0)
+  field(:forward, 4, type: Spawn.Forward, oneof: 0)
 end
 
-defmodule Eigr.Functions.Protocol.InvocationRequest.MetadataEntry do
+defmodule Spawn.InvocationRequest.MetadataEntry do
   @moduledoc false
   use Protobuf, map: true, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
@@ -1421,7 +1411,7 @@ defmodule Eigr.Functions.Protocol.InvocationRequest.MetadataEntry do
   field(:value, 2, type: :string)
 end
 
-defmodule Eigr.Functions.Protocol.InvocationRequest do
+defmodule Spawn.InvocationRequest do
   @moduledoc false
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
@@ -1436,7 +1426,7 @@ defmodule Eigr.Functions.Protocol.InvocationRequest do
           number: 1,
           label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.ActorSystem",
+          type_name: ".spawn.actors.ActorSystem",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -1450,7 +1440,7 @@ defmodule Eigr.Functions.Protocol.InvocationRequest do
           number: 2,
           label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.Actor",
+          type_name: ".spawn.actors.Actor",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -1492,7 +1482,7 @@ defmodule Eigr.Functions.Protocol.InvocationRequest do
           number: 7,
           label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.Noop",
+          type_name: ".spawn.Noop",
           default_value: nil,
           options: nil,
           oneof_index: 0,
@@ -1520,7 +1510,7 @@ defmodule Eigr.Functions.Protocol.InvocationRequest do
           number: 6,
           label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.ActorId",
+          type_name: ".spawn.actors.ActorId",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -1534,7 +1524,7 @@ defmodule Eigr.Functions.Protocol.InvocationRequest do
           number: 8,
           label: :LABEL_REPEATED,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.InvocationRequest.MetadataEntry",
+          type_name: ".spawn.InvocationRequest.MetadataEntry",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -1657,26 +1647,20 @@ defmodule Eigr.Functions.Protocol.InvocationRequest do
 
   oneof(:payload, 0)
 
-  field(:system, 1, type: Eigr.Functions.Protocol.Actors.ActorSystem)
-  field(:actor, 2, type: Eigr.Functions.Protocol.Actors.Actor)
+  field(:system, 1, type: Spawn.Actors.ActorSystem)
+  field(:actor, 2, type: Spawn.Actors.Actor)
   field(:action_name, 3, type: :string, json_name: "actionName")
   field(:value, 4, type: Google.Protobuf.Any, oneof: 0)
-  field(:noop, 7, type: Eigr.Functions.Protocol.Noop, oneof: 0)
+  field(:noop, 7, type: Spawn.Noop, oneof: 0)
   field(:async, 5, type: :bool)
-  field(:caller, 6, type: Eigr.Functions.Protocol.Actors.ActorId)
-
-  field(:metadata, 8,
-    repeated: true,
-    type: Eigr.Functions.Protocol.InvocationRequest.MetadataEntry,
-    map: true
-  )
-
+  field(:caller, 6, type: Spawn.Actors.ActorId)
+  field(:metadata, 8, repeated: true, type: Spawn.InvocationRequest.MetadataEntry, map: true)
   field(:scheduled_to, 9, type: :int64, json_name: "scheduledTo")
   field(:pooled, 10, type: :bool)
   field(:register_ref, 11, type: :string, json_name: "registerRef")
 end
 
-defmodule Eigr.Functions.Protocol.ActorInvocation do
+defmodule Spawn.ActorInvocation do
   @moduledoc false
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
@@ -1691,7 +1675,7 @@ defmodule Eigr.Functions.Protocol.ActorInvocation do
           number: 1,
           label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.ActorId",
+          type_name: ".spawn.actors.ActorId",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -1719,7 +1703,7 @@ defmodule Eigr.Functions.Protocol.ActorInvocation do
           number: 3,
           label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.Context",
+          type_name: ".spawn.Context",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -1747,7 +1731,7 @@ defmodule Eigr.Functions.Protocol.ActorInvocation do
           number: 5,
           label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.Noop",
+          type_name: ".spawn.Noop",
           default_value: nil,
           options: nil,
           oneof_index: 0,
@@ -1761,7 +1745,7 @@ defmodule Eigr.Functions.Protocol.ActorInvocation do
           number: 6,
           label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.ActorId",
+          type_name: ".spawn.actors.ActorId",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -1790,15 +1774,15 @@ defmodule Eigr.Functions.Protocol.ActorInvocation do
 
   oneof(:payload, 0)
 
-  field(:actor, 1, type: Eigr.Functions.Protocol.Actors.ActorId)
+  field(:actor, 1, type: Spawn.Actors.ActorId)
   field(:action_name, 2, type: :string, json_name: "actionName")
-  field(:current_context, 3, type: Eigr.Functions.Protocol.Context, json_name: "currentContext")
+  field(:current_context, 3, type: Spawn.Context, json_name: "currentContext")
   field(:value, 4, type: Google.Protobuf.Any, oneof: 0)
-  field(:noop, 5, type: Eigr.Functions.Protocol.Noop, oneof: 0)
-  field(:caller, 6, type: Eigr.Functions.Protocol.Actors.ActorId)
+  field(:noop, 5, type: Spawn.Noop, oneof: 0)
+  field(:caller, 6, type: Spawn.Actors.ActorId)
 end
 
-defmodule Eigr.Functions.Protocol.ActorInvocationResponse do
+defmodule Spawn.ActorInvocationResponse do
   @moduledoc false
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
@@ -1841,7 +1825,7 @@ defmodule Eigr.Functions.Protocol.ActorInvocationResponse do
           number: 3,
           label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.Context",
+          type_name: ".spawn.Context",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -1869,7 +1853,7 @@ defmodule Eigr.Functions.Protocol.ActorInvocationResponse do
           number: 6,
           label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.Noop",
+          type_name: ".spawn.Noop",
           default_value: nil,
           options: nil,
           oneof_index: 0,
@@ -1883,7 +1867,7 @@ defmodule Eigr.Functions.Protocol.ActorInvocationResponse do
           number: 5,
           label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.Workflow",
+          type_name: ".spawn.Workflow",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -1928,14 +1912,14 @@ defmodule Eigr.Functions.Protocol.ActorInvocationResponse do
 
   field(:actor_name, 1, type: :string, json_name: "actorName")
   field(:actor_system, 2, type: :string, json_name: "actorSystem")
-  field(:updated_context, 3, type: Eigr.Functions.Protocol.Context, json_name: "updatedContext")
+  field(:updated_context, 3, type: Spawn.Context, json_name: "updatedContext")
   field(:value, 4, type: Google.Protobuf.Any, oneof: 0)
-  field(:noop, 6, type: Eigr.Functions.Protocol.Noop, oneof: 0)
-  field(:workflow, 5, type: Eigr.Functions.Protocol.Workflow)
+  field(:noop, 6, type: Spawn.Noop, oneof: 0)
+  field(:workflow, 5, type: Spawn.Workflow)
   field(:checkpoint, 7, type: :bool)
 end
 
-defmodule Eigr.Functions.Protocol.InvocationResponse do
+defmodule Spawn.InvocationResponse do
   @moduledoc false
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
@@ -1950,7 +1934,7 @@ defmodule Eigr.Functions.Protocol.InvocationResponse do
           number: 1,
           label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.RequestStatus",
+          type_name: ".spawn.RequestStatus",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -1964,7 +1948,7 @@ defmodule Eigr.Functions.Protocol.InvocationResponse do
           number: 2,
           label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.ActorSystem",
+          type_name: ".spawn.actors.ActorSystem",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -1978,7 +1962,7 @@ defmodule Eigr.Functions.Protocol.InvocationResponse do
           number: 3,
           label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.Actor",
+          type_name: ".spawn.actors.Actor",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -2006,7 +1990,7 @@ defmodule Eigr.Functions.Protocol.InvocationResponse do
           number: 5,
           label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.Noop",
+          type_name: ".spawn.Noop",
           default_value: nil,
           options: nil,
           oneof_index: 0,
@@ -2035,14 +2019,14 @@ defmodule Eigr.Functions.Protocol.InvocationResponse do
 
   oneof(:payload, 0)
 
-  field(:status, 1, type: Eigr.Functions.Protocol.RequestStatus)
-  field(:system, 2, type: Eigr.Functions.Protocol.Actors.ActorSystem)
-  field(:actor, 3, type: Eigr.Functions.Protocol.Actors.Actor)
+  field(:status, 1, type: Spawn.RequestStatus)
+  field(:system, 2, type: Spawn.Actors.ActorSystem)
+  field(:actor, 3, type: Spawn.Actors.Actor)
   field(:value, 4, type: Google.Protobuf.Any, oneof: 0)
-  field(:noop, 5, type: Eigr.Functions.Protocol.Noop, oneof: 0)
+  field(:noop, 5, type: Spawn.Noop, oneof: 0)
 end
 
-defmodule Eigr.Functions.Protocol.RequestStatus do
+defmodule Spawn.RequestStatus do
   @moduledoc false
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
@@ -2057,7 +2041,7 @@ defmodule Eigr.Functions.Protocol.RequestStatus do
           number: 1,
           label: :LABEL_OPTIONAL,
           type: :TYPE_ENUM,
-          type_name: ".eigr.functions.protocol.Status",
+          type_name: ".spawn.Status",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -2092,6 +2076,6 @@ defmodule Eigr.Functions.Protocol.RequestStatus do
     }
   end
 
-  field(:status, 1, type: Eigr.Functions.Protocol.Status, enum: true)
+  field(:status, 1, type: Spawn.Status, enum: true)
   field(:message, 2, type: :string)
 end

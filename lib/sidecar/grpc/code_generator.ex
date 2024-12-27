@@ -14,7 +14,7 @@ defmodule Sidecar.GRPC.CodeGenerator do
   require Logger
 
   alias Actors.Config.PersistentTermConfig, as: Config
-  alias Eigr.Functions.Protocol.Actors.ActorViewOption
+  alias Spawn.Actors.ActorViewOption
   alias Protobuf.Protoc.Generator.Util
   alias Mix.Tasks.Protobuf.Generate
 
@@ -107,9 +107,16 @@ defmodule Sidecar.GRPC.CodeGenerator do
 
     # do something after generating the code
     Enum.each(svcs, fn svc ->
+      actor_opts =
+        svc.options.__pb_extensions__ |> Map.get({Spawn.Actors.PbExtension, :actor})
+
+      if not is_nil(actor_opts) do
+        :persistent_term.put("actor-#{svc.name}", actor_opts)
+      end
+
       Enum.each(svc.method, fn method ->
         case method.options.__pb_extensions__
-             |> Map.get({Eigr.Functions.Protocol.Actors.PbExtension, :view}) do
+             |> Map.get({Spawn.Actors.PbExtension, :view}) do
           %ActorViewOption{} = option ->
             output_type =
               "Elixir.#{Util.type_from_type_name(ctx, method.output_type)}"
@@ -121,17 +128,13 @@ defmodule Sidecar.GRPC.CodeGenerator do
 
             descriptor = apply(output_type, :descriptor, [])
 
-            field =
-              descriptor.field
-              |> Enum.find(fn field ->
-                field.name == option.map_to
-              end)
+            field = descriptor.field |> Enum.find(fn field -> field.name == option.map_to end)
 
             type_name =
               "Elixir.#{Util.type_from_type_name(ctx, field.type_name)}"
               |> String.to_existing_atom()
 
-            # let the proxy know that there is a 
+            # let the proxy know that there is a
             :persistent_term.put("view-#{svc.name}-#{method.name}", %{
               query: option.query,
               view_name: method.name,

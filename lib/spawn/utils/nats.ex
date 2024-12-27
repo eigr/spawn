@@ -2,7 +2,7 @@ defmodule Spawn.Utils.Nats do
   @moduledoc false
 
   alias Actors.Config.PersistentTermConfig, as: Config
-  alias Eigr.Functions.Protocol.InvocationRequest
+  alias Spawn.InvocationRequest
 
   import Spawn.Utils.Common, only: [to_existing_atom_or_new: 1]
 

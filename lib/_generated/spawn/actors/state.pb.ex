@@ -1,4 +1,4 @@
-defmodule Eigr.Functions.Protocol.State.Revision do
+defmodule Spawn.State.Revision do
   @moduledoc false
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
@@ -37,7 +37,7 @@ defmodule Eigr.Functions.Protocol.State.Revision do
   field(:value, 1, type: :int64)
 end
 
-defmodule Eigr.Functions.Protocol.State.Checkpoint do
+defmodule Spawn.State.Checkpoint do
   @moduledoc false
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
@@ -52,7 +52,7 @@ defmodule Eigr.Functions.Protocol.State.Checkpoint do
           number: 1,
           label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.state.Revision",
+          type_name: ".spawn.state.Revision",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -66,7 +66,7 @@ defmodule Eigr.Functions.Protocol.State.Checkpoint do
           number: 2,
           label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
-          type_name: ".eigr.functions.protocol.actors.ActorState",
+          type_name: ".spawn.actors.ActorState",
           default_value: nil,
           options: nil,
           oneof_index: nil,
@@ -87,6 +87,6 @@ defmodule Eigr.Functions.Protocol.State.Checkpoint do
     }
   end
 
-  field(:revision, 1, type: Eigr.Functions.Protocol.State.Revision)
-  field(:state, 2, type: Eigr.Functions.Protocol.Actors.ActorState)
+  field(:revision, 1, type: Spawn.State.Revision)
+  field(:state, 2, type: Spawn.Actors.ActorState)
 end
