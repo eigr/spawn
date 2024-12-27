@@ -39,14 +39,23 @@ defmodule Example.Actors.ExampleActor.Service do
               __unknown_fields__: []
             },
             %Google.Protobuf.MethodDescriptorProto{
-              name: "ActionA",
+              name: "Sum",
               input_type: ".example.ValuePayload",
-              output_type: ".example.SomeQueryResponse",
+              output_type: ".example.SumResponse",
               options: %Google.Protobuf.MethodOptions{
                 deprecated: false,
                 idempotency_level: :IDEMPOTENCY_UNKNOWN,
                 uninterpreted_option: [],
-                __pb_extensions__: %{},
+                __pb_extensions__: %{
+                  {Google.Api.PbExtension, :http} => %Google.Api.HttpRule{
+                    selector: "",
+                    body: "*",
+                    additional_bindings: [],
+                    response_body: "",
+                    pattern: {:post, "/v1/example/sum"},
+                    __unknown_fields__: []
+                  }
+                },
                 __unknown_fields__: []
               },
               client_streaming: false,
@@ -58,41 +67,16 @@ defmodule Example.Actors.ExampleActor.Service do
             deprecated: false,
             uninterpreted_option: [],
             __pb_extensions__: %{
-              {Spawn.Actors.PbExtension, :settings} => %Spawn.Actors.ActorSettings{
-                kind: :PROJECTION,
-                stateful: true,
-                snapshot_strategy: %Spawn.Actors.ActorSnapshotStrategy{
-                  strategy: {:duration_ms, 60000},
-                  __unknown_fields__: []
-                },
-                deactivation_strategy: %Spawn.Actors.ActorDeactivationStrategy{
-                  strategy: {:duration_ms, 30000},
-                  __unknown_fields__: []
-                },
-                min_pool_size: 0,
-                max_pool_size: 0,
-                projection_settings: %Spawn.Actors.ProjectionSettings{
-                  subjects: [
-                    %Spawn.Actors.ProjectionSubject{
-                      actor: "ActorA",
-                      action: "ActionA",
-                      start_time: %Google.Protobuf.Timestamp{
-                        seconds: 1_672_531_200,
-                        nanos: 0,
-                        __unknown_fields__: []
-                      },
-                      __unknown_fields__: []
-                    }
-                  ],
-                  sourceable: false,
-                  events_retention_strategy: %Spawn.Actors.EventsRetentionStrategy{
-                    strategy: {:duration_ms, 86_400_000},
-                    __unknown_fields__: []
-                  },
-                  strict_events_ordering: false,
-                  __unknown_fields__: []
-                },
+              {Spawn.Actors.PbExtension, :actor} => %Spawn.Actors.ActorOpts{
                 state_type: ".example.ExampleState",
+                stateful: true,
+                deactivate_timeout: 3000,
+                snapshot_interval: 60000,
+                sourceable: false,
+                strict_events_ordering: false,
+                events_retention_strategy: nil,
+                subjects: [],
+                kind: :NAMED,
                 __unknown_fields__: []
               }
             },
@@ -107,7 +91,7 @@ defmodule Example.Actors.ExampleActor.Service do
         location: [
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [],
-            span: [0, 0, 38, 1],
+            span: [0, 0, 30, 1],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -155,7 +139,7 @@ defmodule Example.Actors.ExampleActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0],
-            span: [8, 0, 38, 1],
+            span: [8, 0, 30, 1],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -171,7 +155,7 @@ defmodule Example.Actors.ExampleActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 3],
-            span: [9, 2, 28, 4],
+            span: [9, 2, 15, 4],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -179,7 +163,7 @@ defmodule Example.Actors.ExampleActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 3, 4_890_128],
-            span: [9, 2, 28, 4],
+            span: [9, 2, 15, 4],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -187,7 +171,7 @@ defmodule Example.Actors.ExampleActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 0],
-            span: [30, 2, 35, 3],
+            span: [17, 2, 22, 3],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -195,7 +179,7 @@ defmodule Example.Actors.ExampleActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 0, 1],
-            span: [30, 6, 17],
+            span: [17, 6, 17],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -203,7 +187,7 @@ defmodule Example.Actors.ExampleActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 0, 2],
-            span: [30, 19, 40],
+            span: [17, 19, 40],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -211,7 +195,7 @@ defmodule Example.Actors.ExampleActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 0, 3],
-            span: [30, 51, 77],
+            span: [17, 51, 77],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -219,7 +203,7 @@ defmodule Example.Actors.ExampleActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 0, 4],
-            span: [31, 4, 34, 6],
+            span: [18, 4, 21, 6],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -227,7 +211,7 @@ defmodule Example.Actors.ExampleActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 0, 4, 4_890_127],
-            span: [31, 4, 34, 6],
+            span: [18, 4, 21, 6],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -235,7 +219,7 @@ defmodule Example.Actors.ExampleActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 1],
-            span: [37, 2, 78],
+            span: [24, 2, 29, 3],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -243,7 +227,7 @@ defmodule Example.Actors.ExampleActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 1, 1],
-            span: [37, 6, 13],
+            span: [24, 6, 9],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -251,7 +235,7 @@ defmodule Example.Actors.ExampleActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 1, 2],
-            span: [37, 15, 36],
+            span: [24, 11, 32],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -259,7 +243,23 @@ defmodule Example.Actors.ExampleActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 1, 3],
-            span: ~c"%/I",
+            span: [24, 43, 63],
+            leading_comments: nil,
+            trailing_comments: nil,
+            leading_detached_comments: [],
+            __unknown_fields__: []
+          },
+          %Google.Protobuf.SourceCodeInfo.Location{
+            path: [6, 0, 2, 1, 4],
+            span: [25, 4, 28, 6],
+            leading_comments: nil,
+            trailing_comments: nil,
+            leading_detached_comments: [],
+            __unknown_fields__: []
+          },
+          %Google.Protobuf.SourceCodeInfo.Location{
+            path: [6, 0, 2, 1, 4, 72_295_728],
+            span: [25, 4, 28, 6],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -287,7 +287,19 @@ defmodule Example.Actors.ExampleActor.Service do
     }
   })
 
-  rpc(:ActionA, Example.ValuePayload, Example.SomeQueryResponse, %{})
+  rpc(:Sum, Example.ValuePayload, Example.SumResponse, %{
+    http: %{
+      type: Google.Api.PbExtension,
+      value: %Google.Api.HttpRule{
+        selector: "",
+        body: "*",
+        additional_bindings: [],
+        response_body: "",
+        pattern: {:post, "/v1/example/sum"},
+        __unknown_fields__: []
+      }
+    }
+  })
 end
 
 defmodule Example.Actors.ExampleActor.Stub do
@@ -314,13 +326,12 @@ defmodule Example.Actors.ExampleActor.ActorDispatcher do
     Dispatcher.dispatch(request)
   end
 
-  @spec action_a(Example.ValuePayload.t(), GRPC.Server.Stream.t()) ::
-          Example.SomeQueryResponse.t()
-  def action_a(message, stream) do
+  @spec sum(Example.ValuePayload.t(), GRPC.Server.Stream.t()) :: Example.SumResponse.t()
+  def sum(message, stream) do
     request = %{
       system: "spawn-system",
       actor_name: "ExampleActor",
-      action_name: "ActionA",
+      action_name: "Sum",
       input: message,
       stream: stream,
       descriptor: Example.Actors.ExampleActor.Service.descriptor()
@@ -427,7 +438,7 @@ defmodule Example.Actors.ExampleActor do
   end
 
   @doc """
-  Invokes the ActionA method registered on ExampleActor.
+  Invokes the Sum method registered on ExampleActor.
 
   ## Parameters
   - `ref` - The actor ref to send the action to.
@@ -436,35 +447,35 @@ defmodule Example.Actors.ExampleActor do
 
   ## Examples
   ```elixir
-  iex> Example.Actors.ExampleActor.action_a(%SpawnSdk.ActorRef{name: "actor_id_01", system: "spawn-system"}, %Example.ValuePayload{}, async: false, metadata: %{"example" => "metadata"})
-  {:ok, %Example.SomeQueryResponse{}}
+  iex> Example.Actors.ExampleActor.sum(%SpawnSdk.ActorRef{name: "actor_id_01", system: "spawn-system"}, %Example.ValuePayload{}, async: false, metadata: %{"example" => "metadata"})
+  {:ok, %Example.SumResponse{}}
   ```
   """
-  def action_a() do
+  def sum() do
     %SpawnSdk.ActorRef{system: "spawn-system", name: "ExampleActor"}
-    |> action_a(%Example.ValuePayload{}, [])
+    |> sum(%Example.ValuePayload{}, [])
   end
 
-  def action_a(%Example.ValuePayload{} = payload) do
+  def sum(%Example.ValuePayload{} = payload) do
     %SpawnSdk.ActorRef{system: "spawn-system", name: "ExampleActor"}
-    |> action_a(payload, [])
+    |> sum(payload, [])
   end
 
-  def action_a(%Example.ValuePayload{} = payload, opts) when is_list(opts) do
+  def sum(%Example.ValuePayload{} = payload, opts) when is_list(opts) do
     %SpawnSdk.ActorRef{system: "spawn-system", name: "ExampleActor"}
-    |> action_a(payload, opts)
+    |> sum(payload, opts)
   end
 
-  def action_a(%SpawnSdk.ActorRef{} = ref, %Example.ValuePayload{} = payload) do
+  def sum(%SpawnSdk.ActorRef{} = ref, %Example.ValuePayload{} = payload) do
     ref
-    |> action_a(payload, [])
+    |> sum(payload, [])
   end
 
-  def action_a(%SpawnSdk.ActorRef{} = ref, %Example.ValuePayload{} = payload, opts)
+  def sum(%SpawnSdk.ActorRef{} = ref, %Example.ValuePayload{} = payload, opts)
       when is_list(opts) do
     opts = [
       system: ref.system || "spawn-system",
-      action: "ActionA",
+      action: "Sum",
       payload: payload,
       async: opts[:async] || false,
       metadata: opts[:metadata] || %{}

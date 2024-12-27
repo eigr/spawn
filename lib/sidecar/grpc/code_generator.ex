@@ -107,11 +107,11 @@ defmodule Sidecar.GRPC.CodeGenerator do
 
     # do something after generating the code
     Enum.each(svcs, fn svc ->
-      actor_settings =
-        svc.options.__pb_extensions__ |> Map.get({Spawn.Actors.PbExtension, :settings})
+      actor_opts =
+        svc.options.__pb_extensions__ |> Map.get({Spawn.Actors.PbExtension, :actor})
 
-      if not is_nil(actor_settings) do
-        :persistent_term.put("actor-#{svc.name}", actor_settings)
+      if not is_nil(actor_opts) do
+        :persistent_term.put("actor-#{svc.name}", actor_opts)
       end
 
       Enum.each(svc.method, fn method ->

@@ -14,10 +14,22 @@ message ActorViewOption {
   string map_to = 2;
 }
 
+message ActorOpts {
+  string state_type = 1;
+  bool stateful = 2;
+  int64 deactivate_timeout = 3;
+  int64 snapshot_interval = 4;
+  bool sourceable = 5;
+  bool strict_events_ordering = 6;
+  spawn.actors.EventsRetentionStrategy events_retention_strategy = 7;
+  repeated spawn.actors.ProjectionSubject subjects = 8;
+  spawn.actors.Kind kind = 9;
+}
+
 extend google.protobuf.MethodOptions {
   ActorViewOption view = 4890127;
 }
 
 extend google.protobuf.ServiceOptions {
-  spawn.actors.ActorSettings settings = 4890128;
+  ActorOpts actor = 4890128;
 }

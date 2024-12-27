@@ -1,6 +1,6 @@
 defmodule Example.ValuePayload do
   @moduledoc false
-  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
+  use Protobuf, protoc_gen_elixir_version: "0.13.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -39,7 +39,7 @@ end
 
 defmodule Example.ExampleState do
   @moduledoc false
-  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
+  use Protobuf, protoc_gen_elixir_version: "0.13.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -78,7 +78,7 @@ end
 
 defmodule Example.SumResponse do
   @moduledoc false
-  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
+  use Protobuf, protoc_gen_elixir_version: "0.13.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -117,7 +117,7 @@ end
 
 defmodule Example.SomeQueryResponse do
   @moduledoc false
-  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
+  use Protobuf, protoc_gen_elixir_version: "0.13.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
