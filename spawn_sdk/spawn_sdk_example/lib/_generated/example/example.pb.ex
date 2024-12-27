@@ -20,6 +20,32 @@ defmodule Example.ValuePayload do
           json_name: "value",
           proto3_optional: nil,
           __unknown_fields__: []
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "id",
+          extendee: nil,
+          number: 2,
+          label: :LABEL_OPTIONAL,
+          type: :TYPE_STRING,
+          type_name: nil,
+          default_value: nil,
+          options: %Google.Protobuf.FieldOptions{
+            ctype: :STRING,
+            packed: nil,
+            deprecated: false,
+            lazy: false,
+            jstype: :JS_NORMAL,
+            weak: false,
+            unverified_lazy: false,
+            debug_redact: false,
+            uninterpreted_option: [],
+            __pb_extensions__: %{{Spawn.Actors.PbExtension, :actor_id} => true},
+            __unknown_fields__: []
+          },
+          oneof_index: nil,
+          json_name: "id",
+          proto3_optional: nil,
+          __unknown_fields__: []
         }
       ],
       nested_type: [],
@@ -35,6 +61,7 @@ defmodule Example.ValuePayload do
   end
 
   field(:value, 1, type: :int32)
+  field(:id, 2, type: :string, deprecated: false)
 end
 
 defmodule Example.ExampleState do

@@ -35,7 +35,7 @@ defmodule Sidecar.GRPC.Generators.ActorInvoker do
 
       ## Examples
       ```elixir
-      iex> <%= @module %>.get_state(%SpawnSdk.ActorRef{name: "actor_id_01", system: "spawn-system"})
+      iex> <%= @module %>.get_state(SpawnSdk.Actor.ref("<%= @actor_system %>", "actor_id_01"))
       {:ok, actor_state}
       ```
       \"\"\"
@@ -58,20 +58,6 @@ defmodule Sidecar.GRPC.Generators.ActorInvoker do
       end
 
       <%= for {method_name, input, output, _options} <- @methods do %>
-        @doc \"\"\"
-        Invokes the <%= method_name %> method registered on <%= @actor_name %>.
-
-        ## Parameters
-        - `ref` - The actor ref to send the action to.
-        - `payload` - The payload to send to the action.
-        - `opts` - The options to pass to the action.
-
-        ## Examples
-        ```elixir
-        iex> <%= @module %>.<%= Macro.underscore(method_name) %>(%SpawnSdk.ActorRef{name: "actor_id_01", system: "spawn-system"}, %<%= input %>{}, async: false, metadata: %{"example" => "metadata"})
-        {:ok, %<%= output %>{}}
-        ```
-        \"\"\"
         def <%= Macro.underscore(method_name) %>() do
           %SpawnSdk.ActorRef{system: "<%= @actor_system %>", name: "<%= @actor_name %>"}
           |> <%= Macro.underscore(method_name) %>(%<%= input %>{}, []) 
@@ -92,6 +78,20 @@ defmodule Sidecar.GRPC.Generators.ActorInvoker do
           |> <%= Macro.underscore(method_name) %>(payload, []) 
         end
 
+        @doc \"\"\"
+        Invokes the <%= method_name %> method registered on <%= @actor_name %>.
+
+        ## Parameters
+        - `ref` - The actor ref to send the action to.
+        - `payload` - The payload to send to the action.
+        - `opts` - The options to pass to the action.
+
+        ## Examples
+        ```elixir
+        iex> <%= @module %>.<%= Macro.underscore(method_name) %>(SpawnSdk.Actor.ref("<%= @actor_system %>", "actor_id_01"), %<%= input %>{}, async: false, metadata: %{"example" => "metadata"})
+        {:ok, %<%= output %>{}}
+        ```
+        \"\"\"
         def <%= Macro.underscore(method_name) %>(%SpawnSdk.ActorRef{} = ref, %<%= input %>{} = payload, opts) when is_list(opts) do
           opts = [
             system: ref.system || "<%= @actor_system %>",

@@ -77,8 +77,7 @@ defmodule Sidecar.GRPC.CodeGenerator do
           "--output-path=#{output_path}",
           "--plugin=#{grpc_generator_plugin}",
           "--plugin=#{handler_generator_plugin}",
-          "--plugin=Sidecar.GRPC.Generators.ServiceGenerator",
-          "--plugin=Sidecar.Grpc.Generators.ReflectionServerGenerator"
+          "--plugin=Sidecar.GRPC.Generators.GeneratorAccumulator"
         ] ++
           invoker_helper ++
           user_defined_proto_files_list
@@ -103,9 +102,70 @@ defmodule Sidecar.GRPC.CodeGenerator do
 
   def after_compile_hook do
     svcs = :persistent_term.get(:proto_file_descriptors, [])
+    current_services = :persistent_term.get(:grpc_services, [])
     ctx = :persistent_term.get(:proto_file_ctx, nil)
 
-    # do something after generating the code
+    dispatchers =
+      current_services
+      |> Enum.reduce("", fn svc, acc -> "#{svc}.ActorDispatcher,\n#{acc}" end)
+
+    reflections =
+      current_services
+      |> Enum.reduce("", fn svc, acc -> "#{svc}.Service,\n#{acc}" end)
+
+    compile_proxy_endpoint(dispatchers)
+    compile_reflections(reflections)
+    put_actor_definition_settings(svcs, ctx)
+
+    :persistent_term.erase(:proto_file_descriptors)
+    :persistent_term.erase(:proto_file_ctx)
+    :persistent_term.erase(:grpc_services)
+
+    :ok
+  end
+
+  defp compile_reflections(reflections) do
+    Code.compile_string("""
+    defmodule Sidecar.GRPC.Reflection.Server do
+      defmodule V1 do
+        use GrpcReflection.Server, version: :v1, services: [
+          #{reflections}
+        ]
+      end
+
+      defmodule V1Alpha do
+        use GrpcReflection.Server, version: :v1alpha, services: [
+          #{reflections}
+        ]
+      end
+    end
+    """)
+  end
+
+  defp compile_proxy_endpoint(endpoints) do
+    Code.compile_string("""
+    defmodule Sidecar.GRPC.ProxyEndpoint do
+      use GRPC.Endpoint
+
+      intercept(GRPC.Server.Interceptors.Logger)
+
+      services = [
+        #{endpoints}
+      ]
+
+      services =
+        [
+          Sidecar.GRPC.Reflection.Server.V1,
+          Sidecar.GRPC.Reflection.Server.V1Alpha,
+          Spawn.Actors.Healthcheck.HealthCheckActor.ActorDispatcher
+        ] ++ services
+
+      run(services)
+    end
+    """)
+  end
+
+  defp put_actor_definition_settings(svcs, ctx) do
     Enum.each(svcs, fn svc ->
       actor_opts =
         svc.options.__pb_extensions__ |> Map.get({Spawn.Actors.PbExtension, :actor})
@@ -151,11 +211,6 @@ defmodule Sidecar.GRPC.CodeGenerator do
         end
       end)
     end)
-
-    :persistent_term.erase(:proto_file_descriptors)
-    :persistent_term.erase(:proto_file_ctx)
-
-    :ok
   end
 
   @doc """
