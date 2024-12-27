@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "example/example.proto";
+import "spawn/actors/extensions.proto";
+
+package example.actors;
+
+service ProjectionActor {
+  option (spawn.actors.actor) = {
+    kind: PROJECTION
+    stateful: true
+    state_type: ".example.ExampleState"
+    snapshot_interval: 60000
+    deactivate_timeout: 999999999
+    strict_events_ordering: false
+    subjects: [
+      { actor: "ClockActor", action: "Clock" } 
+    ]
+    events_retention_strategy: {
+      duration_ms: 86000
+    }
+  };
+
+  rpc ExampleView (.example.ValuePayload) returns (.example.SomeQueryResponse) {
+    option (spawn.actors.view) = {
+      query: "SELECT id, name, age WHERE name = :customer_name"
+      map_to: "results"
+    };
+  }
+}

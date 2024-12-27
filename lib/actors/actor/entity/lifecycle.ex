@@ -23,6 +23,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
   }
 
   alias Sidecar.Measurements
+  alias Spawn.Utils.AnySerializer
 
   import Spawn.Utils.Common, only: [return_and_maybe_hibernate: 1]
 
@@ -108,7 +109,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
 
   def load_state(
         %EntityState{
-          actor: %Actor{settings: %ActorSettings{stateful: true}} = actor,
+          actor: %Actor{settings: %ActorSettings{state_type: state_type, stateful: true}} = actor,
           revision: revision,
           opts: opts
         } = state
@@ -130,8 +131,12 @@ defmodule Actors.Actor.Entity.Lifecycle do
       {:not_found, %{}, _current_revision} ->
         Logger.debug("Not found state on statestore for Actor #{inspect(actor.id)}.")
 
-        {:noreply, updated_state(state, state.actor.state, revision),
-         {:continue, :call_init_action}}
+        initial_state = %{
+          state.actor.state
+          | state: state.actor.state.state || maybe_parse_empty_struct(state_type)
+        }
+
+        {:noreply, updated_state(state, initial_state, revision), {:continue, :call_init_action}}
 
       error ->
         handle_load_state_error(actor.id, state, error)
@@ -438,4 +443,14 @@ defmodule Actors.Actor.Entity.Lifecycle do
        do: (timeout || @default_deactivate_timeout) + timeout_factor
 
   defp get_jitter(), do: :rand.uniform(@timeout_jitter)
+
+  defp maybe_parse_empty_struct(""), do: nil
+  defp maybe_parse_empty_struct(nil), do: nil
+
+  defp maybe_parse_empty_struct(state_type) do
+    state_type
+    |> AnySerializer.normalize_package_name()
+    |> struct()
+    |> AnySerializer.any_pack!()
+  end
 end

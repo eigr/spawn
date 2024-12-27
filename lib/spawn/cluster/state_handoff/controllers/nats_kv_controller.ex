@@ -124,7 +124,9 @@ defmodule Spawn.Cluster.StateHandoff.Controllers.NatsKvController do
     key = generate_key(id)
 
     hosts = get_hosts(id)
-    new_hosts = (hosts ++ [host]) |> Enum.uniq() |> :erlang.term_to_binary()
+
+    new_hosts =
+      ([host] ++ hosts) |> Enum.uniq_by(&{&1.node, &1.actor.id}) |> :erlang.term_to_binary()
 
     :ok =
       Jetstream.API.KV.put_value(

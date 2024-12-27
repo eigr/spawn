@@ -2,8 +2,11 @@ syntax = "proto3";
 
 package example;
 
+import "spawn/actors/extensions.proto";
+
 message ValuePayload {
   int32 value = 1;
+  string id = 2 [(spawn.actors.actor_id) = true];
 }
 
 message ExampleState {
@@ -17,3 +20,4 @@ message SumResponse {
 message SomeQueryResponse {
   repeated SumResponse results = 1;
 }
+

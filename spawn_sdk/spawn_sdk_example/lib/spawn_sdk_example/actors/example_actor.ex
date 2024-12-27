@@ -18,12 +18,7 @@ defmodule SpawnSdkExample.Actors.ExampleActor do
   action("Sum", fn %Context{state: state} = ctx, %ValuePayload{value: value} = data ->
     Logger.info("[Example] Received Request: #{inspect(data)}. Context: #{inspect(ctx)}")
 
-    new_value =
-      if is_nil(state) do
-        0 + value
-      else
-        (state.value || 0) + value
-      end
+    new_value = state.value + value
 
     Value.of()
     |> Value.state(%ExampleState{value: new_value})

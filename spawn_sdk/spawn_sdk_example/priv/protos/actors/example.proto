@@ -15,13 +15,6 @@ service ExampleActor {
     deactivate_timeout: 3000
   };
 
-  rpc ExampleView (.example.ValuePayload) returns (.example.SomeQueryResponse) {
-    option (spawn.actors.view) = {
-      query: "SELECT id, name, age WHERE name = :customer_name"
-      map_to: "results"
-    };
-  }
-
   rpc Sum (.example.ValuePayload) returns (.example.SumResponse) {
     option (google.api.http) = {
       post: "/v1/example/sum"
