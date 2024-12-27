@@ -16,19 +16,52 @@ defmodule Statestores.Projection.Query.ParserTest do
   # end
 
   describe "parse/1 group by expressions" do
-    test "parses query with GROUP BY and HAVING clauses" do
-      # dsl = "select sum(points) as total_points group by team having total_points > 100 order by total_points desc"
-      # dsl = "select points, team group by team having sum(points) > 100 order by points desc"
+    # test "parses query with GROUP BY and HAVING clauses" do
+    #   # dsl = "select sum(points) as total_points group by team having total_points > 100 order by total_points desc"
+    #   # dsl = "select points, team group by team having sum(points) > 100 order by points desc"
+    #   dsl =
+    #     "select sum(points) as total where age > 30 and salary <= 5000 group by department having count(employees) > 10 order by total desc"
+
+    #   {select, where, group_by, having, order_by} = Parser.parse(dsl)
+
+    #   assert select == [{:sum, :points, []}]
+    #   assert where == [{:where, :age, ">", 30}, {:where, :salary, "<=", 5000}]
+    #   assert group_by == [:team]
+    #   assert having == [{:having, :total_points, ">", 100}]
+    #   assert order_by == [{:total_points, :desc}]
+    # end
+
+    test "parse a query with all clauses" do
       dsl =
-        "select sum(points) as total where age > 30 and salary <= 5000 group by department having count(employees) > 10 order by total desc"
+        "select sum(points) as total, name where age > 30 and salary <= 5000 group by department having count(employees) > 10 order by total desc"
 
       {select, where, group_by, having, order_by} = Parser.parse(dsl)
 
-      assert select == [{:sum, :points, []}]
-      assert where == []
-      assert group_by == [:team]
-      assert having == [{:having, :total_points, ">", 100}]
-      assert order_by == [{:total_points, :desc}]
+      IO.inspect(select, label: "select")
+      IO.inspect(where, label: "where")
+      IO.inspect(group_by, label: "group_by")
+      IO.inspect(having, label: "having")
+      IO.inspect(order_by, label: "order_by")
+
+      assert select == [
+               {:sum, :points, :total},
+               {nil, :name, nil}
+             ]
+
+      assert where == [
+               {:where, :age, ">", 30},
+               {:where, :salary, "<=", 5000}
+             ]
+
+      assert group_by == [:department]
+
+      assert having == [
+               {:having, :employees, ">", 10}
+             ]
+
+      assert order_by == [
+               {:total, :desc}
+             ]
     end
 
     # test "parses query without HAVING clause" do
