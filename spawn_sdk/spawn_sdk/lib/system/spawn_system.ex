@@ -291,15 +291,9 @@ defmodule SpawnSdk.System.SpawnSystem do
 
     payload_response = parse_payload(response)
 
-    dbg(actor_settings)
-
     state_type =
       maybe_get_state_type_from_settings(actor_settings) ||
         actor_instance.__meta__(:state_type)
-
-    dbg(self_actor_id)
-    dbg(state_type)
-    dbg(host_state || current_state)
 
     new_state =
       case pack_all_to_any(host_state || current_state, state_type) do
