@@ -382,6 +382,51 @@ defmodule Example.Actors.ExampleActor do
   @moduledoc "This module provides helper functions for invoking the methods on the Example.Actors.ExampleActor actor."
 
   @doc """
+  Invokes the get_state implicit action for this actor.
+
+  ## Examples
+  ```elixir
+  iex> Example.Actors.ExampleActor.get_state()
+  {:ok, actor_state}
+  ```
+  """
+  def get_state do
+    %SpawnSdk.ActorRef{system: "spawn-system", name: "ExampleActor"}
+    |> get_state()
+  end
+
+  @doc """
+  Invokes the get_state implicit action.
+
+  ## Parameters
+  - `ref` - The actor ref to send the action to.
+
+  ## Examples
+  ```elixir
+  iex> Example.Actors.ExampleActor.get_state(%SpawnSdk.ActorRef{name: "actor_id_01", system: "spawn-system"})
+  {:ok, actor_state}
+  ```
+  """
+  def get_state(%SpawnSdk.ActorRef{} = ref) do
+    opts = [
+      system: ref.system || "spawn-system",
+      action: "get_state",
+      async: false
+    ]
+
+    actor_to_invoke = ref.name || "ExampleActor"
+
+    opts =
+      if actor_to_invoke == "ExampleActor" do
+        opts
+      else
+        Keyword.put(opts, :ref, "ExampleActor")
+      end
+
+    SpawnSdk.invoke(actor_to_invoke, opts)
+  end
+
+  @doc """
   Invokes the ExampleView method registered on ExampleActor.
 
   ## Parameters
