@@ -285,9 +285,10 @@ defmodule Sidecar.GRPC.Dispatcher do
   defp build_actor_id_from_settings(
          system_name,
          actor_name,
-         %ActorSettings{kind: :NAMED} = _settings,
+         %ActorSettings{kind: kind},
          _message
-       ) do
+       )
+       when kind in [:NAMED, :PROJECTION, :TASK] do
     %ActorId{system: system_name, name: actor_name}
   end
 
@@ -299,6 +300,7 @@ defmodule Sidecar.GRPC.Dispatcher do
        ) do
     {ctype, name} = find_actor_name_and_ctype(message)
     actor_id_name = get_actor_id_name(ctype, message, name)
+
     %ActorId{system: system_name, name: actor_id_name, parent: actor_name}
   end
 
@@ -308,15 +310,19 @@ defmodule Sidecar.GRPC.Dispatcher do
     module = message.__struct__
     descriptor_proto = apply(module, :descriptor, [])
 
-    Enum.find_value(descriptor_proto.field, fn %Google.Protobuf.FieldDescriptorProto{
-                                                 name: name,
-                                                 options: %Google.Protobuf.FieldOptions{
-                                                   ctype: ctype,
-                                                   __pb_extensions__: ext
-                                                 }
-                                               } ->
-      Map.get(ext, {Spawn.Actors.PbExtension, :actor_id}, false) &&
-        {ctype, String.to_atom(name)}
+    Enum.find_value(descriptor_proto.field, fn
+      %Google.Protobuf.FieldDescriptorProto{
+        name: name,
+        options: %Google.Protobuf.FieldOptions{
+          ctype: ctype,
+          __pb_extensions__: ext
+        }
+      } ->
+        Map.get(ext, {Spawn.Actors.PbExtension, :actor_id}, false) &&
+          {ctype, String.to_atom(name)}
+
+      _ ->
+        nil
     end)
   end
 

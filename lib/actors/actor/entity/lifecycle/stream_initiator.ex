@@ -120,11 +120,20 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamInitiator do
 
   defp build_sources(%ProjectionSettings{} = settings) do
     settings.subjects
-    |> Enum.map(fn %ProjectionSubject{start_time: %Timestamp{seconds: start_at}} = subject ->
+    |> Enum.map(fn %ProjectionSubject{} = subject ->
+      opt_start_time =
+        case subject.start_time do
+          nil ->
+            DateTime.from_unix!(0, :second)
+
+          %Timestamp{seconds: start_at} ->
+            DateTime.from_unix!(start_at, :second)
+        end
+
       %{
         name: subject.actor,
         filter_subject: "actors.#{subject.actor}.*.#{subject.action}",
-        opt_start_time: DateTime.from_unix!(start_at, :second)
+        opt_start_time: opt_start_time
       }
     end)
   end

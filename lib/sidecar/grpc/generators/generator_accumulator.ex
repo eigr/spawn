@@ -1,4 +1,4 @@
-defmodule Sidecar.GRPC.Generators.ServiceGenerator do
+defmodule Sidecar.GRPC.Generators.GeneratorAccumulator do
   @moduledoc """
   Module for generating a gRPC proxy endpoint module.
 
@@ -13,28 +13,7 @@ defmodule Sidecar.GRPC.Generators.ServiceGenerator do
 
   @impl true
   def template do
-    """
-    defmodule Sidecar.GRPC.ProxyEndpoint do
-      use GRPC.Endpoint
-
-      intercept(GRPC.Server.Interceptors.Logger)
-
-      services = [
-    <%= for service_name <- @services do %>
-      <%= service_name %>.ActorDispatcher,
-    <% end %>
-      ]
-
-      services =
-        [
-          Sidecar.GRPC.Reflection.Server.V1,
-          Sidecar.GRPC.Reflection.Server.V1Alpha,
-          Spawn.Actors.Healthcheck.HealthCheckActor.ActorDispatcher
-        ] ++ services
-
-      run(services)
-    end
-    """
+    ""
   end
 
   @impl true
@@ -42,7 +21,7 @@ defmodule Sidecar.GRPC.Generators.ServiceGenerator do
     current_services = :persistent_term.get(:grpc_services, [])
     descriptors = (:persistent_term.get(:proto_file_descriptors, []) ++ svcs) |> Enum.uniq()
 
-    services = do_generate(ctx, svcs, current_services)
+    services = services_to_module(ctx, svcs, current_services)
 
     :persistent_term.put(:grpc_services, services)
     :persistent_term.put(:proto_file_descriptors, descriptors)
@@ -54,10 +33,10 @@ defmodule Sidecar.GRPC.Generators.ServiceGenerator do
      ]}
   end
 
-  defp do_generate(_ctx, nil, current_services), do: current_services
-  defp do_generate(_ctx, [], current_services), do: current_services
+  defp services_to_module(_ctx, nil, current_services), do: current_services
+  defp services_to_module(_ctx, [], current_services), do: current_services
 
-  defp do_generate(ctx, svcs, current_services) do
+  defp services_to_module(ctx, svcs, current_services) do
     svcs
     |> Enum.map(fn svc -> Util.mod_name(ctx, [Macro.camelize(svc.name)]) end)
     |> Kernel.++(current_services)
