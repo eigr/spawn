@@ -60,6 +60,7 @@ defmodule Statestores.MixProject do
       {:ecto_sql, "~> 3.12"},
       {:scrivener_ecto, "~> 3.0"},
       {:nimble_parsec, "~> 1.4"},
+      {:sql_parser, "~> 0.2"},
       {:jason, "~> 1.3"},
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false}

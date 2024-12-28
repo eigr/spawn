@@ -5,15 +5,6 @@ package spawn.actors;
 import "google/protobuf/descriptor.proto";
 import "spawn/actors/actor.proto";
 
-extend google.protobuf.FieldOptions {
-  bool actor_id = 9999;
-}
-
-message ActorViewOption {
-  string query = 1;
-  string map_to = 2;
-}
-
 message ActorOpts {
   string state_type = 1;
   bool stateful = 2;
@@ -24,6 +15,19 @@ message ActorOpts {
   spawn.actors.EventsRetentionStrategy events_retention_strategy = 7;
   repeated spawn.actors.ProjectionSubject subjects = 8;
   spawn.actors.Kind kind = 9;
+}
+
+extend google.protobuf.FieldOptions {
+  bool actor_id = 9999;
+}
+
+extend google.protobuf.FieldOptions {
+  bool searchable = 4890129;
+}
+
+message ActorViewOption {
+  string query = 1;
+  string map_to = 2;
 }
 
 extend google.protobuf.MethodOptions {
