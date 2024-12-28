@@ -17,17 +17,17 @@ message ActorOpts {
   spawn.actors.Kind kind = 9;
 }
 
+message ActorViewOption {
+  string query = 1;
+  string map_to = 2;
+}
+
 extend google.protobuf.FieldOptions {
   bool actor_id = 9999;
 }
 
 extend google.protobuf.FieldOptions {
   bool searchable = 4890129;
-}
-
-message ActorViewOption {
-  string query = 1;
-  string map_to = 2;
 }
 
 extend google.protobuf.MethodOptions {
