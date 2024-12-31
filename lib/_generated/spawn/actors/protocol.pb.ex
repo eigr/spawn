@@ -39,10 +39,10 @@ defmodule Spawn.Status do
     }
   end
 
-  field(:UNKNOWN, 0)
-  field(:OK, 1)
-  field(:ACTOR_NOT_FOUND, 2)
-  field(:ERROR, 3)
+  field :UNKNOWN, 0
+  field :OK, 1
+  field :ACTOR_NOT_FOUND, 2
+  field :ERROR, 3
 end
 
 defmodule Spawn.Context.MetadataEntry do
@@ -104,8 +104,8 @@ defmodule Spawn.Context.MetadataEntry do
     }
   end
 
-  field(:key, 1, type: :string)
-  field(:value, 2, type: :string)
+  field :key, 1, type: :string
+  field :value, 2, type: :string
 end
 
 defmodule Spawn.Context.TagsEntry do
@@ -167,8 +167,8 @@ defmodule Spawn.Context.TagsEntry do
     }
   end
 
-  field(:key, 1, type: :string)
-  field(:value, 2, type: :string)
+  field :key, 1, type: :string
+  field :value, 2, type: :string
 end
 
 defmodule Spawn.Context do
@@ -366,11 +366,11 @@ defmodule Spawn.Context do
     }
   end
 
-  field(:state, 1, type: Google.Protobuf.Any)
-  field(:metadata, 4, repeated: true, type: Spawn.Context.MetadataEntry, map: true)
-  field(:tags, 5, repeated: true, type: Spawn.Context.TagsEntry, map: true)
-  field(:caller, 2, type: Spawn.Actors.ActorId)
-  field(:self, 3, type: Spawn.Actors.ActorId)
+  field :state, 1, type: Google.Protobuf.Any
+  field :metadata, 4, repeated: true, type: Spawn.Context.MetadataEntry, map: true
+  field :tags, 5, repeated: true, type: Spawn.Context.TagsEntry, map: true
+  field :caller, 2, type: Spawn.Actors.ActorId
+  field :self, 3, type: Spawn.Actors.ActorId
 end
 
 defmodule Spawn.Noop do
@@ -431,7 +431,7 @@ defmodule Spawn.JSONType do
     }
   end
 
-  field(:content, 1, type: :string)
+  field :content, 1, type: :string
 end
 
 defmodule Spawn.RegistrationRequest do
@@ -484,8 +484,8 @@ defmodule Spawn.RegistrationRequest do
     }
   end
 
-  field(:service_info, 1, type: Spawn.ServiceInfo, json_name: "serviceInfo")
-  field(:actor_system, 2, type: Spawn.Actors.ActorSystem, json_name: "actorSystem")
+  field :service_info, 1, type: Spawn.ServiceInfo, json_name: "serviceInfo"
+  field :actor_system, 2, type: Spawn.Actors.ActorSystem, json_name: "actorSystem"
 end
 
 defmodule Spawn.RegistrationResponse do
@@ -538,8 +538,8 @@ defmodule Spawn.RegistrationResponse do
     }
   end
 
-  field(:status, 1, type: Spawn.RequestStatus)
-  field(:proxy_info, 2, type: Spawn.ProxyInfo, json_name: "proxyInfo")
+  field :status, 1, type: Spawn.RequestStatus
+  field :proxy_info, 2, type: Spawn.ProxyInfo, json_name: "proxyInfo"
 end
 
 defmodule Spawn.ServiceInfo do
@@ -662,13 +662,13 @@ defmodule Spawn.ServiceInfo do
     }
   end
 
-  field(:service_name, 1, type: :string, json_name: "serviceName")
-  field(:service_version, 2, type: :string, json_name: "serviceVersion")
-  field(:service_runtime, 3, type: :string, json_name: "serviceRuntime")
-  field(:support_library_name, 4, type: :string, json_name: "supportLibraryName")
-  field(:support_library_version, 5, type: :string, json_name: "supportLibraryVersion")
-  field(:protocol_major_version, 6, type: :int32, json_name: "protocolMajorVersion")
-  field(:protocol_minor_version, 7, type: :int32, json_name: "protocolMinorVersion")
+  field :service_name, 1, type: :string, json_name: "serviceName"
+  field :service_version, 2, type: :string, json_name: "serviceVersion"
+  field :service_runtime, 3, type: :string, json_name: "serviceRuntime"
+  field :support_library_name, 4, type: :string, json_name: "supportLibraryName"
+  field :support_library_version, 5, type: :string, json_name: "supportLibraryVersion"
+  field :protocol_major_version, 6, type: :int32, json_name: "protocolMajorVersion"
+  field :protocol_minor_version, 7, type: :int32, json_name: "protocolMinorVersion"
 end
 
 defmodule Spawn.SpawnRequest do
@@ -707,7 +707,7 @@ defmodule Spawn.SpawnRequest do
     }
   end
 
-  field(:actors, 1, repeated: true, type: Spawn.Actors.ActorId)
+  field :actors, 1, repeated: true, type: Spawn.Actors.ActorId
 end
 
 defmodule Spawn.SpawnResponse do
@@ -746,7 +746,7 @@ defmodule Spawn.SpawnResponse do
     }
   end
 
-  field(:status, 1, type: Spawn.RequestStatus)
+  field :status, 1, type: Spawn.RequestStatus
 end
 
 defmodule Spawn.ProxyInfo do
@@ -827,10 +827,10 @@ defmodule Spawn.ProxyInfo do
     }
   end
 
-  field(:protocol_major_version, 1, type: :int32, json_name: "protocolMajorVersion")
-  field(:protocol_minor_version, 2, type: :int32, json_name: "protocolMinorVersion")
-  field(:proxy_name, 3, type: :string, json_name: "proxyName")
-  field(:proxy_version, 4, type: :string, json_name: "proxyVersion")
+  field :protocol_major_version, 1, type: :int32, json_name: "protocolMajorVersion"
+  field :protocol_minor_version, 2, type: :int32, json_name: "protocolMinorVersion"
+  field :proxy_name, 3, type: :string, json_name: "proxyName"
+  field :proxy_version, 4, type: :string, json_name: "proxyVersion"
 end
 
 defmodule Spawn.SideEffect do
@@ -869,7 +869,7 @@ defmodule Spawn.SideEffect do
     }
   end
 
-  field(:request, 1, type: Spawn.InvocationRequest)
+  field :request, 1, type: Spawn.InvocationRequest
 end
 
 defmodule Spawn.Broadcast do
@@ -942,11 +942,11 @@ defmodule Spawn.Broadcast do
     }
   end
 
-  oneof(:payload, 0)
+  oneof :payload, 0
 
-  field(:channel_group, 1, type: :string, json_name: "channelGroup")
-  field(:value, 3, type: Google.Protobuf.Any, oneof: 0)
-  field(:noop, 4, type: Spawn.Noop, oneof: 0)
+  field :channel_group, 1, type: :string, json_name: "channelGroup"
+  field :value, 3, type: Google.Protobuf.Any, oneof: 0
+  field :noop, 4, type: Spawn.Noop, oneof: 0
 end
 
 defmodule Spawn.Pipe do
@@ -999,8 +999,8 @@ defmodule Spawn.Pipe do
     }
   end
 
-  field(:actor, 1, type: :string)
-  field(:action_name, 2, type: :string, json_name: "actionName")
+  field :actor, 1, type: :string
+  field :action_name, 2, type: :string, json_name: "actionName"
 end
 
 defmodule Spawn.Forward do
@@ -1053,8 +1053,8 @@ defmodule Spawn.Forward do
     }
   end
 
-  field(:actor, 1, type: :string)
-  field(:action_name, 2, type: :string, json_name: "actionName")
+  field :actor, 1, type: :string
+  field :action_name, 2, type: :string, json_name: "actionName"
 end
 
 defmodule Spawn.Fact.MetadataEntry do
@@ -1116,8 +1116,8 @@ defmodule Spawn.Fact.MetadataEntry do
     }
   end
 
-  field(:key, 1, type: :string)
-  field(:value, 2, type: :string)
+  field :key, 1, type: :string
+  field :value, 2, type: :string
 end
 
 defmodule Spawn.Fact do
@@ -1250,10 +1250,10 @@ defmodule Spawn.Fact do
     }
   end
 
-  field(:uuid, 1, type: :string)
-  field(:state, 2, type: Google.Protobuf.Any)
-  field(:metadata, 3, repeated: true, type: Spawn.Fact.MetadataEntry, map: true)
-  field(:timestamp, 4, type: Google.Protobuf.Timestamp)
+  field :uuid, 1, type: :string
+  field :state, 2, type: Google.Protobuf.Any
+  field :metadata, 3, repeated: true, type: Spawn.Fact.MetadataEntry, map: true
+  field :timestamp, 4, type: Google.Protobuf.Timestamp
 end
 
 defmodule Spawn.Workflow do
@@ -1340,12 +1340,12 @@ defmodule Spawn.Workflow do
     }
   end
 
-  oneof(:routing, 0)
+  oneof :routing, 0
 
-  field(:broadcast, 2, type: Spawn.Broadcast)
-  field(:effects, 1, repeated: true, type: Spawn.SideEffect)
-  field(:pipe, 3, type: Spawn.Pipe, oneof: 0)
-  field(:forward, 4, type: Spawn.Forward, oneof: 0)
+  field :broadcast, 2, type: Spawn.Broadcast
+  field :effects, 1, repeated: true, type: Spawn.SideEffect
+  field :pipe, 3, type: Spawn.Pipe, oneof: 0
+  field :forward, 4, type: Spawn.Forward, oneof: 0
 end
 
 defmodule Spawn.InvocationRequest.MetadataEntry do
@@ -1407,8 +1407,8 @@ defmodule Spawn.InvocationRequest.MetadataEntry do
     }
   end
 
-  field(:key, 1, type: :string)
-  field(:value, 2, type: :string)
+  field :key, 1, type: :string
+  field :value, 2, type: :string
 end
 
 defmodule Spawn.InvocationRequest do
@@ -1645,19 +1645,19 @@ defmodule Spawn.InvocationRequest do
     }
   end
 
-  oneof(:payload, 0)
+  oneof :payload, 0
 
-  field(:system, 1, type: Spawn.Actors.ActorSystem)
-  field(:actor, 2, type: Spawn.Actors.Actor)
-  field(:action_name, 3, type: :string, json_name: "actionName")
-  field(:value, 4, type: Google.Protobuf.Any, oneof: 0)
-  field(:noop, 7, type: Spawn.Noop, oneof: 0)
-  field(:async, 5, type: :bool)
-  field(:caller, 6, type: Spawn.Actors.ActorId)
-  field(:metadata, 8, repeated: true, type: Spawn.InvocationRequest.MetadataEntry, map: true)
-  field(:scheduled_to, 9, type: :int64, json_name: "scheduledTo")
-  field(:pooled, 10, type: :bool)
-  field(:register_ref, 11, type: :string, json_name: "registerRef")
+  field :system, 1, type: Spawn.Actors.ActorSystem
+  field :actor, 2, type: Spawn.Actors.Actor
+  field :action_name, 3, type: :string, json_name: "actionName"
+  field :value, 4, type: Google.Protobuf.Any, oneof: 0
+  field :noop, 7, type: Spawn.Noop, oneof: 0
+  field :async, 5, type: :bool
+  field :caller, 6, type: Spawn.Actors.ActorId
+  field :metadata, 8, repeated: true, type: Spawn.InvocationRequest.MetadataEntry, map: true
+  field :scheduled_to, 9, type: :int64, json_name: "scheduledTo"
+  field :pooled, 10, type: :bool
+  field :register_ref, 11, type: :string, json_name: "registerRef"
 end
 
 defmodule Spawn.ActorInvocation do
@@ -1772,14 +1772,14 @@ defmodule Spawn.ActorInvocation do
     }
   end
 
-  oneof(:payload, 0)
+  oneof :payload, 0
 
-  field(:actor, 1, type: Spawn.Actors.ActorId)
-  field(:action_name, 2, type: :string, json_name: "actionName")
-  field(:current_context, 3, type: Spawn.Context, json_name: "currentContext")
-  field(:value, 4, type: Google.Protobuf.Any, oneof: 0)
-  field(:noop, 5, type: Spawn.Noop, oneof: 0)
-  field(:caller, 6, type: Spawn.Actors.ActorId)
+  field :actor, 1, type: Spawn.Actors.ActorId
+  field :action_name, 2, type: :string, json_name: "actionName"
+  field :current_context, 3, type: Spawn.Context, json_name: "currentContext"
+  field :value, 4, type: Google.Protobuf.Any, oneof: 0
+  field :noop, 5, type: Spawn.Noop, oneof: 0
+  field :caller, 6, type: Spawn.Actors.ActorId
 end
 
 defmodule Spawn.ActorInvocationResponse do
@@ -1908,15 +1908,15 @@ defmodule Spawn.ActorInvocationResponse do
     }
   end
 
-  oneof(:payload, 0)
+  oneof :payload, 0
 
-  field(:actor_name, 1, type: :string, json_name: "actorName")
-  field(:actor_system, 2, type: :string, json_name: "actorSystem")
-  field(:updated_context, 3, type: Spawn.Context, json_name: "updatedContext")
-  field(:value, 4, type: Google.Protobuf.Any, oneof: 0)
-  field(:noop, 6, type: Spawn.Noop, oneof: 0)
-  field(:workflow, 5, type: Spawn.Workflow)
-  field(:checkpoint, 7, type: :bool)
+  field :actor_name, 1, type: :string, json_name: "actorName"
+  field :actor_system, 2, type: :string, json_name: "actorSystem"
+  field :updated_context, 3, type: Spawn.Context, json_name: "updatedContext"
+  field :value, 4, type: Google.Protobuf.Any, oneof: 0
+  field :noop, 6, type: Spawn.Noop, oneof: 0
+  field :workflow, 5, type: Spawn.Workflow
+  field :checkpoint, 7, type: :bool
 end
 
 defmodule Spawn.InvocationResponse do
@@ -2017,13 +2017,13 @@ defmodule Spawn.InvocationResponse do
     }
   end
 
-  oneof(:payload, 0)
+  oneof :payload, 0
 
-  field(:status, 1, type: Spawn.RequestStatus)
-  field(:system, 2, type: Spawn.Actors.ActorSystem)
-  field(:actor, 3, type: Spawn.Actors.Actor)
-  field(:value, 4, type: Google.Protobuf.Any, oneof: 0)
-  field(:noop, 5, type: Spawn.Noop, oneof: 0)
+  field :status, 1, type: Spawn.RequestStatus
+  field :system, 2, type: Spawn.Actors.ActorSystem
+  field :actor, 3, type: Spawn.Actors.Actor
+  field :value, 4, type: Google.Protobuf.Any, oneof: 0
+  field :noop, 5, type: Spawn.Noop, oneof: 0
 end
 
 defmodule Spawn.RequestStatus do
@@ -2076,6 +2076,6 @@ defmodule Spawn.RequestStatus do
     }
   end
 
-  field(:status, 1, type: Spawn.Status, enum: true)
-  field(:message, 2, type: :string)
+  field :status, 1, type: Spawn.Status, enum: true
+  field :message, 2, type: :string
 end

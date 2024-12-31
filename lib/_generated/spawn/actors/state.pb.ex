@@ -34,7 +34,7 @@ defmodule Spawn.State.Revision do
     }
   end
 
-  field(:value, 1, type: :int64)
+  field :value, 1, type: :int64
 end
 
 defmodule Spawn.State.Checkpoint do
@@ -87,6 +87,6 @@ defmodule Spawn.State.Checkpoint do
     }
   end
 
-  field(:revision, 1, type: Spawn.State.Revision)
-  field(:state, 2, type: Spawn.Actors.ActorState)
+  field :revision, 1, type: Spawn.State.Revision
+  field :state, 2, type: Spawn.Actors.ActorState
 end
