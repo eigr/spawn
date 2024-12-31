@@ -62,6 +62,7 @@ defmodule Statestores.MixProject do
       {:nimble_parsec, "~> 1.4"},
       {:sql_parser, "~> 0.2"},
       {:jason, "~> 1.3"},
+      {:protobuf, "~> 0.13"},
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false}
     ]

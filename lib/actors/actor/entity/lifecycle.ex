@@ -308,7 +308,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
   end
 
   defp handle_projection(%Actor{settings: %ActorSettings{kind: :PROJECTION}} = actor) do
-    StreamInitiator.init_projection_stream(actor)
+    :ok = StreamInitiator.init_projection_stream(actor)
   end
 
   defp handle_projection(

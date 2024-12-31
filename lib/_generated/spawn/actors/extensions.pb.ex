@@ -2,20 +2,23 @@ defmodule Spawn.Actors.PbExtension do
   @moduledoc false
   use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
 
-  extend Google.Protobuf.FieldOptions, :actor_id, 9999,
+  extend(Google.Protobuf.FieldOptions, :actor_id, 9999,
     optional: true,
     type: :bool,
     json_name: "actorId"
+  )
 
-  extend Google.Protobuf.FieldOptions, :searchable, 4_890_129, optional: true, type: :bool
+  extend(Google.Protobuf.FieldOptions, :searchable, 4_890_129, optional: true, type: :bool)
 
-  extend Google.Protobuf.MethodOptions, :view, 4_890_127,
+  extend(Google.Protobuf.MethodOptions, :view, 4_890_127,
     optional: true,
     type: Spawn.Actors.ActorViewOption
+  )
 
-  extend Google.Protobuf.ServiceOptions, :actor, 4_890_128,
+  extend(Google.Protobuf.ServiceOptions, :actor, 4_890_128,
     optional: true,
     type: Spawn.Actors.ActorOpts
+  )
 end
 
 defmodule Spawn.Actors.ActorOpts do
@@ -166,19 +169,20 @@ defmodule Spawn.Actors.ActorOpts do
     }
   end
 
-  field :state_type, 1, type: :string, json_name: "stateType"
-  field :stateful, 2, type: :bool
-  field :deactivate_timeout, 3, type: :int64, json_name: "deactivateTimeout"
-  field :snapshot_interval, 4, type: :int64, json_name: "snapshotInterval"
-  field :sourceable, 5, type: :bool
-  field :strict_events_ordering, 6, type: :bool, json_name: "strictEventsOrdering"
+  field(:state_type, 1, type: :string, json_name: "stateType")
+  field(:stateful, 2, type: :bool)
+  field(:deactivate_timeout, 3, type: :int64, json_name: "deactivateTimeout")
+  field(:snapshot_interval, 4, type: :int64, json_name: "snapshotInterval")
+  field(:sourceable, 5, type: :bool)
+  field(:strict_events_ordering, 6, type: :bool, json_name: "strictEventsOrdering")
 
-  field :events_retention_strategy, 7,
+  field(:events_retention_strategy, 7,
     type: Spawn.Actors.EventsRetentionStrategy,
     json_name: "eventsRetentionStrategy"
+  )
 
-  field :subjects, 8, repeated: true, type: Spawn.Actors.ProjectionSubject
-  field :kind, 9, type: Spawn.Actors.Kind, enum: true
+  field(:subjects, 8, repeated: true, type: Spawn.Actors.ProjectionSubject)
+  field(:kind, 9, type: Spawn.Actors.Kind, enum: true)
 end
 
 defmodule Spawn.Actors.ActorViewOption do
@@ -231,6 +235,6 @@ defmodule Spawn.Actors.ActorViewOption do
     }
   end
 
-  field :query, 1, type: :string
-  field :map_to, 2, type: :string, json_name: "mapTo"
+  field(:query, 1, type: :string)
+  field(:map_to, 2, type: :string, json_name: "mapTo")
 end
