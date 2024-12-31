@@ -6,6 +6,11 @@ import "google/protobuf/timestamp.proto";
 import "google/protobuf/struct.proto";
 import "spawn/actors/extensions.proto";
 
+enum EnumTest {
+  ENUM_TEST_UNKNOWN = 0;
+  ENUM_TEST_ACTIVE = 1;
+  ENUM_TEST_INACTIVE = 2;
+}
 
 message TestMessage {
   string name = 1 [(spawn.actors.actor_id) = true];
@@ -18,20 +23,17 @@ message TestMessage {
 
   bytes document = 5;
 
-  // Campo do tipo enum
-  //enum Status {
-  //  UNKNOWN = 0;
-  //  ACTIVE = 1;
-  //  INACTIVE = 2;
-  //}
-  //Status status = 6;
-
   // Nested message type field
   message Address {
     string street = 1;
     string city = 2;
     string state = 3;
     string zip_code = 4;
+    message Country {
+      string name = 1;
+      string code = 2;
+    }
+    Country country = 5;
   }
   Address address = 7;
 
@@ -43,4 +45,6 @@ message TestMessage {
   repeated string tags = 10;
 
   map<string, string> attributes = 11;
+
+  EnumTest enum_test = 12;
 }

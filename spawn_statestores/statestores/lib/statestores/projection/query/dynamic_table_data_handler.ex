@@ -1,4 +1,4 @@
-defmodule Statestores.Projection.Query.DynamicDynamicTableDataHandler do
+defmodule Statestores.Projection.Query.DynamicTableDataHandler do
   @moduledoc """
   Module to dynamically insert, update and query data in a PostgreSQL table based on the definition of a Protobuf module.
 
@@ -10,16 +10,122 @@ defmodule Statestores.Projection.Query.DynamicDynamicTableDataHandler do
   ## Usage Example
 
   iex> DynamicTableDataHandler.upsert(repo, MyProtobufModule, "my_table", %MyProtobufModule{...})
-  :OK
+  :ok
 
-  iex> DynamicTableDataHandler.update(repo, MyProtobufModule, "my_table", %{filter_key: "value"}, %{update_key: "new_value"})
-  :OK
-
-  iex> results = DynamicTableDataHandler.query(repo, MyProtobufModule, "my_table", %{filter_key: "value"})
-  [%MyProtobufModule{...}]
+  iex> results = DynamicTableDataHandler.query(repo, "SELECT age, metadata FROM example WHERE id = :id", %{id: "value"})
+  {:ok, [%{age: 30, metadata: "example data"}]}
   """
 
   alias Ecto.Adapters.SQL
+
+  @doc """
+  Performs a raw query and returns the results.
+
+  ## Parameters
+
+  - `repo`: The Ecto repository module.
+  - `query`: The raw SQL query string with named parameters (e.g., :id).
+  - `params`: A map of parameter values.
+
+  Returns the result rows as a list of maps.
+
+  ## Examples
+    iex> results = DynamicTableDataHandler.query(repo, "SELECT age, metadata FROM example WHERE id = :id", %{id: "value"})
+    {:ok, [%{age: 30, metadata: "example data"}]}
+  """
+  def query(repo, protobuf_module, query, params) do
+    case validate_params(query, params) do
+      {:error, message} ->
+        {:error, message}
+
+      :ok ->
+        {query, values} =
+          Enum.reduce(params, {query, []}, fn {key, value}, {q, acc} ->
+            if String.contains?(q, ":#{key}") do
+              {String.replace(q, ":#{key}", "$#{length(acc) + 1}"), acc ++ [value]}
+            else
+              {q, acc}
+            end
+          end)
+
+        result = SQL.query!(repo, query, values)
+
+        columns = result.columns
+
+        results = Enum.map(result.rows, fn row ->
+          map_value = Enum.zip(columns, row) |> Enum.into(%{})
+
+          {:ok, decoded} = from_decoded(protobuf_module, map_value)
+
+          decoded
+        end)
+
+        {:ok, results}
+    end
+  end
+
+  defp validate_params(query, params) do
+    required_params =
+      Regex.scan(~r/:("\w+"|\w+)/, query)
+      |> List.flatten()
+      |> Enum.filter(&String.starts_with?(&1, ":"))
+      |> Enum.map(&String.trim_leading(&1, ":"))
+
+    param_keys = params |> Map.keys() |> Enum.map(fn key -> "#{key}" end)
+
+    contains_all_params? = Enum.all?(required_params, fn param -> param in param_keys end)
+
+    if contains_all_params? do
+      :ok
+    else
+      {:error, "Required parameters(s): #{Enum.join(required_params, ", ")}"}
+    end
+  end
+
+  defp from_decoded(module, data) when is_map(data) and is_atom(module) do
+    data
+    |> to_proto_decoded()
+    |> Protobuf.JSON.from_decoded(module)
+  end
+
+  defp to_proto_decoded({k, v}) when is_atom(k) do
+    {Atom.to_string(k), to_proto_decoded(v)}
+  end
+
+  defp to_proto_decoded({k, v}) do
+    {k, to_proto_decoded(v)}
+  end
+
+  defp to_proto_decoded(value) when is_list(value) do
+    Enum.map(value, &to_proto_decoded/1)
+  end
+
+  defp to_proto_decoded(value) when is_boolean(value) do
+    value
+  end
+
+  defp to_proto_decoded(%NaiveDateTime{} = value) do
+    DateTime.from_naive!(value, "Etc/UTC")
+    |> to_proto_decoded()
+  end
+
+  defp to_proto_decoded(%DateTime{} = value) do
+    DateTime.to_iso8601(value)
+  end
+
+  defp to_proto_decoded(value) when is_atom(value) do
+    Atom.to_string(value)
+  end
+
+  defp to_proto_decoded(existing_map) when is_map(existing_map) do
+    Map.new(existing_map, &to_proto_decoded/1)
+  end
+
+  defp to_proto_decoded(""), do: nil
+
+  defp to_proto_decoded(value) do
+    value
+  end
 
   @doc """
   Performs an upsert (insert or update) of data in the table.
@@ -42,6 +148,7 @@ defmodule Statestores.Projection.Query.DynamicDynamicTableDataHandler do
     columns =
       fields
       |> Enum.map(&Macro.underscore(&1.name))
+      |> Kernel.++(["type_url"])
 
     placeholders = Enum.map(columns, &"$#{Enum.find_index(columns, fn col -> col == &1 end) + 1}")
 
@@ -59,113 +166,70 @@ defmodule Statestores.Projection.Query.DynamicDynamicTableDataHandler do
     """
 
     values =
-      Enum.map(fields, fn field -> Map.get(data, String.to_atom(Macro.underscore(field.name))) end)
+      Enum.map(fields, fn field ->
+        value = Map.get(data, String.to_atom(Macro.underscore(field.name)))
+
+        parse_value = fn
+          parse_value, %{__unknown_fields__: _} = struct ->
+            Map.from_struct(struct)
+            |> Map.delete(:__unknown_fields__)
+            |> Map.new(fn {key, value} -> {key, parse_value.(parse_value, value)} end)
+
+          _, value when is_boolean(value) ->
+            value
+
+          _, value when is_atom(value) ->
+            "#{value}"
+
+          _, value ->
+            value
+        end
+
+        parse_value.(parse_value, value)
+      end)
+      |> Kernel.++([get_type_url(protobuf_module)])
 
     SQL.query!(repo, sql, values)
+
     :ok
-  end
-
-  @doc """
-  Performs an update of records in the table.
-
-  ## Parameters
-
-  - `repo`: The Ecto repository module.
-  - `protobuf_module`: The Elixir module generated from a Protobuf file.
-  - `table_name`: Name of the table in the database.
-  - `filters`: Map containing the fields and values ​​to filter the records.
-  - `updates`: Map containing the fields and values ​​to update.
-
-  Returns `:ok` on success.
-  """
-  def update(repo, protobuf_module, table_name, filters, updates) do
-    filter_sql =
-      Enum.map(filters, fn {key, _value} -> "#{Macro.underscore(key)} = ?" end)
-      |> Enum.join(" AND ")
-
-    update_sql =
-      Enum.map(updates, fn {key, _value} -> "#{Macro.underscore(key)} = ?" end) |> Enum.join(", ")
-
-    sql = """
-    UPDATE #{table_name}
-    SET #{update_sql}
-    WHERE #{filter_sql}
-    """
-
-    values = Enum.concat([Map.values(updates), Map.values(filters)])
-
-    SQL.query!(repo, sql, values)
-    :ok
-  end
-
-  @doc """
-  Performs a query on the table and returns the results mapped to Protobuf structures.
-
-  ## Parameters
-
-  - `repo`: The Ecto repository module.
-  - `protobuf_module`: The Elixir module generated from a Protobuf file.
-  - `table_name`: Name of the table in the database.
-  - `conditions`: List of conditions, where each condition is a tuple `{field, operator, value}` or `{operator, [conditions]}` for logical combinations.
-
-  Example conditions:
-  - `[{:field, "=", "value"}, {:field2, ">", 10}]` (with implicit `AND`)
-  - `{:or, [{:field, "=", "value"}, {:field2, "<", 5}]}`
-  """
-  def query(repo, protobuf_module, table_name, conditions) do
-    descriptor = protobuf_module.descriptor()
-    fields = descriptor.field
-
-    columns = fields |> Enum.map(&Macro.underscore(&1.name))
-
-    {where_clause, values} = build_where_clause(conditions)
-
-    sql = """
-    SELECT #{Enum.join(columns, ", ")}
-    FROM #{table_name}
-    #{where_clause}
-    """
-
-    result = SQL.query!(repo, sql, values)
-
-    Enum.map(result.rows, fn row ->
-      Enum.zip(columns, row)
-      |> Enum.into(%{})
-      |> Map.new(fn {key, value} -> {String.to_atom(key), value} end)
-      |> protobuf_module.new()
-    end)
-  end
-
-  defp build_where_clause(conditions) do
-    build_conditions(conditions, [])
-  end
-
-  defp build_conditions(conditions, acc) when is_list(conditions) do
-    Enum.reduce(conditions, {"", acc}, fn
-      {:or, sub_conditions}, {clause, acc} ->
-        {sub_clause, sub_values} = build_conditions(sub_conditions, acc)
-        new_clause = clause <> if clause == "", do: "", else: " OR " <> sub_clause
-        {new_clause, sub_values}
-
-      {:and, sub_conditions}, {clause, acc} ->
-        {sub_clause, sub_values} = build_conditions(sub_conditions, acc)
-        new_clause = clause <> if clause == "", do: "", else: " AND " <> sub_clause
-        {new_clause, sub_values}
-
-      {field, op, value}, {clause, acc} ->
-        new_clause = clause <> if clause == "", do: "", else: " AND "
-        column = Macro.underscore(field)
-        placeholder = "?"
-        {new_clause <> "#{column} #{op} #{placeholder}", acc ++ [value]}
-    end)
   end
 
   defp get_primary_key(fields) do
     case Enum.find(fields, fn field ->
-           Map.get(field.options.__pb_extensions__, {Spawn.Actors.PbExtension, :actor_id}) == true
-         end) do
+      options = field.options || %{}
+      actor_id_extension = options |> Map.get(:__pb_extensions__, %{}) |> Map.get({Spawn.Actors.PbExtension, :actor_id})
+
+      actor_id_extension == true
+    end) do
       nil -> "id"
       field -> Macro.underscore(field.name)
     end
+  end
+
+  defp get_type_url(type) do
+    parts =
+      type
+      |> to_string
+      |> String.replace("Elixir.", "")
+      |> String.split(".")
+
+    package_name =
+      with {_, list} <- parts |> List.pop_at(-1),
+           do: Enum.map_join(list, ".", &String.downcase/1)
+
+    type_name = parts |> List.last()
+
+    if String.trim(package_name) == "" do
+      "type.googleapis.com/#{type_name}"
+    else
+      "type.googleapis.com/#{package_name}.#{type_name}"
+    end
+  end
+
+  defp to_existing_atom_or_new(string) do
+    String.to_existing_atom(string)
+  rescue
+    _e ->
+      String.to_atom(string)
   end
 end

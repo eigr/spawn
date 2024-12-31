@@ -57,13 +57,13 @@ defmodule Spawn.Actors.Kind do
     }
   end
 
-  field :UNKNOW_KIND, 0
-  field :NAMED, 1
-  field :UNNAMED, 2
-  field :POOLED, 3
-  field :PROXY, 4
-  field :TASK, 5
-  field :PROJECTION, 6
+  field(:UNKNOW_KIND, 0)
+  field(:NAMED, 1)
+  field(:UNNAMED, 2)
+  field(:POOLED, 3)
+  field(:PROXY, 4)
+  field(:TASK, 5)
+  field(:PROJECTION, 6)
 end
 
 defmodule Spawn.Actors.Registry.ActorsEntry do
@@ -125,8 +125,8 @@ defmodule Spawn.Actors.Registry.ActorsEntry do
     }
   end
 
-  field :key, 1, type: :string
-  field :value, 2, type: Spawn.Actors.Actor
+  field(:key, 1, type: :string)
+  field(:value, 2, type: Spawn.Actors.Actor)
 end
 
 defmodule Spawn.Actors.Registry do
@@ -217,7 +217,7 @@ defmodule Spawn.Actors.Registry do
     }
   end
 
-  field :actors, 1, repeated: true, type: Spawn.Actors.Registry.ActorsEntry, map: true
+  field(:actors, 1, repeated: true, type: Spawn.Actors.Registry.ActorsEntry, map: true)
 end
 
 defmodule Spawn.Actors.ActorSystem do
@@ -270,8 +270,8 @@ defmodule Spawn.Actors.ActorSystem do
     }
   end
 
-  field :name, 1, type: :string
-  field :registry, 2, type: Spawn.Actors.Registry
+  field(:name, 1, type: :string)
+  field(:registry, 2, type: Spawn.Actors.Registry)
 end
 
 defmodule Spawn.Actors.ActorSnapshotStrategy do
@@ -316,9 +316,9 @@ defmodule Spawn.Actors.ActorSnapshotStrategy do
     }
   end
 
-  oneof :strategy, 0
+  oneof(:strategy, 0)
 
-  field :timeout, 1, type: Spawn.Actors.TimeoutStrategy, oneof: 0
+  field(:timeout, 1, type: Spawn.Actors.TimeoutStrategy, oneof: 0)
 end
 
 defmodule Spawn.Actors.ActorDeactivationStrategy do
@@ -363,9 +363,9 @@ defmodule Spawn.Actors.ActorDeactivationStrategy do
     }
   end
 
-  oneof :strategy, 0
+  oneof(:strategy, 0)
 
-  field :timeout, 1, type: Spawn.Actors.TimeoutStrategy, oneof: 0
+  field(:timeout, 1, type: Spawn.Actors.TimeoutStrategy, oneof: 0)
 end
 
 defmodule Spawn.Actors.TimeoutStrategy do
@@ -404,7 +404,7 @@ defmodule Spawn.Actors.TimeoutStrategy do
     }
   end
 
-  field :timeout, 1, type: :int64
+  field(:timeout, 1, type: :int64)
 end
 
 defmodule Spawn.Actors.Action do
@@ -443,7 +443,7 @@ defmodule Spawn.Actors.Action do
     }
   end
 
-  field :name, 1, type: :string
+  field(:name, 1, type: :string)
 end
 
 defmodule Spawn.Actors.FixedTimerAction do
@@ -496,8 +496,8 @@ defmodule Spawn.Actors.FixedTimerAction do
     }
   end
 
-  field :seconds, 1, type: :int32
-  field :action, 2, type: Spawn.Actors.Action
+  field(:seconds, 1, type: :int32)
+  field(:action, 2, type: Spawn.Actors.Action)
 end
 
 defmodule Spawn.Actors.ActorState.TagsEntry do
@@ -559,8 +559,8 @@ defmodule Spawn.Actors.ActorState.TagsEntry do
     }
   end
 
-  field :key, 1, type: :string
-  field :value, 2, type: :string
+  field(:key, 1, type: :string)
+  field(:value, 2, type: :string)
 end
 
 defmodule Spawn.Actors.ActorState do
@@ -665,8 +665,8 @@ defmodule Spawn.Actors.ActorState do
     }
   end
 
-  field :tags, 1, repeated: true, type: Spawn.Actors.ActorState.TagsEntry, map: true
-  field :state, 2, type: Google.Protobuf.Any
+  field(:tags, 1, repeated: true, type: Spawn.Actors.ActorState.TagsEntry, map: true)
+  field(:state, 2, type: Google.Protobuf.Any)
 end
 
 defmodule Spawn.Actors.Metadata.TagsEntry do
@@ -728,8 +728,8 @@ defmodule Spawn.Actors.Metadata.TagsEntry do
     }
   end
 
-  field :key, 1, type: :string
-  field :value, 2, type: :string
+  field(:key, 1, type: :string)
+  field(:value, 2, type: :string)
 end
 
 defmodule Spawn.Actors.Metadata do
@@ -834,8 +834,8 @@ defmodule Spawn.Actors.Metadata do
     }
   end
 
-  field :channel_group, 1, repeated: true, type: Spawn.Actors.Channel, json_name: "channelGroup"
-  field :tags, 2, repeated: true, type: Spawn.Actors.Metadata.TagsEntry, map: true
+  field(:channel_group, 1, repeated: true, type: Spawn.Actors.Channel, json_name: "channelGroup")
+  field(:tags, 2, repeated: true, type: Spawn.Actors.Metadata.TagsEntry, map: true)
 end
 
 defmodule Spawn.Actors.Channel do
@@ -888,8 +888,8 @@ defmodule Spawn.Actors.Channel do
     }
   end
 
-  field :topic, 1, type: :string
-  field :action, 2, type: :string
+  field(:topic, 1, type: :string)
+  field(:action, 2, type: :string)
 end
 
 defmodule Spawn.Actors.ProjectionSubject do
@@ -956,9 +956,9 @@ defmodule Spawn.Actors.ProjectionSubject do
     }
   end
 
-  field :actor, 1, type: :string
-  field :action, 2, type: :string
-  field :start_time, 3, type: Google.Protobuf.Timestamp, json_name: "startTime"
+  field(:actor, 1, type: :string)
+  field(:action, 2, type: :string)
+  field(:start_time, 3, type: Google.Protobuf.Timestamp, json_name: "startTime")
 end
 
 defmodule Spawn.Actors.EventsRetentionStrategy do
@@ -1017,10 +1017,10 @@ defmodule Spawn.Actors.EventsRetentionStrategy do
     }
   end
 
-  oneof :strategy, 0
+  oneof(:strategy, 0)
 
-  field :duration_ms, 1, type: :int64, json_name: "durationMs", oneof: 0
-  field :infinite, 2, type: :bool, oneof: 0
+  field(:duration_ms, 1, type: :int64, json_name: "durationMs", oneof: 0)
+  field(:infinite, 2, type: :bool, oneof: 0)
 end
 
 defmodule Spawn.Actors.ProjectionSettings do
@@ -1101,14 +1101,15 @@ defmodule Spawn.Actors.ProjectionSettings do
     }
   end
 
-  field :subjects, 1, repeated: true, type: Spawn.Actors.ProjectionSubject
-  field :sourceable, 2, type: :bool
+  field(:subjects, 1, repeated: true, type: Spawn.Actors.ProjectionSubject)
+  field(:sourceable, 2, type: :bool)
 
-  field :events_retention_strategy, 3,
+  field(:events_retention_strategy, 3,
     type: Spawn.Actors.EventsRetentionStrategy,
     json_name: "eventsRetentionStrategy"
+  )
 
-  field :strict_events_ordering, 4, type: :bool, json_name: "strictEventsOrdering"
+  field(:strict_events_ordering, 4, type: :bool, json_name: "strictEventsOrdering")
 end
 
 defmodule Spawn.Actors.ActorSettings do
@@ -1245,25 +1246,28 @@ defmodule Spawn.Actors.ActorSettings do
     }
   end
 
-  field :kind, 1, type: Spawn.Actors.Kind, enum: true
-  field :stateful, 2, type: :bool
+  field(:kind, 1, type: Spawn.Actors.Kind, enum: true)
+  field(:stateful, 2, type: :bool)
 
-  field :snapshot_strategy, 3,
+  field(:snapshot_strategy, 3,
     type: Spawn.Actors.ActorSnapshotStrategy,
     json_name: "snapshotStrategy"
+  )
 
-  field :deactivation_strategy, 4,
+  field(:deactivation_strategy, 4,
     type: Spawn.Actors.ActorDeactivationStrategy,
     json_name: "deactivationStrategy"
+  )
 
-  field :min_pool_size, 5, type: :int32, json_name: "minPoolSize"
-  field :max_pool_size, 6, type: :int32, json_name: "maxPoolSize"
+  field(:min_pool_size, 5, type: :int32, json_name: "minPoolSize")
+  field(:max_pool_size, 6, type: :int32, json_name: "maxPoolSize")
 
-  field :projection_settings, 7,
+  field(:projection_settings, 7,
     type: Spawn.Actors.ProjectionSettings,
     json_name: "projectionSettings"
+  )
 
-  field :state_type, 8, type: :string, json_name: "stateType"
+  field(:state_type, 8, type: :string, json_name: "stateType")
 end
 
 defmodule Spawn.Actors.ActorId do
@@ -1330,9 +1334,9 @@ defmodule Spawn.Actors.ActorId do
     }
   end
 
-  field :name, 1, type: :string
-  field :system, 2, type: :string
-  field :parent, 3, type: :string
+  field(:name, 1, type: :string)
+  field(:system, 2, type: :string)
+  field(:parent, 3, type: :string)
 end
 
 defmodule Spawn.Actors.Actor do
@@ -1441,14 +1445,15 @@ defmodule Spawn.Actors.Actor do
     }
   end
 
-  field :id, 1, type: Spawn.Actors.ActorId
-  field :state, 2, type: Spawn.Actors.ActorState
-  field :metadata, 6, type: Spawn.Actors.Metadata
-  field :settings, 3, type: Spawn.Actors.ActorSettings
-  field :actions, 4, repeated: true, type: Spawn.Actors.Action
+  field(:id, 1, type: Spawn.Actors.ActorId)
+  field(:state, 2, type: Spawn.Actors.ActorState)
+  field(:metadata, 6, type: Spawn.Actors.Metadata)
+  field(:settings, 3, type: Spawn.Actors.ActorSettings)
+  field(:actions, 4, repeated: true, type: Spawn.Actors.Action)
 
-  field :timer_actions, 5,
+  field(:timer_actions, 5,
     repeated: true,
     type: Spawn.Actors.FixedTimerAction,
     json_name: "timerActions"
+  )
 end
