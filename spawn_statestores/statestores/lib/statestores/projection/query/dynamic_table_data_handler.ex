@@ -1,4 +1,4 @@
-defmodule Statestores.Projection.Query.TableDataHandler do
+defmodule Statestores.Projection.Query.DynamicDynamicTableDataHandler do
   @moduledoc """
   Module to dynamically insert, update and query data in a PostgreSQL table based on the definition of a Protobuf module.
 
@@ -9,13 +9,13 @@ defmodule Statestores.Projection.Query.TableDataHandler do
 
   ## Usage Example
 
-  iex> TableDataHandler.upsert(repo, MyProtobufModule, "my_table", %MyProtobufModule{...})
+  iex> DynamicTableDataHandler.upsert(repo, MyProtobufModule, "my_table", %MyProtobufModule{...})
   :OK
 
-  iex> TableDataHandler.update(repo, MyProtobufModule, "my_table", %{filter_key: "value"}, %{update_key: "new_value"})
+  iex> DynamicTableDataHandler.update(repo, MyProtobufModule, "my_table", %{filter_key: "value"}, %{update_key: "new_value"})
   :OK
 
-  iex> results = TableDataHandler.query(repo, MyProtobufModule, "my_table", %{filter_key: "value"})
+  iex> results = DynamicTableDataHandler.query(repo, MyProtobufModule, "my_table", %{filter_key: "value"})
   [%MyProtobufModule{...}]
   """
 
