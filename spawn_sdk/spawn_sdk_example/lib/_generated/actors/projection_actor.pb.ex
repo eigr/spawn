@@ -37,6 +37,27 @@ defmodule Example.Actors.ProjectionActor.Service do
               client_streaming: false,
               server_streaming: false,
               __unknown_fields__: []
+            },
+            %Google.Protobuf.MethodDescriptorProto{
+              name: "All",
+              input_type: ".example.ValuePayload",
+              output_type: ".example.SomeQueryResponse",
+              options: %Google.Protobuf.MethodOptions{
+                deprecated: false,
+                idempotency_level: :IDEMPOTENCY_UNKNOWN,
+                uninterpreted_option: [],
+                __pb_extensions__: %{
+                  {Spawn.Actors.PbExtension, :view} => %Spawn.Actors.ActorViewOption{
+                    query: "SELECT * FROM projection_actor",
+                    map_to: "results",
+                    __unknown_fields__: []
+                  }
+                },
+                __unknown_fields__: []
+              },
+              client_streaming: false,
+              server_streaming: false,
+              __unknown_fields__: []
             }
           ],
           options: %Google.Protobuf.ServiceOptions{
@@ -77,7 +98,7 @@ defmodule Example.Actors.ProjectionActor.Service do
         location: [
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [],
-            span: [0, 0, 30, 1],
+            span: [0, 0, 37, 1],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -125,7 +146,7 @@ defmodule Example.Actors.ProjectionActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0],
-            span: [8, 0, 30, 1],
+            span: [8, 0, 37, 1],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -202,6 +223,54 @@ defmodule Example.Actors.ProjectionActor.Service do
             trailing_comments: nil,
             leading_detached_comments: [],
             __unknown_fields__: []
+          },
+          %Google.Protobuf.SourceCodeInfo.Location{
+            path: [6, 0, 2, 1],
+            span: [31, 2, 36, 3],
+            leading_comments: nil,
+            trailing_comments: nil,
+            leading_detached_comments: [],
+            __unknown_fields__: []
+          },
+          %Google.Protobuf.SourceCodeInfo.Location{
+            path: [6, 0, 2, 1, 1],
+            span: [31, 6, 9],
+            leading_comments: nil,
+            trailing_comments: nil,
+            leading_detached_comments: [],
+            __unknown_fields__: []
+          },
+          %Google.Protobuf.SourceCodeInfo.Location{
+            path: [6, 0, 2, 1, 2],
+            span: [31, 11, 32],
+            leading_comments: nil,
+            trailing_comments: nil,
+            leading_detached_comments: [],
+            __unknown_fields__: []
+          },
+          %Google.Protobuf.SourceCodeInfo.Location{
+            path: [6, 0, 2, 1, 3],
+            span: [31, 43, 69],
+            leading_comments: nil,
+            trailing_comments: nil,
+            leading_detached_comments: [],
+            __unknown_fields__: []
+          },
+          %Google.Protobuf.SourceCodeInfo.Location{
+            path: [6, 0, 2, 1, 4],
+            span: [32, 4, 35, 6],
+            leading_comments: nil,
+            trailing_comments: nil,
+            leading_detached_comments: [],
+            __unknown_fields__: []
+          },
+          %Google.Protobuf.SourceCodeInfo.Location{
+            path: [6, 0, 2, 1, 4, 4_890_127],
+            span: [32, 4, 35, 6],
+            leading_comments: nil,
+            trailing_comments: nil,
+            leading_detached_comments: [],
+            __unknown_fields__: []
           }
         ],
         __unknown_fields__: []
@@ -219,6 +288,17 @@ defmodule Example.Actors.ProjectionActor.Service do
       type: Spawn.Actors.PbExtension,
       value: %Spawn.Actors.ActorViewOption{
         query: "SELECT * FROM projection_actor WHERE id = :id",
+        map_to: "results",
+        __unknown_fields__: []
+      }
+    }
+  })
+
+  rpc(:All, Example.ValuePayload, Example.SomeQueryResponse, %{
+    view: %{
+      type: Spawn.Actors.PbExtension,
+      value: %Spawn.Actors.ActorViewOption{
+        query: "SELECT * FROM projection_actor",
         map_to: "results",
         __unknown_fields__: []
       }
@@ -242,6 +322,20 @@ defmodule Example.Actors.ProjectionActor.ActorDispatcher do
       system: "spawn-system",
       actor_name: "ProjectionActor",
       action_name: "ExampleView",
+      input: message,
+      stream: stream,
+      descriptor: Example.Actors.ProjectionActor.Service.descriptor()
+    }
+
+    Dispatcher.dispatch(request)
+  end
+
+  @spec all(Example.ValuePayload.t(), GRPC.Server.Stream.t()) :: Example.SomeQueryResponse.t()
+  def all(message, stream) do
+    request = %{
+      system: "spawn-system",
+      actor_name: "ProjectionActor",
+      action_name: "All",
       input: message,
       stream: stream,
       descriptor: Example.Actors.ProjectionActor.Service.descriptor()
@@ -338,6 +432,62 @@ defmodule Example.Actors.ProjectionActor do
     opts = [
       system: ref.system || "spawn-system",
       action: "ExampleView",
+      payload: payload,
+      async: opts[:async] || false,
+      metadata: opts[:metadata] || %{}
+    ]
+
+    actor_to_invoke = ref.name || "ProjectionActor"
+
+    opts =
+      if actor_to_invoke == "ProjectionActor" do
+        opts
+      else
+        Keyword.put(opts, :ref, "ProjectionActor")
+      end
+
+    SpawnSdk.invoke(actor_to_invoke, opts)
+  end
+
+  def all() do
+    %SpawnSdk.ActorRef{system: "spawn-system", name: "ProjectionActor"}
+    |> all(%Example.ValuePayload{}, [])
+  end
+
+  def all(%Example.ValuePayload{} = payload) do
+    %SpawnSdk.ActorRef{system: "spawn-system", name: "ProjectionActor"}
+    |> all(payload, [])
+  end
+
+  def all(%Example.ValuePayload{} = payload, opts) when is_list(opts) do
+    %SpawnSdk.ActorRef{system: "spawn-system", name: "ProjectionActor"}
+    |> all(payload, opts)
+  end
+
+  def all(%SpawnSdk.ActorRef{} = ref, %Example.ValuePayload{} = payload) do
+    ref
+    |> all(payload, [])
+  end
+
+  @doc """
+  Invokes the All method registered on ProjectionActor.
+
+  ## Parameters
+  - `ref` - The actor ref to send the action to.
+  - `payload` - The payload to send to the action.
+  - `opts` - The options to pass to the action.
+
+  ## Examples
+  ```elixir
+  iex> Example.Actors.ProjectionActor.all(SpawnSdk.Actor.ref("spawn-system", "actor_id_01"), %Example.ValuePayload{}, async: false, metadata: %{"example" => "metadata"})
+  {:ok, %Example.SomeQueryResponse{}}
+  ```
+  """
+  def all(%SpawnSdk.ActorRef{} = ref, %Example.ValuePayload{} = payload, opts)
+      when is_list(opts) do
+    opts = [
+      system: ref.system || "spawn-system",
+      action: "All",
       payload: payload,
       async: opts[:async] || false,
       metadata: opts[:metadata] || %{}

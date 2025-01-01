@@ -78,7 +78,7 @@ defmodule Actors.Actor.Entity.Invocation do
           actor: %Actor{id: actor.id},
           metadata: message.metadata,
           action_name: action,
-          payload: parse_payload(unpack_any_bin(message.state)),
+          payload: {:value, Google.Protobuf.Any.decode(message.state)},
           caller: %ActorId{name: name, system: system_name, parent: parent}
         }
       end)
@@ -454,8 +454,6 @@ defmodule Actors.Actor.Entity.Invocation do
         {:ok, response, new_state} ->
           {:ok, request, response, new_state, opts}
 
-        # handle_response(request, response, new_state, opts)
-
         {:error, reason, new_state} ->
           {:reply, {:error, reason}, new_state}
           |> return_and_maybe_hibernate()
@@ -465,11 +463,11 @@ defmodule Actors.Actor.Entity.Invocation do
 
   defp handle_view_invocation(request, state, opts) do
     Tracer.with_span "invoke-host" do
+      view = :persistent_term.get("view-#{request.actor.name}-#{request.action_name}")
+
       state_type =
         state.actor.settings.state_type
         |> AnySerializer.normalize_package_name()
-
-      view = :persistent_term.get("view-#{request.actor.name}-#{request.action_name}")
 
       {:ok, results} =
         Statestores.Projection.Query.DynamicTableDataHandler.query(
@@ -571,7 +569,7 @@ defmodule Actors.Actor.Entity.Invocation do
          } = _params
        )
        when is_nil(workflow) or workflow == %{} do
-    :ok = do_handle_projection(id, request.action_name, settings, state)
+    :ok = do_handle_projection(id, request.action_name, settings, state, response)
 
     response
   end
@@ -587,16 +585,16 @@ defmodule Actors.Actor.Entity.Invocation do
            opts: opts
          } = _params
        ) do
-    :ok = do_handle_projection(id, request.action_name, settings, state)
+    :ok = do_handle_projection(id, request.action_name, settings, state, response)
 
     do_run_workflow(request, response, state, opts)
   end
 
-  defp do_handle_projection(id, action, %{sourceable: true} = _settings, state) do
+  defp do_handle_projection(id, action, %{sourceable: true} = _settings, _state, response) do
     actor_name_or_parent = if id.parent == "", do: id.name, else: id.parent
 
     subject = "actors.#{actor_name_or_parent}.#{id.name}.#{action}"
-    payload = Google.Protobuf.Any.encode(state.actor.state.state)
+    payload = Google.Protobuf.Any.encode(response.updated_context.state)
 
     uuid = UUID.uuid4(:hex)
 
@@ -609,6 +607,31 @@ defmodule Actors.Actor.Entity.Invocation do
         {"Actor-Action", "#{action}"}
       ]
     )
+  end
+
+  defp do_handle_projection(id, action, %{} = settings, state, response) do
+    if :persistent_term.get("view-#{id.name}-#{action}", false) do
+      # no need to persist any state since this is a view only action
+      :ok
+    else
+      state_type =
+        state.actor.settings.state_type
+        |> AnySerializer.normalize_package_name()
+
+      table_name =
+        if is_nil(id.parent) or id.parent == "" do
+          Macro.underscore(id.name)
+        else
+          Macro.underscore(id.parent)
+        end
+
+      Statestores.Projection.Query.DynamicTableDataHandler.upsert(
+        load_projection_adapter(),
+        state_type,
+        table_name,
+        AnySerializer.any_unpack!(response.updated_context.state, state_type)
+      )
+    end
   end
 
   defp do_handle_projection(_id, _action, _settings, _state), do: :ok

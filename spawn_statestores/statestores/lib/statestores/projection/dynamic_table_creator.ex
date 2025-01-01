@@ -78,8 +78,6 @@ defmodule Statestores.Projection.DynamicTableCreator do
     timestamp_columns =
       "created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP"
 
-    type_url_column = "type_url TEXT NOT NULL"
-
     primary_key_column =
       fields
       |> Enum.find(fn field ->
@@ -101,7 +99,6 @@ defmodule Statestores.Projection.DynamicTableCreator do
       [
         "CREATE TABLE IF NOT EXISTS #{table_name} (",
         columns_sql,
-        ", #{type_url_column}",
         ", #{timestamp_columns}",
         ", #{primary_key_column}",
         ")"
@@ -133,7 +130,6 @@ defmodule Statestores.Projection.DynamicTableCreator do
 
   defp field_to_column_sql(%{name: "created_at"}), do: nil
   defp field_to_column_sql(%{name: "updated_at"}), do: nil
-  defp field_to_column_sql(%{name: "type_url"}), do: nil
 
   defp field_to_column_sql(%{name: name, type: type} = field) do
     column_name = validate_column_name(name)

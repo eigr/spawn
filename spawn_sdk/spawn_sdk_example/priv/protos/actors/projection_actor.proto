@@ -28,4 +28,11 @@ service ProjectionActor {
       map_to: "results"
     };
   }
+
+  rpc All (.example.ValuePayload) returns (.example.SomeQueryResponse) {
+    option (spawn.actors.view) = {
+      query: "SELECT * FROM projection_actor"
+      map_to: "results"
+    };
+  }
 }

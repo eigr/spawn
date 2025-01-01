@@ -9,7 +9,7 @@ defmodule SpawnSdkExample.Actors.ClockActor do
 
   alias Io.Eigr.Spawn.Example.MyState
 
-  action("Clock", [timer: 60_000], fn %Context{state: state} = ctx ->
+  action("Clock", [timer: 5_000], fn %Context{state: state} = ctx ->
     Logger.info("[clock] Clock Actor Received Request. Context: #{inspect(ctx)}")
 
     new_value = if is_nil(state), do: 0, else: state.value + 1

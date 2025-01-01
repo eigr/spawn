@@ -155,7 +155,6 @@ defmodule Statestores.Projection.Query.DynamicTableDataHandler do
     columns =
       fields
       |> Enum.map(&Macro.underscore(&1.name))
-      |> Kernel.++(["type_url"])
 
     placeholders = Enum.map(columns, &"$#{Enum.find_index(columns, fn col -> col == &1 end) + 1}")
 
@@ -194,7 +193,6 @@ defmodule Statestores.Projection.Query.DynamicTableDataHandler do
 
         parse_value.(parse_value, value)
       end)
-      |> Kernel.++([get_type_url(protobuf_module)])
 
     SQL.query!(repo, sql, values)
 
@@ -214,26 +212,6 @@ defmodule Statestores.Projection.Query.DynamicTableDataHandler do
          end) do
       nil -> "id"
       field -> Macro.underscore(field.name)
-    end
-  end
-
-  defp get_type_url(type) do
-    parts =
-      type
-      |> to_string
-      |> String.replace("Elixir.", "")
-      |> String.split(".")
-
-    package_name =
-      with {_, list} <- parts |> List.pop_at(-1),
-           do: Enum.map_join(list, ".", &String.downcase/1)
-
-    type_name = parts |> List.last()
-
-    if String.trim(package_name) == "" do
-      "type.googleapis.com/#{type_name}"
-    else
-      "type.googleapis.com/#{package_name}.#{type_name}"
     end
   end
 

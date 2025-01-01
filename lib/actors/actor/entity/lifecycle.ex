@@ -155,7 +155,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
           } = actor
       }) do
     response =
-      if is_actor_valid?(actor) do
+      if should_persist?(actor) do
         Logger.debug("Doing Actor checkpoint to Actor [#{inspect(name)}]")
 
         StateManager.save(id, actor_state, revision: revision)
@@ -174,7 +174,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
             state: actor_state
           } = actor
       }) do
-    if is_actor_valid?(actor) do
+    if should_persist?(actor) do
       StateManager.save(id, actor_state, revision: revision, status: @deactivated_status)
     end
 
@@ -371,7 +371,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
     {:noreply, state, {:continue, :call_init_action}}
   end
 
-  defp is_actor_valid?(
+  defp should_persist?(
          %Actor{
            settings: %ActorSettings{stateful: stateful},
            state: actor_state
