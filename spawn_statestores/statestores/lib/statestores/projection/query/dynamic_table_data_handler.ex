@@ -33,13 +33,34 @@ defmodule Statestores.Projection.Query.DynamicTableDataHandler do
     iex> results = DynamicTableDataHandler.query(repo, "SELECT age, metadata FROM example WHERE id = :id", %{id: "value"})
     {:ok, [%{age: 30, metadata: "example data"}]}
   """
-  def query(repo, protobuf_module, query, params) do
+  def query(repo, protobuf_module, query, params, opts \\ []) do
     case validate_params(query, params) do
       {:error, message} ->
         {:error, message}
 
       :ok ->
         {query, values} = build_params_for_query(params, query)
+
+        page = opts[:page] || 1
+        page_size = opts[:page_size] || 10
+        # Append LIMIT and OFFSET dynamically
+        offset = (page - 1) * page_size
+
+        {query, values} =
+          if has_outer_limit_or_offset?(query) do
+            # If already present, don't modify the query
+            {query, values}
+          else
+            query = """
+            #{query}
+            LIMIT $#{length(values) + 1}
+            OFFSET $#{length(values) + 2}
+            """
+
+            values = values ++ [page_size, offset]
+
+            {query, values}
+          end
 
         result = SQL.query!(repo, query, values)
 
@@ -55,6 +76,27 @@ defmodule Statestores.Projection.Query.DynamicTableDataHandler do
           end)
 
         {:ok, results}
+    end
+  end
+
+  defp has_outer_limit_or_offset?(query) do
+    query
+    |> String.split(~r/(\(|\)|\bLIMIT\b|\bOFFSET\b)/i, trim: true, include_captures: true)
+    |> Enum.reduce_while(0, fn token, depth ->
+      cond do
+        # Increase depth
+        token == "(" -> {:cont, depth + 1}
+        # Decrease depth
+        token == ")" -> {:cont, depth - 1}
+        # Found at depth 0
+        String.match?(token, ~r/\bLIMIT\b|\bOFFSET\b/i) and depth == 0 -> {:halt, true}
+        # Continue processing
+        true -> {:cont, depth}
+      end
+    end)
+    |> case do
+      true -> true
+      _ -> false
     end
   end
 
@@ -213,12 +255,5 @@ defmodule Statestores.Projection.Query.DynamicTableDataHandler do
       nil -> "id"
       field -> Macro.underscore(field.name)
     end
-  end
-
-  defp to_existing_atom_or_new(string) do
-    String.to_existing_atom(string)
-  rescue
-    _e ->
-      String.to_atom(string)
   end
 end

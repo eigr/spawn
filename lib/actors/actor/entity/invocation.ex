@@ -465,6 +465,20 @@ defmodule Actors.Actor.Entity.Invocation do
     Tracer.with_span "invoke-host" do
       view = :persistent_term.get("view-#{request.actor.name}-#{request.action_name}")
 
+      page_size =
+        if Map.get(view, :page_size, 0) == 0 do
+          10
+        else
+          Map.get(view, :page_size)
+        end
+
+      page =
+        "#{Map.get(request.current_context.metadata || %{}, "page", 1)}" |> String.to_integer()
+
+      page_size =
+        "#{Map.get(request.current_context.metadata || %{}, "page_size", page_size)}"
+        |> String.to_integer()
+
       state_type =
         state.actor.settings.state_type
         |> AnySerializer.normalize_package_name()
@@ -474,7 +488,9 @@ defmodule Actors.Actor.Entity.Invocation do
           load_projection_adapter(),
           state_type,
           view.query,
-          AnySerializer.any_unpack!(request.payload |> elem(1), view.input_type)
+          AnySerializer.any_unpack!(request.payload |> elem(1), view.input_type),
+          page_size: page_size,
+          page: page
         )
 
       response = Map.put(view.output_type.__struct__(), String.to_atom(view.map_to), results)

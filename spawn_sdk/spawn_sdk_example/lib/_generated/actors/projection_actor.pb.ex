@@ -29,6 +29,7 @@ defmodule Example.Actors.ProjectionActor.Service do
                   {Spawn.Actors.PbExtension, :view} => %Spawn.Actors.ActorViewOption{
                     query: "SELECT * FROM projection_actor WHERE id = :id",
                     map_to: "results",
+                    page_size: 0,
                     __unknown_fields__: []
                   }
                 },
@@ -50,6 +51,7 @@ defmodule Example.Actors.ProjectionActor.Service do
                   {Spawn.Actors.PbExtension, :view} => %Spawn.Actors.ActorViewOption{
                     query: "SELECT * FROM projection_actor",
                     map_to: "results",
+                    page_size: 40,
                     __unknown_fields__: []
                   }
                 },
@@ -98,7 +100,7 @@ defmodule Example.Actors.ProjectionActor.Service do
         location: [
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [],
-            span: [0, 0, 37, 1],
+            span: [0, 0, 38, 1],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -146,7 +148,7 @@ defmodule Example.Actors.ProjectionActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0],
-            span: [8, 0, 37, 1],
+            span: [8, 0, 38, 1],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -226,7 +228,7 @@ defmodule Example.Actors.ProjectionActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 1],
-            span: [31, 2, 36, 3],
+            span: [31, 2, 37, 3],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -258,7 +260,7 @@ defmodule Example.Actors.ProjectionActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 1, 4],
-            span: [32, 4, 35, 6],
+            span: [32, 4, 36, 6],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -266,7 +268,7 @@ defmodule Example.Actors.ProjectionActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 1, 4, 4_890_127],
-            span: [32, 4, 35, 6],
+            span: [32, 4, 36, 6],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -289,6 +291,7 @@ defmodule Example.Actors.ProjectionActor.Service do
       value: %Spawn.Actors.ActorViewOption{
         query: "SELECT * FROM projection_actor WHERE id = :id",
         map_to: "results",
+        page_size: 0,
         __unknown_fields__: []
       }
     }
@@ -300,6 +303,7 @@ defmodule Example.Actors.ProjectionActor.Service do
       value: %Spawn.Actors.ActorViewOption{
         query: "SELECT * FROM projection_actor",
         map_to: "results",
+        page_size: 40,
         __unknown_fields__: []
       }
     }

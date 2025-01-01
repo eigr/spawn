@@ -1,6 +1,6 @@
 defmodule Spawn.Actors.PbExtension do
   @moduledoc false
-  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
+  use Protobuf, protoc_gen_elixir_version: "0.13.0", syntax: :proto3
 
   extend(Google.Protobuf.FieldOptions, :actor_id, 9999,
     optional: true,
@@ -23,7 +23,7 @@ end
 
 defmodule Spawn.Actors.ActorOpts do
   @moduledoc false
-  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
+  use Protobuf, protoc_gen_elixir_version: "0.13.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -187,7 +187,7 @@ end
 
 defmodule Spawn.Actors.ActorViewOption do
   @moduledoc false
-  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
+  use Protobuf, protoc_gen_elixir_version: "0.13.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -221,6 +221,20 @@ defmodule Spawn.Actors.ActorViewOption do
           json_name: "mapTo",
           proto3_optional: nil,
           __unknown_fields__: []
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "page_size",
+          extendee: nil,
+          number: 3,
+          label: :LABEL_OPTIONAL,
+          type: :TYPE_INT32,
+          type_name: nil,
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "pageSize",
+          proto3_optional: nil,
+          __unknown_fields__: []
         }
       ],
       nested_type: [],
@@ -237,4 +251,5 @@ defmodule Spawn.Actors.ActorViewOption do
 
   field(:query, 1, type: :string)
   field(:map_to, 2, type: :string, json_name: "mapTo")
+  field(:page_size, 3, type: :int32, json_name: "pageSize")
 end
