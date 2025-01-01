@@ -27,7 +27,7 @@ defmodule Example.Actors.ProjectionActor.Service do
                 uninterpreted_option: [],
                 __pb_extensions__: %{
                   {Spawn.Actors.PbExtension, :view} => %Spawn.Actors.ActorViewOption{
-                    query: "SELECT id, name, age WHERE name = :customer_name",
+                    query: "SELECT * FROM projection_actor WHERE id = :id",
                     map_to: "results",
                     __unknown_fields__: []
                   }
@@ -218,7 +218,7 @@ defmodule Example.Actors.ProjectionActor.Service do
     view: %{
       type: Spawn.Actors.PbExtension,
       value: %Spawn.Actors.ActorViewOption{
-        query: "SELECT id, name, age WHERE name = :customer_name",
+        query: "SELECT * FROM projection_actor WHERE id = :id",
         map_to: "results",
         __unknown_fields__: []
       }

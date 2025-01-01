@@ -83,7 +83,14 @@ defmodule Statestores.Projection.DynamicTableCreator do
     primary_key_column =
       fields
       |> Enum.find(fn field ->
-        Map.get(field.options.__pb_extensions__, {Spawn.Actors.PbExtension, :actor_id}) == true
+        options = field.options || %{}
+
+        actor_id_extension =
+          options
+          |> Map.get(:__pb_extensions__, %{})
+          |> Map.get({Spawn.Actors.PbExtension, :actor_id})
+
+        actor_id_extension == true
       end)
       |> case do
         nil -> "id SERIAL PRIMARY KEY"

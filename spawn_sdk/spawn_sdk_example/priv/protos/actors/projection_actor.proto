@@ -24,7 +24,7 @@ service ProjectionActor {
 
   rpc ExampleView (.example.ValuePayload) returns (.example.SomeQueryResponse) {
     option (spawn.actors.view) = {
-      query: "SELECT id, name, age WHERE name = :customer_name"
+      query: "SELECT * FROM projection_actor WHERE id = :id"
       map_to: "results"
     };
   }

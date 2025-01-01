@@ -38,9 +38,11 @@ defmodule Actors.Actor.Entity.Invocation do
   }
 
   alias Spawn.Utils.Nats
+  alias Spawn.Utils.AnySerializer
 
   import Spawn.Utils.AnySerializer, only: [any_pack!: 1, unpack_any_bin: 1]
   import Spawn.Utils.Common, only: [return_and_maybe_hibernate: 1]
+  import Statestores.Util, only: [load_projection_adapter: 0]
 
   @default_actions [
     "get",
@@ -463,8 +465,21 @@ defmodule Actors.Actor.Entity.Invocation do
 
   defp handle_view_invocation(request, state, opts) do
     Tracer.with_span "invoke-host" do
-      # do query
-      # get query response
+      state_type =
+        state.actor.settings.state_type
+        |> AnySerializer.normalize_package_name()
+
+      view = :persistent_term.get("view-#{request.actor.name}-#{request.action_name}")
+
+      {:ok, results} =
+        Statestores.Projection.Query.DynamicTableDataHandler.query(
+          load_projection_adapter(),
+          state_type,
+          view.query,
+          AnySerializer.any_unpack!(request.payload |> elem(1), view.input_type)
+        )
+
+      response = Map.put(view.output_type.__struct__(), String.to_atom(view.map_to), results)
 
       %ActorInvocation{
         actor: %ActorId{name: name, system: system},
@@ -486,8 +501,7 @@ defmodule Actors.Actor.Entity.Invocation do
         actor_name: name,
         actor_system: system,
         updated_context: context,
-        # payload should result in what was queried and parsed from the query definition
-        payload: {:noop, %Noop{}}
+        payload: {:value, AnySerializer.any_pack!(response)}
       }
 
       {:ok, request, response, state, opts}

@@ -39,29 +39,36 @@ defmodule Statestores.Projection.Query.DynamicTableDataHandler do
         {:error, message}
 
       :ok ->
-        {query, values} =
-          Enum.reduce(params, {query, []}, fn {key, value}, {q, acc} ->
-            if String.contains?(q, ":#{key}") do
-              {String.replace(q, ":#{key}", "$#{length(acc) + 1}"), acc ++ [value]}
-            else
-              {q, acc}
-            end
-          end)
+        {query, values} = build_params_for_query(params, query)
 
         result = SQL.query!(repo, query, values)
 
         columns = result.columns
 
-        results = Enum.map(result.rows, fn row ->
-          map_value = Enum.zip(columns, row) |> Enum.into(%{})
+        results =
+          Enum.map(result.rows, fn row ->
+            map_value = Enum.zip(columns, row) |> Enum.into(%{})
 
-          {:ok, decoded} = from_decoded(protobuf_module, map_value)
+            {:ok, decoded} = from_decoded(protobuf_module, map_value)
 
-          decoded
-        end)
+            decoded
+          end)
 
         {:ok, results}
     end
+  end
+
+  defp build_params_for_query(params, query) when is_struct(params),
+    do: Map.from_struct(params) |> build_params_for_query(query)
+
+  defp build_params_for_query(params, query) when is_map(params) do
+    Enum.reduce(params, {query, []}, fn {key, value}, {q, acc} ->
+      if String.contains?(q, ":#{key}") do
+        {String.replace(q, ":#{key}", "$#{length(acc) + 1}"), acc ++ [value]}
+      else
+        {q, acc}
+      end
+    end)
   end
 
   defp validate_params(query, params) do
@@ -196,11 +203,15 @@ defmodule Statestores.Projection.Query.DynamicTableDataHandler do
 
   defp get_primary_key(fields) do
     case Enum.find(fields, fn field ->
-      options = field.options || %{}
-      actor_id_extension = options |> Map.get(:__pb_extensions__, %{}) |> Map.get({Spawn.Actors.PbExtension, :actor_id})
+           options = field.options || %{}
 
-      actor_id_extension == true
-    end) do
+           actor_id_extension =
+             options
+             |> Map.get(:__pb_extensions__, %{})
+             |> Map.get({Spawn.Actors.PbExtension, :actor_id})
+
+           actor_id_extension == true
+         end) do
       nil -> "id"
       field -> Macro.underscore(field.name)
     end
