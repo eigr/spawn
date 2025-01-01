@@ -38,9 +38,10 @@ defmodule Actors.Actor.Entity.Invocation do
   }
 
   alias Spawn.Utils.Nats
-  alias Spawn.Utils.AnySerializer
 
-  import Spawn.Utils.AnySerializer, only: [any_pack!: 1, unpack_any_bin: 1]
+  import Spawn.Utils.AnySerializer,
+    only: [any_pack!: 1, any_unpack!: 2, normalize_package_name: 0]
+
   import Spawn.Utils.Common, only: [return_and_maybe_hibernate: 1]
   import Statestores.Util, only: [load_projection_adapter: 0]
 
@@ -102,17 +103,6 @@ defmodule Actors.Actor.Entity.Invocation do
     end)
 
     {:noreply, state}
-  end
-
-  defp parse_payload(response) do
-    case response do
-      nil -> {:noop, %Noop{}}
-      %Noop{} = noop -> {:noop, noop}
-      {:noop, %Noop{} = noop} -> {:noop, noop}
-      {_, nil} -> {:noop, %Noop{}}
-      {:value, response} -> {:value, any_pack!(response)}
-      response -> {:value, any_pack!(response)}
-    end
   end
 
   def replay(
@@ -481,14 +471,14 @@ defmodule Actors.Actor.Entity.Invocation do
 
       state_type =
         state.actor.settings.state_type
-        |> AnySerializer.normalize_package_name()
+        |> normalize_package_name()
 
       {:ok, results} =
         Statestores.Projection.Query.DynamicTableDataHandler.query(
           load_projection_adapter(),
           state_type,
           view.query,
-          AnySerializer.any_unpack!(request.payload |> elem(1), view.input_type),
+          any_unpack!(request.payload |> elem(1), view.input_type),
           page_size: page_size,
           page: page
         )
@@ -515,7 +505,7 @@ defmodule Actors.Actor.Entity.Invocation do
         actor_name: name,
         actor_system: system,
         updated_context: context,
-        payload: {:value, AnySerializer.any_pack!(response)}
+        payload: {:value, any_pack!(response)}
       }
 
       {:ok, request, response, state, opts}
@@ -632,7 +622,7 @@ defmodule Actors.Actor.Entity.Invocation do
     else
       state_type =
         state.actor.settings.state_type
-        |> AnySerializer.normalize_package_name()
+        |> normalize_package_name()
 
       table_name =
         if is_nil(id.parent) or id.parent == "" do
@@ -645,7 +635,7 @@ defmodule Actors.Actor.Entity.Invocation do
         load_projection_adapter(),
         state_type,
         table_name,
-        AnySerializer.any_unpack!(response.updated_context.state, state_type)
+        any_unpack!(response.updated_context.state, state_type)
       )
     end
   end
