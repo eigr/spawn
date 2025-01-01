@@ -615,7 +615,13 @@ defmodule Actors.Actor.Entity.Invocation do
     )
   end
 
-  defp do_handle_projection(id, action, %{} = settings, state, response) do
+  defp do_handle_projection(
+         id,
+         action,
+         _settings,
+         %EntityState{actor: %Actor{settings: %ActorSettings{kind: :PROJECTION}}} = state,
+         response
+       ) do
     if :persistent_term.get("view-#{id.name}-#{action}", false) do
       # no need to persist any state since this is a view only action
       :ok
