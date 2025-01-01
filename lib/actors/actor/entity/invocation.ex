@@ -650,7 +650,7 @@ defmodule Actors.Actor.Entity.Invocation do
     end
   end
 
-  defp do_handle_projection(_id, _action, _settings, _state), do: :ok
+  defp do_handle_projection(_id, _action, _settings, _state, _response), do: :ok
 
   defp do_run_workflow(
          _request,
