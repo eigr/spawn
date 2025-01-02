@@ -43,6 +43,17 @@ jobs:
 
           sudo -u postgres psql -c "CREATE DATABASE \"eigr-functions-db\";"
 
+      - name: Shutdown Ubuntu MySQL (SUDO)
+        run: sudo service mysql stop
+
+      - name: Set up MariaDB
+        uses: getong/mariadb-action@v1.11
+        with:
+          mysql database: 'eigr-functions-db'
+          mysql root password: admin
+          mysql user: admin
+          mysql password: admin
+
       - name: Install MariaDB on port 3306
         run: |
           sudo apt-get update
