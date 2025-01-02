@@ -30,18 +30,18 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y postgresql postgresql-contrib
           sudo service postgresql start
-          sudo -u postgres psql -c "CREATE DATABASE eigr-functions-db;"
+          sudo -u postgres psql -c 'CREATE DATABASE "eigr-functions-db";'
           sudo -u postgres psql -c "CREATE USER postgres WITH PASSWORD 'password';"
-          sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE eigr-functions-db TO postgres;"
+          sudo -u postgres psql -c 'GRANT ALL PRIVILEGES ON DATABASE "eigr-functions-db" TO postgres;'
 
       - name: Install MariaDB on port 3306
         run: |
           sudo apt-get update
           sudo apt-get install -y mariadb-server
           sudo service mysql start
-          sudo mysql -e "CREATE DATABASE eigr-functions-db;"
+          sudo mysql -e "CREATE DATABASE \`eigr-functions-db\`;"
           sudo mysql -e "CREATE USER 'admin'@'localhost' IDENTIFIED BY 'admin';"
-          sudo mysql -e "GRANT ALL PRIVILEGES ON eigr-functions-db.* TO 'admin'@'localhost';"
+          sudo mysql -e "GRANT ALL PRIVILEGES ON \`eigr-functions-db\`.* TO 'admin'@'localhost';"
 
       - name: Install NATS with JetStream
         run: |
