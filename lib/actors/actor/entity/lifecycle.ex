@@ -24,8 +24,10 @@ defmodule Actors.Actor.Entity.Lifecycle do
 
   alias Sidecar.Measurements
   alias Spawn.Utils.AnySerializer
+  alias Statestores.Projection.DynamicTableCreator
 
   import Spawn.Utils.Common, only: [return_and_maybe_hibernate: 1]
+  import Statestores.Util, only: [load_projection_adapter: 0]
 
   @deactivated_status "DEACTIVATED"
   @default_deactivate_timeout 10_000
@@ -153,7 +155,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
           } = actor
       }) do
     response =
-      if is_actor_valid?(actor) do
+      if should_persist?(actor) do
         Logger.debug("Doing Actor checkpoint to Actor [#{inspect(name)}]")
 
         StateManager.save(id, actor_state, revision: revision)
@@ -172,7 +174,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
             state: actor_state
           } = actor
       }) do
-    if is_actor_valid?(actor) do
+    if should_persist?(actor) do
       StateManager.save(id, actor_state, revision: revision, status: @deactivated_status)
     end
 
@@ -308,6 +310,24 @@ defmodule Actors.Actor.Entity.Lifecycle do
   end
 
   defp handle_projection(%Actor{settings: %ActorSettings{kind: :PROJECTION}} = actor) do
+    state_type =
+      actor.settings.state_type
+      |> AnySerializer.normalize_package_name()
+
+    table_name =
+      if is_nil(actor.id.parent) or actor.id.parent == "" do
+        Macro.underscore(actor.id.name)
+      else
+        Macro.underscore(actor.id.parent)
+      end
+
+    :ok =
+      DynamicTableCreator.create_or_update_table(
+        load_projection_adapter(),
+        state_type,
+        table_name
+      )
+
     StreamInitiator.init_projection_stream(actor)
   end
 
@@ -351,7 +371,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
     {:noreply, state, {:continue, :call_init_action}}
   end
 
-  defp is_actor_valid?(
+  defp should_persist?(
          %Actor{
            settings: %ActorSettings{stateful: stateful},
            state: actor_state

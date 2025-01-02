@@ -105,6 +105,7 @@ defmodule Spawn.Utils.AnySerializer do
     end
   end
 
+  defp upcase_first(""), do: ""
   defp upcase_first(<<first::utf8, rest::binary>>), do: String.upcase(<<first::utf8>>) <> rest
 
   defp any_pack(record, state_type) when is_struct(record) do

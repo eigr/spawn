@@ -11,6 +11,13 @@ message ValuePayload {
 
 message ExampleState {
   int32 value = 1;
+  string id = 2 [(spawn.actors.actor_id) = true];
+
+  message Data {
+    string id = 1 [(spawn.actors.actor_id) = true];
+    string test = 2;
+  }
+  Data data = 3 [(spawn.actors.searchable) = true];
 }
 
 message SumResponse {
@@ -18,6 +25,6 @@ message SumResponse {
 }
 
 message SomeQueryResponse {
-  repeated SumResponse results = 1;
+  repeated ExampleState results = 1;
 }
 

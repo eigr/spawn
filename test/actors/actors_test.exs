@@ -99,6 +99,9 @@ defmodule ActorsTest do
 
       {:ok, %RegistrationResponse{}} = Actors.register(request)
 
+      # register takes a while so we wait
+      Process.sleep(1000)
+
       # invoke
       invoke_request = build_invocation_request(system: system, actor: actor)
 

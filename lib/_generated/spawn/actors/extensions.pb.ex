@@ -1,12 +1,14 @@
 defmodule Spawn.Actors.PbExtension do
   @moduledoc false
-  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
+  use Protobuf, protoc_gen_elixir_version: "0.13.0", syntax: :proto3
 
   extend(Google.Protobuf.FieldOptions, :actor_id, 9999,
     optional: true,
     type: :bool,
     json_name: "actorId"
   )
+
+  extend(Google.Protobuf.FieldOptions, :searchable, 4_890_129, optional: true, type: :bool)
 
   extend(Google.Protobuf.MethodOptions, :view, 4_890_127,
     optional: true,
@@ -19,63 +21,9 @@ defmodule Spawn.Actors.PbExtension do
   )
 end
 
-defmodule Spawn.Actors.ActorViewOption do
-  @moduledoc false
-  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
-
-  def descriptor do
-    # credo:disable-for-next-line
-    %Google.Protobuf.DescriptorProto{
-      name: "ActorViewOption",
-      field: [
-        %Google.Protobuf.FieldDescriptorProto{
-          name: "query",
-          extendee: nil,
-          number: 1,
-          label: :LABEL_OPTIONAL,
-          type: :TYPE_STRING,
-          type_name: nil,
-          default_value: nil,
-          options: nil,
-          oneof_index: nil,
-          json_name: "query",
-          proto3_optional: nil,
-          __unknown_fields__: []
-        },
-        %Google.Protobuf.FieldDescriptorProto{
-          name: "map_to",
-          extendee: nil,
-          number: 2,
-          label: :LABEL_OPTIONAL,
-          type: :TYPE_STRING,
-          type_name: nil,
-          default_value: nil,
-          options: nil,
-          oneof_index: nil,
-          json_name: "mapTo",
-          proto3_optional: nil,
-          __unknown_fields__: []
-        }
-      ],
-      nested_type: [],
-      enum_type: [],
-      extension_range: [],
-      extension: [],
-      options: nil,
-      oneof_decl: [],
-      reserved_range: [],
-      reserved_name: [],
-      __unknown_fields__: []
-    }
-  end
-
-  field(:query, 1, type: :string)
-  field(:map_to, 2, type: :string, json_name: "mapTo")
-end
-
 defmodule Spawn.Actors.ActorOpts do
   @moduledoc false
-  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
+  use Protobuf, protoc_gen_elixir_version: "0.13.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -235,4 +183,73 @@ defmodule Spawn.Actors.ActorOpts do
 
   field(:subjects, 8, repeated: true, type: Spawn.Actors.ProjectionSubject)
   field(:kind, 9, type: Spawn.Actors.Kind, enum: true)
+end
+
+defmodule Spawn.Actors.ActorViewOption do
+  @moduledoc false
+  use Protobuf, protoc_gen_elixir_version: "0.13.0", syntax: :proto3
+
+  def descriptor do
+    # credo:disable-for-next-line
+    %Google.Protobuf.DescriptorProto{
+      name: "ActorViewOption",
+      field: [
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "query",
+          extendee: nil,
+          number: 1,
+          label: :LABEL_OPTIONAL,
+          type: :TYPE_STRING,
+          type_name: nil,
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "query",
+          proto3_optional: nil,
+          __unknown_fields__: []
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "map_to",
+          extendee: nil,
+          number: 2,
+          label: :LABEL_OPTIONAL,
+          type: :TYPE_STRING,
+          type_name: nil,
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "mapTo",
+          proto3_optional: nil,
+          __unknown_fields__: []
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "page_size",
+          extendee: nil,
+          number: 3,
+          label: :LABEL_OPTIONAL,
+          type: :TYPE_INT32,
+          type_name: nil,
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "pageSize",
+          proto3_optional: nil,
+          __unknown_fields__: []
+        }
+      ],
+      nested_type: [],
+      enum_type: [],
+      extension_range: [],
+      extension: [],
+      options: nil,
+      oneof_decl: [],
+      reserved_range: [],
+      reserved_name: [],
+      __unknown_fields__: []
+    }
+  end
+
+  field(:query, 1, type: :string)
+  field(:map_to, 2, type: :string, json_name: "mapTo")
+  field(:page_size, 3, type: :int32, json_name: "pageSize")
 end

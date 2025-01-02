@@ -174,6 +174,9 @@ test-proxy:
 test-statestores_native:
 	cd spawn_statestores/statestores_native && MIX_ENV=test mix deps.get && MIX_ENV=test PROXY_CLUSTER_STRATEGY=gossip PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
 
+test-statestores:
+	cd spawn_statestores/statestores && MIX_ENV=test mix deps.get && MIX_ENV=test PROXY_CLUSTER_STRATEGY=gossip PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
+
 test-statestores_mariadb:
 	cd spawn_statestores/statestores_mariadb && \
 	MIX_ENV=test mix deps.get && \
@@ -344,8 +347,10 @@ run-sdk-local4:
 	PROXY_CLUSTER_STRATEGY=epmd \
 	SPAWN_USE_INTERNAL_NATS=true \
 	SPAWN_PUBSUB_ADAPTER=nats \
-	PROXY_DATABASE_TYPE=mariadb \
-	PROXY_DATABASE_PORT=3307 \
+	PROXY_DATABASE_TYPE=postgres \
+	PROXY_DATABASE_PORT=5432 \
+	PROXY_DATABASE_USERNAME=postgres \
+	PROXY_DATABASE_SECRET=postgres \
 	SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= \
 	SPAWN_SUPERVISORS_STATE_HANDOFF_CONTROLLER=nats \
 	iex --name spawn_a4@127.0.0.1 -S mix

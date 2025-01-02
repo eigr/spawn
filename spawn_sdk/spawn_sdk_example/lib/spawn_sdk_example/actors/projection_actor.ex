@@ -4,14 +4,19 @@ defmodule SpawnSdkExample.Actors.ProjectionActor do
   require Logger
 
   alias Io.Eigr.Spawn.Example.MyState
+  alias Example.ExampleState
 
   action("Clock", fn %Context{} = ctx, %MyState{} = payload ->
     Logger.info("[projection] Projection Actor Received Request. Context: #{inspect(ctx)}")
 
-    value = payload.value
-    new_value = (value || 0) + (Map.get(ctx.state || %{}, :value) || 0)
-
     Value.of()
-    |> Value.state(%MyState{value: new_value})
+    |> Value.state(%ExampleState{
+      id: "id_#{payload.value}",
+      value: payload.value,
+      data: %Example.ExampleState.Data{
+        id: "data_id_01",
+        test: "data_test"
+      }
+    })
   end)
 end

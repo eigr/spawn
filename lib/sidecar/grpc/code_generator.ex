@@ -200,6 +200,7 @@ defmodule Sidecar.GRPC.CodeGenerator do
               view_name: method.name,
               query_result_type: type_name,
               map_to: option.map_to,
+              page_size: option.page_size,
               output_type: output_type,
               input_type: input_type
             })

@@ -27,6 +27,7 @@ defmodule Statestores.Supervisor do
   def init(_args) do
     lookup_adapter = load_lookup_adapter()
     snapshot_adapter = load_snapshot_adapter()
+    projection_adapter = load_projection_adapter()
 
     case System.get_env("MIX_ENV") do
       env when env in ["dev", "test"] ->
@@ -42,8 +43,8 @@ defmodule Statestores.Supervisor do
         supervisor_process_logger(__MODULE__),
         Statestores.Vault,
         snapshot_adapter,
-        # projection_adapter,
-        lookup_adapter
+        lookup_adapter,
+        projection_adapter
       ]
       |> maybe_add_native_children(snapshot_adapter)
 

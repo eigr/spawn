@@ -32,6 +32,7 @@ PROTOS=("
     priv/protos/spawn/actors/protocol.proto 
     priv/protos/spawn/actors/state.proto 
     priv/protos/spawn/actors/healthcheck.proto
+    priv/protos/spawn/actors/test.proto
 ")
 
 BASE_PATH=`pwd`

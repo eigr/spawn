@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package test;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
+import "spawn/actors/extensions.proto";
+
+
+message TestMessage {
+  string name = 1 [(spawn.actors.actor_id) = true];
+
+  int32 age = 2 [(spawn.actors.searchable) = true];;
+
+  double balance = 3;
+
+  bool active = 4;
+
+  bytes document = 5;
+
+  // Campo do tipo enum
+  //enum Status {
+  //  UNKNOWN = 0;
+  //  ACTIVE = 1;
+  //  INACTIVE = 2;
+  //}
+  //Status status = 6;
+
+  // Nested message type field
+  message Address {
+    string street = 1;
+    string city = 2;
+    string state = 3;
+    string zip_code = 4;
+  }
+  Address address = 7;
+
+  google.protobuf.Timestamp created_at = 8;
+
+  // JSON type field (represented by google.protobuf.Struct)
+  google.protobuf.Struct metadata = 9;
+
+  repeated string tags = 10;
+
+  map<string, string> attributes = 11;
+}
