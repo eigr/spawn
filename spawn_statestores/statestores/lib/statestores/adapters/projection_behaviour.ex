@@ -1,82 +1,21 @@
 defmodule Statestores.Adapters.ProjectionBehaviour do
   @moduledoc """
-  Defines the default behavior for each Statestore Provider.
+  Defines the default behavior for each Projection Provider.
   """
-  alias Scrivener.Page
-  alias Statestores.Schemas.Projection
 
-  @type metadata_key :: String.t()
+  @type projection_type :: module()
+  @type table_name :: String.t()
+  @type data :: struct()
+  @type query :: String.t()
+  @type params :: struct()
+  @type opts :: Keyword.t()
 
-  @type metadata_value :: String.t()
+  @callback create_or_update_table(projection_type(), table_name()) :: :ok
 
-  @type page :: integer()
+  @callback upsert(projection_type(), table_name(), data()) :: :ok
 
-  @type page_size :: integer()
-
-  @type page_data :: Page.t()
-
-  @type projection :: Projection.t()
-
-  @type projections :: list(Projection.t())
-
-  @type projection_name :: String.t()
-
-  @type projection_id :: String.t()
-
-  @type revision :: integer()
-
-  @type time_start :: String.t()
-
-  @type time_end :: String.t()
-
-  @callback create_table(projection_name()) :: {:ok, String.t()}
-
-  @callback get_last(projection_name()) :: {:error, any} | {:ok, projection()}
-
-  @callback get_last_by_projection_id(projection_name(), projection_id()) ::
-              {:error, any} | {:ok, projection()}
-
-  @callback get_all(projection_name(), page(), page_size()) :: {:error, any} | {:ok, page_data()}
-
-  @callback get_all_by_projection_id(projection_name(), projection_id(), page(), page_size()) ::
-              {:error, any} | {:ok, page_data()}
-
-  @callback get_by_interval(
-              projection_name(),
-              time_start(),
-              time_end(),
-              page(),
-              page_size()
-            ) :: {:error, any} | {:ok, page_data()}
-
-  @callback get_by_projection_id_and_interval(
-              projection_name(),
-              projection_id(),
-              time_start(),
-              time_end(),
-              page(),
-              page_size()
-            ) :: {:error, any} | {:ok, page_data()}
-
-  @callback search_by_metadata(
-              projection_name(),
-              metadata_key(),
-              metadata_value(),
-              page(),
-              page_size()
-            ) ::
-              {:error, any} | {:ok, page_data()}
-
-  @callback search_by_projection_id_and_metadata(
-              projection_name(),
-              projection_id(),
-              metadata_key(),
-              metadata_value(),
-              page(),
-              page_size()
-            ) :: {:error, any} | {:ok, page_data()}
-
-  @callback save(projection()) :: {:error, any} | {:ok, projection()}
+  @callback query(projection_type(), query(), params(), opts()) ::
+              {:error, term()} | {:ok, data()}
 
   @callback default_port :: <<_::32>>
 

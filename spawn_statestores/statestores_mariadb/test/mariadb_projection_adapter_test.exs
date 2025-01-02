@@ -1,262 +1,149 @@
-defmodule Statestores.Adapters.MariaDBProjectionAdapterTest do
-  use Statestores.DataCase
-  alias Statestores.Adapters.MariaDBProjectionAdapter, as: Adapter
-  alias Statestores.Schemas.Projection
+defmodule StatestoresMariaDB.MariaDBProjectionAdapterTest do
+  use Statestores.DataCase, async: false
+
+  alias Statestores.Manager.StateManager
+  alias Test.TestMessage
 
   import Statestores.Util, only: [load_projection_adapter: 0]
 
   setup do
     repo = load_projection_adapter()
-    %{repo: repo}
+    table_name = "test_messages"
+
+    data = %TestMessage{
+      name: "test_user",
+      age: 25,
+      balance: 100.50,
+      active: true,
+      document: "binary-data",
+      address: %TestMessage.Address{
+        street: "123 Main St",
+        city: "Testville",
+        state: "TS",
+        zip_code: "12345",
+        country: %TestMessage.Address.Country{
+          name: "Test Country",
+          code: "TC"
+        }
+      },
+      created_at: DateTime.utc_now(),
+      metadata: %{"key" => "value"},
+      tags: ["elixir", "protobuf"],
+      attributes: %{"role" => "admin"}
+    }
+
+    {:ok, _} = Ecto.Adapters.SQL.query(repo, "DROP TABLE IF EXISTS #{table_name}")
+    :ok = StateManager.projection_create_or_update_table(TestMessage, table_name)
+
+    %{repo: repo, table_name: table_name, data: data}
   end
 
-  describe "create_table/1" do
-    test "creates a table if it does not exist" do
-      projection_name = "test_projections"
+  test "add new field to the table if schema changes", ctx do
+    %{
+      repo: repo,
+      data: data,
+      table_name: table_name
+    } = ctx
 
-      assert {:ok, message} = Adapter.create_table(projection_name)
-      assert message == "Table #{projection_name} created or already exists."
-    end
-  end
+    :ok = StateManager.projection_create_or_update_table(TestMessage, table_name)
 
-  describe "get_last/1" do
-    test "returns the last inserted projection", ctx do
-      repo = ctx.repo
-      IO.inspect(repo)
-      projection_name = "test_projections"
+    {:ok, _result} = Ecto.Adapters.SQL.query(repo, "ALTER TABLE #{table_name} DROP COLUMN age")
 
-      {:ok, _} =
-        repo.save(%Projection{
-          id: "123",
-          projection_id: "proj_1",
-          projection_name: projection_name,
-          system: "test_system",
-          metadata: %{"key" => "value"},
-          data_type: "type.googleapis.com/io.eigr.spawn.example.MyState",
-          data: <<1, 2, 3>>,
-          inserted_at: DateTime.utc_now(),
-          updated_at: DateTime.utc_now()
-        })
+    :ok = StateManager.projection_create_or_update_table(TestMessage, table_name)
 
-      assert {:ok, projection} = Adapter.get_last(projection_name)
-      assert projection.projection_id == "proj_1"
-    end
-  end
+    data = %{data | age: 34}
 
-  describe "get_last_by_projection_id/2" do
-    test "returns the last inserted projection for a specific projection_id", ctx do
-      repo = ctx.repo
-      projection_name = "test_projections"
-      projection_id = "proj_1"
+    :ok = StateManager.projection_upsert(TestMessage, table_name, data)
 
-      {:ok, _} =
-        repo.save(%Projection{
-          id: "123",
-          projection_id: projection_id,
-          projection_name: projection_name,
-          system: "test_system",
-          metadata: %{"key" => "value"},
-          data_type: "type.googleapis.com/io.eigr.spawn.example.MyState",
-          data: <<1, 2, 3>>,
-          inserted_at: DateTime.utc_now(),
-          updated_at: DateTime.utc_now()
-        })
-
-      assert {:ok, projection} =
-               Adapter.get_last_by_projection_id(projection_name, projection_id)
-
-      assert projection.projection_id == projection_id
-    end
-  end
-
-  describe "get_all/3" do
-    test "returns paginated projections", ctx do
-      repo = ctx.repo
-      projection_name = "test_projections"
-
-      Enum.each(1..20, fn n ->
-        repo.save(%Projection{
-          id: "#{n}",
-          projection_id: "proj_#{n}",
-          projection_name: projection_name,
-          system: "test_system",
-          metadata: %{"key" => "value#{n}"},
-          data_type: "type.googleapis.com/io.eigr.spawn.example.MyState",
-          data: <<1, 2, 3>>,
-          inserted_at: DateTime.utc_now(),
-          updated_at: DateTime.utc_now()
-        })
-      end)
-
-      {:ok, result} = Adapter.get_all(projection_name, 1, 10)
-      IO.inspect(result, label: "Pagination Result -----------")
-      assert length(result.entries) == 10
-      assert result.page_number == 1
-    end
-  end
-
-  describe "search_by_metadata/5" do
-    test "returns projections matching metadata key and value", ctx do
-      repo = ctx.repo
-      projection_name = "test_projections"
-      metadata_key = "key"
-      metadata_value = "value1"
-
-      repo.save(%Projection{
-        id: "1",
-        projection_id: "proj_1",
-        projection_name: projection_name,
-        system: "test_system",
-        metadata: %{"key" => "value1"},
-        data_type: "type.googleapis.com/io.eigr.spawn.example.MyState",
-        data: <<1, 2, 3>>,
-        inserted_at: DateTime.utc_now(),
-        updated_at: DateTime.utc_now()
-      })
-
-      repo.save(%Projection{
-        id: "2",
-        projection_id: "proj_2",
-        projection_name: projection_name,
-        system: "test_system",
-        metadata: %{"key" => "value2"},
-        data_type: "type.googleapis.com/io.eigr.spawn.example.MyState",
-        data: <<1, 2, 3>>,
-        inserted_at: DateTime.utc_now(),
-        updated_at: DateTime.utc_now()
-      })
-
-      {:ok, result} = Adapter.get_all(projection_name)
-      assert length(result.entries) == 2
-
-      {:ok, result} =
-        Adapter.search_by_metadata(
-          projection_name,
-          metadata_key,
-          metadata_value
-        )
-
-      assert length(result.entries) == 1
-      assert result.entries |> Enum.at(0) |> Map.get(:projection_id) == "proj_1"
-    end
-  end
-
-  describe "search_by_projection_id_and_metadata/6" do
-    test "returns projections matching projection_id and metadata", ctx do
-      repo = ctx.repo
-      projection_name = "test_projections"
-      projection_id = "proj_1"
-      metadata_key = "key"
-      metadata_value = "value1"
-
-      repo.save(%Projection{
-        id: "1",
-        projection_id: projection_id,
-        projection_name: projection_name,
-        system: "test_system",
-        metadata: %{"key" => "value1"},
-        data_type: "type.googleapis.com/io.eigr.spawn.example.MyState",
-        data: <<1, 2, 3>>,
-        inserted_at: DateTime.utc_now(),
-        updated_at: DateTime.utc_now()
-      })
-
-      {:ok, result} =
-        Adapter.search_by_projection_id_and_metadata(
-          projection_name,
-          projection_id,
-          metadata_key,
-          metadata_value
-        )
-
-      assert length(result.entries) == 1
-      assert result.entries |> Enum.at(0) |> Map.get(:projection_id) == projection_id
-    end
-  end
-
-  describe "fail for get_last_by_projection_id/2" do
-    test "returns error if no matching projection_id found", _ctx do
-      projection_name = "test_projections"
-      non_existing_projection_id = "non_existing_proj"
-
-      assert {:error, _error_msg} =
-               Adapter.get_last_by_projection_id(
-                 projection_name,
-                 non_existing_projection_id
-               )
-    end
-  end
-
-  describe "fail get_last/1" do
-    test "returns error if no projections exist", ctx do
-      projection_name = "empty_projections_table"
-
-      assert_raise MyXQL.Error, fn ->
-        Adapter.get_last(projection_name)
-      end
-    end
-  end
-
-  describe "fail search_by_metadata/5" do
-    test "returns no results for non-existing metadata key", ctx do
-      repo = ctx.repo
-      projection_name = "test_projections"
-      invalid_metadata_key = "non_existing_key"
-      metadata_value = "value1"
-
-      {:ok, result} =
-        Adapter.search_by_metadata(
-          projection_name,
-          invalid_metadata_key,
-          metadata_value
-        )
-
-      assert length(result.entries) == 0
-    end
-
-    test "returns no results for non-existing metadata value", ctx do
-      repo = ctx.repo
-      projection_name = "test_projections"
-      metadata_key = "key"
-      invalid_metadata_value = "non_existing_value"
-
-      {:ok, result} =
-        Adapter.search_by_metadata(
-          projection_name,
-          metadata_key,
-          invalid_metadata_value
-        )
-
-      assert length(result.entries) == 0
-    end
-  end
-
-  describe "fail get_last_by_projection_id/2" do
-    test "returns error if invalid parameters are provided", ctx do
-      projection_name = "test_projections"
-      invalid_projection_id = nil
-
-      assert {:error, _message} =
-               Adapter.get_last_by_projection_id(
-                 projection_name,
-                 invalid_projection_id
-               )
-    end
-  end
-
-  describe "fail get_all/3" do
-    test "returns empty results if requested page is out of bounds", ctx do
-      projection_name = "test_projections"
-
-      {:ok, result} = Adapter.get_all(projection_name, 5, 10)
-
-      IO.inspect(result,
-        label: "fail get_all/3 ----------------------------------------------------------------"
+    {:ok, result} =
+      StateManager.projection_query(
+        TestMessage,
+        "SELECT age, name FROM test_messages WHERE name = :name",
+        %{name: "test_user"},
+        []
       )
 
-      assert length(result.entries) == 0
-      # this totall create on test
-      assert result.page_number == 1
-    end
+    assert [%TestMessage{age: 34}] = result
+  end
+
+  test "performs upsert and query operations", ctx do
+    %{table_name: table_name, data: data} = ctx
+
+    :ok = StateManager.projection_upsert(TestMessage, table_name, data)
+
+    {:ok, result} =
+      StateManager.projection_query(
+        TestMessage,
+        "SELECT age, name FROM test_messages WHERE name = :name",
+        %{name: "test_user"},
+        []
+      )
+
+    assert [%TestMessage{name: "test_user"}] = result
+
+    data = %{data | age: 30}
+
+    :ok = StateManager.projection_upsert(TestMessage, table_name, data)
+
+    {:ok, result} =
+      StateManager.projection_query(
+        TestMessage,
+        "SELECT age, name FROM test_messages WHERE name = :name",
+        %{name: "test_user"},
+        []
+      )
+
+    assert [%TestMessage{age: 30}] = result
+  end
+
+  test "performs upsert and query operations with pagination", ctx do
+    %{table_name: table_name, data: data} = ctx
+
+    Enum.each(1..10, fn item ->
+      :ok = StateManager.projection_upsert(TestMessage, table_name, %{data | name: "#{item}"})
+    end)
+
+    {:ok, result} =
+      StateManager.projection_query(
+        TestMessage,
+        "SELECT * FROM test_messages ORDER BY name",
+        %{name: "test_user"},
+        page_size: 3,
+        page: 2
+      )
+
+    assert [%TestMessage{name: "3"}, %TestMessage{name: "4"}, %TestMessage{name: "5"}] = result
+  end
+
+  test "performs a query with no parameters matching query", ctx do
+    %{table_name: table_name, data: data} = ctx
+
+    :ok = StateManager.projection_upsert(TestMessage, table_name, data)
+
+    assert {:error, _result} =
+             StateManager.projection_query(
+               TestMessage,
+               "SELECT age, name FROM test_messages WHERE name = :name",
+               %{},
+               []
+             )
+  end
+
+  test "performs a query with more unecessary parameters", ctx do
+    %{table_name: table_name, data: data} = ctx
+
+    data = %{data | enum_test: nil}
+
+    :ok = StateManager.projection_upsert(TestMessage, table_name, data)
+
+    {:ok, result} =
+      StateManager.projection_query(
+        TestMessage,
+        "SELECT * FROM test_messages",
+        %{metadata: nil},
+        []
+      )
+
+    assert [%TestMessage{name: "test_user"}] = result
   end
 end

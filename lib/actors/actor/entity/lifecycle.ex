@@ -24,10 +24,8 @@ defmodule Actors.Actor.Entity.Lifecycle do
 
   alias Sidecar.Measurements
   alias Spawn.Utils.AnySerializer
-  alias Statestores.Projection.DynamicTableCreator
 
   import Spawn.Utils.Common, only: [return_and_maybe_hibernate: 1]
-  import Statestores.Util, only: [load_projection_adapter: 0]
 
   @deactivated_status "DEACTIVATED"
   @default_deactivate_timeout 10_000
@@ -321,12 +319,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
         Macro.underscore(actor.id.parent)
       end
 
-    :ok =
-      DynamicTableCreator.create_or_update_table(
-        load_projection_adapter(),
-        state_type,
-        table_name
-      )
+    :ok = StateManager.projection_create_or_update_table(state_type, table_name)
 
     StreamInitiator.init_projection_stream(actor)
   end

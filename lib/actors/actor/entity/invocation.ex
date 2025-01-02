@@ -38,12 +38,12 @@ defmodule Actors.Actor.Entity.Invocation do
   }
 
   alias Spawn.Utils.Nats
+  alias Statestores.Manager.StateManager
 
   import Spawn.Utils.AnySerializer,
     only: [any_pack!: 1, any_unpack!: 2, normalize_package_name: 1]
 
   import Spawn.Utils.Common, only: [return_and_maybe_hibernate: 1]
-  import Statestores.Util, only: [load_projection_adapter: 0]
 
   @default_actions [
     "get",
@@ -474,8 +474,7 @@ defmodule Actors.Actor.Entity.Invocation do
         |> normalize_package_name()
 
       {:ok, results} =
-        Statestores.Projection.Query.DynamicTableDataHandler.query(
-          load_projection_adapter(),
+        StateManager.projection_query(
           state_type,
           view.query,
           any_unpack!(request.payload |> elem(1), view.input_type),
@@ -637,8 +636,7 @@ defmodule Actors.Actor.Entity.Invocation do
           Macro.underscore(id.parent)
         end
 
-      Statestores.Projection.Query.DynamicTableDataHandler.upsert(
-        load_projection_adapter(),
+      StateManager.projection_upsert(
         state_type,
         table_name,
         any_unpack!(response.updated_context.state, state_type)

@@ -1,8 +1,7 @@
-defmodule StatestoresPostgres.PostgresProjectionDynamicTableTest do
+defmodule StatestoresPostgres.PostgresProjectionTest do
   use Statestores.DataCase, async: false
 
-  alias Statestores.Projection.DynamicTableCreator
-  alias Statestores.Projection.Query.DynamicTableDataHandler
+  alias Statestores.Manager.StateManager
   alias Test.TestMessage
 
   import Statestores.Util, only: [load_projection_adapter: 0]
@@ -34,7 +33,7 @@ defmodule StatestoresPostgres.PostgresProjectionDynamicTableTest do
     }
 
     {:ok, _} = Ecto.Adapters.SQL.query(repo, "DROP TABLE IF EXISTS #{table_name}")
-    :ok = DynamicTableCreator.create_or_update_table(repo, TestMessage, table_name)
+    :ok = StateManager.projection_create_or_update_table(TestMessage, table_name)
 
     %{repo: repo, table_name: table_name, data: data}
   end
@@ -46,84 +45,103 @@ defmodule StatestoresPostgres.PostgresProjectionDynamicTableTest do
       table_name: table_name
     } = ctx
 
-    :ok = DynamicTableCreator.create_or_update_table(repo, TestMessage, table_name)
+    :ok = StateManager.projection_create_or_update_table(TestMessage, table_name)
 
     {:ok, _result} = Ecto.Adapters.SQL.query(repo, "ALTER TABLE #{table_name} DROP COLUMN age")
 
-    :ok = DynamicTableCreator.create_or_update_table(repo, TestMessage, table_name)
+    :ok = StateManager.projection_create_or_update_table(TestMessage, table_name)
 
     data = %{data | age: 34}
 
-    :ok = DynamicTableDataHandler.upsert(repo, TestMessage, table_name, data)
+    :ok = StateManager.projection_upsert(TestMessage, table_name, data)
 
     {:ok, result} =
-      DynamicTableDataHandler.query(
-        repo,
+      StateManager.projection_query(
         TestMessage,
         "SELECT age, name FROM test_messages WHERE name = :name",
-        %{name: "test_user"}
+        %{name: "test_user"},
+        []
       )
 
     assert [%TestMessage{age: 34}] = result
   end
 
   test "performs upsert and query operations", ctx do
-    %{repo: repo, table_name: table_name, data: data} = ctx
+    %{table_name: table_name, data: data} = ctx
 
-    :ok = DynamicTableDataHandler.upsert(repo, TestMessage, table_name, data)
+    :ok = StateManager.projection_upsert(TestMessage, table_name, data)
 
     {:ok, result} =
-      DynamicTableDataHandler.query(
-        repo,
+      StateManager.projection_query(
         TestMessage,
         "SELECT age, name FROM test_messages WHERE name = :name",
-        %{name: "test_user"}
+        %{name: "test_user"},
+        []
       )
 
     assert [%TestMessage{name: "test_user"}] = result
 
     data = %{data | age: 30}
 
-    :ok = DynamicTableDataHandler.upsert(repo, TestMessage, table_name, data)
+    :ok = StateManager.projection_upsert(TestMessage, table_name, data)
 
     {:ok, result} =
-      DynamicTableDataHandler.query(
-        repo,
+      StateManager.projection_query(
         TestMessage,
         "SELECT age, name FROM test_messages WHERE name = :name",
-        %{name: "test_user"}
+        %{name: "test_user"},
+        []
       )
 
     assert [%TestMessage{age: 30}] = result
   end
 
-  test "performs a query with no parameters matching query", ctx do
-    %{repo: repo, table_name: table_name, data: data} = ctx
+  test "performs upsert and query operations with pagination", ctx do
+    %{table_name: table_name, data: data} = ctx
 
-    :ok = DynamicTableDataHandler.upsert(repo, TestMessage, table_name, data)
+    Enum.each(1..10, fn item ->
+      :ok = StateManager.projection_upsert(TestMessage, table_name, %{data | name: "#{item}"})
+    end)
+
+    {:ok, result} =
+      StateManager.projection_query(
+        TestMessage,
+        "SELECT * FROM test_messages ORDER BY name",
+        %{name: "test_user"},
+        page_size: 3,
+        page: 2
+      )
+
+    assert [%TestMessage{name: "3"}, %TestMessage{name: "4"}, %TestMessage{name: "5"}] = result
+  end
+
+  test "performs a query with no parameters matching query", ctx do
+    %{table_name: table_name, data: data} = ctx
+
+    :ok = StateManager.projection_upsert(TestMessage, table_name, data)
 
     assert {:error, _result} =
-             DynamicTableDataHandler.query(
-               repo,
+             StateManager.projection_query(
                TestMessage,
                "SELECT age, name FROM test_messages WHERE name = :name",
-               %{}
+               %{},
+               []
              )
   end
 
   test "performs a query with more unecessary parameters", ctx do
-    %{repo: repo, table_name: table_name, data: data} = ctx
+    %{table_name: table_name, data: data} = ctx
 
     data = %{data | enum_test: nil}
 
-    :ok = DynamicTableDataHandler.upsert(repo, TestMessage, table_name, data)
+    :ok = StateManager.projection_upsert(TestMessage, table_name, data)
 
     {:ok, result} =
-      DynamicTableDataHandler.query(
-        repo,
+      StateManager.projection_query(
         TestMessage,
         "SELECT * FROM test_messages",
-        %{metadata: nil}
+        %{metadata: nil},
+        []
       )
 
     assert [%TestMessage{name: "test_user"}] = result
