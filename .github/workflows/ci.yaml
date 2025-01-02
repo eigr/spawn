@@ -56,6 +56,13 @@ jobs:
           mariadb version: '10.4.10'
           mysql database: 'eigr-functions-db'
 
+      - name: Set up MariaDB User
+        run: |
+          # Create 'admin' user with password 'admin' and grant privileges
+          sudo mysql -P 3307 -u root -e "CREATE USER IF NOT EXISTS 'admin'@'localhost' IDENTIFIED BY 'admin';"
+          sudo mysql -P 3307 -u root -e "GRANT ALL PRIVILEGES ON *.* TO 'admin'@'localhost' WITH GRANT OPTION;"
+          sudo mysql -P 3307 -u root -e "FLUSH PRIVILEGES;"
+
       - name: Install NATS with JetStream
         run: |
           wget https://github.com/nats-io/nats-server/releases/download/v2.10.0/nats-server-v2.10.0-linux-amd64.tar.gz
