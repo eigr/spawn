@@ -17,7 +17,7 @@ defmodule Statestores.Adapters.MariaDBProjectionAdapter do
     :TYPE_BOOL => "BOOLEAN",
     :TYPE_FLOAT => "FLOAT",
     :TYPE_DOUBLE => "DOUBLE",
-    :TYPE_BYTES => "BLOB",
+    :TYPE_BYTES => "LONGBLOB",
     :TYPE_MESSAGE => "JSON",
     :TYPE_ENUM => "TEXT"
   }
