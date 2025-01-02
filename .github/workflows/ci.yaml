@@ -46,15 +46,16 @@ jobs:
       - name: Install MariaDB on port 3306
         run: |
           sudo apt-get update
-          sudo apt-get install -y mariadb-server
-          sudo service mysql start
+          sudo apt-get install -y mariadb-server mariadb-client
+          sudo systemctl start mariadb # Use systemctl for modern service management
+          sudo systemctl enable mariadb # Ensure MariaDB starts on boot
 
           # Create 'admin' user with password 'admin' and grant privileges
-          sudo mysql -e "CREATE USER IF NOT EXISTS 'admin'@'localhost' IDENTIFIED BY 'admin';"
-          sudo mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'admin'@'localhost' WITH GRANT OPTION;"
-          sudo mysql -e "FLUSH PRIVILEGES;"
+          sudo mysql -u root -e "CREATE USER IF NOT EXISTS 'admin'@'localhost' IDENTIFIED BY 'admin';"
+          sudo mysql -u root -e "GRANT ALL PRIVILEGES ON *.* TO 'admin'@'localhost' WITH GRANT OPTION;"
+          sudo mysql -u root -e "FLUSH PRIVILEGES;"
 
-          sudo mysql -e "CREATE DATABASE \`eigr-functions-db\`;"
+          sudo mysql -u root -e "CREATE DATABASE \`eigr-functions-db\`;"
 
       - name: Install NATS with JetStream
         run: |
