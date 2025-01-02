@@ -49,10 +49,12 @@ jobs:
       - name: Set up MariaDB
         uses: getong/mariadb-action@v1.11
         with:
+          host port: 3800
+          container port: 3307
+          character set server: 'utf8'
+          collation server: 'utf8_general_ci'
+          mariadb version: '10.4.10'
           mysql database: 'eigr-functions-db'
-          mysql root password: admin
-          mysql user: admin
-          mysql password: admin
 
       - name: Install NATS with JetStream
         run: |
@@ -116,7 +118,7 @@ jobs:
           mix deps.get
           MIX_ENV=test \
           PROXY_DATABASE_TYPE=mariadb \
-          PROXY_DATABASE_PORT=3306 \
+          PROXY_DATABASE_PORT=3307 \
           PROXY_DATABASE_USERNAME=admin \
           PROXY_DATABASE_SECRET=admin \
           PROXY_CLUSTER_STRATEGY=gossip \
