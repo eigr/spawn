@@ -1,7 +1,7 @@
 [package]
 edition = "2021"
 name = "activator-simple"
-version = "1.4.3"
+version = "2.0.0-RC1"
 
 [build-dependencies]
 protobuf-codegen = "3.0.0"

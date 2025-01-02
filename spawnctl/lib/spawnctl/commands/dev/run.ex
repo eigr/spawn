@@ -14,7 +14,7 @@ defmodule SpawnCtl.Commands.Dev.Run do
   - Protobuf files location: "/fakepath"
   - Proxy bind address: "0.0.0.0"
   - Proxy bind port: 9001
-  - Proxy image: "ghcr.io/eigr/spawn-proxy:1.4.3"
+  - Proxy image: "ghcr.io/eigr/spawn-proxy:2.0.0-RC1"
   - ActorHost port: 8090
   - Auto provisioning a local Database: true
   - Database hostname: "mariadb"
@@ -87,7 +87,7 @@ defmodule SpawnCtl.Commands.Dev.Run do
     proxy_bind_address: "0.0.0.0",
     proxy_bind_port: 9001,
     proxy_bind_grpc_port: 9980,
-    proxy_image: "ghcr.io/eigr/spawn-proxy:1.4.3",
+    proxy_image: "ghcr.io/eigr/spawn-proxy:2.0.0-RC1",
     actor_host_port: 8090,
     database_self_provisioning: true,
     database_host: "",
