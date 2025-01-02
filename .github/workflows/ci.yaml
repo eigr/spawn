@@ -48,6 +48,12 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y mariadb-server
           sudo service mysql start
+
+          # Create 'admin' user with password 'admin' and grant privileges
+          sudo mysql -e "CREATE USER IF NOT EXISTS 'admin'@'localhost' IDENTIFIED BY 'admin';"
+          sudo mysql -e "GRANT ALL PRIVILEGES ON *.* TO 'admin'@'localhost' WITH GRANT OPTION;"
+          sudo mysql -e "FLUSH PRIVILEGES;"
+
           sudo mysql -e "CREATE DATABASE \`eigr-functions-db\`;"
 
       - name: Install NATS with JetStream
