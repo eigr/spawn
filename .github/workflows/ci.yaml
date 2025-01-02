@@ -56,12 +56,24 @@ jobs:
           mariadb version: '10.4.10'
           mysql database: 'eigr-functions-db'
 
+
+      - name: Wait for MariaDB to be Ready
+        run: |
+          for i in {1..10}; do
+            if mysqladmin ping -h127.0.0.1 -P3307 --silent; then
+              echo "MariaDB is ready!"
+              break
+            fi
+            echo "Waiting for MariaDB..."
+            sleep 5
+          done
+
       - name: Set up MariaDB User
         run: |
           # Create 'admin' user with password 'admin' and grant privileges
-          sudo mysql -P 3307 -u root -e "CREATE USER IF NOT EXISTS 'admin'@'localhost' IDENTIFIED BY 'admin';"
-          sudo mysql -P 3307 -u root -e "GRANT ALL PRIVILEGES ON *.* TO 'admin'@'localhost' WITH GRANT OPTION;"
-          sudo mysql -P 3307 -u root -e "FLUSH PRIVILEGES;"
+          mysql -h127.0.0.1 -P3307 -uroot -e "CREATE USER IF NOT EXISTS 'admin'@'%' IDENTIFIED BY 'admin';"
+          mysql -h127.0.0.1 -P3307 -uroot -e "GRANT ALL PRIVILEGES ON *.* TO 'admin'@'%' WITH GRANT OPTION;"
+          mysql -h127.0.0.1 -P3307 -uroot -e "FLUSH PRIVILEGES;"
 
       - name: Install NATS with JetStream
         run: |
