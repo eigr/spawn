@@ -154,7 +154,7 @@ defmodule Google.Protobuf.ExtensionRangeOptions do
 
   field :uninterpreted_option, 999, repeated: true, type: Google.Protobuf.UninterpretedOption
 
-  extensions([{1000, Protobuf.Extension.max()}])
+  extensions [{1000, Protobuf.Extension.max()}]
 end
 
 defmodule Google.Protobuf.FieldDescriptorProto do
@@ -275,7 +275,7 @@ defmodule Google.Protobuf.FileOptions do
   field :ruby_package, 45, optional: true, type: :string
   field :uninterpreted_option, 999, repeated: true, type: Google.Protobuf.UninterpretedOption
 
-  extensions([{1000, Protobuf.Extension.max()}])
+  extensions [{1000, Protobuf.Extension.max()}]
 end
 
 defmodule Google.Protobuf.MessageOptions do
@@ -290,7 +290,7 @@ defmodule Google.Protobuf.MessageOptions do
   field :deprecated_legacy_json_field_conflicts, 11, optional: true, type: :bool, deprecated: true
   field :uninterpreted_option, 999, repeated: true, type: Google.Protobuf.UninterpretedOption
 
-  extensions([{1000, Protobuf.Extension.max()}])
+  extensions [{1000, Protobuf.Extension.max()}]
 end
 
 defmodule Google.Protobuf.FieldOptions do
@@ -319,7 +319,7 @@ defmodule Google.Protobuf.FieldOptions do
   field :debug_redact, 16, optional: true, type: :bool, default: false
   field :uninterpreted_option, 999, repeated: true, type: Google.Protobuf.UninterpretedOption
 
-  extensions([{1000, Protobuf.Extension.max()}])
+  extensions [{1000, Protobuf.Extension.max()}]
 end
 
 defmodule Google.Protobuf.OneofOptions do
@@ -329,7 +329,7 @@ defmodule Google.Protobuf.OneofOptions do
 
   field :uninterpreted_option, 999, repeated: true, type: Google.Protobuf.UninterpretedOption
 
-  extensions([{1000, Protobuf.Extension.max()}])
+  extensions [{1000, Protobuf.Extension.max()}]
 end
 
 defmodule Google.Protobuf.EnumOptions do
@@ -342,7 +342,7 @@ defmodule Google.Protobuf.EnumOptions do
   field :deprecated_legacy_json_field_conflicts, 6, optional: true, type: :bool, deprecated: true
   field :uninterpreted_option, 999, repeated: true, type: Google.Protobuf.UninterpretedOption
 
-  extensions([{1000, Protobuf.Extension.max()}])
+  extensions [{1000, Protobuf.Extension.max()}]
 end
 
 defmodule Google.Protobuf.EnumValueOptions do
@@ -353,7 +353,7 @@ defmodule Google.Protobuf.EnumValueOptions do
   field :deprecated, 1, optional: true, type: :bool, default: false
   field :uninterpreted_option, 999, repeated: true, type: Google.Protobuf.UninterpretedOption
 
-  extensions([{1000, Protobuf.Extension.max()}])
+  extensions [{1000, Protobuf.Extension.max()}]
 end
 
 defmodule Google.Protobuf.ServiceOptions do
@@ -364,7 +364,7 @@ defmodule Google.Protobuf.ServiceOptions do
   field :deprecated, 33, optional: true, type: :bool, default: false
   field :uninterpreted_option, 999, repeated: true, type: Google.Protobuf.UninterpretedOption
 
-  extensions([{1000, Protobuf.Extension.max()}])
+  extensions [{1000, Protobuf.Extension.max()}]
 end
 
 defmodule Google.Protobuf.MethodOptions do
@@ -382,7 +382,7 @@ defmodule Google.Protobuf.MethodOptions do
 
   field :uninterpreted_option, 999, repeated: true, type: Google.Protobuf.UninterpretedOption
 
-  extensions([{1000, Protobuf.Extension.max()}])
+  extensions [{1000, Protobuf.Extension.max()}]
 end
 
 defmodule Google.Protobuf.UninterpretedOption.NamePart do

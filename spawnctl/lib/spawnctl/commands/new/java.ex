@@ -14,7 +14,7 @@ defmodule SpawnCtl.Commands.New.Java do
 
   import SpawnCtl.Util, only: [log: 3]
 
-  @vsn "1.4.3"
+  @vsn "2.0.0-RC1"
   @main_sdk_version "1.4.3"
   @template "java-std"
 

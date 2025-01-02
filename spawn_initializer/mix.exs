@@ -2,7 +2,7 @@ defmodule SpawnInitializer.MixProject do
   use Mix.Project
 
   @app :spawn_initializer
-  @version "1.4.3"
+  @version "2.0.0-RC1"
   @site "https://eigr.io/"
   @source_url "https://github.com/eigr/spawn"
 

@@ -44,6 +44,7 @@ defmodule Actors.Actor.Entity.Invocation do
     only: [any_pack!: 1, any_unpack!: 2, normalize_package_name: 1]
 
   import Spawn.Utils.Common, only: [return_and_maybe_hibernate: 1]
+  import Statestores.Util, only: [load_projection_adapter: 0]
 
   @default_actions [
     "get",
