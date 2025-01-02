@@ -49,7 +49,7 @@ jobs:
       - name: Set up MariaDB
         uses: getong/mariadb-action@v1.11
         with:
-          host port: 3800
+          host port: 3307
           container port: 3307
           character set server: 'utf8'
           collation server: 'utf8_general_ci'
