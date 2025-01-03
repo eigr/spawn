@@ -39,13 +39,17 @@ jobs:
           sudo sed -i "s/^#host    all             all             ::1\/128                 md5/host    all             all             ::1\/128                 md5/" /etc/postgresql/*/main/pg_hba.conf
 
           # Increase max_connections in postgresql.conf
-          sudo sed -i "s/^#max_connections = [0-9]*/max_connections = 1100/" /etc/postgresql/*/main/postgresql.conf
+          sudo sed -i "s/^#max_connections = [0-9]*/max_connections = 1000/" /etc/postgresql/*/main/postgresql.conf
 
           # Restart PostgreSQL to apply changes
           sudo service postgresql restart
 
           # Create the database
           sudo -u postgres psql -c "CREATE DATABASE \"eigr-functions-db\";"
+
+      - name: Check max_connections
+        run: |
+          psql -U postgres -d eigr-functions-db -c "SHOW max_connections;"
 
       - name: Shutdown Ubuntu MySQL (SUDO)
         run: sudo service mysql stop
