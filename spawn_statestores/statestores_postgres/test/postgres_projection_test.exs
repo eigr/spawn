@@ -1,4 +1,4 @@
-defmodule StatestoresMariaDB.MariaDBProjectionAdapterTest do
+defmodule StatestoresPostgres.PostgresProjectionTest do
   use Statestores.DataCase, async: false
 
   alias Statestores.Manager.StateManager
@@ -40,8 +40,8 @@ defmodule StatestoresMariaDB.MariaDBProjectionAdapterTest do
 
   test "add new field to the table if schema changes", ctx do
     %{
-      repo: repo,
       data: data,
+      repo: repo,
       table_name: table_name
     } = ctx
 

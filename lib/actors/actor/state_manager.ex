@@ -11,15 +11,24 @@ if Code.ensure_loaded?(Statestores.Supervisor) do
     alias Statestores.Schemas.Snapshot
     alias Statestores.Manager.StateManager, as: StateStoreManager
 
+    def projection_create_or_update_table(projection_type, table_name) do
+      StateStoreManager.projection_create_or_update_table(projection_type, table_name)
+    end
+
+    def projection_upsert(projection_type, table_name, data) do
+      StateStoreManager.projection_upsert(projection_type, table_name, data)
+    end
+
+    def projection_query(projection_type, query, params, opts) do
+      StateStoreManager.projection_query(projection_type, query, params, opts)
+    end
+
     def is_new?(_old_hash, new_state) when is_nil(new_state), do: false
 
     def is_new?(old_hash, new_state) do
       with bytes_from_state <- Any.encode(new_state),
            hash <- :crypto.hash(:sha256, bytes_from_state) do
         old_hash != hash
-      else
-        _ ->
-          false
       end
     catch
       _kind, error ->
@@ -72,69 +81,6 @@ if Code.ensure_loaded?(Statestores.Supervisor) do
 
         _ ->
           {:not_found, %{}, 0}
-      end
-    catch
-      _kind, error ->
-        {:error, error}
-    end
-
-    @spec load_all(ActorId.t()) :: {:ok, term()} | :not_found | {:error, term()}
-    def load_all(%ActorId{} = actor_id) do
-      key = generate_key(actor_id)
-
-      snapshots = StateStoreManager.load_all(key)
-
-      results =
-        Enum.map(snapshots, fn %Snapshot{
-                                 status: status,
-                                 node: node,
-                                 revision: rev,
-                                 tags: tags,
-                                 data_type: type,
-                                 data: data
-                               } = _event ->
-          revision = if is_nil(rev), do: 0, else: rev
-
-          {%ActorState{tags: tags, state: %Google.Protobuf.Any{type_url: type, value: data}},
-           revision, status, node}
-        end)
-
-      if Enum.empty?(results) do
-        :not_found
-      else
-        {:ok, results}
-      end
-    catch
-      _kind, error ->
-        {:error, error}
-    end
-
-    @spec load_by_interval(ActorId.t(), String.t(), String.t()) ::
-            {:ok, term()} | :not_found | {:error, term()}
-    def load_by_interval(%ActorId{} = actor_id, time_start, time_end) do
-      key = generate_key(actor_id)
-
-      snapshots = StateStoreManager.load_by_interval(key, time_start, time_end)
-
-      results =
-        Enum.map(snapshots, fn %Snapshot{
-                                 status: status,
-                                 node: node,
-                                 revision: rev,
-                                 tags: tags,
-                                 data_type: type,
-                                 data: data
-                               } = _event ->
-          revision = if is_nil(rev), do: 0, else: rev
-
-          {%ActorState{tags: tags, state: %Google.Protobuf.Any{type_url: type, value: data}},
-           revision, status, node}
-        end)
-
-      if Enum.empty?(results) do
-        :not_found
-      else
-        {:ok, results}
       end
     catch
       _kind, error ->
@@ -285,10 +231,14 @@ else
     def is_new?(_old_hash, _new_state), do: raise(@not_loaded_message)
     def load(_actor_id), do: raise(@not_loaded_message)
     def load(_actor_id, _), do: raise(@not_loaded_message)
-    def load_all(_), do: raise(@not_loaded_message)
-    def load_by_interval(_, _, _), do: raise(@not_loaded_message)
     def save(_actor_id, _state), do: raise(@not_loaded_message)
     def save(_actor_id, _state, _opts), do: raise(@not_loaded_message)
     def save_async(_actor_id, _state, _timeout), do: raise(@not_loaded_message)
+
+    def projection_create_or_update_table(_projection_type, _table_name),
+      do: raise(@not_loaded_message)
+
+    def projection_upsert(_projection_type, _table_name, _data), do: raise(@not_loaded_message)
+    def projection_query(_projection_type, _query, _params, _opts), do: raise(@not_loaded_message)
   end
 end

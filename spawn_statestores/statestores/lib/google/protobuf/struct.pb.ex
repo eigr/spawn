@@ -28,7 +28,7 @@ defmodule Google.Protobuf.Value do
 
   use Protobuf, protoc_gen_elixir_version: "0.13.0", syntax: :proto3
 
-  oneof :kind, 0
+  oneof(:kind, 0)
 
   field :null_value, 1,
     type: Google.Protobuf.NullValue,
