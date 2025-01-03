@@ -28,14 +28,14 @@ defmodule Statestores.Adapters.NativeProjectionAdapter do
   def get_last_by_projection_id(nil, _projection_id), do: {:error, "No record found"}
   def get_last_by_projection_id(_projection_name, nil), do: {:error, "No record found"}
 
-  def get_last_by_projection_id(projection_name, projection_id) do
+  def get_last_by_projection_id(_projection_name, _projection_id) do
     nil
   end
 
   @impl true
   def get_all(nil, _page, _page_size), do: {:error, "No records found"}
 
-  def get_all(projection_name, page \\ 1, page_size \\ 50) do
+  def get_all(_projection_name, _page \\ 1, _page_size \\ 50) do
     nil
   end
 
@@ -46,7 +46,7 @@ defmodule Statestores.Adapters.NativeProjectionAdapter do
   def get_all_by_projection_id(_projection_name, nil, _page, _page_size),
     do: {:error, "No records found"}
 
-  def get_all_by_projection_id(projection_name, projection_id, page \\ 1, page_size \\ 50) do
+  def get_all_by_projection_id(_projection_name, _projection_id, _page \\ 1, _page_size \\ 50) do
     nil
   end
 
@@ -60,7 +60,7 @@ defmodule Statestores.Adapters.NativeProjectionAdapter do
   def get_by_interval(_projection_name, _time_start, nil, _page, _page_size),
     do: {:error, "No records found"}
 
-  def get_by_interval(projection_name, time_start, time_end, page \\ 1, page_size \\ 50) do
+  def get_by_interval(_projection_name, _time_start, _time_end, _page \\ 1, _page_size \\ 50) do
     nil
   end
 
@@ -106,35 +106,35 @@ defmodule Statestores.Adapters.NativeProjectionAdapter do
       do: {:error, "No records found"}
 
   def get_by_projection_id_and_interval(
-        projection_name,
-        projection_id,
-        time_start,
-        time_end,
-        page \\ 1,
-        page_size \\ 50
+        _projection_name,
+        _projection_id,
+        _time_start,
+        _time_end,
+        _page \\ 1,
+        _page_size \\ 50
       ) do
     nil
   end
 
   @impl true
   def search_by_metadata(
-        projection_name,
-        metadata_key,
-        metadata_value,
-        page \\ 1,
-        page_size \\ 50
+        _projection_name,
+        _metadata_key,
+        _metadata_value,
+        _page \\ 1,
+        _page_size \\ 50
       ) do
     nil
   end
 
   @impl true
   def search_by_projection_id_and_metadata(
-        projection_name,
-        projection_id,
-        metadata_key,
-        metadata_value,
-        page \\ 1,
-        page_size \\ 50
+        _projection_name,
+        _projection_id,
+        _metadata_key,
+        _metadata_value,
+        _page \\ 1,
+        _page_size \\ 50
       ) do
     nil
   end

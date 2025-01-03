@@ -4,21 +4,19 @@
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="generator" content="ExDoc v0.30.6">
-    <meta name="project" content="spawn_statestores_mariadb v1.0.0-rc.19">
+    <meta name="generator" content="ExDoc v0.34.2">
+    <meta name="project" content="spawn_statestores_mariadb v2.0.0-RC1">
 
-    <title>API Reference — spawn_statestores_mariadb v1.0.0-rc.19</title>
-    <link rel="stylesheet" href="dist/html-elixir-HHVY3JYD.css" />
+
+    <title>API Reference — spawn_statestores_mariadb v2.0.0-RC1</title>
+    <link rel="stylesheet" href="dist/html-elixir-F2VRIOKR.css" />
 
 
     <script src="dist/handlebars.runtime-NWIB6V2M.js"></script>
-    <script src="dist/handlebars.templates-KDPBTEPL.js"></script>
+    <script src="dist/handlebars.templates-K7URE6B4.js"></script>
     <script src="dist/sidebar_items-5E4AF6C1.js"></script>
-
-      <script src="docs_config.js"></script>
-
-    <script async src="dist/html-CP2A7WXZ.js"></script>
-
+    <script src="docs_config.js"></script>
+    <script async src="dist/html-JDI3AVDD.js"></script>
 
   </head>
   <body data-type="extras" class="page-extra">
@@ -36,81 +34,100 @@
       } catch (error) { }
     </script>
 
-<div class="main">
+<div class="body-wrapper">
 
-<button class="sidebar-button sidebar-toggle" aria-label="toggle sidebar">
+<button id="sidebar-menu" class="sidebar-button sidebar-toggle" aria-label="toggle sidebar" aria-controls="sidebar">
   <i class="ri-menu-line ri-lg" title="Collapse/expand sidebar"></i>
 </button>
 
-<section class="sidebar">
-  <form class="sidebar-search" action="search.html">
-    <button type="submit" class="search-button" aria-label="Submit Search">
-      <i class="ri-search-2-line" aria-hidden="true" title="Submit search"></i>
-    </button>
-    <button type="button" tabindex="-1" class="search-close-button" aria-label="Cancel Search">
-      <i class="ri-close-line ri-lg" aria-hidden="true" title="Cancel search"></i>
-    </button>
-    <label class="search-label">
-      <p class="sr-only">Search</p>
-      <input name="q" type="text" class="search-input" placeholder="Search..." aria-label="Input your search terms" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
-    </label>
-  </form>
-
-  <div class="autocomplete">
-    <div class="autocomplete-results">
-    </div>
-  </div>
+<nav id="sidebar" class="sidebar">
 
   <div class="sidebar-header">
+    <div class="sidebar-projectInfo">
 
-    <div class="sidebar-projectDetails">
-      <a href="https://eigr.io/" class="sidebar-projectName" translate="no">
+      <div>
+        <a href="https://eigr.io/" class="sidebar-projectName" translate="no">
 spawn_statestores_mariadb
-      </a>
-      <div class="sidebar-projectVersion" translate="no">
-        v1.0.0-rc.19
+        </a>
+        <div class="sidebar-projectVersion" translate="no">
+          v2.0.0-RC1
+        </div>
       </div>
     </div>
-    <ul class="sidebar-listNav">
-      <li><a id="extras-list-link" href="#full-list">Pages</a></li>
+    <ul id="sidebar-listNav" class="sidebar-listNav" role="tablist">
+      <li>
+        <button id="extras-list-tab-button" role="tab" data-type="extras" aria-controls="extras-tab-panel" aria-selected="true" tabindex="0">
+Pages
+        </button>
+      </li>
 
-        <li><a id="modules-list-link" href="#full-list">Modules</a></li>
+        <li>
+          <button id="modules-list-tab-button" role="tab" data-type="modules" aria-controls="modules-tab-panel" aria-selected="false" tabindex="-1">
+            Modules
+          </button>
+        </li>
 
 
     </ul>
   </div>
 
-  <ul id="full-list"></ul>
-</section>
+  <div id="extras-tab-panel" class="sidebar-tabpanel" role="tabpanel" aria-labelledby="extras-list-tab-button">
+    <ul id="extras-full-list" class="full-list"></ul>
+  </div>
 
-<section class="content">
+    <div id="modules-tab-panel" class="sidebar-tabpanel" role="tabpanel" aria-labelledby="modules-list-tab-button" hidden>
+      <ul id="modules-full-list" class="full-list"></ul>
+    </div>
+
+
+</nav>
+
+<main class="content">
   <output role="status" id="toast"></output>
-  <div class="content-outer">
-    <div id="content" class="content-inner">
 
-<h1>
-<button class="icon-action display-settings">
-  <i class="ri-settings-3-line"></i>
-  <span class="sr-only">Settings</span>
-</button>
+  <div id="content" class="content-inner">
+    <div class="top-search">
+      <div class="search-settings">
+        <form class="search-bar" action="search.html">
+          <label class="search-label">
+            <span class="sr-only">Search documentation of spawn_statestores_mariadb</span>
+            <input name="q" type="text" class="search-input" placeholder="Press / to search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+          </label>
+          <button type="submit" class="search-button" aria-label="Submit Search">
+            <i class="ri-search-2-line ri-lg" aria-hidden="true" title="Submit search"></i>
+          </button>
+          <button type="button" tabindex="-1" class="search-close-button" aria-hidden="true">
+            <i class="ri-close-line ri-lg" title="Cancel search"></i>
+          </button>
+        </form>
+        <div class="autocomplete">
+        </div>
+        <button class="icon-settings display-settings">
+          <i class="ri-settings-3-line"></i>
+          <span class="sr-only">Settings</span>
+        </button>
+      </div>
+    </div>
+
+<div id="top-content">
+  <h1>
+
+      <a href="https://github.com/eigr/spawn/blob/main/spawn_statestores/statestores_mariadb" title="View Source" class="icon-action" rel="help">
+        <i class="ri-code-s-slash-line" aria-hidden="true"></i>
+        <span class="sr-only">View Source</span>
+      </a>
 
 
-    <a href="https://github.com/eigr/spawn/blob/main/spawn_statestores/statestores_mariadb" title="View Source" class="icon-action" rel="help">
-      <i class="ri-code-s-slash-line" aria-hidden="true"></i>
-      <span class="sr-only">View Source</span>
-    </a>
-
-
-  <span>API Reference <small class="app-vsn">spawn_statestores_mariadb v1.0.0-rc.19</small></span>
-</h1>
+    <span>API Reference <small class="app-vsn">spawn_statestores_mariadb v2.0.0-RC1</small></span>
+  </h1>
 
 
   <section class="details-list">
     <h2 id="modules" class="section-heading">
-  <a href="#modules">
+  <a href="#modules" class="hover-link">
     <i class="ri-link-m" aria-hidden="true"></i>
-    Modules
   </a>
+  <span class="text">Modules</span>
 </h2>
 
     <div class="summary">
@@ -120,7 +137,16 @@ spawn_statestores_mariadb
 
   </div>
 
-    <div class="summary-synopsis"><p>Implements the behavior defined in <a href="https://hexdocs.pm/spawn_statestores/1.0.0-rc.19/Statestores.Adapters.LookupBehaviour.html"><code class="inline">Statestores.Adapters.LookupBehaviour</code></a> for MariaDB databases.</p></div>
+    <div class="summary-synopsis"><p>Implements the behavior defined in <a href="https://hexdocs.pm/spawn_statestores/2.0.0-RC1/Statestores.Adapters.LookupBehaviour.html"><code class="inline">Statestores.Adapters.LookupBehaviour</code></a> for MariaDB databases.</p></div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="Statestores.Adapters.MariaDBProjectionAdapter.html" translate="no">Statestores.Adapters.MariaDBProjectionAdapter</a>
+
+  </div>
+
+    <div class="summary-synopsis"><p>Implements the ProjectionBehaviour for MariaDB, with dynamic table name support.</p></div>
 
 </div>
 <div class="summary-row">
@@ -129,7 +155,7 @@ spawn_statestores_mariadb
 
   </div>
 
-    <div class="summary-synopsis"><p>Implements the behavior defined in <a href="https://hexdocs.pm/spawn_statestores/1.0.0-rc.19/Statestores.Adapters.SnapshotBehaviour.html"><code class="inline">Statestores.Adapters.SnapshotBehaviour</code></a> for MariaDB databases.</p></div>
+    <div class="summary-synopsis"><p>Implements the behavior defined in <a href="https://hexdocs.pm/spawn_statestores/2.0.0-RC1/Statestores.Adapters.SnapshotBehaviour.html"><code class="inline">Statestores.Adapters.SnapshotBehaviour</code></a> for MariaDB databases.</p></div>
 
 </div>
 
@@ -137,7 +163,9 @@ spawn_statestores_mariadb
   </section>
 
 
-<div class="bottom-actions">
+</div>
+
+<div class="bottom-actions" id="bottom-actions">
   <div class="bottom-actions-item">
 
   </div>
@@ -154,41 +182,40 @@ Statestores
 
   </div>
 </div>
-      <footer class="footer">
-        <p>
-
-            <span class="line">
-              <a href="https://hex.pm/packages/spawn_statestores_mariadb/1.0.0-rc.19" class="footer-hex-package">Hex Package</a>
-
-              <a href="https://preview.hex.pm/preview/spawn_statestores_mariadb/1.0.0-rc.19">Hex Preview</a>
-
-            </span>
+    <footer class="footer">
+      <p>
 
           <span class="line">
-            <button class="a-main footer-button display-quick-switch" title="Search HexDocs packages">
-              Search HexDocs
-            </button>
+            <a href="https://hex.pm/packages/spawn_statestores_mariadb/2.0.0-RC1" class="footer-hex-package">Hex Package</a>
 
-              <a href="spawn_statestores_mariadb.epub" title="ePub version">
-                Download ePub version
-              </a>
+            <a href="https://preview.hex.pm/preview/spawn_statestores_mariadb/2.0.0-RC1">Hex Preview</a>
 
           </span>
-        </p>
 
-        <p class="built-using">
-          Built using
-          <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" target="_blank" rel="help noopener" translate="no">ExDoc</a> (v0.30.6) for the
+        <span class="line">
+          <button class="a-main footer-button display-quick-switch" title="Search HexDocs packages">
+            Search HexDocs
+          </button>
 
-            <a href="https://elixir-lang.org" title="Elixir" target="_blank" translate="no">Elixir programming language</a>
+            <a href="spawn_statestores_mariadb.epub" title="ePub version">
+              Download ePub version
+            </a>
 
-        </p>
-      </footer>
-    </div>
+        </span>
+      </p>
+
+      <p class="built-using">
+        Built using
+        <a href="https://github.com/elixir-lang/ex_doc" title="ExDoc" target="_blank" rel="help noopener" translate="no">ExDoc</a> (v0.34.2) for the
+
+          <a href="https://elixir-lang.org" title="Elixir" target="_blank" translate="no">Elixir programming language</a>
+
+      </p>
+
+    </footer>
   </div>
-</section>
+</main>
 </div>
-
 
   </body>
 </html>

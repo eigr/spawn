@@ -281,9 +281,6 @@ defmodule Statestores.Adapters.PostgresProjectionAdapter do
   @impl true
   def default_port, do: "5432"
 
-  defp to_json(nil), do: Jason.encode!(%{})
-  defp to_json(map), do: Jason.encode!(map)
-
   # Private helper to fetch a single record from the database
   defp fetch_single_record(query) do
     case __MODULE__.one(query) do

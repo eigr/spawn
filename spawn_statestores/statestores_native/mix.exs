@@ -2,7 +2,7 @@ defmodule StatestoresNative.MixProject do
   use Mix.Project
 
   @app :spawn_statestores_native
-  @version "0.0.0-local.dev"
+  @version "2.0.0-RC1"
   @source_url "https://github.com/eigr/spawn/blob/main/spawn_statestores/statestores_native"
 
   def project do
@@ -58,7 +58,7 @@ defmodule StatestoresNative.MixProject do
     [
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:mnesiac, "~> 0.3"},
-      {:spawn_statestores, path: "../statestores"}
+      {:spawn_statestores, "2.0.0-RC1"}
     ]
   end
 

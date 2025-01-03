@@ -2,7 +2,7 @@ defmodule Statestores.MixProject do
   use Mix.Project
 
   @app :spawn_statestores
-  @version "0.0.0-local.dev"
+  @version "2.0.0-RC1"
   @source_url "https://github.com/eigr/spawn/blob/main/spawn_statestores/statestores"
 
   def project do

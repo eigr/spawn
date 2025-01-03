@@ -2,7 +2,7 @@ defmodule StatestoresPostgres.MixProject do
   use Mix.Project
 
   @app :spawn_statestores_postgres
-  @version "0.0.0-local.dev"
+  @version "2.0.0-RC1"
   @source_url "https://github.com/eigr/spawn/blob/main/spawn_statestores/statestores_postgres"
 
   def project do
@@ -59,7 +59,7 @@ defmodule StatestoresPostgres.MixProject do
       {:ecto_sql, "~> 3.12"},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:postgrex, "~> 0.17"},
-      {:spawn_statestores, path: "../statestores"}
+      {:spawn_statestores, "2.0.0-RC1"}
     ]
   end
 
