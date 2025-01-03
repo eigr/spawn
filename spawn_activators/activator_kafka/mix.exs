@@ -34,7 +34,7 @@ defmodule ActivatorKafka.MixProject do
       {:spawn, path: "../../"},
       {:broadway_kafka, "~> 0.4.1"},
       {:bakeware, "~> 0.2"},
-      {:bandit, "~> 1.1"},
+      {:bandit, "~> 1.5"},
       {:nimble_options, "~> 0.5.2", override: true}
     ]
   end

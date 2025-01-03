@@ -24,7 +24,6 @@ defmodule Actors.Actor.Entity.Lifecycle do
 
   alias Sidecar.Measurements
   alias Spawn.Utils.AnySerializer
-  alias Statestores.Projection.DynamicTableCreator
 
   import Spawn.Utils.Common, only: [return_and_maybe_hibernate: 1]
   import Statestores.Util, only: [load_projection_adapter: 0]

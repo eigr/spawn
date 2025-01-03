@@ -41,7 +41,7 @@ defmodule Operator.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:bandit, "~> 1.1"},
+      {:bandit, "~> 1.5"},
       {:bakeware, ">= 0.0.0", runtime: false},
       {:bonny, "~> 1.1"},
       {:castore, "~> 1.0"},

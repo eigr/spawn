@@ -36,6 +36,10 @@ deps-get-all:
 	cd spawn_operator/spawn_operator && mix deps.get
 	cd spawn_sdk/spawn_sdk && mix deps.get
 	cd spawn_proxy/proxy && mix deps.get
+	cd spawn_statestores/statestores && mix deps.get
+	cd spawn_statestores/statestores_native && mix deps.get
+	cd spawn_statestores/statestores_postgres && mix deps.get
+	cd spawn_statestores/statestores_mariadb && mix deps.get
 	cd spawn_activators/activator && mix deps.get
 	cd spawn_activators/activator_api && mix deps.get
 	cd spawn_activators/activator_pubsub && mix deps.get
