@@ -126,6 +126,7 @@ jobs:
           MIX_ENV=test \
           PROXY_DATABASE_TYPE=postgres \
           PROXY_DATABASE_PORT=5432 \
+          PROXY_DATABASE_POOL_SIZE=500 \
           PROXY_DATABASE_USERNAME=postgres \
           PROXY_DATABASE_SECRET=postgres \
           PROXY_CLUSTER_STRATEGY=gossip \
