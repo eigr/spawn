@@ -34,22 +34,23 @@ jobs:
           # Set the password for the 'postgres' user to 'postgres'
           sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD 'postgres';"
 
-          # Allow password authentication (uncomment in pg_hba.conf)
+          # Allow password authentication (modify pg_hba.conf)
+          sudo sed -i "s/^local   all             postgres                                peer/local   all             postgres                                md5/" /etc/postgresql/*/main/pg_hba.conf
           sudo sed -i "s/^#host    all             all             127.0.0.1\/32            md5/host    all             all             127.0.0.1\/32            md5/" /etc/postgresql/*/main/pg_hba.conf
           sudo sed -i "s/^#host    all             all             ::1\/128                 md5/host    all             all             ::1\/128                 md5/" /etc/postgresql/*/main/pg_hba.conf
 
           # Increase max_connections in postgresql.conf
-          sudo sed -i "s/^#max_connections = [0-9]*/max_connections = 1000/" /etc/postgresql/*/main/postgresql.conf
+          sudo sed -i "s/^#max_connections = [0-9]*/max_connections = 500/" /etc/postgresql/*/main/postgresql.conf
 
           # Restart PostgreSQL to apply changes
           sudo service postgresql restart
 
           # Create the database
-          sudo -u postgres psql -c "CREATE DATABASE \"eigr-functions-db\";"
+          PGPASSWORD=postgres psql -U postgres -h localhost -c "CREATE DATABASE \"eigr-functions-db\";"
 
       - name: Check max_connections
         run: |
-          sudo psql -U postgres -d eigr-functions-db -c "SHOW max_connections;"
+          PGPASSWORD=postgres psql -U postgres -d eigr-functions-db -h localhost -c "SHOW max_connections;"
 
       - name: Shutdown Ubuntu MySQL (SUDO)
         run: sudo service mysql stop
