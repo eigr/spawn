@@ -2,7 +2,7 @@ defmodule StatestoresMysql.MixProject do
   use Mix.Project
 
   @app :spawn_statestores_mariadb
-  @version "2.0.0-RC1"
+  @version "0.0.0-local.dev"
   @source_url "https://github.com/eigr/spawn/blob/main/spawn_statestores/statestores_mariadb"
 
   def project do
@@ -59,7 +59,7 @@ defmodule StatestoresMysql.MixProject do
       {:ecto_sql, "~> 3.12"},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:myxql, "~> 0.6"},
-      {:spawn_statestores, "2.0.0-RC1"}
+      {:spawn_statestores, path: "../statestores"}
     ]
   end
 

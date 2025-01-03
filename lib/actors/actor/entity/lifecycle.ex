@@ -321,12 +321,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
         Macro.underscore(actor.id.parent)
       end
 
-    :ok =
-      DynamicTableCreator.create_or_update_table(
-        load_projection_adapter(),
-        state_type,
-        table_name
-      )
+    :ok = StateManager.projection_create_or_update_table(state_type, table_name)
 
     StreamInitiator.init_projection_stream(actor)
   end

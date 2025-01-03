@@ -2,7 +2,7 @@ defmodule Proxy.MixProject do
   use Mix.Project
 
   @app :proxy
-  @version "2.0.0-RC1"
+  @version "0.0.0-local.dev"
 
   def project do
     [
@@ -33,10 +33,13 @@ defmodule Proxy.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:spawn, "2.0.0-RC1"},
-      {:spawn_statestores_mariadb, "2.0.0-RC1", optional: true},
-      {:spawn_statestores_postgres, "2.0.0-RC1", optional: true},
-      {:spawn_statestores_native, "2.0.0-RC1", optional: true},
+      {:spawn, path: "../../"},
+      {:spawn_statestores_mariadb,
+       path: "../../spawn_statestores/statestores_mariadb", optional: false},
+      {:spawn_statestores_postgres,
+       path: "../../spawn_statestores/statestores_postgres", optional: false},
+      {:spawn_statestores_native,
+       path: "../../spawn_statestores/statestores_native", optional: false},
       {:bakeware, "~> 0.2"},
       {:bandit, "~> 1.5"},
       {:observer_cli, "~> 1.7"},

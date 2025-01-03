@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        otp: [25. 26]
+        otp: [25]
         elixir: [1.15]
 
     env:
@@ -24,6 +24,59 @@ jobs:
 
       - name: Install Protoc
         uses: arduino/setup-protoc@v3
+
+      - name: Install and Configure Postgres on Port 5232
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql postgresql-contrib
+          sudo service postgresql start
+
+          # Set the password for the 'postgres' user to 'postgres'
+          sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD 'postgres';"
+
+          # Allow password authentication (uncomment in pg_hba.conf)
+          sudo sed -i "s/^#host    all             all             127.0.0.1\/32            md5/host    all             all             127.0.0.1\/32            md5/" /etc/postgresql/*/main/pg_hba.conf
+          sudo sed -i "s/^#host    all             all             ::1\/128                 md5/host    all             all             ::1\/128                 md5/" /etc/postgresql/*/main/pg_hba.conf
+
+          # Increase max_connections in postgresql.conf
+          sudo sed -i "s/^#max_connections = [0-9]*/max_connections = 500/" /etc/postgresql/*/main/postgresql.conf
+
+          # Restart PostgreSQL to apply changes
+          sudo service postgresql restart
+
+          # Create the database
+          sudo -u postgres psql -c "CREATE DATABASE \"eigr-functions-db\";"
+
+      - name: Shutdown Ubuntu MySQL (SUDO)
+        run: sudo service mysql stop
+
+      # - name: Set up MariaDB
+      #   uses: getong/mariadb-action@v1.11
+      #   with:
+      #     host port: 3307
+      #     container port: 3307
+      #     character set server: 'utf8'
+      #     collation server: 'utf8_general_ci'
+      #     mariadb version: '10.4.10'
+      #     mysql database: 'eigr-functions-db'
+      #
+      # - name: Wait for MariaDB to be Ready
+      #   run: |
+      #     for i in {1..10}; do
+      #       if mysqladmin ping -h127.0.0.1 -P3307 --silent; then
+      #         echo "MariaDB is ready!"
+      #         break
+      #       fi
+      #       echo "Waiting for MariaDB..."
+      #       sleep 5
+      #     done
+      #
+      # - name: Set up MariaDB User
+      #   run: |
+      #     # Create 'admin' user with password 'admin' and grant privileges
+      #     mysql -h127.0.0.1 -P3307 -uroot -e "CREATE USER IF NOT EXISTS 'admin'@'%' IDENTIFIED BY 'admin';"
+      #     mysql -h127.0.0.1 -P3307 -uroot -e "GRANT ALL PRIVILEGES ON *.* TO 'admin'@'%' WITH GRANT OPTION;"
+      #     mysql -h127.0.0.1 -P3307 -uroot -e "FLUSH PRIVILEGES;"
 
       - name: Install NATS with JetStream
         run: |
@@ -66,12 +119,35 @@ jobs:
           MIX_ENV=test PROXY_DATABASE_TYPE=native SPAWN_SUPERVISORS_STATE_HANDOFF_CONTROLLER=nats SPAWN_USE_INTERNAL_NATS=true SPAWN_PUBSUB_ADAPTER=nats PROXY_CLUSTER_STRATEGY=gossip PROXY_DATABASE_POOL_SIZE=15 PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
           cd ../../
 
-      - name: Run tests spawn_statestores
+      - name: Run tests spawn_statestores_postgres
         run: |
-          cd spawn_statestores/statestores
+          cd spawn_statestores/statestores_postgres
           mix deps.get
-          MIX_ENV=test PROXY_CLUSTER_STRATEGY=gossip PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
+          MIX_ENV=test \
+          PROXY_DATABASE_TYPE=postgres \
+          PROXY_DATABASE_PORT=5432 \
+          PROXY_DATABASE_USERNAME=postgres \
+          PROXY_DATABASE_SECRET=postgres \
+          PROXY_CLUSTER_STRATEGY=gossip \
+          PROXY_HTTP_PORT=9005 \
+          SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= \
+          elixir --name spawn@127.0.0.1 -S mix test
           cd ../../
+
+      # - name: Run tests spawn_statestores_mariadb
+      #   run: |
+      #     cd spawn_statestores/statestores_mariadb
+      #     mix deps.get
+      #     MIX_ENV=test \
+      #     PROXY_DATABASE_TYPE=mariadb \
+      #     PROXY_DATABASE_PORT=3307 \
+      #     PROXY_DATABASE_USERNAME=admin \
+      #     PROXY_DATABASE_SECRET=admin \
+      #     PROXY_CLUSTER_STRATEGY=gossip \
+      #     PROXY_HTTP_PORT=9005 \
+      #     SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= \
+      #     elixir --name spawn@127.0.0.1 -S mix test
+      #     cd ../../
 
       - name: Run tests statestores_native
         run: |
@@ -100,3 +176,4 @@ jobs:
       #     mix deps.get
       #     MIX_ENV=test PROXY_DATABASE_TYPE=mysql PROXY_CLUSTER_STRATEGY=gossip PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
       #     cd ../../
+     

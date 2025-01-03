@@ -2,7 +2,7 @@ defmodule Statestores.MixProject do
   use Mix.Project
 
   @app :spawn_statestores
-  @version "2.0.0-RC1"
+  @version "0.0.0-local.dev"
   @source_url "https://github.com/eigr/spawn/blob/main/spawn_statestores/statestores"
 
   def project do
@@ -58,9 +58,6 @@ defmodule Statestores.MixProject do
       {:castore, "~> 1.0"},
       {:cloak_ecto, "~> 1.2"},
       {:ecto_sql, "~> 3.12"},
-      {:scrivener_ecto, "~> 3.0"},
-      {:nimble_parsec, "~> 1.4"},
-      {:sql_parser, "~> 0.2"},
       {:jason, "~> 1.3"},
       {:protobuf, "~> 0.13"},
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},

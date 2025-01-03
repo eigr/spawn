@@ -4,7 +4,7 @@ defmodule Spawn.MixProject do
   Code.require_file("internal_versions.exs", "./priv")
 
   @app :spawn
-  @version "2.0.0-RC1"
+  @version "0.0.0-local.dev"
   @site "https://eigr.io/"
   @source_url "https://github.com/eigr/spawn"
 
@@ -106,9 +106,12 @@ defmodule Spawn.MixProject do
       {:opentelemetry_ecto, "~> 1.2"},
       {:opentelemetry_exporter, "~> 1.0"},
       # Statestores deps
-      {:spawn_statestores_mariadb, "2.0.0-RC1", optional: true},
-      {:spawn_statestores_postgres, "2.0.0-RC1", optional: true},
-      {:spawn_statestores_native, "2.0.0-RC1", optional: true},
+      {:spawn_statestores_mariadb,
+       path: "./spawn_statestores/statestores_mariadb", optional: false},
+      {:spawn_statestores_postgres,
+       path: "./spawn_statestores/statestores_postgres", optional: false},
+      {:spawn_statestores_native,
+       path: "./spawn_statestores/statestores_native", optional: false},
       {:pluggable, "~> 1.0"},
       # Non runtime deps
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},

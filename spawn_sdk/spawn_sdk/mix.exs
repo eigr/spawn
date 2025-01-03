@@ -2,7 +2,7 @@ defmodule SpawnSdk.MixProject do
   use Mix.Project
 
   @app :spawn_sdk
-  @version "2.0.0-RC1"
+  @version "0.0.0-local.dev"
   @source_url "https://github.com/eigr/spawn/tree/main/spawn_sdk/spawn_sdk"
 
   def project do
@@ -57,7 +57,7 @@ defmodule SpawnSdk.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:spawn, "2.0.0-RC1"},
+      {:spawn, path: "../.."},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false}
     ]
   end

@@ -10,138 +10,18 @@ defmodule Statestores.Adapters.NativeProjectionAdapter do
   import Statestores.Util, only: [normalize_table_name: 1]
 
   @impl true
-  def create_table(nil), do: {:error, "Projection name cannot be nil."}
-
-  def create_table(projection_name) do
-    table_name = normalize_table_name(projection_name)
-    {:ok, "Table #{table_name} created or already exists."}
+  def create_or_update_table(_projection_type, _table_name) do
+    raise "Projections are not supported using native adapter"
   end
 
   @impl true
-  def get_last(nil), do: {:error, "No record found"}
-
-  def get_last(projection_name) do
-    nil
+  def upsert(_projection_type, _table_name, _data) do
+    raise "Projections are not supported using native adapter"
   end
 
   @impl true
-  def get_last_by_projection_id(nil, _projection_id), do: {:error, "No record found"}
-  def get_last_by_projection_id(_projection_name, nil), do: {:error, "No record found"}
-
-  def get_last_by_projection_id(_projection_name, _projection_id) do
-    nil
-  end
-
-  @impl true
-  def get_all(nil, _page, _page_size), do: {:error, "No records found"}
-
-  def get_all(_projection_name, _page \\ 1, _page_size \\ 50) do
-    nil
-  end
-
-  @impl true
-  def get_all_by_projection_id(nil, _projection_id, _page, _page_size),
-    do: {:error, "No records found"}
-
-  def get_all_by_projection_id(_projection_name, nil, _page, _page_size),
-    do: {:error, "No records found"}
-
-  def get_all_by_projection_id(_projection_name, _projection_id, _page \\ 1, _page_size \\ 50) do
-    nil
-  end
-
-  @impl true
-  def get_by_interval(nil, _time_start, _time_end, _page, _page_size),
-    do: {:error, "No records found"}
-
-  def get_by_interval(_projection_name, nil, _time_end, _page, _page_size),
-    do: {:error, "No records found"}
-
-  def get_by_interval(_projection_name, _time_start, nil, _page, _page_size),
-    do: {:error, "No records found"}
-
-  def get_by_interval(_projection_name, _time_start, _time_end, _page \\ 1, _page_size \\ 50) do
-    nil
-  end
-
-  @impl true
-  def get_by_projection_id_and_interval(
-        nil,
-        _projection_id,
-        _time_start,
-        _time_end,
-        _page,
-        _page_size
-      ),
-      do: {:error, "No records found"}
-
-  def get_by_projection_id_and_interval(
-        _projection_name,
-        nil,
-        _time_start,
-        _time_end,
-        _page,
-        _page_size
-      ),
-      do: {:error, "No records found"}
-
-  def get_by_projection_id_and_interval(
-        _projection_name,
-        _projection_id,
-        nil,
-        _time_end,
-        _page,
-        _page_size
-      ),
-      do: {:error, "No records found"}
-
-  def get_by_projection_id_and_interval(
-        _projection_name,
-        _projection_id,
-        _time_start,
-        nil,
-        _page,
-        _page_size
-      ),
-      do: {:error, "No records found"}
-
-  def get_by_projection_id_and_interval(
-        _projection_name,
-        _projection_id,
-        _time_start,
-        _time_end,
-        _page \\ 1,
-        _page_size \\ 50
-      ) do
-    nil
-  end
-
-  @impl true
-  def search_by_metadata(
-        _projection_name,
-        _metadata_key,
-        _metadata_value,
-        _page \\ 1,
-        _page_size \\ 50
-      ) do
-    nil
-  end
-
-  @impl true
-  def search_by_projection_id_and_metadata(
-        _projection_name,
-        _projection_id,
-        _metadata_key,
-        _metadata_value,
-        _page \\ 1,
-        _page_size \\ 50
-      ) do
-    nil
-  end
-
-  @impl true
-  def save(%Projection{} = projection) do
-    {:ok, projection}
+  def query(_projection_type, _query, _params, _opts) do
+    raise "Projections are not supported using native adapter"
   end
 
   @impl true
