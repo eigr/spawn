@@ -4,9 +4,16 @@ package example;
 
 import "spawn/actors/extensions.proto";
 
+enum EnumTest {
+  ENUM_TEST_UNKNOWN = 0;
+  ENUM_TEST_TEST = 1;
+}
+
 message ValuePayload {
   int32 value = 1;
   string id = 2 [(spawn.actors.actor_id) = true];
+  EnumTest enum_test = 3;
+  string kind = 4;
 }
 
 message ExampleState {

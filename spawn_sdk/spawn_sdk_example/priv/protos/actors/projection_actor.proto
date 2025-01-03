@@ -31,7 +31,7 @@ service ProjectionActor {
 
   rpc All (.example.ValuePayload) returns (.example.SomeQueryResponse) {
     option (spawn.actors.view) = {
-      query: "SELECT * FROM projection_actor"
+      query: "SELECT * FROM projection_actor WHERE :enum_test IS NULL"
       map_to: "results"
       page_size: 40
     };

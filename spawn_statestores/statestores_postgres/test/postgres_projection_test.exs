@@ -29,7 +29,8 @@ defmodule StatestoresPostgres.PostgresProjectionTest do
       created_at: DateTime.utc_now(),
       metadata: %{"key" => "value"},
       tags: ["elixir", "protobuf"],
-      attributes: %{"role" => "admin"}
+      attributes: %{"role" => "admin"},
+      enum_test: :ENUM_TEST_ACTIVE
     }
 
     {:ok, _} = Ecto.Adapters.SQL.query(repo, "DROP TABLE IF EXISTS #{table_name}")
@@ -75,7 +76,7 @@ defmodule StatestoresPostgres.PostgresProjectionTest do
       StateManager.projection_query(
         TestMessage,
         "SELECT age, name FROM test_messages WHERE name = :name",
-        %{name: "test_user"},
+        %{name: :test_user},
         []
       )
 
@@ -94,6 +95,35 @@ defmodule StatestoresPostgres.PostgresProjectionTest do
       )
 
     assert [%TestMessage{age: 30}] = result
+  end
+
+  test "performs query with nil value", ctx do
+    %{table_name: table_name, data: data} = ctx
+
+    :ok = StateManager.projection_upsert(TestMessage, table_name, %{data | document: nil})
+
+    {:ok, result} =
+      StateManager.projection_query(
+        TestMessage,
+        "SELECT * FROM test_messages WHERE ((:document)::text IS NULL OR convert_from(document, 'UTF8') LIKE :document)",
+        %{document: ""},
+        []
+      )
+
+    # document is "" because of the serialization for binary
+    assert [%TestMessage{name: "test_user", document: ""}] = result
+
+    :ok = StateManager.projection_upsert(TestMessage, table_name, %{data | document: "test"})
+
+    {:ok, result} =
+      StateManager.projection_query(
+        TestMessage,
+        "SELECT * FROM test_messages WHERE ((:document)::text IS NULL OR convert_from(document, 'UTF8') LIKE :document)",
+        %{document: "test"},
+        []
+      )
+
+    assert [%TestMessage{name: "test_user", document: "\xB5\xEB-"}] = result
   end
 
   test "performs upsert and query operations with pagination", ctx do

@@ -190,11 +190,7 @@ defmodule Statestores.Adapters.PostgresProjectionAdapter do
             # If already present, don't modify the query
             {query, values}
           else
-            query = """
-            #{query}
-            LIMIT $#{length(values) + 1}
-            OFFSET $#{length(values) + 2}
-            """
+            query = "#{query} LIMIT $#{length(values) + 1} OFFSET $#{length(values) + 2}"
 
             values = values ++ [page_size, offset]
 
@@ -240,6 +236,8 @@ defmodule Statestores.Adapters.PostgresProjectionAdapter do
 
   defp build_params_for_query(params, query) when is_map(params) do
     Enum.reduce(params, {query, []}, fn {key, value}, {q, acc} ->
+      value = to_proto_decoded(value)
+
       if String.contains?(q, ":#{key}") do
         {String.replace(q, ":#{key}", "$#{length(acc) + 1}"), acc ++ [value]}
       else
@@ -250,7 +248,7 @@ defmodule Statestores.Adapters.PostgresProjectionAdapter do
 
   defp validate_params(query, params) do
     required_params =
-      Regex.scan(~r/:("\w+"|\w+)/, query)
+      Regex.scan(~r/(?<!:):("\w+"|\w+)/, query)
       |> List.flatten()
       |> Enum.filter(&String.starts_with?(&1, ":"))
       |> Enum.map(&String.trim_leading(&1, ":"))

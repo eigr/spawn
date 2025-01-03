@@ -49,7 +49,7 @@ defmodule Example.Actors.ProjectionActor.Service do
                 uninterpreted_option: [],
                 __pb_extensions__: %{
                   {Spawn.Actors.PbExtension, :view} => %Spawn.Actors.ActorViewOption{
-                    query: "SELECT * FROM projection_actor",
+                    query: "SELECT * FROM projection_actor WHERE :enum_test IS NULL",
                     map_to: "results",
                     page_size: 40,
                     __unknown_fields__: []
@@ -301,7 +301,7 @@ defmodule Example.Actors.ProjectionActor.Service do
     view: %{
       type: Spawn.Actors.PbExtension,
       value: %Spawn.Actors.ActorViewOption{
-        query: "SELECT * FROM projection_actor",
+        query: "SELECT * FROM projection_actor WHERE :enum_test IS NULL",
         map_to: "results",
         page_size: 40,
         __unknown_fields__: []

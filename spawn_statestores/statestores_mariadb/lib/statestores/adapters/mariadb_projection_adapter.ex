@@ -207,8 +207,8 @@ defmodule Statestores.Adapters.MariaDBProjectionAdapter do
       {:error, message} ->
         {:error, message}
 
-      :ok ->
-        {query, values} = build_params_for_query(params, query)
+      {:ok, required_params} ->
+        {query, values} = build_params_for_query(params, query, required_params)
 
         page = opts[:page] || 1
         page_size = opts[:page_size] || 10
@@ -221,11 +221,7 @@ defmodule Statestores.Adapters.MariaDBProjectionAdapter do
             # If already present, don't modify the query
             {query, values}
           else
-            query = """
-            #{query}
-            LIMIT ?
-            OFFSET ?
-            """
+            query = "#{query} LIMIT ? OFFSET ?"
 
             values = values ++ [page_size, offset]
 
@@ -321,16 +317,17 @@ defmodule Statestores.Adapters.MariaDBProjectionAdapter do
     end
   end
 
-  defp build_params_for_query(params, query) when is_struct(params),
-    do: Map.from_struct(params) |> build_params_for_query(query)
+  defp build_params_for_query(params, query, required_params) when is_struct(params),
+    do: Map.from_struct(params) |> build_params_for_query(query, required_params)
 
-  defp build_params_for_query(params, query) when is_map(params) do
-    Enum.reduce(params, {query, []}, fn {key, value}, {q, acc} ->
-      if String.contains?(q, ":#{key}") do
-        {String.replace(q, ":#{key}", "?"), acc ++ [value]}
-      else
-        {q, acc}
-      end
+  defp build_params_for_query(params, query, required_params) when is_map(params) do
+    Enum.reduce(required_params, {query, []}, fn param, {q, acc} ->
+      key = String.to_existing_atom(param)
+      value = to_proto_decoded(Map.get(params, key))
+
+      new_query = String.replace(q, ":#{param}", "?")
+
+      {new_query, acc ++ [value]}
     end)
   end
 
@@ -346,7 +343,7 @@ defmodule Statestores.Adapters.MariaDBProjectionAdapter do
     contains_all_params? = Enum.all?(required_params, fn param -> param in param_keys end)
 
     if contains_all_params? do
-      :ok
+      {:ok, required_params}
     else
       {:error, "Required parameters(s): #{Enum.join(required_params, ", ")}"}
     end
