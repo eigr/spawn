@@ -49,7 +49,7 @@ jobs:
 
       - name: Check max_connections
         run: |
-          psql -U postgres -d eigr-functions-db -c "SHOW max_connections;"
+          sudo psql -U postgres -d eigr-functions-db -c "SHOW max_connections;"
 
       - name: Shutdown Ubuntu MySQL (SUDO)
         run: sudo service mysql stop
