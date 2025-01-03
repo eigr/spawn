@@ -25,7 +25,7 @@ jobs:
       - name: Install Protoc
         uses: arduino/setup-protoc@v3
 
-      - name: Install Postgres on port 5232
+      - name: Install and Configure Postgres on Port 5232
         run: |
           sudo apt-get update
           sudo apt-get install -y postgresql postgresql-contrib
@@ -38,9 +38,13 @@ jobs:
           sudo sed -i "s/^#host    all             all             127.0.0.1\/32            md5/host    all             all             127.0.0.1\/32            md5/" /etc/postgresql/*/main/pg_hba.conf
           sudo sed -i "s/^#host    all             all             ::1\/128                 md5/host    all             all             ::1\/128                 md5/" /etc/postgresql/*/main/pg_hba.conf
 
+          # Increase max_connections in postgresql.conf
+          sudo sed -i "s/^#max_connections = [0-9]*/max_connections = 500/" /etc/postgresql/*/main/postgresql.conf
+
           # Restart PostgreSQL to apply changes
           sudo service postgresql restart
 
+          # Create the database
           sudo -u postgres psql -c "CREATE DATABASE \"eigr-functions-db\";"
 
       - name: Shutdown Ubuntu MySQL (SUDO)
