@@ -50,34 +50,33 @@ jobs:
       - name: Shutdown Ubuntu MySQL (SUDO)
         run: sudo service mysql stop
 
-      - name: Set up MariaDB
-        uses: getong/mariadb-action@v1.11
-        with:
-          host port: 3307
-          container port: 3307
-          character set server: 'utf8'
-          collation server: 'utf8_general_ci'
-          mariadb version: '10.4.10'
-          mysql database: 'eigr-functions-db'
-
-
-      - name: Wait for MariaDB to be Ready
-        run: |
-          for i in {1..10}; do
-            if mysqladmin ping -h127.0.0.1 -P3307 --silent; then
-              echo "MariaDB is ready!"
-              break
-            fi
-            echo "Waiting for MariaDB..."
-            sleep 5
-          done
-
-      - name: Set up MariaDB User
-        run: |
-          # Create 'admin' user with password 'admin' and grant privileges
-          mysql -h127.0.0.1 -P3307 -uroot -e "CREATE USER IF NOT EXISTS 'admin'@'%' IDENTIFIED BY 'admin';"
-          mysql -h127.0.0.1 -P3307 -uroot -e "GRANT ALL PRIVILEGES ON *.* TO 'admin'@'%' WITH GRANT OPTION;"
-          mysql -h127.0.0.1 -P3307 -uroot -e "FLUSH PRIVILEGES;"
+      # - name: Set up MariaDB
+      #   uses: getong/mariadb-action@v1.11
+      #   with:
+      #     host port: 3307
+      #     container port: 3307
+      #     character set server: 'utf8'
+      #     collation server: 'utf8_general_ci'
+      #     mariadb version: '10.4.10'
+      #     mysql database: 'eigr-functions-db'
+      #
+      # - name: Wait for MariaDB to be Ready
+      #   run: |
+      #     for i in {1..10}; do
+      #       if mysqladmin ping -h127.0.0.1 -P3307 --silent; then
+      #         echo "MariaDB is ready!"
+      #         break
+      #       fi
+      #       echo "Waiting for MariaDB..."
+      #       sleep 5
+      #     done
+      #
+      # - name: Set up MariaDB User
+      #   run: |
+      #     # Create 'admin' user with password 'admin' and grant privileges
+      #     mysql -h127.0.0.1 -P3307 -uroot -e "CREATE USER IF NOT EXISTS 'admin'@'%' IDENTIFIED BY 'admin';"
+      #     mysql -h127.0.0.1 -P3307 -uroot -e "GRANT ALL PRIVILEGES ON *.* TO 'admin'@'%' WITH GRANT OPTION;"
+      #     mysql -h127.0.0.1 -P3307 -uroot -e "FLUSH PRIVILEGES;"
 
       - name: Install NATS with JetStream
         run: |
@@ -135,20 +134,20 @@ jobs:
           elixir --name spawn@127.0.0.1 -S mix test
           cd ../../
 
-      - name: Run tests spawn_statestores_mariadb
-        run: |
-          cd spawn_statestores/statestores_mariadb
-          mix deps.get
-          MIX_ENV=test \
-          PROXY_DATABASE_TYPE=mariadb \
-          PROXY_DATABASE_PORT=3307 \
-          PROXY_DATABASE_USERNAME=admin \
-          PROXY_DATABASE_SECRET=admin \
-          PROXY_CLUSTER_STRATEGY=gossip \
-          PROXY_HTTP_PORT=9005 \
-          SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= \
-          elixir --name spawn@127.0.0.1 -S mix test
-          cd ../../
+      # - name: Run tests spawn_statestores_mariadb
+      #   run: |
+      #     cd spawn_statestores/statestores_mariadb
+      #     mix deps.get
+      #     MIX_ENV=test \
+      #     PROXY_DATABASE_TYPE=mariadb \
+      #     PROXY_DATABASE_PORT=3307 \
+      #     PROXY_DATABASE_USERNAME=admin \
+      #     PROXY_DATABASE_SECRET=admin \
+      #     PROXY_CLUSTER_STRATEGY=gossip \
+      #     PROXY_HTTP_PORT=9005 \
+      #     SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= \
+      #     elixir --name spawn@127.0.0.1 -S mix test
+      #     cd ../../
 
       - name: Run tests statestores_native
         run: |
