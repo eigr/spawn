@@ -1,6 +1,39 @@
+defmodule Example.EnumTest do
+  @moduledoc false
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.13.0", syntax: :proto3
+
+  def descriptor do
+    # credo:disable-for-next-line
+    %Google.Protobuf.EnumDescriptorProto{
+      name: "EnumTest",
+      value: [
+        %Google.Protobuf.EnumValueDescriptorProto{
+          name: "ENUM_TEST_UNKNOWN",
+          number: 0,
+          options: nil,
+          __unknown_fields__: []
+        },
+        %Google.Protobuf.EnumValueDescriptorProto{
+          name: "ENUM_TEST_TEST",
+          number: 1,
+          options: nil,
+          __unknown_fields__: []
+        }
+      ],
+      options: nil,
+      reserved_range: [],
+      reserved_name: [],
+      __unknown_fields__: []
+    }
+  end
+
+  field(:ENUM_TEST_UNKNOWN, 0)
+  field(:ENUM_TEST_TEST, 1)
+end
+
 defmodule Example.ValuePayload do
   @moduledoc false
-  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
+  use Protobuf, protoc_gen_elixir_version: "0.13.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -46,6 +79,34 @@ defmodule Example.ValuePayload do
           json_name: "id",
           proto3_optional: nil,
           __unknown_fields__: []
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "enum_test",
+          extendee: nil,
+          number: 3,
+          label: :LABEL_OPTIONAL,
+          type: :TYPE_ENUM,
+          type_name: ".example.EnumTest",
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "enumTest",
+          proto3_optional: nil,
+          __unknown_fields__: []
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "kind",
+          extendee: nil,
+          number: 4,
+          label: :LABEL_OPTIONAL,
+          type: :TYPE_STRING,
+          type_name: nil,
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "kind",
+          proto3_optional: nil,
+          __unknown_fields__: []
         }
       ],
       nested_type: [],
@@ -62,11 +123,13 @@ defmodule Example.ValuePayload do
 
   field(:value, 1, type: :int32)
   field(:id, 2, type: :string, deprecated: false)
+  field(:enum_test, 3, type: Example.EnumTest, json_name: "enumTest", enum: true)
+  field(:kind, 4, type: :string)
 end
 
 defmodule Example.ExampleState.Data do
   @moduledoc false
-  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
+  use Protobuf, protoc_gen_elixir_version: "0.13.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -132,7 +195,7 @@ end
 
 defmodule Example.ExampleState do
   @moduledoc false
-  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
+  use Protobuf, protoc_gen_elixir_version: "0.13.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -280,7 +343,7 @@ end
 
 defmodule Example.SumResponse do
   @moduledoc false
-  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
+  use Protobuf, protoc_gen_elixir_version: "0.13.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -319,7 +382,7 @@ end
 
 defmodule Example.SomeQueryResponse do
   @moduledoc false
-  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
+  use Protobuf, protoc_gen_elixir_version: "0.13.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
