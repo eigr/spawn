@@ -1,4 +1,4 @@
-version=2.0.0-RC1
+version=2.0.0-RC2
 registry=ghcr.io/eigr
 
 CLUSTER_NAME=spawn-k8s
@@ -115,9 +115,9 @@ build-activator-simple-image:
 		-t ${activator-simple-image} .
 
 build-all-images:
-	docker build --no-cache \
-		-f Dockerfile-proxy \
-		-t ${proxy-image} .
+	# docker build --no-cache \
+	# 	-f Dockerfile-proxy \
+	# 	-t ${proxy-image} .
 	docker build --no-cache \
 		-f Dockerfile-initializer \
 		-t ${proxy-initializer} .

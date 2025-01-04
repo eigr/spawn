@@ -1,21 +1,21 @@
 defmodule InternalVersions do
   # The order here is also the deploy order, its important to keep this way
   @versions [
-    spawn_statestores: "2.0.0-RC1",
-    spawn_statestores_mariadb: "2.0.0-RC1",
-    spawn_statestores_native: "2.0.0-RC1",
-    spawn_statestores_postgres: "2.0.0-RC1",
-    spawn: "2.0.0-RC1",
-    spawn_sdk: "2.0.0-RC1",
-    activator: "2.0.0-RC1",
-    activator_api: "2.0.0-RC1",
-    activator_kafka: "2.0.0-RC1",
-    activator_pubsub: "2.0.0-RC1",
-    activator_rabbitmq: "2.0.0-RC1",
-    activator_sqs: "2.0.0-RC1",
-    proxy: "2.0.0-RC1",
-    spawn_operator: "2.0.0-RC1",
-    spawnctl: "2.0.0-RC1"
+    spawn_statestores: "2.0.0-RC2",
+    spawn_statestores_mariadb: "2.0.0-RC2",
+    spawn_statestores_native: "2.0.0-RC2",
+    spawn_statestores_postgres: "2.0.0-RC2",
+    spawn: "2.0.0-RC2",
+    spawn_sdk: "2.0.0-RC2",
+    activator: "2.0.0-RC2",
+    activator_api: "2.0.0-RC2",
+    activator_kafka: "2.0.0-RC2",
+    activator_pubsub: "2.0.0-RC2",
+    activator_rabbitmq: "2.0.0-RC2",
+    activator_sqs: "2.0.0-RC2",
+    proxy: "2.0.0-RC2",
+    spawn_operator: "2.0.0-RC2",
+    spawnctl: "2.0.0-RC2"
   ]
 
   @doc """

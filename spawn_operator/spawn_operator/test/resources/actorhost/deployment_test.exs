@@ -170,7 +170,7 @@ defmodule DeploymentTest do
                            "--to",
                            "default"
                          ],
-                         "image" => "ghcr.io/eigr/spawn-initializer:2.0.0-RC1",
+                         "image" => "ghcr.io/eigr/spawn-initializer:2.0.0-RC2",
                          "name" => "init-certificates",
                          "env" => [%{"name" => "RELEASE_DISTRIBUTION", "value" => "none"}]
                        }
@@ -331,7 +331,7 @@ defmodule DeploymentTest do
                            "--to",
                            "default"
                          ],
-                         "image" => "ghcr.io/eigr/spawn-initializer:2.0.0-RC1",
+                         "image" => "ghcr.io/eigr/spawn-initializer:2.0.0-RC2",
                          "name" => "init-certificates",
                          "env" => [%{"name" => "RELEASE_DISTRIBUTION", "value" => "none"}]
                        }
@@ -498,7 +498,7 @@ defmodule DeploymentTest do
                            "--to",
                            "default"
                          ],
-                         "image" => "ghcr.io/eigr/spawn-initializer:2.0.0-RC1",
+                         "image" => "ghcr.io/eigr/spawn-initializer:2.0.0-RC2",
                          "name" => "init-certificates",
                          "env" => [%{"name" => "RELEASE_DISTRIBUTION", "value" => "none"}]
                        }
@@ -663,7 +663,7 @@ defmodule DeploymentTest do
                            "--to",
                            "default"
                          ],
-                         "image" => "ghcr.io/eigr/spawn-initializer:2.0.0-RC1",
+                         "image" => "ghcr.io/eigr/spawn-initializer:2.0.0-RC2",
                          "name" => "init-certificates",
                          "env" => [%{"name" => "RELEASE_DISTRIBUTION", "value" => "none"}]
                        }
@@ -795,7 +795,7 @@ defmodule DeploymentTest do
                            %{"configMapRef" => %{"name" => "spawn-test-sidecar-cm"}},
                            %{"secretRef" => %{"name" => "spawn-system-secret"}}
                          ],
-                         "image" => "ghcr.io/eigr/spawn-proxy:2.0.0-RC1",
+                         "image" => "ghcr.io/eigr/spawn-proxy:2.0.0-RC2",
                          "livenessProbe" => %{
                            "failureThreshold" => 3,
                            "httpGet" => %{
@@ -900,7 +900,7 @@ defmodule DeploymentTest do
                            "default"
                          ],
                          "env" => [%{"name" => "RELEASE_DISTRIBUTION", "value" => "none"}],
-                         "image" => "ghcr.io/eigr/spawn-initializer:2.0.0-RC1",
+                         "image" => "ghcr.io/eigr/spawn-initializer:2.0.0-RC2",
                          "name" => "init-certificates"
                        }
                      ],

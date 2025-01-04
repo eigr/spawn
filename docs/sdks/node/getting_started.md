@@ -3,7 +3,7 @@
 First install CLI:
 
 ```SH
-curl -sSL https://github.com/eigr/spawn/releases/download/v2.0.0-RC1/install.sh | sh
+curl -sSL https://github.com/eigr/spawn/releases/download/v2.0.0-RC2/install.sh | sh
 ```
 
 _We recommend you to use Typescript for better usage overall._
