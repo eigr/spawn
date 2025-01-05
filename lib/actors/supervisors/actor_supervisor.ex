@@ -43,6 +43,7 @@ defmodule Actors.Supervisors.ActorSupervisor do
         supervisor_process_logger(__MODULE__),
         get_pubsub_adapter(opts),
         Actors.Actor.Pubsub,
+        Actors.Actor.Entity.Lifecycle.ProjectionConsumers,
         Actors.Actor.Entity.Supervisor.child_spec(opts)
       ] ++
         maybe_add_invocation_scheduler(opts) ++

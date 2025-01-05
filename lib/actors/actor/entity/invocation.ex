@@ -565,7 +565,6 @@ defmodule Actors.Actor.Entity.Invocation do
   defp do_response(
          %{
            actor_id: id,
-           kind: kind,
            projection_settings: settings,
            request: request,
            response: %ActorInvocationResponse{workflow: workflow} = response,
@@ -582,7 +581,6 @@ defmodule Actors.Actor.Entity.Invocation do
   defp do_response(
          %{
            actor_id: id,
-           kind: kind,
            projection_settings: settings,
            request: request,
            response: response,
@@ -596,9 +594,9 @@ defmodule Actors.Actor.Entity.Invocation do
   end
 
   defp do_handle_projection(id, action, %{sourceable: true} = _settings, _state, response) do
-    actor_name_or_parent = if id.parent == "", do: id.name, else: id.parent
+    stream_name = StreamInitiator.stream_name(id)
 
-    subject = "actors.#{actor_name_or_parent}.#{id.name}.#{action}"
+    subject = "actors.#{stream_name}.#{id.name}.#{action}"
     payload = Google.Protobuf.Any.encode(response.updated_context.state)
 
     uuid = UUID.uuid4(:hex)
