@@ -26,7 +26,6 @@ defmodule Actors.Actor.Entity.Lifecycle do
   alias Spawn.Utils.AnySerializer
 
   import Spawn.Utils.Common, only: [return_and_maybe_hibernate: 1]
-  import Statestores.Util, only: [load_projection_adapter: 0]
 
   @deactivated_status "DEACTIVATED"
   @default_deactivate_timeout 10_000
