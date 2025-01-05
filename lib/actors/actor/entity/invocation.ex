@@ -469,13 +469,9 @@ defmodule Actors.Actor.Entity.Invocation do
         "#{Map.get(request.current_context.metadata || %{}, "page_size", page_size)}"
         |> String.to_integer()
 
-      state_type =
-        state.actor.settings.state_type
-        |> normalize_package_name()
-
       {:ok, results} =
         StateManager.projection_query(
-          state_type,
+          view.query_result_type,
           view.query,
           any_unpack!(request.payload |> elem(1), view.input_type),
           page_size: page_size,
