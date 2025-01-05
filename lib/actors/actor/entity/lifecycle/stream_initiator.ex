@@ -20,7 +20,7 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamInitiator do
   @one_day_in_ms :timer.hours(24)
   @stream_not_found_code 10059
 
-  @spec init_projection_stream(module()) :: :ignore | {:error, any()} | {:ok, pid()}
+  @spec init_projection_stream(actor :: Actor.t()) :: :ignore | {:error, any()} | {:ok, pid()}
   def init_projection_stream(%Actor{} = actor) do
     name = "#{actor.id.system}:#{actor.id.name}"
 
@@ -139,7 +139,7 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamInitiator do
   end
 
   defp build_stream_max_age(%ProjectionSettings{} = settings) do
-    case Map.get(settings.events_retention_strategy, :strategy, {:duration_ms, @one_day_in_ms}) do
+    case Map.get(settings.events_retention_strategy || %{}, :strategy, {:duration_ms, @one_day_in_ms}) do
       {:infinite, true} -> 0
       # ms to ns
       {:duration_ms, max_age} -> max_age * 1_000_000
