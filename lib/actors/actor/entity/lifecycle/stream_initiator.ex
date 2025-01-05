@@ -4,7 +4,7 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamInitiator do
   """
   require Logger
 
-  alias Actors.Actor.Entity.Lifecycle.StreamConsumer
+  alias Actors.Actor.Entity.Lifecycle.ProjectionConsumers
 
   alias Spawn.Actors.Actor
   alias Spawn.Actors.ProjectionSettings
@@ -22,7 +22,7 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamInitiator do
 
   @spec init_projection_stream(actor :: Actor.t()) :: :ignore | {:error, any()} | {:ok, pid()}
   def init_projection_stream(%Actor{} = actor) do
-    name = "#{actor.id.system}:#{actor.id.name}"
+    name = stream_name(actor)
 
     with {:create_stream, :ok} <- {:create_stream, create_stream(actor, true)},
          {:create_consumer, :ok} <-
@@ -42,21 +42,13 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamInitiator do
         )
 
         {:error, error}
-
-      error ->
-        Logger.error(
-          "Error on start Projection #{name}. During phase [start_pipeline]. Details: #{inspect(error)}"
-        )
-
-        {:error, error}
     end
   end
 
   def init_sourceable_stream(%Actor{} = actor), do: create_stream(actor, false)
 
   def replay(stream_pid, actor, call_opts) do
-    # TODO: Necessary avoid naming conflicts using actor system and actor name to build name of stream
-    name = "#{actor.id.system}:#{actor.id.name}"
+    name = stream_name(actor)
 
     with {:stop_pipeline, :ok} <- {:stop_pipeline, stop_pipeline(stream_pid)},
          {:destroy_consumer, :ok} <- {:destroy_consumer, destroy_consumer(actor)},
@@ -118,7 +110,7 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamInitiator do
     %Consumer{stream_name: stream_name, durable_name: consumer_name, deliver_policy: :all}
   end
 
-  defp build_sources(%ProjectionSettings{} = settings) do
+  defp build_sources(actor, %ProjectionSettings{} = settings) do
     settings.subjects
     |> Enum.map(fn %ProjectionSubject{} = subject ->
       opt_start_time =
@@ -130,16 +122,22 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamInitiator do
             DateTime.from_unix!(start_at, :second)
         end
 
+      stream_name = stream_name(actor, subject.actor)
+
       %{
-        name: subject.actor,
-        filter_subject: "actors.#{subject.actor}.*.#{subject.action}",
+        name: stream_name,
+        filter_subject: "actors.#{stream_name}.*.#{subject.action}",
         opt_start_time: opt_start_time
       }
     end)
   end
 
   defp build_stream_max_age(%ProjectionSettings{} = settings) do
-    case Map.get(settings.events_retention_strategy || %{}, :strategy, {:duration_ms, @one_day_in_ms}) do
+    case Map.get(
+           settings.events_retention_strategy || %{},
+           :strategy,
+           {:duration_ms, @one_day_in_ms}
+         ) do
       {:infinite, true} -> 0
       # ms to ns
       {:duration_ms, max_age} -> max_age * 1_000_000
@@ -149,22 +147,22 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamInitiator do
   defp conn, do: Nats.connection_name()
 
   defp create_stream(actor, true) do
-    # TODO: Necessary avoid naming conflicts using actor system and actor name to build name of stream
-    stream_name = actor.id.name
+    stream_name = stream_name(actor)
     max_age = build_stream_max_age(actor.settings.projection_settings)
 
     stream =
       %NatsStream{
         name: stream_name,
         subjects: [],
-        sources: build_sources(actor.settings.projection_settings),
+        sources: build_sources(actor, actor.settings.projection_settings),
         duplicate_window: max_age,
         max_age: max_age
       }
 
     case NatsStream.info(conn(), stream_name) do
       {:ok, _info} ->
-        # TODO: Make sure to update the stream if it already exists and sources is changed
+        {:ok, _updated} = NatsStream.update(conn(), stream)
+
         :ok
 
       {:error, %{"code" => 404, "err_code" => @stream_not_found_code}} ->
@@ -177,17 +175,16 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamInitiator do
   end
 
   defp create_stream(actor, false) do
-    # TODO: Necessary avoid naming conflicts using actor system and actor name to build name of stream
-    stream_name = actor.id.name
-
+    stream_name = stream_name(actor)
     max_age = build_stream_max_age(actor.settings.projection_settings)
 
-    stream = %NatsStream{
-      name: stream_name,
-      subjects: ["actors.#{stream_name}.>"],
-      max_age: max_age,
-      duplicate_window: max_age
-    }
+    stream =
+      %NatsStream{
+        name: stream_name,
+        subjects: ["actors.#{stream_name}.>"],
+        max_age: max_age,
+        duplicate_window: max_age
+      }
 
     case NatsStream.info(conn(), stream_name) do
       {:ok, _info} ->
@@ -203,9 +200,8 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamInitiator do
   end
 
   defp create_consumer(actor, opts) do
-    # TODO: Necessary avoid naming conflicts using actor system and actor name to build name of stream
-    stream_name = actor.id.name
-    consumer_name = actor.id.name
+    stream_name = stream_name(actor)
+    consumer_name = stream_name(actor)
 
     case Consumer.info(conn(), stream_name, consumer_name) do
       {:ok, _info} ->
@@ -228,8 +224,8 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamInitiator do
   end
 
   defp destroy_consumer(actor) do
-    stream_name = actor.id.name
-    consumer_name = actor.id.name
+    stream_name = stream_name(actor)
+    consumer_name = stream_name(actor)
 
     case Consumer.info(conn(), stream_name, consumer_name) do
       {:ok, _info} ->
@@ -248,13 +244,26 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamInitiator do
     end
   end
 
-  defp start_pipeline(actor),
-    do:
-      StreamConsumer.start_link(%{
-        actor_name: actor.id.name,
-        projection_pid: self(),
-        strict_ordering: actor.settings.projection_settings.strict_events_ordering
-      })
+  defp start_pipeline(actor) do
+    ProjectionConsumers.new(%{
+      actor_name: stream_name(actor),
+      projection_pid: self(),
+      strict_ordering: actor.settings.projection_settings.strict_events_ordering
+    })
+  end
 
   defp stop_pipeline(pid), do: Broadway.stop(pid)
+
+  def stream_name(actor, actor_name \\ nil)
+  def stream_name(%Actor{} = actor, actor_name), do: stream_name(actor.id, actor_name)
+
+  def stream_name(actor_id, actor_name) do
+    actor_name =
+      actor_name ||
+        if is_nil(actor_id.parent) or actor_id.parent == "",
+          do: actor_id.name,
+          else: actor_id.parent
+
+    "#{actor_id.system}-#{actor_name}"
+  end
 end
