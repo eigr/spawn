@@ -25,7 +25,6 @@ defmodule Sidecar.GRPC.Generators.GeneratorAccumulator do
 
     :persistent_term.put(:grpc_services, services)
     :persistent_term.put(:proto_file_descriptors, descriptors)
-    :persistent_term.put(:proto_file_ctx, ctx)
 
     {"ProxyEndpoint",
      [

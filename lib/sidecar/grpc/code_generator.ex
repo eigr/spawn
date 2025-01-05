@@ -17,6 +17,7 @@ defmodule Sidecar.GRPC.CodeGenerator do
   alias Spawn.Actors.ActorViewOption
   alias Protobuf.Protoc.Generator.Util
   alias Mix.Tasks.Protobuf.Generate
+  alias Spawn.Utils.AnySerializer
 
   @doc """
     Compiles Protobuf files and generates gRPC-related code.
@@ -103,7 +104,6 @@ defmodule Sidecar.GRPC.CodeGenerator do
   def after_compile_hook do
     svcs = :persistent_term.get(:proto_file_descriptors, [])
     current_services = :persistent_term.get(:grpc_services, [])
-    ctx = :persistent_term.get(:proto_file_ctx, nil)
 
     dispatchers =
       current_services
@@ -115,10 +115,9 @@ defmodule Sidecar.GRPC.CodeGenerator do
 
     compile_proxy_endpoint(dispatchers)
     compile_reflections(reflections)
-    put_actor_definition_settings(svcs, ctx)
+    put_actor_definition_settings(svcs)
 
     :persistent_term.erase(:proto_file_descriptors)
-    :persistent_term.erase(:proto_file_ctx)
     :persistent_term.erase(:grpc_services)
 
     :ok
@@ -165,34 +164,30 @@ defmodule Sidecar.GRPC.CodeGenerator do
     """)
   end
 
-  defp put_actor_definition_settings(svcs, ctx) do
+  defp put_actor_definition_settings(svcs) do
     Enum.each(svcs, fn svc ->
-      actor_opts =
-        svc.options.__pb_extensions__ |> Map.get({Spawn.Actors.PbExtension, :actor})
+      options = svc.options || %{}
+      option_extensions = Map.get(options, :__pb_extensions__, %{})
+      actor_opts = Map.get(option_extensions, {Spawn.Actors.PbExtension, :actor})
 
       if not is_nil(actor_opts) do
         :persistent_term.put("actor-#{svc.name}", actor_opts)
       end
 
       Enum.each(svc.method, fn method ->
-        case method.options.__pb_extensions__
-             |> Map.get({Spawn.Actors.PbExtension, :view}) do
-          %ActorViewOption{} = option ->
-            output_type =
-              "Elixir.#{Util.type_from_type_name(ctx, method.output_type)}"
-              |> String.to_existing_atom()
+        method_options = method.options || %{}
+        method_option_extensions = Map.get(method_options, :__pb_extensions__, %{})
 
-            input_type =
-              "Elixir.#{Util.type_from_type_name(ctx, method.input_type)}"
-              |> String.to_existing_atom()
+        case Map.get(method_option_extensions, {Spawn.Actors.PbExtension, :view}) do
+          %ActorViewOption{} = option ->
+            output_type = AnySerializer.normalize_package_name(method.output_type)
+            input_type = AnySerializer.normalize_package_name(method.input_type)
 
             descriptor = apply(output_type, :descriptor, [])
 
             field = descriptor.field |> Enum.find(fn field -> field.name == option.map_to end)
 
-            type_name =
-              "Elixir.#{Util.type_from_type_name(ctx, field.type_name)}"
-              |> String.to_existing_atom()
+            type_name = AnySerializer.normalize_package_name(field.type_name)
 
             # let the proxy know that there is a
             :persistent_term.put("view-#{svc.name}-#{method.name}", %{
