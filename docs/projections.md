@@ -132,7 +132,7 @@ service InventoryProjection {
     stateful: true
     state_type: ".inventory.ConsolidatedInventory"
     subjects: [
-      { actor: "WarehouseActor", action: "UpdateInventory" }
+      { actor: "WarehouseActor", source_action: "UpdateInventory", action: "Consolidate" }
     ]
   };
 
@@ -154,7 +154,8 @@ service InventoryProjection {
 
 ### Key Attributes:
 
-* `subjects`: Specifies the sourceable actor and the action used to generate data for the projection.
+* `subjects`: Specifies the sourceable actor and the action used to generate data for the projection. 
+              It also specifies which projection actor action will be responsible for handling this request.
 
 * `spawn.actors.view`: Defines the SQL-like query for creating views.
 
@@ -170,7 +171,7 @@ defmodule MyAppxample.Actors.InventoryProjectionActor do
 
   alias Inventory.{ConsolidatedInventory, ProductInventory}
 
-  action("UpdateInventory", fn %Context{} = ctx, %ProductInventory{} = product ->
+  action("Consolidate", fn %Context{} = ctx, %ProductInventory{} = product ->
     Value.of()
     |> Value.state(%ConsolidatedInventory{
       product_id: product.product_id, # This will effectively upsert the permanent storage by updating the quantity of each product by its product_id
