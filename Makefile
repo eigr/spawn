@@ -115,9 +115,9 @@ build-activator-simple-image:
 		-t ${activator-simple-image} .
 
 build-all-images:
-	# docker build --no-cache \
-	# 	-f Dockerfile-proxy \
-	# 	-t ${proxy-image} .
+	docker build --no-cache \
+		-f Dockerfile-proxy \
+		-t ${proxy-image} .
 	docker build --no-cache \
 		-f Dockerfile-initializer \
 		-t ${proxy-initializer} .
@@ -132,7 +132,7 @@ build-all-images:
 	# docker build --no-cache -f Dockerfile-elixir-example -t ${spawn-sdk-example-image} .
 
 push-all-images:
-	docker push ${proxy-image}
+	#docker push ${proxy-image}
 	docker push ${proxy-initializer}
 	docker push ${operator-image}
 	#docker push ${activator-api-image}
