@@ -15,7 +15,7 @@ service ExampleActor {
     deactivate_timeout: 3000
   };
 
-  rpc Sum (.example.ValuePayload) returns (.example.SumResponse) {
+  rpc Sum(.example.ValuePayload) returns (.example.SumResponse) {
     option (google.api.http) = {
       post: "/v1/example/sum"
       body: "*"

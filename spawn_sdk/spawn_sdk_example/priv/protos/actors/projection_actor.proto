@@ -22,14 +22,14 @@ service ProjectionActor {
     }
   };
 
-  rpc ExampleView (.example.ValuePayload) returns (.example.SomeQueryResponse) {
+  rpc ExampleView(.example.ValuePayload) returns (.example.SomeQueryResponse) {
     option (spawn.actors.view) = {
       query: "SELECT * FROM projection_actor WHERE id = :id"
       map_to: "results"
     };
   }
 
-  rpc All (.example.ValuePayload) returns (.example.SomeQueryResponse) {
+  rpc All(.example.ValuePayload) returns (.example.SomeQueryResponse) {
     option (spawn.actors.view) = {
       query: "SELECT * FROM projection_actor WHERE :enum_test IS NULL"
       map_to: "results"
