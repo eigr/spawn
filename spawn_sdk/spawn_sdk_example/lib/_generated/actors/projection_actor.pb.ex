@@ -80,6 +80,7 @@ defmodule Example.Actors.ProjectionActor.Service do
                 subjects: [
                   %Spawn.Actors.ProjectionSubject{
                     actor: "ClockActor",
+                    source_action: "Clock",
                     action: "Clock",
                     start_time: nil,
                     __unknown_fields__: []

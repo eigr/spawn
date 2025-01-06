@@ -71,7 +71,12 @@ defmodule Actors.Actor.Entity.Invocation do
         system_name = Map.get(message.metadata, "spawn-system")
         parent = Map.get(message.metadata, "actor-parent")
         name = Map.get(message.metadata, "actor-name")
-        action = Map.get(message.metadata, "actor-action")
+        source_action = Map.get(message.metadata, "actor-action")
+
+        action =
+          actor.settings.projection_settings.subjects
+          |> Enum.find(fn subject -> subject.source_action == source_action end)
+          |> Map.get(:action)
 
         %InvocationRequest{
           async: true,

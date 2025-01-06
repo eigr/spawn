@@ -555,16 +555,18 @@ defmodule SpawnSdk.System.SpawnSystem do
       subjects =
         Enum.map(subjects, fn subject ->
           case subject do
-            {actor, action} ->
+            {actor, source_action, action} ->
               %ProjectionSubject{
                 actor: actor,
+                source_action: source_action,
                 action: action,
                 start_time: %Timestamp{seconds: 0}
               }
 
-            {actor, action, start_time} ->
+            {actor, source_action, action, start_time} ->
               %ProjectionSubject{
                 actor: actor,
+                source_action: source_action,
                 action: action,
                 start_time: %Timestamp{seconds: start_time}
               }

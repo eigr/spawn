@@ -126,7 +126,7 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamInitiator do
 
       %{
         name: stream_name,
-        filter_subject: "actors.#{stream_name}.*.#{subject.action}",
+        filter_subject: "actors.#{stream_name}.*.#{subject.source_action}",
         opt_start_time: opt_start_time
       }
     end)
