@@ -48,18 +48,26 @@ message ProductInventory {
   string name = 2;                                        // Product name
   int32 quantity = 3;                                     // Quantity in stock
 }
+
+service WarehouseActor {
+  option (spawn.actors.actor) = {
+    kind: NAMED
+    stateful: true
+    state_type: ".inventory.WarehouseState",
+    // here we are indicating that the state of this actor 
+    // can be captured by any projection actor that is interested
+    sourceable: true
+  };
+
+  rpc UpdateInventory(.inventory.ProductInventory) returns (.google.protobuf.Empty);
+}
 ```
 
 2. Implement the sourceable actor:
 
 ```elixir
 defmodule MyAppxample.Actors.WarehouseActor do
-  use SpawnSdk.Actor,
-    name: "WarehouseActor",
-    state_type: Inventory.WarehouseState,
-    # here we are indicating that the state of this actor 
-    # can be captured by any projection actor that is interested
-    sourceable: true 
+  use SpawnSdk.Actor, name: "WarehouseActor",
 
   alias Inventory.{WarehouseState, ProductInventory}
 
@@ -163,7 +171,7 @@ service InventoryProjection {
 
 ## Implementing Projection Actors
 
-After defining the Protobuf, implement the projection actor using the Spawn SDK. For example:
+After defining the Protobuf, implement the projection actor using the Spawn Elixir SDK. For example:
 
 ```elixir
 defmodule MyAppxample.Actors.InventoryProjectionActor do
