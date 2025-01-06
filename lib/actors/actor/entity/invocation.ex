@@ -597,8 +597,9 @@ defmodule Actors.Actor.Entity.Invocation do
 
   defp do_handle_projection(id, action, %{sourceable: true} = _settings, _state, response) do
     stream_name = StreamInitiator.stream_name(id)
+    id_name = String.replace(id.name, ".", "-")
 
-    subject = "actors.#{stream_name}.#{id.name}.#{action}"
+    subject = "actors.#{stream_name}.#{id_name}.#{action}"
     payload = Google.Protobuf.Any.encode(response.updated_context.state)
 
     uuid = UUID.uuid4(:hex)

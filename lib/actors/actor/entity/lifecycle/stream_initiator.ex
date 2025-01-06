@@ -264,6 +264,6 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamInitiator do
           do: actor_id.name,
           else: actor_id.parent
 
-    "#{actor_id.system}-#{actor_name}"
+    String.replace("#{actor_id.system}-#{actor_name}", ".", "-")
   end
 end
