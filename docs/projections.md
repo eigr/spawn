@@ -161,7 +161,7 @@ service InventoryProjectionActor {
 
   rpc QueryProduct(.inventory.ProductQuery) returns (.inventory.GeneralInventoryResponse) {
     option (spawn.actors.view) = {
-      query: "SELECT product_id, name, warehouse_id, quantity FROM projection_actor WHERE product_id = :product_id"
+      query: "SELECT product_id, name, warehouse_id, SUM(quantity) FROM projection_actor WHERE product_id = :product_id GROUP BY product_id, name, warehouse_id"
       map_to: "inventory"
     };
   }
