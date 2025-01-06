@@ -40,21 +40,21 @@ import "spawn/actors/extensions.proto";
 import "google/api/annotations.proto";
 
 message WarehouseProductState {
-  string product_id = 1 [(spawn.actors.actor_id) = true]; // ID único combinando depósito e produto
-  string warehouse_id = 2;       // ID do depósito
-  string product_id = 3;         // ID do produto
-  string name = 4;               // Nome do produto
-  int32 quantity = 5;            // Quantidade em estoque
+  string product_id = 1 [(spawn.actors.actor_id) = true]; // Unique ID
+  string warehouse_id = 2;       // Deposit ID
+  string name = 3;               // Product name
+  int32 quantity = 4;            // Quantity in stock
 }
 
 message ProductUpdate {
-  string warehouse_product_id = 1; // ID único combinando depósito e produto
-  int32 quantity = 2;              // Nova quantidade
-  string name = 3;                 // Nome do produto
+  string product_id = 1; // Unique ID matching deposit and product
+  string warehouse_id = 2;       // Deposit ID
+  int32 quantity = 3;            // New quantity
+  string name = 4;               // Product name
 }
 
 service WarehouseProductActor {
-  // Configuração do ator como sourceable
+  // Setting the actor as sourceable
   option (spawn.actors.actor) = {
     kind: UNNAMED
     stateful: true
@@ -64,18 +64,11 @@ service WarehouseProductActor {
     sourceable: true
   };
 
-  // RPC para atualizar o estado de um produto no depósito
+  // RPC to update the status of a product in the warehouse
   rpc UpdateProduct(.inventory.ProductUpdate) returns (.google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/v1/products"
       body: "*"
-    };
-  }
-
-  // RPC para obter o estado atual do produto
-  rpc GetProductState(.google.protobuf.Empty) returns (.inventory.WarehouseProductState) {
-    option (google.api.http) = {
-      get: "/v1/products/{product_id}"
     };
   }
 }
@@ -99,7 +92,6 @@ defmodule MyAppxample.Actors.WarehouseProductActor do
       warehouse_id: update.warehouse_id
     }
 
-    # Return the updated state without any reply
     Value.of()
     |> Value.state(new_state)
     |> Value.noreply!()
