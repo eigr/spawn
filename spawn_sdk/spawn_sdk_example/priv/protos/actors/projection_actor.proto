@@ -15,7 +15,7 @@ service ProjectionActor {
     deactivate_timeout: 999999999
     strict_events_ordering: false
     subjects: [
-      { actor: "ClockActor", action: "Clock" } 
+      { actor: "ClockActor", source_action: "Clock", action: "Clock" } 
     ]
     events_retention_strategy: {
       duration_ms: 86000

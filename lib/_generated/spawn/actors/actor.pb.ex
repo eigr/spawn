@@ -916,9 +916,23 @@ defmodule Spawn.Actors.ProjectionSubject do
           __unknown_fields__: []
         },
         %Google.Protobuf.FieldDescriptorProto{
-          name: "action",
+          name: "source_action",
           extendee: nil,
           number: 2,
+          label: :LABEL_OPTIONAL,
+          type: :TYPE_STRING,
+          type_name: nil,
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "sourceAction",
+          proto3_optional: nil,
+          __unknown_fields__: []
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "action",
+          extendee: nil,
+          number: 3,
           label: :LABEL_OPTIONAL,
           type: :TYPE_STRING,
           type_name: nil,
@@ -932,7 +946,7 @@ defmodule Spawn.Actors.ProjectionSubject do
         %Google.Protobuf.FieldDescriptorProto{
           name: "start_time",
           extendee: nil,
-          number: 3,
+          number: 4,
           label: :LABEL_OPTIONAL,
           type: :TYPE_MESSAGE,
           type_name: ".google.protobuf.Timestamp",
@@ -957,8 +971,9 @@ defmodule Spawn.Actors.ProjectionSubject do
   end
 
   field(:actor, 1, type: :string)
-  field(:action, 2, type: :string)
-  field(:start_time, 3, type: Google.Protobuf.Timestamp, json_name: "startTime")
+  field(:source_action, 2, type: :string, json_name: "sourceAction")
+  field(:action, 3, type: :string)
+  field(:start_time, 4, type: Google.Protobuf.Timestamp, json_name: "startTime")
 end
 
 defmodule Spawn.Actors.EventsRetentionStrategy do
