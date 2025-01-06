@@ -51,7 +51,7 @@ message ProductInventory {
 
 service WarehouseActor {
   option (spawn.actors.actor) = {
-    kind: NAMED
+    kind: UNNAMED
     stateful: true
     state_type: ".inventory.WarehouseState",
     // here we are indicating that the state of this actor 
