@@ -74,7 +74,9 @@ defmodule MyAppxample.Actors.WarehouseActor do
   action("UpdateInventory", fn %Context{state: state} = ctx, %ProductInventory{} = product ->
     new_state =
       case state do
-        nil -> %WarehouseState{warehouse_id: ctx.metadata.id, products: [product]}
+        %WarehouseState{products: nil} -> 
+          %WarehouseState{warehouse_id: ctx.metadata.id, products: [product]}
+          
         %WarehouseState{products: products} ->
           updated_products =
             Enum.map(products, fn p ->
