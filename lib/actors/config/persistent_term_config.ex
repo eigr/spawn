@@ -21,7 +21,7 @@ if Code.ensure_loaded?(:persistent_term) do
       {:actors_max_seconds, "3600"},
       {:actors_global_backpressure_max_demand, "-1"},
       {:actors_global_backpressure_min_demand, "-1"},
-      {:actors_global_backpressure_enabled, "true"},
+      {:actors_global_backpressure_enabled, "false"},
       {:app_name, Config.Name.generate()},
       {:delayed_invokes, "true"},
       {:deployment_mode, "sidecar"},
