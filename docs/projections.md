@@ -139,6 +139,8 @@ message GeneralInventoryResponse {
 
 ```
 
+***__NOTE__***: The `[(spawn.actors.searchable) = true]` option tells the Spawn proxy to index this field, so that searches for this attribute are optimized.
+
 2. Define the actor’s properties and actions:
 
 ```protobuf
@@ -176,7 +178,8 @@ service InventoryProjectionActor {
   rpc QueryAllProducts(.google.protobuf.Empty) returns (.inventory.GeneralInventoryResponse) {
     option (spawn.actors.view) = {
       query: "SELECT product_id, name, warehouse_id, quantity FROM projection_actor"
-      map_to: "inventory"
+      map_to: "inventory",
+      page_size: "100"
     };
   }
 }
@@ -189,7 +192,9 @@ service InventoryProjectionActor {
 
 * `spawn.actors.view`: Defines the SQL-like query for creating views.
 
-* `map_to: "inventory"`: Specifies the target field in response (`.inventory.GeneralInventoryResponse`) where query results will be mapped.
+* `map_to`: Specifies the target field in response (`.inventory.GeneralInventoryResponse`) where query results will be mapped.
+
+* `page_size`: The number of records that will be added to the declared list attribute in `map_to`. 
 
 ## Implementing Projection Actors
 
@@ -225,8 +230,9 @@ Projection actors support custom queries defined in the Protobuf. Examples inclu
 Once deployed, a projection actor can be invoked like any other actor. Use the query attributes defined in the Protobuf to fetch desired data like in Elixir SDK:
 
 ```elixir
-alias Inventory.{InventoryProjectionActor, ProductQuery, GeneralInventoryResponse}
+alias Inventory.{ProductQuery, GeneralInventoryResponse}
+alias Inventory.InventoryProjectionActor, as: InventoryClient
 
-{:ok, %GeneralInventoryResponse{inventory: inventories} = _response} = InventoryProjectionActor.query_product(%ProductQuery{product_id: "some_id"}, metadata: %{"page" => 
+{:ok, %GeneralInventoryResponse{inventory: inventories} = _response} = InventoryClient.query_product(%ProductQuery{product_id: "some_id"}, metadata: %{"page" => 
 "1", "page_size" => "50"})
 ```
