@@ -65,11 +65,12 @@ defmodule MyAppExample.Actors.Inventory do
   alias Inventory.{InventoryState, UpdateInventoryRequest, InventoryResponse}
 
   action("UpdateInventory", fn %Context{} = ctx, %UpdateInventoryRequest{} = request ->
-    Value.state(%InventoryState{
+    Value.of()
+    |> Value.state(%InventoryState{
       product_id: request.product_id,
       quantity: ctx.state.quantity + request.quantity
     })
-    |> Value.reply(%InventoryResponse{message: "Inventory updated successfully"})
+    |> Value.response(%InventoryResponse{message: "Inventory updated successfully"})
   end)
 end
 ```
@@ -132,11 +133,12 @@ defmodule MyAppExample.Actors.SessionActor do
   use SpawnSdk.Actor, name: "SessionActor"
 
   action("StartSession", fn %Context{} = ctx, %StartSessionRequest{} = request ->
-    Value.state(%SessionState{
+    Value.of()
+    |> Value.state(%SessionState{
       session_id: request.session_id,
       user_data: request.user_data
     })
-    |> Value.reply(%SessionResponse{message: "Session started"})
+    |> Value.response(%SessionResponse{message: "Session started"})
   end)
 end
 ```
@@ -155,21 +157,6 @@ end
   - Machine Learning workloads running in a gpu.
 
 ### **Protobuf Definition**
-
-```protobuf
-## **3. Task Actors**
-### **Description**
-- **Definition**: Actors designed for executing specific tasks and can be deployed on specialized nodes in the cluster.
-- **Usage**: Useful for stateless or stateful tasks like computations, machine learning inference, or data transformations.
-- **Use Cases**:
-  - High-compute tasks.
-  - Stateless operations requiring horizontal scalability.
-  - Machine learning and genetic algorithms.
-
----
-
-### **Protobuf Example**
-This example simulates the evaluation of individuals in a genetic algorithm. Each individual has a "genome" (a sequence of floating-point values), and the task calculates its "fitness" for evolutionary computation.  
 
 ```proto
 syntax = "proto3";
@@ -210,17 +197,18 @@ defmodule MyAppExample.Actors.GeneticTaskActor do
   alias Example.{Genome, FitnessResult, BestGenome}
   alias Nx.Tensor
 
-  action("EvaluateGenome", fn %Context{state: %BestGenome{fitness: best_fitness} = current_state} = ctx, %Genome{genes: genes} ->
+  action("EvaluateGenome", fn %Context{state: %BestGenome{fitness: best_fitness} = current_state} = _ctx, %Genome{genes: genes} ->
     fitness = evaluate_genome(genes)
 
     if fitness > best_fitness do
       updated_state = %BestGenome{genes: genes, fitness: fitness}
-      
-      Value.of(fitness_result(fitness))
+      Value.of()
       |> Value.state(updated_state)
+      |> Value.response(fitness_result(fitness))
     else
-      Value.of(fitness_result(fitness))
+      Value.of()
       |> Value.state(current_state)
+      |> Value.response(fitness_result(fitness))
     end
   end)
 
@@ -377,6 +365,7 @@ defmodule MyAppxample.Actors.InventoryProjectionActor do
       warehouse_id: update.warehouse_id,
       quantity: update.quantity
     })
+    |> Value.noreply!()
   end)
 end
 ```
