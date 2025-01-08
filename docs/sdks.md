@@ -22,6 +22,6 @@ Full documentation for each language can be found in each of their repositories,
 
 [Jump to language support index](sdks/index.md)
 
-[Next: Statestores](statestores.md)
+[Next: Modeling Systems with Actors](modeling_with_actors.md)
 
 [Previous: Features](features.md)

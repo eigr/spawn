@@ -239,6 +239,6 @@ alias Inventory.InventoryProjectionActor, as: InventoryClient
 
 [Back to Index](index.md)
 
-[Next: Features](features.md)
+[Next: Modeling Systems with Actors](modeling_with_actors.md)
 
 [Previous: Actors](actors.md)

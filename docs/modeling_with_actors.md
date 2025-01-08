@@ -110,6 +110,6 @@ The Actor Model offers a robust paradigm for building scalable, resilient, and m
 
 [Back to Index](index.md)
 
-[Next: Durable Computing](durable.md)
+[Next: Operator Manual](operator_manual.md)
 
-[Previous: Main Concepts](main.md)
+[Previous: SDKs](sdks.md)
