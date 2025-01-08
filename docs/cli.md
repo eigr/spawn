@@ -25,7 +25,7 @@ Each command comes with its own set of options and subcommands, which are detail
 ### 1. `new` Command
 
 #### **Description:**
-Creates a new SPawn project tailored for a specific target language.
+Creates a new Spawn project tailored for a specific target language.
 
 #### **Usage:**
 
@@ -40,8 +40,6 @@ spawn new <subcommand> [OPTIONS] <name>
 #### **Options for** `new dart`:
 
 * - `--help`: Print this help.
-
-* - `-s`, `--actor-system`: Defines the name of the ActorSystem. (Default: "spawn-system")
 
 * - `-s`, `--actor-system`: Defines the name of the ActorSystem. (Default: "spawn-system")
 
