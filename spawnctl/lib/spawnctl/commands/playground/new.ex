@@ -32,7 +32,7 @@ defmodule SpawnCtl.Commands.Playground.New do
   )
 
   option(:namespace, :string, "Apply manifests on specified Kubernetes namespace.",
-    alias: :n,
+    alias: :N,
     default: "default"
   )
 

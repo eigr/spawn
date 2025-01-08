@@ -46,7 +46,7 @@ defmodule SpawnCtl.Commands.New.Java do
   )
 
   option(:app_image_tag, :string, "Defines the OCI Container image tag.",
-    alias: :i,
+    alias: :t,
     default: @default_opts.app_image_tag
   )
 
@@ -60,7 +60,7 @@ defmodule SpawnCtl.Commands.New.Java do
   )
 
   option(:template_version, :string, "Spawn CLI Language templates version.",
-    alias: :t,
+    alias: :T,
     default: "v#{@vsn}"
   )
 

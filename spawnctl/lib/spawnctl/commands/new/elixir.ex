@@ -19,7 +19,7 @@ defmodule SpawnCtl.Commands.New.Elixir do
     - `-s`, `--actor-system`: Defines the name of the ActorSystem. (Default: "spawn-system")
     - `-d`, `--app-description`: Defines the application description. (Default: "Spawn App.")
     - `-t`, `--app-image-tag`: Defines the OCI Container image tag. (Default: "spawn-elixir-example:#{@vsn}")
-    - `-t`, `--app-namespace`: Defines the Kubernetes namespace to install app. (Default: "default")
+    - `-n`, `--app-namespace`: Defines the Kubernetes namespace to install app. (Default: "default")
     - `-e`, `--elixir-version`: Defines the Elixir version. (Allowed Values: "1.14", "1.15", "1.16", "1.17")
     - `-v`, `--sdk-version`: Spawn Elixir SDK version. (Allowed Values: "1.4.2", "2.0.0-RC2")
     - `-S`, `--statestore-type`: Spawn statestore provider. (Allowed Values: "cockroachdb", "mariadb", "mssql", "mysql", "postgres", "sqlite")
@@ -63,7 +63,7 @@ defmodule SpawnCtl.Commands.New.Elixir do
   )
 
   option(:app_image_tag, :string, "Defines the OCI Container image tag.",
-    alias: :i,
+    alias: :t,
     default: @default_opts.app_image_tag
   )
 
@@ -92,7 +92,7 @@ defmodule SpawnCtl.Commands.New.Elixir do
   )
 
   option(:template_version, :string, "Spawn CLI Language templates version.",
-    alias: :t,
+    alias: :T,
     default: "v#{@vsn}"
   )
 
