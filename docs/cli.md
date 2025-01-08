@@ -52,7 +52,7 @@ spawn new <subcommand> [OPTIONS] <name>
 
 * - `-v`, `--sdk-version`: Spawn SDK version.
 
-* - `-S`, `--statestore-type`: Spawn statestore provider. (Allowed Values: "cockroachdb", "mariadb", "mssql", "mysql", "postgres", "sqlite")
+* - `-S`, `--statestore-type`: Spawn statestore provider. (Allowed Values: "native", "mariadb", "postgres",)
 
 * - `-U`, `--statestore-user`: Spawn statestore username. (Default: "admin")
 
@@ -86,7 +86,7 @@ spawn new dart --actor-system=spawn-system myapp
 
 * - `-v`, `--sdk-version`: Spawn SDK version.
 
-* - `-S`, `--statestore-type`: Spawn statestore provider. (Allowed Values: "cockroachdb", "mariadb", "mssql", "mysql", "postgres", "sqlite")
+* - `-S`, `--statestore-type`: Spawn statestore provider. (Allowed Values: "native", "mariadb", "postgres",)
 
 * - `-U`, `--statestore-user`: Spawn statestore username. (Default: "admin")
 
@@ -120,7 +120,7 @@ spawn new elixir --actor-system=spawn-system --statestore-type=postgres myapp
 
 * - `-v`, `--sdk-version`: Spawn SDK version.
 
-* - `-S`, `--statestore-type`: Spawn statestore provider. (Allowed Values: "cockroachdb", "mariadb", "mssql", "mysql", "postgres", "sqlite")
+* - `-S`, `--statestore-type`: Spawn statestore provider. (Allowed Values: "native", "mariadb", "postgres",)
 
 * - `-U`, `--statestore-user`: Spawn statestore username. (Default: "admin")
 
@@ -152,7 +152,7 @@ spawn new go --actor-system=spawn-system myapp
 
 * - `-v`, `--sdk-version`: Spawn SDK version.
 
-* - `-S`, `--statestore-type`: Spawn statestore provider. (Allowed Values: "cockroachdb", "mariadb", "mssql", "mysql", "postgres", "sqlite")
+* - `-S`, `--statestore-type`: Spawn statestore provider. (Allowed Values: "native", "mariadb", "postgres",)
 
 * - `-U`, `--statestore-user`: Spawn statestore username. (Default: "admin")
 
@@ -190,7 +190,7 @@ spawn new java --actor-system=spawn-system myapp
 
 * - `-v`, `--sdk-version`: Spawn SDK version.
 
-* - `-S`, `--statestore-type`: Spawn statestore provider. (Allowed Values: "cockroachdb", "mariadb", "mssql", "mysql", "postgres", "sqlite")
+* - `-S`, `--statestore-type`: Spawn statestore provider. (Allowed Values: "native", "mariadb", "postgres",)
 
 * - `-U`, `--statestore-user`: Spawn statestore username. (Default: "admin")
 
@@ -222,7 +222,7 @@ spawn new node --actor-system=spawn-system myapp
 
 * - `-v`, `--sdk-version`: Spawn SDK version.
 
-* - `-S`, `--statestore-type`: Spawn statestore provider. (Allowed Values: "cockroachdb", "mariadb", "mssql", "mysql", "postgres", "sqlite")
+* - `-S`, `--statestore-type`: Spawn statestore provider. (Allowed Values: "native", "mariadb", "postgres",)
 
 * - `-U`, `--statestore-user`: Spawn statestore username. (Default: "admin")
 
@@ -254,7 +254,7 @@ spawn new python --actor-system=spawn-system myapp
 
 * - `-v`, `--sdk-version`: Spawn SDK version.
 
-* - `-S`, `--statestore-type`: Spawn statestore provider. (Allowed Values: "cockroachdb", "mariadb", "mssql", "mysql", "postgres", "sqlite")
+* - `-S`, `--statestore-type`: Spawn statestore provider. (Allowed Values: "native", "mariadb", "postgres",)
 
 * - `-U`, `--statestore-user`: Spawn statestore username. (Default: "admin")
 
