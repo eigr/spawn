@@ -450,6 +450,14 @@ end
 
 By supporting both stateful and stateless behaviors, Spawn provides the flexibility needed to design distributed systems that efficiently balance complexity, scalability, and functionality.
 
+---
+
+## Actors Features
+
+Spawn actors offer a rich set of features that empower developers to build robust and scalable distributed systems. These include workflows such as broadcasts, side-effects, forwards, pipes, state restoration, and much more.  
+
+To explore these capabilities in detail, consult the documentation for your favorite [Spawn SDK](sdks.md). [Each SDK](sdks/index.md) provides tailored guidance and examples to help you leverage the full potential of Spawn in your preferred language.
+
 [Back to Index](index.md)
 
 [Next: Projections](projections.md)
