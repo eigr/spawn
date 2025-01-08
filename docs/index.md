@@ -63,6 +63,7 @@
     - 6.2 [Conceptual](conceptual.md)
     - 6.3 [Main Concepts](main.md)
     - 6.5 [Durable Computing](durable.md)
+    - 6.6 [Integration with Elixir Phoenix Liveview](phoenix.md)
 
 [Next: Overview](overview.md)
 
