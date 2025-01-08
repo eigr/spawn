@@ -32,6 +32,6 @@ In turn, each Sidecar container within a POD organizes itself to form an Erlang 
 
 [Back to Index](index.md)
 
-[Next: Conceptual](conceptual.md)
+[Next: Actors](actors.md)
 
-[Previous: Overview](overview.md)
+[Previous: Developer Guide](developer_guide.md)

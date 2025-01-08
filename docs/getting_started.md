@@ -337,6 +337,6 @@ In the next section, you'll find links to each supported SDK.
 
 [Back to Index](index.md)
 
-[Next: SDKs](sdks.md)
+[Next: Developer Guide](developer_guide.md)
 
-[Previous: Install](install.md)
+[Previous: Overview](overview.md)

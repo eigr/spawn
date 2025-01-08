@@ -158,6 +158,6 @@ InvocationRequest type bytes encoded here :-)
 
 [Back to Index](index.md)
 
-[Next: Contributing](../CONTRIBUTING.md)
+[Next: Miscellaneous](miscellaneous.md)
 
 [Previous: Durable Computing](durable.md)

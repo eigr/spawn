@@ -71,6 +71,6 @@ Nats' ability to natively implement different topologies, as well as its minimal
 
 [Back to Index](index.md)
 
-[Next: Durable Computing](durable.md)
+[Next: Modeling Systems with Actors](modeling_with_actors.md)
 
-[Previous: Local Development](local_development.md)
+[Previous: Conceptual](conceptual.md)

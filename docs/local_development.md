@@ -18,6 +18,6 @@ For more information on how to collaborate or even to get to know the project st
 
 [Back to Index](index.md)
 
-[Next: Main Concepts](main.md)
+[Next: Protocol](protocol.md)
 
-[Previous: Observability](observability.md)
+[Previous: Contributing](../CONTRIBUTING.md)

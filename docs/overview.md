@@ -24,6 +24,6 @@ This also brings security to CEOs and CTOs as well as product managers that the 
 
 [Back to Index](index.md)
 
-[Next: Architecture](architecture.md)
+[Next: Getting Started](getting_started.md)
 
 [Previous: Index](index.md)

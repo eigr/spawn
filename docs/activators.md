@@ -4,6 +4,6 @@ TODO
 
 [Back to Index](index.md)
 
-[Next: Observability](observability.md)
+[Next: Operator Manual](operator_manual.md)
 
 [Previous: Statestores](statestores.md)

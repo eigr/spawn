@@ -449,3 +449,9 @@ end
 * **Stateless Actors**: Simpler to implement and scale, as they do not require persistence mechanisms or consistent state handling.
 
 By supporting both stateful and stateless behaviors, Spawn provides the flexibility needed to design distributed systems that efficiently balance complexity, scalability, and functionality.
+
+[Back to Index](index.md)
+
+[Next: Projections](projections.md)
+
+[Previous: Architecture](architecture.md)

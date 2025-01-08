@@ -61,6 +61,6 @@
 
 [Back to Index](index.md)
 
-[Next: Install](install.md)
+[Next: SDKs](sdks.md)
 
-[Previous: Architecture](architecture.md)
+[Previous: Projections](projections.md)

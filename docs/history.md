@@ -37,6 +37,6 @@ Eigr Spawn being based on Erlang/OTP and running on the BEAM is an excellent fit
 
 [Back to Index](index.md)
 
-[Next: Index](index.md)
+[Next: Conceptual](conceptual.md)
 
-[Previous: Contributing](../CONTRIBUTING.md)
+[Previous: Miscellaneous](miscellaneous.md)

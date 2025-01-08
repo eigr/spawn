@@ -48,4 +48,4 @@ It is also worth mentioning that this feature depends on the implementation of e
 
 [Next: Activators](activators.md)
 
-[Previous: Custom Resources](crds.md)
+[Previous: SDKs](sdks.md)

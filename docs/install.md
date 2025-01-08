@@ -43,6 +43,6 @@ kubectl create ns eigr-functions && curl -L https://github.com/eigr/spawn/releas
 
 [Back to Index](index.md)
 
-[Next: Getting Started](getting_started.md)
+[Next: Custom Resources](crds.md)
 
-[Previous: Features](features.md)
+[Previous: Operator Manual](operator_manual.md)

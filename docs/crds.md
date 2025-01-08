@@ -26,4 +26,4 @@ Spawn defines some custom Resources for the user to interact with the API for de
 
 [Next: Actor System Resource](crds/actor_system.md)
 
-[Previous: SDKs](sdks.md)
+[Previous: Install](install.md)

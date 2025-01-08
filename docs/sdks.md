@@ -22,6 +22,6 @@ Full documentation for each language can be found in each of their repositories,
 
 [Jump to language support index](sdks/index.md)
 
-[Next: Custom Resources](crds.md)
+[Next: Statestores](statestores.md)
 
-[Previous: Getting Started](getting_started.md)
+[Previous: Features](features.md)

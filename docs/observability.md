@@ -9,6 +9,6 @@ Spawn exports metrics in Prometheus format and also pushes traces in OTLP format
 
 [Back to Index](index.md)
 
-[Next: Local Development](local_development.md)
+[Next: Contribution Guilde](contribution_guide.md)
 
-[Previous: Activators](activators.md)
+[Previous: Activator Resource](crds/activator.md)

@@ -4,6 +4,4 @@ TODO
 
 [Back to Index](index.md)
 
-[Next: Protocol](protocol.md)
-
-[Previous: Main Concepts](main.md)
+[Previous: Modeling Systems with Actors](modeling_with_actors.md)

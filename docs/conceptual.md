@@ -85,6 +85,6 @@ platform.
 
 [Back to Index](index.md)
 
-[Next: Features](features.md)
+[Next: Main Concepts](main.md)
 
-[Previous: Overview](architecure.md)
+[Previous: History](history.md)

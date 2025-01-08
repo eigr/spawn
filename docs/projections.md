@@ -236,3 +236,9 @@ alias Inventory.InventoryProjectionActor, as: InventoryClient
 {:ok, %GeneralInventoryResponse{inventory: inventories} = _response} = InventoryClient.query_product(%ProductQuery{product_id: "some_id"}, metadata: %{"page" => 
 "1", "page_size" => "50"})
 ```
+
+[Back to Index](index.md)
+
+[Next: Features](features.md)
+
+[Previous: Actors](actors.md)

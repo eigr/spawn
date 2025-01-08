@@ -134,6 +134,6 @@ The Spawn protocol is very simple to implement but it is necessary for the devel
 
 **Don't forget to subscribe to our [Discord](https://discord.gg/2PcshvfS93) server and we wish you a good hack**.
 
-[Next: History](docs/history.md)
+[Next: Local Development](docs/local_development.md)
 
-[Previous: Protocol](docs/protocol.md)
+[Previous: Contribution Guilde](docs/contribution_guide.md)
