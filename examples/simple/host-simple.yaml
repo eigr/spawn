@@ -17,7 +17,7 @@ metadata:
     spawn-eigr.io/sidecar-image-tag: "ghcr.io/eigr/spawn-proxy:2.0.0-RC2"
 spec:
   host:
-    image: eigr/spawn-springboot-examples:0.5.3 # Mandatory
+    image: ttl.sh/spawn-java-example:1h # Mandatory
     ports:
       - name: http
         containerPort: 8090
