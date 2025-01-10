@@ -259,7 +259,7 @@ spec:
     type: MariaDB # 4. Set database provider. Valid options: [MariaDB, Postgres, Native]
     credentialsSecretRef: mariadb-connection-secret # 5. Secret with database connection details created earlier
     pool: # Optional
-      size: "10"
+      size: 10
 ```
 
 This file defines your ActorSystem within the Kubernetes cluster.
@@ -280,7 +280,7 @@ spec:
   host:
     image: eigr/spawn-springboot-examples:latest # 4. Required: Container image
     ports:
-      - name: "http"
+      - name: http
         containerPort: 8091
 ```
 
@@ -302,7 +302,7 @@ spec:
     embedded: true # Indicates a native BEAM application, so no sidecar proxy is needed
     image: eigr/dice-game-example:2.0.0-RC2
     ports:
-      - name: "http"
+      - name: http
         containerPort: 8800
 ```
 
