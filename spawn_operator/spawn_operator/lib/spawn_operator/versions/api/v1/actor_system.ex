@@ -70,10 +70,16 @@ defmodule SpawnOperator.Versions.Api.V1.ActorSystem do
           jsonPath: ".spec.cluster.kind"
         },
         %{
-          name: "State Store Type",
+          name: "Statestore",
           type: "string",
           description: "The type of state store used for the ActorSystem",
           jsonPath: ".spec.statestore.type"
+        },
+        %{
+          name: "Pool Size",
+          type: "string",
+          description: "The pool size of the state store",
+          jsonPath: ".spec.statestore.pool.size"
         }
       ]
     )

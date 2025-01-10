@@ -152,10 +152,16 @@ defmodule SpawnOperator.Versions.Api.V1.ActorHost do
       """a,
       additionalPrinterColumns: [
         %{
-          name: "Host SDK",
+          name: "SDK",
           type: "string",
           description: "SDK used by the ActorHost",
           jsonPath: ".spec.host.sdk"
+        },
+        %{
+          name: "Embedded",
+          type: "string",
+          description: "Embedded Proxy used by the ActorHost",
+          jsonPath: ".spec.host.embedded"
         },
         %{
           name: "Image",
