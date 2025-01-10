@@ -42,7 +42,7 @@ defmodule SpawnOperator.K8s.System.Secret.ActorSystemSecret do
   defp get_storage_options(_system, _ns, params) do
     statestore = String.downcase(Map.get(params, "type", "native")) |> Base.encode64()
     pool_params = Map.get(params, "pool", %{})
-    pool_size = Map.get(pool_params, "size", "10") |> Base.encode64()
+    pool_size = "#{Map.get(pool_params, "size", 10)}" |> Base.encode64()
     statestore_credentials_secret_ref = Map.get(params, "credentialsSecretRef", "none")
     statestore_ssl = "#{Map.get(params, "ssl", "false")}" |> Base.encode64()
     statestore_ssl_verify = "#{Map.get(params, "ssl_verify", "false")}" |> Base.encode64()

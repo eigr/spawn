@@ -1,16 +1,10 @@
 ---
-apiVersion: apps/v1
-kind: Deployment
 metadata:
+  name: spawn-operator
   labels:
     k8s-app: spawn-operator
-  name: spawn-operator
   namespace: eigr-functions
 spec:
-  replicas: 2
-  selector:
-    matchLabels:
-      k8s-app: spawn-operator
   template:
     metadata:
       labels:
@@ -38,7 +32,24 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: spec.serviceAccountName
-          image: docker.io/eigr/spawn-operator:1.4.4-rc.38
+          name: spawn-operator
+          ports:
+            - containerPort: 9090
+          image: ghcr.io/eigr/spawn-operator:2.0.0-RC2
+          resources:
+            limits:
+              cpu: 200m
+              memory: 380Mi
+            requests:
+              cpu: 200m
+              memory: 380Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: false
+          volumeMounts:
+            - mountPath: /app/.cache/bakeware/
+              name: bakeware-cache
           livenessProbe:
             failureThreshold: 3
             httpGet:
@@ -49,9 +60,6 @@ spec:
             periodSeconds: 5
             successThreshold: 1
             timeoutSeconds: 5
-          name: spawn-operator
-          ports:
-            - containerPort: 9090
           readinessProbe:
             failureThreshold: 3
             httpGet:
@@ -62,32 +70,23 @@ spec:
             periodSeconds: 5
             successThreshold: 1
             timeoutSeconds: 5
-          resources:
-            limits:
-              cpu: 1
-              memory: 1024Mi
-            requests:
-              cpu: 10m
-              memory: 380Mi
-          securityContext:
-            allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: true
-            runAsNonRoot: false
-          volumeMounts:
-            - mountPath: /app/.cache/bakeware/
-              name: bakeware-cache
       serviceAccountName: spawn-operator
       volumes:
         - emptyDir: {}
           name: bakeware-cache
+  replicas: 2
+  selector:
+    matchLabels:
+      k8s-app: spawn-operator
+kind: Deployment
+apiVersion: apps/v1
 
 ---
-apiVersion: apiextensions.k8s.io/v1
-kind: CustomResourceDefinition
 metadata:
-  labels: {}
   name: activators.spawn-eigr.io
+  labels: {}
 spec:
+  scope: Namespaced
   group: spawn-eigr.io
   names:
     kind: Activator
@@ -98,34 +97,34 @@ spec:
       - activator
       - activators
     singular: activator
-  scope: Namespaced
   versions:
-    - additionalPrinterColumns: []
+    - name: v1
       deprecated: false
-      deprecationWarning:
-      name: v1
       schema:
         openAPIV3Schema:
+          type: object
           properties:
             status:
+              type: object
               properties:
                 observedGeneration:
                   type: integer
-              type: object
-          type: object
           x-kubernetes-preserve-unknown-fields: true
-      served: true
-      storage: true
+      additionalPrinterColumns: []
       subresources:
         status: {}
+      served: true
+      storage: true
+      deprecationWarning:
+kind: CustomResourceDefinition
+apiVersion: apiextensions.k8s.io/v1
 
 ---
-apiVersion: apiextensions.k8s.io/v1
-kind: CustomResourceDefinition
 metadata:
-  labels: {}
   name: actorhosts.spawn-eigr.io
+  labels: {}
 spec:
+  scope: Namespaced
   group: spawn-eigr.io
   names:
     kind: ActorHost
@@ -137,34 +136,213 @@ spec:
       - actorhost
       - actorhosts
     singular: actorhost
-  scope: Namespaced
   versions:
-    - additionalPrinterColumns: []
+    - name: v1
       deprecated: false
-      deprecationWarning:
-      name: v1
       schema:
         openAPIV3Schema:
+          type: object
+          description: |
+            Defines an ActorHost application. Example:
+
+
+            ---
+            apiVersion: spawn-eigr.io/v1
+            kind: ActorHost
+            metadata:
+              name: my-java-app
+            spec:
+              host:
+                image: ghcr.io/eigr/spawn-springboot-examples:latest
+                sdk: java
+                ports:
+                - containerPort: 80
+          required:
+            - spec
           properties:
             status:
+              type: object
               properties:
+                conditions:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                      status:
+                        type: string
+                        enum:
+                          - 'True'
+                          - 'False'
+                      type:
+                        type: string
+                      lastHeartbeatTime:
+                        type: string
+                        format: date-time
+                      lastTransitionTime:
+                        type: string
+                        format: date-time
                 observedGeneration:
                   type: integer
+            spec:
+              properties:
+                affinity:
+                  type: object
+                autoscaler:
+                  properties:
+                    averageCpuUtilizationPercentage:
+                      type: integer
+                    averageMemoryUtilizationValue:
+                      type: integer
+                    max:
+                      type: integer
+                    min:
+                      type: integer
+                  type: object
+                env:
+                  items:
+                    properties:
+                      name:
+                        type: string
+                      value:
+                        type: string
+                      valueFrom:
+                        properties:
+                          fieldRef:
+                            properties:
+                              fieldPath:
+                                type: string
+                            type: object
+                        type: object
+                    type: object
+                  type: array
+                host:
+                  properties:
+                    embedded:
+                      type: boolean
+                    image:
+                      type: string
+                    ports:
+                      items:
+                        properties:
+                          containerPort:
+                            type: integer
+                          name:
+                            type: string
+                        type: object
+                      type: array
+                    sdk:
+                      enum:
+                        - dart
+                        - elixir
+                        - go
+                        - java
+                        - python
+                        - rust
+                        - springboot
+                        - nodejs
+                      type: string
+                    taskActors:
+                      items:
+                        properties:
+                          actorName:
+                            type: string
+                          topology:
+                            properties:
+                              nodeSelector:
+                                additionalProperties:
+                                  type: string
+                                type: object
+                              tolerations:
+                                items:
+                                  properties:
+                                    effect:
+                                      type: string
+                                    key:
+                                      type: string
+                                    operator:
+                                      type: string
+                                  type: object
+                                type: array
+                            type: object
+                          workerPool:
+                            properties:
+                              bootTimeout:
+                                type: integer
+                              callTimeout:
+                                type: integer
+                              idleShutdownAfter:
+                                type: integer
+                              max:
+                                type: integer
+                              maxConcurrency:
+                                type: integer
+                              min:
+                                type: integer
+                              oneOff:
+                                enum:
+                                  - 'true'
+                                  - 'false'
+                                type: string
+                            type: object
+                        type: object
+                      type: array
+                  required:
+                    - image
+                  type: object
+                replicas:
+                  type: integer
+                topology:
+                  properties:
+                    nodeSelector:
+                      additionalProperties:
+                        type: string
+                      type: object
+                    tolerations:
+                      items:
+                        properties:
+                          effect:
+                            type: string
+                          key:
+                            type: string
+                          operator:
+                            type: string
+                        type: object
+                      type: array
+                  type: object
               type: object
-          type: object
-          x-kubernetes-preserve-unknown-fields: true
-      served: true
-      storage: true
+      additionalPrinterColumns:
+        - name: Host SDK
+          type: string
+          description: SDK used by the ActorHost
+          jsonPath: .spec.host.sdk
+        - name: Image
+          type: string
+          description: Docker image used for the ActorHost
+          jsonPath: .spec.host.image
+        - name: Min Replicas
+          type: integer
+          description: Minimum number of replicas for the ActorHost
+          jsonPath: .spec.autoscaler.min
+        - name: Max Replicas
+          type: integer
+          description: Maximum number of replicas for the ActorHost
+          jsonPath: .spec.autoscaler.max
       subresources:
         status: {}
+      served: true
+      storage: true
+      deprecationWarning:
+kind: CustomResourceDefinition
+apiVersion: apiextensions.k8s.io/v1
 
 ---
-apiVersion: apiextensions.k8s.io/v1
-kind: CustomResourceDefinition
 metadata:
-  labels: {}
   name: actorsystems.spawn-eigr.io
+  labels: {}
 spec:
+  scope: Namespaced
   group: spawn-eigr.io
   names:
     kind: ActorSystem
@@ -176,251 +354,334 @@ spec:
       - actorsystems
       - system
     singular: actorsystem
-  scope: Namespaced
   versions:
-    - additionalPrinterColumns: []
+    - name: v1
       deprecated: false
-      deprecationWarning:
-      name: v1
       schema:
         openAPIV3Schema:
+          type: object
+          description: Defines an Spawn ActorSystem to configure group of ActorHost applications.
+          required:
+            - spec
           properties:
             status:
+              type: object
               properties:
+                conditions:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                      status:
+                        type: string
+                        enum:
+                          - 'True'
+                          - 'False'
+                      type:
+                        type: string
+                      lastHeartbeatTime:
+                        type: string
+                        format: date-time
+                      lastTransitionTime:
+                        type: string
+                        format: date-time
                 observedGeneration:
                   type: integer
+            spec:
+              properties:
+                cluster:
+                  properties:
+                    cookie:
+                      type: string
+                    kind:
+                      default: erlang
+                      enum:
+                        - erlang
+                        - quic
+                      type: string
+                    systemToSystem:
+                      properties:
+                        enabled:
+                          type: boolean
+                        natsClusterSecretRef:
+                          type: string
+                      type: object
+                    tls:
+                      properties:
+                        certManager:
+                          properties:
+                            enabled:
+                              type: boolean
+                            issuerName:
+                              type: string
+                          type: object
+                        secretName:
+                          type: string
+                      type: object
+                  type: object
+                statestore:
+                  properties:
+                    credentialsSecretRef:
+                      type: string
+                    pool:
+                      properties:
+                        size:
+                          type: integer
+                      type: object
+                    type:
+                      enum:
+                        - Native
+                        - native
+                        - MariaDB
+                        - mariadb
+                        - Postgres
+                        - postgres
+                      type: string
+                  type: object
               type: object
-          type: object
-          x-kubernetes-preserve-unknown-fields: true
-      served: true
-      storage: true
+      additionalPrinterColumns:
+        - name: Cluster Kind
+          type: string
+          description: The kind of cluster used for the ActorSystem
+          jsonPath: .spec.cluster.kind
+        - name: State Store Type
+          type: string
+          description: The type of state store used for the ActorSystem
+          jsonPath: .spec.statestore.type
       subresources:
         status: {}
+      served: true
+      storage: true
+      deprecationWarning:
+kind: CustomResourceDefinition
+apiVersion: apiextensions.k8s.io/v1
 
 ---
-apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: spawn-operator
+  labels:
+    k8s-app: spawn-operator
 kind: ClusterRole
-metadata:
-  labels:
-    k8s-app: spawn-operator
-  name: spawn-operator
-rules:
-  - apiGroups:
-      - ""
-    resources:
-      - configmaps
-    verbs:
-      - "*"
-  - apiGroups:
-      - ""
-    resources:
-      - node
-    verbs:
-      - get
-      - list
-  - apiGroups:
-      - ""
-    resources:
-      - nodes
-    verbs:
-      - get
-      - list
-  - apiGroups:
-      - ""
-    resources:
-      - pods
-    verbs:
-      - "*"
-  - apiGroups:
-      - ""
-    resources:
-      - secrets
-    verbs:
-      - "*"
-  - apiGroups:
-      - ""
-    resources:
-      - serviceaccount
-    verbs:
-      - "*"
-  - apiGroups:
-      - ""
-    resources:
-      - serviceaccounts
-    verbs:
-      - "*"
-  - apiGroups:
-      - ""
-    resources:
-      - services
-    verbs:
-      - "*"
-  - apiGroups:
-      - apiextensions.k8s.io
-    resources:
-      - customresourcedefinitions
-    verbs:
-      - "*"
-  - apiGroups:
-      - apps
-    resources:
-      - daemonsets
-    verbs:
-      - "*"
-  - apiGroups:
-      - apps
-    resources:
-      - deployments
-    verbs:
-      - "*"
-  - apiGroups:
-      - autoscaling
-    resources:
-      - horizontalpodautoscalers
-    verbs:
-      - "*"
-  - apiGroups:
-      - batch
-    resources:
-      - cronjob
-    verbs:
-      - "*"
-  - apiGroups:
-      - batch
-    resources:
-      - cronjobs
-    verbs:
-      - "*"
-  - apiGroups:
-      - batch
-    resources:
-      - job
-    verbs:
-      - "*"
-  - apiGroups:
-      - batch
-    resources:
-      - jobs
-    verbs:
-      - "*"
-  - apiGroups:
-      - cert-manager.io
-    resources:
-      - certificate
-    verbs:
-      - "*"
-  - apiGroups:
-      - coordination.k8s.io
-    resources:
-      - leases
-    verbs:
-      - "*"
-  - apiGroups:
-      - events.k8s.io
-    resources:
-      - events
-    verbs:
-      - "*"
-  - apiGroups:
-      - extensions
-    resources:
-      - ingressclasses
-    verbs:
-      - "*"
-  - apiGroups:
-      - extensions
-    resources:
-      - ingresses
-    verbs:
-      - "*"
-  - apiGroups:
-      - networking.k8s.io
-    resources:
-      - ingressclasses
-    verbs:
-      - "*"
-  - apiGroups:
-      - networking.k8s.io
-    resources:
-      - ingresses
-    verbs:
-      - "*"
-  - apiGroups:
-      - rbac.authorization.k8s.io
-    resources:
-      - role
-    verbs:
-      - "*"
-  - apiGroups:
-      - rbac.authorization.k8s.io
-    resources:
-      - rolebindings
-    verbs:
-      - "*"
-  - apiGroups:
-      - rbac.authorization.k8s.io
-    resources:
-      - roles
-    verbs:
-      - "*"
-  - apiGroups:
-      - spawn-eigr.io
-    resources:
-      - activators
-    verbs:
-      - "*"
-  - apiGroups:
-      - spawn-eigr.io
-    resources:
-      - activators/status
-    verbs:
-      - "*"
-  - apiGroups:
-      - spawn-eigr.io
-    resources:
-      - actorhosts
-    verbs:
-      - "*"
-  - apiGroups:
-      - spawn-eigr.io
-    resources:
-      - actorhosts/status
-    verbs:
-      - "*"
-  - apiGroups:
-      - spawn-eigr.io
-    resources:
-      - actorsystems
-    verbs:
-      - "*"
-  - apiGroups:
-      - spawn-eigr.io
-    resources:
-      - actorsystems/status
-    verbs:
-      - "*"
-
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  labels:
-    k8s-app: spawn-operator
-  name: spawn-operator
-  namespace: eigr-functions
-
----
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
+rules:
+  - resources:
+      - configmaps
+    apiGroups:
+      - ""
+    verbs:
+      - '*'
+  - resources:
+      - node
+    apiGroups:
+      - ""
+    verbs:
+      - get
+      - list
+  - resources:
+      - nodes
+    apiGroups:
+      - ""
+    verbs:
+      - get
+      - list
+  - resources:
+      - pods
+    apiGroups:
+      - ""
+    verbs:
+      - '*'
+  - resources:
+      - secrets
+    apiGroups:
+      - ""
+    verbs:
+      - '*'
+  - resources:
+      - serviceaccount
+    apiGroups:
+      - ""
+    verbs:
+      - '*'
+  - resources:
+      - serviceaccounts
+    apiGroups:
+      - ""
+    verbs:
+      - '*'
+  - resources:
+      - services
+    apiGroups:
+      - ""
+    verbs:
+      - '*'
+  - resources:
+      - customresourcedefinitions
+    apiGroups:
+      - apiextensions.k8s.io
+    verbs:
+      - '*'
+  - resources:
+      - daemonsets
+    apiGroups:
+      - apps
+    verbs:
+      - '*'
+  - resources:
+      - deployments
+    apiGroups:
+      - apps
+    verbs:
+      - '*'
+  - resources:
+      - horizontalpodautoscalers
+    apiGroups:
+      - autoscaling
+    verbs:
+      - '*'
+  - resources:
+      - cronjob
+    apiGroups:
+      - batch
+    verbs:
+      - '*'
+  - resources:
+      - cronjobs
+    apiGroups:
+      - batch
+    verbs:
+      - '*'
+  - resources:
+      - job
+    apiGroups:
+      - batch
+    verbs:
+      - '*'
+  - resources:
+      - jobs
+    apiGroups:
+      - batch
+    verbs:
+      - '*'
+  - resources:
+      - certificate
+    apiGroups:
+      - cert-manager.io
+    verbs:
+      - '*'
+  - resources:
+      - leases
+    apiGroups:
+      - coordination.k8s.io
+    verbs:
+      - '*'
+  - resources:
+      - events
+    apiGroups:
+      - events.k8s.io
+    verbs:
+      - '*'
+  - resources:
+      - ingressclasses
+    apiGroups:
+      - extensions
+    verbs:
+      - '*'
+  - resources:
+      - ingresses
+    apiGroups:
+      - extensions
+    verbs:
+      - '*'
+  - resources:
+      - ingressclasses
+    apiGroups:
+      - networking.k8s.io
+    verbs:
+      - '*'
+  - resources:
+      - ingresses
+    apiGroups:
+      - networking.k8s.io
+    verbs:
+      - '*'
+  - resources:
+      - role
+    apiGroups:
+      - rbac.authorization.k8s.io
+    verbs:
+      - '*'
+  - resources:
+      - rolebindings
+    apiGroups:
+      - rbac.authorization.k8s.io
+    verbs:
+      - '*'
+  - resources:
+      - roles
+    apiGroups:
+      - rbac.authorization.k8s.io
+    verbs:
+      - '*'
+  - resources:
+      - activators
+    apiGroups:
+      - spawn-eigr.io
+    verbs:
+      - '*'
+  - resources:
+      - activators/status
+    apiGroups:
+      - spawn-eigr.io
+    verbs:
+      - '*'
+  - resources:
+      - actorhosts
+    apiGroups:
+      - spawn-eigr.io
+    verbs:
+      - '*'
+  - resources:
+      - actorhosts/status
+    apiGroups:
+      - spawn-eigr.io
+    verbs:
+      - '*'
+  - resources:
+      - actorsystems
+    apiGroups:
+      - spawn-eigr.io
+    verbs:
+      - '*'
+  - resources:
+      - actorsystems/status
+    apiGroups:
+      - spawn-eigr.io
+    verbs:
+      - '*'
+
+---
 metadata:
+  name: spawn-operator
   labels:
     k8s-app: spawn-operator
+  namespace: eigr-functions
+kind: ServiceAccount
+apiVersion: v1
+
+---
+metadata:
   name: spawn-operator
+  labels:
+    k8s-app: spawn-operator
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
 roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
   name: spawn-operator
+  kind: ClusterRole
+  apiGroup: rbac.authorization.k8s.io
 subjects:
-  - kind: ServiceAccount
-    name: spawn-operator
+  - name: spawn-operator
+    kind: ServiceAccount
     namespace: eigr-functions

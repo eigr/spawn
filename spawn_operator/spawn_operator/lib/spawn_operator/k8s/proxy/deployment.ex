@@ -62,6 +62,39 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
     }
   }
 
+  @file_shared_volume %{
+    "name" => "shared-volume",
+    "emptyDir" => %{}
+  }
+
+  @file_protos_volume %{
+    "name" => "proto-volume",
+    "emptyDir" => %{}
+  }
+
+  @default_certs_volume %{
+    "name" => "certs",
+    "secret" => %{"secretName" => "tls-certs", "optional" => true}
+  }
+
+  @default_volumes [
+    @default_certs_volume,
+    @file_shared_volume,
+    @file_protos_volume
+  ]
+  
+  @file_copy_volume_mounts [
+    %{"name" => "shared-volume", "mountPath" => "/shared-volume"},
+    %{"name" => "proto-volume", "mountPath" => "/actors"}
+  ]
+
+  @default_certs_volume_mounts %{"name" => "certs", "mountPath" => "/app/certs"}
+
+  @default_volume_mounts [
+    @default_certs_volume_mounts
+   
+  ] ++ @file_copy_volume_mounts
+
   @default_termination_period_seconds 405
 
   @impl true
@@ -134,9 +167,6 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
                 %{
                   "name" => "init-certificates",
                   "image" => "#{annotations.proxy_init_container_image_tag}",
-                  "env" => [
-                    %{"containerPort" => 4369, "name" => "epmd"}
-                  ],
                   "args" => [
                     "--environment",
                     :prod,
@@ -155,6 +185,16 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
                       "value" => "none"
                     }
                   ]
+                },
+                %{
+                  "name" => "copy-proto-files",
+                  "image" => "alpine:3.20",
+                  "command" => ["/bin/sh", "-c"],
+                  "args" => [
+                    #"if [ -d /actors ]; then cp -r /actors/* /shared-volume/; else echo 'Source folder not found!' && exit 1; fi"
+                    "ls -ltra /"
+                  ],
+                  "volumeMounts" => @default_volume_mounts
                 }
               ],
               "serviceAccountName" => "#{system}-sa"
@@ -166,6 +206,7 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
         }
       }
     }
+    |> IO.inspect(label: "Deployment")
   end
 
   defp build_affinity(system, app_name) do
@@ -421,33 +462,22 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
 
   defp maybe_put_volumes(spec, %{"volumes" => volumes}) do
     volumes =
-      volumes ++
-        [
-          %{
-            "name" => "certs",
-            "secret" => %{"secretName" => "tls-certs", "optional" => true}
-          }
-        ]
+      volumes ++ @default_volumes |> List.flatten() |> Enum.uniq(&(&1["name"]))
 
     Map.merge(spec, %{"volumes" => volumes})
   end
 
   defp maybe_put_volumes(spec, _) do
-    Map.put(spec, "volumes", [
-      %{
-        "name" => "certs",
-        "secret" => %{"secretName" => "tls-certs", "optional" => true}
-      }
-    ])
+    Map.put(spec, "volumes", @default_volumes)
   end
 
   defp maybe_put_volume_mounts_to_host_container(spec, %{"volumeMounts" => volumeMounts}) do
-    volumeMounts = volumeMounts ++ [%{"name" => "certs", "mountPath" => "/app/certs"}]
+    volumeMounts = volumeMounts ++ @default_volume_mounts |> List.flatten() |> Enum.uniq(&(&1["name"]))
     Map.merge(spec, %{"volumeMounts" => volumeMounts})
   end
 
   defp maybe_put_volume_mounts_to_host_container(spec, _) do
-    Map.put(spec, "volumeMounts", [%{"name" => "certs", "mountPath" => "/app/certs"}])
+    Map.put(spec, "volumeMounts", @default_volume_mounts)
   end
 
   defp maybe_warn_wrong_volumes(params, host_params) do
