@@ -14,10 +14,10 @@ metadata:
     # Optional. Here I`m using Nats Broker without authentication
     spawn-eigr.io/sidecar-pubsub-adapter: "nats"
     spawn-eigr.io/sidecar-pubsub-nats-hosts: "nats://spawn-nats:4222"
-    spawn-eigr.io/sidecar-image-tag: "ghcr.io/eigr/spawn-proxy:2.0.0-RC2"
+    spawn-eigr.io/sidecar-image-tag: "ghcr.io/eigr/spawn-proxy:1.4.3"
 spec:
   host:
-    image: ttl.sh/spawn-java-example:1h # Mandatory
+    image: ttl.sh/spawn-java-example:24h # Mandatory
     ports:
       - name: http
         containerPort: 8090

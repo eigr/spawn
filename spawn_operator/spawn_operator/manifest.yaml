@@ -1,90 +1,87 @@
----
-metadata:
-  name: spawn-operator
-  labels:
-    k8s-app: spawn-operator
-  namespace: eigr-functions
-spec:
-  template:
-    metadata:
-      labels:
-        k8s-app: spawn-operator
-    spec:
-      containers:
-        - env:
-            - name: MIX_ENV
-              value: prod
-            - name: BONNY_OPERATOR_NAME
-              value: spawn-operator
-            - name: BONNY_POD_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
-            - name: BONNY_POD_NAMESPACE
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.namespace
-            - name: BONNY_POD_IP
-              valueFrom:
-                fieldRef:
-                  fieldPath: status.podIP
-            - name: BONNY_POD_SERVICE_ACCOUNT
-              valueFrom:
-                fieldRef:
-                  fieldPath: spec.serviceAccountName
-          name: spawn-operator
-          ports:
-            - containerPort: 9090
-          image: ghcr.io/eigr/spawn-operator:2.0.0-RC2
-          resources:
-            limits:
-              cpu: 200m
-              memory: 380Mi
-            requests:
-              cpu: 200m
-              memory: 380Mi
-          securityContext:
-            allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: true
-            runAsNonRoot: false
-          volumeMounts:
-            - mountPath: /app/.cache/bakeware/
-              name: bakeware-cache
-          livenessProbe:
-            failureThreshold: 3
-            httpGet:
-              path: /health/liveness
-              port: 9090
-              scheme: HTTP
-            initialDelaySeconds: 30
-            periodSeconds: 5
-            successThreshold: 1
-            timeoutSeconds: 5
-          readinessProbe:
-            failureThreshold: 3
-            httpGet:
-              path: /health/readiness
-              port: 9090
-              scheme: HTTP
-            initialDelaySeconds: 30
-            periodSeconds: 5
-            successThreshold: 1
-            timeoutSeconds: 5
-      serviceAccountName: spawn-operator
-      volumes:
-        - emptyDir: {}
-          name: bakeware-cache
-  replicas: 2
-  selector:
-    matchLabels:
-      k8s-app: spawn-operator
-kind: Deployment
-apiVersion: apps/v1
+# ---
+# spec:
+#   template:
+#     spec:
+#       volumes:
+#         - emptyDir: {}
+#           name: bakeware-cache
+#       containers:
+#         - env:
+#             - name: MIX_ENV
+#               value: prod
+#             - name: BONNY_OPERATOR_NAME
+#               value: spawn-operator
+#             - name: BONNY_POD_NAME
+#               valueFrom:
+#                 fieldRef:
+#                   fieldPath: metadata.name
+#             - name: BONNY_POD_NAMESPACE
+#               valueFrom:
+#                 fieldRef:
+#                   fieldPath: metadata.namespace
+#             - name: BONNY_POD_IP
+#               valueFrom:
+#                 fieldRef:
+#                   fieldPath: status.podIP
+#             - name: BONNY_POD_SERVICE_ACCOUNT
+#               valueFrom:
+#                 fieldRef:
+#                   fieldPath: spec.serviceAccountName
+#           name: spawn-operator
+#           ports:
+#             - containerPort: 9090
+#           image: ghcr.io/eigr/spawn-operator:2.0.0-RC2
+#           resources:
+#             limits:
+#               cpu: 200m
+#               memory: 380Mi
+#             requests:
+#               cpu: 200m
+#               memory: 380Mi
+#           volumeMounts:
+#             - mountPath: /app/.cache/bakeware/
+#               name: bakeware-cache
+#           securityContext:
+#             allowPrivilegeEscalation: false
+#             readOnlyRootFilesystem: true
+#             runAsNonRoot: false
+#           livenessProbe:
+#             failureThreshold: 3
+#             httpGet:
+#               path: /health/liveness
+#               port: 9090
+#               scheme: HTTP
+#             initialDelaySeconds: 30
+#             periodSeconds: 5
+#             successThreshold: 1
+#             timeoutSeconds: 5
+#           readinessProbe:
+#             failureThreshold: 3
+#             httpGet:
+#               path: /health/readiness
+#               port: 9090
+#               scheme: HTTP
+#             initialDelaySeconds: 30
+#             periodSeconds: 5
+#             successThreshold: 1
+#             timeoutSeconds: 5
+#       serviceAccountName: spawn-operator
+#     metadata:
+#       labels:
+#         k8s-app: spawn-operator
+#   replicas: 2
+#   selector:
+#     matchLabels:
+#       k8s-app: spawn-operator
+# metadata:
+#   name: spawn-operator
+#   labels:
+#     k8s-app: spawn-operator
+#   namespace: eigr-functions
+# kind: Deployment
+# apiVersion: apps/v1
 
 ---
-metadata:
-  name: activators.spawn-eigr.io
-  labels: {}
 spec:
   scope: Namespaced
   group: spawn-eigr.io
@@ -116,13 +113,13 @@ spec:
       served: true
       storage: true
       deprecationWarning:
+metadata:
+  name: activators.spawn-eigr.io
+  labels: {}
 kind: CustomResourceDefinition
 apiVersion: apiextensions.k8s.io/v1
 
 ---
-metadata:
-  name: actorhosts.spawn-eigr.io
-  labels: {}
 spec:
   scope: Namespaced
   group: spawn-eigr.io
@@ -313,10 +310,14 @@ spec:
                   type: object
               type: object
       additionalPrinterColumns:
-        - name: Host SDK
+        - name: SDK
           type: string
           description: SDK used by the ActorHost
           jsonPath: .spec.host.sdk
+        - name: Embedded
+          type: string
+          description: Embedded Proxy used by the ActorHost
+          jsonPath: .spec.host.embedded
         - name: Image
           type: string
           description: Docker image used for the ActorHost
@@ -334,13 +335,13 @@ spec:
       served: true
       storage: true
       deprecationWarning:
+metadata:
+  name: actorhosts.spawn-eigr.io
+  labels: {}
 kind: CustomResourceDefinition
 apiVersion: apiextensions.k8s.io/v1
 
 ---
-metadata:
-  name: actorsystems.spawn-eigr.io
-  labels: {}
 spec:
   scope: Namespaced
   group: spawn-eigr.io
@@ -446,15 +447,22 @@ spec:
           type: string
           description: The kind of cluster used for the ActorSystem
           jsonPath: .spec.cluster.kind
-        - name: State Store Type
+        - name: Statestore
           type: string
           description: The type of state store used for the ActorSystem
           jsonPath: .spec.statestore.type
+        - name: Pool Size
+          type: string
+          description: The pool size of the state store
+          jsonPath: .spec.statestore.pool.size
       subresources:
         status: {}
       served: true
       storage: true
       deprecationWarning:
+metadata:
+  name: actorsystems.spawn-eigr.io
+  labels: {}
 kind: CustomResourceDefinition
 apiVersion: apiextensions.k8s.io/v1
 

@@ -62,29 +62,16 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
     }
   }
 
-  @file_shared_volume %{
-    "name" => "shared-volume",
-    "emptyDir" => %{}
-  }
-
-  @file_protos_volume %{
-    "name" => "proto-volume",
-    "emptyDir" => %{}
-  }
-
   @default_certs_volume %{
     "name" => "certs",
     "secret" => %{"secretName" => "tls-certs", "optional" => true}
   }
 
   @default_volumes [
-    @default_certs_volume,
-    @file_shared_volume,
-    @file_protos_volume
+    @default_certs_volume
   ]
-  
-  @file_copy_volume_mounts [
-    %{"name" => "shared-volume", "mountPath" => "/shared-volume"},
+
+  @proto_volume_mounts [
     %{"name" => "proto-volume", "mountPath" => "/actors"}
   ]
 
@@ -92,8 +79,7 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
 
   @default_volume_mounts [
     @default_certs_volume_mounts
-   
-  ] ++ @file_copy_volume_mounts
+  ]
 
   @default_termination_period_seconds 405
 
@@ -185,16 +171,6 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
                       "value" => "none"
                     }
                   ]
-                },
-                %{
-                  "name" => "copy-proto-files",
-                  "image" => "alpine:3.20",
-                  "command" => ["/bin/sh", "-c"],
-                  "args" => [
-                    #"if [ -d /actors ]; then cp -r /actors/* /shared-volume/; else echo 'Source folder not found!' && exit 1; fi"
-                    "ls -ltra /"
-                  ],
-                  "volumeMounts" => @default_volume_mounts
                 }
               ],
               "serviceAccountName" => "#{system}-sa"
@@ -312,7 +288,7 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
         "ports" => actor_host_function_ports,
         "resources" => actor_host_function_resources
       }
-      |> maybe_put_volume_mounts_to_host_container(host_params)
+      |> maybe_put_volume_mounts_to_host_container(host_params, :actorhost)
 
     [
       host_and_proxy_container
@@ -399,7 +375,7 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
           }
         ]
       }
-      |> maybe_put_volume_mounts_to_host_container(host_params)
+      |> maybe_put_volume_mounts_to_host_container(host_params, :sidecar)
 
     host_container =
       %{
@@ -409,7 +385,7 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
         "resources" => actor_host_function_resources
       }
       |> maybe_put_ports_to_host_container(host_params)
-      |> maybe_put_volume_mounts_to_host_container(host_params)
+      |> maybe_put_volume_mounts_to_host_container(host_params, :actorhost)
 
     [
       proxy_container,
@@ -460,24 +436,90 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
     Map.put(spec, "terminationGracePeriodSeconds", @default_termination_period_seconds)
   end
 
-  defp maybe_put_volumes(spec, %{"volumes" => volumes}) do
+  defp maybe_put_volumes(spec, %{"volumes" => volumes} = params) do
+    host_params = Map.get(params, "host")
+    actor_host_function_image = Map.get(host_params, "image")
+
+    proto_volume_mounts = [
+      %{
+        "name" => "proto-volume",
+        "image" => %{
+          "reference" => actor_host_function_image,
+          "pullPolicy" => "IfNotPresent"
+        }
+      }
+    ]
+
     volumes =
-      volumes ++ @default_volumes |> List.flatten() |> Enum.uniq(&(&1["name"]))
+      (volumes ++
+         @default_volumes)
+      |> Kernel.++(proto_volume_mounts)
+      |> List.flatten()
+      |> Enum.uniq(& &1["name"])
 
     Map.merge(spec, %{"volumes" => volumes})
   end
 
-  defp maybe_put_volumes(spec, _) do
-    Map.put(spec, "volumes", @default_volumes)
+  defp maybe_put_volumes(spec, params) do
+    host_params = Map.get(params, "host")
+    actor_host_function_image = Map.get(host_params, "image")
+
+    proto_volume_mounts = [
+      %{
+        "name" => "proto-volume",
+        "image" => %{
+          "reference" => actor_host_function_image,
+          "pullPolicy" => "IfNotPresent"
+        }
+      }
+    ]
+
+    volumes =
+      @default_volumes
+      |> Kernel.++(proto_volume_mounts)
+      |> List.flatten()
+
+    Map.put(spec, "volumes", volumes)
   end
 
-  defp maybe_put_volume_mounts_to_host_container(spec, %{"volumeMounts" => volumeMounts}) do
-    volumeMounts = volumeMounts ++ @default_volume_mounts |> List.flatten() |> Enum.uniq(&(&1["name"]))
+  defp maybe_put_volume_mounts_to_host_container(
+         spec,
+         %{"volumeMounts" => volumeMounts},
+         :actorhost
+       ) do
+    volumeMounts =
+      (volumeMounts ++ @default_volume_mounts) |> List.flatten() |> Enum.uniq(& &1["name"])
+
     Map.merge(spec, %{"volumeMounts" => volumeMounts})
   end
 
-  defp maybe_put_volume_mounts_to_host_container(spec, _) do
+  defp maybe_put_volume_mounts_to_host_container(spec, _, :actorhost) do
     Map.put(spec, "volumeMounts", @default_volume_mounts)
+  end
+
+  defp maybe_put_volume_mounts_to_host_container(
+         spec,
+         %{"volumeMounts" => volumeMounts},
+         :sidecar
+       ) do
+    volumeMounts =
+      volumeMounts
+      |> Kernel.++(@default_volume_mounts)
+      |> Kernel.++(@proto_volume_mounts)
+      |> List.flatten()
+      |> Enum.uniq(& &1["name"])
+
+    Map.merge(spec, %{"volumeMounts" => volumeMounts})
+  end
+
+  defp maybe_put_volume_mounts_to_host_container(spec, _, :sidecar) do
+    volumeMounts =
+      @default_volume_mounts
+      |> Kernel.++(@proto_volume_mounts)
+      |> List.flatten()
+      |> Enum.uniq(& &1["name"])
+
+    Map.put(spec, "volumeMounts", volumeMounts)
   end
 
   defp maybe_warn_wrong_volumes(params, host_params) do
