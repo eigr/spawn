@@ -60,5 +60,5 @@ The utility forwards termination signals (`SIGTERM`, `SIGINT`) to the user's app
 **Build a Production-Ready Binary**
 
 ```bash
-GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags="-s -w" -o bin/sdk-init ./cmd&& upx --best --lzma bin/sdk-init
+GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags="-s -w" -o bin/sdk-init ./cmd && upx --best --lzma bin/sdk-init
 ```
