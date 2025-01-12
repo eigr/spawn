@@ -14,29 +14,29 @@ defmodule Sidecar.GRPC.Generators.HandlerTranscodingGenerator do
   @impl true
   def template do
     """
+    <%= if @render do %>
     defmodule <%= @module %>.ActorDispatcher do
-      <%= if @render do %>
-        use GRPC.Server, service: <%= @service_name %>.Service, http_transcode: true
+      use GRPC.Server, service: <%= @service_name %>.Service, http_transcode: true
 
-        alias Sidecar.GRPC.Dispatcher
+      alias Sidecar.GRPC.Dispatcher
 
-        <%= for {method_name, input, output, _options} <- @methods do %>
-          @spec <%= Macro.underscore(method_name) %>(<%= input %>.t(), GRPC.Server.Stream.t()) :: <%= output %>.t()
-          def <%= Macro.underscore(method_name) %>(message, stream) do
-            request = %{
-              system: <%= inspect(@actor_system) %>,
-              actor_name: <%= inspect(@actor_name) %>,
-              action_name: <%= inspect(method_name) %>,
-              input: message,
-              stream: stream,
-              descriptor: <%= @service_name %>.Service.descriptor()
-            }
+      <%= for {method_name, input, output, _options} <- @methods do %>
+        @spec <%= Macro.underscore(method_name) %>(<%= input %>.t(), GRPC.Server.Stream.t()) :: <%= output %>.t()
+        def <%= Macro.underscore(method_name) %>(message, stream) do
+          request = %{
+            system: <%= inspect(@actor_system) %>,
+            actor_name: <%= inspect(@actor_name) %>,
+            action_name: <%= inspect(method_name) %>,
+            input: message,
+            stream: stream,
+            descriptor: <%= @service_name %>.Service.descriptor()
+          }
 
-            Dispatcher.dispatch(request)
-          end
-        <% end %>
+          Dispatcher.dispatch(request)
+        end
       <% end %>
     end
+    <% end %>
     """
   end
 

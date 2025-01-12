@@ -37,7 +37,6 @@ defmodule Sidecar.GRPC.CodeGenerator do
   def compile_protos(opts \\ []) do
     Logger.debug("Compiling ActorHost Protocol Buffers...")
 
-    actors_path = Keyword.get(opts, :protos_path, Config.get(:grpc_actors_protos_path))
     include_path = Keyword.get(opts, :protos_path, Config.get(:grpc_include_protos_path))
     output_path = Keyword.get(opts, :output_path, Config.get(:grpc_compiled_modules_path))
 
@@ -52,12 +51,7 @@ defmodule Sidecar.GRPC.CodeGenerator do
         {ProtobufGenerate.Plugins.GRPC, Sidecar.GRPC.Generators.HandlerGenerator}
       end
 
-    user_defined_proto_files_list = list_files_with_full_path_by_extensions(actors_path, ".proto")
     include_files_path = list_files_with_full_path_by_extensions(include_path, ".proto")
-
-    Logger.info(
-      "Found #{length(user_defined_proto_files_list)} ActorHost Protocol Buffers to compile... (#{inspect(user_defined_proto_files_list)})"
-    )
 
     invoker_helper =
       if Code.ensure_loaded?(SpawnSdk) do
@@ -68,7 +62,7 @@ defmodule Sidecar.GRPC.CodeGenerator do
 
     spawn_protos_dir = Application.app_dir(:spawn, "priv/protos")
 
-    if length(user_defined_proto_files_list) > 0 do
+    if Enum.count(include_files_path) > 0 do
       protoc_options =
         [
           "--include-path=#{include_path}",
@@ -80,19 +74,8 @@ defmodule Sidecar.GRPC.CodeGenerator do
           "--plugin=#{handler_generator_plugin}",
           "--plugin=Sidecar.GRPC.Generators.GeneratorAccumulator"
         ] ++
-          invoker_helper ++
-          user_defined_proto_files_list
+          invoker_helper ++ include_files_path
 
-      include_files_options =
-        [
-          "--include-path=#{include_path}",
-          "--include-path=#{spawn_protos_dir}",
-          "--generate-descriptors=true",
-          "--one-file-per-module",
-          "--output-path=#{output_path}"
-        ] ++ include_files_path
-
-      _ = Generate.run(include_files_options)
       _ = Generate.run(protoc_options)
 
       :ok
