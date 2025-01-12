@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 )
 
-// CopyDir copia todos os arquivos e subdiretórios de uma origem para um destino.
 func CopyDir(src string, dest string) error {
 	return filepath.Walk(src, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
