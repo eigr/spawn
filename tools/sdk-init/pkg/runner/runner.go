@@ -5,10 +5,14 @@ import (
 	"os/exec"
 )
 
-func RunCommand(cmd string, args ...string) error {
+func RunCommandAsync(cmd string, args ...string) (*exec.Cmd, error) {
 	command := exec.Command(cmd, args...)
 	command.Stdout = os.Stdout
 	command.Stderr = os.Stderr
 
-	return command.Run()
+	if err := command.Start(); err != nil {
+		return nil, err
+	}
+
+	return command, nil
 }
