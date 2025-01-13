@@ -150,12 +150,13 @@ defmodule SpawnSdk.Flow do
     They will "always" be processed asynchronously and any response sent back from the Actor
     receiving the effect will be ignored by the effector.
     """
-    defstruct actor_name: nil, action: nil, payload: nil, scheduled_to: nil
+    defstruct actor_name: nil, action: nil, payload: nil, scheduled_to: nil, register_ref: nil
 
     @type t :: %__MODULE__{
             actor_name: String.t(),
             action: String.t() | atom(),
             payload: module(),
+            register_ref: String.t() | nil,
             scheduled_to: integer() | nil
           }
 
@@ -174,8 +175,8 @@ defmodule SpawnSdk.Flow do
       list ++ [effect]
     end
 
-    @spec to(actor_name(), action(), payload(), list()) :: SideEffect.t()
-    def to(actor_name, action, payload \\ nil, opts \\ []) do
+    @spec to(actor_name(), action(), payload(), String.t() | nil, list()) :: SideEffect.t()
+    def to(actor_name, action, payload \\ nil, register_ref \\ nil, opts \\ []) do
       action_name = if is_atom(action), do: Atom.to_string(action), else: action
 
       %__MODULE__{

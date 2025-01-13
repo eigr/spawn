@@ -435,6 +435,7 @@ defmodule SpawnSdk.System.SpawnSystem do
           },
           payload: payload,
           action_name: effect.action,
+          register_ref: effect.register_ref,
           async: true,
           caller: %ActorId{name: caller_name, system: system},
           scheduled_to: effect.scheduled_to
