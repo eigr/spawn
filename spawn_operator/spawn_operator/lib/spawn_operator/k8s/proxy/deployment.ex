@@ -62,23 +62,29 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
     }
   }
 
+  @proto_volume %{
+    "name" => "shared-volume",
+    "emptyDir" => %{}
+  }
+  
+
   @default_certs_volume %{
     "name" => "certs",
     "secret" => %{"secretName" => "tls-certs", "optional" => true}
   }
 
   @default_volumes [
-    @default_certs_volume
-  ]
-
-  @proto_volume_mounts [
-    %{"name" => "proto-volume", "mountPath" => "/actors"}
+    @default_certs_volume,
+    @proto_volume
   ]
 
   @default_certs_volume_mounts %{"name" => "certs", "mountPath" => "/app/certs"}
 
+  @default_proto_volume_mounts %{"name" => "shared-volume", "mountPath" => "/shared"}
+
   @default_volume_mounts [
-    @default_certs_volume_mounts
+    @default_certs_volume_mounts,
+    @default_proto_volume_mounts
   ]
 
   @default_termination_period_seconds 405
@@ -436,48 +442,21 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
     Map.put(spec, "terminationGracePeriodSeconds", @default_termination_period_seconds)
   end
 
-  defp maybe_put_volumes(spec, %{"volumes" => volumes} = params) do
-    host_params = Map.get(params, "host")
-    actor_host_function_image = Map.get(host_params, "image")
-
-    proto_volume_mounts = [
-      %{
-        "name" => "proto-volume",
-        "image" => %{
-          "reference" => actor_host_function_image,
-          "pullPolicy" => "IfNotPresent"
-        }
-      }
-    ]
-
+  defp maybe_put_volumes(spec, %{"volumes" => volumes} = _params) do
     volumes =
       (volumes ++
          @default_volumes)
-      |> Kernel.++(proto_volume_mounts)
       |> List.flatten()
       |> Enum.uniq(& &1["name"])
 
     Map.merge(spec, %{"volumes" => volumes})
   end
 
-  defp maybe_put_volumes(spec, params) do
-    host_params = Map.get(params, "host")
-    actor_host_function_image = Map.get(host_params, "image")
-
-    proto_volume_mounts = [
-      %{
-        "name" => "proto-volume",
-        "image" => %{
-          "reference" => actor_host_function_image,
-          "pullPolicy" => "IfNotPresent"
-        }
-      }
-    ]
-
+  defp maybe_put_volumes(spec, _params) do
     volumes =
       @default_volumes
-      |> Kernel.++(proto_volume_mounts)
       |> List.flatten()
+      |> Enum.uniq(& &1["name"])
 
     Map.put(spec, "volumes", volumes)
   end
@@ -505,7 +484,6 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
     volumeMounts =
       volumeMounts
       |> Kernel.++(@default_volume_mounts)
-      |> Kernel.++(@proto_volume_mounts)
       |> List.flatten()
       |> Enum.uniq(& &1["name"])
 
@@ -515,7 +493,6 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
   defp maybe_put_volume_mounts_to_host_container(spec, _, :sidecar) do
     volumeMounts =
       @default_volume_mounts
-      |> Kernel.++(@proto_volume_mounts)
       |> List.flatten()
       |> Enum.uniq(& &1["name"])
 

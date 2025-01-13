@@ -91,7 +91,8 @@ defmodule SpawnOperator do
       actors_global_backpressure_min_demand:
         Map.get(annotations, "spawn-eigr.io/actors-global-backpressure-min-demand", "-1"),
       actors_global_backpressure_enabled:
-        Map.get(annotations, "spawn-eigr.io/actors-global-backpressure-enabled", "true")
+        Map.get(annotations, "spawn-eigr.io/actors-global-backpressure-enabled", "true"),
+      grpc_include_protos_path: Map.get(annotations, "spawn-eigr.io/grpc-include-protos-path", "/shared/protos"),
     }
   end
 end
