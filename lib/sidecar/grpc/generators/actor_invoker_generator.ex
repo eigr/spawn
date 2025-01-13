@@ -10,6 +10,7 @@ defmodule Sidecar.GRPC.Generators.ActorInvoker do
   @impl true
   def template do
     """
+    <%= if @render do %>
     defmodule <%= @module %> do
       @moduledoc "This module provides helper functions for invoking the methods on the <%= @service_name %> actor."
 
@@ -113,11 +114,12 @@ defmodule Sidecar.GRPC.Generators.ActorInvoker do
         end
       <% end %>
     end
+    <% end %>
     """
   end
 
   @impl true
-  def generate(ctx, %Google.Protobuf.FileDescriptorProto{service: svcs} = _desc) do
+  def generate(ctx, %Google.Protobuf.FileDescriptorProto{service: [_ | _] = svcs} = _desc) do
     for svc <- svcs do
       mod_name = Util.mod_name(ctx, [Macro.camelize(svc.name)])
       actor_name = Macro.camelize(svc.name)
@@ -143,10 +145,15 @@ defmodule Sidecar.GRPC.Generators.ActorInvoker do
          actor_name: actor_name,
          service_name: mod_name,
          methods: methods,
-         version: Util.version()
+         version: Util.version(),
+         render: true
        ]}
     end
   end
+
+  def generate(_ctx, _opts), do: {"unknown", [render: false]}
+
+  defp opts(nil), do: %{}
 
   defp opts(%Google.Protobuf.MethodOptions{__pb_extensions__: extensions})
        when extensions == %{} do

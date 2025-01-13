@@ -273,6 +273,8 @@ defmodule Sidecar.GRPC.CodeGenerator do
 
       files ->
         files
+        # Exclude files that contains google folder
+        |> Enum.reject(&String.contains?(&1, "google/"))
         |> Enum.filter(&String.ends_with?(&1, extension))
         |> Enum.sort()
     end

@@ -66,7 +66,6 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
     "name" => "shared-volume",
     "emptyDir" => %{}
   }
-  
 
   @default_certs_volume %{
     "name" => "certs",

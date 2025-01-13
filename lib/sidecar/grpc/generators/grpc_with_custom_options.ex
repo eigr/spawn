@@ -12,29 +12,31 @@ defmodule Sidecar.GRPC.Generators.GRPCWithCustomOptions do
   @impl true
   def template do
     """
-    defmodule <%= @module %>.Service do
-      use GRPC.Service, name: <%= inspect(@service_name) %>, protoc_gen_elixir_version: "<%= @version %>"
+    <%= if @render do %>
+      defmodule <%= @module %>.Service do
+        use GRPC.Service, name: <%= inspect(@service_name) %>, protoc_gen_elixir_version: "<%= @version %>"
 
-      <%= if @descriptor_fun_body do %>
-       def descriptor do
-         # credo:disable-for-next-line
-         <%= @descriptor_fun_body %>
-       end
-      <% end %>
+        <%= if @descriptor_fun_body do %>
+        def descriptor do
+          # credo:disable-for-next-line
+          <%= @descriptor_fun_body %>
+        end
+        <% end %>
 
-     <%= for {method_name, input, output, options} <- @methods do %>
-       rpc :<%= method_name %>, <%= input %>, <%= output %>, <%= options %>
-     <% end %>
-    end
+        <%= for {method_name, input, output, options} <- @methods do %>
+        rpc :<%= method_name %>, <%= input %>, <%= output %>, <%= options %>
+        <% end %>
+      end
 
-    defmodule <%= @module %>.Stub do
-      use GRPC.Stub, service: <%= @module %>.Service
-    end
+      defmodule <%= @module %>.Stub do
+        use GRPC.Stub, service: <%= @module %>.Service
+      end
+    <% end %>
     """
   end
 
   @impl true
-  def generate(ctx, %Google.Protobuf.FileDescriptorProto{service: svcs} = desc) do
+  def generate(ctx, %Google.Protobuf.FileDescriptorProto{service: [_ | _] = svcs} = desc) do
     for svc <- svcs do
       mod_name = Util.mod_name(ctx, [Macro.camelize(svc.name)])
       name = Util.prepend_package_prefix(ctx.package, svc.name)
@@ -61,6 +63,7 @@ defmodule Sidecar.GRPC.Generators.GRPCWithCustomOptions do
 
       {mod_name,
        [
+         render: true,
          module: mod_name,
          service_name: name,
          methods: methods,
@@ -70,8 +73,12 @@ defmodule Sidecar.GRPC.Generators.GRPCWithCustomOptions do
     end
   end
 
+  def generate(_ctx, _opts), do: {"unknown", [render: false]}
+
   defp service_arg(type, _streaming? = true), do: "stream(#{type})"
   defp service_arg(type, _streaming?), do: type
+
+  defp opts(nil), do: %{}
 
   defp opts(%Google.Protobuf.MethodOptions{__pb_extensions__: extensions})
        when extensions == %{} do

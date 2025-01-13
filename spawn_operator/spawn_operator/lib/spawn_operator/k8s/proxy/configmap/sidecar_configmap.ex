@@ -160,7 +160,7 @@ defmodule SpawnOperator.K8s.Proxy.CM.Configmap do
         "ACTORS_GLOBAL_BACKPRESSURE_MIN_DEMAND" =>
           annotations.actors_global_backpressure_min_demand,
         "ACTORS_GLOBAL_BACKPRESSURE_ENABLED" => annotations.actors_global_backpressure_enabled,
-        "PROXY_GRPC_INCLUDE_PROTOS_PATH" => annotations.grpc_include_protos_path,
+        "PROXY_GRPC_INCLUDE_PROTOS_PATH" => annotations.grpc_include_protos_path
       }
     }
   end

@@ -17,7 +17,7 @@ defmodule Sidecar.GRPC.Generators.GeneratorAccumulator do
   end
 
   @impl true
-  def generate(ctx, %Google.Protobuf.FileDescriptorProto{service: svcs} = _desc) do
+  def generate(ctx, %Google.Protobuf.FileDescriptorProto{service: [_ | _] = svcs} = _desc) do
     current_services = :persistent_term.get(:grpc_services, [])
     descriptors = (:persistent_term.get(:proto_file_descriptors, []) ++ svcs) |> Enum.uniq()
 
@@ -26,11 +26,10 @@ defmodule Sidecar.GRPC.Generators.GeneratorAccumulator do
     :persistent_term.put(:grpc_services, services)
     :persistent_term.put(:proto_file_descriptors, descriptors)
 
-    {"ProxyEndpoint",
-     [
-       services: services
-     ]}
+    {"ProxyEndpoint", [render: true]}
   end
+
+  def generate(_ctx, _opts), do: {"unknown", [render: false]}
 
   defp services_to_module(_ctx, nil, current_services), do: current_services
   defp services_to_module(_ctx, [], current_services), do: current_services
