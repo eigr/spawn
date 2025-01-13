@@ -15,7 +15,7 @@ defmodule SpawnCtl.Commands.New.Node do
     name: "node",
     description: "Generate a Spawn NodeJS project."
 
-  @vsn "2.0.0-RC2"
+  @vsn "2.0.0-RC4"
   @main_sdk_version "1.4.3"
   @template "nodejs"
 

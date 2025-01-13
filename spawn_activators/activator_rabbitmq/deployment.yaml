@@ -17,7 +17,7 @@ spec:
         k8s-app: rabbitmq-activator
     spec:
       containers:
-        - image: eigr/spawn-activator-rabbitmq:2.0.0-RC2
+        - image: eigr/spawn-activator-rabbitmq:2.0.0-RC4
           name: spawn-activator
           env:
             - name: MIX_ENV

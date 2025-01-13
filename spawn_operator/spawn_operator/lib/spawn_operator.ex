@@ -50,13 +50,13 @@ defmodule SpawnOperator do
         Map.get(
           annotations,
           "spawn-eigr.io/sidecar-image-tag",
-          "ghcr.io/eigr/spawn-proxy:2.0.0-RC2"
+          "ghcr.io/eigr/spawn-proxy:2.0.0-RC4"
         ),
       proxy_init_container_image_tag:
         Map.get(
           annotations,
           "spawn-eigr.io/sidecar-init-container-image-tag",
-          "ghcr.io/eigr/spawn-initializer:2.0.0-RC2"
+          "ghcr.io/eigr/spawn-initializer:2.0.0-RC4"
         ),
       proxy_uds_enabled: Map.get(annotations, "spawn-eigr.io/sidecar-uds-enabled", "false"),
       proxy_uds_address:

@@ -1,4 +1,4 @@
-version=2.0.0-RC2
+version=2.0.0-RC4
 registry=ghcr.io/eigr
 
 CLUSTER_NAME=spawn-k8s

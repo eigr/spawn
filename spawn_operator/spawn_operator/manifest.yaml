@@ -30,7 +30,7 @@
 #           name: spawn-operator
 #           ports:
 #             - containerPort: 9090
-#           image: ghcr.io/eigr/spawn-operator:2.0.0-RC2
+#           image: ghcr.io/eigr/spawn-operator:2.0.0-RC4
 #           resources:
 #             limits:
 #               cpu: 200m
