@@ -132,7 +132,7 @@ build-all-images:
 	# docker build --no-cache -f Dockerfile-elixir-example -t ${spawn-sdk-example-image} .
 
 push-all-images:
-	#docker push ${proxy-image}
+	docker push ${proxy-image}
 	docker push ${proxy-initializer}
 	docker push ${operator-image}
 	#docker push ${activator-api-image}
