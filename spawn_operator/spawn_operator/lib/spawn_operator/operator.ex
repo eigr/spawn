@@ -44,6 +44,7 @@ defmodule SpawnOperator.Operator do
     ]
   end
 
+  @impl true
   def controllers(watch_namespace, _opts) do
     [
       %{
