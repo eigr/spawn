@@ -13,11 +13,10 @@ jobs:
     strategy:
       matrix:
         otp: [25]
-        elixir: [1.17]
+        elixir: [1.15]
 
     env:
       MIX_ENV: test
-      ImageOS: ubuntu20
 
     steps:
       - uses: actions/checkout@v3
