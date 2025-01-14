@@ -42,6 +42,20 @@ defmodule Sidecar.GRPC.Generators.HandlerTranscodingGenerator do
 
   @impl true
   def generate(ctx, %Google.Protobuf.FileDescriptorProto{service: [_ | _] = svcs} = _desc) do
+    svcs =
+      Enum.filter(svcs, fn svc ->
+        Map.get(svc.options || %{}, :__pb_extensions__, %{})
+        |> Map.get({Spawn.Actors.PbExtension, :actor})
+      end)
+
+    do_generate(ctx, svcs)
+  end
+
+  def generate(_ctx, _opts), do: {"unknown", [render: false]}
+
+  defp do_generate(_ctx, []), do: {"unknown", [render: false]}
+
+  defp do_generate(ctx, svcs) do
     for svc <- svcs do
       mod_name = Util.mod_name(ctx, [Macro.camelize(svc.name)])
       actor_name = Macro.camelize(svc.name)
@@ -72,8 +86,6 @@ defmodule Sidecar.GRPC.Generators.HandlerTranscodingGenerator do
        ]}
     end
   end
-
-  def generate(_ctx, _opts), do: {"unknown", [render: false]}
 
   defp service_arg(type, _streaming? = true), do: "stream(#{type})"
   defp service_arg(type, _streaming?), do: type
