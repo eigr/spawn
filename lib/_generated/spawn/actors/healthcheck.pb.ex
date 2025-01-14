@@ -107,8 +107,6 @@ defmodule Spawn.Actors.Healthcheck.HealthCheckReply do
 end
 
 defmodule Spawn.Actors.Healthcheck.HealthCheckActor.Service do
-  @moduledoc false
-
   use GRPC.Service,
     name: "spawn.actors.healthcheck.HealthCheckActor",
     protoc_gen_elixir_version: "0.13.0"
@@ -264,7 +262,25 @@ defmodule Spawn.Actors.Healthcheck.HealthCheckActor.Service do
               __unknown_fields__: []
             }
           ],
-          options: nil,
+          options: %Google.Protobuf.ServiceOptions{
+            deprecated: false,
+            uninterpreted_option: [],
+            __pb_extensions__: %{
+              {Spawn.Actors.PbExtension, :actor} => %Spawn.Actors.ActorOpts{
+                state_type: ".google.protobuf.Empty",
+                stateful: false,
+                deactivate_timeout: 12000,
+                snapshot_interval: 120_000,
+                sourceable: false,
+                strict_events_ordering: false,
+                events_retention_strategy: nil,
+                subjects: [],
+                kind: :NAMED,
+                __unknown_fields__: []
+              }
+            },
+            __unknown_fields__: []
+          },
           __unknown_fields__: []
         }
       ],
@@ -298,7 +314,7 @@ defmodule Spawn.Actors.Healthcheck.HealthCheckActor.Service do
         location: [
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [],
-            span: [0, 0, 35, 1],
+            span: [0, 0, 42, 1],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -530,7 +546,7 @@ defmodule Spawn.Actors.Healthcheck.HealthCheckActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0],
-            span: [21, 0, 35, 1],
+            span: [21, 0, 42, 1],
             leading_comments: " The HealthCheck actor service definition.\n",
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -545,8 +561,24 @@ defmodule Spawn.Actors.Healthcheck.HealthCheckActor.Service do
             __unknown_fields__: []
           },
           %Google.Protobuf.SourceCodeInfo.Location{
+            path: [6, 0, 3],
+            span: [22, 2, 28, 4],
+            leading_comments: nil,
+            trailing_comments: nil,
+            leading_detached_comments: [],
+            __unknown_fields__: []
+          },
+          %Google.Protobuf.SourceCodeInfo.Location{
+            path: [6, 0, 3, 4_890_128],
+            span: [22, 2, 28, 4],
+            leading_comments: nil,
+            trailing_comments: nil,
+            leading_detached_comments: [],
+            __unknown_fields__: []
+          },
+          %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 0],
-            span: [24, 2, 28, 3],
+            span: [31, 2, 35, 3],
             leading_comments: " Get Pong Message\n",
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -554,7 +586,7 @@ defmodule Spawn.Actors.Healthcheck.HealthCheckActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 0, 1],
-            span: [24, 6, 14],
+            span: [31, 6, 14],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -562,7 +594,7 @@ defmodule Spawn.Actors.Healthcheck.HealthCheckActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 0, 2],
-            span: [24, 15, 36],
+            span: [31, 15, 36],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -570,7 +602,7 @@ defmodule Spawn.Actors.Healthcheck.HealthCheckActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 0, 3],
-            span: [24, 47, 63],
+            span: [31, 47, 63],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -578,7 +610,7 @@ defmodule Spawn.Actors.Healthcheck.HealthCheckActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 0, 4],
-            span: [25, 4, 27, 6],
+            span: [32, 4, 34, 6],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -586,7 +618,7 @@ defmodule Spawn.Actors.Healthcheck.HealthCheckActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 0, 4, 72_295_728],
-            span: [25, 4, 27, 6],
+            span: [32, 4, 34, 6],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -594,7 +626,7 @@ defmodule Spawn.Actors.Healthcheck.HealthCheckActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 1],
-            span: [30, 2, 34, 3],
+            span: [37, 2, 41, 3],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -602,7 +634,7 @@ defmodule Spawn.Actors.Healthcheck.HealthCheckActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 1, 1],
-            span: [30, 6, 15],
+            span: [37, 6, 15],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -610,7 +642,7 @@ defmodule Spawn.Actors.Healthcheck.HealthCheckActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 1, 2],
-            span: [30, 16, 37],
+            span: [37, 16, 37],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -618,7 +650,7 @@ defmodule Spawn.Actors.Healthcheck.HealthCheckActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 1, 3],
-            span: [30, 48, 64],
+            span: ~c"%0@",
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -626,7 +658,7 @@ defmodule Spawn.Actors.Healthcheck.HealthCheckActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 1, 4],
-            span: [31, 4, 33, 6],
+            span: [38, 4, 40, 6],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -634,7 +666,7 @@ defmodule Spawn.Actors.Healthcheck.HealthCheckActor.Service do
           },
           %Google.Protobuf.SourceCodeInfo.Location{
             path: [6, 0, 2, 1, 4, 72_295_728],
-            span: [31, 4, 33, 6],
+            span: [38, 4, 40, 6],
             leading_comments: nil,
             trailing_comments: nil,
             leading_detached_comments: [],
@@ -681,7 +713,43 @@ defmodule Spawn.Actors.Healthcheck.HealthCheckActor.Service do
 end
 
 defmodule Spawn.Actors.Healthcheck.HealthCheckActor.Stub do
-  @moduledoc false
-
   use GRPC.Stub, service: Spawn.Actors.Healthcheck.HealthCheckActor.Service
+end
+
+defmodule Spawn.Actors.Healthcheck.HealthCheckActor.ActorDispatcher do
+  use GRPC.Server,
+    service: Spawn.Actors.Healthcheck.HealthCheckActor.Service,
+    http_transcode: true
+
+  alias Sidecar.GRPC.Dispatcher
+
+  @spec liveness(Google.Protobuf.Empty.t(), GRPC.Server.Stream.t()) ::
+          Spawn.Actors.Healthcheck.HealthCheckReply.t()
+  def liveness(message, stream) do
+    request = %{
+      system: "spawn-system",
+      actor_name: "HealthCheckActor",
+      action_name: "Liveness",
+      input: message,
+      stream: stream,
+      descriptor: Spawn.Actors.Healthcheck.HealthCheckActor.Service.descriptor()
+    }
+
+    Dispatcher.dispatch(request)
+  end
+
+  @spec readiness(Google.Protobuf.Empty.t(), GRPC.Server.Stream.t()) ::
+          Spawn.Actors.Healthcheck.HealthCheckReply.t()
+  def readiness(message, stream) do
+    request = %{
+      system: "spawn-system",
+      actor_name: "HealthCheckActor",
+      action_name: "Readiness",
+      input: message,
+      stream: stream,
+      descriptor: Spawn.Actors.Healthcheck.HealthCheckActor.Service.descriptor()
+    }
+
+    Dispatcher.dispatch(request)
+  end
 end

@@ -18,6 +18,12 @@ defmodule Sidecar.GRPC.Generators.GeneratorAccumulator do
 
   @impl true
   def generate(ctx, %Google.Protobuf.FileDescriptorProto{service: [_ | _] = svcs} = _desc) do
+    svcs =
+      Enum.filter(svcs, fn svc ->
+        Map.get(svc.options || %{}, :__pb_extensions__, %{})
+        |> Map.get({Spawn.Actors.PbExtension, :actor})
+      end)
+
     current_services = :persistent_term.get(:grpc_services, [])
     descriptors = (:persistent_term.get(:proto_file_descriptors, []) ++ svcs) |> Enum.uniq()
 

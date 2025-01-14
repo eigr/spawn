@@ -17,7 +17,6 @@ jobs:
 
     env:
       MIX_ENV: test
-      ImageOS: ubuntu20
 
     steps:
       - uses: actions/checkout@v3
