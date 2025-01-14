@@ -183,6 +183,7 @@ defmodule SpawnSdk.Flow do
         actor_name: actor_name,
         action: action_name,
         payload: payload,
+        register_ref: register_ref,
         scheduled_to: parse_scheduled_to(opts[:delay], opts[:scheduled_to])
       }
     end
