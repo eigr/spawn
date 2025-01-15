@@ -44,9 +44,9 @@
 #               cpu: 200m
 #               memory: 380Mi
 #           securityContext:
+#             runAsNonRoot: false
 #             allowPrivilegeEscalation: false
 #             readOnlyRootFilesystem: true
-#             runAsNonRoot: false
 #           volumeMounts:
 #             - mountPath: /app/.cache/bakeware/
 #               name: bakeware-cache
@@ -70,14 +70,14 @@
 #             periodSeconds: 5
 #             successThreshold: 1
 #             timeoutSeconds: 5
-#       serviceAccountName: spawn-operator
 #       volumes:
 #         - emptyDir: {}
 #           name: bakeware-cache
-#   replicas: 2
+#       serviceAccountName: spawn-operator
 #   selector:
 #     matchLabels:
 #       k8s-app: spawn-operator
+#   replicas: 2
 # kind: Deployment
 # apiVersion: apps/v1
 
@@ -86,7 +86,7 @@ metadata:
   name: activators.spawn-eigr.io
   labels: {}
 spec:
-  scope: Namespaced
+  scope: Cluster
   group: spawn-eigr.io
   names:
     kind: Activator
@@ -94,13 +94,10 @@ spec:
     shortNames:
       - act
       - acts
-      - activator
-      - activators
     singular: activator
   versions:
     - name: v1
       deprecated: false
-      storage: true
       schema:
         openAPIV3Schema:
           type: object
@@ -111,6 +108,7 @@ spec:
                 observedGeneration:
                   type: integer
           x-kubernetes-preserve-unknown-fields: true
+      storage: true
       additionalPrinterColumns: []
       subresources:
         status: {}
@@ -124,7 +122,7 @@ metadata:
   name: actorhosts.spawn-eigr.io
   labels: {}
 spec:
-  scope: Namespaced
+  scope: Cluster
   group: spawn-eigr.io
   names:
     kind: ActorHost
@@ -134,14 +132,11 @@ spec:
       - ah
       - actor
       - actors
-      - actorhost
-      - actorhosts
       - hosts
     singular: actorhost
   versions:
     - name: v1
       deprecated: false
-      storage: true
       schema:
         openAPIV3Schema:
           type: object
@@ -315,6 +310,7 @@ spec:
                       type: array
                   type: object
               type: object
+      storage: true
       additionalPrinterColumns:
         - name: SDK
           type: string
@@ -356,14 +352,11 @@ spec:
     shortNames:
       - as
       - actorsys
-      - actorsystem
-      - actorsystems
       - system
     singular: actorsystem
   versions:
     - name: v1
       deprecated: false
-      storage: true
       schema:
         openAPIV3Schema:
           type: object
@@ -448,6 +441,7 @@ spec:
                       type: string
                   type: object
               type: object
+      storage: true
       additionalPrinterColumns:
         - name: Cluster Kind
           type: string
@@ -686,12 +680,12 @@ metadata:
   labels:
     k8s-app: spawn-operator
 kind: ClusterRoleBinding
+subjects:
+  - name: spawn-operator
+    kind: ServiceAccount
+    namespace: eigr-functions
 apiVersion: rbac.authorization.k8s.io/v1
 roleRef:
   name: spawn-operator
   kind: ClusterRole
   apiGroup: rbac.authorization.k8s.io
-subjects:
-  - name: spawn-operator
-    kind: ServiceAccount
-    namespace: eigr-functions
