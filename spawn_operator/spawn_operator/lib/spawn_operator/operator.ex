@@ -9,6 +9,7 @@ defmodule SpawnOperator.Operator do
   step(Bonny.Pluggable.ApplyStatus)
   step(Bonny.Pluggable.ApplyDescendants)
 
+  @impl true
   def crds() do
     [
       Bonny.API.CRD.new!(
@@ -49,11 +50,11 @@ defmodule SpawnOperator.Operator do
   def controllers(watch_namespace, _opts) do
     [
       %{
-        query: K8s.Client.watch("spawn-eigr.io/v1", "Activator", namespace: watch_namespace),
+        query: K8s.Client.watch("spawn-eigr.io/v1", "Activator"),
         controller: SpawnOperator.Controller.ActivatorController
       },
       %{
-        query: K8s.Client.watch("spawn-eigr.io/v1", "ActorHost", namespace: watch_namespace),
+        query: K8s.Client.watch("spawn-eigr.io/v1", "ActorHost"),
         controller: SpawnOperator.Controller.ActorHostController
       },
       %{

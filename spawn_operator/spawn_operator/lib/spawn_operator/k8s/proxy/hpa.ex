@@ -62,7 +62,7 @@ defmodule SpawnOperator.K8s.Proxy.HPA do
       "kind" => "HorizontalPodAutoscaler",
       "metadata" => %{
         "name" => name,
-        "namespace" => ns,
+        "namespace" => system,
         "labels" => %{"app" => name, "actor-system" => system}
       },
       "spec" => %{

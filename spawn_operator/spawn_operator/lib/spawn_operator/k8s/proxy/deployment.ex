@@ -115,7 +115,7 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
       "kind" => "Deployment",
       "metadata" => %{
         "name" => name,
-        "namespace" => ns,
+        "namespace" => system,
         "labels" => %{"app" => name, "actor-system" => system}
       },
       "spec" => %{
@@ -164,11 +164,11 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
                     "--secret",
                     "tls-certs",
                     "--namespace",
-                    "#{ns}",
+                    "#{system}",
                     "--service",
                     "#{system}",
                     "--to",
-                    "#{ns}"
+                    "#{system}"
                   ],
                   "env" => [
                     %{

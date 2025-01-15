@@ -116,7 +116,7 @@ defmodule SpawnOperator.K8s.Proxy.CM.Configmap do
       "apiVersion" => "v1",
       "kind" => "ConfigMap",
       "metadata" => %{
-        "namespace" => ns,
+        "namespace" => system,
         "name" => "#{name}-sidecar-cm"
       },
       "data" => %{
