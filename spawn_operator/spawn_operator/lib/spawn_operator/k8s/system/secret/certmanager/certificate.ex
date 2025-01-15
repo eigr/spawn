@@ -65,7 +65,7 @@ defmodule SpawnOperator.K8s.System.Secret.CertManager.Certificate do
          %{
            system: system,
            namespace: ns,
-           name: _name,
+           name: name,
            params: params,
            labels: _labels,
            annotations: _annotations
@@ -77,14 +77,14 @@ defmodule SpawnOperator.K8s.System.Secret.CertManager.Certificate do
 
     case certmanager.enabled do
       true ->
-        build_certificate(system, ns, certmanager, opts)
+        build_certificate(system, ns, name, certmanager, opts)
 
       _ ->
         %{}
     end
   end
 
-  defp build_certificate(system, ns, certmanager, opts) do
+  defp build_certificate(system, ns, name, certmanager, opts) do
     dns_names = Keyword.get(opts, :dns_names, ["system-#{system}.svc.cluster.local"])
     duration = Map.get(certmanager, "duration", @default_duration)
     group = Map.get(certmanager, "group", @default_group)
@@ -98,7 +98,7 @@ defmodule SpawnOperator.K8s.System.Secret.CertManager.Certificate do
       "kind" => "Certificate",
       "metadata" => %{
         "name" => "#{system}-cert",
-        "namespace" => ns
+        "namespace" => String.downcase(name)
       },
       "spec" => %{
         "secretName" => secret_name,

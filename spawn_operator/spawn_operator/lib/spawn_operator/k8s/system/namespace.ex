@@ -1,4 +1,4 @@
-defmodule SpawnOperator.K8s.System.ServiceAccount do
+defmodule SpawnOperator.K8s.System.Namespace do
   @moduledoc false
   @behaviour SpawnOperator.K8s.Manifest
 
@@ -16,15 +16,14 @@ defmodule SpawnOperator.K8s.System.ServiceAccount do
       ) do
     %{
       "apiVersion" => "v1",
-      "kind" => "ServiceAccount",
+      "kind" => "Namespace",
       "metadata" => %{
         "labels" => %{
           "system-name" => "system-#{name}",
           "spawn-eigr.io/controller.version" =>
             "#{to_string(Application.spec(:spawn_operator, :vsn))}"
         },
-        "name" => "#{name}-sa",
-        "namespace" => String.downcase(name)
+        "name" => String.downcase(name)
       }
     }
   end

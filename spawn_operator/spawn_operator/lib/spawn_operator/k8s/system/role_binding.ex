@@ -24,7 +24,7 @@ defmodule SpawnOperator.K8s.System.RoleBinding do
             "#{to_string(Application.spec(:spawn_operator, :vsn))}"
         },
         "name" => "#{name}-rolebinding",
-        "namespace" => ns
+        "namespace" => String.downcase(name)
       },
       "roleRef" => %{
         "apiGroup" => "rbac.authorization.k8s.io",
@@ -35,7 +35,7 @@ defmodule SpawnOperator.K8s.System.RoleBinding do
         %{
           "kind" => "ServiceAccount",
           "name" => "#{name}-sa",
-          "namespace" => ns
+          "namespace" => String.downcase(name)
         }
       ]
     }

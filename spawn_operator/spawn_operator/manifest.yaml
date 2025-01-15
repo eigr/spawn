@@ -1,85 +1,85 @@
----
-metadata:
-  name: spawn-operator
-  labels:
-    k8s-app: spawn-operator
-  namespace: eigr-functions
-spec:
-  template:
-    metadata:
-      labels:
-        k8s-app: spawn-operator
-    spec:
-      containers:
-        - env:
-            - name: MIX_ENV
-              value: prod
-            - name: BONNY_OPERATOR_NAME
-              value: spawn-operator
-            - name: BONNY_POD_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
-            - name: BONNY_POD_NAMESPACE
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.namespace
-            - name: BONNY_POD_IP
-              valueFrom:
-                fieldRef:
-                  fieldPath: status.podIP
-            - name: BONNY_POD_SERVICE_ACCOUNT
-              valueFrom:
-                fieldRef:
-                  fieldPath: spec.serviceAccountName
-          name: spawn-operator
-          ports:
-            - containerPort: 9090
-          image: ghcr.io/eigr/spawn-operator:2.0.0-RC4
-          resources:
-            limits:
-              cpu: 200m
-              memory: 380Mi
-            requests:
-              cpu: 200m
-              memory: 380Mi
-          securityContext:
-            runAsNonRoot: false
-            allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: true
-          volumeMounts:
-            - mountPath: /app/.cache/bakeware/
-              name: bakeware-cache
-          livenessProbe:
-            failureThreshold: 3
-            httpGet:
-              path: /health/liveness
-              port: 9090
-              scheme: HTTP
-            initialDelaySeconds: 30
-            periodSeconds: 5
-            successThreshold: 1
-            timeoutSeconds: 5
-          readinessProbe:
-            failureThreshold: 3
-            httpGet:
-              path: /health/readiness
-              port: 9090
-              scheme: HTTP
-            initialDelaySeconds: 30
-            periodSeconds: 5
-            successThreshold: 1
-            timeoutSeconds: 5
-      volumes:
-        - emptyDir: {}
-          name: bakeware-cache
-      serviceAccountName: spawn-operator
-  selector:
-    matchLabels:
-      k8s-app: spawn-operator
-  replicas: 2
-kind: Deployment
-apiVersion: apps/v1
+# ---
+# metadata:
+#   name: spawn-operator
+#   labels:
+#     k8s-app: spawn-operator
+#   namespace: eigr-functions
+# spec:
+#   template:
+#     metadata:
+#       labels:
+#         k8s-app: spawn-operator
+#     spec:
+#       containers:
+#         - env:
+#             - name: MIX_ENV
+#               value: prod
+#             - name: BONNY_OPERATOR_NAME
+#               value: spawn-operator
+#             - name: BONNY_POD_NAME
+#               valueFrom:
+#                 fieldRef:
+#                   fieldPath: metadata.name
+#             - name: BONNY_POD_NAMESPACE
+#               valueFrom:
+#                 fieldRef:
+#                   fieldPath: metadata.namespace
+#             - name: BONNY_POD_IP
+#               valueFrom:
+#                 fieldRef:
+#                   fieldPath: status.podIP
+#             - name: BONNY_POD_SERVICE_ACCOUNT
+#               valueFrom:
+#                 fieldRef:
+#                   fieldPath: spec.serviceAccountName
+#           name: spawn-operator
+#           ports:
+#             - containerPort: 9090
+#           image: ghcr.io/eigr/spawn-operator:2.0.0-RC4
+#           resources:
+#             limits:
+#               cpu: 200m
+#               memory: 380Mi
+#             requests:
+#               cpu: 200m
+#               memory: 380Mi
+#           securityContext:
+#             allowPrivilegeEscalation: false
+#             readOnlyRootFilesystem: true
+#             runAsNonRoot: false
+#           volumeMounts:
+#             - mountPath: /app/.cache/bakeware/
+#               name: bakeware-cache
+#           livenessProbe:
+#             failureThreshold: 3
+#             httpGet:
+#               path: /health/liveness
+#               port: 9090
+#               scheme: HTTP
+#             initialDelaySeconds: 30
+#             periodSeconds: 5
+#             successThreshold: 1
+#             timeoutSeconds: 5
+#           readinessProbe:
+#             failureThreshold: 3
+#             httpGet:
+#               path: /health/readiness
+#               port: 9090
+#               scheme: HTTP
+#             initialDelaySeconds: 30
+#             periodSeconds: 5
+#             successThreshold: 1
+#             timeoutSeconds: 5
+#       serviceAccountName: spawn-operator
+#       volumes:
+#         - emptyDir: {}
+#           name: bakeware-cache
+#   replicas: 2
+#   selector:
+#     matchLabels:
+#       k8s-app: spawn-operator
+# kind: Deployment
+# apiVersion: apps/v1
 
 ---
 metadata:
@@ -131,10 +131,12 @@ spec:
     plural: actorhosts
     shortNames:
       - ac
+      - ah
       - actor
       - actors
       - actorhost
       - actorhosts
+      - hosts
     singular: actorhost
   versions:
     - name: v1
@@ -346,7 +348,7 @@ metadata:
   name: actorsystems.spawn-eigr.io
   labels: {}
 spec:
-  scope: Namespaced
+  scope: Cluster
   group: spawn-eigr.io
   names:
     kind: ActorSystem
@@ -684,12 +686,12 @@ metadata:
   labels:
     k8s-app: spawn-operator
 kind: ClusterRoleBinding
-subjects:
-  - name: spawn-operator
-    kind: ServiceAccount
-    namespace: eigr-functions
 apiVersion: rbac.authorization.k8s.io/v1
 roleRef:
   name: spawn-operator
   kind: ClusterRole
   apiGroup: rbac.authorization.k8s.io
+subjects:
+  - name: spawn-operator
+    kind: ServiceAccount
+    namespace: eigr-functions

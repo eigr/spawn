@@ -24,7 +24,7 @@ defmodule SpawnOperator.K8s.System.Role do
             "#{to_string(Application.spec(:spawn_operator, :vsn))}"
         },
         "name" => "#{name}-role",
-        "namespace" => ns
+        "namespace" => String.downcase(name)
       },
       "rules" => [
         %{

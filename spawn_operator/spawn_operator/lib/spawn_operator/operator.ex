@@ -1,4 +1,7 @@
 defmodule SpawnOperator.Operator do
+  @moduledoc """
+  This operator is responsible for managing the lifecycle of the Spawn Eigr resources.
+  """
   use Bonny.Operator, default_watch_namespace: :all
 
   step(Bonny.Pluggable.Logger)
@@ -19,10 +22,12 @@ defmodule SpawnOperator.Operator do
         names:
           Bonny.API.CRD.kind_to_names("ActorHost", [
             "ac",
+            "ah",
             "actor",
             "actors",
             "actorhost",
-            "actorhosts"
+            "actorhosts",
+            "hosts",
           ]),
         group: "spawn-eigr.io",
         scope: :Namespaced,
@@ -38,7 +43,7 @@ defmodule SpawnOperator.Operator do
             "system"
           ]),
         group: "spawn-eigr.io",
-        scope: :Namespaced,
+        scope: :Cluster,
         versions: [SpawnOperator.Versions.Api.V1.ActorSystem]
       )
     ]
@@ -56,7 +61,7 @@ defmodule SpawnOperator.Operator do
         controller: SpawnOperator.Controller.ActorHostController
       },
       %{
-        query: K8s.Client.watch("spawn-eigr.io/v1", "ActorSystem", namespace: watch_namespace),
+        query: K8s.Client.watch("spawn-eigr.io/v1", "ActorSystem"),
         controller: SpawnOperator.Controller.ActorSystemController
       }
     ]

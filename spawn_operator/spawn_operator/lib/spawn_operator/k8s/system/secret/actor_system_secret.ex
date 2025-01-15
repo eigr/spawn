@@ -33,7 +33,7 @@ defmodule SpawnOperator.K8s.System.Secret.ActorSystemSecret do
       "kind" => "Secret",
       "metadata" => %{
         "name" => "#{name}-secret",
-        "namespace" => ns
+        "namespace" => String.downcase(name)
       },
       "data" => data
     }
