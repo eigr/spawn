@@ -16,7 +16,7 @@ defmodule Spawnctl.Runtimes.Behaviors.K8sRuntime do
     defstruct opts: %{}, kubeconfig: nil
 
     defimpl SpawnCtl.Commands.Install.Behavior.Runtime, for: __MODULE__ do
-      @vsn "v2.0.0-RC4"
+      @vsn "v2.0.0-RC5"
       @manifest_filename "spawn-manifest.yaml"
       @default_namespace "eigr-functions"
 

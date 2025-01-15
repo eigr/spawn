@@ -12,7 +12,7 @@ The recommended way to install Spawn is via our CLI tool.
 Installing is very simple. First download and install our CLI in one command line:
 
 ```sh
-curl -sSL https://github.com/eigr/spawn/releases/download/v2.0.0-RC4/install.sh | sh
+curl -sSL https://github.com/eigr/spawn/releases/download/v2.0.0-RC5/install.sh | sh
 ```
 
 At this point you will be ready to also install our Kubernetes Operator.
@@ -38,7 +38,7 @@ kubectl create ns eigr-functions && curl -L https://github.com/eigr/spawn/releas
 > **_NOTE:_** You need to inform the desired release version. For example:
 
 ```shell
-kubectl create ns eigr-functions && curl -L https://github.com/eigr/spawn/releases/download/v2.0.0-RC4/manifest.yaml | kubectl apply -f -
+kubectl create ns eigr-functions && curl -L https://github.com/eigr/spawn/releases/download/v2.0.0-RC5/manifest.yaml | kubectl apply -f -
 ```
 
 [Back to Index](index.md)

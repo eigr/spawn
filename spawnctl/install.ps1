@@ -8,7 +8,7 @@ if (Get-Command spawn -ErrorAction SilentlyContinue) {
 }
 
 # Download the binary
-$URL = "https://github.com/eigr/spawn/releases/download/v2.0.0-RC4/$FILENAME"
+$URL = "https://github.com/eigr/spawn/releases/download/v2.0.0-RC5/$FILENAME"
 $DOWNLOAD_PATH = "$env:TEMP\spawn.exe"
 
 Invoke-WebRequest -Uri $URL -OutFile $DOWNLOAD_PATH
