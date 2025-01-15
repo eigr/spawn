@@ -1,8 +1,26 @@
-## Customize flags given to the VM: https://www.erlang.org/doc/man/erl.html
-## -mode/-name/-sname/-setcookie are configured via env vars, do not set them here
+## Distributed Erlang Options
+## Enable TLS distribution
+-proto_dist inet_tls -ssl_dist_optfile /app/mtls.ssl.conf
 
-## Increase number of concurrent ports/sockets
-##+Q 65536
+## Use Ctrl-C to interrupt the current shell rather than invoking the emulator's
+## break handler and possibly exiting the VM.
++Bc
 
-## Tweak GC to run more often
-##-env ERL_FULLSWEEP_AFTER 10
+# Allow time warps so that the Erlang system time can more closely match the
+# OS system time.
++C multi_time_warp
+
+## Load code at system startup
+## See http://erlang.org/doc/system_principles/system_principles.html#code-loading-strategy
+-mode embedded
+
+## Disable scheduler busy wait to reduce idle CPU usage and avoid delaying
+## other OS processes. See http://erlang.org/doc/man/erl.html#+sbwt
++sbwt none
++sbwtdcpu none
++sbwtdio none
+
+## Enable heartbeat monitoring of the Erlang runtime system
+-heart -env HEART_BEAT_TIMEOUT 30
+
+-name proxy@${POD_IP}
