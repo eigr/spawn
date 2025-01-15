@@ -35,7 +35,7 @@ defmodule Statestores.Supervisor do
         Statestores.Migrator.migrate(lookup_adapter)
 
       _ ->
-        # migrate via job in production (future release)
+        # TODO: migrate via job in production (future release)
         Statestores.Migrator.migrate(snapshot_adapter)
         Statestores.Migrator.migrate(lookup_adapter)
     end
