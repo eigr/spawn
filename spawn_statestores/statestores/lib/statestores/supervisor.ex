@@ -29,14 +29,8 @@ defmodule Statestores.Supervisor do
     snapshot_adapter = load_snapshot_adapter()
     projection_adapter = load_projection_adapter()
 
-    case System.get_env("MIX_ENV") do
-      env when env in ["dev", "test"] ->
-        Statestores.Migrator.migrate(snapshot_adapter)
-        Statestores.Migrator.migrate(lookup_adapter)
-
-      _ ->
-        nil
-    end
+    Statestores.Migrator.migrate(snapshot_adapter)
+    Statestores.Migrator.migrate(lookup_adapter)
 
     children =
       [
