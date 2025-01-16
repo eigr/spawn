@@ -44,9 +44,9 @@ spec:
               cpu: 200m
               memory: 380Mi
           securityContext:
-            runAsNonRoot: false
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
+            runAsNonRoot: false
           volumeMounts:
             - mountPath: /app/.cache/bakeware/
               name: bakeware-cache
@@ -70,14 +70,14 @@ spec:
             periodSeconds: 5
             successThreshold: 1
             timeoutSeconds: 5
+      serviceAccountName: spawn-operator
       volumes:
         - emptyDir: {}
           name: bakeware-cache
-      serviceAccountName: spawn-operator
+  replicas: 2
   selector:
     matchLabels:
       k8s-app: spawn-operator
-  replicas: 2
 kind: Deployment
 apiVersion: apps/v1
 
@@ -90,15 +90,14 @@ spec:
   group: spawn-eigr.io
   names:
     kind: Activator
+    singular: activator
     plural: activators
     shortNames:
       - act
       - acts
-    singular: activator
   versions:
     - name: v1
       deprecated: false
-      storage: true
       schema:
         openAPIV3Schema:
           type: object
@@ -113,6 +112,7 @@ spec:
       subresources:
         status: {}
       served: true
+      storage: true
       deprecationWarning:
 kind: CustomResourceDefinition
 apiVersion: apiextensions.k8s.io/v1
@@ -126,6 +126,7 @@ spec:
   group: spawn-eigr.io
   names:
     kind: ActorHost
+    singular: actorhost
     plural: actorhosts
     shortNames:
       - ac
@@ -133,11 +134,9 @@ spec:
       - actor
       - actors
       - hosts
-    singular: actorhost
   versions:
     - name: v1
       deprecated: false
-      storage: true
       schema:
         openAPIV3Schema:
           type: object
@@ -335,6 +334,7 @@ spec:
       subresources:
         status: {}
       served: true
+      storage: true
       deprecationWarning:
 kind: CustomResourceDefinition
 apiVersion: apiextensions.k8s.io/v1
@@ -348,16 +348,15 @@ spec:
   group: spawn-eigr.io
   names:
     kind: ActorSystem
+    singular: actorsystem
     plural: actorsystems
     shortNames:
       - as
       - actorsys
       - system
-    singular: actorsystem
   versions:
     - name: v1
       deprecated: false
-      storage: true
       schema:
         openAPIV3Schema:
           type: object
@@ -396,31 +395,52 @@ spec:
                   properties:
                     cookie:
                       type: string
+                    features:
+                      properties:
+                        erlangMtls:
+                          properties:
+                            certManager:
+                              properties:
+                                enabled:
+                                  type: boolean
+                                issuerName:
+                                  type: string
+                              type: object
+                            enabled:
+                              type: boolean
+                            secretName:
+                              type: string
+                          type: object
+                        multiCluster:
+                          properties:
+                            enabled:
+                              default: true
+                              type: boolean
+                            transport:
+                              default: nats
+                              enum:
+                                - nats
+                              type: string
+                          type: object
+                        nats:
+                          properties:
+                            credentialsSecretRef:
+                              default: native-nats-credentials
+                              type: string
+                            enabled:
+                              default: true
+                              type: boolean
+                            url:
+                              default: nats://nats.eigr-functions.svc.cluster.local:4222
+                              type: string
+                          type: object
+                      type: object
                     kind:
                       default: erlang
                       enum:
                         - erlang
                         - quic
                       type: string
-                    systemToSystem:
-                      properties:
-                        enabled:
-                          type: boolean
-                        natsClusterSecretRef:
-                          type: string
-                      type: object
-                    tls:
-                      properties:
-                        certManager:
-                          properties:
-                            enabled:
-                              type: boolean
-                            issuerName:
-                              type: string
-                          type: object
-                        secretName:
-                          type: string
-                      type: object
                   type: object
                 statestore:
                   properties:
@@ -458,6 +478,7 @@ spec:
       subresources:
         status: {}
       served: true
+      storage: true
       deprecationWarning:
 kind: CustomResourceDefinition
 apiVersion: apiextensions.k8s.io/v1
@@ -680,12 +701,12 @@ metadata:
   labels:
     k8s-app: spawn-operator
 kind: ClusterRoleBinding
-subjects:
-  - name: spawn-operator
-    kind: ServiceAccount
-    namespace: eigr-functions
 apiVersion: rbac.authorization.k8s.io/v1
 roleRef:
   name: spawn-operator
   kind: ClusterRole
   apiGroup: rbac.authorization.k8s.io
+subjects:
+  - name: spawn-operator
+    kind: ServiceAccount
+    namespace: eigr-functions

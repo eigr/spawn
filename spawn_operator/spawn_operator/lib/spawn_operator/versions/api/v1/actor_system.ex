@@ -29,25 +29,45 @@ defmodule SpawnOperator.Versions.Api.V1.ActorSystem do
                     default: "erlang"
                   cookie:
                     type: string
-                  systemToSystem:
+                  features:
                     type: object
                     properties:
-                      enabled:
-                        type: boolean
-                      natsClusterSecretRef:
-                        type: string
-                  tls:
-                    type: object
-                    properties:
-                      secretName:
-                        type: string
-                      certManager:
+                      erlangMtls:
                         type: object
                         properties:
                           enabled:
                             type: boolean
-                          issuerName:
+                          secretName:
                             type: string
+                          certManager:
+                            type: object
+                            properties:
+                              enabled:
+                                type: boolean
+                              issuerName:
+                                type: string
+                      multiCluster:
+                        type: object
+                        properties:
+                          enabled:
+                            type: boolean
+                            default: true
+                          transport:
+                            type: string
+                            enum: ["nats"]
+                            default: "nats"
+                      nats:
+                        type: object
+                        properties:
+                          enabled:
+                            type: boolean
+                            default: true
+                          url:
+                            type: string
+                            default: "nats://nats.eigr-functions.svc.cluster.local:4222"
+                          credentialsSecretRef:
+                            type: string
+                            default: "native-nats-credentials"
               statestore:
                 type: object
                 properties:
