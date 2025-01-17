@@ -170,7 +170,7 @@ test-sdk:
 	elixir --name spawn@127.0.0.1 -S mix test
 
 test-operator:
-	cd spawn_operator/spawn_operator && MIX_ENV=test mix deps.get && MIX_ENV=test PROXY_DATABASE_TYPE=mysql PROXY_CLUSTER_STRATEGY=gossip PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
+	cd spawn_operator/spawn_operator && MIX_ENV=test mix deps.get && MIX_ENV=test PROXY_DATABASE_TYPE=mariadb PROXY_CLUSTER_STRATEGY=gossip PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
 
 test-proxy:
 	cd spawn_proxy/proxy && MIX_ENV=test mix deps.get && MIX_ENV=test SPAWN_PROXY_LOGGER_LEVEL=debug PROXY_DATABASE_TYPE=mariadb PROXY_DATABASE_PORT=3307 PROXY_CLUSTER_STRATEGY=gossip PROXY_HTTP_PORT=9005 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= elixir --name spawn@127.0.0.1 -S mix test
@@ -227,7 +227,7 @@ integration.yaml: ## Create a k3d cluster
 test.integration: integration.yaml
 
 test.integration: ## Run integration tests using k3d `make cluster`
-	cd spawn_operator/spawn_operator && PROXY_CLUSTER_STRATEGY=gossip PROXY_DATABASE_TYPE=mysql  PROXY_DATABASE_POOL_SIZE=10 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= TEST_KUBECONFIG=${K3D_KUBECONFIG_PATH} mix test --only integration
+	cd spawn_operator/spawn_operator && PROXY_CLUSTER_STRATEGY=gossip PROXY_DATABASE_TYPE=mariadb  PROXY_DATABASE_POOL_SIZE=10 SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= TEST_KUBECONFIG=${K3D_KUBECONFIG_PATH} mix test --only integration
 
 run-benchmark:
 	cd spawn_sdk/spawn_sdk_example && \
@@ -427,7 +427,7 @@ run-activator-sqs-local:
 
 run-proxy-image:
 	docker run --rm --name=spawn-proxy \
-	-e PROXY_DATABASE_TYPE=mysql \
+	-e PROXY_DATABASE_TYPE=mariadb \
 	-e SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= \
 	--net=host ${proxy-image}
 

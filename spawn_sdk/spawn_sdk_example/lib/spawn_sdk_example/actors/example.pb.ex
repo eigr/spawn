@@ -222,7 +222,6 @@ defmodule Io.Eigr.Spawn.Example.Joe.Service do
         swift_prefix: nil,
         php_class_prefix: nil,
         php_namespace: nil,
-        php_generic_services: false,
         php_metadata_namespace: nil,
         ruby_package: nil,
         uninterpreted_option: [],

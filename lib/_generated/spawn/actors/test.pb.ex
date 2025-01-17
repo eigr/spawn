@@ -1,6 +1,6 @@
 defmodule Test.EnumTest do
   @moduledoc false
-  use Protobuf, enum: true, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -40,7 +40,7 @@ end
 
 defmodule Test.TestMessage.Address.Country do
   @moduledoc false
-  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
+  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -94,7 +94,7 @@ end
 
 defmodule Test.TestMessage.Address do
   @moduledoc false
-  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
+  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -236,7 +236,7 @@ end
 
 defmodule Test.TestMessage.AttributesEntry do
   @moduledoc false
-  use Protobuf, map: true, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
+  use Protobuf, map: true, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -282,6 +282,7 @@ defmodule Test.TestMessage.AttributesEntry do
         deprecated: false,
         map_entry: true,
         deprecated_legacy_json_field_conflicts: nil,
+        features: nil,
         uninterpreted_option: [],
         __pb_extensions__: %{},
         __unknown_fields__: []
@@ -299,7 +300,7 @@ end
 
 defmodule Test.TestMessage do
   @moduledoc false
-  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
+  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -323,6 +324,11 @@ defmodule Test.TestMessage do
             weak: false,
             unverified_lazy: false,
             debug_redact: false,
+            retention: nil,
+            targets: [],
+            edition_defaults: [],
+            features: nil,
+            feature_support: nil,
             uninterpreted_option: [],
             __pb_extensions__: %{{Spawn.Actors.PbExtension, :actor_id} => true},
             __unknown_fields__: []
@@ -349,6 +355,11 @@ defmodule Test.TestMessage do
             weak: false,
             unverified_lazy: false,
             debug_redact: false,
+            retention: nil,
+            targets: [],
+            edition_defaults: [],
+            features: nil,
+            feature_support: nil,
             uninterpreted_option: [],
             __pb_extensions__: %{{Spawn.Actors.PbExtension, :searchable} => true},
             __unknown_fields__: []
@@ -655,6 +666,7 @@ defmodule Test.TestMessage do
             deprecated: false,
             map_entry: true,
             deprecated_legacy_json_field_conflicts: nil,
+            features: nil,
             uninterpreted_option: [],
             __pb_extensions__: %{},
             __unknown_fields__: []

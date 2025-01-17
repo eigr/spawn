@@ -1,6 +1,6 @@
 defmodule Io.Cloudevents.V1.CloudEvent.AttributesEntry do
   @moduledoc false
-  use Protobuf, map: true, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
+  use Protobuf, map: true, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -46,6 +46,7 @@ defmodule Io.Cloudevents.V1.CloudEvent.AttributesEntry do
         deprecated: false,
         map_entry: true,
         deprecated_legacy_json_field_conflicts: nil,
+        features: nil,
         uninterpreted_option: [],
         __pb_extensions__: %{},
         __unknown_fields__: []
@@ -63,7 +64,7 @@ end
 
 defmodule Io.Cloudevents.V1.CloudEvent.CloudEventAttributeValue do
   @moduledoc false
-  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
+  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -196,7 +197,7 @@ end
 
 defmodule Io.Cloudevents.V1.CloudEvent do
   @moduledoc false
-  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
+  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -359,6 +360,7 @@ defmodule Io.Cloudevents.V1.CloudEvent do
             deprecated: false,
             map_entry: true,
             deprecated_legacy_json_field_conflicts: nil,
+            features: nil,
             uninterpreted_option: [],
             __pb_extensions__: %{},
             __unknown_fields__: []

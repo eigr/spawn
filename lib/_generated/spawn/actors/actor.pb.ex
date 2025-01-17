@@ -1,6 +1,6 @@
 defmodule Spawn.Actors.Kind do
   @moduledoc false
-  use Protobuf, enum: true, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -68,7 +68,7 @@ end
 
 defmodule Spawn.Actors.Registry.ActorsEntry do
   @moduledoc false
-  use Protobuf, map: true, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
+  use Protobuf, map: true, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -114,6 +114,7 @@ defmodule Spawn.Actors.Registry.ActorsEntry do
         deprecated: false,
         map_entry: true,
         deprecated_legacy_json_field_conflicts: nil,
+        features: nil,
         uninterpreted_option: [],
         __pb_extensions__: %{},
         __unknown_fields__: []
@@ -131,7 +132,7 @@ end
 
 defmodule Spawn.Actors.Registry do
   @moduledoc false
-  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
+  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -196,6 +197,7 @@ defmodule Spawn.Actors.Registry do
             deprecated: false,
             map_entry: true,
             deprecated_legacy_json_field_conflicts: nil,
+            features: nil,
             uninterpreted_option: [],
             __pb_extensions__: %{},
             __unknown_fields__: []
@@ -222,7 +224,7 @@ end
 
 defmodule Spawn.Actors.ActorSystem do
   @moduledoc false
-  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
+  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -276,7 +278,7 @@ end
 
 defmodule Spawn.Actors.ActorSnapshotStrategy do
   @moduledoc false
-  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
+  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -323,7 +325,7 @@ end
 
 defmodule Spawn.Actors.ActorDeactivationStrategy do
   @moduledoc false
-  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
+  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -370,7 +372,7 @@ end
 
 defmodule Spawn.Actors.TimeoutStrategy do
   @moduledoc false
-  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
+  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -409,7 +411,7 @@ end
 
 defmodule Spawn.Actors.Action do
   @moduledoc false
-  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
+  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -448,7 +450,7 @@ end
 
 defmodule Spawn.Actors.FixedTimerAction do
   @moduledoc false
-  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
+  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -502,7 +504,7 @@ end
 
 defmodule Spawn.Actors.ActorState.TagsEntry do
   @moduledoc false
-  use Protobuf, map: true, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
+  use Protobuf, map: true, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -548,6 +550,7 @@ defmodule Spawn.Actors.ActorState.TagsEntry do
         deprecated: false,
         map_entry: true,
         deprecated_legacy_json_field_conflicts: nil,
+        features: nil,
         uninterpreted_option: [],
         __pb_extensions__: %{},
         __unknown_fields__: []
@@ -565,7 +568,7 @@ end
 
 defmodule Spawn.Actors.ActorState do
   @moduledoc false
-  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
+  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -644,6 +647,7 @@ defmodule Spawn.Actors.ActorState do
             deprecated: false,
             map_entry: true,
             deprecated_legacy_json_field_conflicts: nil,
+            features: nil,
             uninterpreted_option: [],
             __pb_extensions__: %{},
             __unknown_fields__: []
@@ -671,7 +675,7 @@ end
 
 defmodule Spawn.Actors.Metadata.TagsEntry do
   @moduledoc false
-  use Protobuf, map: true, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
+  use Protobuf, map: true, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -717,6 +721,7 @@ defmodule Spawn.Actors.Metadata.TagsEntry do
         deprecated: false,
         map_entry: true,
         deprecated_legacy_json_field_conflicts: nil,
+        features: nil,
         uninterpreted_option: [],
         __pb_extensions__: %{},
         __unknown_fields__: []
@@ -734,7 +739,7 @@ end
 
 defmodule Spawn.Actors.Metadata do
   @moduledoc false
-  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
+  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -813,6 +818,7 @@ defmodule Spawn.Actors.Metadata do
             deprecated: false,
             map_entry: true,
             deprecated_legacy_json_field_conflicts: nil,
+            features: nil,
             uninterpreted_option: [],
             __pb_extensions__: %{},
             __unknown_fields__: []
@@ -840,7 +846,7 @@ end
 
 defmodule Spawn.Actors.Channel do
   @moduledoc false
-  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
+  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -894,7 +900,7 @@ end
 
 defmodule Spawn.Actors.ProjectionSubject do
   @moduledoc false
-  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
+  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -978,7 +984,7 @@ end
 
 defmodule Spawn.Actors.EventsRetentionStrategy do
   @moduledoc false
-  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
+  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -1040,7 +1046,7 @@ end
 
 defmodule Spawn.Actors.ProjectionSettings do
   @moduledoc false
-  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
+  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -1129,7 +1135,7 @@ end
 
 defmodule Spawn.Actors.ActorSettings do
   @moduledoc false
-  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
+  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -1287,7 +1293,7 @@ end
 
 defmodule Spawn.Actors.ActorId do
   @moduledoc false
-  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
+  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -1356,7 +1362,7 @@ end
 
 defmodule Spawn.Actors.Actor do
   @moduledoc false
-  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
+  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
