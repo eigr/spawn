@@ -37,6 +37,7 @@ defmodule SpawnOperator.Versions.Api.V1.ActorSystem do
                         properties:
                           enabled:
                             type: boolean
+                            default: false
                           secretName:
                             type: string
                           certManager:

@@ -13,8 +13,7 @@ defmodule SpawnOperator.Operator do
   def crds() do
     [
       Bonny.API.CRD.new!(
-        names:
-          Bonny.API.CRD.kind_to_names("Activator", ["act", "acts"]),
+        names: Bonny.API.CRD.kind_to_names("Activator", ["act", "acts"]),
         group: "spawn-eigr.io",
         scope: :Cluster,
         versions: [SpawnOperator.Versions.Api.V1.Activator]
@@ -26,7 +25,7 @@ defmodule SpawnOperator.Operator do
             "ah",
             "actor",
             "actors",
-            "hosts",
+            "hosts"
           ]),
         group: "spawn-eigr.io",
         scope: :Cluster,
