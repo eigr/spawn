@@ -251,10 +251,12 @@ metadata:
   name: spawn-system # 1. Required. Name of the ActorSystem
   namespace: default # 2. Optional. Default namespace is "default"
 spec:
-  # This externalInvocation section is required only if using the Nats broker in your project.
-  externalInvocation:
-    enabled: "true"
-    externalConnectorRef: nats-invocation-conn-secret # 3. Nats broker credentials
+  cluster:
+    features:
+      # This nats section is required only if using the Nats broker in your project.
+      nats:
+        enabled: true
+        credentialsSecretRef: "nats-invocation-conn-secret" # 3. Nats broker credentials
   statestore:
     type: MariaDB # 4. Set database provider. Valid options: [MariaDB, Postgres, Native]
     credentialsSecretRef: mariadb-connection-secret # 5. Secret with database connection details created earlier

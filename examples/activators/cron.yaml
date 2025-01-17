@@ -10,7 +10,7 @@ metadata:
 spec:
   activator:
     type: Cron
-    externalConnectorRef: invocation-connection-ref-secret
+    externalConnectorRef: nats-invocation-conn-secret
   bindings:
     sources:
       - name: minute-scheduler
