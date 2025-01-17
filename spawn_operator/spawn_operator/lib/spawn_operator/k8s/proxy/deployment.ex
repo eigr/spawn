@@ -7,10 +7,6 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
 
   @default_actor_host_function_env [
     %{
-      "name" => "RELEASE_NAME",
-      "value" => "proxy"
-    },
-    %{
       "name" => "NAMESPACE",
       "valueFrom" => %{"fieldRef" => %{"fieldPath" => "metadata.namespace"}}
     },
@@ -283,6 +279,10 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
       @default_actor_host_function_env ++
         [
           %{
+            "name" => "RELEASE_NAME",
+            "value" => system
+          },
+          %{
             "name" => "RELEASE_COOKIE",
             "valueFrom" => %{
               "secretKeyRef" => %{"name" => "#{system}-secret", "key" => "RELEASE_COOKIE"}
@@ -358,6 +358,10 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
     updated_default_envs =
       @default_actor_host_function_env ++
         [
+          %{
+            "name" => "RELEASE_NAME",
+            "value" => system
+          },
           %{
             "name" => "RELEASE_COOKIE",
             "valueFrom" => %{
