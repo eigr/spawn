@@ -1,6 +1,6 @@
 defmodule Spawn.Actors.Healthcheck.Status do
   @moduledoc false
-  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
+  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -69,7 +69,7 @@ end
 
 defmodule Spawn.Actors.Healthcheck.HealthCheckReply do
   @moduledoc false
-  use Protobuf, syntax: :proto3, protoc_gen_elixir_version: "0.13.0"
+  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -109,7 +109,7 @@ end
 defmodule Spawn.Actors.Healthcheck.HealthCheckActor.Service do
   use GRPC.Service,
     name: "spawn.actors.healthcheck.HealthCheckActor",
-    protoc_gen_elixir_version: "0.13.0"
+    protoc_gen_elixir_version: "0.14.0"
 
   def descriptor do
     # credo:disable-for-next-line
@@ -220,6 +220,7 @@ defmodule Spawn.Actors.Healthcheck.HealthCheckActor.Service do
               options: %Google.Protobuf.MethodOptions{
                 deprecated: false,
                 idempotency_level: :IDEMPOTENCY_UNKNOWN,
+                features: nil,
                 uninterpreted_option: [],
                 __pb_extensions__: %{
                   {Google.Api.PbExtension, :http} => %Google.Api.HttpRule{
@@ -244,6 +245,7 @@ defmodule Spawn.Actors.Healthcheck.HealthCheckActor.Service do
               options: %Google.Protobuf.MethodOptions{
                 deprecated: false,
                 idempotency_level: :IDEMPOTENCY_UNKNOWN,
+                features: nil,
                 uninterpreted_option: [],
                 __pb_extensions__: %{
                   {Google.Api.PbExtension, :http} => %Google.Api.HttpRule{
@@ -264,6 +266,7 @@ defmodule Spawn.Actors.Healthcheck.HealthCheckActor.Service do
           ],
           options: %Google.Protobuf.ServiceOptions{
             deprecated: false,
+            features: nil,
             uninterpreted_option: [],
             __pb_extensions__: %{
               {Spawn.Actors.PbExtension, :actor} => %Spawn.Actors.ActorOpts{
@@ -303,9 +306,9 @@ defmodule Spawn.Actors.Healthcheck.HealthCheckActor.Service do
         swift_prefix: nil,
         php_class_prefix: nil,
         php_namespace: nil,
-        php_generic_services: false,
         php_metadata_namespace: nil,
         ruby_package: nil,
+        features: nil,
         uninterpreted_option: [],
         __pb_extensions__: %{},
         __unknown_fields__: []
@@ -673,6 +676,7 @@ defmodule Spawn.Actors.Healthcheck.HealthCheckActor.Service do
             __unknown_fields__: []
           }
         ],
+        __pb_extensions__: %{},
         __unknown_fields__: []
       },
       public_dependency: [],

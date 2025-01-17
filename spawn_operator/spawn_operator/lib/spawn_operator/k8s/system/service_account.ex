@@ -24,7 +24,7 @@ defmodule SpawnOperator.K8s.System.ServiceAccount do
             "#{to_string(Application.spec(:spawn_operator, :vsn))}"
         },
         "name" => "#{name}-sa",
-        "namespace" => ns
+        "namespace" => String.downcase(name)
       }
     }
   end

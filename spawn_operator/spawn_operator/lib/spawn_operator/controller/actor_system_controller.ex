@@ -1,7 +1,7 @@
 defmodule SpawnOperator.Controller.ActorSystemController do
-  require Bonny.API.CRD
-
+  @moduledoc false
   use Bonny.ControllerV2
+  require Bonny.API.CRD
 
   step(Bonny.Pluggable.SkipObservedGenerations)
   step(SpawnOperator.Handler.ActorSystemHandler)

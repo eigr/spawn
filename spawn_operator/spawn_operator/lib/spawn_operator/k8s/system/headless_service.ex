@@ -10,7 +10,7 @@ defmodule SpawnOperator.K8s.System.HeadlessService do
   def manifest(
         %{
           system: _system,
-          namespace: ns,
+          namespace: _ns,
           name: name,
           params: _params,
           labels: _labels,
@@ -28,7 +28,7 @@ defmodule SpawnOperator.K8s.System.HeadlessService do
             "#{to_string(Application.spec(:spawn_operator, :vsn))}"
         },
         "name" => "system-#{name}",
-        "namespace" => ns
+        "namespace" => String.downcase(name)
       },
       "spec" => %{
         "clusterIP" => "None",

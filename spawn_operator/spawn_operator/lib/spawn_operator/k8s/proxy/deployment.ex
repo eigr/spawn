@@ -88,6 +88,13 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
 
   @default_termination_period_seconds 405
 
+  @erlang_profiles %{
+    insecure_erl_flags:
+      "+C multi_time_warp -mode embedded +sbwt none +sbwtdcpu none +sbwtdio none",
+    tls_erl_flags:
+      " -proto_dist inet_tls -ssl_dist_optfile /app/mtls.ssl.conf +C multi_time_warp -mode embedded +sbwt none +sbwtdcpu none +sbwtdio none"
+  }
+
   @impl true
   def manifest(resource, _opts \\ []), do: gen_deployment(resource)
 
@@ -102,6 +109,20 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
          } = _resource
        ) do
     host_params = Map.get(params, "host")
+
+    cluster =
+      Map.get(params, "cluster", %{"features" => %{"erlangMtls" => %{"enabled" => false}}})
+
+    erlang_mtls_enabled =
+      Map.get(cluster, "features", %{})
+      |> Map.get("erlangMtls", %{})
+      |> Map.get("enabled", false)
+
+    erlang_profile =
+      if erlang_mtls_enabled,
+        do: @erlang_profiles.tls_erl_flags,
+        else: @erlang_profiles.insecure_erl_flags
+
     task_actors_config = %{"taskActors" => Map.get(host_params, "taskActors", %{})}
     topology = Map.get(params, "topology", %{})
 
@@ -110,12 +131,42 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
 
     maybe_warn_wrong_volumes(params, host_params)
 
+    init_containers =
+      if erlang_mtls_enabled do
+        [
+          %{
+            "name" => "init-certificates",
+            "image" => "#{annotations.proxy_init_container_image_tag}",
+            "args" => [
+              "--environment",
+              :prod,
+              "--secret",
+              "tls-certs",
+              "--namespace",
+              "#{system}",
+              "--service",
+              "#{system}",
+              "--to",
+              "#{system}"
+            ],
+            "env" => [
+              %{
+                "name" => "RELEASE_DISTRIBUTION",
+                "value" => "none"
+              }
+            ]
+          }
+        ]
+      else
+        []
+      end
+
     %{
       "apiVersion" => "apps/v1",
       "kind" => "Deployment",
       "metadata" => %{
         "name" => name,
-        "namespace" => ns,
+        "namespace" => system,
         "labels" => %{"app" => name, "actor-system" => system}
       },
       "spec" => %{
@@ -152,37 +203,16 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
                   name,
                   host_params,
                   annotations,
-                  task_actors_config
+                  task_actors_config,
+                  erlang_profile,
+                  erlang_mtls_enabled
                 ),
-              "initContainers" => [
-                %{
-                  "name" => "init-certificates",
-                  "image" => "#{annotations.proxy_init_container_image_tag}",
-                  "args" => [
-                    "--environment",
-                    :prod,
-                    "--secret",
-                    "tls-certs",
-                    "--namespace",
-                    "#{ns}",
-                    "--service",
-                    "#{system}",
-                    "--to",
-                    "#{ns}"
-                  ],
-                  "env" => [
-                    %{
-                      "name" => "RELEASE_DISTRIBUTION",
-                      "value" => "none"
-                    }
-                  ]
-                }
-              ],
+              "initContainers" => init_containers,
               "serviceAccountName" => "#{system}-sa"
             }
             |> maybe_put_node_selector(topology)
             |> maybe_put_node_tolerations(topology)
-            |> maybe_put_volumes(params)
+            |> maybe_put_volumes(params, erlang_mtls_enabled)
             |> maybe_set_termination_period(params)
         }
       }
@@ -237,7 +267,16 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
     }
   end
 
-  defp get_containers(true, system, name, host_params, annotations, task_actors_config) do
+  defp get_containers(
+         true,
+         system,
+         name,
+         host_params,
+         annotations,
+         task_actors_config,
+         flags,
+         erlang_mtls_enabled
+       ) do
     actor_host_function_image = Map.get(host_params, "image")
 
     updated_default_envs =
@@ -248,6 +287,10 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
             "valueFrom" => %{
               "secretKeyRef" => %{"name" => "#{system}-secret", "key" => "RELEASE_COOKIE"}
             }
+          },
+          %{
+            "name" => "ERL_FLAGS",
+            "value" => flags
           }
         ]
 
@@ -293,14 +336,23 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
         "ports" => actor_host_function_ports,
         "resources" => actor_host_function_resources
       }
-      |> maybe_put_volume_mounts_to_host_container(host_params, :actorhost)
+      |> maybe_put_volume_mounts_to_host_container(host_params, :actorhost, erlang_mtls_enabled)
 
     [
       host_and_proxy_container
     ]
   end
 
-  defp get_containers(false, system, name, host_params, annotations, task_actors_config) do
+  defp get_containers(
+         false,
+         system,
+         name,
+         host_params,
+         annotations,
+         task_actors_config,
+         flags,
+         erlang_mtls_enabled
+       ) do
     actor_host_function_image = Map.get(host_params, "image")
 
     updated_default_envs =
@@ -311,6 +363,10 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
             "valueFrom" => %{
               "secretKeyRef" => %{"name" => "#{system}-secret", "key" => "RELEASE_COOKIE"}
             }
+          },
+          %{
+            "name" => "ERL_FLAGS",
+            "value" => flags
           }
         ]
 
@@ -380,7 +436,7 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
           }
         ]
       }
-      |> maybe_put_volume_mounts_to_host_container(host_params, :sidecar)
+      |> maybe_put_volume_mounts_to_host_container(host_params, :sidecar, erlang_mtls_enabled)
 
     host_container =
       %{
@@ -390,7 +446,7 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
         "resources" => actor_host_function_resources
       }
       |> maybe_put_ports_to_host_container(host_params)
-      |> maybe_put_volume_mounts_to_host_container(host_params, :actorhost)
+      |> maybe_put_volume_mounts_to_host_container(host_params, :actorhost, erlang_mtls_enabled)
 
     [
       proxy_container,
@@ -441,61 +497,99 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
     Map.put(spec, "terminationGracePeriodSeconds", @default_termination_period_seconds)
   end
 
-  defp maybe_put_volumes(spec, %{"volumes" => volumes} = _params) do
-    volumes =
-      (volumes ++
-         @default_volumes)
-      |> List.flatten()
-      |> Enum.uniq(& &1["name"])
+  defp maybe_put_volumes(spec, %{"volumes" => volumes} = _params, erlang_mtls_enabled) do
+    default_volumes =
+      if erlang_mtls_enabled do
+        @default_volumes
+      else
+        Enum.reject(@default_volumes, &(&1["name"] == "certs"))
+      end
 
-    Map.merge(spec, %{"volumes" => volumes})
+    all_volumes =
+      (volumes ++ default_volumes)
+      |> List.flatten()
+      |> Enum.uniq_by(& &1["name"])
+
+    if all_volumes == [], do: spec, else: Map.put(spec, "volumes", all_volumes)
   end
 
-  defp maybe_put_volumes(spec, _params) do
-    volumes =
-      @default_volumes
-      |> List.flatten()
-      |> Enum.uniq(& &1["name"])
+  defp maybe_put_volumes(spec, _params, erlang_mtls_enabled) do
+    default_volumes =
+      if erlang_mtls_enabled do
+        @default_volumes
+      else
+        Enum.reject(@default_volumes, &(&1["name"] == "certs"))
+      end
 
-    Map.put(spec, "volumes", volumes)
+    if default_volumes == [], do: spec, else: Map.put(spec, "volumes", default_volumes)
   end
 
   defp maybe_put_volume_mounts_to_host_container(
          spec,
-         %{"volumeMounts" => volumeMounts},
-         :actorhost
+         %{"volumeMounts" => volume_mounts},
+         :actorhost,
+         erlang_mtls_enabled
        ) do
-    volumeMounts =
-      (volumeMounts ++ @default_volume_mounts) |> List.flatten() |> Enum.uniq(& &1["name"])
+    default_volume_mounts =
+      if erlang_mtls_enabled do
+        @default_volume_mounts
+      else
+        Enum.reject(@default_volume_mounts, &(&1["name"] == "certs"))
+      end
 
-    Map.merge(spec, %{"volumeMounts" => volumeMounts})
+    all_volume_mounts =
+      (volume_mounts ++ default_volume_mounts)
+      |> List.flatten()
+      |> Enum.uniq_by(& &1["name"])
+
+    if all_volume_mounts == [], do: spec, else: Map.put(spec, "volumeMounts", all_volume_mounts)
   end
 
-  defp maybe_put_volume_mounts_to_host_container(spec, _, :actorhost) do
-    Map.put(spec, "volumeMounts", @default_volume_mounts)
+  defp maybe_put_volume_mounts_to_host_container(spec, _, :actorhost, erlang_mtls_enabled) do
+    default_volume_mounts =
+      if erlang_mtls_enabled do
+        @default_volume_mounts
+      else
+        Enum.reject(@default_volume_mounts, &(&1["name"] == "certs"))
+      end
+
+    if default_volume_mounts == [],
+      do: spec,
+      else: Map.put(spec, "volumeMounts", default_volume_mounts)
   end
 
   defp maybe_put_volume_mounts_to_host_container(
          spec,
-         %{"volumeMounts" => volumeMounts},
-         :sidecar
+         %{"volumeMounts" => volume_mounts},
+         :sidecar,
+         erlang_mtls_enabled
        ) do
-    volumeMounts =
-      volumeMounts
-      |> Kernel.++(@default_volume_mounts)
-      |> List.flatten()
-      |> Enum.uniq(& &1["name"])
+    default_volume_mounts =
+      if erlang_mtls_enabled do
+        @default_volume_mounts
+      else
+        Enum.reject(@default_volume_mounts, &(&1["name"] == "certs"))
+      end
 
-    Map.merge(spec, %{"volumeMounts" => volumeMounts})
+    all_volume_mounts =
+      (volume_mounts ++ default_volume_mounts)
+      |> List.flatten()
+      |> Enum.uniq_by(& &1["name"])
+
+    if all_volume_mounts == [], do: spec, else: Map.put(spec, "volumeMounts", all_volume_mounts)
   end
 
-  defp maybe_put_volume_mounts_to_host_container(spec, _, :sidecar) do
-    volumeMounts =
-      @default_volume_mounts
-      |> List.flatten()
-      |> Enum.uniq(& &1["name"])
+  defp maybe_put_volume_mounts_to_host_container(spec, _, :sidecar, erlang_mtls_enabled) do
+    default_volume_mounts =
+      if erlang_mtls_enabled do
+        @default_volume_mounts
+      else
+        Enum.reject(@default_volume_mounts, &(&1["name"] == "certs"))
+      end
 
-    Map.put(spec, "volumeMounts", volumeMounts)
+    if default_volume_mounts == [],
+      do: spec,
+      else: Map.put(spec, "volumeMounts", default_volume_mounts)
   end
 
   defp maybe_warn_wrong_volumes(params, host_params) do

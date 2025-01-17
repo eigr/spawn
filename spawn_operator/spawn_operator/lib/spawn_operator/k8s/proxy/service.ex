@@ -6,8 +6,8 @@ defmodule SpawnOperator.K8s.Proxy.Service do
   @impl true
   def manifest(
         %{
-          system: _system,
-          namespace: ns,
+          system: system,
+          namespace: _ns,
           name: name,
           params: params,
           labels: _labels,
@@ -65,7 +65,7 @@ defmodule SpawnOperator.K8s.Proxy.Service do
             "#{to_string(Application.spec(:spawn_operator, :vsn))}"
         },
         "name" => "#{name}",
-        "namespace" => ns
+        "namespace" => system
       },
       "spec" => %{
         "selector" => %{"app" => name},
