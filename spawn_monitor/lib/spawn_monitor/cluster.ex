@@ -72,7 +72,7 @@ defmodule SpawnMonitor.Cluster do
         strategy: Cluster.Strategy.Kubernetes.DNS,
         config: [
           service: env("PROXY_HEADLESS_SERVICE", "proxy-headless"),
-          application_name: "proxy",
+          application_name: env("PROXY_APP_NAME", "proxy"),
           polling_interval: polling_interval
         ]
       ]
