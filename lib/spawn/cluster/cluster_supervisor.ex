@@ -94,7 +94,7 @@ defmodule Spawn.Cluster.ClusterSupervisor do
   defp get_k8s_dns_strategy(_opts),
     do: [
       proxy: [
-        strategy: Elixir.Cluster.Strategy.Kubernetes.DNS,
+        strategy: Elixir.Spawn.Cluster.ClusterResolver,
         config: [
           service: Config.get(:proxy_headless_service),
           application_name: Config.get(:actor_system_name),

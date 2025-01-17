@@ -276,22 +276,22 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
     actor_host_function_image = Map.get(host_params, "image")
 
     updated_default_envs =
-        [
-          %{
-            "name" => "RELEASE_NAME",
-            "value" => system
-          },
-          %{
-            "name" => "RELEASE_COOKIE",
-            "valueFrom" => %{
-              "secretKeyRef" => %{"name" => "#{system}-secret", "key" => "RELEASE_COOKIE"}
-            }
-          },
-          %{
-            "name" => "ERL_FLAGS",
-            "value" => flags
+      [
+        %{
+          "name" => "RELEASE_NAME",
+          "value" => system
+        },
+        %{
+          "name" => "RELEASE_COOKIE",
+          "valueFrom" => %{
+            "secretKeyRef" => %{"name" => "#{system}-secret", "key" => "RELEASE_COOKIE"}
           }
-        ] ++ @default_actor_host_function_env
+        },
+        %{
+          "name" => "ERL_FLAGS",
+          "value" => flags
+        }
+      ] ++ @default_actor_host_function_env
 
     actor_host_function_envs =
       if is_nil(task_actors_config) || List.first(Map.values(task_actors_config)) == %{} do
@@ -355,22 +355,22 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
     actor_host_function_image = Map.get(host_params, "image")
 
     updated_default_envs =
-        [
-          %{
-            "name" => "RELEASE_NAME",
-            "value" => system
-          },
-          %{
-            "name" => "RELEASE_COOKIE",
-            "valueFrom" => %{
-              "secretKeyRef" => %{"name" => "#{system}-secret", "key" => "RELEASE_COOKIE"}
-            }
-          },
-          %{
-            "name" => "ERL_FLAGS",
-            "value" => flags
+      [
+        %{
+          "name" => "RELEASE_NAME",
+          "value" => system
+        },
+        %{
+          "name" => "RELEASE_COOKIE",
+          "valueFrom" => %{
+            "secretKeyRef" => %{"name" => "#{system}-secret", "key" => "RELEASE_COOKIE"}
           }
-        ] ++ @default_actor_host_function_env
+        },
+        %{
+          "name" => "ERL_FLAGS",
+          "value" => flags
+        }
+      ] ++ @default_actor_host_function_env
 
     actor_host_function_envs =
       Map.get(host_params, "env", []) ++
