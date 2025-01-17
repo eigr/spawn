@@ -121,8 +121,10 @@ defmodule SpawnOperator.K8s.System.Secret.ActorSystemSecret do
   end
 
   defp maybe_use_nats_cluster(config, _name, namespace, params) do
-    nats_params = Map.get(params, "externalInvocation", %{})
-    enabled = Map.get(nats_params, "enabled", "false")
+    cluster_params = Map.get(params, "cluster", %{})
+    features = Map.get(cluster_params, "features", %{})
+    nats_params = Map.get(features, "nats", %{})
+    enabled = "#{Map.get(nats_params, "enabled", false)}"
 
     nats_config =
       case enabled do
@@ -130,7 +132,7 @@ defmodule SpawnOperator.K8s.System.Secret.ActorSystemSecret do
           %{}
 
         "true" ->
-          nats_secret_ref = Map.fetch!(nats_params, "externalConnectorRef")
+          nats_secret_ref = Map.fetch!(nats_params, "credentialsSecretRef")
 
           {:ok, secret} =
             K8s.Client.get("v1", :secret,
@@ -139,11 +141,11 @@ defmodule SpawnOperator.K8s.System.Secret.ActorSystemSecret do
             )
             |> then(&K8s.Client.run(conn(), &1))
 
-          secret_data = Map.fetch!(secret, "data")
-          nats_host_url = Map.fetch!(secret_data, "url")
+          secret_data = Map.get(secret, "data")
+          nats_host_url = Map.get(secret_data, "url", nats_params["url"])
           nats_auth = Map.get(secret_data, "authEnabled", "false")
-          nats_user = Map.fetch!(secret_data, "username")
-          nats_secret = Map.fetch!(secret_data, "password")
+          nats_user = Map.get(secret_data, "username")
+          nats_secret = Map.get(secret_data, "password")
           nats_tls = Map.get(secret_data, "tlsEnabled", "false")
 
           %{
