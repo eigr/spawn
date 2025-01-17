@@ -79,19 +79,19 @@ defmodule SpawnOperator do
       pubsub_nats_auth_pass:
         Map.get(annotations, "spawn-eigr.io/sidecar-pubsub-nats-auth-pass", "admin"),
       delayed_invokes: Map.get(annotations, "spawn-eigr.io/sidecar-delayed-invokes", "true"),
-      sync_interval: Map.get(annotations, "spawn-eigr.io/sidecar-crdt-sync-interval", "2"),
-      ship_interval: Map.get(annotations, "spawn-eigr.io/sidecar-crdt-ship-interval", "2"),
-      ship_debounce: Map.get(annotations, "spawn-eigr.io/sidecar-crdt-ship-debounce", "2"),
+      sync_interval: Map.get(annotations, "spawn-eigr.io/sidecar-crdt-sync-interval", "100"),
+      ship_interval: Map.get(annotations, "spawn-eigr.io/sidecar-crdt-ship-interval", "100"),
+      ship_debounce: Map.get(annotations, "spawn-eigr.io/sidecar-crdt-ship-debounce", "100"),
       neighbours_sync_interval:
         Map.get(annotations, "spawn-eigr.io/sidecar-state-handoff-sync-interval", "60000"),
       supervisors_state_handoff_controller:
-        Map.get(annotations, "spawn-eigr.io/supervisors-state-handoff-controller", "crdt"),
+        Map.get(annotations, "spawn-eigr.io/supervisors-state-handoff-controller", "nats"),
       actors_global_backpressure_max_demand:
         Map.get(annotations, "spawn-eigr.io/actors-global-backpressure-max-demand", "-1"),
       actors_global_backpressure_min_demand:
         Map.get(annotations, "spawn-eigr.io/actors-global-backpressure-min-demand", "-1"),
       actors_global_backpressure_enabled:
-        Map.get(annotations, "spawn-eigr.io/actors-global-backpressure-enabled", "true"),
+        Map.get(annotations, "spawn-eigr.io/actors-global-backpressure-enabled", "false"),
       grpc_include_protos_path:
         Map.get(annotations, "spawn-eigr.io/grpc-include-protos-path", "/shared/protos")
     }
