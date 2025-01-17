@@ -85,6 +85,7 @@ defmodule SpawnOperator.K8s.System.Secret.ActorSystemSecret do
   end
 
   defp get_dist_options(system, ns, params) do
+
     kind = Map.get(params, "kind", "erlang")
 
     case String.to_existing_atom(kind) do

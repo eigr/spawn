@@ -108,11 +108,13 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
 
     cluster =
       Map.get(params, "cluster", %{"features" => %{"erlangMtls" => %{"enabled" => false}}})
+      |> IO.inspect(label: "cluster")
 
     erlang_mtls_enabled =
       Map.get(cluster, "features", %{})
       |> Map.get("erlangMtls", %{})
       |> Map.get("enabled", false)
+      |> IO.inspect(label: "erlang_mtls_enabled")
 
     erlang_profile =
       if erlang_mtls_enabled,
