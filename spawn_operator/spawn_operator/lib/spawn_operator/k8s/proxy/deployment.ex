@@ -102,7 +102,7 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
     IO.inspect(params, label: "spec")
 
     erlang_mtls_enabled =
-      System.get_env("ERL_CLUSTER_MTL_ENABLED", "false")
+      System.get_env("ERL_CLUSTER_MTLS_ENABLED", "false")
       |> to_bool()
 
     IO.inspect(erlang_mtls_enabled, label: "Erlang cluster tls enabled")

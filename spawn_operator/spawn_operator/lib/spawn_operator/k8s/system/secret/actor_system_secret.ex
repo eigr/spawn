@@ -115,7 +115,7 @@ defmodule SpawnOperator.K8s.System.Secret.ActorSystemSecret do
         cluster_heartbeat = "240000" |> Base.encode64()
 
         %{
-          "ERL_CLUSTER_MTL_ENABLED" => Base.encode64("#{erlang_mtls_enabled}"),
+          "ERL_CLUSTER_MTLS_ENABLED" => Base.encode64("#{erlang_mtls_enabled}"),
           "ERL_FLAGS" => Base.encode64(erlang_profile),
           "RELEASE_COOKIE" => cookie,
           "PROXY_ACTOR_SYSTEM_NAME" => Base.encode64(system),
