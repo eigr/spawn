@@ -99,6 +99,7 @@ defmodule SpawnOperator.K8s.Proxy.CM.Configmap do
     # Optional. Default "true"
     spawn-eigr.io/actors-global-backpressure-enabled: "true"
   """
+
   @impl true
   def manifest(resource, _opts \\ []), do: gen_configmap(resource)
 
@@ -107,7 +108,7 @@ defmodule SpawnOperator.K8s.Proxy.CM.Configmap do
            system: system,
            namespace: ns,
            name: name,
-           params: _params,
+           params: params,
            labels: _labels,
            annotations: annotations
          } = _resource

@@ -135,6 +135,6 @@ defmodule Spawn.Cluster.ClusterResolver do
     |> Enum.map(&:inet_parse.ntoa(&1))
     |> Enum.map(&"#{app_name}@#{&1}")
     |> Enum.map(&String.to_atom(&1))
-    IO.inspect(&1, label: "Parsed addresses ---------------------")
+    |> IO.inspect(label: "Parsed addresses ---------------------")
   end
 end

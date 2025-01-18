@@ -5,6 +5,13 @@ defmodule SpawnOperator.K8s.System.Secret.ActorSystemSecret do
 
   import Bonny.Config, only: [conn: 0]
 
+  @erlang_profiles %{
+    insecure_erl_flags:
+      "+C multi_time_warp -mode embedded +sbwt none +sbwtdcpu none +sbwtdio none",
+    tls_erl_flags:
+      " -proto_dist inet_tls -ssl_dist_optfile /app/mtls.ssl.conf +C multi_time_warp -mode embedded +sbwt none +sbwtdcpu none +sbwtdio none"
+  }
+
   @impl true
   def manifest(resource, _opts \\ []), do: gen_secret(resource)
 
@@ -26,7 +33,7 @@ defmodule SpawnOperator.K8s.System.Secret.ActorSystemSecret do
 
     data =
       Map.merge(distributed_options, storage_options)
-      |> maybe_use_nats_cluster(name, ns, params)
+      |> maybe_use_nats_cluster(name, ns, cluster_params)
 
     %{
       "apiVersion" => "v1",
@@ -85,8 +92,19 @@ defmodule SpawnOperator.K8s.System.Secret.ActorSystemSecret do
   end
 
   defp get_dist_options(system, ns, params) do
-
     kind = Map.get(params, "kind", "erlang")
+
+    features =
+      Map.get(params, "features", %{"erlangMtls" => %{"enabled" => false}})
+
+    erlang_mtls_enabled =
+      Map.get(features, "erlangMtls", %{})
+      |> Map.get("enabled", false)
+
+    erlang_profile =
+      if erlang_mtls_enabled,
+        do: @erlang_profiles.tls_erl_flags,
+        else: @erlang_profiles.insecure_erl_flags
 
     case String.to_existing_atom(kind) do
       :erlang ->
@@ -97,6 +115,8 @@ defmodule SpawnOperator.K8s.System.Secret.ActorSystemSecret do
         cluster_heartbeat = "240000" |> Base.encode64()
 
         %{
+          "ERL_CLUSTER_MTL_ENABLED" => Base.encode64("#{erlang_mtls_enabled}"),
+          "ERL_FLAGS" => Base.encode64(erlang_profile),
           "RELEASE_COOKIE" => cookie,
           "PROXY_ACTOR_SYSTEM_NAME" => Base.encode64(system),
           "PROXY_CLUSTER_POLLING" => cluster_poolling,
@@ -112,8 +132,6 @@ defmodule SpawnOperator.K8s.System.Secret.ActorSystemSecret do
         %{
           "PROXY_CLUSTER_STRATEGY" => cluster_strategy,
           "PROXY_HEADLESS_SERVICE" => cluster_service
-          # "PROXY_TLS_CERT_PATH" => "",
-          # "PROXY_TLS_KEY_PATH" => ""
         }
 
       _other ->
@@ -122,28 +140,40 @@ defmodule SpawnOperator.K8s.System.Secret.ActorSystemSecret do
   end
 
   defp maybe_use_nats_cluster(config, _name, namespace, params) do
-    cluster_params = Map.get(params, "cluster", %{})
-    features = Map.get(cluster_params, "features", %{})
+    features =
+      Map.get(params, "features", %{
+        "nats" => %{
+          "enabled" => false,
+          "url" => "nats://nats.eigr-functions.svc.cluster.local:4222",
+          "credentialsSecretRef" => "nats-connectin-secret"
+        }
+      })
+
     nats_params = Map.get(features, "nats", %{})
-    enabled = "#{Map.get(nats_params, "enabled", false)}"
+
+    nats_enabled =
+      Map.get(nats_params, "enabled")
+
+    nats_url =
+      Map.get(nats_params, "url")
 
     nats_config =
-      case enabled do
-        "false" ->
+      case nats_enabled do
+        false ->
           %{}
 
-        "true" ->
+        true ->
           nats_secret_ref = Map.fetch!(nats_params, "credentialsSecretRef")
 
           {:ok, secret} =
             K8s.Client.get("v1", :secret,
-              namespace: namespace,
+              namespace: "eigr-functions",
               name: nats_secret_ref
             )
             |> then(&K8s.Client.run(conn(), &1))
 
           secret_data = Map.get(secret, "data")
-          nats_host_url = Map.get(secret_data, "url", nats_params["url"])
+          nats_host_url = nats_url |> Base.encode64()
           nats_auth = Map.get(secret_data, "authEnabled", "false")
           nats_user = Map.get(secret_data, "username")
           nats_secret = Map.get(secret_data, "password")

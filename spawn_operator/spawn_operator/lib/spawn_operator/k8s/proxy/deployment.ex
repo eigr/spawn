@@ -1,7 +1,8 @@
 defmodule SpawnOperator.K8s.Proxy.Deployment do
   @moduledoc false
-
   require Logger
+
+  import SpawnOperator.Utils
 
   @behaviour SpawnOperator.K8s.Manifest
 
@@ -84,13 +85,6 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
 
   @default_termination_period_seconds 405
 
-  @erlang_profiles %{
-    insecure_erl_flags:
-      "+C multi_time_warp -mode embedded +sbwt none +sbwtdcpu none +sbwtdio none",
-    tls_erl_flags:
-      " -proto_dist inet_tls -ssl_dist_optfile /app/mtls.ssl.conf +C multi_time_warp -mode embedded +sbwt none +sbwtdcpu none +sbwtdio none"
-  }
-
   @impl true
   def manifest(resource, _opts \\ []), do: gen_deployment(resource)
 
@@ -105,21 +99,13 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
          } = _resource
        ) do
     host_params = Map.get(params, "host")
-
-    cluster =
-      Map.get(params, "cluster", %{"features" => %{"erlangMtls" => %{"enabled" => false}}})
-      |> IO.inspect(label: "cluster")
+    IO.inspect(params, label: "spec")
 
     erlang_mtls_enabled =
-      Map.get(cluster, "features", %{})
-      |> Map.get("erlangMtls", %{})
-      |> Map.get("enabled", false)
-      |> IO.inspect(label: "erlang_mtls_enabled")
+      System.get_env("ERL_CLUSTER_MTL_ENABLED", "false")
+      |> to_bool()
 
-    erlang_profile =
-      if erlang_mtls_enabled,
-        do: @erlang_profiles.tls_erl_flags,
-        else: @erlang_profiles.insecure_erl_flags
+    IO.inspect(erlang_mtls_enabled, label: "Erlang cluster tls enabled")
 
     task_actors_config = %{"taskActors" => Map.get(host_params, "taskActors", %{})}
     topology = Map.get(params, "topology", %{})
@@ -202,7 +188,6 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
                   host_params,
                   annotations,
                   task_actors_config,
-                  erlang_profile,
                   erlang_mtls_enabled
                 ),
               "initContainers" => init_containers,
@@ -272,7 +257,6 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
          host_params,
          annotations,
          task_actors_config,
-         flags,
          erlang_mtls_enabled
        ) do
     actor_host_function_image = Map.get(host_params, "image")
@@ -288,10 +272,6 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
           "valueFrom" => %{
             "secretKeyRef" => %{"name" => "#{system}-secret", "key" => "RELEASE_COOKIE"}
           }
-        },
-        %{
-          "name" => "ERL_FLAGS",
-          "value" => flags
         }
       ] ++ @default_actor_host_function_env
 
@@ -351,7 +331,6 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
          host_params,
          annotations,
          task_actors_config,
-         flags,
          erlang_mtls_enabled
        ) do
     actor_host_function_image = Map.get(host_params, "image")
@@ -367,10 +346,6 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
           "valueFrom" => %{
             "secretKeyRef" => %{"name" => "#{system}-secret", "key" => "RELEASE_COOKIE"}
           }
-        },
-        %{
-          "name" => "ERL_FLAGS",
-          "value" => flags
         }
       ] ++ @default_actor_host_function_env
 
