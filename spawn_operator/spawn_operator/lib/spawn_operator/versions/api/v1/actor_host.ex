@@ -50,6 +50,124 @@ defmodule SpawnOperator.Versions.Api.V1.ActorHost do
                 type: object
               replicas:
                 type: integer
+              volumes:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    configMap:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        items:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              key:
+                                type: string
+                              path:
+                                type: string
+                    emptyDir:
+                      type: object
+                      properties:
+                        medium:
+                          type: string
+                          enum: ["", "Memory"]
+                        sizeLimit:
+                          type: string
+                    persistentVolumeClaim:
+                      type: object
+                      properties:
+                        claimName:
+                          type: string
+                        readOnly:
+                          type: boolean
+                    secret:
+                      type: object
+                      properties:
+                        secretName:
+                          type: string
+                        items:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              key:
+                                type: string
+                              path:
+                                type: string
+                    hostPath:
+                      type: object
+                      properties:
+                        path:
+                          type: string
+                        type:
+                          type: string
+                          enum: ["", "DirectoryOrCreate", "Directory", "FileOrCreate", "File", "Socket", "CharDevice", "BlockDevice"]
+                    projected:
+                      type: object
+                      properties:
+                        sources:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              configMap:
+                                type: object
+                                properties:
+                                  name:
+                                    type: string
+                                  items:
+                                    type: array
+                                    items:
+                                      type: object
+                                      properties:
+                                        key:
+                                          type: string
+                                        path:
+                                          type: string
+                              secret:
+                                type: object
+                                properties:
+                                  name:
+                                    type: string
+                                  items:
+                                    type: array
+                                    items:
+                                      type: object
+                                      properties:
+                                        key:
+                                          type: string
+                                        path:
+                                          type: string
+                    downwardAPI:
+                      type: object
+                      properties:
+                        items:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              path:
+                                type: string
+                              fieldRef:
+                                type: object
+                                properties:
+                                  fieldPath:
+                                    type: string
+                              resourceFieldRef:
+                                type: object
+                                properties:
+                                  containerName:
+                                    type: string
+                                  resource:
+                                    type: string
+                                  divisor:
+                                    type: string
               topology:
                 type: object
                 properties:
@@ -75,6 +193,15 @@ defmodule SpawnOperator.Versions.Api.V1.ActorHost do
                 properties:
                   image:
                     type: string
+                  volumeMounts:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        mountPath:
+                          type: string
                   embedded:
                     type: boolean
                   sdk:
