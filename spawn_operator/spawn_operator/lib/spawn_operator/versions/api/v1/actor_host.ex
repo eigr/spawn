@@ -89,6 +89,23 @@ defmodule SpawnOperator.Versions.Api.V1.ActorHost do
                           type: string
                         containerPort:
                           type: integer
+                  env:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        value:
+                          type: string
+                        valueFrom:
+                          type: object
+                          properties:
+                            fieldRef:
+                              type: object
+                              properties:
+                                fieldPath:
+                                  type: string
                   taskActors:
                     type: array
                     items:
@@ -132,23 +149,6 @@ defmodule SpawnOperator.Versions.Api.V1.ActorHost do
                                     type: string
                                   effect:
                                     type: string
-              env:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    name:
-                      type: string
-                    value:
-                      type: string
-                    valueFrom:
-                      type: object
-                      properties:
-                        fieldRef:
-                          type: object
-                          properties:
-                            fieldPath:
-                              type: string
       """a,
       additionalPrinterColumns: [
         %{
