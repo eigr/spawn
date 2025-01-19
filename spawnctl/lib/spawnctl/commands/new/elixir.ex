@@ -39,8 +39,8 @@ defmodule SpawnCtl.Commands.New.Elixir do
 
   import SpawnCtl.Util, only: [log: 3]
 
-  @vsn "2.0.0-RC5"
-  @main_sdk_version "2.0.0-RC5"
+  @vsn "2.0.0-RC9"
+  @main_sdk_version "2.0.0-RC9"
 
   @default_opts %{
     actor_system: "spawn-system",

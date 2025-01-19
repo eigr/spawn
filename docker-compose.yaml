@@ -74,7 +74,7 @@ services:
     ports:
       - "4222:4222"
   # spawn-proxy:
-  #   image: eigr/spawn-proxy:2.0.0-RC5
+  #   image: eigr/spawn-proxy:2.0.0-RC9
   #   restart: always
   #   environment:
   #     PROXY_APP_NAME: spawn

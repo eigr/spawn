@@ -236,7 +236,7 @@ defmodule Actors.Actor.CallerConsumer do
       protocol_major_version: 1,
       protocol_minor_version: 2,
       proxy_name: "spawn",
-      proxy_version: "2.0.0-RC5"
+      proxy_version: "2.0.0-RC9"
     }
   end
 

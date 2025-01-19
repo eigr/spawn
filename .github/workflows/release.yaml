@@ -82,7 +82,7 @@ jobs:
           context: .
           file: ./Dockerfile-proxy
           push: true
-          tags: ghcr.io/eigr/spawn-proxy:latest,ghcr.io/eigr/spawn-proxy:2.0.0-RC5
+          tags: ghcr.io/eigr/spawn-proxy:latest,ghcr.io/eigr/spawn-proxy:2.0.0-RC9
           github-token: ${{ secrets.GHCR_PAT }}
 
       - name: Build and push spawn operator image
@@ -91,7 +91,7 @@ jobs:
           context: .
           file: ./Dockerfile-operator
           push: true
-          tags: ghcr.io/eigr/spawn-operator:latest,ghcr.io/eigr/spawn-operator:2.0.0-RC5
+          tags: ghcr.io/eigr/spawn-operator:latest,ghcr.io/eigr/spawn-operator:2.0.0-RC9
           github-token: ${{ secrets.GHCR_PAT }}
 
       - name: Build and push spawn initializer image
@@ -100,7 +100,7 @@ jobs:
           context: .
           file: ./Dockerfile-initializer
           push: true
-          tags: ghcr.io/eigr/spawn-initializer:latest,ghcr.io/eigr/spawn-initializer:2.0.0-RC5
+          tags: ghcr.io/eigr/spawn-initializer:latest,ghcr.io/eigr/spawn-initializer:2.0.0-RC9
           github-token: ${{ secrets.GHCR_PAT }}
 
       - name: Install Zig

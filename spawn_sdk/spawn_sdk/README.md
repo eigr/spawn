@@ -15,11 +15,11 @@ by adding `spawn_sdk` and `spawn_statestores_*` to your list of dependencies in 
 ```elixir
 def deps do
   [
-    {:spawn_sdk, "~> 2.0.0-RC5"},
+    {:spawn_sdk, "~> 2.0.0-RC9"},
 
     # You can uncomment one of those dependencies if you are going to use Persistent Actors
-    #{:spawn_statestores_mariadb, "~> 2.0.0-RC5"},
-    #{:spawn_statestores_postgres, "~> 2.0.0-RC5"},
+    #{:spawn_statestores_mariadb, "~> 2.0.0-RC9"},
+    #{:spawn_statestores_postgres, "~> 2.0.0-RC9"},
   ]
 end
 ```
