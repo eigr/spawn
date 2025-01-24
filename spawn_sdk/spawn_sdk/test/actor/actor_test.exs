@@ -87,11 +87,12 @@ defmodule Actor.ActorTest do
         SideEffect.to(
           "second_actor",
           "forward_caller_name",
-          %MyMessageResponse{data: "first_actor_value"}
+          %MyMessageResponse{data: "first_actor_value"},
+          nil,
+          metadata: %{"some_meta" => "meta_present"}
         )
       ])
-      |> Value.value(%MyMessageResponse{data: "worked_with_effects"})
-      |> Value.void()
+      |> Value.response(%MyMessageResponse{data: "worked_with_effects"})
     end
 
     defact wrong_state(_ctx) do
@@ -206,7 +207,9 @@ defmodule Actor.ActorTest do
       caller_name = "#{Map.get(ctx.caller || %{}, :name)} as caller to third_actor"
 
       Value.of()
-      |> Value.response(%MyMessageResponse{data: caller_name})
+      |> Value.response(%MyMessageResponse{
+        data: caller_name <> " " <> Map.get(ctx.metadata, "origin_meta")
+      })
     end
 
     defact forward_caller_name(value, %Context{} = _ctx) do
@@ -343,7 +346,7 @@ defmodule Actor.ActorTest do
         delay: 5
       )
 
-      Process.sleep(10)
+      Process.sleep(100)
 
       assert SpawnSdk.invoke(dynamic_actor_name,
                ref: "json_actor_ref",
@@ -364,7 +367,7 @@ defmodule Actor.ActorTest do
         scheduled_at: DateTime.utc_now() |> DateTime.add(5, :second)
       )
 
-      Process.sleep(10)
+      Process.sleep(100)
 
       assert SpawnSdk.invoke(dynamic_actor_name,
                ref: "json_actor_ref",
@@ -440,10 +443,11 @@ defmodule Actor.ActorTest do
                  ref: "my_actor_ref",
                  system: system,
                  action: "pipe_caller",
-                 payload: payload
+                 payload: payload,
+                 metadata: %{"origin_meta" => "meta_present"}
                )
 
-      assert %{data: "second_actor as caller to third_actor"} = response
+      assert %{data: "second_actor as caller to third_actor meta_present"} = response
     end
 
     test "calling a function that sets wrong state type", ctx do

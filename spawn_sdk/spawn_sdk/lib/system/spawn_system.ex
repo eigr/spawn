@@ -370,14 +370,15 @@ defmodule SpawnSdk.System.SpawnSystem do
 
   defp handle_pipe(
          %SpawnSdk.Value{
-           pipe: %SpawnSdk.Flow.Pipe{actor_name: actor_name, action: action} = _pipe
+           pipe: %SpawnSdk.Flow.Pipe{} = pipe
          } = _value
        ) do
-    cmd = if is_atom(action), do: Atom.to_string(action), else: action
+    cmd = if is_atom(pipe.action), do: Atom.to_string(pipe.action), else: pipe.action
 
     pipe = %Spawn.Pipe{
-      actor: actor_name,
-      action_name: cmd
+      actor: pipe.actor_name,
+      action_name: cmd,
+      register_ref: pipe.register_ref
     }
 
     {:pipe, pipe}
@@ -393,14 +394,15 @@ defmodule SpawnSdk.System.SpawnSystem do
 
   defp handle_forward(
          %SpawnSdk.Value{
-           forward: %SpawnSdk.Flow.Forward{actor_name: actor_name, action: action} = _forward
+           forward: %SpawnSdk.Flow.Forward{} = forward
          } = _value
        ) do
-    cmd = if is_atom(action), do: Atom.to_string(action), else: action
+    cmd = if is_atom(forward.action), do: Atom.to_string(forward.action), else: forward.action
 
     forward = %Spawn.Forward{
-      actor: actor_name,
-      action_name: cmd
+      actor: forward.actor_name,
+      action_name: cmd,
+      register_ref: forward.register_ref
     }
 
     {:forward, forward}
@@ -438,6 +440,7 @@ defmodule SpawnSdk.System.SpawnSystem do
           register_ref: effect.register_ref,
           async: true,
           caller: %ActorId{name: caller_name, system: system},
+          metadata: effect.metadata,
           scheduled_to: effect.scheduled_to
         }
       }

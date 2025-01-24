@@ -989,6 +989,20 @@ defmodule Spawn.Pipe do
           json_name: "actionName",
           proto3_optional: nil,
           __unknown_fields__: []
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "register_ref",
+          extendee: nil,
+          number: 3,
+          label: :LABEL_OPTIONAL,
+          type: :TYPE_STRING,
+          type_name: nil,
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "registerRef",
+          proto3_optional: nil,
+          __unknown_fields__: []
         }
       ],
       nested_type: [],
@@ -1005,6 +1019,7 @@ defmodule Spawn.Pipe do
 
   field(:actor, 1, type: :string)
   field(:action_name, 2, type: :string, json_name: "actionName")
+  field(:register_ref, 3, type: :string, json_name: "registerRef")
 end
 
 defmodule Spawn.Forward do
@@ -1043,6 +1058,20 @@ defmodule Spawn.Forward do
           json_name: "actionName",
           proto3_optional: nil,
           __unknown_fields__: []
+        },
+        %Google.Protobuf.FieldDescriptorProto{
+          name: "register_ref",
+          extendee: nil,
+          number: 3,
+          label: :LABEL_OPTIONAL,
+          type: :TYPE_STRING,
+          type_name: nil,
+          default_value: nil,
+          options: nil,
+          oneof_index: nil,
+          json_name: "registerRef",
+          proto3_optional: nil,
+          __unknown_fields__: []
         }
       ],
       nested_type: [],
@@ -1059,6 +1088,7 @@ defmodule Spawn.Forward do
 
   field(:actor, 1, type: :string)
   field(:action_name, 2, type: :string, json_name: "actionName")
+  field(:register_ref, 3, type: :string, json_name: "registerRef")
 end
 
 defmodule Spawn.Fact.MetadataEntry do

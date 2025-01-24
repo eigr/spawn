@@ -73,6 +73,12 @@ defmodule Actors.Actor.Entity.Invocation do
         name = Map.get(message.metadata, "actor-name")
         source_action = Map.get(message.metadata, "actor-action")
 
+        action_metadata =
+          case Map.get(message.metadata, "action-metadata") do
+            nil -> %{}
+            metadata -> Jason.decode!(metadata)
+          end
+
         action =
           actor.settings.projection_settings.subjects
           |> Enum.find(fn subject -> subject.source_action == source_action end)
@@ -82,7 +88,7 @@ defmodule Actors.Actor.Entity.Invocation do
           async: true,
           system: %ActorSystem{name: system_name},
           actor: %Actor{id: actor.id},
-          metadata: message.metadata,
+          metadata: action_metadata,
           action_name: action,
           payload: {:value, Google.Protobuf.Any.decode(message.state)},
           caller: %ActorId{name: name, system: system_name, parent: parent}
@@ -404,7 +410,7 @@ defmodule Actors.Actor.Entity.Invocation do
     response_checkpoint(response, checkpoint, revision, state)
   end
 
-  defp is_authorized?(invocation, actions, timers) do
+  defp is_authorized?(invocation, _actions, _timers) do
     acl_manager = get_acl_manager()
 
     acl_manager.get_policies!()
@@ -580,7 +586,7 @@ defmodule Actors.Actor.Entity.Invocation do
          } = _params
        )
        when is_nil(workflow) or workflow == %{} do
-    :ok = do_handle_projection(id, request.action_name, settings, state, response)
+    :ok = do_handle_projection(id, request, settings, state, response)
 
     response
   end
@@ -595,12 +601,14 @@ defmodule Actors.Actor.Entity.Invocation do
            opts: opts
          } = _params
        ) do
-    :ok = do_handle_projection(id, request.action_name, settings, state, response)
+    :ok = do_handle_projection(id, request, settings, state, response)
 
     do_run_workflow(request, response, state, opts)
   end
 
-  defp do_handle_projection(id, action, %{sourceable: true} = _settings, _state, response) do
+  defp do_handle_projection(id, request, %{sourceable: true} = _settings, _state, response) do
+    action = request.action_name
+
     stream_name = StreamInitiator.stream_name(id)
     id_name = String.replace(id.name, ".", "-")
 
@@ -615,19 +623,20 @@ defmodule Actors.Actor.Entity.Invocation do
         {"Spawn-System", "#{id.system}"},
         {"Actor-Parent", "#{id.parent}"},
         {"Actor-Name", "#{id.name}"},
-        {"Actor-Action", "#{action}"}
+        {"Actor-Action", "#{action}"},
+        {"Action-Metadata", Jason.encode!(request.current_context.metadata)}
       ]
     )
   end
 
   defp do_handle_projection(
          id,
-         action,
+         request,
          _settings,
          %EntityState{actor: %Actor{settings: %ActorSettings{kind: :PROJECTION}}} = state,
          response
        ) do
-    if :persistent_term.get("view-#{id.name}-#{action}", false) do
+    if :persistent_term.get("view-#{id.name}-#{request.action_name}", false) do
       # no need to persist any state since this is a view only action
       :ok
     else
@@ -650,7 +659,7 @@ defmodule Actors.Actor.Entity.Invocation do
     end
   end
 
-  defp do_handle_projection(_id, _action, _settings, _state, _response), do: :ok
+  defp do_handle_projection(_id, _request, _settings, _state, _response), do: :ok
 
   defp do_run_workflow(
          _request,
@@ -671,7 +680,7 @@ defmodule Actors.Actor.Entity.Invocation do
          opts
        ) do
     Tracer.with_span "run-workflow" do
-      do_side_effects(effects, opts)
+      do_side_effects(request, effects, opts)
       do_broadcast(request, broadcast, opts)
       do_handle_routing(request, response, opts)
     end
@@ -689,7 +698,8 @@ defmodule Actors.Actor.Entity.Invocation do
 
   defp do_handle_routing(
          %ActorInvocation{
-           actor: %ActorId{name: caller_actor_name, system: system_name}
+           actor: %ActorId{name: caller_actor_name, system: system_name},
+           current_context: %Context{metadata: metadata}
          },
          %ActorInvocationResponse{
            payload: payload,
@@ -708,6 +718,7 @@ defmodule Actors.Actor.Entity.Invocation do
           system: %ActorSystem{name: system_name},
           actor: %Actor{id: %ActorId{name: actor_name, system: system_name}},
           action_name: cmd,
+          metadata: metadata,
           payload: payload,
           caller: %ActorId{name: caller_actor_name, system: system_name}
         }
@@ -737,7 +748,8 @@ defmodule Actors.Actor.Entity.Invocation do
   defp do_handle_routing(
          %ActorInvocation{
            actor: %ActorId{name: caller_actor_name, system: system_name},
-           payload: payload
+           payload: payload,
+           current_context: %Context{metadata: metadata}
          } = _request,
          %ActorInvocationResponse{
            workflow:
@@ -756,6 +768,7 @@ defmodule Actors.Actor.Entity.Invocation do
           system: %ActorSystem{name: system_name},
           actor: %Actor{id: %ActorId{name: actor_name, system: system_name}},
           action_name: cmd,
+          metadata: metadata,
           payload: payload,
           caller: %ActorId{name: caller_actor_name, system: system_name}
         }
@@ -810,13 +823,13 @@ defmodule Actors.Actor.Entity.Invocation do
     :noreply
   end
 
-  def do_side_effects(effects, opts \\ [])
+  def do_side_effects(request, effects, opts \\ [])
 
-  def do_side_effects(effects, _opts) when effects == [] do
+  def do_side_effects(_request, effects, _opts) when effects == [] do
     :ok
   end
 
-  def do_side_effects(effects, _opts) when is_list(effects) do
+  def do_side_effects(request, effects, _opts) when is_list(effects) do
     Tracer.with_span "handle-side-effects" do
       try do
         spawn(fn ->
@@ -830,6 +843,9 @@ defmodule Actors.Actor.Entity.Invocation do
                              } = invocation
                          } ->
             try do
+              metadata = Map.merge(request.current_context.metadata, invocation.metadata)
+              invocation = %InvocationRequest{invocation | metadata: metadata}
+
               Actors.invoke(invocation, span_ctx: Tracer.current_span_ctx())
             catch
               error ->

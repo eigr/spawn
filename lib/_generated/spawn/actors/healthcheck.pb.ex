@@ -107,6 +107,8 @@ defmodule Spawn.Actors.Healthcheck.HealthCheckReply do
 end
 
 defmodule Spawn.Actors.Healthcheck.HealthCheckActor.Service do
+  @moduledoc false
+
   use GRPC.Service,
     name: "spawn.actors.healthcheck.HealthCheckActor",
     protoc_gen_elixir_version: "0.14.0"
@@ -717,6 +719,8 @@ defmodule Spawn.Actors.Healthcheck.HealthCheckActor.Service do
 end
 
 defmodule Spawn.Actors.Healthcheck.HealthCheckActor.Stub do
+  @moduledoc false
+
   use GRPC.Stub, service: Spawn.Actors.Healthcheck.HealthCheckActor.Service
 end
 
