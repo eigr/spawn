@@ -280,6 +280,9 @@ message Pipe {
 
   // Action.
   string action_name = 2;
+
+  // Register ref
+  string register_ref = 3;
 }
 
 // Sends the input of a action of an Actor to the input of another action of an
@@ -291,6 +294,9 @@ message Forward {
 
   // Action.
   string action_name = 2;
+
+  // Register ref
+  string register_ref = 3;
 }
 
 // Facts are emitted by actions and represent the internal state of the moment

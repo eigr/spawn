@@ -73,6 +73,12 @@ defmodule Actors.Actor.Entity.Invocation do
         name = Map.get(message.metadata, "actor-name")
         source_action = Map.get(message.metadata, "actor-action")
 
+        action_metadata =
+          case Map.get(message.metadata, "action-metadata") do
+            nil -> %{}
+            metadata -> Jason.decode!(metadata)
+          end
+
         action =
           actor.settings.projection_settings.subjects
           |> Enum.find(fn subject -> subject.source_action == source_action end)
@@ -82,7 +88,7 @@ defmodule Actors.Actor.Entity.Invocation do
           async: true,
           system: %ActorSystem{name: system_name},
           actor: %Actor{id: actor.id},
-          metadata: message.metadata,
+          metadata: action_metadata,
           action_name: action,
           payload: {:value, Google.Protobuf.Any.decode(message.state)},
           caller: %ActorId{name: name, system: system_name, parent: parent}
@@ -580,7 +586,7 @@ defmodule Actors.Actor.Entity.Invocation do
          } = _params
        )
        when is_nil(workflow) or workflow == %{} do
-    :ok = do_handle_projection(id, request.action_name, settings, state, response)
+    :ok = do_handle_projection(id, request, settings, state, response)
 
     response
   end
@@ -595,12 +601,14 @@ defmodule Actors.Actor.Entity.Invocation do
            opts: opts
          } = _params
        ) do
-    :ok = do_handle_projection(id, request.action_name, settings, state, response)
+    :ok = do_handle_projection(id, request, settings, state, response)
 
     do_run_workflow(request, response, state, opts)
   end
 
-  defp do_handle_projection(id, action, %{sourceable: true} = _settings, _state, response) do
+  defp do_handle_projection(id, request, %{sourceable: true} = _settings, _state, response) do
+    action = request.action_name
+
     stream_name = StreamInitiator.stream_name(id)
     id_name = String.replace(id.name, ".", "-")
 
@@ -615,7 +623,8 @@ defmodule Actors.Actor.Entity.Invocation do
         {"Spawn-System", "#{id.system}"},
         {"Actor-Parent", "#{id.parent}"},
         {"Actor-Name", "#{id.name}"},
-        {"Actor-Action", "#{action}"}
+        {"Actor-Action", "#{action}"},
+        {"Action-Metadata", Jason.encode!(request.metadata)}
       ]
     )
   end
