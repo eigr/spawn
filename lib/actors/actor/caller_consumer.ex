@@ -618,27 +618,22 @@ defmodule Actors.Actor.CallerConsumer do
                 end
               end)
             rescue
-              error ->
-                Logger.error(Exception.format(:error, error, __STACKTRACE__))
+              e ->
+                Logger.error(
+                  "Failure to make a call to actor #{inspect(actor.id.name)} #{inspect(e)}"
+                )
 
-                {:error, :actor_invoke, error}
-            catch
-              :exit, error ->
-                # no need to log because this is already logged by the system
-                {:error, :actor_invoke, error}
+                reraise e, __STACKTRACE__
             end
             |> case do
-              :error = result ->
+              result = :error ->
                 {:cont, result}
 
-              {:error, :action_not_found, _msg} = result ->
+              result = {:error, msg} ->
+                {:cont, result}
+
+              result = {:error, :action_not_found, msg} ->
                 {:halt, result}
-
-              {:error, :actor_invoke, error} ->
-                {:halt, {:error, error}}
-
-              {:error, _msg} = result ->
-                {:cont, result}
 
               result ->
                 {:halt, result}
