@@ -565,6 +565,16 @@ defmodule Actors.Actor.CallerConsumer do
           timeout =
             case metadata["request-timeout"] do
               nil -> 60_000
+              value -> String.to_integer(value)
+            end
+
+          # when a invoke errors or throws an exception
+          # we can backoff or not
+          fail_backoff =
+            case metadata["fail_backoff"] do
+              nil -> false
+              "false" -> false
+              "true" -> true
               value -> value
             end
 
@@ -635,7 +645,9 @@ defmodule Actors.Actor.CallerConsumer do
                 {:halt, result}
 
               {:error, :actor_invoke, error} ->
-                {:halt, {:error, error}}
+                keep_retrying_action = if fail_backoff, do: :cont, else: :halt
+
+                {keep_retrying_action, {:error, error}}
 
               {:error, _msg} = result ->
                 {:cont, result}

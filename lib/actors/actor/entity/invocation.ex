@@ -671,7 +671,7 @@ defmodule Actors.Actor.Entity.Invocation do
          opts
        ) do
     Tracer.with_span "run-workflow" do
-      do_side_effects(effects, opts)
+      do_side_effects(request, effects, opts)
       do_broadcast(request, broadcast, opts)
       do_handle_routing(request, response, opts)
     end
@@ -689,7 +689,8 @@ defmodule Actors.Actor.Entity.Invocation do
 
   defp do_handle_routing(
          %ActorInvocation{
-           actor: %ActorId{name: caller_actor_name, system: system_name}
+           actor: %ActorId{name: caller_actor_name, system: system_name},
+           current_context: %Context{metadata: metadata}
          },
          %ActorInvocationResponse{
            payload: payload,
@@ -708,6 +709,7 @@ defmodule Actors.Actor.Entity.Invocation do
           system: %ActorSystem{name: system_name},
           actor: %Actor{id: %ActorId{name: actor_name, system: system_name}},
           action_name: cmd,
+          metadata: metadata,
           payload: payload,
           caller: %ActorId{name: caller_actor_name, system: system_name}
         }
@@ -737,7 +739,8 @@ defmodule Actors.Actor.Entity.Invocation do
   defp do_handle_routing(
          %ActorInvocation{
            actor: %ActorId{name: caller_actor_name, system: system_name},
-           payload: payload
+           payload: payload,
+           current_context: %Context{metadata: metadata}
          } = _request,
          %ActorInvocationResponse{
            workflow:
@@ -756,6 +759,7 @@ defmodule Actors.Actor.Entity.Invocation do
           system: %ActorSystem{name: system_name},
           actor: %Actor{id: %ActorId{name: actor_name, system: system_name}},
           action_name: cmd,
+          metadata: metadata,
           payload: payload,
           caller: %ActorId{name: caller_actor_name, system: system_name}
         }
@@ -810,13 +814,13 @@ defmodule Actors.Actor.Entity.Invocation do
     :noreply
   end
 
-  def do_side_effects(effects, opts \\ [])
+  def do_side_effects(request, effects, opts \\ [])
 
-  def do_side_effects(effects, _opts) when effects == [] do
+  def do_side_effects(_request, effects, _opts) when effects == [] do
     :ok
   end
 
-  def do_side_effects(effects, _opts) when is_list(effects) do
+  def do_side_effects(request, effects, _opts) when is_list(effects) do
     Tracer.with_span "handle-side-effects" do
       try do
         spawn(fn ->
@@ -830,6 +834,9 @@ defmodule Actors.Actor.Entity.Invocation do
                              } = invocation
                          } ->
             try do
+              metadata = Map.merge(request.current_context.metadata, invocation.metadata)
+              invocation = %InvocationRequest{invocation | metadata: metadata}
+
               Actors.invoke(invocation, span_ctx: Tracer.current_span_ctx())
             catch
               error ->

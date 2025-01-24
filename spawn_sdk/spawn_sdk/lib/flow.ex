@@ -90,24 +90,29 @@ defmodule SpawnSdk.Flow do
     the actor that performs the Pipe is free to process another message
     and the actor that is receiving the Pipe is the one who will respond to the original caller.
     """
-    defstruct actor_name: nil, action: nil
+    defstruct actor_name: nil, action: nil, register_ref: nil
 
     @type t :: %__MODULE__{
             actor_name: String.t(),
-            action: String.t() | atom()
+            action: String.t() | atom(),
+            register_ref: String.t() | nil
           }
 
     @type actor_name :: String.t()
 
+    @type register_ref :: String.t() | nil
+
     @type action :: String.t() | atom()
 
-    @spec to(actor_name(), action()) :: Pipe.t()
-    def to(actor_name, action) do
+    @spec to(actor_name :: actor_name(), action :: action(), register_ref :: register_ref()) ::
+            Forward.t()
+    def to(actor_name, action, register_ref \\ nil) do
       action_name = if is_atom(action), do: Atom.to_string(action), else: action
 
       %__MODULE__{
         actor_name: actor_name,
-        action: action_name
+        action: action_name,
+        register_ref: register_ref
       }
     end
   end
@@ -121,24 +126,29 @@ defmodule SpawnSdk.Flow do
     to process another message and the actor that is receiving the forwarding will respond
     to the original caller.
     """
-    defstruct actor_name: nil, action: nil
+    defstruct actor_name: nil, action: nil, register_ref: nil
 
     @type t :: %__MODULE__{
             actor_name: String.t(),
-            action: String.t() | atom()
+            action: String.t() | atom(),
+            register_ref: String.t() | nil
           }
 
     @type actor_name :: String.t()
 
+    @type register_ref :: String.t() | nil
+
     @type action :: String.t() | atom()
 
-    @spec to(actor_name(), action()) :: Forward.t()
-    def to(actor_name, action) do
+    @spec to(actor_name :: actor_name(), action :: action(), register_ref :: register_ref()) ::
+            Forward.t()
+    def to(actor_name, action, register_ref \\ nil) do
       action_name = if is_atom(action), do: Atom.to_string(action), else: action
 
       %__MODULE__{
         actor_name: actor_name,
-        action: action_name
+        action: action_name,
+        register_ref: register_ref
       }
     end
   end
@@ -150,13 +160,19 @@ defmodule SpawnSdk.Flow do
     They will "always" be processed asynchronously and any response sent back from the Actor
     receiving the effect will be ignored by the effector.
     """
-    defstruct actor_name: nil, action: nil, payload: nil, scheduled_to: nil, register_ref: nil
+    defstruct actor_name: nil,
+              action: nil,
+              payload: nil,
+              scheduled_to: nil,
+              register_ref: nil,
+              metadata: nil
 
     @type t :: %__MODULE__{
             actor_name: String.t(),
             action: String.t() | atom(),
             payload: module(),
             register_ref: String.t() | nil,
+            metadata: map() | nil,
             scheduled_to: integer() | nil
           }
 
@@ -165,6 +181,8 @@ defmodule SpawnSdk.Flow do
     @type action :: String.t() | atom()
 
     @type payload :: term() | nil
+
+    @type metadata :: map() | nil
 
     @spec of() :: list(SideEffect.t())
     def of(), do: []
@@ -184,6 +202,7 @@ defmodule SpawnSdk.Flow do
         action: action_name,
         payload: payload,
         register_ref: register_ref,
+        metadata: opts[:metadata] || %{},
         scheduled_to: parse_scheduled_to(opts[:delay], opts[:scheduled_to])
       }
     end

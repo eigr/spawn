@@ -48,37 +48,27 @@ defmodule SpawnSdk.Defact do
       )
 
       def handle_action({unquote(action_name), payload}, context) do
-        try do
-          case {:erlang.fun_info(unquote(block_fn), :arity), unquote(action_name)} do
-            {{:arity, 1}, _name} ->
-              unquote(block_fn).(context)
+        case {:erlang.fun_info(unquote(block_fn), :arity), unquote(action_name)} do
+          {{:arity, 1}, _name} ->
+            unquote(block_fn).(context)
 
-            {{:arity, 2}, action} when action not in ~w(init Init Setup setup) ->
-              unquote(block_fn).(context, payload)
+          {{:arity, 2}, action} when action not in ~w(init Init Setup setup) ->
+            unquote(block_fn).(context, payload)
 
-            {{:arity, arity}, _} ->
-              raise SpawnSdk.Actor.MalformedActor,
-                    "Invalid callback arity #{arity} needs to be in (1, 2) for action=#{unquote(action_name)}"
-          end
-          |> case do
-            %SpawnSdk.Value{} = value ->
-              value
+          {{:arity, arity}, _} ->
+            raise SpawnSdk.Actor.MalformedActor,
+                  "Invalid callback arity #{arity} needs to be in (1, 2) for action=#{unquote(action_name)}"
+        end
+        |> case do
+          %SpawnSdk.Value{} = value ->
+            value
 
-            {:reply, %SpawnSdk.Value{} = value} ->
-              value
+          {:reply, %SpawnSdk.Value{} = value} ->
+            value
 
-            _ ->
-              raise SpawnSdk.Actor.MalformedActor,
-                    "Return value for action=#{unquote(action_name)} must be a %Value{} struct"
-          end
-        rescue
-          e ->
-            reraise SpawnSdk.Actor.MalformedActor,
-                    [
-                      message: "Error in action=#{unquote(action_name)} error=#{inspect(e)}",
-                      exception: e
-                    ],
-                    __STACKTRACE__
+          _ ->
+            raise SpawnSdk.Actor.MalformedActor,
+                  "Return value for action=#{unquote(action_name)} must be a %Value{} struct"
         end
       end
     end

@@ -87,20 +87,12 @@ defmodule Spawn.Cluster.ClusterResolver do
     service = Keyword.fetch!(config, :service)
     resolver = Keyword.get(config, :resolver, &:inet_res.getbyname(&1, :a))
 
-    IO.inspect(app_name, label: "Using application name ---------------------")
-    IO.inspect(service, label: "Using service ---------------------")
-    IO.inspect(resolver, label: "Using resolver ---------------------") 
-    IO.inspect(Node.get_cookie(), label: "Using node cookie ---------------------")
-
     cond do
       app_name != nil and service != nil ->
         headless_service = to_charlist(service)
 
-        IO.inspect(headless_service, label: "Using headless service ---------------------")
-
         case resolver.(headless_service) do
           {:ok, {:hostent, _fqdn, [], :inet, _value, addresses}} ->
-            IO.inspect(addresses, label: "Using addresses ---------------------")
             parse_response(addresses, app_name)
 
           {:error, reason} ->
@@ -135,6 +127,5 @@ defmodule Spawn.Cluster.ClusterResolver do
     |> Enum.map(&:inet_parse.ntoa(&1))
     |> Enum.map(&"#{app_name}@#{&1}")
     |> Enum.map(&String.to_atom(&1))
-    |> IO.inspect(label: "Parsed addresses ---------------------")
   end
 end
