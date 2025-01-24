@@ -89,7 +89,7 @@ defmodule Spawn.Cluster.ClusterResolver do
 
     IO.inspect(app_name, label: "Using application name ---------------------")
     IO.inspect(service, label: "Using service ---------------------")
-    IO.inspect(resolver, label: "Using resolver ---------------------") 
+    IO.inspect(resolver, label: "Using resolver ---------------------")
     IO.inspect(Node.get_cookie(), label: "Using node cookie ---------------------")
 
     cond do

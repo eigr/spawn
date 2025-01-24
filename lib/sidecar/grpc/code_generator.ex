@@ -88,16 +88,16 @@ defmodule Sidecar.GRPC.CodeGenerator do
     svcs = :persistent_term.get(:proto_file_descriptors, [])
     current_services = :persistent_term.get(:grpc_services, [])
 
-    dispatchers =
-      current_services
-      |> Enum.reduce("", fn svc, acc -> "#{svc}.ActorDispatcher,\n#{acc}" end)
+    # dispatchers =
+    #   current_services
+    #   |> Enum.reduce("", fn svc, acc -> "#{svc}.ActorDispatcher,\n#{acc}" end)
+    #
+    # reflections =
+    #   current_services
+    #   |> Enum.reduce("", fn svc, acc -> "#{svc}.Service,\n#{acc}" end)
 
-    reflections =
-      current_services
-      |> Enum.reduce("", fn svc, acc -> "#{svc}.Service,\n#{acc}" end)
-
-    compile_proxy_endpoint(dispatchers)
-    compile_reflections(reflections)
+    # compile_proxy_endpoint(dispatchers)
+    # compile_reflections(reflections)
     put_actor_definition_settings(svcs)
 
     :persistent_term.erase(:proto_file_descriptors)
