@@ -25,7 +25,6 @@ defmodule Actors.Actor.CallerConsumer do
     ActorSettings,
     ActorSystem,
     Registry,
-    ActorOpts,
     TimeoutStrategy,
     ProjectionSettings,
     ActorDeactivationStrategy,

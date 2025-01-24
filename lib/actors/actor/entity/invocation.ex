@@ -404,7 +404,7 @@ defmodule Actors.Actor.Entity.Invocation do
     response_checkpoint(response, checkpoint, revision, state)
   end
 
-  defp is_authorized?(invocation, actions, timers) do
+  defp is_authorized?(invocation, _actions, _timers) do
     acl_manager = get_acl_manager()
 
     acl_manager.get_policies!()
