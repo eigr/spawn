@@ -40,6 +40,13 @@ defmodule Actor.ActorTest do
       |> Value.void()
     end)
 
+    action("test_error", fn _ctx, _payload ->
+      # match error
+      1 = 2
+
+      Value.of()
+    end)
+
     action("sum", fn %Context{} = ctx, %MyMessageRequest{id: id, data: data} ->
       current_state = ctx.state
       new_state = current_state
@@ -408,6 +415,21 @@ defmodule Actor.ActorTest do
   end
 
   describe "invoke with routing" do
+    test "simple match error inside an action", ctx do
+      system = ctx.system
+
+      dynamic_actor_name = "#{inspect(make_ref())}" <> "simple_error"
+
+      assert {:ok, response} =
+               SpawnSdk.invoke(dynamic_actor_name,
+                 ref: "my_actor_ref",
+                 system: system,
+                 action: "test_error"
+               )
+
+      assert {:error, _} = response
+    end
+
     test "simple call that goes through 3 actors piping each other", ctx do
       system = ctx.system
 
