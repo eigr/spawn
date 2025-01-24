@@ -705,7 +705,7 @@ defmodule Actors.Actor.Entity.Invocation do
            payload: payload,
            workflow:
              %Workflow{
-               routing: {:pipe, %Pipe{actor: actor_name, action_name: cmd} = _pipe} = _workflow
+               routing: {:pipe, %Pipe{actor: actor_name, action_name: cmd} = pipe} = _workflow
              } = response
          },
          opts
@@ -717,6 +717,7 @@ defmodule Actors.Actor.Entity.Invocation do
         invocation = %InvocationRequest{
           system: %ActorSystem{name: system_name},
           actor: %Actor{id: %ActorId{name: actor_name, system: system_name}},
+          register_ref: pipe.register_ref,
           action_name: cmd,
           metadata: metadata,
           payload: payload,
@@ -755,7 +756,7 @@ defmodule Actors.Actor.Entity.Invocation do
            workflow:
              %Workflow{
                routing:
-                 {:forward, %Forward{actor: actor_name, action_name: cmd} = _pipe} = _workflow
+                 {:forward, %Forward{actor: actor_name, action_name: cmd} = forward} = _workflow
              } = response
          },
          opts
@@ -767,6 +768,7 @@ defmodule Actors.Actor.Entity.Invocation do
         invocation = %InvocationRequest{
           system: %ActorSystem{name: system_name},
           actor: %Actor{id: %ActorId{name: actor_name, system: system_name}},
+          register_ref: forward.register_ref,
           action_name: cmd,
           metadata: metadata,
           payload: payload,
