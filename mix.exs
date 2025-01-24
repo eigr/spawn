@@ -78,6 +78,7 @@ defmodule Spawn.MixProject do
       {:protobuf, "~> 0.14"},
       {:protobuf_generate, "~> 0.1"},
       {:grpc, "~> 0.8"},
+      {:grpc_reflection, "~> 0.1"},
       {:finch, "~> 0.18"},
       {:flame_k8s_backend, "~> 0.5"},
       {:retry, "~> 0.17"},
@@ -105,9 +106,12 @@ defmodule Spawn.MixProject do
       {:opentelemetry_ecto, "~> 1.2"},
       {:opentelemetry_exporter, "~> 1.0"},
       # Statestores deps
-      {:spawn_statestores_mariadb, "2.0.0-RC9", optional: true},
-      {:spawn_statestores_postgres, "2.0.0-RC9", optional: true},
-      {:spawn_statestores_native, "2.0.0-RC9", optional: true},
+      {:spawn_statestores_mariadb,
+       path: "./spawn_statestores/statestores_mariadb", optional: false},
+      {:spawn_statestores_postgres,
+       path: "./spawn_statestores/statestores_postgres", optional: false},
+      {:spawn_statestores_native,
+       path: "./spawn_statestores/statestores_native", optional: false},
       {:pluggable, "~> 1.0"},
       # Non runtime deps
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},

@@ -420,12 +420,14 @@ defmodule Actor.ActorTest do
 
       dynamic_actor_name = "#{inspect(make_ref())}" <> "simple_error"
 
-      assert {:error, _response} =
+      assert {:ok, response} =
                SpawnSdk.invoke(dynamic_actor_name,
                  ref: "my_actor_ref",
                  system: system,
                  action: "test_error"
                )
+
+      assert {:error, _} = response
     end
 
     test "simple call that goes through 3 actors piping each other", ctx do

@@ -46,7 +46,7 @@ defmodule Sidecar.GRPC.Supervisor do
 
   defp maybe_start_reflection(children, true) do
     Logger.info("Starting gRPC Reflection...")
-    children |> List.flatten()
+    (children ++ [{GrpcReflection, []}]) |> List.flatten()
   end
 
   defp maybe_start_grpc_server(children, false), do: children
@@ -55,12 +55,11 @@ defmodule Sidecar.GRPC.Supervisor do
     port = Config.get(:grpc_port)
     Logger.debug("Starting gRPC Server on port #{inspect(port)}...")
 
-    # ++
-    children
-    # [
-    #   {GRPC.Server.Supervisor,
-    #    endpoint: Sidecar.GRPC.ProxyEndpoint, port: port, start_server: true}
-    # ])
+    (children ++
+       [
+         {GRPC.Server.Supervisor,
+          endpoint: Sidecar.GRPC.ProxyEndpoint, port: port, start_server: true}
+       ])
     |> List.flatten()
   end
 
