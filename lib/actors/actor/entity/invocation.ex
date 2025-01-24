@@ -624,7 +624,7 @@ defmodule Actors.Actor.Entity.Invocation do
         {"Actor-Parent", "#{id.parent}"},
         {"Actor-Name", "#{id.name}"},
         {"Actor-Action", "#{action}"},
-        {"Action-Metadata", Jason.encode!(request.metadata)}
+        {"Action-Metadata", Jason.encode!(request.current_context.metadata)}
       ]
     )
   end
