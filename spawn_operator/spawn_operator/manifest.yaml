@@ -1,14 +1,6 @@
 ---
-metadata:
-  name: spawn-operator
-  labels:
-    k8s-app: spawn-operator
-  namespace: eigr-functions
 spec:
   template:
-    metadata:
-      labels:
-        k8s-app: spawn-operator
     spec:
       containers:
         - env:
@@ -35,7 +27,6 @@ spec:
           name: spawn-operator
           ports:
             - containerPort: 9090
-          #image: ghcr.io/eigr/spawn-operator:2.0.0-RC9
           image: docker.io/eigr/spawn-operator:2.0.0-RC9
           resources:
             limits:
@@ -75,27 +66,32 @@ spec:
       volumes:
         - emptyDir: {}
           name: bakeware-cache
+    metadata:
+      labels:
+        k8s-app: spawn-operator
   replicas: 1
   selector:
     matchLabels:
       k8s-app: spawn-operator
+metadata:
+  name: spawn-operator
+  labels:
+    k8s-app: spawn-operator
+  namespace: eigr-functions
 kind: Deployment
 apiVersion: apps/v1
 
 ---
-metadata:
-  name: activators.spawn-eigr.io
-  labels: {}
 spec:
   scope: Cluster
   group: spawn-eigr.io
   names:
     kind: Activator
+    singular: activator
     plural: activators
     shortNames:
       - act
       - acts
-    singular: activator
   versions:
     - name: v1
       deprecated: false
@@ -110,23 +106,24 @@ spec:
                   type: integer
           x-kubernetes-preserve-unknown-fields: true
       additionalPrinterColumns: []
-      storage: true
       subresources:
         status: {}
       served: true
+      storage: true
       deprecationWarning:
+metadata:
+  name: activators.spawn-eigr.io
+  labels: {}
 kind: CustomResourceDefinition
 apiVersion: apiextensions.k8s.io/v1
 
 ---
-metadata:
-  name: actorhosts.spawn-eigr.io
-  labels: {}
 spec:
   scope: Cluster
   group: spawn-eigr.io
   names:
     kind: ActorHost
+    singular: actorhost
     plural: actorhosts
     shortNames:
       - ac
@@ -134,7 +131,6 @@ spec:
       - actor
       - actors
       - hosts
-    singular: actorhost
   versions:
     - name: v1
       deprecated: false
@@ -287,6 +283,15 @@ spec:
                             type: object
                         type: object
                       type: array
+                    volumeMounts:
+                      items:
+                        properties:
+                          mountPath:
+                            type: string
+                          name:
+                            type: string
+                        type: object
+                      type: array
                   required:
                     - image
                   type: object
@@ -310,6 +315,134 @@ spec:
                         type: object
                       type: array
                   type: object
+                volumes:
+                  items:
+                    properties:
+                      configMap:
+                        properties:
+                          items:
+                            items:
+                              properties:
+                                key:
+                                  type: string
+                                path:
+                                  type: string
+                              type: object
+                            type: array
+                          name:
+                            type: string
+                        type: object
+                      downwardAPI:
+                        properties:
+                          items:
+                            items:
+                              properties:
+                                fieldRef:
+                                  properties:
+                                    fieldPath:
+                                      type: string
+                                  type: object
+                                path:
+                                  type: string
+                                resourceFieldRef:
+                                  properties:
+                                    containerName:
+                                      type: string
+                                    divisor:
+                                      type: string
+                                    resource:
+                                      type: string
+                                  type: object
+                              type: object
+                            type: array
+                        type: object
+                      emptyDir:
+                        properties:
+                          medium:
+                            enum:
+                              - ""
+                              - Memory
+                            type: string
+                          sizeLimit:
+                            type: string
+                        type: object
+                      hostPath:
+                        properties:
+                          path:
+                            type: string
+                          type:
+                            enum:
+                              - ""
+                              - DirectoryOrCreate
+                              - Directory
+                              - FileOrCreate
+                              - File
+                              - Socket
+                              - CharDevice
+                              - BlockDevice
+                            type: string
+                        type: object
+                      name:
+                        type: string
+                      persistentVolumeClaim:
+                        properties:
+                          claimName:
+                            type: string
+                          readOnly:
+                            type: boolean
+                        type: object
+                      projected:
+                        properties:
+                          sources:
+                            items:
+                              properties:
+                                configMap:
+                                  properties:
+                                    items:
+                                      items:
+                                        properties:
+                                          key:
+                                            type: string
+                                          path:
+                                            type: string
+                                        type: object
+                                      type: array
+                                    name:
+                                      type: string
+                                  type: object
+                                secret:
+                                  properties:
+                                    items:
+                                      items:
+                                        properties:
+                                          key:
+                                            type: string
+                                          path:
+                                            type: string
+                                        type: object
+                                      type: array
+                                    name:
+                                      type: string
+                                  type: object
+                              type: object
+                            type: array
+                        type: object
+                      secret:
+                        properties:
+                          items:
+                            items:
+                              properties:
+                                key:
+                                  type: string
+                                path:
+                                  type: string
+                              type: object
+                            type: array
+                          secretName:
+                            type: string
+                        type: object
+                    type: object
+                  type: array
               type: object
       additionalPrinterColumns:
         - name: SDK
@@ -332,29 +465,29 @@ spec:
           type: integer
           description: Maximum number of replicas for the ActorHost
           jsonPath: .spec.autoscaler.max
-      storage: true
       subresources:
         status: {}
       served: true
+      storage: true
       deprecationWarning:
+metadata:
+  name: actorhosts.spawn-eigr.io
+  labels: {}
 kind: CustomResourceDefinition
 apiVersion: apiextensions.k8s.io/v1
 
 ---
-metadata:
-  name: actorsystems.spawn-eigr.io
-  labels: {}
 spec:
   scope: Cluster
   group: spawn-eigr.io
   names:
     kind: ActorSystem
+    singular: actorsystem
     plural: actorsystems
     shortNames:
       - as
       - actorsys
       - system
-    singular: actorsystem
   versions:
     - name: v1
       deprecated: false
@@ -477,11 +610,14 @@ spec:
           type: string
           description: The pool size of the state store
           jsonPath: .spec.statestore.pool.size
-      storage: true
       subresources:
         status: {}
       served: true
+      storage: true
       deprecationWarning:
+metadata:
+  name: actorsystems.spawn-eigr.io
+  labels: {}
 kind: CustomResourceDefinition
 apiVersion: apiextensions.k8s.io/v1
 
