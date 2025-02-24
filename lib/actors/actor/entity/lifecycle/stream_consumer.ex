@@ -6,6 +6,7 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamConsumer do
   alias Spawn.Utils.Nats
   alias Spawn.Fact
   alias Google.Protobuf.Timestamp
+  alias Sidecar.GracefulShutdown
 
   @type fact :: %Fact{}
 
@@ -47,9 +48,14 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamConsumer do
 
   @spec handle_message(any(), Message.t(), any()) :: Message.t()
   def handle_message(_processor_name, message, _context) do
-    message
-    |> build_fact()
-    |> Message.configure_ack(on_success: :term)
+    if GracefulShutdown.running?() do
+      message
+      |> build_fact()
+      |> Message.configure_ack(on_success: :term)
+    else
+      message
+      |> Message.failed("Failed to deliver because app is draining")
+    end
   end
 
   @spec handle_batch(any(), Message.t(), any(), opts()) :: list(Message.t())

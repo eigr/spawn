@@ -4,7 +4,7 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamInitiator do
   """
   require Logger
 
-  alias Actors.Actor.Entity.Lifecycle.ProjectionConsumers
+  alias Actors.Actor.Entity.Lifecycle.StreamConsumer
 
   alias Spawn.Actors.Actor
   alias Spawn.Actors.ProjectionSettings
@@ -245,7 +245,7 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamInitiator do
   end
 
   defp start_pipeline(actor) do
-    ProjectionConsumers.new(%{
+    StreamConsumer.start_link(%{
       actor_name: stream_name(actor),
       projection_pid: self(),
       strict_ordering: actor.settings.projection_settings.strict_events_ordering

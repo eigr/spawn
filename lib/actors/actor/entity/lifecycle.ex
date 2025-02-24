@@ -78,7 +78,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
         actor.id
       )
 
-    schedule_deactivate(deactivation_strategy, get_jitter())
+    schedule_deactivate(actor, deactivation_strategy, get_jitter())
 
     state =
       case maybe_schedule_snapshot_advance(snapshot_strategy) do
@@ -252,7 +252,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
                   %ActorDeactivationStrategy{strategy: deactivation_strategy} =
                     _actor_deactivation_strategy
               }
-            } = _actor
+            } = actor
         } = state
       ) do
     queue_length = Process.info(self(), :message_queue_len)
@@ -265,7 +265,7 @@ defmodule Actors.Actor.Entity.Lifecycle do
         {:stop, :shutdown, state}
 
       _ ->
-        schedule_deactivate(deactivation_strategy)
+        schedule_deactivate(actor, deactivation_strategy)
         {:noreply, state}
     end
   end
@@ -423,7 +423,16 @@ defmodule Actors.Actor.Entity.Lifecycle do
 
   defp maybe_schedule_snapshot_advance(_), do: :ok
 
-  defp schedule_deactivate(deactivation_strategy, timeout_factor \\ 0) do
+  defp schedule_deactivate(actor, deactivation_strategy, timeout_factor \\ 0)
+
+  defp schedule_deactivate(
+         %Actor{settings: %ActorSettings{kind: :PROJECTION}},
+         deactivation_strategy,
+         timeout_factor
+       ),
+       do: :ok
+
+  defp schedule_deactivate(_actor, deactivation_strategy, timeout_factor) do
     strategy = maybe_get_default_deactivation_strategy(deactivation_strategy)
 
     Process.send_after(
