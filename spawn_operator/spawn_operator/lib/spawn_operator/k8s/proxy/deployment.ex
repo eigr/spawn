@@ -195,7 +195,7 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
             }
             |> maybe_put_node_selector(topology)
             |> maybe_put_node_tolerations(topology)
-            |> maybe_put_image_pull_secrets(topology)
+            |> maybe_put_image_pull_secrets(host_params)
             |> maybe_put_volumes(params, erlang_mtls_enabled)
             |> maybe_set_termination_period(params)
         }
@@ -457,7 +457,10 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
 
   defp maybe_put_node_tolerations(spec, _), do: spec
 
-  defp maybe_put_image_pull_secrets(spec, %{"imagePullSecrets" => image_pull_secrets} = _topology) do
+  defp maybe_put_image_pull_secrets(
+         spec,
+         %{"imagePullSecrets" => image_pull_secrets} = _host_params
+       ) do
     Map.merge(spec, %{"imagePullSecrets" => image_pull_secrets})
   end
 
