@@ -193,6 +193,8 @@ defmodule SpawnOperator.Versions.Api.V1.ActorHost do
                 properties:
                   image:
                     type: string
+                  pullSecretsRef:
+                    type: string
                   volumeMounts:
                     type: array
                     items:
