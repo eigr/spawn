@@ -459,9 +459,9 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
 
   defp maybe_put_image_pull_secrets(
          spec,
-         %{"imagePullSecrets" => image_pull_secrets} = _host_params
+         %{"pullSecretRef" => secret_name} = _host_params
        ) do
-    Map.merge(spec, %{"imagePullSecrets" => image_pull_secrets})
+    Map.merge(spec, %{"imagePullSecrets" => %{"name" => secret_name}})
   end
 
   defp maybe_put_image_pull_secrets(spec, _), do: spec
