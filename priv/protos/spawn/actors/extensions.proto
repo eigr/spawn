@@ -23,6 +23,10 @@ message ActorViewOption {
   int32 page_size = 3;
 }
 
+message AgentActorToolOpts {
+  string description = 1;
+}
+
 extend google.protobuf.FieldOptions {
   bool actor_id = 9999;
 }
@@ -37,4 +41,32 @@ extend google.protobuf.MethodOptions {
 
 extend google.protobuf.ServiceOptions {
   ActorOpts actor = 4890128;
+}
+
+// Agents via MCP protocol
+// example:
+// message ForecastPayload {
+//   string date = 1 [
+//     (spawn.actors.agent_arg) = "A date which you want to fetch the forecast",
+//     (spawn.actors.agent_required) = true
+//   ];
+// }
+extend google.protobuf.FieldOptions {
+  string agent_arg = 4890130;
+}
+
+extend google.protobuf.FieldOptions {
+  bool agent_required = 4890131;
+}
+
+// example:
+// service WeatherActor {
+//   rpc GetForecast(ForecastPayload) returns (Spawn.Mcp.TextResponse) {
+//     option (spawn.actors.agent) = {
+//       description = "Get current weather information for a date"
+//     };
+//   }
+// }
+extend google.protobuf.ServiceOptions {
+  AgentActorToolOpts agent = 4890132;
 }
