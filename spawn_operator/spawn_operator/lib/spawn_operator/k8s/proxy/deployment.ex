@@ -151,12 +151,12 @@ defmodule SpawnOperator.K8s.Proxy.Deployment do
       "metadata" => %{
         "name" => name,
         "namespace" => system,
-        "labels" => %{"app" => name, "actor-system" => system}
+        "labels" => %{"app" => name, "actor-system" => system, "operator" => "spawn-operator"}
       },
       "spec" => %{
         "replicas" => replicas,
         "selector" => %{
-          "matchLabels" => %{"actor-system" => system}
+          "matchLabels" => %{"actor-system" => system, "operator" => "spawn-operator"}
         },
         "strategy" => %{
           "type" => "RollingUpdate",
