@@ -34,6 +34,8 @@ defmodule SpawnOperator.Handler.ActorSystemHandler do
   alias SpawnOperator.K8s.System.RoleBinding
   alias SpawnOperator.K8s.System.Secret.ActorSystemSecret
   alias SpawnOperator.K8s.System.ServiceAccount
+  alias SpawnOperator.K8s.System.EpmdDS
+  alias SpawnOperator.K8s.System.EpmdPolicy
 
   @behaviour Pluggable
 
@@ -51,7 +53,9 @@ defmodule SpawnOperator.Handler.ActorSystemHandler do
       {:cluster_service, build_system_service(resource)},
       {:service_account, build_service_account(resource)},
       {:roles, build_role(resource)},
-      {:role_binding, build_role_binding(resource)}
+      {:role_binding, build_role_binding(resource)},
+      {:epmd_daemonset, build_epmd_daemonset(resource)},
+      {:epmd_network_policy, build_epmd_network_policy(resource)}
     ]
 
     axn =
@@ -132,6 +136,16 @@ defmodule SpawnOperator.Handler.ActorSystemHandler do
   end
 
   defp build_role_binding(resource) do
+    SpawnOperator.get_args(resource)
+    |> RoleBinding.manifest()
+  end
+
+  defp build_epmd_daemonset(resource) do
+    SpawnOperator.get_args(resource)
+    |> RoleBinding.manifest()
+  end
+
+  defp build_epmd_network_policy(resource) do
     SpawnOperator.get_args(resource)
     |> RoleBinding.manifest()
   end
