@@ -293,6 +293,25 @@ run-proxy-with-postgres:
 	SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= \
 	iex --name spawn_a3@127.0.0.1 -S mix
 
+run-proxy-with-mariadb:
+	cd spawn_proxy/proxy && mix deps.get && \
+	OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:4317 \
+	OTEL_EXPORTER_OTLP_TRACES_PROTOCOL=grpc \
+	OTEL_EXPORTER_OTLP_TRACES_COMPRESSION=gzip \
+	SPAWN_PROXY_LOGGER_LEVEL=info \
+	PROXY_CLUSTER_STRATEGY=epmd \
+	SPAWN_USE_INTERNAL_NATS=false \
+	SPAWN_PUBSUB_ADAPTER=native \
+	PROXY_DATABASE_PORT=3307 \
+	PROXY_DATABASE_TYPE=mariadb \
+	PROXY_DATABASE_USERNAME=admin \
+	PROXY_DATABASE_SECRET=admin \
+	PROXY_DATABASE_POOL_SIZE=30 \
+	PROXY_HTTP_PORT=9001 \
+	USER_FUNCTION_PORT=8090 \
+	SPAWN_STATESTORE_KEY=3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE= \
+	iex --name spawn_a3@127.0.0.1 -S mix
+
 run-proxy-local-nodejs-test:
 	ERL_ZFLAGS='-proto_dist inet_tls -ssl_dist_optfile rel/overlays/local-mtls.ssl.conf' \
 	cd spawn_proxy/proxy && mix deps.get && \
