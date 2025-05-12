@@ -9,6 +9,7 @@
 
 ![ci](https://github.com/eigr/spawn/actions/workflows/ci.yaml/badge.svg)
 [![docs-ci](https://github.com/eigr/spawn/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/eigr/spawn/actions/workflows/pages/pages-build-deployment)
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/10543/badge)](https://www.bestpractices.dev/projects/10543)
 ![last commit](https://img.shields.io/github/last-commit/eigr/spawn?style=social)
 [![join discord](https://badgen.net/badge/discord/Join%20Eigr%20on%20Discord/discord?icon=discord&label&color=blue)](https://discord.gg/2PcshvfS93)
 [![twitter](https://badgen.net/badge/twitter/@eigr_io/blue?label&icon=twitter)](https://twitter.com/eigr_io)
