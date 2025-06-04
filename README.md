@@ -19,8 +19,8 @@
 
 ## Overview
 
-**Spawn is your actor-native service mesh for durable, stateful computing — polyglot by design, protocol-agnostic by nature.**
-**Write once, run over all protocols:** Erlang-native, gRPC, or HTTP with automatic transcoding. One implementation, accessible everywhere. No boilerplate, no glue code — just clean actor abstractions that speak all your transports fluently.
+**Spawn** is your actor-native service mesh for **durable, stateful computing** — **polyglot** by design, protocol-agnostic by nature.
+**Write once, run over all protocols:** Erlang-native, gRPC, or HTTP with automatic transcoding. One implementation, accessible everywhere. No boilerplate, no glue code — just clean actor abstractions that speak a*ll your transports fluently.
 
 Spawn simplifies the hardest part of distributed systems — **managing state at scale** — by wrapping it in an actor model that's native to modern protocols and tooling. Built by contributors to [Cloudstate](https://github.com/cloudstateio/cloudstate), it brings durable computing to your favorite language: Elixir, Java, TypeScript, Python, Rust, Go, Dart... you name it.
 
@@ -35,7 +35,7 @@ Define your service once using Protobuf annotations:
 
   ✅ Native Erlang invocation.
 
-  ✅ gRPC for high-performance internal APIs.
+  ✅ gRPC for high-performance APIs.
 
   ✅ HTTP transcoding for REST endpoints.
 
