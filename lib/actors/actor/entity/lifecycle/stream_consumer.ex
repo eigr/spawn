@@ -67,8 +67,6 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamConsumer do
 
   @spec build_fact(Message.t()) :: Message.t()
   defp build_fact(message) do
-    # %Broadway.Message{data: "{\"ACTION\":\"KEY_ADDED\",\"KEY\":\"MYKEY\",\"VALUE\":\"MYVALUE\"}", metadata: %{headers: [], topic: "actors.mike"}, acknowledger: {OffBroadway.Jetstream.Acknowledger, #Reference<0.743380651.807927811.227242>, %{on_success: :term, reply_to: "$JS.ACK.newtest.projectionviewertest.1.11.11.1725657673932595345.21"}}, batcher: :default, batch_key: :default, batch_mode: :bulk, status: :ok}
-
     message
     |> Message.put_data(process_data(message))
   end
