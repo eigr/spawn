@@ -13,7 +13,7 @@ defmodule SpawnSdkExample.Actors.ClockActor do
     Logger.info("[clock] Clock Actor Received Request. Context: #{inspect(ctx)}")
 
     new_value = if is_nil(state), do: 0, else: state.value + 1
-    new_state = MyState.new(value: new_value)
+    new_state = %MyState{value: new_value}
 
     Value.of()
     |> Value.state(new_state)
@@ -26,7 +26,7 @@ defmodule SpawnSdkExample.Actors.ClockActor do
     Logger.info("[SECOND_CLOCK] Second Actor Received Request. Context: #{inspect(ctx)}")
 
     new_value = if is_nil(state), do: 0, else: state.value + 1
-    new_state = MyState.new(value: new_value)
+    new_state = %MyState{value: new_value}
 
     Value.of()
     |> Value.state(new_state)

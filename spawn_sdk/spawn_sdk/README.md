@@ -212,7 +212,7 @@ defmodule SpawnSdkExample.Actors.ForwardPipeActor do
     Logger.info("Received request with #{msg.value}")
 
     Value.of()
-    |> Value.response(MyBusinessMessage.new(value: 999))
+    |> Value.response(%MyBusinessMessage{value: 999})
     |> Value.pipe(
       Pipe.to("second_actor", "sum_plus_one")
     )
@@ -233,7 +233,7 @@ defmodule SpawnSdkExample.Actors.SecondActorExample do
     Logger.info("Received request with #{msg.value}")
 
     Value.of()
-    |> Value.response(MyBusinessMessage.new(value: msg.value + 1))
+    |> Value.response(%MyBusinessMessage{value: msg.value + 1})
     |> Value.void()
   end
 end
@@ -444,7 +444,7 @@ defmodule SpawnSdkExample.Actors.ClockActor do
     Logger.info("[clock] Clock Actor Received Request. Context: #{inspect(ctx)}")
 
     new_value = if is_nil(state), do: 0, else: state.value + 1
-    new_state = MyState.new(value: new_value)
+    new_state = %MyState{value: new_value}
 
     Value.of()
     |> Value.state(new_state)
