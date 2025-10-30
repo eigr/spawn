@@ -117,8 +117,10 @@ defmodule Actors.FactoryTest do
   def build_actor_state(attrs \\ []) do
     state =
       any_pack!(%Actors.Protos.StateTest{name: "example_state_name_#{inspect(make_ref())}"})
+    
+    value = attrs[:state] || state
 
-    %ActorState{state: Any.new(attrs[:state] || state)}
+    %ActorState{state: %Any{type_url: get_type_url(Actors.Protos.StateTest)}, value: value}
   end
 
   def build_actor_deactivation_strategy(attrs \\ []) do
