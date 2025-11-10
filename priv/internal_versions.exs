@@ -7,12 +7,6 @@ defmodule InternalVersions do
     spawn_statestores_postgres: "2.0.0-RC9",
     spawn: "2.0.0-RC9",
     spawn_sdk: "2.0.0-RC9",
-    activator: "2.0.0-RC9",
-    activator_api: "2.0.0-RC9",
-    activator_kafka: "2.0.0-RC9",
-    activator_pubsub: "2.0.0-RC9",
-    activator_rabbitmq: "2.0.0-RC9",
-    activator_sqs: "2.0.0-RC9",
     proxy: "2.0.0-RC9",
     spawn_operator: "2.0.0-RC9",
     spawnctl: "2.0.0-RC9"

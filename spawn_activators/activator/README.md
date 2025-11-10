@@ -1,3 +1,0 @@
-# Activators
-
-**TODO: Add description**
