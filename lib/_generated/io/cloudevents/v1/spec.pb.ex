@@ -1,6 +1,6 @@
 defmodule Io.Cloudevents.V1.CloudEvent.AttributesEntry do
   @moduledoc false
-  use Protobuf, map: true, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
+  use Protobuf, map: true, protoc_gen_elixir_version: "0.15.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -64,7 +64,7 @@ end
 
 defmodule Io.Cloudevents.V1.CloudEvent.CloudEventAttributeValue do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.15.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -197,7 +197,7 @@ end
 
 defmodule Io.Cloudevents.V1.CloudEvent do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.15.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line

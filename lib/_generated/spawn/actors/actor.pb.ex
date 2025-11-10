@@ -1,6 +1,6 @@
 defmodule Spawn.Actors.Kind do
   @moduledoc false
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.15.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -68,7 +68,7 @@ end
 
 defmodule Spawn.Actors.Registry.ActorsEntry do
   @moduledoc false
-  use Protobuf, map: true, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
+  use Protobuf, map: true, protoc_gen_elixir_version: "0.15.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -132,7 +132,7 @@ end
 
 defmodule Spawn.Actors.Registry do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.15.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -224,7 +224,7 @@ end
 
 defmodule Spawn.Actors.ActorSystem do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.15.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -278,7 +278,7 @@ end
 
 defmodule Spawn.Actors.ActorSnapshotStrategy do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.15.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -325,7 +325,7 @@ end
 
 defmodule Spawn.Actors.ActorDeactivationStrategy do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.15.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -372,7 +372,7 @@ end
 
 defmodule Spawn.Actors.TimeoutStrategy do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.15.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -411,7 +411,7 @@ end
 
 defmodule Spawn.Actors.Action do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.15.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -450,7 +450,7 @@ end
 
 defmodule Spawn.Actors.FixedTimerAction do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.15.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -504,7 +504,7 @@ end
 
 defmodule Spawn.Actors.ActorState.TagsEntry do
   @moduledoc false
-  use Protobuf, map: true, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
+  use Protobuf, map: true, protoc_gen_elixir_version: "0.15.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -568,7 +568,7 @@ end
 
 defmodule Spawn.Actors.ActorState do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.15.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -675,7 +675,7 @@ end
 
 defmodule Spawn.Actors.Metadata.TagsEntry do
   @moduledoc false
-  use Protobuf, map: true, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
+  use Protobuf, map: true, protoc_gen_elixir_version: "0.15.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -739,7 +739,7 @@ end
 
 defmodule Spawn.Actors.Metadata do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.15.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -846,7 +846,7 @@ end
 
 defmodule Spawn.Actors.Channel do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.15.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -900,7 +900,7 @@ end
 
 defmodule Spawn.Actors.ProjectionSubject do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.15.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -984,7 +984,7 @@ end
 
 defmodule Spawn.Actors.EventsRetentionStrategy do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.15.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -1046,7 +1046,7 @@ end
 
 defmodule Spawn.Actors.ProjectionSettings do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.15.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -1135,7 +1135,7 @@ end
 
 defmodule Spawn.Actors.ActorSettings do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.15.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -1293,7 +1293,7 @@ end
 
 defmodule Spawn.Actors.ActorId do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.15.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -1362,7 +1362,7 @@ end
 
 defmodule Spawn.Actors.Actor do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.15.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line

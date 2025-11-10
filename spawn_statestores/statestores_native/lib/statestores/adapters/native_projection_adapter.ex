@@ -5,10 +5,6 @@ defmodule Statestores.Adapters.NativeProjectionAdapter do
   use Statestores.Adapters.ProjectionBehaviour
   use GenServer
 
-  alias Statestores.Schemas.Projection
-
-  import Statestores.Util, only: [normalize_table_name: 1]
-
   @impl true
   def create_or_update_table(_projection_type, _table_name) do
     raise "Projections are not supported using native adapter"
