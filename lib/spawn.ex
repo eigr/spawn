@@ -96,7 +96,7 @@ defmodule Spawn do
 
 
   """
-  @version GRPC.Mixfile.project()[:version]
+  @version Spawn.MixProject.project()[:version]
 
   @doc """
   Returns version of this project.
