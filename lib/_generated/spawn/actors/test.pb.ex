@@ -1,6 +1,6 @@
 defmodule Test.EnumTest do
   @moduledoc false
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.15.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -33,14 +33,14 @@ defmodule Test.EnumTest do
     }
   end
 
-  field(:ENUM_TEST_UNKNOWN, 0)
-  field(:ENUM_TEST_ACTIVE, 1)
-  field(:ENUM_TEST_INACTIVE, 2)
+  field :ENUM_TEST_UNKNOWN, 0
+  field :ENUM_TEST_ACTIVE, 1
+  field :ENUM_TEST_INACTIVE, 2
 end
 
 defmodule Test.TestMessage.Address.Country do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.15.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -88,13 +88,13 @@ defmodule Test.TestMessage.Address.Country do
     }
   end
 
-  field(:name, 1, type: :string)
-  field(:code, 2, type: :string)
+  field :name, 1, type: :string
+  field :code, 2, type: :string
 end
 
 defmodule Test.TestMessage.Address do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.15.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -227,16 +227,16 @@ defmodule Test.TestMessage.Address do
     }
   end
 
-  field(:street, 1, type: :string)
-  field(:city, 2, type: :string)
-  field(:state, 3, type: :string)
-  field(:zip_code, 4, type: :string, json_name: "zipCode")
-  field(:country, 5, type: Test.TestMessage.Address.Country)
+  field :street, 1, type: :string
+  field :city, 2, type: :string
+  field :state, 3, type: :string
+  field :zip_code, 4, type: :string, json_name: "zipCode"
+  field :country, 5, type: Test.TestMessage.Address.Country
 end
 
 defmodule Test.TestMessage.AttributesEntry do
   @moduledoc false
-  use Protobuf, map: true, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
+  use Protobuf, map: true, protoc_gen_elixir_version: "0.15.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -294,13 +294,13 @@ defmodule Test.TestMessage.AttributesEntry do
     }
   end
 
-  field(:key, 1, type: :string)
-  field(:value, 2, type: :string)
+  field :key, 1, type: :string
+  field :value, 2, type: :string
 end
 
 defmodule Test.TestMessage do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.15.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -688,15 +688,15 @@ defmodule Test.TestMessage do
     }
   end
 
-  field(:name, 1, type: :string, deprecated: false)
-  field(:age, 2, type: :int32, deprecated: false)
-  field(:balance, 3, type: :double)
-  field(:active, 4, type: :bool)
-  field(:document, 5, type: :bytes)
-  field(:address, 7, type: Test.TestMessage.Address)
-  field(:created_at, 8, type: Google.Protobuf.Timestamp, json_name: "createdAt")
-  field(:metadata, 9, type: Google.Protobuf.Struct)
-  field(:tags, 10, repeated: true, type: :string)
-  field(:attributes, 11, repeated: true, type: Test.TestMessage.AttributesEntry, map: true)
-  field(:enum_test, 12, type: Test.EnumTest, json_name: "enumTest", enum: true)
+  field :name, 1, type: :string, deprecated: false
+  field :age, 2, type: :int32, deprecated: false
+  field :balance, 3, type: :double
+  field :active, 4, type: :bool
+  field :document, 5, type: :bytes
+  field :address, 7, type: Test.TestMessage.Address
+  field :created_at, 8, type: Google.Protobuf.Timestamp, json_name: "createdAt"
+  field :metadata, 9, type: Google.Protobuf.Struct
+  field :tags, 10, repeated: true, type: :string
+  field :attributes, 11, repeated: true, type: Test.TestMessage.AttributesEntry, map: true
+  field :enum_test, 12, type: Test.EnumTest, json_name: "enumTest", enum: true
 end
