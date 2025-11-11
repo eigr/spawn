@@ -1,4 +1,6 @@
 defmodule SpawnSdk.Flow do
+  @moduledoc false
+  
   defmodule Broadcast do
     @moduledoc """
     Actors can also send messages to a group of actors at once as an action callback. This we call Broadcast.

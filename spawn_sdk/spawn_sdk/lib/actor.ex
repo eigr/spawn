@@ -1,29 +1,142 @@
 defmodule SpawnSdk.Actor do
   @moduledoc """
-  Documentation for `Actor`.
+  Defines the behavior and macros for creating Spawn actors.
 
-  Actor look like this:
+  `SpawnSdk.Actor` is a behaviour module that provides the foundation for building
+  stateful, distributed actors in the Spawn ecosystem. Actors are autonomous entities
+  that encapsulate state and behavior, communicating through message passing.
 
-    defmodule MyActor do
-      use SpawnSdk.Actor,
-        name: "joe",
-        persistent: false,
-        state_type: Io.Eigr.Spawn.Example.MyState,
-        deactivate_timeout: 5_000,
-        snapshot_timeout: 2_000
+  ## Features
 
-      require Logger
-      alias Io.Eigr.Spawn.Example.{MyState, MyBusinessMessage}
+  - **Stateful computation** - Actors maintain persistent state across invocations
+  - **Message-based communication** - Interact through well-defined actions
+  - **Fault tolerance** - Built-in supervision and error recovery
+  - **Horizontal scaling** - Distribute actors across multiple nodes
+  - **Event sourcing** - Optional state snapshots and event replay
+  - **Side effects** - Asynchronous communication with other actors
+  - **Broadcasting** - Publish events to multiple subscribers
 
-      defact sum(%MyBusinessMessage{value: value} = data}, %Context{state: state} = ctx) do
-        Logger.info("Received Request...")
+  ## Actor Types
 
-        new_value = (state.value || 0) + value
+  - **Named actors** - Singleton actors with fixed names, started at system boot
+  - **Unnamed actors** - Dynamic actors spawned on-demand with unique identifiers
+  - **Pooled actors** - Load-balanced actors for stateless operations
+  - **Timer actors** - Actors with periodic execution capabilities
 
-        %Value{}
-        |> Value.of(%MyBusinessMessage{value: new_value}, %MyState{value: new_value})
-        |> Value.reply!()
+  ## Configuration Options
+
+  - `name` - Actor identifier within the system (required)
+  - `kind` - `:named` (default) or `:unnamed` 
+  - `stateful` - `true` (default) or `false` for stateless actors
+  - `state_type` - Protobuf message type for state serialization
+  - `deactivate_timeout` - Idle time before actor deactivation (ms)
+  - `snapshot_timeout` - Interval for automatic state snapshots (ms)
+  - `channels` - List of broadcast channels to subscribe to
+
+  ## Basic Usage
+
+      defmodule MyApp.Actors.Counter do
+        use SpawnSdk.Actor,
+          name: "counter",
+          stateful: true,
+          state_type: MyApp.Domain.CounterState
+
+        # Initialization action (optional)
+        init fn %Context{} = ctx ->
+          initial_state = %CounterState{count: 0}
+          Value.of() |> Value.state(initial_state)
+        end
+
+        # Define actor actions
+        action "increment", fn %Context{state: state}, %{value: value} ->
+          new_count = (state.count || 0) + value
+          new_state = %{state | count: new_count}
+          
+          Value.of(%{count: new_count}, new_state)
+        end
+
+        action "get_count", fn %Context{state: state}, _payload ->
+          Value.of(%{count: state.count || 0}, state)
+        end
       end
+
+  ## Advanced Features
+
+  ### Side Effects
+
+      action "process_order", fn ctx, order_data ->
+        # Process order logic...
+        
+        Value.of(order_result, new_state)
+        |> Value.effects([
+          SideEffect.of()
+          |> SideEffect.effect("email_service", :send_confirmation, order_data)
+          |> SideEffect.effect("inventory_service", :update_stock, order_data)
+        ])
+      end
+
+  ### Broadcasting
+
+      action "user_registered", fn ctx, user_data ->
+        event = %UserRegistered{user_id: user_data.id, timestamp: DateTime.utc_now()}
+        
+        Value.of(user_data, ctx.state)
+        |> Value.broadcast(Broadcast.to("user.events", event))
+      end
+
+  ### Timer Actions
+
+      # Execute every 30 seconds
+      action "heartbeat", [timer: 30_000], fn %Context{} = ctx ->
+        Logger.info("Actor heartbeat")
+        Value.of() |> Value.state(ctx.state)
+      end
+
+  ## Actor Lifecycle
+
+  1. **Initialization** - Actor starts and runs `init` action if defined
+  2. **Active** - Actor processes incoming messages and maintains state  
+  3. **Idle** - Actor becomes inactive after `deactivate_timeout`
+  4. **Reactivation** - Actor restores state when receiving new messages
+  5. **Termination** - Actor shuts down gracefully during system shutdown
+
+  ## State Management
+
+  Actors can maintain state using Protobuf messages for efficient serialization
+  and cross-language compatibility:
+
+      # Define state schema
+      message CounterState {
+        int32 count = 1;
+        google.protobuf.Timestamp last_updated = 2;
+      }
+
+      # Use in actor
+      use SpawnSdk.Actor,
+        state_type: MyApp.Proto.CounterState
+
+  ## Error Handling
+
+  Actors provide built-in error recovery through supervision. Failed actors
+  are automatically restarted while preserving their last known state.
+
+  ## Performance Considerations
+
+  - Use `stateful: false` for computational actors without state
+  - Configure appropriate `deactivate_timeout` based on usage patterns
+  - Leverage pooled actors for CPU-intensive, stateless operations
+  - Use side effects for non-blocking inter-actor communication
+
+  ## Documentation
+
+  For comprehensive guides and examples:
+
+  - [Actor Types Guide](guides/basic/actor_types.md)
+  - [Actor Configuration](guides/basic/actor_configuration.md) 
+  - [Side Effects](guides/advanced/side_effects.md)
+  - [Broadcasting](guides/advanced/broadcast.md)
+  - [Forwards and Pipes](guides/advanced/forwards_and_pipes.md)
+
   """
 
   alias SpawnSdk.{
