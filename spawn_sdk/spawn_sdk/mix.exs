@@ -10,6 +10,7 @@ defmodule SpawnSdk.MixProject do
       app: @app,
       version: @version,
       description: "Spawn Elixir SDK is the support library for the Spawn Actors System",
+      name: "Spawn Elixir SDK",
       source_url: @source_url,
       homepage_url: "https://eigr.io/",
       build_path: "../../_build",
@@ -44,17 +45,62 @@ defmodule SpawnSdk.MixProject do
 
   defp docs do
     [
-      main: "readme",
+      main: "SpawnSdk.Actor",
       source_url: @source_url,
       source_ref: "v#{@version}",
       formatter_opts: [gfm: true],
       extras: [
-        "README.md"
+        "guides/basic/quickstart.md",
+        "guides/basic/actor_types.md",
+        "guides/basic/actor_configuration.md",
+        "guides/basic/client_api.md",
+        "guides/basic/supervision.md",
+        "guides/advanced/side_effects.md",
+        "guides/advanced/forwards_and_pipes.md",
+        "guides/advanced/broadcast.md"
+      ],
+      groups_for_extras: [
+        "Getting Started": [
+          "guides/basic/quickstart.md"
+        ],
+        "Basic Concepts": [
+          "guides/basic/actor_types.md",
+          "guides/basic/actor_configuration.md",
+          "guides/basic/client_api.md",
+          "guides/basic/supervision.md"
+        ],
+        "Advanced Features": [
+          "guides/advanced/side_effects.md",
+          "guides/advanced/forwards_and_pipes.md",
+          "guides/advanced/broadcast.md"
+        ]
+      ],
+      groups_for_modules: [
+        "Actors": [
+          SpawnSdk.Actor,
+          SpawnSdk.System.Supervisor,
+          SpawnSdk.Context,
+          SpawnSdk.Value
+        ],
+        Workflows: [
+          SpawnSdk.Flow.Broadcast,
+          SpawnSdk.Flow.Forward,
+          SpawnSdk.Flow.Pipe,
+          SpawnSdk.Flow.SideEffect
+        ],
+        Deprecated: [
+          SpawnSdk
+        ],
+        Miscellaneous: [
+          SpawnSdk.Defact,
+          SpawnSdk.System,
+          SpawnSdk.System.SpawnSystem,
+          SpawnSdk.Channel.Subscriber
+        ]
       ]
     ]
   end
 
-  # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
       {:spawn, path: "../.."},
