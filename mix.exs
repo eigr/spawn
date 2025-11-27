@@ -78,7 +78,7 @@ defmodule Spawn.MixProject do
       {:protobuf, "~> 0.14"},
       {:protobuf_generate, "~> 0.1"},
       {:grpc, "~> 0.10"},
-      {:grpc_reflection, "~> 0.2.0"},
+      {:grpc_reflection, "~> 0.3.0"},
       {:finch, "~> 0.18"},
       {:flame_k8s_backend, "~> 0.5"},
       {:retry, "~> 0.17"},
