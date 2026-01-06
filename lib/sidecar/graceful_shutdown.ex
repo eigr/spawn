@@ -20,7 +20,7 @@ defmodule Sidecar.GracefulShutdown do
   defmodule State do
     @moduledoc false
 
-    defstruct init_stop?: true, shutdown_delay_ms: 6_000, notify_pid: nil
+    defstruct init_stop?: true, shutdown_delay_ms: 0, notify_pid: nil
 
     def new(opts) do
       Map.merge(%__MODULE__{}, Enum.into(opts, %{}))

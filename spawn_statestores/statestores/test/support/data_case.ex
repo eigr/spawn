@@ -5,7 +5,7 @@ defmodule Statestores.DataCase do
 
   using do
     quote do
-      use Statestores.SandboxHelper, repos: [Statestores.Util.load_snapshot_adapter()]
+      use Statestores.SandboxHelper, repos: [Statestores.Util.load_repo()]
 
       import Statestores.DataCase
     end

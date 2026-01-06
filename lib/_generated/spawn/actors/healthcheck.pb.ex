@@ -1,6 +1,6 @@
 defmodule Spawn.Actors.Healthcheck.Status do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.15.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -69,7 +69,7 @@ end
 
 defmodule Spawn.Actors.Healthcheck.HealthCheckReply do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.15.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -109,7 +109,7 @@ end
 defmodule Spawn.Actors.Healthcheck.HealthCheckActor.Service do
   use GRPC.Service,
     name: "spawn.actors.healthcheck.HealthCheckActor",
-    protoc_gen_elixir_version: "0.15.0"
+    protoc_gen_elixir_version: "0.14.0"
 
   def descriptor do
     # credo:disable-for-next-line

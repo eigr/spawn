@@ -32,6 +32,7 @@ defmodule Spawn.MixProject do
     ]
   end
 
+  # Run "mix help compile.app" to learn about applications.
   def application do
     [
       extra_applications: [
@@ -53,21 +54,20 @@ defmodule Spawn.MixProject do
 
   defp docs do
     [
-      main: "Spawn",
-      logo: "docs/images/sepp-elixir-254-400.png",
+      main: "readme",
       source_url: @source_url,
       source_ref: "v#{@version}",
-      source_url_pattern: "#{@source_url}/blob/v#{@version}/spawn/%{path}#L%{line}",
       formatter_opts: [gfm: true],
       extras: [
-        "README.md",
-        "guides/getting_started/quickstart.livemd"
+        "README.md"
       ]
     ]
   end
 
+  # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      # Core deps
       {:decimal, "~> 2.0"},
       {:decorator, "~> 1.4"},
       {:iter, "~> 0.1.2"},
@@ -77,14 +77,13 @@ defmodule Spawn.MixProject do
       {:castore, "~> 1.0"},
       {:protobuf, "~> 0.14"},
       {:protobuf_generate, "~> 0.1"},
-      {:grpc, "~> 0.10"},
-      {:grpc_reflection, "~> 0.3.0"},
+      {:grpc, "~> 0.8"},
+      {:grpc_reflection, "~> 0.1.5"},
       {:finch, "~> 0.18"},
       {:flame_k8s_backend, "~> 0.5"},
       {:retry, "~> 0.17"},
       {:flow, "~> 1.2"},
       {:libcluster, "~> 3.3"},
-      {:horde, "~> 0.9"},
       {:highlander, "~> 0.2.1"},
       {:phoenix_pubsub, "~> 2.1"},
       {:phoenix_pubsub_nats, "~> 0.2"},
@@ -97,26 +96,21 @@ defmodule Spawn.MixProject do
       {:broadway, "~> 1.1"},
       # temporary until bandit releases 1.5.4
       {:hpax, "~> 0.1.1"},
-      # Add cowlib override for gun compatibility
-      {:cowlib, "~> 2.15", override: true},
       # Metrics & Tracing deps
       {:telemetry_poller, "~> 1.0"},
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_metrics_prometheus_core, "~> 1.2.1"},
-      {:opentelemetry_api, "~> 1.5"},
-      {:opentelemetry, "~> 1.7"},
+      {:opentelemetry_api, "~> 1.0"},
+      {:opentelemetry, "~> 1.0"},
       {:opentelemetry_ecto, "~> 1.2"},
       {:opentelemetry_exporter, "~> 1.0"},
       # Statestores deps
-      {:spawn_statestores_mariadb,
-       path: "./spawn_statestores/statestores_mariadb", optional: false},
-      {:spawn_statestores_postgres,
-       path: "./spawn_statestores/statestores_postgres", optional: false},
-      {:spawn_statestores_native,
-       path: "./spawn_statestores/statestores_native", optional: false},
+      {:spawn_statestores_postgres, path: "./spawn_statestores/statestores_postgres", optional: false},
       {:pluggable, "~> 1.0"},
+      # Non runtime deps
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
-      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false}
+      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
+      {:ra_registry, "~> 0.1.2"}
     ]
   end
 

@@ -35,11 +35,9 @@ defmodule Statestores.Adapters.LookupBehaviour do
     quote do
       alias Statestores.Adapters.LookupBehaviour
       import Ecto.Query, only: [from: 2]
-      import Statestores.Util, only: [init_config: 1, generate_key: 1]
+      import Statestores.Util, only: [generate_key: 1]
 
       @behaviour Statestores.Adapters.LookupBehaviour
-
-      def init(_type, config), do: init_config(config)
     end
   end
 end

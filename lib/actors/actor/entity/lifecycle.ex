@@ -70,13 +70,13 @@ defmodule Actors.Actor.Entity.Lifecycle do
     :ok = handle_metadata(name, system, metadata)
     :ok = Invocation.handle_timers(timer_actions, system, state.actor)
 
-    :ok =
-      Spawn.Cluster.Node.Registry.update_entry_value(
-        Actors.Actor.Entity,
-        actor_name_key,
-        self(),
-        actor.id
-      )
+    # :ok =
+    #   Spawn.Cluster.Node.Registry.update_entry_value(
+    #     Actors.Actor.Entity,
+    #     actor_name_key,
+    #     self(),
+    #     actor.id
+    #   )
 
     schedule_deactivate(actor, deactivation_strategy, get_jitter())
 

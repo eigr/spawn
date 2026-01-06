@@ -6,9 +6,7 @@ defmodule Statestores.Supervisor do
 
   import Statestores.Util,
     only: [
-      load_lookup_adapter: 0,
-      load_snapshot_adapter: 0,
-      load_projection_adapter: 0,
+      load_repo: 0,
       supervisor_process_logger: 1
     ]
 
@@ -25,30 +23,24 @@ defmodule Statestores.Supervisor do
 
   @impl true
   def init(_args) do
-    lookup_adapter = load_lookup_adapter()
-    snapshot_adapter = load_snapshot_adapter()
-    projection_adapter = load_projection_adapter()
+    repo = load_repo()
 
     case System.get_env("MIX_ENV") do
       env when env in ["dev", "test"] ->
-        Statestores.Migrator.migrate(snapshot_adapter)
-        Statestores.Migrator.migrate(lookup_adapter)
+        Statestores.Migrator.migrate(repo)
 
       _ ->
         # TODO: migrate via job in production (future release)
-        Statestores.Migrator.migrate(snapshot_adapter)
-        Statestores.Migrator.migrate(lookup_adapter)
+        Statestores.Migrator.migrate(repo)
     end
 
     children =
       [
         supervisor_process_logger(__MODULE__),
         Statestores.Vault,
-        snapshot_adapter,
-        lookup_adapter,
-        projection_adapter
+        repo
       ]
-      |> maybe_add_native_children(snapshot_adapter)
+      |> maybe_add_native_children(repo)
 
     Supervisor.init(children, strategy: :one_for_one)
   end

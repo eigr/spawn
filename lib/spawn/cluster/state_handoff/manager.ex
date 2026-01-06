@@ -21,12 +21,7 @@ defmodule Spawn.Cluster.StateHandoff.Manager do
 
   @impl true
   def init(opts) do
-    controller =
-      Application.get_env(
-        :spawn,
-        :state_handoff_controller_adapter,
-        Spawn.Cluster.StateHandoff.Controllers.CrdtController
-      )
+    controller = Application.get_env(:spawn, :state_handoff_controller_adapter)
 
     do_init(opts)
 

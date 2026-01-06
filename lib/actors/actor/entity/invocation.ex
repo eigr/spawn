@@ -9,7 +9,6 @@ defmodule Actors.Actor.Entity.Invocation do
   alias Actors.Actor.Entity.EntityState
   alias Actors.Actor.Entity.Lifecycle
   alias Actors.Actor.Entity.Lifecycle.StreamInitiator
-  alias Actors.Actor.InvocationScheduler
   alias Actors.Exceptions.NotAuthorizedException
   alias Actors.Actor.Pubsub
   alias Actors.Actor.StateManager
@@ -137,28 +136,7 @@ defmodule Actors.Actor.Entity.Invocation do
 
   def handle_timers([], _system, _actor), do: :ok
 
-  def handle_timers(timers, system, actor) when is_list(timers) do
-    invocations =
-      Enum.map(timers, fn %FixedTimerAction{action: %Action{name: action}, seconds: delay} ->
-        invocation_request = %InvocationRequest{
-          actor: actor,
-          action_name: action,
-          payload: {:noop, %Noop{}},
-          async: true,
-          scheduled_to: 0,
-          caller: actor.id,
-          system: %ActorSystem{name: system}
-        }
-
-        scheduled_to =
-          DateTime.utc_now()
-          |> DateTime.add(delay, :millisecond)
-
-        {invocation_request, scheduled_to, delay}
-      end)
-
-    InvocationScheduler.schedule_fixed_invocations(invocations)
-
+  def handle_timers(timers, _system, _actor) when is_list(timers) do
     :ok
   catch
     error -> Logger.error("Error on handle timers #{inspect(error)}")

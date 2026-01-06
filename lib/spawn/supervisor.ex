@@ -32,7 +32,9 @@ defmodule Spawn.Supervisor do
         {Spawn.Cache.LookupCache, []},
         Spawn.Cluster.StateHandoff.ManagerSupervisor.child_spec(opts),
         {Spawn.Cluster.ClusterSupervisor, []},
-        Spawn.Cluster.Node.Registry.child_spec()
+        {RaRegistry, name: Spawn.RaRegistry, keys: :unique, ra_config: %{data_dir: ~c"/tmp/ra"}}
+        #
+        # Spawn.Cluster.Node.Registry.child_spec()
       ])
 
     Supervisor.init(children, strategy: :one_for_one)

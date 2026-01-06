@@ -75,7 +75,7 @@ defmodule SpawnSdk.System.SpawnSystem do
 
   @impl SpawnSdk.System
   def spawn_actor(actor_name, spawn_actor_opts) do
-    opts = [revision: Keyword.get(spawn_actor_opts, :revision, 0)]
+    opts = [revision: Keyword.get(spawn_actor_opts, :revision, 0), interface: SpawnSdk.Interface]
     system = Keyword.get(spawn_actor_opts, :system, nil)
     parent = get_parent_actor_name(spawn_actor_opts)
 
@@ -109,7 +109,7 @@ defmodule SpawnSdk.System.SpawnSystem do
       raise "You have to specify an action"
     end
 
-    opts = []
+    opts = [interface: SpawnSdk.Interface]
     payload = parse_payload(payload)
 
     req = %InvocationRequest{
@@ -428,6 +428,7 @@ defmodule SpawnSdk.System.SpawnSystem do
        ) do
     Enum.map(effects, fn %SpawnSdk.Flow.SideEffect{} = effect ->
       payload = parse_payload(effect.payload)
+      metadata = effect.metadata || %{}
 
       %Spawn.SideEffect{
         request: %InvocationRequest{
@@ -440,7 +441,7 @@ defmodule SpawnSdk.System.SpawnSystem do
           register_ref: effect.register_ref,
           async: true,
           caller: %ActorId{name: caller_name, system: system},
-          metadata: effect.metadata,
+          metadata: metadata |> Map.put("fail_backoff", "true"),
           scheduled_to: effect.scheduled_to
         }
       }

@@ -6,13 +6,7 @@ defmodule Actors.Actor.Pool do
   require Logger
 
   alias Actors.Registry.HostActor
-
-  alias Spawn.Actors.{
-    Actor,
-    ActorId,
-    ActorSettings
-  }
-
+  alias Spawn.Actors.{Actor, ActorId}
   alias Spawn.Utils.Common
 
   @doc """
@@ -26,12 +20,9 @@ defmodule Actors.Actor.Pool do
   Returns a list of `HostActor` structs representing the hosts in the pool.
   """
   @spec create_actor_host_pool(Actor.t(), keyword()) :: list(HostActor.t())
-  def create_actor_host_pool(
-        %Actor{id: %ActorId{} = _id, settings: %ActorSettings{} = _settings} = actor,
-        opts
-      ) do
+  def create_actor_host_pool(%ActorId{} = id, opts) do
     opts = Keyword.merge(opts, hash: Common.actor_host_hash())
 
-    [%HostActor{node: Node.self(), actor: actor, opts: opts}]
+    [%HostActor{node: Node.self(), actor_id: id, opts: opts}]
   end
 end

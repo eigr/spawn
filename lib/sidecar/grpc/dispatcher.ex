@@ -269,9 +269,9 @@ defmodule Sidecar.GRPC.Dispatcher do
   end
 
   defp build_actor_id(system_name, actor_name, message) do
-    with {:ok, %HostActor{actor: %Actor{settings: %ActorSettings{} = actor_settings}}} <-
+    with {:ok, %HostActor{} = host} <-
            ActorRegistry.lookup(%ActorId{system: system_name, name: actor_name}) do
-      build_actor_id_from_settings(system_name, actor_name, actor_settings, message)
+      %ActorId{system: system_name, name: actor_name, parent: actor_name}
     else
       {:not_found, _} ->
         log_and_raise_error(
@@ -281,30 +281,6 @@ defmodule Sidecar.GRPC.Dispatcher do
         )
     end
   end
-
-  defp build_actor_id_from_settings(
-         system_name,
-         actor_name,
-         %ActorSettings{kind: kind},
-         _message
-       )
-       when kind in [:NAMED, :PROJECTION, :TASK] do
-    %ActorId{system: system_name, name: actor_name}
-  end
-
-  defp build_actor_id_from_settings(
-         system_name,
-         actor_name,
-         %ActorSettings{kind: :UNNAMED} = _settings,
-         message
-       ) do
-    {ctype, name} = find_actor_name_and_ctype(message)
-    actor_id_name = get_actor_id_name(ctype, message, name)
-
-    %ActorId{system: system_name, name: actor_id_name, parent: actor_name}
-  end
-
-  defp build_actor_id_from_settings(_, _, _, _), do: nil
 
   defp find_actor_name_and_ctype(message) do
     module = message.__struct__

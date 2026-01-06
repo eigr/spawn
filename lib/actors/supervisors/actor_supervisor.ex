@@ -30,22 +30,13 @@ defmodule Actors.Supervisors.ActorSupervisor do
     Protobuf.load_extensions()
     get_acl_manager().load_acl_policies("#{@base_app_dir}/policies")
 
-    consumers =
-      Enum.into(1..@max_consumers, [], fn index ->
-        %{
-          id: index,
-          start: {Actors.Actor.CallerConsumer, :start_link, [[id: index, opts: opts]]}
-        }
-      end)
-
     children =
       [
         supervisor_process_logger(__MODULE__),
         get_pubsub_adapter(opts),
         Actors.Actor.Pubsub,
         Actors.Actor.Entity.Supervisor.child_spec(opts)
-      ] ++
-        maybe_add_invocation_scheduler(opts) ++ [{CallerProducer, []}] ++ consumers
+      ] ++ maybe_add_invocation_scheduler(opts) 
 
     Supervisor.init(children, strategy: :one_for_one)
   end
@@ -55,7 +46,8 @@ defmodule Actors.Supervisors.ActorSupervisor do
 
   defp maybe_add_invocation_scheduler(_opts) do
     if Config.get(:delayed_invokes) do
-      [{Highlander, Actors.Actor.InvocationScheduler.child_spec()}]
+      # [{Highlander, Actors.Actor.InvocationScheduler.child_spec()}]
+      []
     else
       []
     end

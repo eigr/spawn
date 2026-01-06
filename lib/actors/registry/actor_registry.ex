@@ -30,11 +30,11 @@ defmodule Actors.Registry.ActorRegistry do
             atoms: [:error, :too_many_requests],
             rescue_only: [ErlangError] do
         try do
-          StateHandoff.set(host.actor.id, host)
+          StateHandoff.set(host.actor_id, host)
         rescue
           e ->
             Logger.error(
-              "Error to register actor #{inspect(host.actor.id)} for host #{inspect(host)}: #{inspect(e)}"
+              "Error to register actor_id #{inspect(host.actor_id)} for host #{inspect(host)}: #{inspect(e)}"
             )
 
             reraise e, __STACKTRACE__
@@ -110,7 +110,7 @@ defmodule Actors.Registry.ActorRegistry do
         {:not_found, []}
 
       hosts ->
-        Enum.filter(hosts, &(&1.actor.id.name == actor_name))
+        Enum.filter(hosts, &(&1.actor_id.name == actor_name))
         |> then(fn
           [] -> {:not_found, []}
           hosts -> {:ok, hosts}
@@ -124,16 +124,15 @@ defmodule Actors.Registry.ActorRegistry do
   # As always, when prioritizing performance,
   defp filter(hosts, filter_by_parent?, %ActorId{name: actor_name, parent: parent_name}) do
     Enum.filter(hosts, fn ac ->
-      (filter_by_parent? && ac.actor.id.parent == parent_name) ||
-        (not filter_by_parent? && ac.actor.id.name == actor_name)
+      (filter_by_parent? && ac.actor_id.parent == parent_name) ||
+        (not filter_by_parent? && ac.actor_id.name == actor_name)
     end)
   end
 
   defp choose_hosts(hosts, filter_by_parent?, %ActorId{name: _actor_name} = _id, parent_name) do
     if filter_by_parent? do
-      %HostActor{node: _node, actor: actor, opts: opts} = host = Enum.random(hosts)
-      new_actor = %Actor{actor | id: %ActorId{actor.id | name: parent_name}}
-      {:ok, %HostActor{host | actor: new_actor, opts: opts}}
+      %HostActor{node: _node, actor_id: actor_id, opts: opts} = host = Enum.random(hosts)
+      {:ok, %HostActor{host | actor_id: %ActorId{actor_id | name: parent_name}, opts: opts}}
     else
       case LoadBalancer.next_host(hosts) do
         {:ok, node_host, _updated_hosts} ->

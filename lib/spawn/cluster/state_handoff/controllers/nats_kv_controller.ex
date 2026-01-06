@@ -94,7 +94,10 @@ defmodule Spawn.Cluster.StateHandoff.Controllers.NatsKvController do
       "Found a host that is likely registered to a dead node. Flushing node from hosts list for key #{inspect(key)}"
     )
 
-    new_hosts = hosts |> :erlang.term_to_binary()
+    new_hosts =
+      hosts
+      |> Enum.reject(fn host -> Map.get(host, :actor) end)
+      |> :erlang.term_to_binary()
 
     :ok =
       Jetstream.API.KV.put_value(
@@ -125,8 +128,12 @@ defmodule Spawn.Cluster.StateHandoff.Controllers.NatsKvController do
 
     hosts = get_hosts(id)
 
+    # new_hosts = [host] |> :erlang.term_to_binary()
     new_hosts =
-      ([host] ++ hosts) |> Enum.uniq_by(&{&1.node, &1.actor.id}) |> :erlang.term_to_binary()
+      ([host] ++ hosts)
+      |> Enum.reject(fn host -> Map.get(host, :actor) end)
+      |> Enum.uniq_by(&{&1.node, &1.actor_id})
+      |> :erlang.term_to_binary()
 
     :ok =
       Jetstream.API.KV.put_value(
@@ -156,7 +163,9 @@ defmodule Spawn.Cluster.StateHandoff.Controllers.NatsKvController do
           if is_nil(message.data) do
             []
           else
-            [:erlang.binary_to_term(message.data)] |> List.flatten()
+            [:erlang.binary_to_term(message.data)]
+            |> List.flatten()
+            |> Enum.reject(fn host -> Map.get(host, :actor) end)
           end
 
         {:error, _} ->

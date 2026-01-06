@@ -1,12 +1,18 @@
 defmodule Actors.Actor.Entity.Lifecycle.StreamConsumer do
   @moduledoc false
-  use Broadway
+  use Gnat.Jetstream.PullConsumer
 
-  alias Broadway.Message
+  require Logger
+  require OpenTelemetry.Tracer, as: Tracer
+
   alias Spawn.Utils.Nats
   alias Spawn.Fact
   alias Google.Protobuf.Timestamp
   alias Sidecar.GracefulShutdown
+  alias Spawn.Actors.ActorSystem
+  alias Spawn.Actors.Actor
+  alias Spawn.Actors.ActorId
+  alias Spawn.InvocationRequest
 
   @type fact :: %Fact{}
 
@@ -16,85 +22,79 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamConsumer do
           strict_ordering: boolean()
         }
 
-  @spec start_link(opts :: opts()) :: :ignore | {:error, any()} | {:ok, pid()}
   def start_link(opts) do
-    Broadway.start_link(
-      __MODULE__,
-      # there will be not a lot so probably fine to convert to atom
-      name: String.to_atom(opts.actor_name),
-      context: opts,
-      producer: [
-        module: {
-          OffBroadway.Jetstream.Producer,
-          connection_name: Nats.connection_name(),
-          stream_name: opts.actor_name,
-          consumer_name: opts.actor_name
-        },
-        concurrency: build_concurrency(opts)
-      ],
-      processors: [
-        default: [concurrency: build_concurrency(opts)]
-      ],
-      batchers: [
-        default: [
-          concurrency: build_concurrency(opts),
-          # Avoi big batches, micro batches is better
-          batch_size: 10,
-          batch_timeout: 2_000
-        ]
-      ]
+    Gnat.Jetstream.PullConsumer.start_link(__MODULE__, opts,
+      name: String.to_atom(opts.actor_name)
     )
   end
 
-  @spec handle_message(any(), Message.t(), any()) :: Message.t()
-  def handle_message(_processor_name, message, _context) do
+  @impl true
+  def init(opts) do
+    {:ok, opts,
+     connection_name: Nats.connection_name(),
+     stream_name: opts.actor_name,
+     consumer_name: opts.actor_name}
+  end
+
+  def handle_message(message, state) do
     if GracefulShutdown.running?() do
-      message
-      |> build_fact()
-      |> Message.configure_ack(on_success: :term)
+      payload = message.body
+
+      metadata =
+        Enum.reduce(message.headers, %{}, fn {key, value}, acc ->
+          Map.put(acc, key, value)
+        end)
+        |> Map.put("topic", message.topic)
+
+      time = DateTime.utc_now() |> DateTime.to_unix(:second)
+
+      fact = %Fact{
+        uuid: UUID.uuid4(:hex),
+        metadata: metadata,
+        state: payload,
+        timestamp: %Timestamp{seconds: time}
+      }
+
+      process_message(fact, state)
+
+      {:ack, state}
     else
-      message
-      |> Message.failed("Failed to deliver because app is draining")
+      {:nack, state}
     end
   end
 
-  @spec handle_batch(any(), Message.t(), any(), opts()) :: list(Message.t())
-  def handle_batch(_, messages, _, context) do
-    GenServer.cast(context.projection_pid, {:process_projection_events, messages})
+  # Process a single message and invoke the actor
+  defp process_message(%Fact{} = message, state) do
+    actor_name = state.actor_name |> String.split("-") |> List.last()
+    actor_settings = :persistent_term.get("actor-#{actor_name}")
 
-    messages
-  end
+    system_name = Map.get(message.metadata, "spawn-system")
+    parent = Map.get(message.metadata, "actor-parent")
+    name = Map.get(message.metadata, "actor-name")
+    source_action = Map.get(message.metadata, "actor-action")
 
-  @spec build_fact(Message.t()) :: Message.t()
-  defp build_fact(message) do
-    # %Broadway.Message{data: "{\"ACTION\":\"KEY_ADDED\",\"KEY\":\"MYKEY\",\"VALUE\":\"MYVALUE\"}", metadata: %{headers: [], topic: "actors.mike"}, acknowledger: {OffBroadway.Jetstream.Acknowledger, #Reference<0.743380651.807927811.227242>, %{on_success: :term, reply_to: "$JS.ACK.newtest.projectionviewertest.1.11.11.1725657673932595345.21"}}, batcher: :default, batch_key: :default, batch_mode: :bulk, status: :ok}
+    action_metadata =
+      case Map.get(message.metadata, "action-metadata") do
+        nil -> %{}
+        metadata -> Jason.decode!(metadata)
+      end
 
-    message
-    |> Message.put_data(process_data(message))
-  end
+    action =
+      actor_settings.subjects
+      |> Enum.find(fn subject -> subject.source_action == source_action end)
+      |> Map.get(:action)
 
-  @spec process_data(Message.t()) :: fact()
-  defp process_data(message) do
-    payload = message.data
-
-    metadata =
-      Enum.reduce(message.metadata.headers, %{}, fn {key, value}, acc ->
-        Map.put(acc, key, value)
-      end)
-      |> Map.put("topic", message.metadata.topic)
-
-    time = DateTime.utc_now() |> DateTime.to_unix(:seconds)
-
-    %Fact{
-      uuid: UUID.uuid4(:hex),
-      metadata: metadata,
-      state: payload,
-      timestamp: %Timestamp{seconds: time}
+    invocation = %InvocationRequest{
+      system: %ActorSystem{name: system_name},
+      actor: %Actor{id: %ActorId{name: actor_name, system: system_name}},
+      metadata: action_metadata,
+      action_name: action,
+      payload: {:value, Google.Protobuf.Any.decode(message.state)},
+      caller: %ActorId{name: name, system: system_name, parent: parent}
     }
-  end
 
-  # Projections are like long-lasting threads and therefore concurrency should be avoided
-  # if the intention is to have some notion of ordering.
-  defp build_concurrency(%{strict_ordering: true}), do: 1
-  defp build_concurrency(%{strict_ordering: false}), do: System.schedulers_online()
+    # If this raises or throws, the error will be caught in handle_batch
+    # and the message will be marked as failed for Broadway to retry
+    {:ok, _response} = Actors.invoke(invocation, span_ctx: Tracer.current_span_ctx())
+  end
 end

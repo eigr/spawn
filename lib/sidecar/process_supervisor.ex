@@ -28,6 +28,7 @@ defmodule Sidecar.ProcessSupervisor do
         Spawn.Supervisor.child_spec(opts),
         statestores(),
         Actors.Supervisors.ActorSupervisor.child_spec(opts),
+        Actors.Supervisors.ActorProjectionHandlerSupervisor.child_spec(opts),
         Actors.Supervisors.ProtocolSupervisor.child_spec(opts),
         %{
           id: :healthcheck_actor_init,

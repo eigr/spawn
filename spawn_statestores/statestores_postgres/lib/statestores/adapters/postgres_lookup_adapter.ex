@@ -4,36 +4,35 @@ defmodule Statestores.Adapters.PostgresLookupAdapter do
   """
   use Statestores.Adapters.LookupBehaviour
 
-  use Ecto.Repo,
-    otp_app: :spawn_statestores,
-    adapter: Ecto.Adapters.Postgres
+  import Ecto.Query
 
   alias Statestores.Schemas.{Lookup, ValueObjectSchema}
+  alias Statestores.PostgresRepo
 
   @impl true
   def clean(node) do
     node = Atom.to_string(node)
-    res = delete_all(from(l in Lookup, where: l.node == ^node))
+    res = PostgresRepo.delete_all(from(l in Lookup, where: l.node == ^node))
     {:ok, res}
   end
 
   @impl true
   def get_all_by_node(node) do
     node = Atom.to_string(node)
-    res = all(from(l in Lookup, where: l.node == ^node))
+    res = PostgresRepo.all(from(l in Lookup, where: l.node == ^node))
     {:ok, res}
   end
 
   @impl true
   def get_by_id(id) do
     key = generate_key(id)
-    {:ok, all(from(l in Lookup, where: l.id == ^key))}
+    {:ok, PostgresRepo.all(from(l in Lookup, where: l.id == ^key))}
   end
 
   @impl true
   def get_by_id_node(id, node) do
     node = Atom.to_string(node)
-    res = all(from(l in Lookup, where: l.id == ^id and l.node == ^node))
+    res = PostgresRepo.all(from(l in Lookup, where: l.id == ^id and l.node == ^node))
     {:ok, res}
   end
 
@@ -52,7 +51,7 @@ defmodule Statestores.Adapters.PostgresLookupAdapter do
 
     %Lookup{}
     |> Lookup.changeset(ValueObjectSchema.to_map(event))
-    |> insert_or_update(
+    |> PostgresRepo.insert_or_update(
       on_conflict: [
         set: [
           actor: actor,

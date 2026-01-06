@@ -27,7 +27,7 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamInitiator do
     with {:create_stream, :ok} <- {:create_stream, create_stream(actor, true)},
          {:create_consumer, :ok} <-
            {:create_consumer, create_consumer(actor, deliver_policy: :all)} do
-      start_pipeline(actor)
+      {:ok, self()}
     else
       {:create_stream, error} ->
         Logger.error(
@@ -252,7 +252,7 @@ defmodule Actors.Actor.Entity.Lifecycle.StreamInitiator do
     })
   end
 
-  defp stop_pipeline(pid), do: Broadway.stop(pid)
+  defp stop_pipeline(pid), do: Process.exit(pid, :shutdown)
 
   def stream_name(actor, actor_name \\ nil)
   def stream_name(%Actor{} = actor, actor_name), do: stream_name(actor.id, actor_name)

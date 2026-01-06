@@ -36,7 +36,7 @@ spec:
           ports:
             - containerPort: 9090
           #image: ghcr.io/eigr/spawn-operator:2.0.0-RC9
-          image: docker.io/eigr/spawn-operator:2.0.0-RC9
+          image: eliasdarruda/operator:2.0.0-RC10
           resources:
             limits:
               cpu: 200m
@@ -119,226 +119,397 @@ kind: CustomResourceDefinition
 apiVersion: apiextensions.k8s.io/v1
 
 ---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
 metadata:
   name: actorhosts.spawn-eigr.io
-  labels: {}
 spec:
-  scope: Cluster
+  conversion:
+    strategy: None
   group: spawn-eigr.io
   names:
     kind: ActorHost
+    listKind: ActorHostList
     plural: actorhosts
     shortNames:
-      - ac
-      - ah
-      - actor
-      - actors
-      - hosts
+    - ac
+    - ah
+    - actor
+    - actors
+    - hosts
     singular: actorhost
+  scope: Cluster
   versions:
-    - name: v1
-      deprecated: false
-      schema:
-        openAPIV3Schema:
-          type: object
-          description: |
-            Defines an ActorHost application. Example:
+  - additionalPrinterColumns:
+    - description: SDK used by the ActorHost
+      jsonPath: .spec.host.sdk
+      name: SDK
+      type: string
+    - description: Embedded Proxy used by the ActorHost
+      jsonPath: .spec.host.embedded
+      name: Embedded
+      type: string
+    - description: Docker image used for the ActorHost
+      jsonPath: .spec.host.image
+      name: Image
+      type: string
+    - description: Minimum number of replicas for the ActorHost
+      jsonPath: .spec.autoscaler.min
+      name: Min Replicas
+      type: integer
+    - description: Maximum number of replicas for the ActorHost
+      jsonPath: .spec.autoscaler.max
+      name: Max Replicas
+      type: integer
+    name: v1
+    schema:
+      openAPIV3Schema:
+        description: |
+          Defines an ActorHost application. Example:
 
 
-            ---
-            apiVersion: spawn-eigr.io/v1
-            kind: ActorHost
-            metadata:
-              name: my-java-app
-            spec:
+          ---
+          apiVersion: spawn-eigr.io/v1
+          kind: ActorHost
+          metadata:
+            name: my-java-app
+          spec:
+            host:
+              image: ghcr.io/eigr/spawn-springboot-examples:latest
+              sdk: java
+              ports:
+              - containerPort: 80
+        properties:
+          spec:
+            properties:
+              affinity:
+                type: object
+              autoscaler:
+                properties:
+                  averageCpuUtilizationPercentage:
+                    type: integer
+                  averageMemoryUtilizationValue:
+                    type: integer
+                  max:
+                    type: integer
+                  min:
+                    type: integer
+                type: object
               host:
-                image: ghcr.io/eigr/spawn-springboot-examples:latest
-                sdk: java
-                ports:
-                - containerPort: 80
-          required:
-            - spec
-          properties:
-            status:
-              type: object
-              properties:
-                conditions:
-                  type: array
-                  items:
+                properties:
+                  embedded:
+                    type: boolean
+                  env:
+                    items:
+                      properties:
+                        name:
+                          type: string
+                        value:
+                          type: string
+                        valueFrom:
+                          properties:
+                            fieldRef:
+                              properties:
+                                fieldPath:
+                                  type: string
+                              type: object
+                            secretKeyRef:
+                              properties:
+                                name:
+                                  type: string
+                                key:
+                                  type: string
+                              type: object
+                          type: object
+                      type: object
+                    type: array
+                  image:
+                    type: string
+                  ports:
+                    items:
+                      properties:
+                        containerPort:
+                          type: integer
+                        name:
+                          type: string
+                      type: object
+                    type: array
+                  sdk:
+                    enum:
+                    - dart
+                    - elixir
+                    - go
+                    - java
+                    - python
+                    - rust
+                    - springboot
+                    - nodejs
+                    type: string
+                  pullSecretRef:
+                    type: string
+                  taskActors:
+                    items:
+                      properties:
+                        actorName:
+                          type: string
+                        topology:
+                          properties:
+                            nodeSelector:
+                              additionalProperties:
+                                type: string
+                              type: object
+                            tolerations:
+                              items:
+                                properties:
+                                  effect:
+                                    type: string
+                                  key:
+                                    type: string
+                                  operator:
+                                    type: string
+                                type: object
+                              type: array
+                          type: object
+                        workerPool:
+                          properties:
+                            bootTimeout:
+                              type: integer
+                            callTimeout:
+                              type: integer
+                            idleShutdownAfter:
+                              type: integer
+                            max:
+                              type: integer
+                            maxConcurrency:
+                              type: integer
+                            min:
+                              type: integer
+                            oneOff:
+                              enum:
+                              - "true"
+                              - "false"
+                              type: string
+                          type: object
+                      type: object
+                    type: array
+                  volumeMounts:
+                    items:
+                      properties:
+                        mountPath:
+                          type: string
+                        name:
+                          type: string
+                      type: object
+                    type: array
+                required:
+                - image
+                type: object
+              replicas:
+                type: integer
+              topology:
+                properties:
+                  nodeSelector:
+                    additionalProperties:
+                      type: string
                     type: object
-                    properties:
-                      message:
-                        type: string
-                      status:
-                        type: string
-                        enum:
-                          - 'True'
-                          - 'False'
-                      type:
-                        type: string
-                      lastHeartbeatTime:
-                        type: string
-                        format: date-time
-                      lastTransitionTime:
-                        type: string
-                        format: date-time
-                observedGeneration:
-                  type: integer
-            spec:
-              properties:
-                affinity:
-                  type: object
-                autoscaler:
+                  tolerations:
+                    items:
+                      properties:
+                        effect:
+                          type: string
+                        key:
+                          type: string
+                        operator:
+                          type: string
+                      type: object
+                    type: array
+                type: object
+              volumes:
+                items:
                   properties:
-                    averageCpuUtilizationPercentage:
-                      type: integer
-                    averageMemoryUtilizationValue:
-                      type: integer
-                    max:
-                      type: integer
-                    min:
-                      type: integer
-                  type: object
-                host:
-                  properties:
-                    embedded:
-                      type: boolean
-                    env:
-                      items:
-                        properties:
-                          name:
-                            type: string
-                          value:
-                            type: string
-                          valueFrom:
+                    configMap:
+                      properties:
+                        items:
+                          items:
+                            properties:
+                              key:
+                                type: string
+                              path:
+                                type: string
+                            type: object
+                          type: array
+                        name:
+                          type: string
+                      type: object
+                    downwardAPI:
+                      properties:
+                        items:
+                          items:
                             properties:
                               fieldRef:
                                 properties:
                                   fieldPath:
                                     type: string
                                 type: object
-                            type: object
-                        type: object
-                      type: array
-                    image:
-                      type: string
-                    ports:
-                      items:
-                        properties:
-                          containerPort:
-                            type: integer
-                          name:
-                            type: string
-                        type: object
-                      type: array
-                    sdk:
-                      enum:
-                        - dart
-                        - elixir
-                        - go
-                        - java
-                        - python
-                        - rust
-                        - springboot
-                        - nodejs
-                      type: string
-                    taskActors:
-                      items:
-                        properties:
-                          actorName:
-                            type: string
-                          topology:
-                            properties:
-                              nodeSelector:
-                                additionalProperties:
-                                  type: string
+                              path:
+                                type: string
+                              resourceFieldRef:
+                                properties:
+                                  containerName:
+                                    type: string
+                                  divisor:
+                                    type: string
+                                  resource:
+                                    type: string
                                 type: object
-                              tolerations:
-                                items:
-                                  properties:
-                                    effect:
-                                      type: string
-                                    key:
-                                      type: string
-                                    operator:
-                                      type: string
-                                  type: object
-                                type: array
                             type: object
-                          workerPool:
+                          type: array
+                      type: object
+                    emptyDir:
+                      properties:
+                        medium:
+                          enum:
+                          - ""
+                          - Memory
+                          type: string
+                        sizeLimit:
+                          type: string
+                      type: object
+                    hostPath:
+                      properties:
+                        path:
+                          type: string
+                        type:
+                          enum:
+                          - ""
+                          - DirectoryOrCreate
+                          - Directory
+                          - FileOrCreate
+                          - File
+                          - Socket
+                          - CharDevice
+                          - BlockDevice
+                          type: string
+                      type: object
+                    name:
+                      type: string
+                    persistentVolumeClaim:
+                      properties:
+                        claimName:
+                          type: string
+                        readOnly:
+                          type: boolean
+                      type: object
+                    projected:
+                      properties:
+                        sources:
+                          items:
                             properties:
-                              bootTimeout:
-                                type: integer
-                              callTimeout:
-                                type: integer
-                              idleShutdownAfter:
-                                type: integer
-                              max:
-                                type: integer
-                              maxConcurrency:
-                                type: integer
-                              min:
-                                type: integer
-                              oneOff:
-                                enum:
-                                  - 'true'
-                                  - 'false'
+                              configMap:
+                                properties:
+                                  items:
+                                    items:
+                                      properties:
+                                        key:
+                                          type: string
+                                        path:
+                                          type: string
+                                      type: object
+                                    type: array
+                                  name:
+                                    type: string
+                                type: object
+                              secret:
+                                properties:
+                                  items:
+                                    items:
+                                      properties:
+                                        key:
+                                          type: string
+                                        path:
+                                          type: string
+                                      type: object
+                                    type: array
+                                  name:
+                                    type: string
+                                type: object
+                            type: object
+                          type: array
+                      type: object
+                    secret:
+                      properties:
+                        items:
+                          items:
+                            properties:
+                              key:
+                                type: string
+                              path:
                                 type: string
                             type: object
-                        type: object
-                      type: array
-                  required:
-                    - image
-                  type: object
-                replicas:
-                  type: integer
-                topology:
-                  properties:
-                    nodeSelector:
-                      additionalProperties:
-                        type: string
+                          type: array
+                        secretName:
+                          type: string
                       type: object
-                    tolerations:
-                      items:
-                        properties:
-                          effect:
-                            type: string
-                          key:
-                            type: string
-                          operator:
-                            type: string
-                        type: object
-                      type: array
                   type: object
-              type: object
-      additionalPrinterColumns:
-        - name: SDK
-          type: string
-          description: SDK used by the ActorHost
-          jsonPath: .spec.host.sdk
-        - name: Embedded
-          type: string
-          description: Embedded Proxy used by the ActorHost
-          jsonPath: .spec.host.embedded
-        - name: Image
-          type: string
-          description: Docker image used for the ActorHost
-          jsonPath: .spec.host.image
-        - name: Min Replicas
-          type: integer
-          description: Minimum number of replicas for the ActorHost
-          jsonPath: .spec.autoscaler.min
-        - name: Max Replicas
-          type: integer
-          description: Maximum number of replicas for the ActorHost
-          jsonPath: .spec.autoscaler.max
-      storage: true
-      subresources:
-        status: {}
-      served: true
-      deprecationWarning:
-kind: CustomResourceDefinition
-apiVersion: apiextensions.k8s.io/v1
+                type: array
+            type: object
+          status:
+            properties:
+              conditions:
+                items:
+                  properties:
+                    lastHeartbeatTime:
+                      format: date-time
+                      type: string
+                    lastTransitionTime:
+                      format: date-time
+                      type: string
+                    message:
+                      type: string
+                    status:
+                      enum:
+                      - "True"
+                      - "False"
+                      type: string
+                    type:
+                      type: string
+                  type: object
+                type: array
+              observedGeneration:
+                type: integer
+            type: object
+        required:
+        - spec
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ActorHost
+    listKind: ActorHostList
+    plural: actorhosts
+    shortNames:
+    - ac
+    - ah
+    - actor
+    - actors
+    - hosts
+    singular: actorhost
+  conditions:
+  - lastTransitionTime: "2025-01-19T22:17:17Z"
+    message: no conflicts found
+    reason: NoConflicts
+    status: "True"
+    type: NamesAccepted
+  - lastTransitionTime: "2025-01-19T22:17:17Z"
+    message: the initial names have been accepted
+    reason: InitialNamesAccepted
+    status: "True"
+    type: Established
+  storedVersions:
+  - v1
 
 ---
 metadata:

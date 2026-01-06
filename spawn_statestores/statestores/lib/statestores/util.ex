@@ -57,6 +57,14 @@ defmodule Statestores.Util do
     }
   end
 
+  @spec load_repo :: adapter()
+  def load_repo() do
+    type =
+      String.to_existing_atom(System.get_env("PROXY_DATABASE_TYPE", get_default_database_type()))
+
+    load_repo_adapter(type)
+  end
+
   @spec load_lookup_adapter :: adapter()
   def load_lookup_adapter() do
     case Application.fetch_env(@otp_app, :database_lookup_adapter) do
@@ -195,8 +203,8 @@ defmodule Statestores.Util do
     load_snapshot_adapter().default_port()
   end
 
-  @spec generate_key(any()) :: integer()
-  def generate_key(id), do: :erlang.phash2({id.name, id.system})
+  @spec generate_key(any()) :: String.t()
+  def generate_key(%{name: name}), do: name
 
   def get_statestore_key do
     key =
@@ -222,6 +230,13 @@ defmodule Statestores.Util do
     # Ensures the name is all lowercase
     |> String.downcase()
   end
+
+  # Repo adapter
+  defp load_repo_adapter(:mariadb), do: Statestores.MariadbRepo
+
+  defp load_repo_adapter(:postgres), do: Statestores.PostgresRepo
+
+  defp load_repo_adapter(:native), do: Statestores.Adapters.NativeSnapshotAdapter
 
   # Lookup Adapters
   defp load_lookup_adapter_by_type(:mariadb), do: Statestores.Adapters.MariaDBLookupAdapter

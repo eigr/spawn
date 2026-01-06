@@ -1,7 +1,8 @@
 defmodule StatestoresPostgresTest.RepoTest do
   use Statestores.DataCase
   alias Statestores.Schemas.Snapshot
-  import Statestores.Util, only: [load_snapshot_adapter: 0, generate_key: 1]
+  alias Statestores.Adapters.PostgresSnapshotAdapter
+  import Statestores.Util, only: [generate_key: 1]
 
   setup do
     %{system: "test-system"}
@@ -13,7 +14,6 @@ defmodule StatestoresPostgresTest.RepoTest do
     actor = "mike"
     id = %{name: actor, system: system}
     key = generate_key(id)
-    repo = load_snapshot_adapter()
 
     event = %Snapshot{
       id: key,
@@ -27,10 +27,10 @@ defmodule StatestoresPostgresTest.RepoTest do
       data: "Hello Joe"
     }
 
-    _result = repo.save(event)
+    _result = PostgresSnapshotAdapter.save(event)
 
     # Ensure no historical snapshot is created
-    historical_events = repo.get_all_snapshots_by_key(key)
+    historical_events = PostgresSnapshotAdapter.get_all_snapshots_by_key(key)
     assert length(historical_events) == 0
   end
 
@@ -40,7 +40,6 @@ defmodule StatestoresPostgresTest.RepoTest do
     actor = "mike"
     id = %{name: actor, system: system}
     key = generate_key(id)
-    repo = load_snapshot_adapter()
 
     event = %Snapshot{
       id: key,
@@ -53,8 +52,8 @@ defmodule StatestoresPostgresTest.RepoTest do
       data: "Hello Joe"
     }
 
-    _result = repo.save(event)
-    actor_state = repo.get_by_key(key)
+    _result = PostgresSnapshotAdapter.save(event)
+    actor_state = PostgresSnapshotAdapter.get_by_key(key)
     # IO.inspect(actor_state, label: "First event")
 
     # Ensure the initial state is correct
@@ -64,8 +63,8 @@ defmodule StatestoresPostgresTest.RepoTest do
     # Simulate an update after some time
     Process.sleep(1000)
     updated_event = %{event | data: "new joe"}
-    _result = repo.save(updated_event)
-    actor_state2 = repo.get_by_key(key)
+    _result = PostgresSnapshotAdapter.save(updated_event)
+    actor_state2 = PostgresSnapshotAdapter.get_by_key(key)
     # IO.inspect(actor_state2, label: "Updated event")
 
     # Validate that the current_snapshots table was updated
@@ -74,7 +73,7 @@ defmodule StatestoresPostgresTest.RepoTest do
     assert actor_state.updated_at != actor_state2.updated_at
 
     # Validate that a record was added to historical_snapshots
-    historical_events = repo.get_all_snapshots_by_key(key)
+    historical_events = PostgresSnapshotAdapter.get_all_snapshots_by_key(key)
     assert length(historical_events) == 1
 
     historical_event = List.first(historical_events)
@@ -89,7 +88,6 @@ defmodule StatestoresPostgresTest.RepoTest do
     actor = "mike"
     id = %{name: actor, system: system}
     key = generate_key(id)
-    repo = load_snapshot_adapter()
 
     # Insert initial snapshot
     event = %Snapshot{
@@ -104,32 +102,32 @@ defmodule StatestoresPostgresTest.RepoTest do
       data: "Initial"
     }
 
-    _result = repo.save(event)
+    _result = PostgresSnapshotAdapter.save(event)
 
     # First update
     Process.sleep(1000)
     first_update = %{event | data: "First Update"}
-    _result = repo.save(first_update)
+    _result = PostgresSnapshotAdapter.save(first_update)
 
     # Second update
     Process.sleep(1000)
     second_update = %{first_update | data: "Second Update"}
-    _result = repo.save(second_update)
+    _result = PostgresSnapshotAdapter.save(second_update)
 
     # Third update
     Process.sleep(1000)
     third_update = %{second_update | data: "Third Update"}
-    _result = repo.save(third_update)
+    _result = PostgresSnapshotAdapter.save(third_update)
 
     # Validate current snapshot
     # TODO: The implementation should include the snapshot table when using get_all_snapshots...
     # This needs to be implemented in the future and this test should be changed to reflect the implementation
-    final_state = repo.get_by_key(key)
+    final_state = PostgresSnapshotAdapter.get_by_key(key)
     assert final_state.data == "Third Update"
     assert final_state.revision == 4
 
     # Validate historical snapshots
-    historical_events = repo.get_all_snapshots_by_key(key)
+    historical_events = PostgresSnapshotAdapter.get_all_snapshots_by_key(key)
     assert length(historical_events) == 3
 
     # Check the data and revision for each historical snapshot
@@ -149,7 +147,6 @@ defmodule StatestoresPostgresTest.RepoTest do
     actor = "mike"
     id = %{name: actor, system: system}
     key = generate_key(id)
-    repo = load_snapshot_adapter()
 
     event = %Snapshot{
       id: key,
@@ -163,14 +160,14 @@ defmodule StatestoresPostgresTest.RepoTest do
       data: "Hello Joe"
     }
 
-    _result = repo.save(event)
-    actor_state = repo.get_by_key(key)
+    _result = PostgresSnapshotAdapter.save(event)
+    actor_state = PostgresSnapshotAdapter.get_by_key(key)
 
     assert actor_state.data == "Hello Joe"
     assert actor_state.revision == 1
 
     # Validate that no historical record was created on the first insert
-    historical_events = repo.get_all_snapshots_by_key(key)
+    historical_events = PostgresSnapshotAdapter.get_all_snapshots_by_key(key)
     assert length(historical_events) == 0
   end
 
@@ -180,7 +177,6 @@ defmodule StatestoresPostgresTest.RepoTest do
     actor = "mike"
     id = %{name: actor, system: system}
     key = generate_key(id)
-    repo = load_snapshot_adapter()
 
     event = %Snapshot{
       id: key,
@@ -194,14 +190,14 @@ defmodule StatestoresPostgresTest.RepoTest do
       data: "Hello Joe"
     }
 
-    _result = repo.save(event)
+    _result = PostgresSnapshotAdapter.save(event)
     Process.sleep(1000)
 
     updated_event = %{event | data: "Hello Joe"}
-    _result = repo.save(updated_event)
+    _result = PostgresSnapshotAdapter.save(updated_event)
 
     # Retrieve the historical snapshot by revision
-    historical_event = repo.get_by_key_and_revision(key, 1)
+    historical_event = PostgresSnapshotAdapter.get_by_key_and_revision(key, 1)
 
     assert historical_event.data == "Hello Joe"
     assert historical_event.revision == 1

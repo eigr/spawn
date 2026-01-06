@@ -3,13 +3,13 @@ defmodule Actors.Registry.HostActor do
   `HostActor` Defines the type of Actor that will be registered in `ActorRegistry`.
   """
 
-  alias Spawn.Actors.Actor
+  alias Spawn.Actors.ActorId
 
-  defstruct actor: nil, node: nil, opts: nil
+  defstruct actor_id: nil, node: nil, opts: nil
 
   @type t :: %__MODULE__{
           node: node(),
-          actor: Actor.t(),
+          actor_id: ActorId.t(),
           opts: Keyword.t()
         }
 end
