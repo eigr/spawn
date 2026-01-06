@@ -13,7 +13,6 @@ defmodule Actors.Actor.CallerConsumer do
   alias Actors.Config.PersistentTermConfig, as: Config
   alias Actors.Actor.Entity, as: ActorEntity
   alias Actors.Actor.Entity.Supervisor, as: ActorEntitySupervisor
-  alias Actors.Actor.InvocationScheduler
   alias Actors.Actor.Pool, as: ActorPool
 
   alias Actors.Registry.{ActorRegistry, HostActor}
@@ -172,14 +171,17 @@ defmodule Actors.Actor.CallerConsumer do
     if Sidecar.GracefulShutdown.running?() do
       actors
       |> Map.values()
-      |> Enum.map(fn actor -> ActorPool.create_actor_host_pool(actor, opts) end)
+      |> Enum.map(fn actor -> ActorPool.create_actor_host_pool(actor.id, opts) end)
       |> List.flatten()
       |> Enum.filter(&(&1.node == Node.self()))
       |> ActorRegistry.register()
-      |> tap(fn _sts -> warmup_actors(actor_system, actors, opts) end)
       |> case do
         :ok ->
           status = %RequestStatus{status: :OK, message: "Accepted"}
+          :persistent_term.put(:registered_actors, actors)
+
+          warmup_actors(actor_system, actors, opts)
+
           {:ok, %RegistrationResponse{proxy_info: get_proxy_info(), status: status}}
 
         _ ->
@@ -479,9 +481,8 @@ defmodule Actors.Actor.CallerConsumer do
               end
             end)
 
-          error ->
-            raise ArgumentError,
-                  "You are trying to create an actor from an Unnamed actor that has never been registered before. ActorId: #{inspect(id)}. Details. #{inspect(error)}"
+          _error ->
+            ActorPool.create_actor_host_pool(id, opts)
         end
       end)
       |> List.flatten()
@@ -577,7 +578,16 @@ defmodule Actors.Actor.CallerConsumer do
               value -> value
             end
 
-          retry_while with: exponential_backoff() |> randomize |> expiry(timeout) do
+          retry_strategy =
+            if fail_backoff do
+              exponential_backoff() |> randomize |> expiry(timeout)
+            else
+              # When fail_backoff is off, retry only once after 100s
+              # Cap at 1 retry
+              constant_backoff(101) |> expiry(101) |> cap(1)
+            end
+
+          retry_while with: retry_strategy do
             try do
               Tracer.add_event("lookup", [{"target", actor.id.name}])
 
@@ -595,7 +605,7 @@ defmodule Actors.Actor.CallerConsumer do
                       # Choose the first result (which is now a random result)
                       host = hd(shuffled_actor_hosts)
 
-                      {pooled?, system.name, host.actor.id.parent, actor_id}
+                      {pooled?, system.name, host.actor_id.parent, actor_id}
 
                     _ ->
                       fqdn =
@@ -621,7 +631,7 @@ defmodule Actors.Actor.CallerConsumer do
                 if is_nil(request.scheduled_to) || request.scheduled_to == 0 do
                   maybe_invoke_async(async?, actor_ref, request_params, opts)
                 else
-                  InvocationScheduler.schedule_invoke(request_params)
+                  #InvocationScheduler.schedule_invoke(request_params)
 
                   {:ok, :async}
                 end
@@ -644,9 +654,8 @@ defmodule Actors.Actor.CallerConsumer do
                 {:halt, result}
 
               {:error, :actor_invoke, error} ->
-                keep_retrying_action = if fail_backoff, do: :cont, else: :halt
-
-                {keep_retrying_action, {:error, error}}
+                # Always retry for actor_invoke errors, but limited by the retry strategy
+                {:cont, {:error, error}}
 
               {:error, _msg} = result ->
                 {:cont, result}
@@ -663,13 +672,7 @@ defmodule Actors.Actor.CallerConsumer do
   end
 
   defp to_spawn_hosts(id, actor_hosts, spawned_opts) do
-    Enum.map(actor_hosts, fn %HostActor{
-                               node: node,
-                               actor: %Actor{} = unnamed_actor,
-                               opts: opts
-                             } = _host ->
-      spawned_actor = %Actor{unnamed_actor | id: id}
-
+    Enum.map(actor_hosts, fn %HostActor{node: node, opts: opts} ->
       new_opts =
         if Keyword.has_key?(spawned_opts, :revision) do
           Keyword.put(opts, :revision, Keyword.get(spawned_opts, :revision, 0))
@@ -677,7 +680,7 @@ defmodule Actors.Actor.CallerConsumer do
           opts
         end
 
-      %HostActor{node: node, actor: spawned_actor, opts: new_opts}
+      %HostActor{node: node, actor_id: id, opts: new_opts}
     end)
   end
 
@@ -732,7 +735,16 @@ defmodule Actors.Actor.CallerConsumer do
     Tracer.with_span "actor-lookup" do
       Tracer.set_attributes([{:actor_fqdn, actor_fqdn}])
 
-      case Spawn.Cluster.Node.Registry.lookup(Actors.Actor.Entity, parent) do
+      lookup_response =
+        case RaRegistry.lookup(Spawn.RaRegistry, parent) do
+          [{actor_ref, actor_ref_id}] when is_pid(actor_ref) ->
+            [{actor_ref, actor_ref_id}]
+
+          _ ->
+            []
+        end
+
+      case lookup_response do
         [{actor_ref, actor_ref_id}] ->
           Tracer.add_event("actor-status", [{"alive", true}])
           Tracer.set_attributes([{"actor-pid", "#{inspect(actor_ref)}"}])
@@ -757,11 +769,11 @@ defmodule Actors.Actor.CallerConsumer do
                    filter_by_parent: pooled,
                    parent: parent
                  ) do
-              {:ok, %HostActor{node: node, actor: actor, opts: opts}} ->
+              {:ok, %HostActor{node: node, actor_id: actor_id, opts: opts}} ->
                 do_call(
                   system,
                   node,
-                  actor,
+                  actor_id,
                   actor_fqdn,
                   action_fun,
                   opts
@@ -815,7 +827,7 @@ defmodule Actors.Actor.CallerConsumer do
   defp do_call(
          system,
          node,
-         actor,
+         actor_id,
          {pooled, _system_name, _parent, actor_name} = _actor_fqdn,
          action_fun,
          opts
@@ -825,7 +837,7 @@ defmodule Actors.Actor.CallerConsumer do
              node,
              __MODULE__,
              :try_reactivate_actor,
-             [system, actor, opts],
+             [system, actor_id, opts],
              @erpc_timeout
            ) do
         {:ok, actor_ref} ->
@@ -837,24 +849,20 @@ defmodule Actors.Actor.CallerConsumer do
 
           if pooled,
             # Ensures that the name change will not affect the host function call
-            do: action_fun.(actor_ref, %ActorId{actor.id | name: actor_name.name}),
-            else: action_fun.(actor_ref, actor.id)
+            do: action_fun.(actor_ref, %ActorId{actor_id | name: actor_name.name}),
+            else: action_fun.(actor_ref, actor_id)
 
         _ ->
           raise ErlangError
       end
     catch
       :exit, reason ->
-        Logger.error(
-          "Failed to call Actor #{inspect(actor.id)} on Node #{inspect(node)}: #{inspect(reason)}"
-        )
+        Logger.error(Exception.format(:error, reason, __STACKTRACE__))
 
         :error
 
       :error, error ->
-        Logger.error(
-          "Failed to call Actor #{inspect(actor.id)} on Node #{inspect(node)}: #{inspect(error)}"
-        )
+        Logger.error(Exception.format(:error, error, __STACKTRACE__))
 
         :error
     end
@@ -875,15 +883,16 @@ defmodule Actors.Actor.CallerConsumer do
   Reactivation is attempted by looking up the actor in the registry
   or creating a new actor if not found.
   """
-  @spec try_reactivate_actor(ActorSystem.t(), Actor.t(), any()) :: {:ok, any()} | {:error, any()}
-  def try_reactivate_actor(system, actor, opts \\ [])
+  @spec try_reactivate_actor(ActorSystem.t(), ActorId.t(), any()) ::
+          {:ok, any()} | {:error, any()}
+  def try_reactivate_actor(system, actor_id, opts \\ [])
 
   def try_reactivate_actor(
         %ActorSystem{} = system,
-        %Actor{id: %ActorId{name: name} = _id} = actor,
+        %ActorId{name: name} = actor_id,
         opts
       ) do
-    case ActorEntitySupervisor.lookup_or_create_actor(system, actor, opts) do
+    case ActorEntitySupervisor.lookup_or_create_actor(system, actor_id, opts) do
       {:ok, actor_ref} ->
         Logger.debug("Actor #{name} reactivated. ActorRef PID: #{inspect(actor_ref)}")
         {:ok, actor_ref}
@@ -895,8 +904,8 @@ defmodule Actors.Actor.CallerConsumer do
   end
 
   # To lookup all actors
-  def try_reactivate_actor(nil, %Actor{id: %ActorId{name: name} = _id} = actor, opts) do
-    case ActorEntitySupervisor.lookup_or_create_actor(nil, actor, opts) do
+  def try_reactivate_actor(nil, %Actor{id: %ActorId{name: name} = id}, opts) do
+    case ActorEntitySupervisor.lookup_or_create_actor(nil, id, opts) do
       {:ok, actor_ref} ->
         Logger.debug("Actor #{name} reactivated. ActorRef PID: #{inspect(actor_ref)}")
         {:ok, actor_ref}
@@ -932,7 +941,7 @@ defmodule Actors.Actor.CallerConsumer do
   @spec lookup_or_create_actor(ActorSystem.t(), String.t(), Actor.t(), any()) ::
           {:ok, pid()} | {:error, String.t()}
   defp lookup_or_create_actor(actor_system, actor_name, actor, opts) do
-    case ActorEntitySupervisor.lookup_or_create_actor(actor_system, actor, opts) do
+    case ActorEntitySupervisor.lookup_or_create_actor(actor_system, actor.id, opts) do
       {:ok, pid} ->
         {:ok, pid}
 
@@ -945,7 +954,7 @@ defmodule Actors.Actor.CallerConsumer do
   defp is_selectable?(
          {_actor_name,
           %Actor{
-            metadata: %Metadata{channel_group: channel_group},
+            metadata: %Metadata{channel_group: _channel_group},
             settings: %ActorSettings{stateful: stateful, kind: kind}
           } = _actor}
        ) do

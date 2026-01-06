@@ -1,0 +1,102 @@
+version: "3.8"
+
+services:
+  otel:
+    image: otel/opentelemetry-collector-contrib:0.60.0
+    command: [ "--config=/conf/otel-collector-config.yaml" ]
+    privileged: true
+    ports:
+      - 4317:4317
+      - 4318:4318
+      - 55681:55681
+    volumes:
+      - ./config/otel-collector-config.yaml:/conf/otel-collector-config.yaml
+    links:
+      - zipkin
+
+  zipkin:
+    image: openzipkin/zipkin-slim
+    ports:
+      - 9411:9411
+    privileged: true
+
+  postgres:
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DATABASE=eigr-functions-db
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres:/var/lib/postgresql/data
+
+  mysql:
+    image: mysql:5.7
+    environment:
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: "admin"
+      MYSQL_ROOT_PASSWORD: "admin"
+      MYSQL_DATABASE: "eigr-functions-db"
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql:/var/lib/mysql
+    networks:
+      - mysql-compose-network
+
+  mariadb:
+    image: mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: eigr-functions-db
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+    volumes:
+      - mariadb:/var/lib/mysql
+    ports:
+      - "3307:3306"
+    networks:
+      - mysql-compose-network
+    command: ["--max_connections=1000"]
+
+  adminer:
+    image: adminer
+    ports:
+      - 8080:8080
+    networks:
+      - mysql-compose-network
+
+  nats:
+    image: 'nats:latest'
+    ports:
+      - "4222:4222"
+  # spawn-proxy:
+  #   image: eigr/spawn-proxy:2.0.0-RC9
+  #   restart: always
+  #   environment:
+  #     PROXY_APP_NAME: spawn
+  #     PROXY_HTTP_PORT: 9001
+  #     PROXY_DATABASE_TYPE: postgres
+  #     PROXY_DATABASE_NAME: eigr-functions-db
+  #     PROXY_DATABASE_USERNAME: postgres
+  #     PROXY_DATABASE_SECRET: password
+  #     PROXY_DATABASE_HOST: localhost
+  #     PROXY_DATABASE_PORT: 5432
+  #     SPAWN_STATESTORE_KEY: 3Jnb0hZiHIzHTOih7t2cTEPEpY98Tu1wvQkPfq/XwqE=
+  #     USER_FUNCTION_HOST: 0.0.0.0 # Your NodeJS runtime host
+  #     USER_FUNCTION_PORT: 8090 # Your NodeJS runtime exposed port
+  #   # network_mode: host # only uncomment this if you're running your nodejs locally in Linux, check note below for Windows
+  #   ports:
+  #     - "9001:9001"
+
+networks:
+  mysql-compose-network:
+    driver: bridge
+
+volumes:
+  mysql:
+  postgres:
+  mariadb:

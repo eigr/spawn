@@ -116,13 +116,9 @@ defmodule Actors.FactoryTest do
 
   def build_actor_state(attrs \\ []) do
     state =
-      if is_nil(attrs[:state]) do
-        any_pack!(%Actors.Protos.StateTest{name: "example_state_name_#{inspect(make_ref())}"})
-      else
-        any_pack!(attrs[:state])
-      end
+      any_pack!(%Actors.Protos.StateTest{name: "example_state_name_#{inspect(make_ref())}"})
 
-    %ActorState{state: state}
+    %ActorState{state: Any.new(attrs[:state] || state)}
   end
 
   def build_actor_deactivation_strategy(attrs \\ []) do

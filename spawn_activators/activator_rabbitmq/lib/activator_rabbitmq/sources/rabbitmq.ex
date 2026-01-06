@@ -1,0 +1,110 @@
+defmodule ActivatorRabbitMQ.Sources.RabbitMQ do
+  @moduledoc """
+  RabbitMQ Broadway Producer
+  """
+  use Broadway
+  require Logger
+
+  alias Activator.Dispatcher.DefaultDispatcher, as: Dispatcher
+
+  alias Broadway.Message
+
+  @spec start_link(keyword) :: :ignore | {:error, any} | {:ok, pid}
+  def start_link(opts), do: start_source(opts)
+
+  @impl true
+  def handle_message(_, message, context) do
+    message
+    |> Message.update_data(fn data ->
+      Dispatcher.dispatch(data, context)
+    end)
+  rescue
+    e ->
+      msg =
+        Message.update_data(message, fn data ->
+          {e, __STACKTRACE__, data}
+        end)
+
+      Message.put_batcher(msg, :dispatch_err)
+  end
+
+  def handle_batch(:dispatch_err, messages, _, _) do
+    Enum.map(messages, fn msg ->
+      {error, stack_trace, data} = msg.data
+
+      Logger.error(
+        "Error on process Message: #{inspect(data)}. Error #{Exception.format(:error, error, stack_trace)}"
+      )
+    end)
+
+    messages
+  end
+
+  defp start_source(opts) do
+    encoder = Keyword.get(opts, :encoder, Activator.Encoder.CloudEvent)
+    actor_concurrency = Keyword.get(opts, :actor_concurrency, 1)
+    actor_system = Keyword.fetch!(opts, :actor_system)
+    kind = Keyword.fetch!(opts, :kind)
+
+    Broadway.start_link(__MODULE__,
+      name: __MODULE__,
+      context: [
+        encoder: encoder,
+        system: actor_system,
+        kind: kind
+      ],
+      producer: get_producer_settings(opts),
+      processors: [
+        default: [
+          concurrency: actor_concurrency
+        ]
+      ],
+      batchers: [
+        dispatch_err: [batch_size: 10, concurrency: 2, batch_timeout: 1500]
+      ]
+    )
+  end
+
+  defp get_producer_settings(opts) do
+    queue = Keyword.fetch!(opts, :source_queue)
+    username = Keyword.fetch!(opts, :username)
+    password = Keyword.fetch!(opts, :password)
+    provider_host = Keyword.get(opts, :provider_host, "localhost")
+    provider_port = Keyword.get(opts, :provider_port, 5672)
+    source_concurrency = Keyword.get(opts, :source_concurrency, 1)
+    qos_prefetch_count = Keyword.get(opts, :prefetch_count, 50)
+
+    producer = [
+      module:
+        {BroadwayRabbitMQ.Producer,
+         queue: queue,
+         connection: [
+           host: provider_host,
+           port: provider_port,
+           username: username,
+           password: password
+         ],
+         on_failure: :reject_and_requeue_once,
+         qos: [
+           prefetch_count: qos_prefetch_count
+         ]},
+      concurrency: source_concurrency
+    ]
+
+    case Keyword.get(producer, :use_rate_limiting, false) do
+      true ->
+        interval = Keyword.get(opts, :rate_limiting_interval, 1_000)
+        allowed_messages = Keyword.fetch!(opts, :rate_limiting_allowed_messages)
+
+        rate_limiting = [
+          interval: interval,
+          allowed_messages: allowed_messages
+        ]
+
+        Keyword.merge(producer, rate_limiting)
+
+      false ->
+        producer
+    end
+  end
+end

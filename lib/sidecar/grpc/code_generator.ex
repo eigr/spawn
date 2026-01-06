@@ -15,7 +15,6 @@ defmodule Sidecar.GRPC.CodeGenerator do
 
   alias Actors.Config.PersistentTermConfig, as: Config
   alias Spawn.Actors.ActorViewOption
-  alias Protobuf.Protoc.Generator.Util
   alias Mix.Tasks.Protobuf.Generate
   alias Spawn.Utils.AnySerializer
 
@@ -154,6 +153,13 @@ defmodule Sidecar.GRPC.CodeGenerator do
       actor_opts = Map.get(option_extensions, {Spawn.Actors.PbExtension, :actor})
 
       if not is_nil(actor_opts) do
+        if actor_opts.kind == :PROJECTION do
+          # put all projections in a persistent term list
+          projections = :persistent_term.get("projections", [])
+
+          :persistent_term.put("projections", [svc.name | projections])
+        end
+
         :persistent_term.put("actor-#{svc.name}", actor_opts)
       end
 
@@ -255,7 +261,8 @@ defmodule Sidecar.GRPC.CodeGenerator do
   def compile_modules(module), do: do_compile(module)
 
   defp do_compile(module) do
-    Code.compile_string(module)
+    # Code.compile_string(module)
+    :ok
   rescue
     error in UndefinedFunctionError ->
       Logger.error("Error in Module definition. Make sure the service name is correct")

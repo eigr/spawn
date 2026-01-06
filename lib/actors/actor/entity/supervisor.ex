@@ -11,7 +11,7 @@ defmodule Actors.Actor.Entity.Supervisor do
 
   alias Actors.Actor.Entity.EntityState
   alias Actors.Config.PersistentTermConfig, as: Config
-  alias Spawn.Actors.{Actor, ActorSystem}
+  alias Spawn.Actors.{ActorId, ActorSystem}
 
   @default_number_of_partitions 8
   @shutdown_timeout_ms 330_000
@@ -43,48 +43,74 @@ defmodule Actors.Actor.Entity.Supervisor do
   @doc """
   Adds a Actor to the dynamic supervisor.
   """
-  @spec lookup_or_create_actor(ActorSystem.t(), Actor.t(), any()) :: {:ok, any}
-  def lookup_or_create_actor(system, actor, opts \\ [])
+  @spec lookup_or_create_actor(ActorSystem.t(), ActorId.t(), any()) :: {:ok, any}
+  def lookup_or_create_actor(system, actor_id, opts \\ [])
 
   def lookup_or_create_actor(
         actor_system,
-        %Actor{} = actor,
+        %ActorId{} = actor_id,
         opts
       ) do
-    revision = Keyword.get(opts, :revision, 0)
+    if actor = :persistent_term.get(:registered_actors, nil) do
+      actor_name =
+        if actor_id.parent == "" or is_nil(actor_id.parent) do
+          actor_id.name
+        else
+          actor_id.parent
+        end
 
-    entity_state = %EntityState{
-      system: Map.get(actor_system || %{}, :name),
-      actor: actor,
-      revision: revision,
-      opts: opts
-    }
+      actor = actor |> Map.get(actor_name) |> Map.put(:id, actor_id)
 
-    child_spec = %{
-      id: Actors.Actor.Entity,
-      start: {Actors.Actor.Entity, :start_link, [entity_state]},
-      restart: :transient,
-      # wait until for 5 and a half minutes
-      shutdown: @shutdown_timeout_ms
-    }
+      revision = Keyword.get(opts, :revision, 0)
 
+      entity_state =
+        %EntityState{
+          system: Map.get(actor_system || %{}, :name),
+          actor: actor,
+          revision: revision,
+          opts: opts
+        }
+
+      child_spec = %{
+        id: Actors.Actor.Entity,
+        start: {Actors.Actor.Entity, :start_link, [entity_state]},
+        restart: :transient,
+        # wait until for 5 and a half minutes
+        shutdown: @shutdown_timeout_ms
+      }
+
+      start_child(child_spec)
+      |> case do
+        {:ok, pid} ->
+          {:ok, pid}
+
+        error ->
+          error
+      end
+    else
+      :actors_not_registered
+    end
+  end
+
+  defp start_child(child_spec) do
     case DynamicSupervisor.start_child(via(child_spec), child_spec) do
-      {:error, {:already_started, pid}} ->
+      {:error, {:already_started, pid}} when is_pid(pid) ->
         {:ok, pid}
 
-      {:ok, pid} ->
+      {:ok, pid} when is_pid(pid) ->
         {:ok, pid}
 
       {:error, {:name_conflict, {{Actors.Actor.Entity, name}, _f}, _registry, pid}} ->
         Logger.warning("Name conflict on start Actor #{name} from PID #{inspect(pid)}.")
 
         :ignore
+
+      _ ->
+        :invalid_process
     end
   end
 
-  defp get_key(spec), do: :erlang.phash2(Map.drop(spec, [:id]))
-
-  defp via(spec), do: {:via, PartitionSupervisor, {__MODULE__, get_key(spec)}}
+  defp via(spec), do: {:via, PartitionSupervisor, {__MODULE__, self()}}
 
   defp get_number_of_partitions() do
     if System.schedulers_online() > 1 do

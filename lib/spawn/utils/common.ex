@@ -79,4 +79,19 @@ defmodule Spawn.Utils.Common do
         tuple
     end
   end
+
+  def distributed_alive(pid) when is_pid(pid) do
+    owner_node = node(pid)
+    self = Node.self()
+
+    if owner_node == self do
+      Process.alive?(pid)
+    else
+      :erpc.call(owner_node, Process, :alive?, [pid])
+    end
+  rescue
+    _ -> false
+  end
+
+  def distributed_alive(_pid), do: false
 end

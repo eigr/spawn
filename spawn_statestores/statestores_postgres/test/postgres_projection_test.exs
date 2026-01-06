@@ -4,10 +4,10 @@ defmodule StatestoresPostgres.PostgresProjectionTest do
   alias Statestores.Manager.StateManager
   alias Test.TestMessage
 
-  import Statestores.Util, only: [load_projection_adapter: 0]
+  import Statestores.Util, only: [load_repo: 0]
 
   setup do
-    repo = load_projection_adapter()
+    repo = load_repo()
     table_name = "test_messages"
 
     data = %TestMessage{

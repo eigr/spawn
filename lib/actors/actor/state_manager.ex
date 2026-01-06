@@ -110,8 +110,7 @@ if Code.ensure_loaded?(Statestores.Supervisor) do
            hash <- :crypto.hash(:sha256, bytes_from_state),
            key <- generate_key(actor_id) do
         %Snapshot{
-          id: key,
-          actor: name,
+          actor: key,
           system: system,
           status: status,
           node: node,
@@ -169,8 +168,7 @@ if Code.ensure_loaded?(Statestores.Supervisor) do
           key = generate_key(actor_id)
 
           %Snapshot{
-            id: key,
-            actor: name,
+            actor: key,
             system: system,
             status: status,
             node: node,
@@ -209,7 +207,7 @@ if Code.ensure_loaded?(Statestores.Supervisor) do
       end
     end
 
-    defp generate_key(id), do: :erlang.phash2(id)
+    defp generate_key(%{name: name}), do: name
 
     defp inserted_successfully?(ref, pid) do
       receive do

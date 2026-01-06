@@ -4,11 +4,8 @@ defmodule Statestores.Adapters.PostgresProjectionAdapter do
   """
   use Statestores.Adapters.ProjectionBehaviour
 
-  use Ecto.Repo,
-    otp_app: :spawn_statestores,
-    adapter: Ecto.Adapters.Postgres
-
   alias Ecto.Adapters.SQL
+  alias Statestores.PostgresRepo
 
   @type_map %{
     :TYPE_INT32 => "INTEGER",
@@ -38,7 +35,7 @@ defmodule Statestores.Adapters.PostgresProjectionAdapter do
   """
   @impl true
   def create_or_update_table(protobuf_module, table_name) do
-    repo = __MODULE__
+    repo = PostgresRepo
     descriptor = protobuf_module.descriptor()
     fields = descriptor.field
 
@@ -171,7 +168,7 @@ defmodule Statestores.Adapters.PostgresProjectionAdapter do
   """
   @impl true
   def query(protobuf_module, query, params, opts) do
-    repo = __MODULE__
+    repo = PostgresRepo
 
     case validate_params(query, params) do
       {:error, message} ->
@@ -295,6 +292,10 @@ defmodule Statestores.Adapters.PostgresProjectionAdapter do
     DateTime.to_iso8601(value)
   end
 
+  defp to_proto_decoded(%Decimal{} = value) do
+    Decimal.to_float(value)
+  end
+
   defp to_proto_decoded(value) when is_atom(value) do
     Atom.to_string(value)
   end
@@ -323,7 +324,7 @@ defmodule Statestores.Adapters.PostgresProjectionAdapter do
   """
   @impl true
   def upsert(protobuf_module, table_name, data) do
-    repo = __MODULE__
+    repo = PostgresRepo
 
     descriptor = protobuf_module.descriptor()
     fields = descriptor.field

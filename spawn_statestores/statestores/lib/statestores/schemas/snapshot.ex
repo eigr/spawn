@@ -10,8 +10,8 @@ defmodule Statestores.Schemas.Snapshot do
 
   @primary_key false
   schema "snapshots" do
-    field(:id, :integer, primary_key: true)
-    field(:actor, :string)
+    field(:id, :integer)
+    field(:actor, :string, primary_key: true)
     field(:system, :string)
     field(:status, :string)
     field(:node, :string)
@@ -26,7 +26,7 @@ defmodule Statestores.Schemas.Snapshot do
   def changeset(event, attrs \\ %{}) do
     event
     |> cast(attrs, [:id, :actor, :system, :status, :node, :revision, :tags, :data_type, :data])
-    |> validate_required([:id, :actor, :system, :status, :node, :revision, :tags, :data_type])
+    |> validate_required([:actor, :system, :status, :node, :revision, :tags, :data_type])
     |> case do
       %{valid?: false, changes: changes} = changeset when changes == %{} ->
         # If the changeset is invalid and has no changes, it is

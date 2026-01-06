@@ -1,6 +1,6 @@
 defmodule Test.EnumTest do
   @moduledoc false
-  use Protobuf, enum: true, protoc_gen_elixir_version: "0.15.0", syntax: :proto3
+  use Protobuf, enum: true, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -40,7 +40,7 @@ end
 
 defmodule Test.TestMessage.Address.Country do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.15.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -94,7 +94,7 @@ end
 
 defmodule Test.TestMessage.Address do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.15.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -236,7 +236,7 @@ end
 
 defmodule Test.TestMessage.AttributesEntry do
   @moduledoc false
-  use Protobuf, map: true, protoc_gen_elixir_version: "0.15.0", syntax: :proto3
+  use Protobuf, map: true, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line
@@ -300,7 +300,7 @@ end
 
 defmodule Test.TestMessage do
   @moduledoc false
-  use Protobuf, protoc_gen_elixir_version: "0.15.0", syntax: :proto3
+  use Protobuf, protoc_gen_elixir_version: "0.14.0", syntax: :proto3
 
   def descriptor do
     # credo:disable-for-next-line

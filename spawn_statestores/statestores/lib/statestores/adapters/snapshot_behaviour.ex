@@ -4,7 +4,7 @@ defmodule Statestores.Adapters.SnapshotBehaviour do
   """
   alias Statestores.Schemas.Snapshot
 
-  @type id :: String.t()
+  @type actor :: String.t()
 
   @type revision :: integer()
 
@@ -16,13 +16,13 @@ defmodule Statestores.Adapters.SnapshotBehaviour do
 
   @type time_end :: String.t()
 
-  @callback get_by_key(id()) :: snapshot()
+  @callback get_by_key(actor()) :: snapshot()
 
-  @callback get_by_key_and_revision(id(), revision()) :: snapshot()
+  @callback get_by_key_and_revision(actor(), revision()) :: snapshot()
 
-  @callback get_all_snapshots_by_key(id()) :: snapshots()
+  @callback get_all_snapshots_by_key(actor()) :: snapshots()
 
-  @callback get_snapshots_by_interval(id(), time_start(), time_end()) :: snapshots()
+  @callback get_snapshots_by_interval(actor(), time_start(), time_end()) :: snapshots()
 
   @callback save(snapshot()) :: {:error, any} | {:ok, snapshot()}
 
@@ -31,11 +31,9 @@ defmodule Statestores.Adapters.SnapshotBehaviour do
   defmacro __using__(_opts) do
     quote do
       alias Statestores.Adapters.SnapshotBehaviour
-      import Statestores.Util, only: [init_config: 1, generate_key: 1]
+      import Statestores.Util, only: [generate_key: 1]
 
       @behaviour Statestores.Adapters.SnapshotBehaviour
-
-      def init(_type, config), do: init_config(config)
     end
   end
 end
