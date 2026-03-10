@@ -71,7 +71,7 @@ defmodule Spawn.MixProject do
       {:decimal, "~> 2.0"},
       {:decorator, "~> 1.4"},
       {:iter, "~> 0.1.2"},
-      {:nebulex, "~> 2.5"},
+      {:nebulex, "~> 3.0"},
       {:shards, "~> 1.1"},
       {:telemetry, "~> 1.0"},
       {:castore, "~> 1.0"},
