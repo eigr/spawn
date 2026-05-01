@@ -7,134 +7,182 @@ Spawn is a Stateful Serverless Platform for providing the multi-language Actor M
 
 The advantage of the Elixir SDK over other SDKs is in Elixir's native ability to connect directly to an Erlang network. For this reason, the Elixir SDK allows any valid Elixir application to be part of a Spawn network without needing a sidecar attached.
 
-## Installation
+## Quick Start
 
-[Available in Hex](https://hex.pm/packages/spawn_sdk), the package can be installed
-by adding `spawn_sdk` and `spawn_statestores_*` to your list of dependencies in `mix.exs`:
+Get up and running with Spawn actors in minutes:
+
+1. **Add to your dependencies:**
 
 ```elixir
 def deps do
   [
     {:spawn_sdk, "~> 2.0.0-RC9"},
-
-    # You can uncomment one of those dependencies if you are going to use Persistent Actors
-    #{:spawn_statestores_mariadb, "~> 2.0.0-RC9"},
+    # Optional: for persistent actors
     #{:spawn_statestores_postgres, "~> 2.0.0-RC9"},
   ]
 end
 ```
 
-### Deploy
-
-Following the steps below, you will have a valid Elixir application to use in a Spawn cluster. However, you will still need to generate a container image with your application to use it together with the [Spawn Operator for Kubernetes](https://github.com/eigr/spawn/tree/main/spawn_operator/spawn_operator).
-
-## How to use
-
-After creating an Elixir application project, create the protobuf files for your business domain.
-It is common practice to do this under the **priv/** folder. Let's demonstrate an example:
-
-```protobuf
-syntax = "proto3";
-
-package io.eigr.spawn.example;
-
-message MyState {
-  int32 value = 1;
-}
-
-message MyBusinessMessage {
-  int32 value = 1;
-}
-```
-
-It is important to try to separate the type of message that must be stored as the actors' state from the type of messages
-that will be exchanged between their actors' operations calls. In other words, the Actor's internal state is also represented
-as a protobuf type, and it is a good practice to separate these types of messages from the others in its business domain.
-
-In the above case `MyState` is the type protobuf that represents the state of the Actor that we will create later
-while `MyBusiness` is the type of message that we will send and receive from this Actor.
-
-Now that we have defined our input and output types as Protobuf types we will need to compile these files to generate their respective Elixir modules. An example of how to do this can be found [here](https://github.com/eigr/spawn/blob/main/spawn_sdk/spawn_sdk_example/compile-example-pb.sh)
-
-> **_NOTE:_** You need to have installed the elixir plugin for protoc. More information on how to obtain and install the necessary tools can be found here [here](https://github.com/elixir-protobuf/protobuf#usage)
-
-Now that the protobuf types have been created we can proceed with the code. Example definition of an Actor.
-
-## Named Actors
-
-In this example we are creating an actor in a Named way, that is, it is a known actor at compile time.
+2. **Create your first actor:**
 
 ```elixir
-defmodule SpawnSdkExample.Actors.MyActor do
+defmodule MyApp.Actors.Counter do
   use SpawnSdk.Actor,
-    name: "jose", # Default is Full Qualified Module name a.k.a __MODULE__
-    kind: :named, # Default is already :named. Valid are :named | :unnamed
-    stateful: true, # Default is already true
-    state_type: Io.Eigr.Spawn.Example.MyState, # or :json if you don't care about protobuf types
-    deactivate_timeout: 30_000,
-    snapshot_timeout: 2_000
+    name: "counter",
+    stateful: true,
+    state_type: MyApp.Domain.CounterState
 
-  require Logger
-
-  alias Io.Eigr.Spawn.Example.{MyState, MyBusinessMessage}
-
-  # The callback could also be referenced to an existing function:
-  # action "SomeAction", &some_defp_handler/0
-  # action "SomeAction", &SomeModule.handler/1
-  # action "SomeAction", &SomeModule.handler/2
-
-  init fn %Context{state: state} = ctx ->
-    Logger.info("[joe] Received InitRequest. Context: #{inspect(ctx)}")
-
-    Value.of()
-    |> Value.state(state)
-  end
-
-  action "Sum", fn %Context{state: state} = ctx, %MyBusinessMessage{value: value} = data ->
-    Logger.info("Received Request: #{inspect(data)}. Context: #{inspect(ctx)}")
-
-    new_value = if is_nil(state), do: value, else: (state.value || 0) + value
-
-    Value.of(%MyBusinessMessage{value: new_value}, %MyState{value: new_value})
+  action "increment", fn %Context{state: state}, %{value: value} ->
+    new_count = (state.count || 0) + value
+    new_state = %CounterState{count: new_count}
+    
+    Value.of(%{count: new_count}, new_state)
   end
 end
-
 ```
 
-We declare two actions that the Actor can do. An initialization action that will be called every time an Actor instance is created and an action that will be responsible for performing a simple sum.
-
-Note Keep in mind that any Action that has the names present in the list below will behave as an initialization Action and will be called when the Actor is started (if there is more than one Action with one of these names, only one will be called).
-
-Defaults inicialization Action names: "**init**", "**Init**", "**setup**", "**Setup**"
-
-## Unnamed Actor
-
-We can also create Unnamed Dynamic/Lazy actors, that is, despite having its unnamed behavior defined at compile time, a Lazy actor will only have a concrete instance when it is associated with an identifier/name at runtime. Below follows the same previous actor being defined as Unnamed.
+3. **Set up your supervision tree:**
 
 ```elixir
-defmodule SpawnSdkExample.Actors.UnnamedActor do
+defmodule MyApp.Application do
+  use Application
+
+  def start(_type, _args) do
+    children = [
+      {SpawnSdk.System.Supervisor,
+       system: "my-app", actors: [MyApp.Actors.Counter]}
+    ]
+
+    Supervisor.start_link(children, strategy: :one_for_one)
+  end
+end
+```
+
+4. **Use your actor:**
+
+```elixir
+SpawnSdk.invoke("counter", 
+  system: "my-app", 
+  action: "increment", 
+  payload: %{value: 5}
+)
+#=> {:ok, %{count: 5}}
+```
+
+## Documentation
+
+### 📚 Basic Concepts
+
+- **[Quickstart Guide](guides/basic/quickstart.md)** - Get started with your first actor
+- **[Actor Types](guides/basic/actor_types.md)** - Named, unnamed, pooled, and timer actors
+- **[Actor Configuration](guides/basic/actor_configuration.md)** - Complete configuration reference
+- **[Client API](guides/basic/client_api.md)** - Invoking actors and handling responses
+- **[Supervision](guides/basic/supervision.md)** - Setting up your actor system
+
+### 🚀 Advanced Features
+
+- **[Side Effects](guides/advanced/side_effects.md)** - Asynchronous actor-to-actor communication
+- **[Forwards and Pipes](guides/advanced/forwards_and_pipes.md)** - Request routing and processing pipelines
+- **[Broadcast](guides/advanced/broadcast.md)** - Event-driven architectures and pub-sub patterns
+
+## Key Features
+
+- **🎭 Multiple Actor Types** - Named, unnamed, pooled, and timer actors
+- **💾 State Management** - Persistent, transactional state with snapshots
+- **🔄 Side Effects** - Asynchronous, fire-and-forget operations
+- **📡 Broadcasting** - Pub-sub messaging between actors
+- **🔀 Flow Control** - Forward and pipe patterns for request routing
+- **⚡ High Performance** - Native Elixir clustering and distribution
+- **🔧 Easy Integration** - Direct Phoenix and LiveView integration
+
+## Examples
+
+### Named Actor (Always Available)
+```elixir
+defmodule MyApp.Actors.ConfigService do
   use SpawnSdk.Actor,
-    name: "unnamed_actor",
+    name: "config_service",
+    kind: :named,
+    stateful: true
+
+  action "get_config", fn %Context{state: state}, %{key: key} ->
+    value = Map.get(state.config, key)
+    Value.of(%{key: key, value: value}, state)
+  end
+end
+```
+
+### Unnamed Actor (Dynamic Instances)
+```elixir
+defmodule MyApp.Actors.UserSession do
+  use SpawnSdk.Actor,
+    name: "user_session",
     kind: :unnamed,
-    state_type: Io.Eigr.Spawn.Example.MyState
+    state_type: MyApp.Domain.SessionState
 
-  require Logger
-
-  alias Io.Eigr.Spawn.Example.{MyState, MyBusinessMessage}
-
-  action "Sum", fn %Context{state: state} = ctx, %MyBusinessMessage{value: value} = data ->
-    Logger.info("Received Request: #{inspect(data)}. Context: #{inspect(ctx)}")
-
-    new_value = if is_nil(state), do: value, else: (state.value || 0) + value
-
-    Value.of(%MyBusinessMessage{value: new_value}, %MyState{value: new_value})
+  action "login", fn %Context{}, %{user_id: user_id} ->
+    session_state = %SessionState{
+      user_id: user_id,
+      logged_in_at: DateTime.utc_now()
+    }
+    
+    Value.of(%{success: true}, session_state)
   end
+end
+
+# Usage
+SpawnSdk.invoke("user_123", ref: "user_session", ...)
+```
+
+### Side Effects (Async Operations)
+```elixir
+action "process_order", fn ctx, order_data ->
+  Value.of(order_result, new_state)
+  |> Value.effects([
+    SideEffect.of()
+    |> SideEffect.effect("email_service", :send_confirmation, order_data)
+    |> SideEffect.effect("inventory_service", :update_stock, order_data)
+  ])
 end
 ```
 
-Notice that the only thing that has changed is the the kind of actor, in this case the kind is set to :unnamed.
+### Broadcasting (Event-Driven)
+```elixir
+action "create_user", fn ctx, user_data ->
+  user_created_event = %UserCreated{...}
+  
+  Value.of(new_user, updated_state)
+  |> Value.broadcast(Broadcast.to("user.events", user_created_event))
+end
+```
 
-> **_NOTE:_** Can Elixir programmers think in terms of Named vs Unnamed actors as more or less known at startup vs dynamically supervised/registered? That is, defining your actors directly in the supervision tree or using a Dynamic Supervisor for that.
+## Production Ready
+
+Spawn is production-ready and battle-tested:
+
+- **Kubernetes Native** - Full Kubernetes operator support
+- **Observability** - OpenTelemetry integration, metrics, and tracing  
+- **Persistence** - PostgreSQL and MySQL state stores
+- **Scalability** - Horizontal scaling across multiple nodes
+- **Security** - State encryption and secure networking
+
+## Getting Help
+
+- **[GitHub Issues](https://github.com/eigr/spawn/issues)** - Bug reports and feature requests
+- **[Documentation](https://hexdocs.pm/spawn_sdk)** - Complete API documentation  
+- **[Examples](https://github.com/eigr/spawn/tree/main/examples)** - Sample applications
+- **[Community](https://github.com/eigr/spawn/discussions)** - Questions and discussions
+
+## What's Next?
+
+1. Follow the **[Quickstart Guide](guides/basic/quickstart.md)** to build your first actor
+2. Explore **[Actor Types](guides/basic/actor_types.md)** to understand different patterns
+3. Learn about **[Advanced Features](guides/advanced/)** for complex scenarios
+4. Check out **[Examples](https://github.com/eigr/spawn/tree/main/examples)** for real-world patterns
+
+---
+
+**Ready to build distributed, stateful applications with ease? Start with the [Quickstart Guide](guides/basic/quickstart.md)!**
 
 ## Side Effects
 

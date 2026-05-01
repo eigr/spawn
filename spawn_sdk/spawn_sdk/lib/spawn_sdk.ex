@@ -1,10 +1,9 @@
 defmodule SpawnSdk do
-  @moduledoc "README.md"
-             |> File.read!()
-             |> String.split("<!-- MDOC !-->")
-             |> Enum.fetch!(1)
+  @moduledoc """
+  """
 
   defmodule ActorRef do
+    @moduledoc false
     @enforce_keys [:name]
     defstruct system: nil, name: nil, opts: []
 
@@ -16,6 +15,7 @@ defmodule SpawnSdk do
   end
 
   defmodule ActorChannel do
+    @moduledoc false
     @enforce_keys [:channel]
     defstruct channel: nil, opts: []
 
@@ -26,6 +26,7 @@ defmodule SpawnSdk do
   end
 
   defmodule ActorGroupRef do
+    @moduledoc false
     @enforce_keys [:actors]
     defstruct actors: nil, opts: []
 
